@@ -1,15 +1,13 @@
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { assert } from 'chai';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-
 import VastEndScreenFixture from 'html/fixtures/VastEndScreenFixture.html';
 import 'mocha';
 import * as sinon from 'sinon';
-
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { GdprManager } from 'Ads/Managers/GdprManager';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 describe('VastEndScreen', () => {
     let handleInvocation: sinon.SinonSpy;

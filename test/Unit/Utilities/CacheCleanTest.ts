@@ -1,4 +1,3 @@
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
@@ -214,9 +213,8 @@ describe('CacheCleanTest', () => {
         const focusManager = new FocusManager(nativeBridge);
         const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request: Request = new Request(nativeBridge, wakeUpManager);
-        const programmaticTrackingService: ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
-        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService);
+        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
         cacheApi = new TestCacheApi(nativeBridge);
         storageApi = new TestStorageApi(nativeBridge);
         nativeBridge.Cache = cacheApi;

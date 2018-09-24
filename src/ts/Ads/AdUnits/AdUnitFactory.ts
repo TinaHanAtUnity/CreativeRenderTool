@@ -83,7 +83,7 @@ export class AdUnitFactory {
 
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
 
-        AbstractPrivacy.createBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge, parameters.configuration);
+        AbstractPrivacy.createBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge, parameters.coreConfig);
 
         // todo: select ad unit based on placement
         if (parameters.campaign instanceof VastCampaign) {
@@ -169,7 +169,7 @@ export class AdUnitFactory {
             language: parameters.deviceInfo.getLanguage(),
             gameId: parameters.clientInfo.getGameId(),
             targetGameName: targetGameName,
-            abGroup: parameters.configuration.getAbGroup(),
+            abGroup: parameters.coreConfig.getAbGroup(),
             privacy: privacy,
             showGDPRBanner: showGDPRBanner,
             adUnitStyle: undefined,
@@ -243,7 +243,7 @@ export class AdUnitFactory {
 
         const hasAdvertiserDomain = parameters.campaign.getAdvertiserDomain() !== undefined;
         if (hasAdvertiserDomain && parameters.campaign.isMoatEnabled()) {
-            MoatViewabilityService.initMoat(nativeBridge, parameters.campaign, parameters.clientInfo, parameters.placement, parameters.deviceInfo, parameters.configuration);
+            MoatViewabilityService.initMoat(nativeBridge, parameters.campaign, parameters.clientInfo, parameters.placement, parameters.deviceInfo, parameters.coreConfig);
         }
 
         const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
@@ -303,11 +303,11 @@ export class AdUnitFactory {
         parameters.gameSessionId = parameters.gameSessionId || 0;
 
         if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || AdUnitFactory._forcedPlayableMRAID) {
-            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.configuration.getAbGroup(), parameters.gameSessionId);
+            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         } else if (ARUtil.isARCreative(parameters.campaign) || AdUnitFactory._forcedARMRAID) {
-            mraid = new ARMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.configuration.getAbGroup(), parameters.gameSessionId);
+            mraid = new ARMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         } else {
-            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.configuration.getAbGroup(), parameters.gameSessionId);
+            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         }
 
         const mraidAdUnitParameters: IMRAIDAdUnitParameters = {
@@ -382,8 +382,8 @@ export class AdUnitFactory {
         promoView.render();
         document.body.appendChild(promoView.container());
 
-        promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.configuration, parameters.gdprManager));
-        promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.configuration.getToken(), parameters.clientInfo.getGameId(), parameters.configuration.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.configuration.isOptOutEnabled()));
+        promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.adsConfig, parameters.gdprManager));
+        promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.coreConfig.getToken(), parameters.clientInfo.getGameId(), parameters.coreConfig.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.adsConfig.isOptOutEnabled()));
         promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
         ReportingPrivacy.setupReportListener(privacy, promoAdUnit);
 
@@ -478,7 +478,8 @@ export class AdUnitFactory {
             adMobSignalFactory: parameters.adMobSignalFactory,
             campaign: parameters.campaign,
             clientInfo: parameters.clientInfo,
-            configuration: parameters.configuration,
+            coreConfig: parameters.coreConfig,
+            adsConfig: parameters.adsConfig,
             gdprManager: parameters.gdprManager
         });
         view.addEventHandler(eventHandler);
@@ -511,7 +512,8 @@ export class AdUnitFactory {
             campaign: params.campaign,
             operativeEventManager: params.operativeEventManager,
             thirdPartyEventManager: params.thirdPartyEventManager,
-            configuration: params.configuration,
+            coreConfig: params.coreConfig,
+            adsConfig: params.adsConfig,
             placement: params.placement,
             video: video,
             adUnitStyle: adUnitStyle,
@@ -531,12 +533,12 @@ export class AdUnitFactory {
     private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
 
         let privacy: AbstractPrivacy;
-        if (ReportAdTest.isValid(parameters.configuration.getAbGroup())) {
-            privacy = new ReportingPrivacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.configuration.isGDPREnabled(), parameters.configuration.isCoppaCompliant());
-        } else if (parameters.configuration.isGDPREnabled()) {
-            privacy = new GDPRPrivacy(nativeBridge, parameters.gdprManager, parameters.configuration.isCoppaCompliant());
+        if (ReportAdTest.isValid(parameters.coreConfig.getAbGroup())) {
+            privacy = new ReportingPrivacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
+        } else if (parameters.adsConfig.isGDPREnabled()) {
+            privacy = new GDPRPrivacy(nativeBridge, parameters.gdprManager, parameters.coreConfig.isCoppaCompliant());
         } else {
-            privacy = new Privacy(nativeBridge, parameters.configuration.isCoppaCompliant());
+            privacy = new Privacy(nativeBridge, parameters.coreConfig.isCoppaCompliant());
         }
         const privacyEventHandler = new PrivacyEventHandler(nativeBridge, parameters);
         privacy.addEventHandler(privacyEventHandler);
@@ -544,6 +546,6 @@ export class AdUnitFactory {
     }
 
     private static showGDPRBanner(parameters: IAdUnitParameters<Campaign>): boolean {
-        return parameters.configuration.isGDPREnabled() ? !parameters.configuration.isOptOutRecorded() : false;
+        return parameters.adsConfig.isGDPREnabled() ? !parameters.adsConfig.isOptOutRecorded() : false;
     }
 }

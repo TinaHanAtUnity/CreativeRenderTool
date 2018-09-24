@@ -2,23 +2,25 @@ import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { IVideoEventHandler } from 'Ads/Native/VideoPlayer';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { FinishState } from 'Core/Constants/FinishState';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { Configuration } from 'Core/Models/Configuration';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Double } from 'Core/Utilities/Double';
-import { FileInfo } from 'Core/Utilities/FileInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
 export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEventHandler {
 
     protected _operativeEventManager: OperativeEventManager;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
-    protected _configuration: Configuration;
+    protected _coreConfig: CoreConfiguration;
+    protected _adsConfig: AdsConfiguration;
     protected _placement: Placement;
     protected _adUnitStyle: AdUnitStyle | undefined;
     protected _video: Video;
@@ -28,7 +30,8 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
 
         this._operativeEventManager = params.operativeEventManager;
         this._thirdPartyEventManager = params.thirdPartyEventManager;
-        this._configuration = params.configuration;
+        this._coreConfig = params.coreConfig;
+        this._adsConfig = params.adsConfig;
         this._placement = params.placement;
         this._adUnitStyle = params.adUnitStyle;
         this._video = params.video;
@@ -64,7 +67,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                     lastPosition: lastPosition,
                     duration: this._video.getDuration()
                 });
-                Diagnostics.trigger('video_player_too_large_progress', error, this._campaign.getSession());
+                SessionDiagnostics.trigger('video_player_too_large_progress', error, this._campaign.getSession());
 
                 return;
             }
@@ -84,7 +87,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                         url: this._video.getUrl(),
                         originalUrl: this._video.getOriginalUrl(),
                         cached: this._video.isCached(),
-                        cacheMode: this._configuration.getCacheMode(),
+                        cacheMode: this._adsConfig.getCacheMode(),
                         lowMemory: this._adUnit.isLowMemory()
                     };
 
@@ -94,7 +97,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                         this._nativeBridge.Cache.getFileInfo(fileId).then((fileInfo) => {
                             error.fileInfo = fileInfo;
                             if(fileInfo.found) {
-                                return FileInfo.getVideoInfo(this._nativeBridge, fileId).then(([width, height, duration]) => {
+                                return VideoFileInfo.getVideoInfo(this._nativeBridge, fileId).then(([width, height, duration]) => {
                                     const videoInfo: any = {
                                         width: width,
                                         height: height,
@@ -172,7 +175,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                 url: url,
                 originalUrl: originalUrl
             });
-            Diagnostics.trigger('video_too_long', error, this._campaign.getSession());
+            SessionDiagnostics.trigger('video_too_long', error, this._campaign.getSession());
             this.handleVideoError('video_too_long_error');
             return;
         }

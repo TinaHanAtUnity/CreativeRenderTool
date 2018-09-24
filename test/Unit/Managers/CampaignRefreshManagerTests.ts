@@ -13,8 +13,10 @@ import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -25,10 +27,10 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 
-import { CacheMode, Configuration } from 'Core/Models/Configuration';
+import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { Cache, CacheStatus } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 
@@ -96,7 +98,8 @@ describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let vastParser: VastParser;
-    let configuration: Configuration;
+    let coreConfig: CoreConfiguration;
+    let adsConfig: AdsConfiguration;
     let campaignManager: CampaignManager;
     let wakeUpManager: WakeUpManager;
     let nativeBridge: NativeBridge;
@@ -192,7 +195,7 @@ describe('CampaignRefreshManager', () => {
         };
 
         placementManager = sinon.createStubInstance(PlacementManager);
-        PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
+        PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
@@ -202,8 +205,8 @@ describe('CampaignRefreshManager', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService);
-        assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
+        assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, nativeBridge);
         container = new TestContainer();
         const campaign = TestFixtures.getCampaign();
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -213,7 +216,8 @@ describe('CampaignRefreshManager', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             campaign: campaign
         });
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
@@ -232,7 +236,8 @@ describe('CampaignRefreshManager', () => {
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             gdprManager: gdprManager,
@@ -247,9 +252,10 @@ describe('CampaignRefreshManager', () => {
 
     describe('PLC campaigns', () => {
         beforeEach(() => {
-            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
-            campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfo, request, cache);
+            coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+            campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
         it('get campaign should return undefined', () => {
@@ -272,14 +278,14 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(tmpCampaign.getId(), '582bb5e352e4c4abd7fab850');
                 }
 
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
                 campaignManager.onCampaign.trigger('video', TestFixtures.getCampaign());
                 assert.notEqual(campaignRefreshManager.getCampaign('video'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof PerformanceCampaign);
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.READY);
             });
         });
 
@@ -299,14 +305,14 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(tmpCampaign.getId(), '582bb5e352e4c4abd7fab850');
                 }
 
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
                 campaignManager.onCampaign.trigger('video', TestFixtures.getXPromoCampaign());
                 assert.notEqual(campaignRefreshManager.getCampaign('video'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof XPromoCampaign);
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.READY);
             });
         });
 
@@ -326,15 +332,15 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(tmpCampaign.getId(), '12345');
                 }
 
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
                 campaignManager.onCampaign.trigger('video', TestFixtures.getCompanionVastCampaign());
 
                 assert.isDefined(campaignRefreshManager.getCampaign('video'));
                 assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof VastCampaign);
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.READY);
             });
         });
 
@@ -356,14 +362,14 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(tmpCampaign.getId(), '58dec182f01b1c0cdef54f0f');
                 }
 
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
                 campaignManager.onCampaign.trigger('video', mraid);
                 assert.isDefined(campaignRefreshManager.getCampaign('video'));
                 assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof MRAIDCampaign);
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.READY);
             });
         });
 
@@ -383,8 +389,8 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(tmpCampaign.getId(), '582bb5e352e4c4abd7fab850');
                 }
 
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
                 return campaignRefreshManager.refresh().then(() => {
                     const tmpCampaign2 = campaignRefreshManager.getCampaign('premium');
@@ -399,8 +405,8 @@ describe('CampaignRefreshManager', () => {
                         assert.equal(tmpCampaign3.getId(), '582bb5e352e4c4abd7fab850');
                     }
 
-                    assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                    assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                    assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                    assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
                 });
             });
         });
@@ -412,23 +418,23 @@ describe('CampaignRefreshManager', () => {
                 return Promise.resolve();
             });
 
-            assert.equal(configuration.getPlacement('premium').getState(), PlacementState.NOT_AVAILABLE);
-            assert.equal(configuration.getPlacement('video').getState(), PlacementState.NOT_AVAILABLE);
+            assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.NOT_AVAILABLE);
+            assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.NOT_AVAILABLE);
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.equal(campaignRefreshManager.getCampaign('premium'), undefined);
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.NO_FILL);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.NO_FILL);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
                 campaignManager.onNoFill.trigger('video');
 
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.NO_FILL);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.NO_FILL);
             });
         });
 
         it('should invalidate campaigns', () => {
             const campaign = TestFixtures.getCampaign();
-            const placement: Placement = configuration.getPlacement('premium');
+            const placement: Placement = adsConfig.getPlacement('premium');
             adUnitParams.campaign = campaign;
             adUnitParams.placement = placement;
             const currentAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
@@ -445,13 +451,13 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(tmpCampaign.getId(), '582bb5e352e4c4abd7fab850');
                 }
 
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
                 campaignManager.onCampaign.trigger('video', TestFixtures.getCampaign());
 
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.READY);
 
                 campaignRefreshManager.setCurrentAdUnit(currentAdUnit);
                 currentAdUnit.onStart.trigger();
@@ -464,7 +470,7 @@ describe('CampaignRefreshManager', () => {
         it ('should set campaign status to ready after close', () => {
             let campaign: Campaign = TestFixtures.getCampaign();
             const campaign2 = TestFixtures.getPlayableMRAIDCampaign();
-            const placement: Placement = configuration.getPlacement('premium');
+            const placement: Placement = adsConfig.getPlacement('premium');
             adUnitParams.campaign = campaign;
             adUnitParams.placement = placement;
             const currentAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
@@ -482,13 +488,13 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(tmpCampaign.getId(), '582bb5e352e4c4abd7fab850');
                 }
 
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
                 campaignManager.onCampaign.trigger('video', campaign);
 
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.READY);
 
                 campaignRefreshManager.setCurrentAdUnit(currentAdUnit);
                 currentAdUnit.onStart.trigger();
@@ -503,19 +509,19 @@ describe('CampaignRefreshManager', () => {
                         assert.equal(tmpCampaign2.getId(), '58dec182f01b1c0cdef54f0f');
                     }
 
-                    assert.equal(configuration.getPlacement('premium').getState(), PlacementState.WAITING);
-                    assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                    assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.WAITING);
+                    assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
                     currentAdUnit.onClose.trigger();
 
-                    assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                    assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                    assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                    assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
                     campaignManager.onCampaign.trigger('video', campaign);
                     currentAdUnit.onClose.trigger();
 
-                    assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
-                    assert.equal(configuration.getPlacement('video').getState(), PlacementState.READY);
+                    assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
+                    assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.READY);
                 });
             });
         });
@@ -529,13 +535,13 @@ describe('CampaignRefreshManager', () => {
                 return Promise.resolve();
             });
 
-            assert.equal(configuration.getPlacement('premium').getState(), PlacementState.NOT_AVAILABLE);
-            assert.equal(configuration.getPlacement('video').getState(), PlacementState.NOT_AVAILABLE);
+            assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.NOT_AVAILABLE);
+            assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.NOT_AVAILABLE);
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.equal(campaignRefreshManager.getCampaign('premium'), undefined);
-                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.NO_FILL);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.NO_FILL);
+                assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.NO_FILL);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.NO_FILL);
             });
         });
 
@@ -647,9 +653,10 @@ describe('CampaignRefreshManager', () => {
         beforeEach(() => {
             sandbox = sinon.createSandbox();
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '00000');
-            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
-            campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfoPromoGame, request, cache);
+            coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+            campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfoPromoGame, request, cache);
         });
 
         afterEach(() => {
@@ -674,7 +681,7 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(tmpCampaign.getAdType(), 'purchasing/iap');
                 }
 
-                assert.equal(configuration.getPlacement('promoPlacement').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.READY);
             });
         });
 
@@ -686,7 +693,7 @@ describe('CampaignRefreshManager', () => {
             });
 
             return campaignRefreshManager.refresh().then(() => {
-                assert.equal(configuration.getPlacement('promoPlacement').getState(), PlacementState.NO_FILL);
+                assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.NO_FILL);
             });
         });
     });
@@ -696,9 +703,10 @@ describe('CampaignRefreshManager', () => {
         beforeEach(() => {
             sandbox = sinon.createSandbox();
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
-            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
-            campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfoPromoGame, request, cache);
+            coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+            campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfoPromoGame, request, cache);
         });
 
         afterEach(() => {
@@ -723,7 +731,7 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(tmpCampaign.getAdType(), 'purchasing/iap');
                 }
 
-                assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
             });
         });
 
@@ -735,7 +743,7 @@ describe('CampaignRefreshManager', () => {
             });
 
             return campaignRefreshManager.refresh().then(() => {
-                assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.NO_FILL);
+                assert.equal(adsConfig.getPlacement('mixedPlacement-promo').getState(), PlacementState.NO_FILL);
             });
         });
 
@@ -756,7 +764,7 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(tmpCampaign.getId(), '582bb5e352e4c4abd7fab850');
                 }
 
-                assert.equal(configuration.getPlacement('testDashPlacement-rewarded').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('testDashPlacement-rewarded').getState(), PlacementState.READY);
             });
         });
 
@@ -777,7 +785,7 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(tmpCampaign.getId(), '000000000000000000000123');
                 }
 
-                assert.equal(configuration.getPlacement('rewardedPromoPlacement-rewardedpromo').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('rewardedPromoPlacement-rewardedpromo').getState(), PlacementState.READY);
             });
         });
 
@@ -801,16 +809,16 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(tmpCampaign.getAdType(), 'purchasing/iap');
                 }
 
-                assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('testDashPlacement-rewarded').getState(), PlacementState.NO_FILL);
-                assert.equal(configuration.getPlacement('rewardedPromoPlacement-rewardedpromo').getState(), PlacementState.NO_FILL);
+                assert.equal(adsConfig.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('testDashPlacement-rewarded').getState(), PlacementState.NO_FILL);
+                assert.equal(adsConfig.getPlacement('rewardedPromoPlacement-rewardedpromo').getState(), PlacementState.NO_FILL);
             });
         });
 
         it('should invalidate mixed rewarded campaigns and set suffixed placement as ready the second time onCampaign is triggered after being invalidated', () => {
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             const campaign = TestFixtures.getPromoCampaign();
-            const placement: Placement = configuration.getPlacement('premium');
+            const placement: Placement = adsConfig.getPlacement('premium');
             adUnitParams.campaign = campaign;
             adUnitParams.placement = placement;
             const currentAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
@@ -829,13 +837,13 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(tmpCampaign.getId(), '000000000000000000000123');
                 }
 
-                assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                assert.equal(adsConfig.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
                 campaignManager.onCampaign.trigger('video', TestFixtures.getCampaign());
 
-                assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.READY);
 
                 assert.equal(campaignRefreshManager.getCampaign('mixedPlacement-rewarded'), undefined);
                 assert.notEqual(campaignRefreshManager.getCampaign('mixedPlacement-promo'), undefined);
@@ -855,13 +863,13 @@ describe('CampaignRefreshManager', () => {
                         assert.equal(tmpCampaign2.getId(), '000000000000000000000123');
                     }
 
-                    assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.WAITING);
-                    assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                    assert.equal(adsConfig.getPlacement('mixedPlacement-promo').getState(), PlacementState.WAITING);
+                    assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
                     currentAdUnit.onClose.trigger();
 
-                    assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
-                    assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                    assert.equal(adsConfig.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
+                    assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
                 });
             });
         });
@@ -874,19 +882,19 @@ describe('CampaignRefreshManager', () => {
                 return Promise.resolve();
             });
 
-            assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.NOT_AVAILABLE);
-            assert.equal(configuration.getPlacement('video').getState(), PlacementState.NOT_AVAILABLE);
+            assert.equal(adsConfig.getPlacement('mixedPlacement-promo').getState(), PlacementState.NOT_AVAILABLE);
+            assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.NOT_AVAILABLE);
 
             return campaignRefreshManager.refresh().then(() => {
                 assert.equal(campaignRefreshManager.getCampaign('mixedPlacement-promo'), undefined);
 
-                assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.NO_FILL);
+                assert.equal(adsConfig.getPlacement('mixedPlacement-promo').getState(), PlacementState.NO_FILL);
 
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
                 campaignManager.onNoFill.trigger('video');
 
-                assert.equal(configuration.getPlacement('video').getState(), PlacementState.NO_FILL);
+                assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.NO_FILL);
             });
         });
     });

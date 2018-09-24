@@ -42,10 +42,10 @@ describe('IosEventsTest', () => {
 
     beforeEach(function(done) {
         // tslint:disable:no-invalid-this
-        this.timeout(7000);
+        this.timeout(15000);
         // tslint:enable
         const xhr = new XMLHttpRequest();
-        xhr.timeout = 5000;
+        xhr.timeout = 10000;
         xhr.onload = (event: Event) => {
             const responseObj: any = JSON.parse(xhr.responseText);
             currentGameId = responseObj.game_id;
@@ -60,10 +60,10 @@ describe('IosEventsTest', () => {
 
     afterEach(function(done) {
         // tslint:disable:no-invalid-this
-        this.timeout(7000);
+        this.timeout(15000);
         // tslint:enable
         const xhr = new XMLHttpRequest();
-        xhr.timeout = 5000;
+        xhr.timeout = 10000;
         xhr.onload = (event: Event) => {
             done();
         };

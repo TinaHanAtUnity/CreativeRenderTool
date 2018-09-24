@@ -9,13 +9,14 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Session } from 'Ads/Models/Session';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Promises } from 'Core/Utilities/Promises';
 import { Request } from 'Core/Utilities/Request';
 import { Timer } from 'Core/Utilities/Timer';
@@ -30,7 +31,8 @@ export interface IAdMobEventHandlerParameters {
     adMobSignalFactory: AdMobSignalFactory;
     clientInfo: ClientInfo;
     campaign: AdMobCampaign;
-    configuration: Configuration;
+    coreConfig: CoreConfiguration;
+    adsConfig: AdsConfiguration;
     gdprManager: GdprManager;
 }
 
@@ -51,7 +53,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     private _clientInfo: ClientInfo;
 
     constructor(parameters: IAdMobEventHandlerParameters) {
-        super(parameters.gdprManager, parameters.configuration);
+        super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
         this._adUnit = parameters.adUnit;
         this._nativeBridge = parameters.nativeBridge;
         this._request = parameters.request;
@@ -135,7 +137,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     public onTrackingEvent(event: string, data?: any) {
         this._adUnit.sendTrackingEvent(event);
         if (event === 'error') {
-            Diagnostics.trigger('admob_ad_error', data, this._campaign.getSession());
+            SessionDiagnostics.trigger('admob_ad_error', data, this._campaign.getSession());
         }
     }
 

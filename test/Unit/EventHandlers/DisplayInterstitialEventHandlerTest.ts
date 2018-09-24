@@ -63,9 +63,12 @@ describe('DisplayInterstitialEventHandler', () => {
             const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
             const gdprManager = sinon.createStubInstance(GdprManager);
+
+            const coreConfig = TestFixtures.getCoreConfiguration();
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
-            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
+            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
+
             view = new DisplayInterstitial(nativeBridge, placement, campaign, privacy, false);
 
             displayInterstitialAdUnitParameters = {
@@ -78,7 +81,8 @@ describe('DisplayInterstitialEventHandler', () => {
                 operativeEventManager: operativeEventManager,
                 placement: placement,
                 campaign: campaign,
-                configuration: TestFixtures.getConfiguration(),
+                coreConfig: TestFixtures.getCoreConfiguration(),
+                adsConfig: TestFixtures.getAdsConfiguration(),
                 request: request,
                 options: {},
                 view: view,

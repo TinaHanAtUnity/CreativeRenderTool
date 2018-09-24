@@ -1,12 +1,12 @@
 import { IVideoAdUnitParameters, VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;
