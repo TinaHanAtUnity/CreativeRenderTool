@@ -1,6 +1,6 @@
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
-import { Configuration } from 'Core/Models/Configuration';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 export const enum MixedPlacementTypes {
@@ -41,7 +41,7 @@ export class MixedPlacementUtility {
         }
     }
 
-    public static shouldFillMixedPlacement(placementId: string, configuration: Configuration, campaign: Campaign): boolean {
+    public static shouldFillMixedPlacement(placementId: string, configuration: AdsConfiguration, campaign: Campaign): boolean {
         const correctSuffix = this.extractMixedPlacementSuffix(placementId, campaign, configuration);
 
         if (correctSuffix === MixedPlacementTypes.NON_REWARDED) {
@@ -51,7 +51,7 @@ export class MixedPlacementUtility {
         return this.endsWithSuffix(placementId, correctSuffix);
     }
 
-    public static insertMediaIdsIntoJSON(configuration: Configuration, jsonPlacements: { [placementName: string]: string }): { [placementName: string]: string } {
+    public static insertMediaIdsIntoJSON(configuration: AdsConfiguration, jsonPlacements: { [placementName: string]: string }): { [placementName: string]: string } {
         const result: { [placementName: string]: string } = {};
         for(const placementId in jsonPlacements) {
             if (jsonPlacements.hasOwnProperty(placementId)) {
@@ -67,7 +67,7 @@ export class MixedPlacementUtility {
         return result;
     }
 
-    private static extractMixedPlacementSuffix(placementId: string, campaign: Campaign, configuration: Configuration): MixedPlacementTypes {
+    private static extractMixedPlacementSuffix(placementId: string, campaign: Campaign, configuration: AdsConfiguration): MixedPlacementTypes {
         let str = MixedPlacementTypes.NON_REWARDED;
         const placement = configuration.getPlacement(placementId);
 
@@ -90,7 +90,7 @@ export class MixedPlacementUtility {
         return str;
     }
 
-    private static hasMixedPlacementSuffix(placementId: string, configuration: Configuration): boolean {
+    private static hasMixedPlacementSuffix(placementId: string, configuration: AdsConfiguration): boolean {
         const mixedList = MixedPlacementUtility.getMixedPlacementTypeList();
 
         let fixedPlacementId;

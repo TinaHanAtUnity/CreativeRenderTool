@@ -1,6 +1,7 @@
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
@@ -37,14 +38,16 @@ export class GdprManager {
     private _nativeBridge: NativeBridge;
     private _deviceInfo: DeviceInfo;
     private _clientInfo: ClientInfo;
-    private _configuration: Configuration;
+    private _coreConfig: CoreConfiguration;
+    private _adsConfig: AdsConfiguration;
     private _request: Request;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, clientInfo: ClientInfo, configuration: Configuration, request: Request) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, request: Request) {
         this._nativeBridge = nativeBridge;
         this._deviceInfo = deviceInfo;
         this._clientInfo = clientInfo;
-        this._configuration = configuration;
+        this._coreConfig = coreConfig;
+        this._adsConfig = adsConfig;
         this._request = request;
 
         this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
@@ -54,7 +57,7 @@ export class GdprManager {
         let infoJson: any = {
             'adid': this._deviceInfo.getAdvertisingIdentifier(),
             'action': action,
-            'projectId': this._configuration.getUnityProjectId(),
+            'projectId': this._coreConfig.getUnityProjectId(),
             'platform': Platform[this._clientInfo.getPlatform()].toLowerCase(),
             'gameId': this._clientInfo.getGameId()
         };
@@ -71,11 +74,11 @@ export class GdprManager {
     }
 
     public getConsentAndUpdateConfiguration(): Promise<boolean> {
-        if (this._configuration.isGDPREnabled()) {
+        if (this._adsConfig.isGDPREnabled()) {
             // get consent only if gdpr is enabled
             return this.getConsent().then((consent: boolean) => {
                 // check gdpr enabled again in case it has changed
-                if (this._configuration.isGDPREnabled()) {
+                if (this._adsConfig.isGDPREnabled()) {
                     this.updateConfigurationWithConsent(consent);
                     this.pushConsent(consent);
                 }
@@ -87,13 +90,13 @@ export class GdprManager {
     }
 
     public retrievePersonalInformation(): Promise<IGdprPersonalProperties> {
-        const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._configuration.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
+        const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._coreConfig.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
 
         // Test url which should respond with : {"adsSeenInGameThisWeek":27,"gamePlaysThisWeek":39,"installsFromAds":0}
         // const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=1501434&adid=BC5BAF66-713E-44A5-BE8E-56497B6B6E0A&projectId=567&storeId=google`;
         const personalPayload = {
             deviceModel: this._deviceInfo.getModel(),
-            country: this._configuration.getCountry()
+            country: this._coreConfig.getCountry()
         };
 
         return this._request.get(url).then((response) => {
@@ -111,7 +114,7 @@ export class GdprManager {
     }
 
     public isOptOutEnabled(): boolean {
-        return this._configuration.isOptOutEnabled();
+        return this._adsConfig.isOptOutEnabled();
     }
 
     private pushConsent(consent: boolean): Promise<void> {
@@ -141,13 +144,13 @@ export class GdprManager {
     }
 
     private updateConfigurationWithConsent(consent: boolean) {
-        this._configuration.setOptOutEnabled(!consent);
-        this._configuration.setOptOutRecorded(true);
+        this._adsConfig.setOptOutEnabled(!consent);
+        this._adsConfig.setOptOutRecorded(true);
     }
 
     private onStorageSet(eventType: string, data: any) {
         // should only use consent when gdpr is enabled in configuration
-        if (this._configuration.isGDPREnabled()) {
+        if (this._adsConfig.isGDPREnabled()) {
             if(data && data.gdpr && data.gdpr.consent) {
                 const value: boolean | undefined = this.getConsentTypeHack(data.gdpr.consent.value);
 

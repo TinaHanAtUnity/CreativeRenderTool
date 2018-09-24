@@ -71,7 +71,8 @@ describe('VastAdUnit', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         vastCampaign = TestFixtures.getEventVastCampaign();
         const video = vastCampaign.getVideo();
-        const configuration = TestFixtures.getConfiguration();
+        const coreConfig = TestFixtures.getCoreConfiguration();
+        const adsConfig = TestFixtures.getAdsConfiguration();
 
         let duration = vastCampaign.getVast().getDuration();
         if(duration) {
@@ -88,11 +89,12 @@ describe('VastAdUnit', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             campaign: vastCampaign
         });
 
-        const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+        const privacy = new Privacy(nativeBridge, coreConfig.isCoppaCompliant());
         const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         const gdprManager = sinon.createStubInstance(GdprManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -107,7 +109,8 @@ describe('VastAdUnit', () => {
             operativeEventManager: operativeEventManager,
             placement: placement,
             campaign: vastCampaign,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             endScreen: undefined,

@@ -200,7 +200,8 @@ describe('SessionManagerTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: TestFixtures.getConfiguration(),
+            coreConfig: TestFixtures.getCoreConfiguration(),
+            adsConfig: TestFixtures.getAdsConfiguration(),
             campaign: TestFixtures.getCampaign()
         });
     });
