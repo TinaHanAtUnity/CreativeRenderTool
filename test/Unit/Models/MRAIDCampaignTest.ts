@@ -11,7 +11,7 @@ describe('MRAIDCampaign', () => {
 
     describe('when created with campaign json', () => {
         it('should have correct data from the json', () => {
-            const configuration = TestFixtures.getConfiguration();
+            const configuration = TestFixtures.getCoreConfiguration();
             const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
             const media = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
             const mraidJson = JSON.parse(media.content);

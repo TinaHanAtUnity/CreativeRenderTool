@@ -1,8 +1,8 @@
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Session } from 'Ads/Models/Session';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ISchema, Model } from 'Core/Models/Model';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export interface ICampaign {
     id: string;
@@ -91,7 +91,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     public abstract isConnectionNeeded(): boolean;
 
     protected handleError(error: WebViewError) {
-        Diagnostics.trigger('set_model_value_failed', error, this.getSession());
+        SessionDiagnostics.trigger('set_model_value_failed', error, this.getSession());
         throw error;
     }
 

@@ -1,5 +1,13 @@
 # Staged
 
+* Remove Ads dependencies from Core [#6335](https://github.com/Applifier/unity-ads-webview/pull/6335)
+
+# Mon Sep 24 09:44:02 UTC 2018 
+
+* Enable close icon skip for specific game IDs [#6406](https://github.com/Applifier/unity-ads-webview/pull/6406)
+
+# Fri Sep 21 09:07:42 UTC 2018
+
 * Use 'display' style to hide and show video-overlay content [#6382](https://github.com/Applifier/unity-ads-webview/pull/6382)
 * Fix audio route change handling on iOS [#6383](https://github.com/Applifier/unity-ads-webview/pull/6383)
 

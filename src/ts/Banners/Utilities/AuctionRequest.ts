@@ -1,5 +1,6 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
@@ -8,7 +9,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
@@ -46,7 +47,8 @@ export interface IPlacementMedia {
 
 export interface IAuctionRequestParams {
     nativeBridge: NativeBridge;
-    configuration: Configuration;
+    coreConfig: CoreConfiguration;
+    adsConfig: AdsConfiguration;
     adMobSignalFactory: AdMobSignalFactory;
     metaDataManager: MetaDataManager;
     request: Request;
@@ -100,7 +102,8 @@ export class AuctionRequest {
 
     protected _nativeBridge: NativeBridge;
     protected _response: INativeResponse;
-    private _configuration: Configuration;
+    private _coreConfig: CoreConfiguration;
+    private _adsConfig: AdsConfiguration;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _metaDataManager: MetaDataManager;
     private _request: Request;
@@ -126,7 +129,8 @@ export class AuctionRequest {
 
     constructor(params: IAuctionRequestParams) {
         this._nativeBridge = params.nativeBridge;
-        this._configuration = params.configuration;
+        this._coreConfig = params.coreConfig;
+        this._adsConfig = params.adsConfig;
         this._request = params.request;
         this._clientInfo = params.clientInfo;
         this._deviceInfo = params.deviceInfo;
@@ -269,7 +273,7 @@ export class AuctionRequest {
             });
         }
 
-        if (this._configuration.getTestMode()) {
+        if (this._coreConfig.getTestMode()) {
             url = Url.addParameters(url, { test: true });
         }
 
@@ -367,12 +371,12 @@ export class AuctionRequest {
         const body: any = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
             bundleId: this._clientInfo.getApplicationName(),
-            coppa: this._configuration.isCoppaCompliant(),
+            coppa: this._coreConfig.isCoppaCompliant(),
             language: this._deviceInfo.getLanguage(),
             gameSessionId: this._sessionManager.getGameSessionId(),
             timeZone: this._deviceInfo.getTimeZone(),
             simulator: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
-            token: this._configuration.getToken()
+            token: this._coreConfig.getToken()
         };
 
         if (this._previousPlacementID) {
@@ -425,15 +429,15 @@ export class AuctionRequest {
                 const placementRequest = this.createPlacementRequest();
 
                 body.placements = placementRequest;
-                body.properties = this._configuration.getProperties();
+                body.properties = this._coreConfig.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
-                body.projectId = this._configuration.getUnityProjectId();
+                body.projectId = this._coreConfig.getUnityProjectId();
                 body.gameSessionCounters = GameSessionCounters.getDTO();
-                body.gdprEnabled = this._configuration.isGDPREnabled();
-                body.optOutEnabled = this._configuration.isOptOutEnabled();
-                body.optOutRecorded = this._configuration.isOptOutRecorded();
+                body.gdprEnabled = this._adsConfig.isGDPREnabled();
+                body.optOutEnabled = this._adsConfig.isOptOutEnabled();
+                body.optOutRecorded = this._adsConfig.isOptOutRecorded();
 
-                const organizationId = this._configuration.getOrganizationId();
+                const organizationId = this._coreConfig.getOrganizationId();
                 if (organizationId) {
                     body.organizationId = organizationId;
                 }
