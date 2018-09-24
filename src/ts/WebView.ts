@@ -48,7 +48,7 @@ import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { ABGroupBuilder, ReportAdTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -72,6 +72,7 @@ import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export class WebView {
 
@@ -323,6 +324,12 @@ export class WebView {
             this._jaegerManager.stop(jaegerInitSpan);
 
             return this._sessionManager.sendUnsentSessions();
+        }).then(() => {
+            if ((ReportAdTest.isValid(this._coreConfig.getAbGroup()) && this._adsConfig.isGDPREnabled())) {
+                return AbstractPrivacy.setUserInformation(this._gdprManager).catch(() => {
+                    this._nativeBridge.Sdk.logInfo('Failed to set up privacy information.');
+                });
+            }
         }).then(() => {
             if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                 this._nativeBridge.setAutoBatchEnabled(false);
