@@ -6,13 +6,11 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AdapterMetaData } from 'Core/Models/MetaData/AdapterMetaData';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Request } from 'Core/Utilities/Request';
@@ -20,7 +18,7 @@ import { Url } from 'Core/Utilities/Url';
 
 export class ConfigManager {
 
-    public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerSpan: JaegerSpan): Promise<Configuration> {
+    public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerSpan: JaegerSpan): Promise<any> {
         return Promise.all([
             metaDataManager.fetch(FrameworkMetaData),
             metaDataManager.fetch(AdapterMetaData),
@@ -47,28 +45,7 @@ export class ConfigManager {
             }).then(response => {
                 jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
                 try {
-                    const configJson = JsonParser.parse(response.response);
-                    const config: Configuration = ConfigurationParser.parse(configJson, clientInfo);
-                    nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for token ' + config.getToken() + ' (A/B group ' + config.getAbGroup() + ')');
-                    if(config.getToken()) {
-                        if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {
-                            ConfigManager.storeGamerToken(nativeBridge, config.getToken());
-                        }
-                    } else {
-                        Diagnostics.trigger('config_failure', {
-                            configUrl: url,
-                            configResponse: response.response
-                        });
-
-                        throw new Error('gamer token missing in PLC config');
-                    }
-                    if(!config.getDefaultPlacement()) {
-                        Diagnostics.trigger('missing_default_placement', {
-                            configUrl: url,
-                            configResponse: response.response
-                        });
-                    }
-                    return config;
+                    return JsonParser.parse(response.response);
                 } catch(error) {
                     Diagnostics.trigger('config_parsing_failed', {
                         configUrl: url,
@@ -88,9 +65,6 @@ export class ConfigManager {
                         error = new ConfigError((new Error(responseObj.error)));
                     }
                 }
-                jaegerSpan.addTag(JaegerTags.Error, 'true');
-                jaegerSpan.addTag(JaegerTags.ErrorMessage, error.message);
-                jaegerSpan.addAnnotation(error.message);
                 throw error;
             });
         });
@@ -187,7 +161,7 @@ export class ConfigManager {
         return this.fetchValue(nativeBridge, 'gamerToken');
     }
 
-    private static storeGamerToken(nativeBridge: NativeBridge, gamerToken: string): Promise<void[]> {
+    public static storeGamerToken(nativeBridge: NativeBridge, gamerToken: string): Promise<void[]> {
         return this.storeValue(nativeBridge, 'gamerToken', gamerToken);
     }
 
