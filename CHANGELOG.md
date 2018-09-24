@@ -1,4 +1,4 @@
-# Staged
+# Fri Sep 21 09:07:42 UTC 2018
 
 * Use 'display' style to hide and show video-overlay content [#6382](https://github.com/Applifier/unity-ads-webview/pull/6382)
 * Fix audio route change handling on iOS [#6383](https://github.com/Applifier/unity-ads-webview/pull/6383)
