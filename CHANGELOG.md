@@ -1,3 +1,7 @@
+# Staged
+
+* Remove Ads dependencies from Core [#6335](https://github.com/Applifier/unity-ads-webview/pull/6335)
+
 # Mon Sep 24 09:44:02 UTC 2018 
 
 * Enable close icon skip for specific game IDs [#6406](https://github.com/Applifier/unity-ads-webview/pull/6406)
