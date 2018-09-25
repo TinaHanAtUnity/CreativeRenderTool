@@ -664,6 +664,10 @@ export class WebView {
                 AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
             }
 
+            if(TestEnvironment.get('forcedGDPRBanner')) {
+                AdUnitFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
+            }
+
             let forcedARMRAID = false;
             if (TestEnvironment.get('forcedARMRAID')) {
                 forcedARMRAID = TestEnvironment.get('forcedARMRAID');
