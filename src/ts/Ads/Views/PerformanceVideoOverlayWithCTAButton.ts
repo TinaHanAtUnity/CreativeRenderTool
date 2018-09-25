@@ -8,8 +8,8 @@ export class PerformanceVideoOverlayWithCTAButton extends NewVideoOverlay implem
     private _showPerformanceAdCTAButton: boolean = false;
     private _campaign: Campaign;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, campaign: PerformanceCampaign, disablePrivacyDuringVideo?: boolean) {
-        super(nativeBridge, muted, language, gameId, privacy, showGDPRBanner, disablePrivacyDuringVideo);
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, campaign: PerformanceCampaign, disablePrivacyDuringVideo?: boolean, seatId?: number) {
+        super(nativeBridge, muted, language, gameId, privacy, showGDPRBanner, disablePrivacyDuringVideo, seatId);
 
         this._campaign = campaign;
         this._templateData.gameIcon = campaign.getGameIcon() ? campaign.getGameIcon().getUrl() : '';

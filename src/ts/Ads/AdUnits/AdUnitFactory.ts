@@ -524,10 +524,11 @@ export class AdUnitFactory {
 
         const skipAllowed = parameters.placement.allowSkip();
         const CTAButtonTestEnabled = PerformanceVideoOverlayCTAButtonTest.isValid(parameters.coreConfig.getAbGroup());
+        const isPerformanceCampaign = parameters.campaign instanceof PerformanceCampaign;
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else if (skipAllowed && isPerformanceCampaign && CTAButtonTestEnabled) {
-            overlay = new PerformanceVideoOverlayWithCTAButton(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, <PerformanceCampaign>parameters.campaign, disablePrivacyDuringVideo);
+            overlay = new PerformanceVideoOverlayWithCTAButton(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, <PerformanceCampaign>parameters.campaign, showPrivacyDuringVideo, parameters.campaign.getSeatId());
         } else {
             overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, showPrivacyDuringVideo, parameters.campaign.getSeatId());
         }
