@@ -1,7 +1,10 @@
 # Staged
 
-* Remove Ads dependencies from Core [#6335](https://github.com/Applifier/unity-ads-webview/pull/6335)
 * Reporting Bad Ads AB Test Groups 11/12 [#6297](https://github.com/Applifier/unity-ads-webview/pull/6297)
+
+# Tue Sep 25 18:29:10 UTC 2018
+
+* Remove Ads dependencies from Core [#6335](https://github.com/Applifier/unity-ads-webview/pull/6335)
 
 # Mon Sep 24 09:44:02 UTC 2018 
 
