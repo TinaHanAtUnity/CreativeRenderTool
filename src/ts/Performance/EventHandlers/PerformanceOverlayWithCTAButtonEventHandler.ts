@@ -16,8 +16,10 @@ import { IosUtils } from 'Ads/Utilities/IosUtils';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export interface IVideoOverlayDownloadParameters extends IEndScreenDownloadParameters {
+    videoDuration: number;
     videoProgress: number;
 }
 
@@ -42,11 +44,24 @@ export class PerformanceOverlayWithCTAButtonEventHandler extends PerformanceOver
         const operativeEventParameters = this.getOperativeEventParams(parameters);
         this._operativeEventManager.sendClick(operativeEventParameters);
 
+        this.sendClickEventToKafka(parameters);
+
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this.onDownloadIos(parameters);
         } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this.onDownloadAndroid(parameters);
         }
+    }
+
+    private sendClickEventToKafka(parameters: IVideoOverlayDownloadParameters) {
+        const currentSession = this._campaign.getSession();
+        const kafkaObject: any = {};
+        kafkaObject.type = 'video_overlay_cta_button_click';
+        kafkaObject.auctionId = currentSession.getId();
+        kafkaObject.number1 = parameters.videoDuration / 1000;
+        kafkaObject.number2 = parameters.videoProgress / 1000;
+        kafkaObject.number3 = parameters.videoProgress / parameters.videoDuration;
+        HttpKafka.sendEvent('ads.sdk2.events.aui.experiments', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
 
     private onDownloadAndroid(parameters: IVideoOverlayDownloadParameters): void {

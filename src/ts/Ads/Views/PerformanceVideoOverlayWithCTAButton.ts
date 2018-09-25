@@ -5,7 +5,6 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 
 export class PerformanceVideoOverlayWithCTAButton extends NewVideoOverlay implements IPrivacyHandler {
-    private _showPerformanceAdCTAButton: boolean = false;
     private _campaign: Campaign;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, campaign: PerformanceCampaign, disablePrivacyDuringVideo?: boolean, seatId?: number) {
@@ -43,6 +42,7 @@ export class PerformanceVideoOverlayWithCTAButton extends NewVideoOverlay implem
                         bypassAppSheet: campaign.getBypassAppSheet(),
                         appStoreId: campaign.getAppStoreId(),
                         store: campaign.getStore(),
+                        videoDuration: this._videoDuration,
                         videoProgress: this._videoProgress
                     });
                 }
