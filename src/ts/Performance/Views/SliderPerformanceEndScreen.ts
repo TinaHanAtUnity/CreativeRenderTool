@@ -2,6 +2,7 @@ import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
 import { Slider } from 'Performance/Views/Slider';
 import SliderEndScreenTemplate from 'html/SliderEndScreen.html';
+import { detectOrientation } from 'Device';
 
 export class SliderPerformanceEndScreen extends EndScreen {
     private _campaign: SliderPerformanceCampaign;
@@ -38,8 +39,8 @@ export class SliderPerformanceEndScreen extends EndScreen {
 
     public show(): void {
         super.show();
-        /* TODO: Check orientation */
-        this._slider.resize(window.innerWidth, window.innerHeight / 2);
+        this.resize();
+        window.addEventListener('resize', this.resize.bind(this), false);
     }
 
     protected onDownloadEvent(event: Event): void {
@@ -56,5 +57,14 @@ export class SliderPerformanceEndScreen extends EndScreen {
 
     protected getTemplate() {
         return SliderEndScreenTemplate;
+    }
+
+    protected resize() {
+        const orientation = detectOrientation();
+        if (orientation === 'portrait') {
+            this._slider.resize(window.innerWidth, window.innerHeight / 2, true);
+        } else {
+            this._slider.resize(window.innerWidth / 2, window.innerHeight, true);
+        }
     }
 }
