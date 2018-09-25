@@ -523,7 +523,7 @@ export class AdUnitFactory {
         let overlay: AbstractVideoOverlay;
 
         const skipAllowed = parameters.placement.allowSkip();
-        const CTAButtonTestEnabled = PerformanceVideoOverlayCTAButtonTest.isValid(parameters.configuration.getAbGroup());
+        const CTAButtonTestEnabled = PerformanceVideoOverlayCTAButtonTest.isValid(parameters.coreConfig.getAbGroup());
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else if (skipAllowed && isPerformanceCampaign && CTAButtonTestEnabled) {

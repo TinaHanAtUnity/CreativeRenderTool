@@ -1,9 +1,6 @@
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
-import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
-import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Request } from 'Core/Utilities/Request';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -17,6 +14,8 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { StoreName } from 'Performance/Models/PerformanceCampaign';
 
 export interface IVideoOverlayDownloadParameters extends IEndScreenDownloadParameters {
     videoProgress: number;
@@ -118,7 +117,7 @@ export class PerformanceOverlayWithCTAButtonEventHandler extends PerformanceOver
                 response: error.nativeResponse
             });
         }
-        Diagnostics.trigger('click_attribution_failed', error, currentSession);
+        SessionDiagnostics.trigger('click_attribution_failed', error, currentSession);
     }
 
     private openAppStore(parameters: IVideoOverlayDownloadParameters) {
@@ -187,7 +186,7 @@ export class PerformanceOverlayWithCTAButtonEventHandler extends PerformanceOver
             case StoreName.GOOGLE:
                 return 'market://details?id=' + parameters.appStoreId;
             case StoreName.XIAOMI:
-                return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + this._configuration.getToken();
+                return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + this._coreConfig.getToken();
             default:
                 return '';
         }
