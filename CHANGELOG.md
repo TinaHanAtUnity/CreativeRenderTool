@@ -1,6 +1,6 @@
 # Wed Sep 26 21:14:54 UTC 2018
 
-* Temporarily remove Mixed Placement functionality and tests
+* Temporarily remove Mixed Placement functionality and tests[#6474](https://github.com/Applifier/unity-ads-webview/pull/6474)
 
 # Wed Sep 26 09:51:45 UTC 2018
 
