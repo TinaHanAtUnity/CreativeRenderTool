@@ -31,7 +31,9 @@ export class BackupCampaignManager {
 
         this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.mediaid', mediaId);
         this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.adtypes', JSON.stringify(placement.getAdTypes()));
-        this._nativeBridge.Storage.write(StorageType.PRIVATE);
+        // note: Storage.write is intentionally omitted as an optimization hack
+        // it is enough to have Storage.write after campaigns are stored
+        // if placements are not written because of this, it won't matter since campaigns would not be written either
     }
 
     public storeCampaign(campaign: Campaign) {

@@ -12,12 +12,10 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 describe('BackupCampaignManagerTest', () => {
     it('should store placement data', () => {
         const setSpy = sinon.spy();
-        const writeSpy = sinon.spy();
 
         const nativeBridge: NativeBridge = <NativeBridge><any>{
             Storage: {
-                set: setSpy,
-                write: writeSpy
+                set: setSpy
             }
         };
 
@@ -28,7 +26,6 @@ describe('BackupCampaignManagerTest', () => {
         backupCampaignManager.storePlacement(placement, testMediaId);
 
         assert.equal(setSpy.callCount, 2, 'two values were not written for backup campaign placement data');
-        assert.equal(writeSpy.callCount, 1, 'storage was not written to device storage after setting values');
 
         assert.equal(setSpy.getCall(0).args[0], StorageType.PRIVATE, 'data was not written to private storage');
         assert.equal(setSpy.getCall(0).args[1], 'backupcampaign.placement.' + placement.getId() + '.mediaid', 'incorrect key for mediaId');
@@ -37,8 +34,6 @@ describe('BackupCampaignManagerTest', () => {
         assert.equal(setSpy.getCall(1).args[0], StorageType.PRIVATE, 'data was not written to private storage');
         assert.equal(setSpy.getCall(1).args[1], 'backupcampaign.placement.' + placement.getId() + '.adtypes', 'incorrect key for adtypes');
         assert.equal(setSpy.getCall(1).args[2], '["TEST"]', 'incorrect adtype serialization');
-
-        assert.equal(writeSpy.getCall(0).args[0], StorageType.PRIVATE, 'data was not written to private storage');
     });
 
     it('should store performance campaign data', () => {
