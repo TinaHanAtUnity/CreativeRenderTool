@@ -80,6 +80,7 @@ import { ReportAdTest } from 'Core/Models/ABGroup';
 export class AdUnitFactory {
     private static _forcedPlayableMRAID: boolean = false;
     private static _forcedARMRAID: boolean = false;
+    private static _forceGDPRBanner: boolean = false;
 
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
 
@@ -113,6 +114,10 @@ export class AdUnitFactory {
 
     public static setForcedARMRAID(value: boolean) {
         AdUnitFactory._forcedARMRAID = value;
+    }
+
+    public static setForcedGDPRBanner(value: boolean) {
+        AdUnitFactory._forceGDPRBanner = value;
     }
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
@@ -546,6 +551,10 @@ export class AdUnitFactory {
     }
 
     private static showGDPRBanner(parameters: IAdUnitParameters<Campaign>): boolean {
+        if (AdUnitFactory._forceGDPRBanner) {
+            return true;
+        }
+
         return parameters.adsConfig.isGDPREnabled() ? !parameters.adsConfig.isOptOutRecorded() : false;
     }
 }
