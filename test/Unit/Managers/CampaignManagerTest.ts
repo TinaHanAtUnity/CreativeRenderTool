@@ -1488,7 +1488,7 @@ describe('CampaignManager', () => {
         });
     });
 
-    describe('on mixed placement request', () => {
+    xdescribe('on mixed placement request', () => {
         let requestData: string = '{}';
         let assetManager: AssetManager;
         let campaignManager: CampaignManager;

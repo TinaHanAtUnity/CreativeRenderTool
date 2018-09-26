@@ -1,3 +1,7 @@
+# Wed Sep 26 21:01:54 UTC 2018
+
+* Temporarily disable Mixed Placement Utility Custom feature and tests
+
 # Wed Sep 26 09:51:45 UTC 2018
 
 * Reporting Bad Ads AB Test Groups 11/12 [#6297](https://github.com/Applifier/unity-ads-webview/pull/6297)
