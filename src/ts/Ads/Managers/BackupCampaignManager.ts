@@ -98,6 +98,7 @@ export class BackupCampaignManager {
 
     public deleteBackupCampaigns() {
         this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'backupcampaign');
+        this._nativeBridge.Storage.write(StorageType.PRIVATE);
     }
 
     private getCampaignType(campaign: Campaign): string | undefined {
