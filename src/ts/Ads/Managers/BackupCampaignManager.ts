@@ -13,6 +13,8 @@ import { IFileInfo } from 'Core/Native/Cache';
 import { Video } from 'Ads/Models/Assets/Video';
 
 export class BackupCampaignManager {
+    private static _maxExpiryDelay: number = 7 * 24 * 3600 * 1000; // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
+
     private _nativeBridge: NativeBridge;
     private _coreConfiguration: CoreConfiguration;
 
@@ -49,9 +51,7 @@ export class BackupCampaignManager {
         if(campaignType) {
             let willExpireAt: number | undefined = campaign.getWillExpireAt();
             if(!willExpireAt) {
-                // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
-                const maxExpiryDelay: number = 7 * 24 * 3600 * 1000;
-                willExpireAt = Date.now() + maxExpiryDelay;
+                willExpireAt = Date.now() + BackupCampaignManager._maxExpiryDelay;
             }
 
             this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.type', campaignType);
