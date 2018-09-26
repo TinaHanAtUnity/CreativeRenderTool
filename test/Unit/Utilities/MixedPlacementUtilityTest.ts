@@ -12,7 +12,7 @@ import 'mocha';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
-describe('MixedPlacementUtilities', () => {
+xdescribe('MixedPlacementUtilities', () => {
 
     let configuration: AdsConfiguration;
     let promoSkippableCampaign: PromoCampaign;
