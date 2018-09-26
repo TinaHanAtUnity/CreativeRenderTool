@@ -47,7 +47,9 @@ export class BackupCampaignManager {
         if(campaignType) {
             let willExpireAt: number | undefined = campaign.getWillExpireAt();
             if(!willExpireAt) {
-                willExpireAt = Date.now() + 7 * 24 * 3600 * 1000;
+                // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
+                const maxExpiryDelay: number = 7 * 24 * 3600 * 1000;
+                willExpireAt = Date.now() + maxExpiryDelay;
             }
 
             this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.type', campaignType);
@@ -69,7 +71,7 @@ export class BackupCampaignManager {
                 const campaignRootKey: string = 'backupcampaign.campaign.' + mediaId;
                 return Promise.all([this.getString(campaignRootKey + '.type'), this.getString(campaignRootKey + '.data'), this.getNumber(campaignRootKey + '.willexpireat')]).then(([type, data, willexpireat]) => {
                     if(type && data && willexpireat && Date.now() < willexpireat) {
-                        const loader: CampaignLoader | undefined = this.getCampaignLoader(type);
+                        const loader = this.getCampaignLoader(type);
 
                         if(loader) {
                             const campaign = loader.load(data);
@@ -162,14 +164,7 @@ export class BackupCampaignManager {
         }
 
         return Promise.all(promises).then((values: boolean[]) => {
-            // just one non-cached asset is enough to make entire campaign not cached
-            for(const value of values) {
-                if(value === false) {
-                    return false;
-                }
-            }
-
-            return true;
+            return values.every(value => value);
         });
     }
 
