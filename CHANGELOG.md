@@ -1,4 +1,9 @@
-# Staged
+# Wed Sep 26 09:51:45 UTC 2018
+
+* Reporting Bad Ads AB Test Groups 11/12 [#6297](https://github.com/Applifier/unity-ads-webview/pull/6297)
+* Move Tencent Logo to Top-left Corner [#6409](https://github.com/Applifier/unity-ads-webview/pull/6409)
+
+# Tue Sep 25 18:29:10 UTC 2018
 
 * Remove Ads dependencies from Core [#6335](https://github.com/Applifier/unity-ads-webview/pull/6335)
 
