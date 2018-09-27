@@ -8,14 +8,7 @@ export class CustomFeatures {
     }
 
     public static isMixedPlacementExperiment(gameId: string): boolean {
-        return gameId === '1543512' ||
-               gameId === '1003628' ||
-               gameId === '1042745' ||
-               gameId === '1783249' ||
-               gameId === '1783250' ||
-               gameId === '1543513' ||
-               gameId === '1783091' || // Guild of Heroes
-               gameId === '1783092';   // Guild of Heroes
+        return false;
     }
 
     public static isSonicPlayable(creativeId: string | undefined) {

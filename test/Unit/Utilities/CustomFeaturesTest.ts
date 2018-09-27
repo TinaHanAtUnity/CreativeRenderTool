@@ -38,7 +38,7 @@ describe('CustomFeatures', () => {
         });
     });
 
-    describe('isMixedPlacementExperiment', () => {
+    xdescribe('isMixedPlacementExperiment', () => {
         it('should return true if gameId is 1543512', () => {
             const value = CustomFeatures.isMixedPlacementExperiment('1543512');
             assert.isTrue(value);
