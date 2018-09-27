@@ -41,11 +41,6 @@ export class Slider {
             });
         });
 
-        // @ts-ignore
-        window._slider = this;
-        // @ts-ignore
-        window.parent._slider = this;
-
         /* Only when all images are loaded */
         this._ready = Promise.all(allSlidesCreatedPromise).then(() => {
             this._rootEl.appendChild(this.createPagination());
