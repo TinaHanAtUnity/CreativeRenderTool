@@ -1,0 +1,54 @@
+@import "vars.styl";
+
+$end-screen-improved-styles-mixin($scale-size = $default-scale-size) {
+    $end-screen-improved-styles-size = $default-size * $scale-size;
+
+    #end-screen {
+        &.improved-endscreen-styles-test {
+            .game-icon {
+                width: 4 * $end-screen-improved-styles-size;
+                height: 4 * $end-screen-improved-styles-size;
+            }
+
+            .row-container {
+                bottom: .7 * $end-screen-improved-styles-size;
+            }
+
+            .store-container {
+                margin-top: .2 * $end-screen-improved-styles-size;
+            }
+
+            .name-container {
+                font-size: 1.2 * $end-screen-improved-styles-size;
+            }
+
+            .game-rating {
+                font-size: 1 * $end-screen-improved-styles-size;
+            }
+
+            .game-rating-count {
+                font-size: .9 * $end-screen-improved-styles-size;
+            }
+
+            .icon-star:before {
+                font-size: 1.2 * $end-screen-improved-styles-size;
+            }
+        }
+    }
+
+    .portrait {
+        #end-screen {
+            &.improved-endscreen-styles-test {
+                .download-container {
+                    margin: 2.2 * $end-screen-improved-styles-size auto 0.75 * $end-screen-improved-styles-size auto;
+                }
+
+                .column-container {
+                    margin-left: .8 * $end-screen-improved-styles-size;
+                }
+            }
+        }
+    }
+}
+
+$end-screen-improved-styles-mixin();
