@@ -69,11 +69,10 @@ export class CustomFeatures {
         campaignId = 'test';
         const screenshots: { [key: string]: string[] } = {
             'test': [
-                'https://lh3.googleusercontent.com/r9Lop-rvoj5NJepnt6DFe2qrGiVEEc05D-1mB6XUb49tf4FrnVSIEdh6Pi7tBzsIFnI=w1739-h1170-rw',
-                'https://lh3.googleusercontent.com/hUEuMju1dhqANA_7g6xOtR9A6SVbj3YxSvwAo5vq7-vBJ8sarDn1IRwQYff5vgjIL88_=w1739-h1170-rw',
-                'https://lh3.googleusercontent.com/P4nGXQPqTS_eJ0jSiKp0e1xUYLrE365PTlxrJaeZoJlS321xom-LiZCdXoJOaRxbDQ=w1739-h1170-rw',
-                'https://lh3.googleusercontent.com/pHOAqc-gMT4e2jND7X96mw1Tm4JnelLjtTLtqXvBOQnOZjcXuKKwrVvOYNJeHXlrfm5m=w1739-h1170-rw',
-                'https://lh3.googleusercontent.com/c4356hfvZwsqAHstmamvYU2O9zFNSxwpTqpNic8BhF0Vj9ashpOOxiDBNWJpwr64t4w=w1739-h1170-rw'
+                'https://cdn6.aptoide.com/imgs/2/4/e/24e1f778a6e2d976cff2302c872f0555_screen.jpg',
+                'https://cdn6.aptoide.com/imgs/4/c/e/4cee944a4a6e4f1eaa3bc1876b626887_screen.jpg',
+                'https://cdn6.aptoide.com/imgs/9/8/5/9857d41c2c3134879cb5f17dd4e26dbb_screen.jpg',
+                'https://cdn6.aptoide.com/imgs/e/b/f/ebfecbe0331d47b1e64579dd74981f5d_screen.jpg'
             ]
         };
         return screenshots[campaignId];

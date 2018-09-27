@@ -7,6 +7,7 @@ export class Slider {
     private _originalSlidesOrder: HTMLElement[] = [];
     private _width: number;
     private _height: number;
+    private _ready: Promise<void>;
 
     constructor(urls: string[], size: { width: number; height: number } = {width: 0, height: 0}) {
         const {width, height} = size;
@@ -21,13 +22,14 @@ export class Slider {
 
         this._sliderScrollableContainer = this.createElement('div', 'slider-scrollable-container', [], {
             'overflow-x': 'scroll',
-            'overflow-y': 'hidden'
+            'overflow-y': 'hidden',
+            '-webkit-overflow-scrolling': 'touch'
         });
 
         this._slidesContainer = this.createElement('div', 'slider-slides-container');
 
         this._sliderScrollableContainer.addEventListener('scroll', () => {
-            window.requestAnimationFrame(this.handleScrolling.bind(this));
+            window.requestAnimationFrame(this.handleScrolling.bind(this, event));
         });
 
         this._rootEl.appendChild(this._sliderScrollableContainer).appendChild(this._slidesContainer);
@@ -39,14 +41,18 @@ export class Slider {
             });
         });
 
-        Promise.all(allSlidesCreatedPromise).then(() => {
-            this._rootEl.appendChild(this.createPagination());
+        // @ts-ignore
+        window._slider = this;
+        // @ts-ignore
+        window.parent._slider = this;
 
+        /* Only when all images are loaded */
+        this._ready = Promise.all(allSlidesCreatedPromise).then(() => {
+            this._rootEl.appendChild(this.createPagination());
             if (width !== 0 && height !== 0) {
                 this.resize(width, height, true);
             }
 
-            // this.startAnimation();
         });
     }
 
@@ -71,7 +77,7 @@ export class Slider {
 
     private moveSlide(left: boolean = false) {
         if (left) {
-            const slide = <HTMLElement>(<HTMLElement>this._slidesContainer.lastChild).cloneNode(true);
+            const slide = <HTMLElement>(<HTMLElement>this._slidesContainer.lastChild).cloneNode();
             this._slidesContainer.insertBefore(slide, this._slidesContainer.firstChild);
             this._slidesContainer.removeChild(<HTMLElement>this._slidesContainer.lastChild);
             this._sliderScrollableContainer.scrollLeft += this._width;
@@ -92,7 +98,13 @@ export class Slider {
         }, 20);
     }
 
-    public resize(width: number, height: number, scroll = false) {
+    public resize(...args: any[]) {
+        this._ready.then(() => {
+            this.doResize.apply(this, args);
+        });
+    }
+
+    private doResize(width: number, height: number, scroll = false) {
         const slidesDOM = this._slidesContainer.querySelectorAll('.slide');
 
         this.setStyles(this._slidesContainer, {
@@ -100,11 +112,10 @@ export class Slider {
             'height': `${height}px`
         });
 
-        for (const [index, slide] of slidesDOM.entries()) {
+        for (const slide of slidesDOM) {
             this.setStyles(<HTMLElement>slide, {
                 'width': `${width}px`,
-                'height': `${height}px`,
-                'left': `${width * index}px`
+                'height': `${height}px`
             });
         }
 
@@ -135,17 +146,17 @@ export class Slider {
     private updatePagination() {
         const slides = this._slidesContainer.getElementsByClassName('slide');
         const scrollPosition = this._sliderScrollableContainer.scrollLeft;
-        let activeSide: HTMLElement;
+        let activeSlide: HTMLElement;
 
         for (const slide of slides) {
             if ((<HTMLElement>slide).offsetLeft >= scrollPosition && (<HTMLElement>slide).offsetLeft + (<HTMLElement>slide).offsetWidth >= scrollPosition) {
-                activeSide = <HTMLElement>slide;
+                activeSlide = <HTMLElement>slide;
                 break;
             }
         }
 
         const activeIndex = this._originalSlidesOrder.findIndex((slide) => {
-            return slide.id === activeSide.id;
+            return slide.id === (activeSlide && activeSlide.id);
         });
 
         this._paginationIndicators.map((indicator, index) => {
@@ -167,21 +178,35 @@ export class Slider {
 
     private createSlide(url: string, id: string): Promise<HTMLElement> {
         return new Promise((resolve) => {
-            const image = new Image();
-            image.onload = () => {
-                const slide = this.createElement('div', id, ['slide'], {
-                    'background-image': `url(${image.src})`,
-                    'background-size': '100% 100%',
-                    'display': 'inline-block',
-                    'width': `${this._width}px`,
-                    'height': `${this._height}px`
-                });
+            if (url) {
+                const image = new Image();
+                image.onload = () => {
+                    resolve(this.generateSlideHTML(id, image));
+                };
 
-                resolve(slide);
-            };
-
-            image.src = url;
+                image.src = url;
+            } else {
+                resolve(this.generateSlideHTML(id));
+            }
         });
+    }
+
+    private generateSlideHTML = (id: string, image?: HTMLImageElement) => {
+        const src = image && image.src;
+        const style = {
+            'display': 'inline-block',
+            'width': `${this._width}px`,
+            'height': `${this._height}px`,
+        };
+
+        if (src) {
+            Object.assign(style, {
+                'background-image': `url(${src})`,
+                'background-size': '100% 100%'
+            });
+        }
+
+        return this.createElement('div', id, ['slide'], style);
     }
 
     private createPagination() {
