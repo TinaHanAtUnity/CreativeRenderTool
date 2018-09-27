@@ -196,7 +196,7 @@ export class Slider {
         const style = {
             'display': 'inline-block',
             'width': `${this._width}px`,
-            'height': `${this._height}px`,
+            'height': `${this._height}px`
         };
 
         if (src) {
