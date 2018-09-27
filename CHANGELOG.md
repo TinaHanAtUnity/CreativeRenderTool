@@ -1,3 +1,9 @@
+# Staged
+
+* Refactor backup campaign implementation [#6407](https://github.com/Applifier/unity-ads-webview/pull/6407)
+* Re-run CTA button color experiment with 4 A/B group and 4 colors. Each A/B group should have one assigned color for download button (groups 16, 17, 18 & 19) [#6472](https://github.com/Applifier/unity-ads-webview/pull/6472)
+* Add metadata to force GDPR banner to be visible [#6451](https://github.com/Applifier/unity-ads-webview/pull/6451)
+
 # Wed Sep 26 21:14:54 UTC 2018
 
 * Temporarily remove Mixed Placement functionality and tests[#6474](https://github.com/Applifier/unity-ads-webview/pull/6474)
