@@ -5,19 +5,19 @@ export enum StorageCommandType {
     DELETE
 }
 
-export interface StorageCommand {
+export interface IStorageCommand {
     type: StorageCommandType;
     key: string;
     value?: any;
 }
 
-export interface StorageBatch {
-    commands: StorageCommand[]
+export interface IStorageBatch {
+    commands: IStorageCommand[];
 }
 
 export class StorageOperation {
     private _type: StorageType;
-    private _batch: StorageBatch;
+    private _batch: IStorageBatch;
 
     constructor(type: StorageType) {
         this._type = type;
@@ -45,7 +45,7 @@ export class StorageOperation {
         return this._type;
     }
 
-    public getBatch(): StorageBatch {
+    public getBatch(): IStorageBatch {
         return this._batch;
     }
 }

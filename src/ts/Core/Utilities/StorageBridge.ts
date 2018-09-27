@@ -1,13 +1,13 @@
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
-import { StorageOperation, StorageBatch, StorageCommand, StorageCommandType } from 'Core/Utilities/StorageOperation';
+import { StorageOperation, IStorageBatch, IStorageCommand, StorageCommandType } from 'Core/Utilities/StorageOperation';
 
 export class StorageBridge {
     private static _storageBatchInterval = 1000; // milliseconds
 
     private _nativeBridge: NativeBridge;
-    private _publicStorageQueue: StorageBatch; // queue for storage operations to public storage
-    private _privateStorageQueue: StorageBatch; // queue for storage operations to private storage
+    private _publicStorageQueue: IStorageBatch; // queue for storage operations to public storage
+    private _privateStorageQueue: IStorageBatch; // queue for storage operations to private storage
     private _storageBatchTimer: any;
 
     constructor(nativeBridge: NativeBridge) {
@@ -40,17 +40,17 @@ export class StorageBridge {
         }
     }
 
-    private executeBatch(type: StorageType, batch: StorageBatch) {
+    private executeBatch(type: StorageType, batch: IStorageBatch) {
         if(batch.commands.length === 0) {
             return;
         }
 
-        let operation: StorageCommand;
-        for(operation of batch.commands) {
-            if(operation.type === StorageCommandType.SET) {
-                this._nativeBridge.Storage.set(type, operation.key, operation.value);
-            } else if(operation.type === StorageCommandType.DELETE) {
-                this._nativeBridge.Storage.delete(type, operation.key);
+        let command: IStorageCommand;
+        for(command of batch.commands) {
+            if(command.type === StorageCommandType.SET) {
+                this._nativeBridge.Storage.set(type, command.key, command.value);
+            } else if(command.type === StorageCommandType.DELETE) {
+                this._nativeBridge.Storage.delete(type, command.key);
             }
         }
 
