@@ -1,4 +1,4 @@
-# Staged
+# Thu Sep 27 13:33:54 UTC 2018
 
 * Refactor backup campaign implementation [#6407](https://github.com/Applifier/unity-ads-webview/pull/6407)
 * Re-run CTA button color experiment with 4 A/B group and 4 colors. Each A/B group should have one assigned color for download button (groups 16, 17, 18 & 19) [#6472](https://github.com/Applifier/unity-ads-webview/pull/6472)
