@@ -51,6 +51,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -120,6 +121,7 @@ describe('CampaignRefreshManager', () => {
     let gdprManager: GdprManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
     let placementManager: PlacementManager;
+    let backupCampaignManager: BackupCampaignManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -206,7 +208,8 @@ describe('CampaignRefreshManager', () => {
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
-        assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, nativeBridge);
+        backupCampaignManager = new BackupCampaignManager(nativeBridge, coreConfig);
+        assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, nativeBridge, backupCampaignManager);
         container = new TestContainer();
         const campaign = TestFixtures.getCampaign();
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -254,7 +257,7 @@ describe('CampaignRefreshManager', () => {
         beforeEach(() => {
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
@@ -655,7 +658,7 @@ describe('CampaignRefreshManager', () => {
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '00000');
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfoPromoGame, request, cache);
         });
 
@@ -705,7 +708,7 @@ describe('CampaignRefreshManager', () => {
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfoPromoGame, request, cache);
         });
 
