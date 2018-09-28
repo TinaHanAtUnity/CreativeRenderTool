@@ -1,3 +1,7 @@
+# Staged
+
+* Always enable autobatching for game ID 1448666 [#6498](https://github.com/Applifier/unity-ads-webview/pull/6498)
+
 # Thu Sep 27 13:33:54 UTC 2018
 
 * Refactor backup campaign implementation [#6407](https://github.com/Applifier/unity-ads-webview/pull/6407)
