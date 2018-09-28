@@ -1,4 +1,4 @@
-# Staged
+# Fri Sep 28 12:37:23 UTC 2018
 
 * Always enable autobatching for game ID 1448666 [#6498](https://github.com/Applifier/unity-ads-webview/pull/6498)
 
