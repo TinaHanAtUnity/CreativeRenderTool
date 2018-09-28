@@ -4,10 +4,15 @@ export class Slider {
     private _slidesContainer: HTMLElement;
     private _paginationIndicatorsContainer: HTMLElement;
     private _paginationIndicators: HTMLElement[] = [];
-    private _originalSlidesOrder: HTMLElement[] = [];
+    private _slidesOrder: HTMLElement[] = [];
     private _width: number;
     private _height: number;
+
+    private _infiniteScrolling: boolean = true;
+
     private _ready: Promise<void>;
+    private _sliderHead: HTMLElement;
+    private _sliderTail: HTMLElement;
 
     constructor(urls: string[], size: { width: number; height: number } = {width: 0, height: 0}) {
         const {width, height} = size;
@@ -36,17 +41,34 @@ export class Slider {
 
         const allSlidesCreatedPromise = urls.map((url, index) => {
             return this.createSlide(url, 'slide-' + index).then((slide) => {
-                this._originalSlidesOrder.push(slide);
+                this._slidesOrder.push(slide);
                 this._slidesContainer.appendChild(slide);
             });
         });
 
         /* Only when all images are loaded */
         this._ready = Promise.all(allSlidesCreatedPromise).then(() => {
+
             this._rootEl.appendChild(this.createPagination());
+
+            if (this._infiniteScrolling) {
+                this.createSlide('', 'slide-head').then((slide) => {
+                    slide.style.backgroundImage = this._slidesOrder[0].style.backgroundImage;
+                    this._sliderHead = this._slidesContainer.appendChild(slide);
+                });
+
+                this.createSlide('', 'slide-tail').then((slide) => {
+                    slide.style.backgroundImage = this._slidesOrder[this._slidesOrder.length - 1].style.backgroundImage;
+                    this._sliderTail = this._slidesContainer.insertBefore(slide, this._slidesContainer.firstChild);
+                });
+            }
+
             if (width !== 0 && height !== 0) {
                 this.resize(width, height, true);
             }
+
+            // @ts-ignore
+            window.__slider = this;
 
         });
     }
@@ -56,15 +78,17 @@ export class Slider {
     }
 
     private handleScrolling() {
-        const leftBoundary = (<HTMLElement>this._slidesContainer.firstChild).offsetWidth * 0.5;
-        const rightBoundary = this._slidesContainer.offsetWidth - (<HTMLElement>this._slidesContainer.lastChild).offsetWidth * 1.5;
+        if (this._infiniteScrolling) {
+            const leftBoundary = (<HTMLElement>this._slidesContainer.firstChild).offsetWidth * 0.5;
+            const rightBoundary = this._slidesContainer.offsetWidth - (<HTMLElement>this._slidesContainer.lastChild).offsetWidth * 2.125;
 
-        if (this._sliderScrollableContainer.scrollLeft <= leftBoundary) {
-            this.moveSlide(true);
-        }
+            if (this._sliderScrollableContainer.scrollLeft <= leftBoundary) {
+                this.moveSlide(true);
+            }
 
-        if (this._sliderScrollableContainer.scrollLeft >= rightBoundary) {
-            this.moveSlide();
+            if (this._sliderScrollableContainer.scrollLeft >= rightBoundary) {
+                this.moveSlide();
+            }
         }
 
         this.updatePagination();
@@ -72,15 +96,24 @@ export class Slider {
 
     private moveSlide(left: boolean = false) {
         if (left) {
-            const slide = <HTMLElement>(<HTMLElement>this._slidesContainer.lastChild).cloneNode();
-            this._slidesContainer.insertBefore(slide, this._slidesContainer.firstChild);
-            this._slidesContainer.removeChild(<HTMLElement>this._slidesContainer.lastChild);
-            this._sliderScrollableContainer.scrollLeft += this._width;
+            this.createSlide('', 'slide-tail').then((tailSlide) => {
+                const nextSlide = this._slidesOrder[this._slidesOrder.length - 1];
+                this._sliderTail.id = nextSlide.id;
+                this._sliderTail.style.backgroundImage = nextSlide.style.backgroundImage;
+                tailSlide.style.backgroundImage = this._slidesOrder[this._slidesOrder.length - 2].style.backgroundImage;
+                this._sliderTail = this._slidesContainer.insertBefore(tailSlide, this._slidesContainer.firstChild);
+                this._slidesOrder.unshift(<HTMLElement>this._slidesOrder.pop());
+                this._sliderScrollableContainer.scrollLeft += this._width;
+            });
         } else {
-            const slide = <HTMLElement>(<HTMLElement>this._slidesContainer.firstChild).cloneNode(true);
-            this._slidesContainer.appendChild(slide);
-            this._slidesContainer.removeChild(<HTMLElement>this._slidesContainer.firstChild);
-            this._sliderScrollableContainer.scrollLeft -= this._width;
+            this.createSlide('', 'slide-head').then((headSlide) => {
+                const nextSlide = this._slidesOrder[0];
+                this._sliderHead.id = nextSlide.id;
+                this._sliderHead.style.backgroundImage = nextSlide.style.backgroundImage;
+                headSlide.style.backgroundImage = this._slidesOrder[1].style.backgroundImage;
+                this._sliderHead = this._slidesContainer.appendChild(headSlide);
+                this._slidesOrder.push(<HTMLElement>this._slidesOrder.shift());
+            });
         }
 
         this.resize(this._width, this._height);
@@ -128,11 +161,9 @@ export class Slider {
         });
 
         if (scroll) {
-            const middleSlide = Math.floor(this._originalSlidesOrder.length / 2);
+            const middleSlide = Math.floor(this._slidesOrder.length / 2);
             this._sliderScrollableContainer.scrollLeft = (<HTMLElement>this._slidesContainer.children[middleSlide]).offsetLeft;
         }
-
-        this.updatePagination();
 
         this._width = width;
         this._height = height;
@@ -150,7 +181,7 @@ export class Slider {
             }
         }
 
-        const activeIndex = this._originalSlidesOrder.findIndex((slide) => {
+        const activeIndex = this._slidesOrder.findIndex((slide) => {
             return slide.id === (activeSlide && activeSlide.id);
         });
 
@@ -191,13 +222,13 @@ export class Slider {
         const style = {
             'display': 'inline-block',
             'width': `${this._width}px`,
-            'height': `${this._height}px`
+            'height': `${this._height}px`,
+            'background-size': '100% 100%'
         };
 
         if (src) {
             Object.assign(style, {
-                'background-image': `url(${src})`,
-                'background-size': '100% 100%'
+                'background-image': `url(${src})`
             });
         }
 
@@ -210,7 +241,7 @@ export class Slider {
             'text-align': 'center'
         });
 
-        this._paginationIndicators = this._originalSlidesOrder.map((slide, index) => {
+        this._paginationIndicators = this._slidesOrder.map((slide, index) => {
             const indicator = this.createElement('div', 'slider-pagination-' + index, ['slider-pagination-indicator'], {
                 'display': 'inline-block',
                 'background': 'white',
