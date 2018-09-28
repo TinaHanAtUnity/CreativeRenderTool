@@ -45,6 +45,9 @@ export class Slider {
 
         this._slidesContainer = this.createElement('div', 'slider-slides-container');
 
+        // For infinite scroll, we can try to highjack ontouchstart, ontouchmove and ontouchend
+        // to calculate distance and based on that scroll slider.
+        // Overall it could be a better solution, if native scrolling on ios will not start to cooperate better
         this._sliderScrollableContainer.addEventListener('scroll', () => {
             window.requestAnimationFrame(this.handleScrolling.bind(this, event));
         });
@@ -76,9 +79,9 @@ export class Slider {
                 });
             }
 
-            // TODO: This should not be a case usually
-            // TODO: the reason is webview does not provide with in height in `constructor` of endscreen method.
-            // TODO: But we want to start download images as soon as possible.
+            // TODO: This should not be a case usually, if you use this slider outside of webview.
+            // TODO: The reason is SDK's webview does not provide width in height in `constructor` of endscreen method.
+            // TODO: But we want to start download images as soon as possible, so we initialise slider there.
             // TODO: Maybe separate load images method and call it separately or have slider.show() method or similar.
             if (width !== 0 && height !== 0) {
                 this.resize(width, height, true);
