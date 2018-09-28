@@ -64,4 +64,16 @@ describe('CustomFeatures', () => {
             assert.isFalse(value);
         });
     });
+
+    describe('isAlwaysAutobatching', () => {
+        it('should return true for gameId 1448666', () => {
+            const value = CustomFeatures.isAlwaysAutobatching('1448666');
+            assert.isTrue(value);
+        });
+
+        it('should return false if gameId is anything besides 1448666', () => {
+            const value = CustomFeatures.isAlwaysAutobatching('14851');
+            assert.isFalse(value);
+        });
+    });
 });

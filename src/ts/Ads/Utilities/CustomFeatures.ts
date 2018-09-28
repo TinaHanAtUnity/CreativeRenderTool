@@ -52,4 +52,8 @@ export class CustomFeatures {
             || gameId === '1585102'
             || gameId === '2808037';
     }
+
+    public static isAlwaysAutobatching(gameId: string): boolean {
+        return gameId === '1448666'; // for testing if this helps with Wooga ANR issue, ABT-567
+    }
 }
