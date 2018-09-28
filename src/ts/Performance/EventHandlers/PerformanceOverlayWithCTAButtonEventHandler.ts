@@ -61,7 +61,7 @@ export class PerformanceOverlayWithCTAButtonEventHandler extends PerformanceOver
         kafkaObject.number1 = parameters.videoDuration / 1000;
         kafkaObject.number2 = parameters.videoProgress / 1000;
         kafkaObject.number3 = parameters.videoProgress / parameters.videoDuration;
-        HttpKafka.sendEvent('ads.sdk2.events.aui.experiments', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+        HttpKafka.sendEvent('ads.sdk2.events.aui.experiments.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
 
     private onDownloadAndroid(parameters: IVideoOverlayDownloadParameters): void {
