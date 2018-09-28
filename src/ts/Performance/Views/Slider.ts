@@ -1,23 +1,35 @@
 export class Slider {
     private _rootEl: HTMLElement;
+
+    // Evetyhing scrollable should be inside this container
     private _sliderScrollableContainer: HTMLElement;
+
+    // Slides shown to user including head, tail and duplicated slides
     private _slidesContainer: HTMLElement;
+
     private _paginationIndicatorsContainer: HTMLElement;
     private _paginationIndicators: HTMLElement[] = [];
+
+    // Keep actual slides order, without head, tail and duplicated slides to handle pagination and for infinite scrolling
     private _slidesOrder: HTMLElement[] = [];
+
+    // Height and width of slide
     private _width: number;
     private _height: number;
 
     private _infiniteScrolling: boolean = true;
 
+    // Resolved once all images are downloaded
     private _ready: Promise<void>;
+
+    // Container holds image that should be prefilled in infinite scrolling
     private _sliderHead: HTMLElement;
     private _sliderTail: HTMLElement;
 
     constructor(urls: string[], size: { width: number; height: number } = {width: 0, height: 0}) {
         const {width, height} = size;
 
-        /* TODO: Max size */
+        /* TODO: Maybe do configurable */
         urls.length = 3;
 
         this._rootEl = this.createElement('div', 'slider-root-container', [], {
@@ -47,6 +59,7 @@ export class Slider {
         });
 
         /* Only when all images are loaded */
+        // TODO: Handle if images are not loaded in time
         this._ready = Promise.all(allSlidesCreatedPromise).then(() => {
 
             this._rootEl.appendChild(this.createPagination());
@@ -63,13 +76,13 @@ export class Slider {
                 });
             }
 
+            // TODO: This should not be a case usually
+            // TODO: the reason is webview does not provide with in height in `constructor` of endscreen method.
+            // TODO: But we want to start download images as soon as possible.
+            // TODO: Maybe separate load images method and call it separately or have slider.show() method or similar.
             if (width !== 0 && height !== 0) {
                 this.resize(width, height, true);
             }
-
-            // @ts-ignore
-            window.__slider = this;
-
         });
     }
 
@@ -79,6 +92,7 @@ export class Slider {
 
     private handleScrolling() {
         if (this._infiniteScrolling) {
+            // In what point in scroll line slider applies infinite scroll effect
             const leftBoundary = (<HTMLElement>this._slidesContainer.firstChild).offsetWidth * 0.5;
             const rightBoundary = this._slidesContainer.offsetWidth - (<HTMLElement>this._slidesContainer.lastChild).offsetWidth * 2.125;
 
@@ -94,7 +108,17 @@ export class Slider {
         this.updatePagination();
     }
 
+    public scrollToMiddleSlide() {
+        const middleSlide = Math.floor(this._slidesContainer.children.length / 2);
+        this._sliderScrollableContainer.scrollLeft = (<HTMLElement>this._slidesContainer.children[middleSlide]).offsetLeft;
+    }
+
     private moveSlide(left: boolean = false) {
+        // Copy first/last element => append/insertBefore this._sliderContainer.children;
+        // This method (or similar e.g. also removing cloned child) works fine in browser and tested android devices.
+        // But not on iOS when scrolling specifically to the left.
+        // Reason: insertBefore makes this._sliderContainer.children to grow to the right, and does not move scroll position
+        // Also ios scrolling bounce effect does not contribute to this situation well
         if (left) {
             this.createSlide('', 'slide-tail').then((tailSlide) => {
                 const nextSlide = this._slidesOrder[this._slidesOrder.length - 1];
@@ -120,6 +144,7 @@ export class Slider {
     }
 
     private startAnimation() {
+        // Simplest auto scrolling implementation
         const speed = 2;
         setInterval(() => {
             this._sliderScrollableContainer.scrollLeft += speed;
@@ -132,7 +157,7 @@ export class Slider {
         });
     }
 
-    private doResize(width: number, height: number, scroll = false) {
+    private doResize(width: number, height: number) {
         const slidesDOM = this._slidesContainer.querySelectorAll('.slide');
 
         this.setStyles(this._slidesContainer, {
@@ -159,11 +184,6 @@ export class Slider {
                 'margin': `0 ${height * 0.005}px`
             });
         });
-
-        if (scroll) {
-            const middleSlide = Math.floor(this._slidesOrder.length / 2);
-            this._sliderScrollableContainer.scrollLeft = (<HTMLElement>this._slidesContainer.children[middleSlide]).offsetLeft;
-        }
 
         this._width = width;
         this._height = height;

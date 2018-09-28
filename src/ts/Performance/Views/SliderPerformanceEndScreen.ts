@@ -40,6 +40,7 @@ export class SliderPerformanceEndScreen extends EndScreen {
     public show(): void {
         super.show();
         this.resize();
+        this._slider.scrollToMiddleSlide();
         window.addEventListener('resize', this.resize.bind(this), false);
     }
 
