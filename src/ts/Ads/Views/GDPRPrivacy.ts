@@ -14,7 +14,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
     private _dataDeletionConfirmation: boolean = false;
 
     constructor(nativeBridge: NativeBridge, gdprManager: GdprManager, isCoppaCompliant: boolean) {
-        super(nativeBridge, isCoppaCompliant, 'gdpr-privacy');
+        super(nativeBridge, isCoppaCompliant, true, 'gdpr-privacy');
 
         this._template = new Template(GDPRPrivacyTemplate);
         this._gdprManager = gdprManager;

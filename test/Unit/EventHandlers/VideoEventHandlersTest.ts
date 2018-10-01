@@ -18,7 +18,6 @@ import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
@@ -49,6 +48,7 @@ import { XPromoVideoEventHandler } from 'XPromo/EventHandlers/XPromoVideoEventHa
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -117,7 +117,8 @@ describe('VideoEventHandlersTest', () => {
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
-        const privacy = new Privacy(nativeBridge, coreConfig.isCoppaCompliant());
+        const gdprManager = sinon.createStubInstance(GdprManager);
+        const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
 
         const endScreenParams : IEndScreenParameters = {
@@ -130,7 +131,6 @@ describe('VideoEventHandlersTest', () => {
             targetGameName: performanceCampaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, performanceCampaign);
-        const gdprManager = sinon.createStubInstance(GdprManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -175,7 +175,7 @@ describe('VideoEventHandlersTest', () => {
             programmaticTrackingService: programmaticTrackingService
         };
 
-        const xpromoPrivacy = new Privacy(nativeBridge, coreConfig.isCoppaCompliant());
+        const xpromoPrivacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
         xPromoCampaign = TestFixtures.getXPromoCampaign();
         const xpromoEndScreenParams : IEndScreenParameters = {
             nativeBridge: nativeBridge,

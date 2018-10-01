@@ -9,7 +9,6 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { MOAT } from 'Ads/Views/MOAT';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
@@ -25,7 +24,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -64,7 +64,8 @@ describe('VastOverlayEventHandlersTest', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
-        privacy = new Privacy(nativeBridge, true);
+        const gdprManager = sinon.createStubInstance(GdprManager);
+        privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -93,8 +94,6 @@ describe('VastOverlayEventHandlersTest', () => {
             adsConfig: adsConfig,
             campaign: campaign
         });
-
-        const gdprManager = sinon.createStubInstance(GdprManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -141,8 +140,13 @@ describe('VastOverlayEventHandlersTest', () => {
 
         describe('When ad unit has an endscreen', () => {
             it('should hide endcard', () => {
-                const endScreenPrivacy = new Privacy(nativeBridge, false);
-                const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId(), endScreenPrivacy);
+                const vastEndScreenParameters: IVastEndscreenParameters = {
+                    campaign: vastAdUnitParameters.campaign,
+                    clientInfo: vastAdUnitParameters.clientInfo,
+                    seatId: vastAdUnitParameters.campaign.getSeatId(),
+                    showPrivacyDuringEndscreen: false
+                };
+                const vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
                 sinon.spy(vastEndScreen, 'show');
                 vastAdUnitParameters.endScreen = vastEndScreen;
                 vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);

@@ -1,4 +1,3 @@
-import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IVideoAdUnitParameters, VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
@@ -8,17 +7,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
-
-class DeviceOrientation {
-    public static getDeviceOrientation(): Orientation {
-        let height = window.innerHeight;
-        if (height <= 0) {
-            height = 1;
-        }
-        const aspectRatio = window.innerWidth / height;
-        return aspectRatio >= 1 ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
-    }
-}
 
 export interface IVastAdUnitParameters extends IVideoAdUnitParameters<VastCampaign> {
     endScreen?: VastEndScreen;

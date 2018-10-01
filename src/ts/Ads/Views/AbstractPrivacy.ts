@@ -1,6 +1,6 @@
+import { GdprManager, IGdprPersonalProperties } from 'Ads/Managers/GdprManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Platform } from 'Core/Constants/Platform';
-
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -30,6 +30,19 @@ export interface IBuildInformation extends ITemplateData {
 
 export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
 
+    private static buildInformation: IBuildInformation;
+    private static userInformation: IGdprPersonalProperties;
+
+    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, isGDPREnabled: boolean, id: string) {
+        super(nativeBridge.getPlatform(), id);
+        this._templateData = {
+            'isCoppaCompliant': isCoppaCompliant,
+            'isGDPREnabled': isGDPREnabled,
+            'buildInformation': AbstractPrivacy.buildInformation,
+            'userInformation': AbstractPrivacy.userInformation
+        };
+    }
+
     public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge, configuration: CoreConfiguration) {
         const date = new Date();
         AbstractPrivacy.buildInformation = {
@@ -49,14 +62,10 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
         };
     }
 
-    private static buildInformation: IBuildInformation;
-
-    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, id: string) {
-        super(nativeBridge, id);
-
-        this._templateData = {
-            'isCoppaCompliant': isCoppaCompliant
-        };
+    public static setUserInformation(gdprManager: GdprManager) {
+        return gdprManager.retrievePersonalInformation().then((personalProperties) => {
+            AbstractPrivacy.userInformation = personalProperties;
+        });
     }
 
     protected abstract onCloseEvent(event: Event): void;

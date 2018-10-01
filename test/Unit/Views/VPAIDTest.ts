@@ -1,5 +1,4 @@
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { Privacy } from 'Ads/Views/Privacy';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
 import { Observable1 } from 'Core/Utilities/Observable';
@@ -36,7 +35,6 @@ describe('VPAID View', () => {
         model.getCreativeParameters.returns('{}');
         (<sinon.SinonStub>campaign.getVPAID).returns(model);
 
-        const privacy = new Privacy(nativeBridge, true);
         view = new VPAID(nativeBridge, webPlayerContainer, campaign, TestFixtures.getPlacement());
 
         eventHandler = {

@@ -1,3 +1,34 @@
+# Staged
+
+* Enable close icon skip for specific game IDs [#6520](https://github.com/Applifier/unity-ads-webview/pull/6520)
+
+# Fri Sep 28 12:37:23 UTC 2018
+
+* Always enable autobatching for game ID 1448666 [#6498](https://github.com/Applifier/unity-ads-webview/pull/6498)
+
+# Thu Sep 27 13:33:54 UTC 2018
+
+* Refactor backup campaign implementation [#6407](https://github.com/Applifier/unity-ads-webview/pull/6407)
+* Re-run CTA button color experiment with 4 A/B group and 4 colors. Each A/B group should have one assigned color for download button (groups 16, 17, 18 & 19) [#6472](https://github.com/Applifier/unity-ads-webview/pull/6472)
+* Add metadata to force GDPR banner to be visible [#6451](https://github.com/Applifier/unity-ads-webview/pull/6451)
+
+# Wed Sep 26 21:14:54 UTC 2018
+
+* Temporarily remove Mixed Placement functionality and tests[#6474](https://github.com/Applifier/unity-ads-webview/pull/6474)
+
+# Wed Sep 26 09:51:45 UTC 2018
+
+* Reporting Bad Ads AB Test Groups 11/12 [#6297](https://github.com/Applifier/unity-ads-webview/pull/6297)
+* Move Tencent Logo to Top-left Corner [#6409](https://github.com/Applifier/unity-ads-webview/pull/6409)
+
+# Tue Sep 25 18:29:10 UTC 2018
+
+* Remove Ads dependencies from Core [#6335](https://github.com/Applifier/unity-ads-webview/pull/6335)
+
+# Mon Sep 24 09:44:02 UTC 2018 
+
+* Enable close icon skip for specific game IDs [#6406](https://github.com/Applifier/unity-ads-webview/pull/6406)
+
 # Fri Sep 21 09:07:42 UTC 2018
 
 * Use 'display' style to hide and show video-overlay content [#6382](https://github.com/Applifier/unity-ads-webview/pull/6382)

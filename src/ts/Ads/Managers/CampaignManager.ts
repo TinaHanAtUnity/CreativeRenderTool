@@ -42,6 +42,7 @@ import { INativeResponse, Request } from 'Core/Managers/Request';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export class CampaignManager {
 
@@ -91,6 +92,7 @@ export class CampaignManager {
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
+    private _backupCampaignManager: BackupCampaignManager;
     private _request: Request;
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
@@ -100,7 +102,7 @@ export class CampaignManager {
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping, jaegerManager: JaegerManager) {
+    constructor(nativeBridge: NativeBridge, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
         this._nativeBridge = nativeBridge;
         this._coreConfig = coreConfig;
         this._adsConfig = adsConfig;
@@ -115,6 +117,7 @@ export class CampaignManager {
         this._requesting = false;
         this._ignoreEvents = false;
         this._jaegerManager = jaegerManager;
+        this._backupCampaignManager = backupCampaignManager;
     }
 
     public cleanCachedUrl(url: string): string {
@@ -208,6 +211,7 @@ export class CampaignManager {
 
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
+        this._backupCampaignManager.deleteBackupCampaigns();
 
         this._requesting = true;
 
@@ -358,6 +362,8 @@ export class CampaignManager {
                         } else {
                             fill[mediaId] = [placement];
                         }
+
+                        this._backupCampaignManager.storePlacement(this._adsConfig.getPlacement(placement), mediaId);
                     } else {
                         noFill.push(placement);
                     }

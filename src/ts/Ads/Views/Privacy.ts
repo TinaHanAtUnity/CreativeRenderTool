@@ -1,13 +1,12 @@
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Template } from 'Core/Utilities/Template';
-import PrivacyTemplate from 'html/Privacy.html';
+import PrivacyTemplate from 'html/privacy.html';
 
 export class Privacy extends AbstractPrivacy {
 
     constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean) {
-        super(nativeBridge, isCoppaCompliant, 'privacy');
+        super(nativeBridge, isCoppaCompliant, false, 'privacy');
 
         this._template = new Template(PrivacyTemplate);
 
