@@ -4,6 +4,7 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { StorageType } from 'Core/Native/Storage';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
 import { Request } from 'Core/Utilities/Request';
@@ -15,6 +16,7 @@ describe('FailedOperativeEventManagerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
     let request: Request;
     let focusManager: FocusManager;
     let wakeUpManager: WakeUpManager;
@@ -25,6 +27,7 @@ describe('FailedOperativeEventManagerTest', () => {
             handleCallback
         });
 
+        storageBridge = new StorageBridge(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
@@ -53,7 +56,7 @@ describe('FailedOperativeEventManagerTest', () => {
             describe('Performance events', () => {
                 it('Should send single event', () => {
                     const manager = new FailedOperativeEventManager('12345', '12345');
-                    return manager.sendFailedEvent(nativeBridge, request, true).then(() => {
+                    return manager.sendFailedEvent(nativeBridge, request, storageBridge).then(() => {
                         sinon.assert.calledOnce(<sinon.SinonSpy>request.post);
                         sinon.assert.calledWith(<sinon.SinonSpy>request.post, 'http://test.url', '{\"testdata\": \"test\"}');
                         sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.Storage.get);
@@ -66,7 +69,7 @@ describe('FailedOperativeEventManagerTest', () => {
 
                 it('Should send multiple events', () => {
                     const manager = new FailedOperativeEventManager('12345');
-                    return manager.sendFailedEvents(nativeBridge, request).then(() => {
+                    return manager.sendFailedEvents(nativeBridge, request, storageBridge).then(() => {
                         sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.Storage.getKeys);
                         sinon.assert.calledTwice(<sinon.SinonSpy>nativeBridge.Storage.get);
                         sinon.assert.calledTwice(<sinon.SinonSpy>nativeBridge.Storage.delete);
@@ -78,7 +81,7 @@ describe('FailedOperativeEventManagerTest', () => {
 
                 it('Should not send event without eventId', () => {
                     const manager = new FailedOperativeEventManager('12345');
-                    return manager.sendFailedEvent(nativeBridge, request, true).then(() => {
+                    return manager.sendFailedEvent(nativeBridge, request, storageBridge).then(() => {
                         sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Storage.get);
                         sinon.assert.notCalled(<sinon.SinonSpy>request.post);
                         sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Storage.write);
@@ -97,7 +100,7 @@ describe('FailedOperativeEventManagerTest', () => {
                     HttpKafka.setRequest(request);
 
                     const manager = new FailedXpromoOperativeEventManager('12345', '12345');
-                    return manager.sendFailedEvent(nativeBridge, request, true).then(() => {
+                    return manager.sendFailedEvent(nativeBridge, request, storageBridge).then(() => {
                         sinon.assert.calledOnce(<sinon.SinonSpy>request.post);
                         sinon.assert.calledWith(<sinon.SinonSpy>request.post, 'https://httpkafka.unityads.unity3d.com/v1/events');
                         sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.Storage.get);
@@ -119,7 +122,7 @@ describe('FailedOperativeEventManagerTest', () => {
 
             it('Single event', () => {
                 const manager = new FailedOperativeEventManager('12345', '12345');
-                return manager.storeFailedEvent(nativeBridge, {test1: 'test1', test2: 'test2'}).then(() => {
+                return manager.storeFailedEvent(storageBridge, {test1: 'test1', test2: 'test2'}).then(() => {
                     sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.Storage.set);
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Storage.set, StorageType.PRIVATE, 'session.12345.operative.12345', {test1: 'test1', test2: 'test2'});
                     sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.Storage.write);

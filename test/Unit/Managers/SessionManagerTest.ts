@@ -10,6 +10,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { RequestApi } from 'Core/Native/Request';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 
@@ -162,6 +163,7 @@ describe('SessionManagerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
 
     let storageApi: TestStorageApi;
     let requestApi: TestRequestApi;
@@ -180,6 +182,7 @@ describe('SessionManagerTest', () => {
             handleCallback
         });
 
+        storageBridge = new StorageBridge(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
@@ -192,7 +195,7 @@ describe('SessionManagerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -202,6 +205,7 @@ describe('SessionManagerTest', () => {
             deviceInfo: deviceInfo,
             coreConfig: TestFixtures.getCoreConfiguration(),
             adsConfig: TestFixtures.getAdsConfiguration(),
+            storageBridge: storageBridge,
             campaign: TestFixtures.getCampaign()
         });
     });

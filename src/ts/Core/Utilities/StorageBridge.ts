@@ -12,8 +12,12 @@ export class StorageBridge {
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
-        this._publicStorageQueue.commands = [];
-        this._privateStorageQueue.commands = [];
+        this._publicStorageQueue = {
+            commands: []
+        };
+        this._privateStorageQueue = {
+            commands: []
+        };
     }
 
     public queue(operation: StorageOperation) {
@@ -57,9 +61,13 @@ export class StorageBridge {
         this._nativeBridge.Storage.write(type);
 
         if(type === StorageType.PUBLIC) {
-            this._publicStorageQueue.commands = [];
+            this._publicStorageQueue = {
+                commands: []
+            };
         } else {
-            this._privateStorageQueue.commands = [];
+            this._privateStorageQueue = {
+                commands: []
+            };
         }
     }
 }

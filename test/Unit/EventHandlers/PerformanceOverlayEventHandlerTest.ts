@@ -25,12 +25,14 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('PerformanceOverlayEventHandlerTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
     let overlay: Overlay;
     let endScreen: PerformanceEndScreen;
     let container: AdUnitContainer;
@@ -48,6 +50,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             handleCallback
         });
 
+        storageBridge = new StorageBridge(nativeBridge);
         const metaDataManager = new MetaDataManager(nativeBridge);
         const campaign = TestFixtures.getCampaign();
         const coreConfig = TestFixtures.getCoreConfiguration();
@@ -60,7 +63,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         video = new Video('', TestFixtures.getSession());
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        const sessionManager = new SessionManager(nativeBridge, request);
+        const sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -70,6 +73,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             deviceInfo: deviceInfo,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: campaign
         });
 

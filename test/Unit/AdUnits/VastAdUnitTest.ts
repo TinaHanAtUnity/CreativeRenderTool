@@ -26,6 +26,7 @@ import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScree
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('VastAdUnitTest', () => {
 
@@ -64,6 +65,7 @@ describe('VastAdUnitTest', () => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const nativeBridge = TestFixtures.getNativeBridge();
+        const storageBridge = new StorageBridge(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request = new Request(nativeBridge, wakeUpManager);
@@ -80,7 +82,7 @@ describe('VastAdUnitTest', () => {
             video.setDuration(duration);
         }
 
-        const sessionManager = new SessionManager(nativeBridge, request);
+        const sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         const metaDataManager = new MetaDataManager(nativeBridge);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
@@ -91,6 +93,7 @@ describe('VastAdUnitTest', () => {
             deviceInfo: deviceInfo,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: vastCampaign
         });
 
