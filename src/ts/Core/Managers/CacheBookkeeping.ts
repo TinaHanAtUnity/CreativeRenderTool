@@ -4,7 +4,6 @@ import { IFileInfo } from 'Core/Native/Cache';
 import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FileId } from 'Core/Utilities/FileId';
-import { Logger } from 'Core/Utilities/Logger';
 import { Core } from '../Core';
 
 export interface IFileBookkeepingInfo {
@@ -75,9 +74,9 @@ export class CacheBookkeeping {
                 }
 
                 if (deleteFiles.length > 0) {
-                    Logger.Debug('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files (' + (deleteSize / 1024) + 'kB), keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
+                    this._core.Api.Sdk.logDebug('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files (' + (deleteSize / 1024) + 'kB), keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
                 } else {
-                    Logger.Debug('Unity Ads cache: Keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
+                    this._core.Api.Sdk.logDebug('Unity Ads cache: Keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
                 }
 
                 let dirty: boolean = false;
@@ -85,7 +84,7 @@ export class CacheBookkeeping {
                 deleteFiles.map(file => {
                     if (keys.indexOf(FileId.getFileIdHash(file)) !== -1) {
                         promises.push(this._core.Api.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.FILES, FileId.getFileIdHash(file))).catch((error) => {
-                            Logger.Debug('Error while removing file storage entry');
+                            this._core.Api.Sdk.logDebug('Error while removing file storage entry');
                         }));
                         dirty = true;
                     }
@@ -105,9 +104,9 @@ export class CacheBookkeeping {
                         } else {
                             // file not fully downloaded, deleting it
                             return Promise.all([
-                                Logger.Debug('Unity ads cache: Deleting partial download ' + file),
+                                this._core.Api.Sdk.logDebug('Unity ads cache: Deleting partial download ' + file),
                                 this._core.Api.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.FILES, FileId.getFileIdHash(file))).catch((error) => {
-                                    Logger.Debug('Error while removing file storage entry for partially downloaded file');
+                                    this._core.Api.Sdk.logDebug('Error while removing file storage entry for partially downloaded file');
                                 }),
                                 this._core.Api.Storage.write(StorageType.PRIVATE),
                                 this._core.Api.Cache.deleteFile(file)
@@ -116,7 +115,7 @@ export class CacheBookkeeping {
                     }).catch(() => {
                         // entry not found in bookkeeping so delete file
                         return Promise.all([
-                            Logger.Debug('Unity ads cache: Deleting desynced download ' + file),
+                            this._core.Api.Sdk.logDebug('Unity ads cache: Deleting desynced download ' + file),
                             this._core.Api.Cache.deleteFile(file)
                         ]);
                     }));

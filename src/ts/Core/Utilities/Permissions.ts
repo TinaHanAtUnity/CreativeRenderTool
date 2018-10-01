@@ -19,7 +19,7 @@ export class PermissionsUtil {
     private static readonly ANDROID_PERMISSIONS_ASKED_KEY = 'unity-ads-permissions-asked';
 
     public static checkPermissions(core: Core, permission: PermissionTypes): Promise<CurrentPermission> {
-        const platform = core.getPlatform();
+        const platform = core.NativeBridge.getPlatform();
         if (platform === Platform.ANDROID) {
             return PermissionsUtil.checkAndroidPermission(core, permission);
         } else if (platform === Platform.IOS) {
@@ -30,12 +30,12 @@ export class PermissionsUtil {
     }
 
     public static requestPermission(core: Core, permission: PermissionTypes): Promise<void> {
-        const platformPermission = PermissionsUtil.getPlatformPermission(core.getPlatform(), permission);
+        const platformPermission = PermissionsUtil.getPlatformPermission(core.NativeBridge.getPlatform(), permission);
         if (platformPermission === PermissionTypes.INVALID) {
             return Promise.reject(PermissionTypes.INVALID);
         }
 
-        const platform = core.getPlatform();
+        const platform = core.NativeBridge.getPlatform();
         if (platform === Platform.ANDROID) {
             core.Api.Permissions.permissionRequestCode += 1;
             return core.Api.Android!.Preferences.setBoolean(PermissionsUtil.ANDROID_PERMISSIONS_ASKED_KEY, permission.toString(), true).then(() => {

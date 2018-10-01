@@ -1,17 +1,18 @@
-import { StorageApi, StorageError, StorageType } from 'Core/Native/Storage';
+import { StorageError, StorageType } from 'Core/Native/Storage';
+import { Core } from '../Core';
 
 export class MetaData {
-    private _storage: StorageApi;
+    private _core: Core;
 
-    constructor(storage: StorageApi) {
-        this._storage = storage;
+    constructor(core: Core) {
+        this._core = core;
     }
 
     public get<T>(key: string, deleteValue: boolean) {
-        return this._storage.get<T>(StorageType.PUBLIC, key + '.value').then((value: T) => {
+        return this._core.Api.Storage.get<T>(StorageType.PUBLIC, key + '.value').then((value: T) => {
             if(deleteValue) {
-                this._storage.delete(StorageType.PUBLIC, key);
-                this._storage.write(StorageType.PUBLIC);
+                this._core.Api.Storage.delete(StorageType.PUBLIC, key);
+                this._core.Api.Storage.write(StorageType.PUBLIC);
             }
             return Promise.resolve([true, value]);
         }).catch(([error]) => {
@@ -31,7 +32,7 @@ export class MetaData {
     }
 
     public getKeys(category: string): Promise<string[]> {
-        return this._storage.getKeys(StorageType.PUBLIC, category, false).then(results => {
+        return this._core.Api.Storage.getKeys(StorageType.PUBLIC, category, false).then(results => {
             return results;
         }).catch(([error]) => {
             switch(error) {
@@ -46,7 +47,7 @@ export class MetaData {
     }
 
     public hasCategory(category: string): Promise<boolean> {
-        return this._storage.getKeys(StorageType.PUBLIC, category, false).then(results => {
+        return this._core.Api.Storage.getKeys(StorageType.PUBLIC, category, false).then(results => {
             return results.length > 0;
         }).catch(([error]) => {
             switch(error) {

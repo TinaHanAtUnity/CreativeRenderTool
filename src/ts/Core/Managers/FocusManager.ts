@@ -26,12 +26,12 @@ export class FocusManager {
     constructor(core: Core) {
         this._core = core;
         this._appForeground = true;
-        if(core.getPlatform() === Platform.ANDROID) {
+        if(core.NativeBridge.getPlatform() === Platform.ANDROID) {
             this._core.Api.Android!.Broadcast.onBroadcastAction.subscribe((name, action, data, extra) => this.onBroadcastAction(name, action, data, extra));
             this._core.Api.Android!.Lifecycle.onActivityResumed.subscribe((activity) => this.onResume(activity));
             this._core.Api.Android!.Lifecycle.onActivityPaused.subscribe((activity) => this.onPause(activity));
             this._core.Api.Android!.Lifecycle.onActivityDestroyed.subscribe((activity) => this.onDestroyed(activity));
-        } else if(core.getPlatform() === Platform.IOS) {
+        } else if(core.NativeBridge.getPlatform() === Platform.IOS) {
             this._core.Api.iOS!.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
         }
 

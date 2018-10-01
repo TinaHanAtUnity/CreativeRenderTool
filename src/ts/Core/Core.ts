@@ -25,7 +25,6 @@ import { ResolveApi } from 'Core/Native/Resolve';
 import { SdkApi } from 'Core/Native/Sdk';
 import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
-import { Logger } from 'Core/Utilities/Logger';
 import { AndroidCacheApi } from 'Core/Native/Android/Cache';
 import { AndroidDeviceInfoApi } from 'Core/Native/Android/DeviceInfo';
 import { AndroidPermissionsApi } from 'Core/Native/Android/Permissions';
@@ -37,6 +36,21 @@ import { IosDeviceInfoApi } from 'Core/Native/iOS/DeviceInfo';
 import { IosPermissionsApi } from 'Core/Native/iOS/Permissions';
 import { IosPreferencesApi } from 'Core/Native/iOS/Preferences';
 import { IosSensorInfoApi } from 'Core/Native/iOS/SensorInfo';
+import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { UnityAdsError } from 'Core/Constants/UnityAdsError';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { HttpKafka } from 'Core/Utilities/HttpKafka';
+import { ConfigManager } from 'Core/Managers/ConfigManager';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { ConfigError } from 'Core/Errors/ConfigError';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { MetaData } from 'Core/Utilities/MetaData';
 
 export interface ICoreAndroidApi extends IApi {
     Broadcast: BroadcastApi;
@@ -78,6 +92,8 @@ export interface ICoreApi extends IModuleApi {
 
 export class Core implements IApiModule<ICoreApi> {
 
+    public readonly NativeBridge: NativeBridge;
+
     public readonly Api: ICoreApi;
 
     public readonly CacheManager: CacheManager;
@@ -90,10 +106,16 @@ export class Core implements IApiModule<ICoreApi> {
     public readonly Resolve: Resolve;
     public readonly WakeUpManager: WakeUpManager;
 
-    private readonly _platform: Platform;
-    private _apiLevel?: number;
+    public ClientInfo: ClientInfo;
+    public DeviceInfo: DeviceInfo;
+    public Config: CoreConfiguration;
+
+    private _initialized = false;
+    private _initializedAt: number;
 
     constructor(nativeBridge: NativeBridge) {
+        this.NativeBridge = nativeBridge;
+
         const api: ICoreApi = {
             Cache: new CacheApi(nativeBridge),
             Connectivity: new ConnectivityApi(nativeBridge),
@@ -135,12 +157,10 @@ export class Core implements IApiModule<ICoreApi> {
 
         this.Api = api;
 
-        Logger.setSdk(this.Api.Sdk);
-
         this.FocusManager = new FocusManager(this);
         this.MetaDataManager = new MetaDataManager(this);
         this.WakeUpManager = new WakeUpManager(this);
-        this.Request = new Request(this, this.WakeUpManager);
+        this.Request = new Request(this);
         this.CacheBookkeeping = new CacheBookkeeping(this);
         this.CacheManager = new CacheManager(this);
         this.Resolve = new Resolve(this);
@@ -148,16 +168,144 @@ export class Core implements IApiModule<ICoreApi> {
         this.JaegerManager = new JaegerManager(this);
     }
 
-    public setApiLevel(apiLevel: number) {
-        this._apiLevel = apiLevel;
+    public initialize(): Promise<void> {
+        const jaegerInitSpan = new JaegerSpan('Initialize'); // start a span
+        return this.Api.Sdk.loadComplete().then((data) => {
+            jaegerInitSpan.addAnnotation('nativeBridge loadComplete');
+            this.ClientInfo = new ClientInfo(data);
+
+            if(!/^\d+$/.test(this.ClientInfo.getGameId())) {
+                const message = `Provided Game ID '${this.ClientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
+                this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], message);
+                return Promise.reject(message);
+            }
+
+            if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
+                this.DeviceInfo = new AndroidDeviceInfo(this);
+            } else if(this.NativeBridge.getPlatform() === Platform.IOS) {
+                this.DeviceInfo = new IosDeviceInfo(this);
+            }
+
+            this.JaegerManager.addOpenSpan(jaegerInitSpan);
+
+            HttpKafka.setRequest(this.Request);
+            HttpKafka.setClientInfo(this.ClientInfo);
+
+            if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
+                this.Api.Android!.Request.setMaximumPoolSize(8);
+                this.Api.Android!.Request.setKeepAliveTime(10000);
+            } else {
+                this.Api.Request.setConcurrentRequestCount(8);
+            }
+
+            return Promise.all([this.DeviceInfo.fetch(), this.setupTestEnvironment()]);
+        }).then(() => {
+            HttpKafka.setDeviceInfo(this.DeviceInfo);
+
+            this.WakeUpManager.setListenConnectivity(true);
+            if(this.NativeBridge.getPlatform() === Platform.IOS) {
+                this.FocusManager.setListenAppForeground(true);
+                this.FocusManager.setListenAppBackground(true);
+            } else {
+                this.FocusManager.setListenScreen(true);
+                this.FocusManager.setListenAndroidLifecycle(true);
+            }
+
+            const configSpan = this.JaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
+            let configPromise = ConfigManager.fetch(this, configSpan);
+
+            configPromise.then(() => {
+                this.JaegerManager.stop(configSpan);
+            }).catch(() => {
+                this.JaegerManager.stop(configSpan);
+            });
+
+            configPromise = configPromise.then((configJson): [CoreConfiguration] => {
+                const coreConfig = CoreConfigurationParser.parse(configJson);
+                this.Api.Sdk.logInfo('Received configuration token ' + coreConfig.getToken() + ' (A/B group ' + coreConfig.getAbGroup() + ')');
+                if(this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo.getLimitAdTracking()) {
+                    ConfigManager.storeGamerToken(this, configJson.token);
+                }
+                return [coreConfig];
+            }).catch((error) => {
+                configSpan.addTag(JaegerTags.Error, 'true');
+                configSpan.addTag(JaegerTags.ErrorMessage, error.message);
+                configSpan.addAnnotation(error.message);
+                throw new Error(error);
+            });
+
+            const cachePromise = this.CacheBookkeeping.cleanCache().catch(error => {
+                // don't fail init due to cache cleaning issues, instead just log and report diagnostics
+                this.Api.Sdk.logError('Unity Ads cleaning cache failed: ' + error);
+                Diagnostics.trigger('cleaning_cache_failed', error);
+            });
+
+            return Promise.all([configPromise, cachePromise]);
+        }).then(([[coreConfig, adsConfig]]) => {
+            this.Config = coreConfig;
+
+            HttpKafka.setConfiguration(this.Config);
+            this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
+
+            if (!this.Config.isEnabled()) {
+                const error = new Error('Game with ID ' + this.ClientInfo.getGameId() +  ' is not enabled');
+                error.name = 'DisabledGame';
+                throw error;
+            }
+        }).then(() => {
+            this._initialized = true;
+            this._initializedAt = Date.now();
+            this.Api.Sdk.initComplete();
+            this.JaegerManager.stop(jaegerInitSpan);
+
+            if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
+                this.Api.Android!.Request.setMaximumPoolSize(1);
+            } else {
+                this.Api.Request.setConcurrentRequestCount(1);
+            }
+        }).catch(error => {
+            jaegerInitSpan.addAnnotation(error.message);
+            jaegerInitSpan.addTag(JaegerTags.Error, 'true');
+            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
+            if (this.JaegerManager) {
+                this.JaegerManager.stop(jaegerInitSpan);
+            }
+
+            if(error instanceof ConfigError) {
+                error = { 'message': error.message, 'name': error.name };
+                this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
+            } else if(error instanceof Error && error.name === 'DisabledGame') {
+                return;
+            }
+
+            this.Api.Sdk.logError(JSON.stringify(error));
+            Diagnostics.trigger('initialization_error', error);
+        });
     }
 
-    public getApiLevel(): number | undefined {
-        return this._apiLevel;
-    }
+    private setupTestEnvironment(): Promise<void> {
+        return TestEnvironment.setup(new MetaData(this)).then(() => {
+            if(TestEnvironment.get('serverUrl')) {
+                ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
+            }
 
-    public getPlatform(): Platform {
-        return this._platform;
+            if(TestEnvironment.get('configUrl')) {
+                ConfigManager.setTestBaseUrl(TestEnvironment.get('configUrl'));
+            }
+
+            if(TestEnvironment.get('kafkaUrl')) {
+                HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaUrl'));
+            }
+
+            if(TestEnvironment.get('abGroup')) {
+                // needed in both due to placement level control support
+                const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
+                if (!isNaN(abGroupNumber)) { // if it is a number get the group
+                    const abGroup = ABGroupBuilder.getAbGroup(abGroupNumber);
+                    ConfigManager.setAbGroup(abGroup);
+                }
+            }
+        });
     }
 
 }

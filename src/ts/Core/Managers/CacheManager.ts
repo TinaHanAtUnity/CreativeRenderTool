@@ -6,7 +6,6 @@ import { FileInfo } from 'Core/Utilities/FileInfo';
 import { Observable0, Observable1, Observable2, Observable3, Observable5 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Managers/Request';
 import { Core } from 'Core/Core';
-import { Logger } from 'Core/Utilities/Logger';
 
 export enum CacheStatus {
     OK,
@@ -180,7 +179,7 @@ export class CacheManager {
                 if(callback) {
                     switch(error) {
                         case CacheError[CacheError.FILE_ALREADY_CACHING]:
-                            Logger.Error('Unity Ads cache error: attempted to add second download from ' + url + ' to ' + fileId);
+                            this._core.Api.Sdk.logError('Unity Ads cache error: attempted to add second download from ' + url + ' to ' + fileId);
                             this.fulfillCallback(url, CacheStatus.FAILED);
                             return;
 
@@ -268,7 +267,7 @@ export class CacheManager {
     private onDownloadProgress(url: string, size: number, totalSize: number): void {
         this.updateProgress(size, false);
 
-        Logger.Debug('Cache progress for "' + url + '": ' + Math.round(size / totalSize * 100) + '%');
+        this._core.Api.Sdk.logDebug('Cache progress for "' + url + '": ' + Math.round(size / totalSize * 100) + '%');
     }
 
     private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: HeadersType): void {

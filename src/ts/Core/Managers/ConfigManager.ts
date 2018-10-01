@@ -5,14 +5,11 @@ import { RequestError } from 'Core/Errors/RequestError';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AdapterMetaData } from 'Core/Models/MetaData/AdapterMetaData';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
+import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Logger } from 'Core/Utilities/Logger';
 import { Url } from 'Core/Utilities/Url';
 
 export class ConfigManager {
@@ -21,22 +18,22 @@ export class ConfigManager {
         return Promise.all([
             core.MetaDataManager.fetch(FrameworkMetaData),
             core.MetaDataManager.fetch(AdapterMetaData),
-            ConfigManager.fetchGamerToken(core.Api.Storage)
+            ConfigManager.fetchGamerToken(core)
         ]).then(([framework, adapter, storedGamerToken]) => {
             let gamerToken: string | undefined;
 
-            if(core.getPlatform() === Platform.IOS && core.Api.DeviceInfo.getLimitAdTrackingFlag()) {
+            if(core.NativeBridge.getPlatform() === Platform.IOS && core.Api.DeviceInfo.getLimitAdTrackingFlag()) {
                 // only use stored gamerToken for iOS when ad tracking is limited
                 gamerToken = storedGamerToken;
             } else if(storedGamerToken) {
                 // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
-                ConfigManager.deleteGamerToken(storage);
+                ConfigManager.deleteGamerToken(core);
             }
 
-            const url: string = ConfigManager.createConfigUrl(core.clientInfo, deviceInfo, framework, adapter, gamerToken);
-            jaegerSpan.addTag(JaegerTags.DeviceType, Platform[core.getPlatform()]);
-            Logger.Info('Requesting configuration from ' + url);
-            return request.get(url, [], {
+            const url: string = ConfigManager.createConfigUrl(core, framework, adapter, gamerToken);
+            jaegerSpan.addTag(JaegerTags.DeviceType, Platform[core.NativeBridge.getPlatform()]);
+            core.Api.Sdk.logInfo('Requesting configuration from ' + url);
+            return core.Request.get(url, [], {
                 retries: 2,
                 retryDelay: 10000,
                 followRedirects: false,
@@ -50,7 +47,7 @@ export class ConfigManager {
                         configUrl: url,
                         configResponse: response.response
                     });
-                    Logger.Error('Config request failed ' + error);
+                    core.Api.Sdk.logError('Config request failed ' + error);
                     throw new Error(error);
                 }
             }).catch(error => {
@@ -80,10 +77,10 @@ export class ConfigManager {
     private static ConfigBaseUrl: string = 'https://publisher-config.unityads.unity3d.com/games';
     private static AbGroup: ABGroup | undefined;
 
-    private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): string {
+    private static createConfigUrl(core: Core, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
-            clientInfo.getGameId(),
+            core.ClientInfo.getGameId(),
             'configuration'
         ].join('/');
 
@@ -93,33 +90,33 @@ export class ConfigManager {
         }
 
         url = Url.addParameters(url, {
-            bundleId: clientInfo.getApplicationName(),
-            encrypted: !clientInfo.isDebuggable(),
-            rooted: deviceInfo.isRooted(),
-            platform: Platform[clientInfo.getPlatform()].toLowerCase(),
-            sdkVersion: clientInfo.getSdkVersion(),
-            osVersion: deviceInfo.getOsVersion(),
-            deviceModel: deviceInfo.getModel(),
-            language: deviceInfo.getLanguage(),
-            test: clientInfo.getTestMode(),
+            bundleId: core.ClientInfo.getApplicationName(),
+            encrypted: !core.ClientInfo.isDebuggable(),
+            rooted: core.DeviceInfo.isRooted(),
+            platform: Platform[core.NativeBridge.getPlatform()].toLowerCase(),
+            sdkVersion: core.ClientInfo.getSdkVersion(),
+            osVersion: core.DeviceInfo.getOsVersion(),
+            deviceModel: core.DeviceInfo.getModel(),
+            language: core.DeviceInfo.getLanguage(),
+            test: core.ClientInfo.getTestMode(),
             gamerToken: gamerToken,
             forceAbGroup: abGroup
         });
 
-        if(clientInfo.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
+        if(core.NativeBridge.getPlatform() === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                deviceMake: deviceInfo.getManufacturer()
+                deviceMake: (<AndroidDeviceInfo>core.DeviceInfo).getManufacturer()
             });
         }
 
-        if(deviceInfo.getAdvertisingIdentifier()) {
+        if(core.DeviceInfo.getAdvertisingIdentifier()) {
             url = Url.addParameters(url, {
-                advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
-                limitAdTracking: deviceInfo.getLimitAdTracking()
+                advertisingTrackingId: core.DeviceInfo.getAdvertisingIdentifier(),
+                limitAdTracking: core.DeviceInfo.getLimitAdTracking()
             });
-        } else if(clientInfo.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
+        } else if(core.NativeBridge.getPlatform() === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                androidId: deviceInfo.getAndroidId()
+                androidId: (<AndroidDeviceInfo>core.DeviceInfo).getAndroidId()
             });
         }
 
@@ -134,37 +131,37 @@ export class ConfigManager {
         return url;
     }
 
-    private static fetchValue(storage: StorageApi, key: string): Promise<string | undefined> {
-        return storage.get<string>(StorageType.PRIVATE, key).then(value => {
+    private static fetchValue(core: Core, key: string): Promise<string | undefined> {
+        return core.Api.Storage.get<string>(StorageType.PRIVATE, key).then(value => {
             return value;
         }).catch(error => {
             return undefined;
         });
     }
 
-    private static storeValue(storage: StorageApi, key: string, value: string): Promise<void[]> {
+    private static storeValue(core: Core, key: string, value: string): Promise<void[]> {
         return Promise.all([
-            storage.set(StorageType.PRIVATE, key, value),
-            storage.write(StorageType.PRIVATE)
+            core.Api.Storage.set(StorageType.PRIVATE, key, value),
+            core.Api.Storage.write(StorageType.PRIVATE)
         ]);
     }
 
-    private static deleteValue(storage: StorageApi, key: string): Promise<void[]> {
+    private static deleteValue(core: Core, key: string): Promise<void[]> {
         return Promise.all([
-            storage.delete(StorageType.PRIVATE, key),
-            storage.write(StorageType.PRIVATE)
+            core.Api.Storage.delete(StorageType.PRIVATE, key),
+            core.Api.Storage.write(StorageType.PRIVATE)
         ]);
     }
 
-    private static fetchGamerToken(storage: StorageApi): Promise<string | undefined> {
-        return this.fetchValue(storage, 'gamerToken');
+    private static fetchGamerToken(core: Core): Promise<string | undefined> {
+        return this.fetchValue(core, 'gamerToken');
     }
 
-    public static storeGamerToken(storage: StorageApi, gamerToken: string): Promise<void[]> {
-        return this.storeValue(storage, 'gamerToken', gamerToken);
+    public static storeGamerToken(core: Core, gamerToken: string): Promise<void[]> {
+        return this.storeValue(core, 'gamerToken', gamerToken);
     }
 
-    private static deleteGamerToken(storage: StorageApi): Promise<void[]> {
-        return this.deleteValue(storage, 'gamerToken');
+    private static deleteGamerToken(core: Core): Promise<void[]> {
+        return this.deleteValue(core, 'gamerToken');
     }
 }

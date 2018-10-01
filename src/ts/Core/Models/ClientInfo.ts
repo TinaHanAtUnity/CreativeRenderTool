@@ -1,4 +1,3 @@
-import { Platform } from 'Core/Constants/Platform';
 import { Model } from 'Core/Models/Model';
 
 interface IClientInfo {
@@ -8,7 +7,6 @@ interface IClientInfo {
     applicationVersion: string;
     sdkVersion: number;
     sdkVersionName: string;
-    platform: Platform;
     debuggable: boolean;
     configUrl: string;
     webviewUrl: string;
@@ -20,7 +18,7 @@ interface IClientInfo {
 
 export class ClientInfo extends Model<IClientInfo> {
 
-    constructor(platform: Platform, data: any[]) {
+    constructor(data: any[]) {
         super('ClientInfo', {
             gameId: ['string'],
             testMode: ['boolean'],
@@ -28,7 +26,6 @@ export class ClientInfo extends Model<IClientInfo> {
             applicationVersion: ['string'],
             sdkVersion: ['number'],
             sdkVersionName: ['string'],
-            platform: ['number'],
             debuggable: ['boolean'],
             configUrl: ['string'],
             webviewUrl: ['string'],
@@ -37,8 +34,6 @@ export class ClientInfo extends Model<IClientInfo> {
             initTimestamp: ['number'],
             reinitialized: ['boolean']
         });
-
-        this.set('platform', platform);
 
         this.set('gameId', data.shift());
         this.set('testMode', data.shift());
@@ -79,10 +74,6 @@ export class ClientInfo extends Model<IClientInfo> {
         return this.get('sdkVersionName');
     }
 
-    public getPlatform(): Platform {
-        return this.get('platform');
-    }
-
     public isDebuggable(): boolean {
         return this.get('debuggable');
     }
@@ -119,7 +110,6 @@ export class ClientInfo extends Model<IClientInfo> {
             'bundleVersion': this.getApplicationVersion(),
             'sdkVersion': this.getSdkVersion(),
             'sdkVersionName': this.getSdkVersionName(),
-            'platform': Platform[this.getPlatform()].toLowerCase(),
             'encrypted': !this.isDebuggable(),
             'configUrl': this.getConfigUrl(),
             'webviewUrl': this.getWebviewUrl(),

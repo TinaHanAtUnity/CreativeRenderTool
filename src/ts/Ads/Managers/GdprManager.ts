@@ -9,7 +9,6 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Request } from 'Core/Managers/Request';
-import { AdsConfiguration } from '../Models/AdsConfiguration';
 
 export interface IGdprPersonalProperties {
     deviceModel: string;

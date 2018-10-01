@@ -3,6 +3,7 @@ import { RequestError } from 'Core/Errors/RequestError';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 import { Core } from '../Core';
+import { AndroidDeviceInfo } from '../Models/AndroidDeviceInfo';
 
 const enum RequestStatus {
     COMPLETE,
@@ -84,9 +85,9 @@ export class Request {
     private _core: Core;
     private _wakeUpManager: WakeUpManager;
 
-    constructor(core: Core, wakeUpManager: WakeUpManager) {
+    constructor(core: Core) {
         this._core = core;
-        this._wakeUpManager = wakeUpManager;
+        this._wakeUpManager = core.WakeUpManager;
 
         this._core.Api.Request.onComplete.subscribe((rawId, url, response, responseCode, headers) => this.onRequestComplete(rawId, url, response, responseCode, headers));
         this._core.Api.Request.onFailed.subscribe((rawId, url, error) => this.onRequestFailed(rawId, url, error));
@@ -136,7 +137,7 @@ export class Request {
         }
 
         // fix for Android 4.0 and older, https://code.google.com/p/android/issues/detail?id=24672
-        if(this._core.getPlatform() === Platform.ANDROID && this._core.getApiLevel()! < 16) {
+        if(this._core.NativeBridge.getPlatform() === Platform.ANDROID && (<AndroidDeviceInfo>this._core.DeviceInfo).getApiLevel()! < 16) {
             headers.push(['Accept-Encoding', '']);
         }
 

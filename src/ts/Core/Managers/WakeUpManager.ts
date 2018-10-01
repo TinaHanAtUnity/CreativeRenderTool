@@ -1,4 +1,3 @@
-import { Logger } from 'Core/Utilities/Logger';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Core } from 'Core/Core';
 
@@ -33,7 +32,7 @@ export class WakeUpManager {
             if(this._connectionEvents <= 10) {
                 this.onNetworkConnected.trigger();
             } else if(this._connectionEvents === 11) {
-                Logger.Warning('Unity Ads has received more than 10 connection events in 30 minutes, now ignoring connection events');
+                this._core.Api.Sdk.logWarning('Unity Ads has received more than 10 connection events in 30 minutes, now ignoring connection events');
             }
         }
     }
