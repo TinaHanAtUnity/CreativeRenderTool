@@ -63,7 +63,7 @@ export class IosDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'unregisterVolumeChangeListener');
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch (event) {
             case DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED]:
                 this.onVolumeChanged.trigger(parameters[0], parameters[1]);

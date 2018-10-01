@@ -98,7 +98,7 @@ export class VastMediaFile extends Model<IVastMediaFile> {
         return this.get('maintainAspectRatio');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'fileURL': this.getFileURL(),
             'deliveryType': this.getDeliveryType(),

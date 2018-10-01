@@ -27,8 +27,8 @@ export interface IMRAIDCampaign extends IProgrammaticCampaign {
 }
 
 export interface IPlayableConfiguration {
-    default?: any;
-    [key: string]: any;
+    default?: unknown;
+    [key: string]: unknown;
 }
 
 export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
@@ -171,8 +171,8 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
         return true;
     }
 
-    public getDTO(): { [key: string]: any } {
-        let resourceUrlDTO: any;
+    public getDTO(): { [key: string]: unknown } {
+        let resourceUrlDTO: unknown;
         const resourceUrlAsset = this.getResourceUrl();
         if (resourceUrlAsset) {
             resourceUrlDTO = resourceUrlAsset.getDTO();

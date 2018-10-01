@@ -119,7 +119,7 @@ export class AuctionRequest {
     private _timeout: number | undefined;
     private _session: Session;
     private _url: string | null;
-    private _body: any | null;
+    private _body: unknown | null;
     private _headers: Array<[string, string]> = [];
 
     private _requestStart: number;
@@ -177,12 +177,12 @@ export class AuctionRequest {
         this._url = url;
     }
 
-    public getBody(): any | null {
+    public getBody(): unknown | null {
         return this._body;
     }
 
     // Overrides the body used in the request.
-    public setBody(body: any) {
+    public setBody(body: unknown) {
         this._body = body;
     }
 
@@ -301,7 +301,7 @@ export class AuctionRequest {
             });
         }
 
-        const promises: Array<Promise<any>> = [];
+        const promises: Array<Promise<unknown>> = [];
         promises.push(this._deviceInfo.getScreenWidth());
         promises.push(this._deviceInfo.getScreenHeight());
         promises.push(this._deviceInfo.getConnectionType());
@@ -319,8 +319,8 @@ export class AuctionRequest {
         });
     }
 
-    protected createPlacementRequest(): any {
-        const placementRequest: any = {};
+    protected createPlacementRequest(): unknown {
+        const placementRequest: unknown = {};
         Object.keys(this._placements).forEach((placementId) => {
             const placement = this._placements[placementId];
             placementRequest[placementId] = this.createPlacementDTO(placement);
@@ -328,8 +328,8 @@ export class AuctionRequest {
         return placementRequest;
     }
 
-    protected createPlacementDTO(placement: Placement): any {
-        const dto: any = {
+    protected createPlacementDTO(placement: Placement): unknown {
+        const dto: unknown = {
             adTypes: placement.getAdTypes(),
             allowSkip: placement.allowSkip()
         };
@@ -349,11 +349,11 @@ export class AuctionRequest {
         });
     }
 
-    private getRequestBody(): Promise<any> {
+    private getRequestBody(): Promise<unknown> {
         if (this._body) {
             return Promise.resolve(this._body);
         }
-        const promises: Array<Promise<any>> = [];
+        const promises: Array<Promise<unknown>> = [];
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
@@ -368,7 +368,7 @@ export class AuctionRequest {
             return signal.getDTO();
         }));
 
-        const body: any = {
+        const body: unknown = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
             bundleId: this._clientInfo.getApplicationName(),
             coppa: this._coreConfig.isCoppaCompliant(),
@@ -408,7 +408,7 @@ export class AuctionRequest {
                 body.versionCode = versionCode;
             }
 
-            const metaDataPromises: Array<Promise<any>> = [];
+            const metaDataPromises: Array<Promise<unknown>> = [];
             metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
             metaDataPromises.push(this._metaDataManager.fetch(FrameworkMetaData));
 

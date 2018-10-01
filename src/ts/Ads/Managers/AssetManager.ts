@@ -22,7 +22,7 @@ enum CacheType {
 }
 
 type ICampaignQueueResolveFunction = (campaign: Campaign) => void;
-type ICampaignQueueRejectFunction = (reason?: any) => void;
+type ICampaignQueueRejectFunction = (reason?: unknown) => void;
 
 interface ICampaignQueueObject {
     campaign: Campaign;
@@ -32,7 +32,7 @@ interface ICampaignQueueObject {
 }
 
 type IAssetQueueResolveFunction = (value: string[]) => void;
-type IAssetQueueRejectFunction = (reason?: any) => void;
+type IAssetQueueRejectFunction = (reason?: unknown) => void;
 
 interface IAssetQueueObject {
     url: string;

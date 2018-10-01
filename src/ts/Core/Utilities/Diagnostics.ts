@@ -10,7 +10,7 @@ export class Diagnostics {
             };
         }
 
-        const kafkaObject: any = {};
+        const kafkaObject: unknown = {};
         kafkaObject.type = type;
         kafkaObject[type] = error;
         kafkaObject.timestamp = Date.now();

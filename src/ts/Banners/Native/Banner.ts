@@ -66,7 +66,7 @@ export class BannerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setViews', [views]);
     }
 
-    public handleEvent(event: string, parameters: any[]) {
+    public handleEvent(event: string, parameters: unknown[]) {
         switch (event) {
             case BannerEvents.BannerEventResized:
                 this.handleBannerResized(parameters);
@@ -94,7 +94,7 @@ export class BannerApi extends NativeApi {
         }
     }
 
-    private handleBannerResized(parameters: any[]) {
+    private handleBannerResized(parameters: unknown[]) {
         const x = parameters[0],
             y = parameters[1],
             width = parameters[2],
@@ -103,7 +103,7 @@ export class BannerApi extends NativeApi {
         this.onBannerResized.trigger({x, y, width, height, alpha});
     }
 
-    private handleBannerVisibilityChanged(parameters: any[]) {
+    private handleBannerVisibilityChanged(parameters: unknown[]) {
         const visibilityAsNumber = parameters[0];
         const visibility = this.getVisibilityForNumber(visibilityAsNumber);
         this.onBannerVisibilityChanged.trigger(visibility);
@@ -122,7 +122,7 @@ export class BannerApi extends NativeApi {
         }
     }
 
-    private handleBannerAttachedStateEvent(parameters: any[]) {
+    private handleBannerAttachedStateEvent(parameters: unknown[]) {
         if (parameters.length !== 1) {
             this._nativeBridge.Sdk.logWarning('Banner attached state event with no attached state parameter');
         } else {

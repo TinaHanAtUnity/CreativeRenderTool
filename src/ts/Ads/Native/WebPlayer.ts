@@ -204,11 +204,11 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setEventSettings', [eventSettings, viewId]);
     }
 
-    public sendEvent(args: any[], viewId: string): Promise<void> {
+    public sendEvent(args: unknown[], viewId: string): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendEvent', [args, viewId]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case WebplayerEvent[WebplayerEvent.PAGE_STARTED]:
                 this.onPageStarted.trigger(parameters.pop(), parameters[0]);

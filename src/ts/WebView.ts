@@ -129,7 +129,7 @@ export class WebView {
         }
     }
 
-    public initialize(): Promise<void | any[]> {
+    public initialize(): Promise<void | unknown[]> {
         const jaegerInitSpan = new JaegerSpan('Initialize'); // start a span
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             jaegerInitSpan.addAnnotation('nativeBridge loadComplete');
@@ -368,7 +368,7 @@ export class WebView {
      PUBLIC API EVENT HANDLERS
      */
 
-    public show(placementId: string, options: any, callback: INativeCallback): void {
+    public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
 
         if(this._showing) {
@@ -458,7 +458,7 @@ export class WebView {
         context.hide();
     }
 
-    private showAd(placement: Placement, campaign: Campaign, options: any) {
+    private showAd(placement: Placement, campaign: Campaign, options: unknown) {
         const testGroup = this._coreConfig.getAbGroup();
         const start = Date.now();
 

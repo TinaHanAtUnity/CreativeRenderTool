@@ -37,7 +37,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _privacyButtonElement: HTMLElement;
     private _GDPRPopupElement: HTMLElement;
 
-    private _fadeTimer: any;
+    private _fadeTimer: unknown;
     private _fadeStatus: boolean = true;
     private _privacy: AbstractPrivacy;
     private _gdprPopupClicked: boolean = false;

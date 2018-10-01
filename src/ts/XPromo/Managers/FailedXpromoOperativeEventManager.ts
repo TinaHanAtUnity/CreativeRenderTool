@@ -12,7 +12,7 @@ export class FailedXpromoOperativeEventManager extends FailedOperativeEventManag
     }
 
     public sendFailedEvent(nativeBridge: NativeBridge, request: Request, writeStorage?: boolean): Promise<void> {
-        return nativeBridge.Storage.get<{ [key: string]: any }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
+        return nativeBridge.Storage.get<{ [key: string]: unknown }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
             const kafkaType = eventData.kafkaType;
             const data = eventData.data;
             return HttpKafka.sendEvent(kafkaType, KafkaCommonObjectType.PERSONAL, JSON.parse(data));
@@ -27,8 +27,8 @@ export class FailedXpromoOperativeEventManager extends FailedOperativeEventManag
         });
     }
 
-    protected getPromisesForFailedEvents(nativeBridge: NativeBridge, request: Request, keys: string[]): Array<Promise<any>> {
-        const promises: Array<Promise<any>> = [];
+    protected getPromisesForFailedEvents(nativeBridge: NativeBridge, request: Request, keys: string[]): Array<Promise<unknown>> {
+        const promises: Array<Promise<unknown>> = [];
         keys.map(eventId => {
             const manager = new FailedXpromoOperativeEventManager(this._sessionId, eventId);
             promises.push(manager.sendFailedEvent(nativeBridge, request));

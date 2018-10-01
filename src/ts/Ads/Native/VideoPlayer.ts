@@ -86,7 +86,7 @@ export class VideoPlayerApi extends NativeApiWithEventHandlers<IVideoEventHandle
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setAutomaticallyWaitsToMinimizeStalling', [value]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case VideoPlayerEvent[VideoPlayerEvent.PROGRESS]:
                 this._handlers.forEach(handler => handler.onProgress(parameters[0]));

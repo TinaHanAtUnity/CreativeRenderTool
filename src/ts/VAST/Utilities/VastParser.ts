@@ -18,7 +18,7 @@ export class VastParser {
 
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
-    private _rootWrapperVast: any;
+    private _rootWrapperVast: unknown;
 
     constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParser.DEFAULT_MAX_WRAPPER_DEPTH) {
         this._domParser = domParser || VastParser.createDOMParser();
@@ -41,7 +41,7 @@ export class VastParser {
             throw new Error('VAST xml data is missing');
         }
 
-        const childNodes = <Node[]><any>xml.documentElement.childNodes;
+        const childNodes = <Node[]><unknown>xml.documentElement.childNodes;
 
         // collect error URLs before moving on to ads
         for(const node of childNodes) {
@@ -66,7 +66,7 @@ export class VastParser {
         return new Vast(ads, errorURLTemplates);
     }
 
-    public retrieveVast(vast: any, nativeBridge: NativeBridge, request: Request, parent?: Vast, depth: number = 0): Promise<Vast> {
+    public retrieveVast(vast: unknown, nativeBridge: NativeBridge, request: Request, parent?: Vast, depth: number = 0): Promise<Vast> {
         let parsedVast: Vast;
 
         if (depth === 0) {
@@ -124,7 +124,7 @@ export class VastParser {
         }
     }
 
-    private parseNodeText(node: any): string {
+    private parseNodeText(node: unknown): string {
         let parsedText = node && (node.textContent || node.text);
 
         if (parsedText) {
@@ -134,7 +134,7 @@ export class VastParser {
         return parsedText;
     }
 
-    private parseAdElement(adElement: any): VastAd | undefined {
+    private parseAdElement(adElement: unknown): VastAd | undefined {
         let ad: VastAd | undefined;
         const childNodes = adElement.childNodes;
         for(const adTypeElement of childNodes) {
@@ -153,11 +153,11 @@ export class VastParser {
         return ad;
     }
 
-    private parseWrapperElement(wrapperElement: any): VastAd {
+    private parseWrapperElement(wrapperElement: unknown): VastAd {
         return this.parseInLineElement(wrapperElement);
     }
 
-    private parseInLineElement(inLineElement: any): VastAd {
+    private parseInLineElement(inLineElement: unknown): VastAd {
         const ad = new VastAd();
         const childNodes = inLineElement.childNodes;
         for(const node of childNodes) {
@@ -213,7 +213,7 @@ export class VastParser {
         return ad;
     }
 
-    private parseCreativeLinearElement(creativeElement: any): any {
+    private parseCreativeLinearElement(creativeElement: unknown): unknown {
         const creative = new VastCreativeLinear();
 
         creative.setDuration(this.parseDuration(this.parseNodeText(this.childByName(creativeElement, 'Duration'))));
@@ -286,7 +286,7 @@ export class VastParser {
         return creative;
     }
 
-    private parseCreativeCompanionAdElement(companionAdElement: any): any {
+    private parseCreativeCompanionAdElement(companionAdElement: unknown): unknown {
         const staticResourceElement = this.childByName(companionAdElement, 'StaticResource');
         const companionClickThroughElement = this.childByName(companionAdElement, 'CompanionClickThrough');
 
@@ -355,7 +355,7 @@ export class VastParser {
         return hours + minutes + seconds;
     }
 
-    private childByName(node: any, name: string): any {
+    private childByName(node: unknown, name: string): unknown {
         const childNodes = node.childNodes;
         for(const child of childNodes) {
             if (child.nodeName === name) {
@@ -364,7 +364,7 @@ export class VastParser {
         }
     }
 
-    private childsByName(node: any, name: string): any {
+    private childsByName(node: unknown, name: string): unknown {
         const matches: Node[] = [];
         const childNodes = node.childNodes;
         for(const child of childNodes) {

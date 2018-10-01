@@ -35,7 +35,7 @@ export class AndroidVideoPlayerApi extends NativeApiWithEventHandlers<IAndroidVi
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setInfoListenerEnabled', [enabled]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case AndroidVideoPlayerEvent[AndroidVideoPlayerEvent.INFO]:
                 this._handlers.forEach(handler => handler.onInfo(parameters[0], parameters[1], parameters[2]));

@@ -25,7 +25,7 @@ export class FrameworkMetaData extends BaseMetaData<IFrameworkMetaData> {
         return this.get('version');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'frameworkName': this.getName(),
             'frameworkVersion': this.getVersion()

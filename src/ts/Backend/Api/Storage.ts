@@ -16,7 +16,7 @@ export class Storage {
         throw ['COULDNT_GET_VALUE', key];
     }
 
-    public static set(storage: string, key: string, value: any) {
+    public static set(storage: string, key: string, value: unknown) {
         return;
     }
 
@@ -44,7 +44,7 @@ export class Storage {
         return;
     }
 
-    private static findObject(storage: any, key: string) {
+    private static findObject(storage: unknown, key: string) {
         if (!key.length) {
             return storage;
         }

@@ -28,7 +28,7 @@ export abstract class NativeApi {
         this._fullApiClassName = this.getFullApiClassName();
     }
 
-    public handleEvent(event: string, parameters: any[]) {
+    public handleEvent(event: string, parameters: unknown[]) {
         throw new Error(this._apiClass + ' event ' + event + ' does not have an observable');
     }
 

@@ -117,7 +117,7 @@ export class CacheApi extends NativeApi {
         return this._nativeBridge.invoke<string>(this._fullApiClassName, 'setFileContent', [fileId, encoding, content]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case CacheEvent[CacheEvent.DOWNLOAD_STARTED]:
                 this.onDownloadStarted.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);

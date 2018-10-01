@@ -40,7 +40,7 @@ export class LifecycleApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'unregister');
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case LifecycleEvent[LifecycleEvent.CREATED]:
                 this.onActivityCreated.trigger(parameters[0]);

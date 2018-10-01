@@ -38,12 +38,12 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
         });
     }
 
-    protected setValues(data: { [key: string]: any }): boolean {
+    protected setValues(data: { [key: string]: unknown }): boolean {
         let success = false;
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
                 try {
-                    this.set(<any>key, data[key]);
+                    this.set(<unknown>key, data[key]);
                 } catch (e) {
                     return false;
                 }
@@ -56,13 +56,13 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
     }
 
     private getValues(nativeBridge: NativeBridge, keys: string[]): Promise<{}> {
-        const returnObject: { [key: string]: any } = {};
+        const returnObject: { [key: string]: unknown } = {};
         const metaData: MetaData = new MetaData(nativeBridge);
         return metaData.hasCategory(this.getCategory()).then(exists => {
             if(!exists) {
                 return Promise.resolve([]);
             }
-            return Promise.all(keys.map((key) => metaData.get<any>(this.getCategory() + '.' + key, false).then(([found, value]) => {
+            return Promise.all(keys.map((key) => metaData.get<unknown>(this.getCategory() + '.' + key, false).then(([found, value]) => {
                 if(found) {
                     returnObject[key] = value;
                 }

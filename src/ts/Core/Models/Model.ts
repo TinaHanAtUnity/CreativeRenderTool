@@ -19,7 +19,7 @@ export abstract class Model<T extends object> {
         this.setModelValues(data);
     }
 
-    public abstract getDTO(): { [key: string]: any };
+    public abstract getDTO(): { [key: string]: unknown };
 
     public toJSON(): string {
         return JSON.stringify(this._data);
@@ -53,7 +53,7 @@ export abstract class Model<T extends object> {
         throw error;
     }
 
-    private getTypeOf(value: any): string {
+    private getTypeOf(value: unknown): string {
         let valueType: string = typeof value;
         if (Array.isArray(value)) {
             valueType = 'array';
@@ -66,7 +66,7 @@ export abstract class Model<T extends object> {
         return valueType;
     }
 
-    private checkValue(value: any, allowedTypes: SchemaType[]): boolean {
+    private checkValue(value: unknown, allowedTypes: SchemaType[]): boolean {
         for(const currentType of allowedTypes) {
             const valueType = this.getTypeOf(value);
             if(valueType === currentType || (currentType === 'number' && valueType === 'integer')) {

@@ -131,7 +131,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
     }
 
     private onMessage(e: MessageEvent): void {
-        const data: any = e.data;
+        const data: unknown = e.data;
         switch (data.type) {
             case 'close':
                 this.onCloseEvent(e);

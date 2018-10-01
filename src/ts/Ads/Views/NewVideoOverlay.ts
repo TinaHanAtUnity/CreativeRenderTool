@@ -30,7 +30,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _callButtonElement: HTMLElement;
     private _timerElement: HTMLElement;
 
-    private _fadeTimer: any;
+    private _fadeTimer: unknown;
     private _areControlsVisible: boolean = false;
     private _privacy: AbstractPrivacy;
     private _gdprPopupClicked: boolean = false;

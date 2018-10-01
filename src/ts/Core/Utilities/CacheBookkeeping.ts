@@ -27,8 +27,8 @@ export class CacheBookkeeping {
         this._nativeBridge = nativeBridge;
     }
 
-    public cleanCache(): Promise<any[]> {
-        return Promise.all([this.getFilesKeys(), this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([keys, files, campaigns]: [string[], IFileInfo[], object]): Promise<any> => {
+    public cleanCache(): Promise<unknown[]> {
+        return Promise.all([this.getFilesKeys(), this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([keys, files, campaigns]: [string[], IFileInfo[], object]): Promise<unknown> => {
             if (!files || !files.length) {
                 let campaignCount = 0;
                 if (campaigns) {
@@ -47,7 +47,7 @@ export class CacheBookkeeping {
 
             return this.cleanCacheBookKeeping().then(() => {
                 // clean files older than three weeks and limit cache size to 50 megabytes
-                const promises: Array<Promise<any>> = [];
+                const promises: Array<Promise<unknown>> = [];
                 const timeThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
                 const sizeThreshold: number = 50 * 1024 * 1024;
 
@@ -97,7 +97,7 @@ export class CacheBookkeeping {
 
                 // check consistency of kept files so that bookkeeping and files on device match
                 keepFiles.map(file => {
-                    promises.push(this.getFileInfo(file).then((response): Promise<any[]> => {
+                    promises.push(this.getFileInfo(file).then((response): Promise<unknown[]> => {
                         if (response.fullyDownloaded === true) {
                             // file and bookkeeping ok
                             return Promise.all([]);
@@ -121,7 +121,7 @@ export class CacheBookkeeping {
                     }));
                 });
 
-                return Promise.all([this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]: [IFileInfo[], { [key: string]: any }]) => {
+                return Promise.all([this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]: [IFileInfo[], { [key: string]: unknown }]) => {
                     const cacheFilesLeftIds: string[] = [];
                     cacheFilesLeft.map(currentFile => {
                         cacheFilesLeftIds.push(FileId.getFileIdHash(currentFile.id));
@@ -205,7 +205,7 @@ export class CacheBookkeeping {
         });
     }
 
-    public setCachedCampaignResponse(response: INativeResponse): Promise<any> {
+    public setCachedCampaignResponse(response: INativeResponse): Promise<unknown> {
         const cacheCampaignUrlPromise = this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'), response.url);
         const cachedCampaignResponsePromise = this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'), response.response);
 
@@ -214,7 +214,7 @@ export class CacheBookkeeping {
         });
     }
 
-    public deleteCachedCampaignResponse(): Promise<any> {
+    public deleteCachedCampaignResponse(): Promise<unknown> {
         const cacheCampaignUrlPromise = this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'));
         const cachedCampaignResponsePromise = this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'));
 
@@ -233,7 +233,7 @@ export class CacheBookkeeping {
 
     private cleanCacheBookKeeping(): Promise<void> {
         return this.getKeys().then((cacheKeys) => {
-            const promises: Array<Promise<any>> = cacheKeys
+            const promises: Array<Promise<unknown>> = cacheKeys
                 .filter(cacheKey => cacheKey && !(cacheKey.toUpperCase() in CacheKey))
                 .map(cacheKey => this._nativeBridge.Storage.delete(StorageType.PRIVATE, this._rootKey + '.' + cacheKey));
 

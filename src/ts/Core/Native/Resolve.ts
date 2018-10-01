@@ -20,7 +20,7 @@ export class ResolveApi extends NativeApi {
         return this._nativeBridge.invoke<string>(this._fullApiClassName, 'resolve', [id, host]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case ResolveEvent[ResolveEvent.COMPLETE]:
                 this.onComplete.trigger(parameters[0], parameters[1], parameters[2]);

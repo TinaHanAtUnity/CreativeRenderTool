@@ -85,7 +85,7 @@ export class Video extends Asset<IVideo> {
         this.set('quartile', quartile);
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'asset': super.getDTO(),
             'size': this.getSize(),

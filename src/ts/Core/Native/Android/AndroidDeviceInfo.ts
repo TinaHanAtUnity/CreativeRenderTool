@@ -176,7 +176,7 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'getNetworkMetered');
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch (event) {
             case DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED]:
                 this.onVolumeChanged.trigger(parameters[0], parameters[1], parameters[2]);

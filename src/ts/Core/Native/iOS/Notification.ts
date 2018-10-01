@@ -8,7 +8,7 @@ enum NotificationEvent {
 
 export class NotificationApi extends NativeApi {
 
-    public readonly onNotification = new Observable2<string, any>();
+    public readonly onNotification = new Observable2<string, unknown>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Notification', ApiPackage.CORE);
@@ -34,7 +34,7 @@ export class NotificationApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'removeAVNotificationObserver', [name]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case NotificationEvent[NotificationEvent.ACTION]:
                 this.onNotification.trigger(parameters[0], parameters[1]);

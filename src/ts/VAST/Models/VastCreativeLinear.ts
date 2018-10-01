@@ -13,9 +13,9 @@ interface IVastCreativeLinear extends IVastCreative {
 
 export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
     constructor();
-    constructor(duration?: number, skipDelay?: number, mediaFiles?: any[],
+    constructor(duration?: number, skipDelay?: number, mediaFiles?: unknown[],
                 videoClickThroughURLTemplate?: string, videoClickTrackingURLTemplates?: string[],
-                videoCustomClickURLTemplates?: string[], adParameters?: any) {
+                videoCustomClickURLTemplates?: string[], adParameters?: unknown) {
         super('VastCreativeLinear', {
             type: ['string'],
             trackingEvents: ['object'],
@@ -89,7 +89,7 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
         return this.get('adParameters');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         const mediaFiles = [];
         for (const mediaFile of this.getMediaFiles()) {
             mediaFiles.push(mediaFile.getDTO());

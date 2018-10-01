@@ -18,9 +18,9 @@ export enum MoatState {
 
 export class MOAT extends View<VastCampaign> {
     private _iframe: HTMLIFrameElement;
-    private _resizeHandler: any;
-    private _resizeDelayer: any;
-    private _resizeTimeout: any;
+    private _resizeHandler: unknown;
+    private _resizeDelayer: unknown;
+    private _resizeTimeout: unknown;
     private _didInitMoat = false;
     private _messageListener: (e: MessageEvent) => void;
     private _state: MoatState = MoatState.STOPPED;
@@ -34,7 +34,7 @@ export class MOAT extends View<VastCampaign> {
 
     public render(): void {
         super.render();
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#moat-iframe');
+        const iframe: unknown = this._iframe = <HTMLIFrameElement>this._container.querySelector('#moat-iframe');
         iframe.srcdoc = MOATContainer;
     }
 
@@ -143,7 +143,7 @@ export class MOAT extends View<VastCampaign> {
         }
     }
 
-    public triggerViewabilityEvent(type: string, payload: any) {
+    public triggerViewabilityEvent(type: string, payload: unknown) {
         this._nativeBridge.Sdk.logDebug('Calling MOAT viewability event "' + type + '" with payload: ' + payload);
         if (this._iframe.contentWindow) {
             this._iframe.contentWindow.postMessage({

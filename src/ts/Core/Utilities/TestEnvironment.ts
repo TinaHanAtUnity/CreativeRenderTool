@@ -10,7 +10,7 @@ export class TestEnvironment {
                 deleteValue = clearKeyValue;
             }
 
-            const promises: any[] = [];
+            const promises: unknown[] = [];
             keys.forEach((key) => {
                 promises.push(metaData.get('test.' + key, deleteValue).then(([found, value]) => {
                     if(found) {
@@ -22,9 +22,9 @@ export class TestEnvironment {
         });
     }
 
-    public static get(key: string): any {
+    public static get(key: string): unknown {
         return TestEnvironment._testEnvironment[key];
     }
 
-    private static _testEnvironment: { [key: string]: any } = {};
+    private static _testEnvironment: { [key: string]: unknown } = {};
 }

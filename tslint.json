@@ -7,7 +7,7 @@
     "variable-name": false,
     "no-bitwise": false,
     "no-this-assignment": false,
-    "no-any": false,
+    "no-any": true,
     "no-typeof-undefined": false,
     "whitespace": [false, "check-branch", "check-decl", "check-operator", "check-separator", "check-type"],
     "prefer-template": false,

@@ -17,7 +17,7 @@ export interface IMRAIDHandler {
 export interface IMRAIDMessage {
     type: string;
     event: string;
-    data?: any;
+    data?: unknown;
 }
 
 export interface IMRAIDOrientationProperties {

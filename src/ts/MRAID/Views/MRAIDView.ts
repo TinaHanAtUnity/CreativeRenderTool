@@ -34,7 +34,7 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onMraidSkip(): void;
     onMraidClose(): void;
     onMraidOrientationProperties(orientationProperties: IOrientationProperties): void;
-    onPlayableAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: any): void;
+    onPlayableAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: unknown): void;
     onMraidShowEndScreen(): void;
 }
 
@@ -90,7 +90,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    public createMRAID(container: any): Promise<string> {
+    public createMRAID(container: unknown): Promise<string> {
         const fetchingTimestamp = Date.now();
         let fetchingStopTimestamp = Date.now();
         let mraidParseTimestamp = Date.now();

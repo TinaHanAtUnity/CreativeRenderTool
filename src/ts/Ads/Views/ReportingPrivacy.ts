@@ -40,7 +40,7 @@ export class ReportingPrivacy extends AbstractPrivacy {
 
         super(nativeBridge, isCoppaCompliant, gdprEnabled, 'reporting-privacy');
         this._templateData.badAdKeys = Object.keys(BadAdReason);
-        this._templateData.badAdReasons = (<string[]>(<any>Object).values(BadAdReason));
+        this._templateData.badAdReasons = (<string[]>(<unknown>Object).values(BadAdReason));
 
         this._template = new Template(ReportingPrivacyTemplate);
         this._campaign = campaign;

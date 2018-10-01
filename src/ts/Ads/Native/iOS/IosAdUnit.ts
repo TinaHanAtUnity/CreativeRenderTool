@@ -92,7 +92,7 @@ export class IosAdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<Double[]>(this._fullApiClassName, 'getViewFrame', [view]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case AdUnitEvent[AdUnitEvent.VIEW_CONTROLLER_INIT]:
                 this.onViewControllerInit.trigger();

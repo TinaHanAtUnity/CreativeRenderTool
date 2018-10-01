@@ -4,8 +4,8 @@ import { IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
 
 export class PlayableEventHandler extends MRAIDEventHandler implements IMRAIDViewHandler {
 
-    public onPlayableAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, backgroundTime: number, event: string, eventData: any): void {
-        const kafkaObject: any = {};
+    public onPlayableAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, backgroundTime: number, event: string, eventData: unknown): void {
+        const kafkaObject: unknown = {};
         kafkaObject.type = event;
         kafkaObject.eventData = eventData;
         kafkaObject.timeFromShow = timeFromShow;

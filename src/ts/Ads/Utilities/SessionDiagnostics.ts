@@ -2,6 +2,13 @@ import { Session } from 'Ads/Models/Session';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { INativeResponse } from 'Core/Utilities/Request';
 
+export interface IKafkaObject {
+    [key: string]: unknown;
+    type: string;
+    timestamp: number;
+    adPlan?: string;
+}
+
 export class SessionDiagnostics {
     public static trigger(type: string, error: {}, session: Session): Promise<INativeResponse> {
         // ElasticSearch schema generation can result in dropping errors if root values are not the same type across errors
@@ -11,13 +18,12 @@ export class SessionDiagnostics {
             };
         }
 
-        const kafkaObject: any = {};
-        kafkaObject.type = type;
+        const kafkaObject: IKafkaObject = {
+            type,
+            timestamp: Date.now(),
+            adPlan: session.getAdPlan() ? session.getAdPlan() : undefined
+        };
         kafkaObject[type] = error;
-        kafkaObject.timestamp = Date.now();
-        if (session.getAdPlan() !== undefined) {
-            kafkaObject.adPlan = session.getAdPlan();
-        }
 
         return HttpKafka.sendEvent('ads.sdk2.diagnostics', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }

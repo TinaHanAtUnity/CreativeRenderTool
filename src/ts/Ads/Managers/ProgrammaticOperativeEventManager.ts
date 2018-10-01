@@ -29,11 +29,11 @@ export class ProgrammaticOperativeEventManager extends OperativeEventManager {
         return undefined;
     }
 
-    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, any]> {
+    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, unknown]> {
         return super.getInfoJson(params, eventId, gameSession, gamerSid, previousPlacementId).then(([id, infoJson]) => {
             infoJson.creativeId =  this._campaign.getCreativeId();
 
-            return <[string, any]>[eventId, infoJson];
+            return <[string, unknown]>[eventId, infoJson];
         });
     }
 }

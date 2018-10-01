@@ -37,7 +37,7 @@ interface IPlacement {
 
 export class Placement extends Model<IPlacement> {
 
-    constructor(data: any) {
+    constructor(data: unknown) {
         super('Placement', {
             id: ['string'],
             name: ['string'],
@@ -184,7 +184,7 @@ export class Placement extends Model<IPlacement> {
         return false;
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'id': this.getId(),
             'name': this.getName(),

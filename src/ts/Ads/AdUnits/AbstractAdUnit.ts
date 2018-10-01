@@ -31,7 +31,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
     request: Request;
-    options: any;
+    options: unknown;
     gdprManager: GdprManager;
     adMobSignalFactory?: AdMobSignalFactory;
     webPlayerContainer?: WebPlayerContainer;

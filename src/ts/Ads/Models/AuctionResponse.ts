@@ -25,7 +25,7 @@ export interface IAuctionResponse {
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
-    constructor(placements: string[], data: any, mediaId: string, correlationId: string) {
+    constructor(placements: string[], data: unknown, mediaId: string, correlationId: string) {
         super('AuctionResponse', {
             placements: ['array'],
             contentType: ['string'],
@@ -83,7 +83,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('content');
     }
 
-    public getJsonContent(): any {
+    public getJsonContent(): unknown {
         return JsonParser.parse(this.getContent());
     }
 
@@ -155,7 +155,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('isMoatEnabled');
     }
 
-    public getDTO(): {[key: string]: any } {
+    public getDTO(): {[key: string]: unknown } {
         return {
             'placements': this.getPlacements(),
             'contentType': this.getContentType(),

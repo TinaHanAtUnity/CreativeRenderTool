@@ -8,7 +8,7 @@ enum BroadcastEvent {
 
 export class BroadcastApi extends NativeApi {
 
-    public readonly onBroadcastAction = new Observable4<string, string, string, any>();
+    public readonly onBroadcastAction = new Observable4<string, string, string, unknown>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Broadcast', ApiPackage.CORE);
@@ -30,7 +30,7 @@ export class BroadcastApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'removeAllBroadcastListeners', []);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         if(event === BroadcastEvent[BroadcastEvent.ACTION]) {
             this.onBroadcastAction.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
         } else {

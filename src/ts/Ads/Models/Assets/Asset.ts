@@ -69,7 +69,7 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
         return this.get('creativeId');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'url': this.getOriginalUrl(),
             'cachedUrl': this.getCachedUrl(),

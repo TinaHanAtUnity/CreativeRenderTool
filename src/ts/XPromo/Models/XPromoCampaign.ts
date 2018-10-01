@@ -122,7 +122,7 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
     public getTrackingUrlsForEvent(eventName: string): string[] {
         const trackingUrls = this.get('trackingUrls');
         if (trackingUrls) {
-            return (<any>trackingUrls)[eventName] || [];
+            return (<unknown>trackingUrls)[eventName] || [];
         }
         return [];
     }
@@ -151,32 +151,32 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
         return false;
     }
 
-    public getDTO(): { [key: string]: any } {
-        let gameIcon: any;
+    public getDTO(): { [key: string]: unknown } {
+        let gameIcon: unknown;
         const gameIconObject = this.getGameIcon();
         if (gameIconObject) {
             gameIcon = gameIconObject.getDTO();
         }
 
-        let landscapeImage: any;
+        let landscapeImage: unknown;
         const landscapeImageObject = this.getLandscape();
         if (landscapeImageObject) {
             landscapeImage = landscapeImageObject.getDTO();
         }
 
-        let portraitImage: any;
+        let portraitImage: unknown;
         const portraitImageObject = this.getPortrait();
         if (portraitImageObject) {
             portraitImage = portraitImageObject.getDTO();
         }
 
-        let video: any;
+        let video: unknown;
         const videoObject = this.getVideo();
         if (videoObject) {
             video = videoObject.getDTO();
         }
 
-        let streamingVideo: any;
+        let streamingVideo: unknown;
         const streamingVideoObject = this.getStreamingVideo();
         if (streamingVideoObject) {
             streamingVideo = streamingVideoObject.getDTO();

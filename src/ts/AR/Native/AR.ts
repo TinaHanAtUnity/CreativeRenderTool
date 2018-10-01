@@ -98,7 +98,7 @@ export class ARApi extends NativeApi {
         return this._nativeBridge.invoke<IARVideoFormat[]>(this._fullApiClassName, 'getSupportedVideoFormats');
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch (event) {
             case AREvent[AREvent.AR_PLANES_ADDED]:
                 this.onPlanesAdded.trigger(parameters[0]);

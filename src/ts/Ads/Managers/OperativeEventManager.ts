@@ -130,7 +130,7 @@ export class OperativeEventManager {
 
         session.setEventSent(EventType.FIRST_QUARTILE);
 
-        const fulfilled = ([id, infoJson]: [string, any]) => {
+        const fulfilled = ([id, infoJson]: [string, unknown]) => {
             this.sendEvent('first_quartile', id, infoJson.sessionId, this.createVideoEventUrl('first_quartile'), JSON.stringify(infoJson));
         };
 
@@ -146,7 +146,7 @@ export class OperativeEventManager {
 
         session.setEventSent(EventType.MIDPOINT);
 
-        const fulfilled = ([id, infoJson]: [string, any]) => {
+        const fulfilled = ([id, infoJson]: [string, unknown]) => {
             this.sendEvent('midpoint', id, infoJson.sessionId, this.createVideoEventUrl('midpoint'), JSON.stringify(infoJson));
         };
 
@@ -162,7 +162,7 @@ export class OperativeEventManager {
 
         session.setEventSent(EventType.THIRD_QUARTILE);
 
-        const fulfilled = ([id, infoJson]: [string, any]) => {
+        const fulfilled = ([id, infoJson]: [string, unknown]) => {
             this.sendEvent('third_quartile', id, infoJson.sessionId, this.createVideoEventUrl('third_quartile'), JSON.stringify(infoJson));
         };
 
@@ -177,7 +177,7 @@ export class OperativeEventManager {
         }
         session.setEventSent(EventType.SKIP);
 
-        const fulfilled = ([id, infoJson]: [string, any]) => {
+        const fulfilled = ([id, infoJson]: [string, unknown]) => {
             if(params.videoProgress) {
                 infoJson.skippedAt = params.videoProgress;
             }
@@ -218,7 +218,7 @@ export class OperativeEventManager {
 
         GameSessionCounters.addView(this._campaign);
 
-        const fulfilled = ([id, infoJson]: [string, any]) => {
+        const fulfilled = ([id, infoJson]: [string, unknown]) => {
             this.sendEvent('view', id, infoJson.sessionId, this.createVideoEventUrl('video_end'), JSON.stringify(infoJson));
         };
 
@@ -233,7 +233,7 @@ export class OperativeEventManager {
         }
         session.setEventSent(EventType.CLICK);
 
-        const fulfilled = ([id, infoJson]: [string, any]) => {
+        const fulfilled = ([id, infoJson]: [string, unknown]) => {
             this.sendEvent('click', id, session.getId(), this.createClickEventUrl(), JSON.stringify(infoJson));
         };
 
@@ -285,14 +285,14 @@ export class OperativeEventManager {
         return undefined;
     }
 
-    protected createUniqueEventMetadata(params: IOperativeEventParams, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, any]> {
+    protected createUniqueEventMetadata(params: IOperativeEventParams, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, unknown]> {
         return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
             return this.getInfoJson(params, id, gameSession, gamerSid, previousPlacementId);
         });
     }
 
-    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, any]> {
-        let infoJson: any = {
+    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, unknown]> {
+        let infoJson: unknown = {
             'eventId': eventId,
             'auctionId': this._campaign.getSession().getId(),
             'gameSessionId': gameSession,
@@ -372,7 +372,7 @@ export class OperativeEventManager {
                 infoJson.frameworkVersion = framework.getVersion();
             }
 
-            return <[string, any]>[eventId, infoJson];
+            return <[string, unknown]>[eventId, infoJson];
         });
     }
 }

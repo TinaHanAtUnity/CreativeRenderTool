@@ -33,7 +33,7 @@ export class MixedPlacementUtility {
         return true;
     }
 
-    public static createMixedPlacements(rawPlacement: any, placements: { [id: string]: Placement }) {
+    public static createMixedPlacements(rawPlacement: unknown, placements: { [id: string]: Placement }) {
         const rawPlacementId = rawPlacement.id;
         for (const mixedPlacementSuffix of this.getMixedPlacementTypeList()) {
             rawPlacement.id = rawPlacementId + mixedPlacementSuffix;

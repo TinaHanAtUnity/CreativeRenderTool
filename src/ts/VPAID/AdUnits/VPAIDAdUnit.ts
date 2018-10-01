@@ -42,7 +42,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _view: VPAID;
     private _vpaidCampaign: VPAIDCampaign;
     private _timer: Timer;
-    private _options: any;
+    private _options: unknown;
     private _deviceInfo: DeviceInfo;
     private _urlLoadingObserver: IObserver2<string, string>;
     private _privacyShowing = false;
@@ -206,7 +206,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
     }
 
-    private setupWebPlayer(): Promise<any> {
+    private setupWebPlayer(): Promise<unknown> {
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this.setupAndroidWebPlayer();
         } else {
@@ -229,7 +229,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         return Promise.all(promises);
     }
 
-    private setupIosWebPlayer(): Promise<any> {
+    private setupIosWebPlayer(): Promise<unknown> {
         const settings = {
             'allowsPlayback': true,
             'playbackRequiresAction': false,

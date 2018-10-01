@@ -43,7 +43,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
     private static _progressInterval: number = 250;
 
-    protected _options: any;
+    protected _options: unknown;
     protected _deviceInfo: DeviceInfo;
     protected _overlay: AbstractVideoOverlay | undefined;
     private _video: Video;

@@ -66,7 +66,7 @@ export class GameSessionCounters {
         this._adRequestCount++;
     }
 
-    public static getDTO(): { [key: string]: any } {
+    public static getDTO(): { [key: string]: unknown } {
         return {
             adRequests: this._adRequestCount,
             starts: this._totalStartCount,

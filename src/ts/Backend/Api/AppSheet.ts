@@ -4,11 +4,11 @@ export class AppSheet {
         return false;
     }
 
-    public static prepare(options: any, timeout: number) {
+    public static prepare(options: unknown, timeout: number) {
         return;
     }
 
-    public static destroy(options: any) {
+    public static destroy(options: unknown) {
         return;
     }
 

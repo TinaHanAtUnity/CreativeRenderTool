@@ -109,7 +109,7 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
         return this.get('advertiserBundleId');
     }
 
-    private addTrackingToVAST(tracking: any) {
+    private addTrackingToVAST(tracking: unknown) {
         if (tracking) {
             for (const trackingEventName in tracking) {
                 if (tracking.hasOwnProperty(trackingEventName)) {

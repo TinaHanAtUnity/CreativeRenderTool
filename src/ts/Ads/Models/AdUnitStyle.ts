@@ -33,7 +33,7 @@ export class AdUnitStyle extends Model<IAdUnitStyle> {
         return this.get('ctaButtonColor');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'ctaButtonColor': this.getCTAButtonColor()
         };

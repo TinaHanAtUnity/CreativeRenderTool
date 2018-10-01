@@ -208,7 +208,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         }
     }
 
-    private triggerDiagnosticsError(error: any, clickAttributionUrl: string) {
+    private triggerDiagnosticsError(error: unknown, clickAttributionUrl: string) {
         const currentSession = this._campaign.getSession();
 
         if (error instanceof RequestError) {

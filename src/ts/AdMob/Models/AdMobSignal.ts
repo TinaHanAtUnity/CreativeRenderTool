@@ -584,7 +584,7 @@ export class AdMobSignal extends Model<IAdMobSignal> {
         return str;
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'sdkVersion': this.getSdkVersion(),
             'batteryLevel': this.getBatteryLevel(),

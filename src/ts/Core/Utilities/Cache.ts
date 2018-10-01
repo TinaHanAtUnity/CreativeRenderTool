@@ -29,7 +29,7 @@ export interface ICacheCampaignsResponse {
 }
 
 type ICallbackResolveFunction = (value?: [CacheStatus, string]) => void;
-type ICallbackRejectFunction = (reason?: any) => void;
+type ICallbackRejectFunction = (reason?: unknown) => void;
 
 export type HeadersType = Array<[string, string]>;
 
@@ -363,7 +363,7 @@ export class Cache {
             callback.networkRetry = true;
 
             // note: this timeout may never trigger since timeouts are unreliable when ad unit is not active
-            // therefore this method should not assume any previous state and work the same way as system event handlers
+            // therefore this method should not assume unknown previous state and work the same way as system event handlers
             // if this never triggers, retrying will still be triggered from connection events
             setTimeout(() => {
                 const retryCallback = this._callbacks[url];
@@ -447,7 +447,7 @@ export class Cache {
         }
     }
 
-    private onStorageSet(eventType: string, data: any) {
+    private onStorageSet(eventType: string, data: unknown) {
         let deleteValue: boolean = false;
 
         if(data && data.caching && data.caching.pause && 'value' in data.caching.pause) {

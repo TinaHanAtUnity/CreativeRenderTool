@@ -6,9 +6,9 @@ export class Swipe {
     private _startX: number;
     private _startY: number;
 
-    private _onTouchEndListener: ((event: TouchEvent) => any);
-    private _onTouchCancelListener: ((event: TouchEvent) => any);
-    private _onTouchMoveListener: ((event: TouchEvent) => any);
+    private _onTouchEndListener: ((event: TouchEvent) => unknown);
+    private _onTouchCancelListener: ((event: TouchEvent) => unknown);
+    private _onTouchMoveListener: ((event: TouchEvent) => unknown);
 
     constructor(element: HTMLElement) {
         this._element = element;

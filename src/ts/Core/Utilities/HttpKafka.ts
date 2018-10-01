@@ -26,8 +26,8 @@ export class HttpKafka {
         HttpKafka._configuration = configuration;
     }
 
-    public static sendEvent(type: string, objectType: KafkaCommonObjectType, data: any): Promise<INativeResponse> {
-        const messages: any[] = [];
+    public static sendEvent(type: string, objectType: KafkaCommonObjectType, data: unknown): Promise<INativeResponse> {
+        const messages: unknown[] = [];
         messages.push({
             'type': type,
             'msg': data
@@ -61,9 +61,9 @@ export class HttpKafka {
     private static _configuration: CoreConfiguration | undefined;
     private static _deviceInfoUpdating: boolean = false;
 
-    private static createCommonObject(objectType: KafkaCommonObjectType, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: CoreConfiguration): Promise<any> {
+    private static createCommonObject(objectType: KafkaCommonObjectType, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: CoreConfiguration): Promise<unknown> {
         if(objectType === KafkaCommonObjectType.EMPTY) {
-            const emptyCommon: any = {
+            const emptyCommon: unknown = {
                 'common': {
                     'client': null,
                     'device': null,
@@ -72,7 +72,7 @@ export class HttpKafka {
             };
             return Promise.resolve(emptyCommon);
         } else {
-            const common: any = {
+            const common: unknown = {
                 'common': {
                     'client': clientInfo ? clientInfo.getDTO() : null,
                     'device': null,

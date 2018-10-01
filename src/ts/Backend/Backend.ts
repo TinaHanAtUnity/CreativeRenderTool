@@ -28,24 +28,24 @@ interface IInvocation {
 interface IResult {
     callbackId: number;
     callbackStatus: CallbackStatus;
-    parameters: any[];
+    parameters: unknown[];
 }
 
 export class Backend implements IWebViewBridge {
 
-    public static sendEvent(category: string, name: string, ...parameters: any[]) {
+    public static sendEvent(category: string, name: string, ...parameters: unknown[]) {
         // tslint:disable:no-string-literal
-        (<any>window)['nativebridge']['handleEvent']([category, name].concat(parameters));
+        (<unknown>window)['nativebridge']['handleEvent']([category, name].concat(parameters));
         // tslint:enable:no-string-literal
     }
 
     public static getPlatform(): Platform {
         // tslint:disable:no-string-literal
-        return (<any>window)['nativebridge']['getPlatform']();
+        return (<unknown>window)['nativebridge']['getPlatform']();
         // tslint:enable:no-string-literal
     }
 
-    private _apiMap: { [key: string]: any } = {
+    private _apiMap: { [key: string]: unknown } = {
         '.*AdUnit': AdUnit,
         '.*AppSheet': AppSheet,
         '.*Broadcast': Broadcast,
@@ -66,10 +66,10 @@ export class Backend implements IWebViewBridge {
     };
 
     public handleInvocation(rawInvocations: string): void {
-        const invocations: IInvocation[] = JSON.parse(rawInvocations).map((invocation: any) => this.parseInvocation(invocation));
+        const invocations: IInvocation[] = JSON.parse(rawInvocations).map((invocation: unknown) => this.parseInvocation(invocation));
         const results = invocations.map((invocation) => this.executeInvocation(invocation));
         // tslint:disable:no-string-literal
-        (<any>window)['nativebridge']['handleCallback'](results.map(result => [result.callbackId.toString(), CallbackStatus[result.callbackStatus], result.parameters]));
+        (<unknown>window)['nativebridge']['handleCallback'](results.map(result => [result.callbackId.toString(), CallbackStatus[result.callbackStatus], result.parameters]));
         // tslint:enable:no-string-literal
     }
 
@@ -77,7 +77,7 @@ export class Backend implements IWebViewBridge {
         return;
     }
 
-    private parseInvocation(invocation: any): IInvocation {
+    private parseInvocation(invocation: unknown): IInvocation {
         return {
             className: invocation[0],
             method: invocation[1],

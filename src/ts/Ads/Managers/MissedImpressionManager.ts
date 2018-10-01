@@ -11,7 +11,7 @@ export class MissedImpressionManager {
         this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
-    private onStorageSet(eventType: string, data: any) {
+    private onStorageSet(eventType: string, data: unknown) {
         if(data && data.mediation && data.mediation.missedImpressionOrdinal && data.mediation.missedImpressionOrdinal.value) {
             HttpKafka.sendEvent('ads.sdk2.events.missedimpression.json', KafkaCommonObjectType.ANONYMOUS, {
                 ordinal: data.mediation.missedImpressionOrdinal.value

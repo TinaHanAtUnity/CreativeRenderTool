@@ -99,7 +99,7 @@ export class BannerAdUnit {
     }
 
     private setUpBannerPlayerEvents(sendOverrideURLEvent: boolean): Promise<void> {
-        let eventSettings: any;
+        let eventSettings: unknown;
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             eventSettings = {
                 'onPageFinished': { 'sendEvent': true },

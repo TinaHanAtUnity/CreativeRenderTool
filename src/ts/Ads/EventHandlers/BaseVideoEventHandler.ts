@@ -56,7 +56,7 @@ export abstract class BaseVideoEventHandler {
         this._adUnit.onFinish.trigger();
     }
 
-    protected handleVideoError(errorType?: string, errorData?: any) {
+    protected handleVideoError(errorType?: string, errorData?: unknown) {
         if(this._adUnit.getVideoState() !== VideoState.ERRORED) {
             const previousState = this._adUnit.getVideoState();
             this._adUnit.setVideoState(VideoState.ERRORED);

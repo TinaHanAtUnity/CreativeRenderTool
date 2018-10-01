@@ -29,7 +29,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _privacyButton: HTMLElement;
     private _loaded = false;
 
-    private _messageListener: any;
+    private _messageListener: unknown;
 
     private _canClose = false;
     private _canSkip = false;
@@ -37,7 +37,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _closeRemaining: number;
     private _showTimestamp: number;
-    private _updateInterval: any;
+    private _updateInterval: unknown;
 
     // analytics data
     private _playableStartTimestamp: number;
@@ -87,7 +87,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
 
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        const iframe: unknown = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
         this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
 
@@ -216,7 +216,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
+    private sendMraidAnalyticsEvent(eventName: string, eventData?: unknown) {
         const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
         const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;

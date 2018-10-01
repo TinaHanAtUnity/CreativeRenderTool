@@ -6,14 +6,14 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 
 export class AdsConfigurationParser {
-    public static parse(configJson: any, clientInfo?: ClientInfo): AdsConfiguration {
+    public static parse(configJson: unknown, clientInfo?: ClientInfo): AdsConfiguration {
         const configPlacements = configJson.placements;
         const placements: { [id: string]: Placement } = {};
         let defaultPlacement: Placement | undefined;
         let defaultBannerPlacement: Placement | undefined;
 
         if (configPlacements) {
-            configPlacements.forEach((rawPlacement: any): void => {
+            configPlacements.forEach((rawPlacement: unknown): void => {
                 const placement: Placement = new Placement(rawPlacement);
                 if(clientInfo && CustomFeatures.isMixedPlacementExperiment(clientInfo.getGameId())) {
                     MixedPlacementUtility.originalPlacements[placement.getId()] = placement;
@@ -53,7 +53,7 @@ export class AdsConfigurationParser {
         return new AdsConfiguration(configurationParams);
     }
 
-    private static parseCacheMode(configJson: any): CacheMode {
+    private static parseCacheMode(configJson: unknown): CacheMode {
         switch(configJson.assetCaching) {
             case 'forced':
                 return CacheMode.FORCED;

@@ -52,7 +52,7 @@ export class PrivacyEventHandler implements IPrivacyHandler {
             this._configuration.setOptOutEnabled(optOutEnabled);
 
             // if default choice was not changed and no previous answer has been recorded, we must treat this event
-            // as skip because user has not pressed any button and opening the privacy dialog might have been just a misclick
+            // as skip because user has not pressed unknown button and opening the privacy dialog might have been just a misclick
             if (optOutEnabled) {
                 // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
                 this._gdprManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);

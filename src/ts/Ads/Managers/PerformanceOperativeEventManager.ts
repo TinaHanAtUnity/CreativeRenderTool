@@ -23,13 +23,13 @@ export class PerformanceOperativeEventManager extends OperativeEventManager {
         return Url.addParameters(this._performanceCampaign.getClickUrl(), { redirect: false });
     }
 
-    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, any]> {
+    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, unknown]> {
         return super.getInfoJson(params, eventId, gameSession, gamerSid, previousPlacementId).then(([id, infoJson]) => {
             if(params.asset) {
                 infoJson.unityCreativeId = params.asset.getCreativeId();
             }
 
-            return <[string, any]>[eventId, infoJson];
+            return <[string, unknown]>[eventId, infoJson];
         });
     }
 }

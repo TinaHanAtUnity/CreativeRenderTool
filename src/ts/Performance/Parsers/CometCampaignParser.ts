@@ -161,7 +161,7 @@ export class CometCampaignParser extends CampaignParser {
         return urls;
     }
 
-    private parseAdUnitStyle(adUnitStyleJson: any): AdUnitStyle | undefined {
+    private parseAdUnitStyle(adUnitStyleJson: unknown): AdUnitStyle | undefined {
         let adUnitStyle: AdUnitStyle | undefined;
         try {
             if (!adUnitStyleJson) {

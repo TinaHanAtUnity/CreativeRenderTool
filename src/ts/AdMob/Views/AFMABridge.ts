@@ -53,7 +53,7 @@ export interface ITouchInfo {
 export interface IAFMAMessage {
     type: string;
     event: string;
-    data?: any;
+    data?: unknown;
 }
 
 export interface IClickSignalResponse {
@@ -73,7 +73,7 @@ export interface IAFMAHandler {
     onAFMAOpenInAppStore(productId: string, url: string): void;
     onAFMAFetchAppStoreOverlay(productId: string): void;
     onAFMAResolveOpenableIntents(productId: IOpenableIntentsRequest): void;
-    onAFMATrackingEvent(event: string, data?: any): void;
+    onAFMATrackingEvent(event: string, data?: unknown): void;
     onAFMAClickSignalRequest(touchInfo: ITouchInfo): void;
     onAFMAUserSeeked(): void;
 }
@@ -138,7 +138,7 @@ export class AFMABridge {
         }
     }
 
-    private postMessage(event: string, data?: any) {
+    private postMessage(event: string, data?: unknown) {
         this._iframe.contentWindow!.postMessage({
             type: 'afma',
             event: event,

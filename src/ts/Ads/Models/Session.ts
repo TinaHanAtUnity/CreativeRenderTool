@@ -59,7 +59,7 @@ export class Session extends Model<ISession> {
         this.set('eventSent', eventSent);
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'id': this.getId(),
             'eventSent': this.get('eventSent')

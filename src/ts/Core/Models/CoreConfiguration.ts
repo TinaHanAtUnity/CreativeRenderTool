@@ -77,7 +77,7 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
         return this.get('projectId');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'enabled': this.isEnabled(),
             'country': this.getCountry(),

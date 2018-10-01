@@ -97,7 +97,7 @@ export class CampaignManager {
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
     private _realtimeUrl: string | undefined;
-    private _realtimeBody: any = {};
+    private _realtimeBody: unknown = {};
     private _ignoreEvents: boolean;
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
@@ -156,7 +156,7 @@ export class CampaignManager {
 
             SdkStats.setAdRequestTimestamp();
         }).then(() => {
-            let cachedJson: any;
+            let cachedJson: unknown;
             try {
                 cachedJson = JsonParser.parse(cachedResponse.response);
             } catch (e) {
@@ -439,7 +439,7 @@ export class CampaignManager {
                     return Promise.resolve();
                 }
 
-                let cachedJson: any;
+                let cachedJson: unknown;
                 try {
                     cachedJson = JsonParser.parse(response.response);
                 } catch (e) {
@@ -569,7 +569,7 @@ export class CampaignManager {
             if (campaign instanceof PerformanceMRAIDCampaign) {
                 const cachingDuration = Date.now() - cachingTimestamp;
 
-                const kafkaObject: any = {};
+                const kafkaObject: unknown = {};
                 kafkaObject.type = 'playable_caching_time';
                 kafkaObject.eventData = {
                     contentType: contentType
@@ -617,7 +617,7 @@ export class CampaignManager {
         return Promise.resolve();
     }
 
-    private handleError(error: any, placementIds: string[], diagnosticsType: string, session?: Session): Promise<void> {
+    private handleError(error: unknown, placementIds: string[], diagnosticsType: string, session?: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
         if (!this._ignoreEvents) {
             this.onError.trigger(error, placementIds, diagnosticsType, session);
@@ -714,7 +714,7 @@ export class CampaignManager {
             });
         }
 
-        const promises: Array<Promise<any>> = [];
+        const promises: Array<Promise<unknown>> = [];
         promises.push(this._deviceInfo.getScreenWidth());
         promises.push(this._deviceInfo.getScreenHeight());
         promises.push(this._deviceInfo.getConnectionType());
@@ -732,8 +732,8 @@ export class CampaignManager {
         });
     }
 
-    private createRequestBody(nofillRetry?: boolean, realtimePlacement?: Placement): Promise<any> {
-        const placementRequest: any = {};
+    private createRequestBody(nofillRetry?: boolean, realtimePlacement?: Placement): Promise<unknown> {
+        const placementRequest: unknown = {};
 
         if(realtimePlacement && this._realtimeBody) {
 
@@ -748,7 +748,7 @@ export class CampaignManager {
             }
 
             if(realtimePlacement.getRealtimeData()) {
-                const realtimeDataObject: any = {};
+                const realtimeDataObject: unknown = {};
                 realtimeDataObject[realtimePlacement.getId()] = realtimePlacement.getRealtimeData();
                 this._realtimeBody.realtimeData = realtimeDataObject;
             }
@@ -757,13 +757,13 @@ export class CampaignManager {
                 this._realtimeBody.deviceFreeSpace = freeSpace;
                 return this._realtimeBody;
             }).catch((e) => {
-                // Try the request with the original request value anyways
+                // Try the request with the original request value unknownways
                 return this._realtimeBody;
             });
         }
         this._realtimeBody = undefined;
 
-        const promises: Array<Promise<any>> = [];
+        const promises: Array<Promise<unknown>> = [];
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
@@ -778,7 +778,7 @@ export class CampaignManager {
             return signal.getDTO();
         }));
 
-        const body: any = {
+        const body: unknown = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
             bundleId: this._clientInfo.getApplicationName(),
             coppa: this._coreConfig.isCoppaCompliant(),
@@ -818,7 +818,7 @@ export class CampaignManager {
                 body.versionCode = versionCode;
             }
 
-            const metaDataPromises: Array<Promise<any>> = [];
+            const metaDataPromises: Array<Promise<unknown>> = [];
             metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
             metaDataPromises.push(this._metaDataManager.fetch(FrameworkMetaData));
 

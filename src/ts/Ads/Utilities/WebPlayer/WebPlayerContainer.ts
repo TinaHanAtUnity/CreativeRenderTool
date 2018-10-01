@@ -59,7 +59,7 @@ export abstract class WebPlayerContainer {
         return this._nativeBridge.WebPlayer.setEventSettings(eventSettings, this._viewId);
     }
 
-    public sendEvent(args: any[]): Promise<void> {
+    public sendEvent(args: unknown[]): Promise<void> {
         return this._nativeBridge.WebPlayer.sendEvent(args, this._viewId);
     }
 

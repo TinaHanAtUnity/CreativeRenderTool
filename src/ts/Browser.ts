@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const JS_FUNC_NAME_GET_HEADLESS = 'getHeadless';
 
     const setClientInfo = () => {
-        const fields: Array<[string, string, ((element: HTMLInputElement) => any) | undefined]> = [
+        const fields: Array<[string, string, ((element: HTMLInputElement) => unknown) | undefined]> = [
             ['appName', 'setAppName', undefined],
             ['appVersion', 'setAppVersion', undefined],
             ['sdkVersion', 'setSdkVersion', toInt],
@@ -40,14 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ['initTimeStamp', 'setInitTimeStamp', toInt],
             ['reinitialized', 'setReinitialized', toBoolean]
         ];
-        fields.forEach(([field, setter, parser]: [string, string, ((element: HTMLInputElement) => any) | undefined]) => {
+        fields.forEach(([field, setter, parser]: [string, string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById(field);
-            (<any>Sdk)[setter](parser ? parser(element) : element.value);
+            (<unknown>Sdk)[setter](parser ? parser(element) : element.value);
         });
     };
 
     const setAndroidDeviceInfo = () => {
-        const fields: Array<[string, ((element: HTMLInputElement) => any) | undefined]> = [
+        const fields: Array<[string, ((element: HTMLInputElement) => unknown) | undefined]> = [
             ['AdvertisingTrackingId', undefined],
             ['LimitAdTrackingFlag', toBoolean],
             ['AndroidId', undefined],
@@ -77,14 +77,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ['BatteryStatus', toInt],
             ['RingerMode', toInt]
         ];
-        fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => any) | undefined]) => {
+        fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById('android' + field);
-            (<any>DeviceInfo)['set' + field](parser ? parser(element) : element.value);
+            (<unknown>DeviceInfo)['set' + field](parser ? parser(element) : element.value);
         });
     };
 
     const setIosDeviceInfo = () => {
-        const fields: Array<[string, ((element: HTMLInputElement) => any) | undefined]> = [
+        const fields: Array<[string, ((element: HTMLInputElement) => unknown) | undefined]> = [
             ['AdvertisingTrackingId', undefined],
             ['LimitAdTrackingFlag', toBoolean],
             ['Manufacturer', undefined],
@@ -112,9 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ['UserInterfaceIdiom', toInt],
             ['Simulator', toBoolean]
         ];
-        fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => any) | undefined]) => {
+        fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById('ios' + field);
-            (<any>DeviceInfo)['set' + field](parser ? parser(element) : element.value);
+            (<unknown>DeviceInfo)['set' + field](parser ? parser(element) : element.value);
         });
     };
 
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
             autoSkipElement.disabled = true;
             initializeButton.disabled = true;
 
-            const publicStorage: any = {
+            const publicStorage: unknown = {
                 test: {}
             };
 
@@ -226,14 +226,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        if((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS]()) {
+        if((<unknown>window).parent[JS_FUNC_NAME_GET_HEADLESS]()) {
             initialize();
         } else {
             initializeButton.addEventListener('click', (event: Event) => {
                 event.preventDefault();
                 initialize();
             }, false);
-            (<any>window).parent.document.getElementById('initialize').disabled = false;
+            (<unknown>window).parent.document.getElementById('initialize').disabled = false;
         }
     }
 });

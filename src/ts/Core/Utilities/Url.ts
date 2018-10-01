@@ -50,7 +50,7 @@ export class Url {
         };
     }
 
-    public static addParameters(url: string, parameters: { [key: string]: any }): string {
+    public static addParameters(url: string, parameters: { [key: string]: unknown }): string {
         let newUrl: string = url.toString();
         if(newUrl.indexOf('?') !== -1) {
             newUrl += '&';

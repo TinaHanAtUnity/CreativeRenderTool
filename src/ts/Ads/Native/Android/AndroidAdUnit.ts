@@ -129,46 +129,46 @@ export class AndroidAdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getCurrentMotionEventCount');
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case AdUnitEvent[AdUnitEvent.ON_START]:
-                this.onStart.trigger(parameters[0]);
+                this.onStart.trigger(<number>parameters[0]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_CREATE]:
-                this.onCreate.trigger(parameters[0]);
+                this.onCreate.trigger(<number>parameters[0]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_RESUME]:
-                this.onResume.trigger(parameters[0]);
+                this.onResume.trigger(<number>parameters[0]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_DESTROY]:
-                this.onDestroy.trigger(parameters[0], parameters[1]);
+                this.onDestroy.trigger(<boolean>parameters[0], <number>parameters[1]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_PAUSE]:
-                this.onPause.trigger(parameters[0], parameters[1]);
+                this.onPause.trigger(<boolean>parameters[0], <number>parameters[1]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.KEY_DOWN]:
-                this.onKeyDown.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
+                this.onKeyDown.trigger(<number>parameters[0], <number>parameters[1], <number>parameters[2], <number>parameters[3], <number>parameters[4]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_RESTORE]:
-                this.onRestore.trigger(parameters[0]);
+                this.onRestore.trigger(<number>parameters[0]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_STOP]:
-                this.onStop.trigger(parameters[0]);
+                this.onStop.trigger(<number>parameters[0]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_FOCUS_GAINED]:
-                this.onFocusGained.trigger(parameters[0]);
+                this.onFocusGained.trigger(<number>parameters[0]);
                 break;
 
             case AdUnitEvent[AdUnitEvent.ON_FOCUS_LOST]:
-                this.onFocusLost.trigger(parameters[0]);
+                this.onFocusLost.trigger(<number>parameters[0]);
                 break;
 
             default:

@@ -23,7 +23,7 @@ export class IosVideoPlayerApi extends NativeApiWithEventHandlers<IIosVideoEvent
         super(nativeBridge, 'VideoPlayer', ApiPackage.ADS);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case IosVideoPlayerEvent[IosVideoPlayerEvent.LIKELY_TO_KEEP_UP]:
                 this._handlers.forEach(handler => handler.onLikelyToKeepUp(parameters[0], parameters[1]));

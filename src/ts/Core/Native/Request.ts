@@ -67,7 +67,7 @@ export class RequestApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setConcurrentRequestCount', [count]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case RequestEvent[RequestEvent.COMPLETE]:
                 this.onComplete.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);

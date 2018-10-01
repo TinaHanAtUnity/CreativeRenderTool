@@ -219,11 +219,11 @@ export class Request {
         }
     }
 
-    private finishRequest(id: number, status: RequestStatus, ...parameters: any[]) {
+    private finishRequest(id: number, status: RequestStatus, ...parameters: unknown[]) {
         const callbackObject = Request._callbacks[id];
         if(callbackObject) {
             if(status === RequestStatus.COMPLETE) {
-                callbackObject.resolve(...parameters);
+                callbackObject.resolve(<INativeResponse>parameters[0]);
             } else {
                 callbackObject.reject(...parameters);
             }

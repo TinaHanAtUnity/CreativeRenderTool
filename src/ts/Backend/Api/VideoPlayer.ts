@@ -13,8 +13,8 @@ export class VideoPlayer {
 
         if('exec' in window) {
             // tslint:disable:no-string-literal
-            const exec = (<any>window)['exec'];
-            exec('curl -s "' + url + '" | exiftool -j -').then((result: any) => {
+            const exec = (<unknown>window)['exec'];
+            exec('curl -s "' + url + '" | exiftool -j -').then((result: unknown) => {
                 const stdout: string = result.stdout;
                 const stream = JSON.parse(stdout)[0];
                 const duration = VideoPlayer._duration = Math.round(parseFloat(stream.Duration) * 1000);
@@ -106,6 +106,6 @@ export class VideoPlayer {
     private static _height: number | undefined;
 
     private static _videoView: HTMLVideoElement;
-    private static _progressTimer: any;
+    private static _progressTimer: unknown;
 
 }

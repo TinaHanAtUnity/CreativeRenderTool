@@ -22,7 +22,7 @@ export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign>
 export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _promoView: Promo;
-    private _options: any;
+    private _options: unknown;
     private _placement: Placement;
     private _campaign: PromoCampaign;
     private _privacy: AbstractPrivacy;

@@ -22,7 +22,7 @@ export class SessionManager {
         return new Session(id);
     }
 
-    public startNewSession(sessionId: string): Promise<any[]> {
+    public startNewSession(sessionId: string): Promise<unknown[]> {
         const sessionTimestampKey = SessionUtils.getSessionStorageTimestampKey(sessionId);
         const timestamp = Date.now();
 
@@ -34,7 +34,7 @@ export class SessionManager {
         });
     }
 
-    public sendUnsentSessions(): Promise<any[]> {
+    public sendUnsentSessions(): Promise<unknown[]> {
         return this.getUnsentSessions().then(sessions => {
             const promises = sessions.map(sessionId => {
                 return this.isSessionOutdated(sessionId).then(outdated => {
@@ -60,7 +60,7 @@ export class SessionManager {
         return this._gameSessionId;
     }
 
-    private deleteSession(sessionId: string): Promise<any[]> {
+    private deleteSession(sessionId: string): Promise<unknown[]> {
         return Promise.all([
             this._nativeBridge.Storage.delete(StorageType.PRIVATE, SessionUtils.getSessionStorageKey(sessionId)),
             this._nativeBridge.Storage.write(StorageType.PRIVATE)
@@ -82,8 +82,8 @@ export class SessionManager {
         });
     }
 
-    private sendUnsentEvents(sessionId: string): Promise<any[]> {
-        const promises: Array<Promise<any>> = [];
+    private sendUnsentEvents(sessionId: string): Promise<unknown[]> {
+        const promises: Array<Promise<unknown>> = [];
         const failedOperativeEventManager = new FailedOperativeEventManager(sessionId);
         promises.push(failedOperativeEventManager.sendFailedEvents(this._nativeBridge, this._request));
         const failedXpromoOperativeEventManager = new FailedXpromoOperativeEventManager(sessionId);

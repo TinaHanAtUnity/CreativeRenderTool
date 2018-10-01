@@ -33,11 +33,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _iframeLoaded = false;
 
-    private _messageListener: any;
-    private _deviceorientationListener: any;
-    private _loadingScreenTimeout: any;
-    private _prepareTimeout: any;
-    private _updateInterval: any;
+    private _messageListener: unknown;
+    private _deviceorientationListener: unknown;
+    private _loadingScreenTimeout: unknown;
+    private _prepareTimeout: unknown;
+    private _updateInterval: unknown;
 
     private _canClose = false;
     private _canSkip = false;
@@ -58,7 +58,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _arErrorObserver: IObserver1<number>;
     private _arSessionInterruptedObserver: IObserver0;
     private _arSessionInterruptionEndedObserver: IObserver0;
-    private _arAndroidEnumsReceivedObserver: IObserver1<any>;
+    private _arAndroidEnumsReceivedObserver: IObserver1<unknown>;
 
     private _hasCameraPermission = false;
     private _permissionResultObserver: IObserver2<string, boolean>;
@@ -131,7 +131,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._cameraPermissionPanel = <HTMLElement>this._container.querySelector('.camera-permission-panel');
         this._permissionLearnMorePanel = <HTMLElement>this._container.querySelector('.permissions-learn-more');
 
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        const iframe: unknown = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
         this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
 

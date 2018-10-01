@@ -54,7 +54,7 @@ export class GdprManager {
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
-        let infoJson: any = {
+        let infoJson: unknown = {
             'adid': this._deviceInfo.getAdvertisingIdentifier(),
             'action': action,
             'projectId': this._coreConfig.getUnityProjectId(),
@@ -133,7 +133,7 @@ export class GdprManager {
     }
 
     private getConsent(): Promise<boolean> {
-        return this._nativeBridge.Storage.get(StorageType.PUBLIC, GdprManager.GdprConsentStorageKey).then((data: any) => {
+        return this._nativeBridge.Storage.get(StorageType.PUBLIC, GdprManager.GdprConsentStorageKey).then((data: unknown) => {
             const value: boolean | undefined = this.getConsentTypeHack(data);
             if(typeof(value) !== 'undefined') {
                 return Promise.resolve(value);
@@ -148,7 +148,7 @@ export class GdprManager {
         this._adsConfig.setOptOutRecorded(true);
     }
 
-    private onStorageSet(eventType: string, data: any) {
+    private onStorageSet(eventType: string, data: unknown) {
         // should only use consent when gdpr is enabled in configuration
         if (this._adsConfig.isGDPREnabled()) {
             if(data && data.gdpr && data.gdpr.consent) {
@@ -164,8 +164,8 @@ export class GdprManager {
 
     // Android C# layer will map boolean values to Java primitive boolean types and causes reflection failure
     // with Android Java native layer method that takes Object as value
-    // this hack allows anyone use both booleans and string "true" and "false" values
-    private getConsentTypeHack(value: any): boolean | undefined {
+    // this hack allows unknownone use both booleans and string "true" and "false" values
+    private getConsentTypeHack(value: unknown): boolean | undefined {
         if(typeof(value) === 'boolean') {
             return value;
         } else if(typeof(value) === 'string') {

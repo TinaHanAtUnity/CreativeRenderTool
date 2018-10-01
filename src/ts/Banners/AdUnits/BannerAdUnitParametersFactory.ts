@@ -53,7 +53,7 @@ export class BannerAdUnitParametersFactory {
         this._programmaticTrackingService = programmaticTrackingService;
     }
 
-    public create(campaign: Campaign, placement: Placement, options: any): Promise<IAdUnitParameters<Campaign>> {
+    public create(campaign: Campaign, placement: Placement, options: unknown): Promise<IAdUnitParameters<Campaign>> {
         return Promise.all([
             this.getDeviceOrientation()
         ]).then(([orientation]) => {

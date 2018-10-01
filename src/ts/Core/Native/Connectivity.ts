@@ -21,7 +21,7 @@ export class ConnectivityApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setConnectionMonitoring', [status]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case ConnectivityEvent[ConnectivityEvent.CONNECTED]:
                 this.onConnected.trigger(parameters[0], parameters[1]);

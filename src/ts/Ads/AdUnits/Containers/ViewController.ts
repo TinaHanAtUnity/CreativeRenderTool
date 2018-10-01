@@ -34,12 +34,12 @@ export class ViewController extends AdUnitContainer {
     private _options: IIosOptions;
     private _clientInfo: ClientInfo;
 
-    private _onViewControllerDidAppearObserver: any;
-    private _onViewControllerDidDisappearObserver: any;
-    private _onMemoryWarningObserver: any;
-    private _onNotificationObserver: any;
-    private _onAppBackgroundObserver: any;
-    private _onAppForegroundObserver: any;
+    private _onViewControllerDidAppearObserver: unknown;
+    private _onViewControllerDidDisappearObserver: unknown;
+    private _onMemoryWarningObserver: unknown;
+    private _onNotificationObserver: unknown;
+    private _onAppBackgroundObserver: unknown;
+    private _onAppForegroundObserver: unknown;
 
     constructor(nativeBridge: NativeBridge, deviceInfo: IosDeviceInfo, focusManager: FocusManager, clientInfo: ClientInfo) {
         super();
@@ -102,8 +102,8 @@ export class ViewController extends AdUnitContainer {
         return this._nativeBridge.IosAdUnit.close();
     }
 
-    public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
-        const promises: Array<Promise<any>> = [];
+    public reconfigure(configuration: ViewConfiguration): Promise<unknown[]> {
+        const promises: Array<Promise<unknown>> = [];
 
         return Promise.all([
             this._deviceInfo.getScreenWidth(),
@@ -133,7 +133,7 @@ export class ViewController extends AdUnitContainer {
         });
     }
 
-    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any> {
+    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<unknown> {
         return this._nativeBridge.IosAdUnit.setShouldAutorotate(allowRotation).then(() => {
             return this._nativeBridge.IosAdUnit.setSupportedOrientations(this.getOrientation(this._options, allowRotation, forceOrientation));
         });
@@ -212,7 +212,7 @@ export class ViewController extends AdUnitContainer {
         this._handlers.forEach(handler => handler.onContainerForeground());
     }
 
-    private onNotification(event: string, parameters: any): void {
+    private onNotification(event: string, parameters: unknown): void {
         // ignore notifications if ad unit is not active
         if(!this._showing) {
             return;

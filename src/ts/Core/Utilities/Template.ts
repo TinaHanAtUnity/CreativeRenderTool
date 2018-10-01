@@ -18,12 +18,12 @@ export class Template {
 
     private static _escapeRegExp: RegExp = /\\|'|\r|\n|\u2028|\u2029/g;
 
-    private static _escapeChar: (substring: string, ...args: any[]) => string = (match: string): string => {
+    private static _escapeChar: (substring: string, ...args: unknown[]) => string = (match: string): string => {
         return '\\' + Template._escapes[match];
     }
 
     private _localization?: Localization;
-    private _templateFunction: (data: any) => string;
+    private _templateFunction: (data: unknown) => string;
 
     constructor(templateString: string, localization?: Localization) {
         this._localization = localization;
@@ -47,7 +47,7 @@ export class Template {
 
         try {
             const templateFunction = new Function('data', source);
-            this._templateFunction = (data: any) => {
+            this._templateFunction = (data: unknown) => {
                 return templateFunction.call(this, data);
             };
         } catch(error) {
@@ -56,7 +56,7 @@ export class Template {
         }
     }
 
-    public render(data: any): string {
+    public render(data: unknown): string {
         if(this._localization) {
             data.t = (phrase: string) => this._localization!.translate(phrase);
         } else {

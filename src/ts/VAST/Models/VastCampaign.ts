@@ -115,7 +115,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
         return this.get('isMoatEnabled');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         let portrait;
         const portraitAsset = this.get('portrait');
         if (portraitAsset) {
@@ -138,7 +138,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
         };
     }
 
-    private processCustomTracking(tracking: any) {
+    private processCustomTracking(tracking: unknown) {
         if (tracking) {
             for (const trackingEventName in tracking) {
                 if (tracking.hasOwnProperty(trackingEventName)) {

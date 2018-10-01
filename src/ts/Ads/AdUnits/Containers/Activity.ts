@@ -26,14 +26,14 @@ export class Activity extends AdUnitContainer {
     private _activityId: number;
     private _currentActivityFinished: boolean;
 
-    private _onResumeObserver: any;
-    private _onPauseObserver: any;
-    private _onDestroyObserver: any;
-    private _onCreateObserver: any;
-    private _onRestoreObserver: any;
+    private _onResumeObserver: unknown;
+    private _onPauseObserver: unknown;
+    private _onDestroyObserver: unknown;
+    private _onCreateObserver: unknown;
+    private _onRestoreObserver: unknown;
 
-    private _onFocusGainedObserver: any;
-    private _onFocusLostObserver: any;
+    private _onFocusGainedObserver: unknown;
+    private _onFocusLostObserver: unknown;
 
     private _androidOptions: IAndroidOptions;
 
@@ -70,7 +70,7 @@ export class Activity extends AdUnitContainer {
             this._lockedOrientation = forceOrientation;
         }
 
-        let keyEvents: any[] = [];
+        let keyEvents: unknown[] = [];
         if(disableBackbutton) {
             keyEvents = [KeyCode.BACK];
         }
@@ -96,8 +96,8 @@ export class Activity extends AdUnitContainer {
         }
     }
 
-    public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
-        const promises: Array<Promise<any>> = [];
+    public reconfigure(configuration: ViewConfiguration): Promise<unknown[]> {
+        const promises: Array<Promise<unknown>> = [];
 
         return Promise.all([
             this._deviceInfo.getScreenWidth(),
@@ -124,7 +124,7 @@ export class Activity extends AdUnitContainer {
         });
     }
 
-    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any> {
+    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<unknown> {
         return this._nativeBridge.AndroidAdUnit.setOrientation(this.getOrientation(allowRotation, forceOrientation, this._androidOptions));
     }
 

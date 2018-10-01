@@ -23,7 +23,7 @@ interface InitAdOptions {
 export interface IVPAIDHandler {
     onVPAIDCompanionClick(): void;
     onVPAIDCompanionView(): void;
-    onVPAIDEvent(eventType: string, args: any[]): void;
+    onVPAIDEvent(eventType: string, args: unknown[]): void;
     onVPAIDStuck(): void;
     onVPAIDSkip(): void;
     onVPAIDProgress(duration: number, remainingTime: number): void;
@@ -146,15 +146,15 @@ export class VPAID extends View<IVPAIDHandler> {
         return textArea.value;
     }
 
-    private sendEvent(event: string, parameters?: any[]): Promise<void> {
-        const webPlayerParams: any[] = [event];
+    private sendEvent(event: string, parameters?: unknown[]): Promise<void> {
+        const webPlayerParams: unknown[] = [event];
         if (parameters) {
             webPlayerParams.push(parameters);
         }
         return this._webPlayerContainer.sendEvent(webPlayerParams);
     }
 
-    private onWebPlayerEvent(args: any[]) {
+    private onWebPlayerEvent(args: unknown[]) {
         const eventType = args.shift();
         const params = args.shift();
 

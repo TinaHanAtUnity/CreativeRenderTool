@@ -1,7 +1,7 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
-export type ClientInfoData = [number, boolean, string, string, string, string, boolean, string, string, string];
+export type ClientInfoData = [string, boolean, string, string, number, string, boolean, string, string, string, string, number, boolean];
 
 export class SdkApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {

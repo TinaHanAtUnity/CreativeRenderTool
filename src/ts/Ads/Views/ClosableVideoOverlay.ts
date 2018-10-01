@@ -23,7 +23,7 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
 
     private _callButtonVisible: boolean = false;
 
-    private _fadeTimer: any;
+    private _fadeTimer: unknown;
     private _fadeStatus: boolean = true;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string) {

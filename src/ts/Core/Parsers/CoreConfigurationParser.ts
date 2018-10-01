@@ -2,7 +2,7 @@ import { ABGroupBuilder } from 'Core/Models/ABGroup';
 import { CoreConfiguration, ICoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 export class CoreConfigurationParser {
-    public static parse(configJson: any): CoreConfiguration {
+    public static parse(configJson: unknown): CoreConfiguration {
         const configurationParams: ICoreConfiguration = {
             enabled: configJson.enabled,
             country: configJson.country,

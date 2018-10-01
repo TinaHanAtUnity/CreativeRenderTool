@@ -38,7 +38,7 @@ export enum CallbackStatus {
     ERROR
 }
 
-export type INativeCallback = (status: CallbackStatus, ...parameters: any[]) => void;
+export type INativeCallback = (status: CallbackStatus, ...parameters: unknown[]) => void;
 
 export class NativeBridge implements INativeBridge {
 
@@ -87,7 +87,7 @@ export class NativeBridge implements INativeBridge {
     public AdsProperties: AdsPropertiesApi;
 
     private _callbackId: number = 1;
-    private _callbackTable: {[key: number]: CallbackContainer<any>} = {};
+    private _callbackTable: {[key: number]: CallbackContainer<unknown>} = {};
 
     private _platform: Platform;
     private _apiLevel: number;
@@ -95,7 +95,7 @@ export class NativeBridge implements INativeBridge {
 
     private _autoBatchEnabled: boolean;
     private _autoBatch: BatchInvocation;
-    private _autoBatchTimer: any; // todo: should be number but causes naming clash with nodejs Timer
+    private _autoBatchTimer: unknown; // todo: should be number but causes naming clash with nodejs Timer
     private _autoBatchInterval = 1;
 
     constructor(backend: IWebViewBridge, platform: Platform = Platform.TEST, autoBatch = true) {
@@ -139,13 +139,13 @@ export class NativeBridge implements INativeBridge {
         this.AdsProperties = new AdsPropertiesApi(this);
     }
 
-    public registerCallback<T>(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void): number {
+    public registerCallback<T>(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: unknown) => void): number {
         const id: number = this._callbackId++;
         this._callbackTable[id] = new CallbackContainer(resolve, reject);
         return id;
     }
 
-    public invoke<T>(className: string, methodName: string, parameters?: any[]): Promise<T> {
+    public invoke<T>(className: string, methodName: string, parameters?: unknown[]): Promise<T> {
         if(this._autoBatchEnabled) {
             if(!this._autoBatch) {
                 this._autoBatch = new BatchInvocation(this);
@@ -167,8 +167,8 @@ export class NativeBridge implements INativeBridge {
         }
     }
 
-    public handleCallback(results: any[][]): void {
-        results.forEach((result: any[]): void => {
+    public handleCallback(results: unknown[][]): void {
+        results.forEach((result: unknown[]): void => {
             const id: number = parseInt(result.shift(), 10);
             const status = NativeBridge.convertStatus(result.shift());
             let parameters = result.shift();
@@ -193,7 +193,7 @@ export class NativeBridge implements INativeBridge {
         });
     }
 
-    public handleEvent(parameters: any[]): void {
+    public handleEvent(parameters: unknown[]): void {
         const category: string = parameters.shift();
         const event: string = parameters.shift();
         switch(category) {
@@ -276,14 +276,14 @@ export class NativeBridge implements INativeBridge {
         }
     }
 
-    public handleInvocation(parameters: any[]): void {
+    public handleInvocation(parameters: unknown[]): void {
         const className: string = parameters.shift();
         const methodName: string = parameters.shift();
         const callback: string = parameters.shift();
-        parameters.push((status: CallbackStatus, ...callbackParameters: any[]) => {
+        parameters.push((status: CallbackStatus, ...callbackParameters: unknown[]) => {
             this.invokeCallback(callback, CallbackStatus[status], ...callbackParameters);
         });
-        (<any>window)[className][methodName].apply((<any>window)[className], parameters);
+        (<unknown>window)[className][methodName].apply((<unknown>window)[className], parameters);
     }
 
     public setApiLevel(apiLevel: number) {
@@ -306,7 +306,7 @@ export class NativeBridge implements INativeBridge {
         this._backend.handleInvocation(JSON.stringify(batch.getBatch()).replace(NativeBridge._doubleRegExp, '$1'));
     }
 
-    private invokeCallback(id: string, status: string, ...parameters: any[]): void {
+    private invokeCallback(id: string, status: string, ...parameters: unknown[]): void {
         this._backend.handleCallback(id, status, JSON.stringify(parameters));
     }
 

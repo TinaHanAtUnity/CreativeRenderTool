@@ -28,7 +28,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _view: DisplayInterstitial;
-    private _options: any;
+    private _options: unknown;
     private _campaign: DisplayInterstitialCampaign;
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;

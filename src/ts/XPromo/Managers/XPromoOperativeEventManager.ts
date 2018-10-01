@@ -70,7 +70,7 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
     }
 
     public sendHttpKafkaEvent(kafkaType: string, eventType: string, params: IOperativeEventParams): Promise<INativeResponse> {
-        const fulfilled = ([id, infoJson]: [string, any]) => {
+        const fulfilled = ([id, infoJson]: [string, unknown]) => {
 
             // todo: clears duplicate data for httpkafka, should be cleaned up
             delete infoJson.eventId;

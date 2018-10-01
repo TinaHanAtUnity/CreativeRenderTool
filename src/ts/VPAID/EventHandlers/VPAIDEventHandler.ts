@@ -51,8 +51,8 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._vpaidEventHandlers.AdDurationChange = this.onAdDurationChange;
     }
 
-    public onVPAIDEvent(eventType: string, args: any[]) {
-        let argsCopy: any[] | undefined;
+    public onVPAIDEvent(eventType: string, args: unknown[]) {
+        let argsCopy: unknown[] | undefined;
         if(args) {
             argsCopy = Array.prototype.slice.call(args);
         }

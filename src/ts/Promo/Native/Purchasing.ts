@@ -38,7 +38,7 @@ export class PurchasingApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'initiatePurchasingCommand', [event]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case PurchasingEvent[PurchasingEvent.COMMAND]:
                 this.onCommandResult.trigger(parameters[0]);
