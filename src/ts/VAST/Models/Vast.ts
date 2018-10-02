@@ -1,15 +1,6 @@
 import { Model } from 'Core/Models/Model';
 import { VastAd } from 'VAST/Models/VastAd';
 import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
-import { VastCreative } from 'VAST/Models/VastCreative';
-
-export enum VASTMediaFileSize {
-    WIFI_MIN = 10485760,    // 10 MB in Bytes
-    WIFI_MAX = 20971520,    // 20 MB
-    CELL_MIN = 5242880,     // 5 MB
-    CELL_MAX = 10485760,    // 10 MB
-    SDK_MAX = 20971520      // 20 MB SDK max limit for 'too_large_file' error
-}
 
 interface IVast {
     ads: VastAd[];
@@ -73,7 +64,7 @@ export class Vast extends Model<IVast> {
         throw new Error('No video URL found for VAST');
     }
 
-    public getVideoUrlInRange(minSize: number, maxSize: number): string | null {
+    public getVideoUrlInRange(minSize: number, maxSize: number): string {
         let mediaUrl: string | null = null;
         let minFileSize: number = -1;
         const ad = this.getAd();
@@ -95,7 +86,11 @@ export class Vast extends Model<IVast> {
             }
         }
 
-        return mediaUrl;
+        if (mediaUrl) {
+            return mediaUrl;
+        } else {
+            throw new Error('No Video URL found for VAST');
+        }
     }
 
     public getImpressionUrls(): string[] {

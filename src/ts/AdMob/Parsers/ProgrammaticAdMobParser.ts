@@ -13,10 +13,11 @@ import { Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { VastParser } from 'VAST/Utilities/VastParser';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, deviceInfo?: DeviceInfo, gameId?: string): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
         const platform = nativeBridge.getPlatform();
