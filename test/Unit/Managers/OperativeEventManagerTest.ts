@@ -167,6 +167,18 @@ class TestRequestApi extends RequestApi {
     }
 }
 
+class TestHelper {
+    public static waitForStorageBatch(storageBridge: StorageBridge): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const storageObserver = () => {
+                storageBridge.onPrivateStorageWrite.unsubscribe(storageObserver);
+                resolve();
+            };
+            storageBridge.onPrivateStorageWrite.subscribe(storageObserver);
+        });
+    }
+}
+
 describe('OperativeEventManagerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
@@ -192,7 +204,7 @@ describe('OperativeEventManagerTest', () => {
             handleCallback
         });
 
-        storageBridge = new StorageBridge(nativeBridge);
+        storageBridge = new StorageBridge(nativeBridge, 1);
         metaDataManager = new MetaDataManager(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
@@ -260,6 +272,8 @@ describe('OperativeEventManagerTest', () => {
 
         const requestSpy = sinon.spy(request, 'post');
 
+        const storagePromise = TestHelper.waitForStorageBatch(storageBridge);
+
         const event = operativeEventManager.sendEvent('test', eventId, sessionId, url, data).then(() => {
             assert.fail('Send failed operative event failed to fail');
         }).catch(() => {
@@ -269,7 +283,9 @@ describe('OperativeEventManagerTest', () => {
 
             const urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
             const dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
-            return storageApi.get<string>(StorageType.PRIVATE, urlKey).then(storedUrl => {
+            return storagePromise.then(() => {
+                return storageApi.get<string>(StorageType.PRIVATE, urlKey);
+            }).then(storedUrl => {
                 assert.equal(url, storedUrl, 'Failed operative event url was not correctly stored');
             }).then(() => {
                 return storageApi.get<string>(StorageType.PRIVATE, dataKey);
