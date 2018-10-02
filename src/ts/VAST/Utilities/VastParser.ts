@@ -221,6 +221,7 @@ export class VastParser {
             return null;
         }
 
+        const mediaDuration = creative.getDuration();
         const skipOffset = creativeElement.getAttribute('skipoffset');
         if (skipOffset == null) {
             creative.setSkipDelay(null);
@@ -270,7 +271,8 @@ export class VastParser {
                     parseInt(mediaFileElement.getAttribute('maxBitrate') || 0, 10),
                     parseInt(mediaFileElement.getAttribute('width') || 0, 10),
                     parseInt(mediaFileElement.getAttribute('height') || 0, 10),
-                    mediaFileElement.getAttribute('apiFramework'));
+                    mediaFileElement.getAttribute('apiFramework'),
+                    this.parseMediaFileSize(mediaDuration, parseInt(mediaFileElement.getAttribute('bitrate') || 0, 10)));
                 creative.addMediaFile(mediaFile);
             }
         }
@@ -353,6 +355,10 @@ export class VastParser {
         }
 
         return hours + minutes + seconds;
+    }
+
+    private parseMediaFileSize(duration: number, kbitrate: number): number {
+        return (duration * kbitrate * 1000) / 8;
     }
 
     private childByName(node: any, name: string): any {

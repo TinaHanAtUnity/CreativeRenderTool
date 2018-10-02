@@ -1,6 +1,15 @@
 import { Model } from 'Core/Models/Model';
 import { VastAd } from 'VAST/Models/VastAd';
 import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
+import { VastCreative } from 'VAST/Models/VastCreative';
+
+export enum VASTMediaFileSize {
+    WIFI_MIN = 10485760,    // 10 MB in Bytes
+    WIFI_MAX = 20971520,    // 20 MB
+    CELL_MIN = 5242880,     // 5 MB
+    CELL_MAX = 10485760,    // 10 MB
+    SDK_MAX = 20971520      // 20 MB SDK max limit for 'too_large_file' error
+}
 
 interface IVast {
     ads: VastAd[];
@@ -62,6 +71,31 @@ export class Vast extends Model<IVast> {
         }
 
         throw new Error('No video URL found for VAST');
+    }
+
+    public getVideoUrlInRange(minSize: number, maxSize: number): string | null {
+        let mediaUrl: string | null = null;
+        let minFileSize: number = -1;
+        const ad = this.getAd();
+        if (ad) {
+            for (const creative of ad.getCreatives()) {
+                for (const mediaFile of creative.getMediaFiles()) {
+                    const mimeType = mediaFile.getMIMEType();
+                    const playable = mimeType && this.isPlayableMIMEType(mimeType);
+                    if (playable && mediaFile.getFileURL()) {
+                        const fileSize = mediaFile.getFileSize();
+                        if (fileSize >= minSize && fileSize <= maxSize) {
+                            if (fileSize < minFileSize) {
+                                mediaUrl = mediaFile.getFileURL();
+                                minFileSize = fileSize;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return mediaUrl;
     }
 
     public getImpressionUrls(): string[] {
@@ -245,5 +279,9 @@ export class Vast extends Model<IVast> {
         const playableMIMEType = 'video/mp4';
         MIMEType = MIMEType.toLowerCase();
         return MIMEType === playableMIMEType;
+    }
+
+    private selectMediaFileInRange(vastAd: VastAd, minSize: number, maxSize: number): string | null {
+        return null;
     }
 }
