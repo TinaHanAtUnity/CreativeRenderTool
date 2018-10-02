@@ -38,9 +38,9 @@ export class StorageBridge {
         }
 
         if(type === StorageType.PUBLIC) {
-            this._publicStorageQueue.commands.concat(batch.commands);
+            this._publicStorageQueue.commands = this._publicStorageQueue.commands.concat(batch.commands);
         } else {
-            this._privateStorageQueue.commands.concat(batch.commands);
+            this._privateStorageQueue.commands = this._privateStorageQueue.commands.concat(batch.commands);
         }
 
         if(!this._storageBatchTimer) {

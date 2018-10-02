@@ -26,15 +26,13 @@ export class SessionManager {
         return new Session(id);
     }
 
-    public startNewSession(sessionId: string): Promise<any[]> {
+    public startNewSession(sessionId: string): void {
         const sessionTimestampKey = SessionUtils.getSessionStorageTimestampKey(sessionId);
         const timestamp = Date.now();
 
         const operation = new StorageOperation(StorageType.PRIVATE);
         operation.set(sessionTimestampKey, timestamp);
         this._storageBridge.queue(operation);
-
-        return Promise.resolve([]);
     }
 
     public sendUnsentSessions(): Promise<any[]> {
