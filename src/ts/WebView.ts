@@ -254,9 +254,7 @@ export class WebView {
             this._jaegerManager.setJaegerTracingEnabled(this._coreConfig.isJaegerTracingEnabled());
 
             const placementManager = new PlacementManager(this._nativeBridge, this._adsConfig);
-            PurchasingUtilities.initialize(this._clientInfo, this._coreConfig, this._adsConfig, this._nativeBridge, placementManager);
-            PurchasingUtilities.sendPurchaseInitializationEvent();
-            this._nativeBridge.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(iapPayload));
+
 
             if (!this._coreConfig.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
@@ -264,19 +262,7 @@ export class WebView {
                 throw error;
             }
 
-            let analyticsPromise;
-            if(this._coreConfig.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
-                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._coreConfig, this._focusManager);
-                analyticsPromise = this._analyticsManager.init().then(() => {
-                    this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
-                });
-            } else {
-                const analyticsStorage: AnalyticsStorage = new AnalyticsStorage(this._nativeBridge);
-                analyticsPromise = analyticsStorage.getSessionId(this._clientInfo.isReinitialized()).then(gameSessionId => {
-                    analyticsStorage.setSessionId(gameSessionId);
-                    this._sessionManager.setGameSessionId(gameSessionId);
-                });
-            }
+
             const gdprConsentPromise = this._gdprManager.getConsentAndUpdateConfiguration().catch((error) => {
                 // do nothing
                 // error happens when consent value is undefined

@@ -35,8 +35,8 @@ export interface IFileInfo {
 }
 
 export class CacheApi extends NativeApi {
-    public Android: AndroidCacheApi;
-    public Ios: IosCacheApi;
+    public readonly Android?: AndroidCacheApi;
+    public iOS?: IosCacheApi;
 
     public readonly onDownloadStarted = new Observable5<string, number, number, number, Array<[string, string]>>();
     public readonly onDownloadProgress = new Observable3<string, number, number>();
@@ -48,7 +48,7 @@ export class CacheApi extends NativeApi {
         super(nativeBridge, 'Cache', ApiPackage.CORE, EventCategory[EventCategory.CACHE]);
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
-            this.Ios = new IosCacheApi(nativeBridge);
+            this.iOS = new IosCacheApi(nativeBridge);
         } else {
             this.Android = new AndroidCacheApi(nativeBridge);
         }

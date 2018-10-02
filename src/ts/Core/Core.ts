@@ -7,17 +7,11 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { Request } from 'Core/Managers/Request';
 import { Resolve } from 'Core/Managers/Resolve';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { IApi, IApiModule, IModuleApi } from 'Core/Modules/ApiModule';
-import { BroadcastApi } from 'Core/Native/Android/Broadcast';
-import { IntentApi } from 'Core/Native/Android/Intent';
-import { LifecycleApi } from 'Core/Native/Android/Lifecycle';
+import { IApi, IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CacheApi } from 'Core/Native/Cache';
 import { ConnectivityApi } from 'Core/Native/Connectivity';
 import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
-import { MainBundleApi } from 'Core/Native/iOS/MainBundle';
-import { NotificationApi } from 'Core/Native/iOS/Notification';
-import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 import { ListenerApi } from 'Core/Native/Listener';
 import { PermissionsApi } from 'Core/Native/Permissions';
 import { RequestApi } from 'Core/Native/Request';
@@ -25,17 +19,6 @@ import { ResolveApi } from 'Core/Native/Resolve';
 import { SdkApi } from 'Core/Native/Sdk';
 import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
-import { AndroidCacheApi } from 'Core/Native/Android/Cache';
-import { AndroidDeviceInfoApi } from 'Core/Native/Android/DeviceInfo';
-import { AndroidPermissionsApi } from 'Core/Native/Android/Permissions';
-import { AndroidPreferencesApi } from 'Core/Native/Android/Preferences';
-import { AndroidRequestApi } from 'Core/Native/Android/Request';
-import { AndroidSensorInfoApi } from 'Core/Native/Android/SensorInfo';
-import { IosCacheApi } from 'Core/Native/iOS/Cache';
-import { IosDeviceInfoApi } from 'Core/Native/iOS/DeviceInfo';
-import { IosPermissionsApi } from 'Core/Native/iOS/Permissions';
-import { IosPreferencesApi } from 'Core/Native/iOS/Preferences';
-import { IosSensorInfoApi } from 'Core/Native/iOS/SensorInfo';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
@@ -52,29 +35,6 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { MetaData } from 'Core/Utilities/MetaData';
 
-export interface ICoreAndroidApi extends IApi {
-    Broadcast: BroadcastApi;
-    Cache: AndroidCacheApi;
-    DeviceInfo: AndroidDeviceInfoApi;
-    Intent: IntentApi;
-    Lifecycle: LifecycleApi;
-    Permissions: AndroidPermissionsApi;
-    Preferences: AndroidPreferencesApi;
-    Request: AndroidRequestApi;
-    SensorInfo: AndroidSensorInfoApi;
-}
-
-export interface ICoreIosApi extends IApi {
-    Cache: IosCacheApi;
-    DeviceInfo: IosDeviceInfoApi;
-    MainBundle: MainBundleApi;
-    Notification: NotificationApi;
-    Permissions: IosPermissionsApi;
-    Preferences: IosPreferencesApi;
-    SensorInfo: IosSensorInfoApi;
-    UrlScheme: UrlSchemeApi;
-}
-
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
     Connectivity: ConnectivityApi;
@@ -86,8 +46,6 @@ export interface ICoreApi extends IModuleApi {
     Sdk: SdkApi;
     SensorInfo: SensorInfoApi;
     Storage: StorageApi;
-    Android?: ICoreAndroidApi;
-    iOS?: ICoreIosApi;
 }
 
 export class Core implements IApiModule<ICoreApi> {
@@ -116,7 +74,7 @@ export class Core implements IApiModule<ICoreApi> {
     constructor(nativeBridge: NativeBridge) {
         this.NativeBridge = nativeBridge;
 
-        const api: ICoreApi = {
+        this.Api = {
             Cache: new CacheApi(nativeBridge),
             Connectivity: new ConnectivityApi(nativeBridge),
             DeviceInfo: new DeviceInfoApi(nativeBridge),
@@ -128,34 +86,6 @@ export class Core implements IApiModule<ICoreApi> {
             SensorInfo: new SensorInfoApi(nativeBridge),
             Storage: new StorageApi(nativeBridge)
         };
-
-        const platform = nativeBridge.getPlatform();
-        if(platform === Platform.ANDROID) {
-            api.Android = {
-                Broadcast: new BroadcastApi(nativeBridge),
-                Cache: new AndroidCacheApi(nativeBridge),
-                DeviceInfo: new AndroidDeviceInfoApi(nativeBridge),
-                Intent: new IntentApi(nativeBridge),
-                Lifecycle: new LifecycleApi(nativeBridge),
-                Permissions: new AndroidPermissionsApi(nativeBridge),
-                Preferences: new AndroidPreferencesApi(nativeBridge),
-                Request: new AndroidRequestApi(nativeBridge),
-                SensorInfo: new AndroidSensorInfoApi(nativeBridge)
-            };
-        } else if(platform === Platform.IOS) {
-            api.iOS = {
-                Cache: new IosCacheApi(nativeBridge),
-                DeviceInfo: new IosDeviceInfoApi(nativeBridge),
-                MainBundle: new MainBundleApi(nativeBridge),
-                Notification: new NotificationApi(nativeBridge),
-                Permissions: new IosPermissionsApi(nativeBridge),
-                Preferences: new IosPreferencesApi(nativeBridge),
-                SensorInfo: new IosSensorInfoApi(nativeBridge),
-                UrlScheme: new UrlSchemeApi(nativeBridge)
-            };
-        }
-
-        this.Api = api;
 
         this.FocusManager = new FocusManager(this);
         this.MetaDataManager = new MetaDataManager(this);
@@ -259,7 +189,7 @@ export class Core implements IApiModule<ICoreApi> {
             this.JaegerManager.stop(jaegerInitSpan);
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
-                this.Api.Android!.Request.setMaximumPoolSize(1);
+                this.Api.Request.Android.setMaximumPoolSize(1);
             } else {
                 this.Api.Request.setConcurrentRequestCount(1);
             }
@@ -312,10 +242,10 @@ export class Core implements IApiModule<ICoreApi> {
 
 export abstract class CoreModule {
 
-    protected readonly core: Core;
+    public readonly Core: Core;
 
     protected constructor(core: Core) {
-        this.core = core;
+        this.Core = core;
     }
 
 }

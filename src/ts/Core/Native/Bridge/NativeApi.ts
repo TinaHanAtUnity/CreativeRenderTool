@@ -23,6 +23,9 @@ export abstract class NativeApi {
     protected _eventCategory?: string;
     protected _fullApiClassName: string;
 
+    public abstract readonly Android?: NativeApi;
+    public abstract readonly iOS?: NativeApi;
+
     protected constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage, eventCategory?: string) {
         this._nativeBridge = nativeBridge;
         this._apiClass = apiClass;

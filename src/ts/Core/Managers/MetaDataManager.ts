@@ -19,7 +19,7 @@ export class MetaDataManager {
             }
         }
 
-        return metaData.fetch(this._core.Api.Storage, keys).then((success) => {
+        return metaData.fetch(this._core, keys).then((success) => {
             if (success) {
                 if(cache) {
                     this._metaDataCache[metaData.getCategory()] = metaData;

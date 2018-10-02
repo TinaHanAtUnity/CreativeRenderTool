@@ -1,6 +1,6 @@
-import { StorageApi } from 'Core/Native/Storage';
 import { ISchema, Model } from 'Core/Models/Model';
 import { MetaData } from 'Core/Utilities/MetaData';
+import { Core } from '../../Core';
 
 export interface IMetaData {
     category: string;
@@ -25,7 +25,7 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
         return this.get('keys');
     }
 
-    public fetch(storage: StorageApi, keys?: string[]): Promise<boolean> {
+    public fetch(core: Core, keys?: string[]): Promise<boolean> {
         let finalKeys: string[] = [];
         if (!keys) {
             finalKeys = this.getKeys();
@@ -33,7 +33,7 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
             finalKeys = keys;
         }
 
-        return this.getValues(storage, finalKeys).then((data) => {
+        return this.getValues(core, finalKeys).then((data) => {
             return this.setValues(data);
         });
     }
@@ -55,9 +55,9 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
         return success;
     }
 
-    private getValues(storage: StorageApi, keys: string[]): Promise<{}> {
+    private getValues(core: Core, keys: string[]): Promise<{}> {
         const returnObject: { [key: string]: any } = {};
-        const metaData: MetaData = new MetaData(storage);
+        const metaData: MetaData = new MetaData(core);
         return metaData.hasCategory(this.getCategory()).then(exists => {
             if(!exists) {
                 return Promise.resolve([]);

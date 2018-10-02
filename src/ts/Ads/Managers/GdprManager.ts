@@ -3,12 +3,13 @@ import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Request } from 'Core/Managers/Request';
+import { Ads } from '../Ads';
+import { Core } from '../../Core/Core';
 
 export interface IGdprPersonalProperties {
     deviceModel: string;
@@ -35,22 +36,13 @@ export class GdprManager {
     private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
     private static GdprConsentStorageKey = 'gdpr.consent.value';
 
-    private _storage: StorageApi;
-    private _deviceInfo: DeviceInfo;
-    private _clientInfo: ClientInfo;
-    private _coreConfig: CoreConfiguration;
-    private _adsConfig: AdsConfiguration;
-    private _request: Request;
+    private readonly _core: Core;
+    private readonly _ads: Ads;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, request: Request) {
-        this._nativeBridge = nativeBridge;
-        this._deviceInfo = deviceInfo;
-        this._clientInfo = clientInfo;
-        this._coreConfig = coreConfig;
-        this._adsConfig = adsConfig;
-        this._request = request;
-
-        this._storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
+    constructor(core: Core, ads: Ads) {
+        this._core = core;
+        this._ads = ads;
+        core.Api.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
