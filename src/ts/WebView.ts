@@ -42,7 +42,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ConfigError } from 'Core/Errors/ConfigError';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
+import { JaegerManager } from 'Core/Jaeger/JaegerManager';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -63,8 +63,8 @@ import { HttpKafka } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { Promises, TimeoutError } from 'Core/Utilities/Promises';
-import { INativeResponse, Request } from 'Core/Managers/Request';
-import { Resolve } from 'Core/Managers/Resolve';
+import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { Resolve } from 'Core/Utilities/Resolve';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
@@ -91,7 +91,7 @@ export class WebView {
     private _backupCampaignManager: BackupCampaignManager;
     private _refreshManager: RefreshManager;
     private _assetManager: AssetManager;
-    private _cache: CacheManager;
+    private _cache: Cache;
     private _cacheBookkeeping: CacheBookkeeping;
     private _container: AdUnitContainer;
 
@@ -254,7 +254,9 @@ export class WebView {
             this._jaegerManager.setJaegerTracingEnabled(this._coreConfig.isJaegerTracingEnabled());
 
             const placementManager = new PlacementManager(this._nativeBridge, this._adsConfig);
-
+            PurchasingUtilities.initialize(this._clientInfo, this._coreConfig, this._adsConfig, this._nativeBridge, placementManager);
+            PurchasingUtilities.sendPurchaseInitializationEvent();
+            this._nativeBridge.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(iapPayload));
 
             if (!this._coreConfig.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
@@ -262,7 +264,19 @@ export class WebView {
                 throw error;
             }
 
-
+            let analyticsPromise;
+            if(this._coreConfig.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
+                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._coreConfig, this._focusManager);
+                analyticsPromise = this._analyticsManager.init().then(() => {
+                    this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
+                });
+            } else {
+                const analyticsStorage: AnalyticsStorage = new AnalyticsStorage(this._nativeBridge);
+                analyticsPromise = analyticsStorage.getSessionId(this._clientInfo.isReinitialized()).then(gameSessionId => {
+                    analyticsStorage.setSessionId(gameSessionId);
+                    this._sessionManager.setGameSessionId(gameSessionId);
+                });
+            }
             const gdprConsentPromise = this._gdprManager.getConsentAndUpdateConfiguration().catch((error) => {
                 // do nothing
                 // error happens when consent value is undefined
