@@ -1,7 +1,7 @@
 import {Platform} from 'Core/Constants/Platform';
 import {NativeBridge} from 'Core/Native/Bridge/NativeBridge';
 import {AndroidPermission} from 'Core/Native/Android/AndroidPermissions';
-import {IosPermission} from 'Core/Native/iOS/IosPermissions';
+import {IosPermission, IosBundleKeys} from 'Core/Native/iOS/IosPermissions';
 
 export enum CurrentPermission {
     UNKNOWN,
@@ -13,11 +13,6 @@ export enum PermissionTypes {
     CAMERA = 'camera',
     AUDIO = 'audio',
     INVALID = 'invalid'
-}
-
-enum IosBundleKeys {
-    Camera = 'NSCameraUsageDescription',
-    Audio = 'NSMicrophoneUsageDescription'
 }
 
 export class PermissionsUtil {
@@ -96,7 +91,7 @@ export class PermissionsUtil {
             return Promise.resolve(false);
         }
         return nativeBridge.MainBundle.getDataForKey(key)
-            .then((value: string | any) => value !== '')
+            .then((value: [string, any]) => value[0] !== '')
             .catch(() => false);
     }
 
