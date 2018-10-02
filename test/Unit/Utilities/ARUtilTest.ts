@@ -1,44 +1,49 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import {NativeBridge} from 'Core/Native/Bridge/NativeBridge';
-import {ARApi} from 'AR/Native/AR';
-import {AndroidARApi} from 'AR/Native/Android/AndroidARApi';
-import {ARUtil} from 'AR/Utilities/ARUtil';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ARApi } from 'AR/Native/AR';
+import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
+import { ARUtil } from 'AR/Utilities/ARUtil';
 
 describe('ARUtil Test', () => {
+    const ANDROID_AR_SUPPORTED_RETRY_COUNT = 5;
     let nativeBridge: any;
 
-    it('Android Supported', (done) => {
+    it('Android Supported (transient first)', () => {
         nativeBridge = sinon.createStubInstance(NativeBridge);
         nativeBridge.AR = sinon.createStubInstance(ARApi);
         nativeBridge.AR.Android = sinon.createStubInstance(AndroidARApi);
-        nativeBridge.AR.Android.isARSupported.onCall(0).returns(Promise.resolve([true, false]));
-        nativeBridge.AR.Android.isARSupported.onCall(1).returns(Promise.resolve([false, true]));
+        nativeBridge.AR.Android.isARSupported.onCall(0).resolves([true, false]);
+        nativeBridge.AR.Android.isARSupported.onCall(1).resolves([false, true]);
 
-        ARUtil.isARSupported(nativeBridge).then(supported => {
+        return ARUtil.isARSupported(nativeBridge).then(supported => {
            sinon.assert.calledTwice(nativeBridge.AR.Android.isARSupported);
            assert(supported);
-           done();
+
+           return Promise.resolve();
         });
     });
 
-    it('Android Supported Retry', (done) => {
+    it('Android Supported Retry', () => {
+        const IS_TRANSIENT = true;
+        const IS_SUPPORTED = false;
         nativeBridge = sinon.createStubInstance(NativeBridge);
         nativeBridge.AR = sinon.createStubInstance(ARApi);
         nativeBridge.AR.Android = sinon.createStubInstance(AndroidARApi);
-        nativeBridge.AR.Android.isARSupported.onCall(0).returns(Promise.resolve([true, false]));
-        nativeBridge.AR.Android.isARSupported.onCall(1).returns(Promise.resolve([true, false]));
-        nativeBridge.AR.Android.isARSupported.onCall(2).returns(Promise.resolve([true, false]));
-        nativeBridge.AR.Android.isARSupported.onCall(3).returns(Promise.resolve([true, false]));
-        nativeBridge.AR.Android.isARSupported.onCall(4).returns(Promise.resolve([true, false]));
-        nativeBridge.AR.Android.isARSupported.onCall(5).returns(Promise.resolve([true, false]));
+        nativeBridge.AR.Android.isARSupported.onCall(0).resolves([IS_TRANSIENT, IS_SUPPORTED]);
+        nativeBridge.AR.Android.isARSupported.onCall(1).resolves([IS_TRANSIENT, IS_SUPPORTED]);
+        nativeBridge.AR.Android.isARSupported.onCall(2).resolves([IS_TRANSIENT, IS_SUPPORTED]);
+        nativeBridge.AR.Android.isARSupported.onCall(3).resolves([IS_TRANSIENT, IS_SUPPORTED]);
+        nativeBridge.AR.Android.isARSupported.onCall(4).resolves([IS_TRANSIENT, IS_SUPPORTED]);
+        nativeBridge.AR.Android.isARSupported.onCall(5).resolves([IS_TRANSIENT, IS_SUPPORTED]);
 
-        ARUtil.isARSupported(nativeBridge).then(supported => {
+        return ARUtil.isARSupported(nativeBridge).then(supported => {
             const count = nativeBridge.AR.Android.isARSupported.callCount;
-            assert.equal(count, 5, 'isARSupported retried ' + count + ' times');
+            assert.equal(count, ANDROID_AR_SUPPORTED_RETRY_COUNT, 'isARSupported retried ' + count + ' times');
             assert(!supported);
-            done();
+
+            return Promise.resolve();
         });
     });
 });
