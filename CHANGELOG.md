@@ -1,3 +1,7 @@
+# Pending
+
+* add missing 'supports' in MRAID container and remove one logWarning [#6540](https://github.com/Applifier/unity-ads-webview/pull/6540)
+
 # Mon Oct  1 11:33:41 UTC 2018
 
 * Enable close icon skip for specific game IDs [#6520](https://github.com/Applifier/unity-ads-webview/pull/6520)
@@ -14,7 +18,7 @@
 
 # Wed Sep 26 21:14:54 UTC 2018
 
-* Temporarily remove Mixed Placement functionality and tests[#6474](https://github.com/Applifier/unity-ads-webview/pull/6474)
+* Temporarily remove Mixed Placement functionality and tests [#6474](https://github.com/Applifier/unity-ads-webview/pull/6474)
 
 # Wed Sep 26 09:51:45 UTC 2018
 
