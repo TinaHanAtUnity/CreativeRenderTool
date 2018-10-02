@@ -1,16 +1,20 @@
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
 import { StorageOperation, IStorageBatch, IStorageCommand, StorageCommandType } from 'Core/Utilities/StorageOperation';
+import { Observable0 } from 'Core/Utilities/Observable';
 
 export class StorageBridge {
-    private static _storageBatchInterval = 1000; // milliseconds
+    public onPublicStorageWrite = new Observable0();
+    public onPrivateStorageWrite = new Observable0();
 
     private _nativeBridge: NativeBridge;
     private _publicStorageQueue: IStorageBatch; // queue for storage operations to public storage
     private _privateStorageQueue: IStorageBatch; // queue for storage operations to private storage
     private _storageBatchTimer: any;
 
-    constructor(nativeBridge: NativeBridge) {
+    private _storageBatchInterval: number = 1000; // default value is 1000 milliseconds
+
+    constructor(nativeBridge: NativeBridge, interval?: number) {
         this._nativeBridge = nativeBridge;
         this._publicStorageQueue = {
             commands: []
@@ -18,6 +22,10 @@ export class StorageBridge {
         this._privateStorageQueue = {
             commands: []
         };
+
+        if(interval) {
+            this._storageBatchInterval = interval;
+        }
     }
 
     public queue(operation: StorageOperation) {
@@ -40,7 +48,7 @@ export class StorageBridge {
                 this.executeBatch(StorageType.PUBLIC, this._publicStorageQueue);
                 this.executeBatch(StorageType.PRIVATE, this._privateStorageQueue);
                 delete this._storageBatchTimer;
-            }, StorageBridge._storageBatchInterval);
+            }, this._storageBatchInterval);
         }
     }
 
@@ -64,10 +72,12 @@ export class StorageBridge {
             this._publicStorageQueue = {
                 commands: []
             };
+            this.onPublicStorageWrite.trigger();
         } else {
             this._privateStorageQueue = {
                 commands: []
             };
+            this.onPrivateStorageWrite.trigger();
         }
     }
 }
