@@ -1,6 +1,6 @@
 import { BaseMetaData, IMetaData } from 'Core/Models/MetaData/BaseMetaData';
 import { StorageType } from 'Core/Native/Storage';
-import { Core, ICoreApi } from '../../Core';
+import { ICoreApi } from '../../Core';
 
 interface IPlayerMetaData extends IMetaData {
     server_id: string;

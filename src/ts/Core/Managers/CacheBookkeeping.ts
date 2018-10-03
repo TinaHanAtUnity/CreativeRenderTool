@@ -4,7 +4,7 @@ import { IFileInfo } from 'Core/Native/Cache';
 import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FileId } from 'Core/Utilities/FileId';
-import { Core, ICoreApi } from '../Core';
+import { ICoreApi } from '../Core';
 
 export interface IFileBookkeepingInfo {
     fullyDownloaded: boolean;

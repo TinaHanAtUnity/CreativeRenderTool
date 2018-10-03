@@ -5,7 +5,7 @@ import { FileId } from 'Core/Utilities/FileId';
 import { FileInfo } from 'Core/Utilities/FileInfo';
 import { Observable0, Observable1, Observable2, Observable3, Observable5 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Managers/Request';
-import { Core, ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/Core';
 import { WakeUpManager } from './WakeUpManager';
 import { CacheBookkeeping } from './CacheBookkeeping';
 

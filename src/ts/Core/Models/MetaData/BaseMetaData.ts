@@ -1,6 +1,6 @@
 import { ISchema, Model } from 'Core/Models/Model';
 import { MetaData } from 'Core/Utilities/MetaData';
-import { Core, ICoreApi } from '../../Core';
+import { ICoreApi } from '../../Core';
 
 export interface IMetaData {
     category: string;

@@ -1,6 +1,6 @@
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
 import { ISchema, Model } from 'Core/Models/Model';
-import { Core, ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/Core';
 
 export interface IDeviceInfo {
     advertisingIdentifier: string | undefined | null;
