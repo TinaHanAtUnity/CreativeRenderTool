@@ -64,35 +64,6 @@ export class Vast extends Model<IVast> {
         throw new Error('No video URL found for VAST');
     }
 
-    public getVideoUrlInRange(minSize: number, maxSize: number): string {
-        let mediaUrl: string | null = null;
-        let minFileSize: number = -1;
-        const ad = this.getAd();
-        if (ad) {
-            for (const creative of ad.getCreatives()) {
-                for (const mediaFile of creative.getMediaFiles()) {
-                    const mimeType = mediaFile.getMIMEType();
-                    const playable = mimeType && this.isPlayableMIMEType(mimeType);
-                    if (playable && mediaFile.getFileURL()) {
-                        const fileSize = mediaFile.getFileSize();
-                        if (fileSize >= minSize && fileSize <= maxSize) {
-                            if (fileSize < minFileSize) {
-                                mediaUrl = mediaFile.getFileURL();
-                                minFileSize = fileSize;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (mediaUrl) {
-            return mediaUrl;
-        } else {
-            throw new Error('No Video URL found for VAST');
-        }
-    }
-
     public getImpressionUrls(): string[] {
         const ad = this.getAd();
         if (ad) {
@@ -274,9 +245,5 @@ export class Vast extends Model<IVast> {
         const playableMIMEType = 'video/mp4';
         MIMEType = MIMEType.toLowerCase();
         return MIMEType === playableMIMEType;
-    }
-
-    private selectMediaFileInRange(vastAd: VastAd, minSize: number, maxSize: number): string | null {
-        return null;
     }
 }
