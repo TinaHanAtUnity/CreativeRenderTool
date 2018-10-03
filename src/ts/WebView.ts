@@ -340,7 +340,9 @@ export class WebView {
             }
         }).then(() => {
             if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                this._nativeBridge.setAutoBatchEnabled(false);
+                if(!CustomFeatures.isAlwaysAutobatching(this._clientInfo.getGameId())) {
+                    this._nativeBridge.setAutoBatchEnabled(false);
+                }
                 this._nativeBridge.Request.Android.setMaximumPoolSize(1);
             } else {
                 this._nativeBridge.Request.setConcurrentRequestCount(1);
@@ -586,7 +588,9 @@ export class WebView {
         this._showing = false;
 
         if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.setAutoBatchEnabled(false);
+            if(!CustomFeatures.isAlwaysAutobatching(this._clientInfo.getGameId())) {
+                this._nativeBridge.setAutoBatchEnabled(false);
+            }
             this._nativeBridge.Request.Android.setMaximumPoolSize(1);
         } else {
             this._nativeBridge.Request.setConcurrentRequestCount(1);
