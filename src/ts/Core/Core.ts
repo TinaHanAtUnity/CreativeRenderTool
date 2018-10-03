@@ -7,7 +7,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { Request } from 'Core/Managers/Request';
 import { Resolve } from 'Core/Managers/Resolve';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { IApi, IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { IAndroidModuleApi, IApiModule, IIosModuleApi, IModuleApi, IPlatformModuleApi } from 'Core/Modules/IApiModule';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CacheApi } from 'Core/Native/Cache';
 import { ConnectivityApi } from 'Core/Native/Connectivity';
@@ -34,6 +34,12 @@ import { ConfigError } from 'Core/Errors/ConfigError';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { MetaData } from 'Core/Utilities/MetaData';
+import { BroadcastApi } from './Native/Android/Broadcast';
+import { IntentApi } from './Native/Android/Intent';
+import { LifecycleApi } from './Native/Android/Lifecycle';
+import { MainBundleApi } from './Native/iOS/MainBundle';
+import { NotificationApi } from './Native/iOS/Notification';
+import { UrlSchemeApi } from './Native/iOS/UrlScheme';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -48,16 +54,32 @@ export interface ICoreApi extends IModuleApi {
     Storage: StorageApi;
 }
 
-export class Core implements IApiModule<ICoreApi> {
+export interface IAndroidCoreApi extends ICoreApi, IAndroidModuleApi {
+    Android: {
+        Broadcast: BroadcastApi;
+        Intent: IntentApi;
+        Lifecycle: LifecycleApi;
+    };
+}
+
+export interface IIosCoreApi extends ICoreApi, IIosModuleApi {
+    iOS: {
+        MainBundle: MainBundleApi;
+        Notification: NotificationApi;
+        UrlScheme: UrlSchemeApi;
+    };
+}
+
+export class Core<P extends Platform> implements IApiModule {
 
     public readonly NativeBridge: NativeBridge;
 
-    public readonly Api: ICoreApi;
+    public readonly Api: IAndroidCoreApi | IIosCoreApi;
 
     public readonly CacheManager: CacheManager;
     public readonly CacheBookkeeping: CacheBookkeeping;
     // public ConfigManager: ConfigManager;
-    public readonly FocusManager: FocusManager;
+    public readonly FocusManager: FocusManager<P>;
     public readonly JaegerManager: JaegerManager;
     public readonly MetaDataManager: MetaDataManager;
     public readonly Request: Request;
@@ -74,7 +96,7 @@ export class Core implements IApiModule<ICoreApi> {
     constructor(nativeBridge: NativeBridge) {
         this.NativeBridge = nativeBridge;
 
-        this.Api = {
+        const api: ICoreApi = {
             Cache: new CacheApi(nativeBridge),
             Connectivity: new ConnectivityApi(nativeBridge),
             DeviceInfo: new DeviceInfoApi(nativeBridge),
@@ -87,15 +109,42 @@ export class Core implements IApiModule<ICoreApi> {
             Storage: new StorageApi(nativeBridge)
         };
 
-        this.FocusManager = new FocusManager(this);
-        this.MetaDataManager = new MetaDataManager(this);
-        this.WakeUpManager = new WakeUpManager(this);
-        this.Request = new Request(this);
-        this.CacheBookkeeping = new CacheBookkeeping(this);
-        this.CacheManager = new CacheManager(this);
-        this.Resolve = new Resolve(this);
-        this.MetaDataManager = new MetaDataManager(this);
-        this.JaegerManager = new JaegerManager(this);
+        switch(nativeBridge.getPlatform()) {
+            case Platform.ANDROID:
+                this.Api = {
+                    Platform: Platform.ANDROID,
+                    ...api,
+                    Android: {
+                        Broadcast: new BroadcastApi(nativeBridge),
+                        Intent: new IntentApi(nativeBridge),
+                        Lifecycle: new LifecycleApi(nativeBridge)
+                    }
+                };
+                break;
+
+            case Platform.IOS:
+                this.Api = {
+                    Platform: Platform.IOS,
+                    ... api,
+                    iOS: {
+                        MainBundle: new MainBundleApi(nativeBridge),
+                        Notification: new NotificationApi(nativeBridge),
+                        UrlScheme: new UrlSchemeApi(nativeBridge)
+                    }
+                };
+                break;
+
+            default:
+        }
+
+        this.FocusManager = new FocusManager<P>(this.Api);
+        this.WakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
+        this.Request = new Request(this._nativeBridge, this._wakeUpManager);
+        this.CacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
+        this.CacheManager = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping);
+        this.Resolve = new Resolve(this._nativeBridge);
+        this.MetaDataManager = new MetaDataManager(this._nativeBridge);
+        this.JaegerManager = new JaegerManager(this._request);
     }
 
     public initialize(): Promise<void> {

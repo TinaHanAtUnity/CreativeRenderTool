@@ -39,7 +39,7 @@ export class NativeBridge implements INativeBridge {
 
     private _eventHandlers: { [key: string]: NativeApi } = {};
 
-    constructor(backend: IWebViewBridge, platform: Platform = Platform.TEST, autoBatch = true) {
+    constructor(backend: IWebViewBridge, platform: Platform, autoBatch = true) {
         this._backend = backend;
         this._platform = platform;
         this._autoBatchEnabled = autoBatch;
