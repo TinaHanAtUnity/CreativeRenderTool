@@ -1,4 +1,5 @@
 import { Model } from 'Core/Models/Model';
+import { ClientInfoData } from 'Core/Native/Sdk';
 
 interface IClientInfo {
     gameId: string;
@@ -18,7 +19,7 @@ interface IClientInfo {
 
 export class ClientInfo extends Model<IClientInfo> {
 
-    constructor(data: any[]) {
+    constructor(data: ClientInfoData) {
         super('ClientInfo', {
             gameId: ['string'],
             testMode: ['boolean'],
@@ -35,19 +36,19 @@ export class ClientInfo extends Model<IClientInfo> {
             reinitialized: ['boolean']
         });
 
-        this.set('gameId', data.shift());
-        this.set('testMode', data.shift());
-        this.set('applicationName', data.shift());
-        this.set('applicationVersion', data.shift());
-        this.set('sdkVersion', data.shift());
-        this.set('sdkVersionName', data.shift());
-        this.set('debuggable', data.shift());
-        this.set('configUrl', data.shift());
-        this.set('webviewUrl', data.shift());
-        this.set('webviewHash', data.shift());
-        this.set('webviewVersion', data.shift());
-        this.set('initTimestamp', data.shift());
-        this.set('reinitialized', data.shift());
+        this.set('gameId', data[0]);
+        this.set('testMode', data[1]);
+        this.set('applicationName', data[2]);
+        this.set('applicationVersion', data[3]);
+        this.set('sdkVersion', data[4]);
+        this.set('sdkVersionName', data[5]);
+        this.set('debuggable', data[6]);
+        this.set('configUrl', data[7]);
+        this.set('webviewUrl', data[8]);
+        this.set('webviewHash', data[9]);
+        this.set('webviewVersion', data[10]);
+        this.set('initTimestamp', data[11]);
+        this.set('reinitialized', data[12]);
     }
 
     public getGameId(): string {

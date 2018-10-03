@@ -1,6 +1,6 @@
 import { ISchema, Model } from 'Core/Models/Model';
 import { MetaData } from 'Core/Utilities/MetaData';
-import { Core } from '../../Core';
+import { Core, ICoreApi } from '../../Core';
 
 export interface IMetaData {
     category: string;
@@ -25,7 +25,7 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
         return this.get('keys');
     }
 
-    public fetch(core: Core, keys?: string[]): Promise<boolean> {
+    public fetch(core: ICoreApi, keys?: string[]): Promise<boolean> {
         let finalKeys: string[] = [];
         if (!keys) {
             finalKeys = this.getKeys();
@@ -55,7 +55,7 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
         return success;
     }
 
-    private getValues(core: Core, keys: string[]): Promise<{}> {
+    private getValues(core: ICoreApi, keys: string[]): Promise<{}> {
         const returnObject: { [key: string]: any } = {};
         const metaData: MetaData = new MetaData(core);
         return metaData.hasCategory(this.getCategory()).then(exists => {

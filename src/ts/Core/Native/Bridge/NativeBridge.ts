@@ -33,8 +33,8 @@ export class NativeBridge implements INativeBridge {
     private _backend: IWebViewBridge;
 
     private _autoBatchEnabled: boolean;
-    private _autoBatch: BatchInvocation;
-    private _autoBatchTimer: number;
+    private _autoBatch?: BatchInvocation;
+    private _autoBatchTimer?: number;
     private _autoBatchInterval = 1;
 
     private _eventHandlers: { [key: string]: NativeApi } = {};
@@ -59,9 +59,11 @@ export class NativeBridge implements INativeBridge {
             const promise = this._autoBatch.queue<T>(className, methodName, parameters);
             if(!this._autoBatchTimer) {
                 this._autoBatchTimer = window.setTimeout(() => {
-                    this.invokeBatch(this._autoBatch);
-                    delete this._autoBatch;
-                    delete this._autoBatchTimer;
+                    if(this._autoBatch) {
+                        this.invokeBatch(this._autoBatch);
+                        delete this._autoBatch;
+                        delete this._autoBatchTimer;
+                    }
                 }, this._autoBatchInterval);
             }
             return promise;

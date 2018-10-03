@@ -1,6 +1,6 @@
 import { BaseMetaData, IMetaData } from 'Core/Models/MetaData/BaseMetaData';
 import { StorageType } from 'Core/Native/Storage';
-import { Core } from '../../Core';
+import { Core, ICoreApi } from '../../Core';
 
 interface IPlayerMetaData extends IMetaData {
     server_id: string;
@@ -18,11 +18,11 @@ export class PlayerMetaData extends BaseMetaData<IPlayerMetaData> {
         this.set('category', 'player');
     }
 
-    public fetch(core: Core, keys?: string[]): Promise<boolean> {
+    public fetch(core: ICoreApi, keys?: string[]): Promise<boolean> {
         return super.fetch(core, keys).then((exists) => {
             if (exists) {
-                return core.Api.Storage.delete(StorageType.PUBLIC, this.getCategory()).then(() => {
-                    core.Api.Storage.write(StorageType.PUBLIC);
+                return core.Storage.delete(StorageType.PUBLIC, this.getCategory()).then(() => {
+                    core.Storage.write(StorageType.PUBLIC);
                     return true;
                 });
             } else {

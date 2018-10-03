@@ -11,8 +11,8 @@ export interface IAccelerometerData {
 }
 
 export class SensorInfoApi extends NativeApi {
-    public Android: AndroidSensorInfoApi;
-    public Ios: IosSensorInfoApi;
+    public readonly Android?: AndroidSensorInfoApi;
+    public readonly Ios?: IosSensorInfoApi;
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'SensorInfo', ApiPackage.CORE);

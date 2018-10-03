@@ -5,7 +5,9 @@ import { FileId } from 'Core/Utilities/FileId';
 import { FileInfo } from 'Core/Utilities/FileInfo';
 import { Observable0, Observable1, Observable2, Observable3, Observable5 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Managers/Request';
-import { Core } from 'Core/Core';
+import { Core, ICoreApi } from 'Core/Core';
+import { WakeUpManager } from './WakeUpManager';
+import { CacheBookkeeping } from './CacheBookkeeping';
 
 export enum CacheStatus {
     OK,
@@ -63,11 +65,14 @@ export class CacheManager {
 
     public readonly onTooLargeFile = new Observable5<ICacheEvent, number, number, number, HeadersType>();
 
-    private _core: Core;
+    private _core: ICoreApi;
+    private _wakeUpManager: WakeUpManager;
+    private _request: Request;
+    private _cacheBookkeeping: CacheBookkeeping;
 
     private _callbacks: { [url: string]: ICallbackObject } = {};
 
-    private _currentUrl: string;
+    private _currentUrl?: string;
     private _paused: boolean;
 
     private _maxRetries: number = 5;
@@ -76,11 +81,14 @@ export class CacheManager {
     private readonly _maxFileSize = 20971520;
 
     private _currentDownloadPosition: number = -1;
-    private _lastProgressEvent: number;
+    private _lastProgressEvent?: number;
     private _fastConnectionDetected: boolean = false;
 
-    constructor(core: Core, options?: ICacheOptions) {
+    constructor(core: ICoreApi, wakeUpManager: WakeUpManager, request: Request, cacheBookkeeping: CacheBookkeeping, options?: ICacheOptions) {
         this._core = core;
+        this._wakeUpManager = wakeUpManager;
+        this._request = request;
+        this._cacheBookkeeping = cacheBookkeeping;
 
         if(options) {
             this._maxRetries = options.retries;
@@ -89,20 +97,20 @@ export class CacheManager {
 
         this._paused = false;
 
-        this._core.WakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
+        this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
 
-        this._core.Api.Cache.setProgressInterval(250);
-        this._core.Api.Cache.onDownloadStarted.subscribe((url, size, totalSize, responseCode, headers) => this.onDownloadStarted(url, size, totalSize, responseCode, headers));
-        this._core.Api.Cache.onDownloadProgress.subscribe((url, size, totalSize) => this.onDownloadProgress(url, size, totalSize));
-        this._core.Api.Cache.onDownloadEnd.subscribe((url, size, totalSize, duration, responseCode, headers) => this.onDownloadEnd(url, size, totalSize, duration, responseCode, headers));
-        this._core.Api.Cache.onDownloadStopped.subscribe((url, size, totalSize, duration, responseCode, headers) => this.onDownloadStopped(url, size, totalSize, duration, responseCode, headers));
-        this._core.Api.Cache.onDownloadError.subscribe((error, url, message) => this.onDownloadError(error, url, message));
-        this._core.Api.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
+        this._core.Cache.setProgressInterval(250);
+        this._core.Cache.onDownloadStarted.subscribe((url, size, totalSize, responseCode, headers) => this.onDownloadStarted(url, size, totalSize, responseCode, headers));
+        this._core.Cache.onDownloadProgress.subscribe((url, size, totalSize) => this.onDownloadProgress(url, size, totalSize));
+        this._core.Cache.onDownloadEnd.subscribe((url, size, totalSize, duration, responseCode, headers) => this.onDownloadEnd(url, size, totalSize, duration, responseCode, headers));
+        this._core.Cache.onDownloadStopped.subscribe((url, size, totalSize, duration, responseCode, headers) => this.onDownloadStopped(url, size, totalSize, duration, responseCode, headers));
+        this._core.Cache.onDownloadError.subscribe((error, url, message) => this.onDownloadError(error, url, message));
+        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
 
-        this._core.Api.Storage.get<boolean>(StorageType.PUBLIC, 'caching.pause.value').then(paused => {
+        this._core.Storage.get<boolean>(StorageType.PUBLIC, 'caching.pause.value').then(paused => {
             this._paused = paused;
-            this._core.Api.Storage.delete(StorageType.PUBLIC, 'caching.pause');
-            this._core.Api.Storage.write(StorageType.PUBLIC);
+            this._core.Storage.delete(StorageType.PUBLIC, 'caching.pause');
+            this._core.Storage.write(StorageType.PUBLIC);
         }).catch(() => {
             // ignore errors, assume caching not paused
         });
@@ -110,8 +118,8 @@ export class CacheManager {
 
     public cache(url: string): Promise<string[]> {
         return Promise.all<boolean, string>([
-            FileInfo.isCached(this._core.Api.Cache, this._core.CacheBookkeeping, url),
-            FileId.getFileId(url, this._core.Api.Cache)
+            FileInfo.isCached(this._core.Cache, this._cacheBookkeeping, url),
+            FileId.getFileId(url, this._core.Cache)
         ]).then(([isCached, fileId]) => {
             if(isCached) {
                 return Promise.resolve<[CacheStatus, string]>([CacheStatus.OK, fileId]);
@@ -123,7 +131,7 @@ export class CacheManager {
             return promise;
         }).then(([status, fileId]: [CacheStatus, string]) => {
             if(status === CacheStatus.OK) {
-                return FileId.getFileUrl(fileId, this._core.Api.Cache).then(fileUrl => {
+                return FileId.getFileUrl(fileId, this._core.Cache).then(fileUrl => {
                     return [fileId, fileUrl];
                 });
             }
@@ -148,7 +156,7 @@ export class CacheManager {
         }
 
         if(activeDownload) {
-            this._core.Api.Cache.stop();
+            this._core.Cache.stop();
         }
     }
 
@@ -157,7 +165,7 @@ export class CacheManager {
     }
 
     public getFreeSpace(): Promise<number> {
-        return this._core.Api.Cache.getFreeSpace().then(freeSpace => {
+        return this._core.Cache.getFreeSpace().then(freeSpace => {
             return freeSpace;
         });
     }
@@ -165,7 +173,7 @@ export class CacheManager {
     private downloadFile(url: string, fileId: string): void {
         this._currentUrl = url;
 
-        FileInfo.getFileInfo(this._core.Api.Cache, fileId).then(fileInfo => {
+        FileInfo.getFileInfo(this._core.Cache, fileId).then(fileInfo => {
             let append = false;
             let headers: HeadersType = [];
 
@@ -174,12 +182,12 @@ export class CacheManager {
                 headers = [['Range', 'bytes=' + fileInfo.size + '-']];
             }
 
-            this._core.Api.Cache.download(url, fileId, headers, append).catch(error => {
+            this._core.Cache.download(url, fileId, headers, append).catch(error => {
                 const callback = this._callbacks[url];
                 if(callback) {
                     switch(error) {
                         case CacheError[CacheError.FILE_ALREADY_CACHING]:
-                            this._core.Api.Sdk.logError('Unity Ads cache error: attempted to add second download from ' + url + ' to ' + fileId);
+                            this._core.Sdk.logError('Unity Ads cache error: attempted to add second download from ' + url + ' to ' + fileId);
                             this.fulfillCallback(url, CacheStatus.FAILED);
                             return;
 
@@ -244,11 +252,11 @@ export class CacheManager {
             callback.contentLength = totalSize;
             this.onStart.trigger(CacheManager.getCacheEvent(callback), size);
             if(size === 0) {
-                this._core.CacheBookkeeping.writeFileEntry(callback.fileId, this._core.CacheBookkeeping.createFileInfo(false, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
+                this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(false, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
             }
             // reject all files larger than 20 megabytes
             if(totalSize > this._maxFileSize) {
-                this._core.Api.Cache.stop();
+                this._core.Cache.stop();
                 this.onTooLargeFile.trigger(CacheManager.getCacheEvent(callback), size, totalSize, responseCode, headers);
             }
         } else {
@@ -267,7 +275,7 @@ export class CacheManager {
     private onDownloadProgress(url: string, size: number, totalSize: number): void {
         this.updateProgress(size, false);
 
-        this._core.Api.Sdk.logDebug('Cache progress for "' + url + '": ' + Math.round(size / totalSize * 100) + '%');
+        this._core.Sdk.logDebug('Cache progress for "' + url + '": ' + Math.round(size / totalSize * 100) + '%');
     }
 
     private onDownloadEnd(url: string, size: number, totalSize: number, duration: number, responseCode: number, headers: HeadersType): void {
@@ -276,14 +284,14 @@ export class CacheManager {
         const callback = this._callbacks[url];
         if(callback) {
             if(Request.AllowedResponseCodes.exec(responseCode.toString())) {
-                this._core.CacheBookkeeping.writeFileEntry(callback.fileId, this._core.CacheBookkeeping.createFileInfo(true, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
+                this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(true, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
                 this.fulfillCallback(url, CacheStatus.OK);
                 this.onFinish.trigger(CacheManager.getCacheEvent(callback));
                 return;
             } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
                 this.onRedirect.trigger(CacheManager.getCacheEvent(callback));
-                this._core.CacheBookkeeping.removeFileEntry(callback.fileId);
-                this._core.Api.Cache.deleteFile(callback.fileId);
+                this._cacheBookkeeping.removeFileEntry(callback.fileId);
+                this._core.Cache.deleteFile(callback.fileId);
                 const location = Request.getHeader(headers, 'location');
                 if(location) {
                     let fileId = callback.fileId;
@@ -303,9 +311,9 @@ export class CacheManager {
             }
 
             this.onFinishError.trigger(CacheManager.getCacheEvent(callback), size, totalSize, responseCode, headers);
-            this._core.CacheBookkeeping.removeFileEntry(callback.fileId);
+            this._cacheBookkeeping.removeFileEntry(callback.fileId);
             if(size > 0) {
-                this._core.Api.Cache.deleteFile(callback.fileId);
+                this._core.Cache.deleteFile(callback.fileId);
             }
 
             this.fulfillCallback(url, CacheStatus.FAILED);
@@ -317,7 +325,7 @@ export class CacheManager {
 
         const callback = this._callbacks[url];
         if(callback) {
-            this._core.CacheBookkeeping.writeFileEntry(callback.fileId, this._core.CacheBookkeeping.createFileInfo(false, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
+            this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(false, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
             this.onStop.trigger(CacheManager.getCacheEvent(callback));
             if(callback.contentLength > this._maxFileSize) {
                 // files larger than 20 megabytes should be handled as failures
@@ -373,21 +381,21 @@ export class CacheManager {
     }
 
     private handleRequestRangeError(callback: ICallbackObject, url: string): void {
-        Promise.all([this._core.Api.Cache.getFileInfo(callback.fileId), this._core.Request.head(url)]).then(([fileInfo, response]) => {
+        Promise.all([this._core.Cache.getFileInfo(callback.fileId), this._request.head(url)]).then(([fileInfo, response]) => {
             const contentLength = Request.getHeader(response.headers, 'Content-Length');
 
             if(response.responseCode === 200 && fileInfo.found && contentLength && fileInfo.size === parseInt(contentLength, 10) && fileInfo.size > 0) {
-                this._core.CacheBookkeeping.writeFileEntry(callback.fileId, this._core.CacheBookkeeping.createFileInfo(true, fileInfo.size, fileInfo.size, FileId.getFileIdExtension(callback.fileId)));
+                this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(true, fileInfo.size, fileInfo.size, FileId.getFileIdExtension(callback.fileId)));
                 this.fulfillCallback(url, CacheStatus.OK);
             } else {
-                this._core.CacheBookkeeping.removeFileEntry(callback.fileId);
+                this._cacheBookkeeping.removeFileEntry(callback.fileId);
                 if(fileInfo.found) {
-                    this._core.Api.Cache.deleteFile(callback.fileId);
+                    this._core.Cache.deleteFile(callback.fileId);
                 }
                 this.fulfillCallback(url, CacheStatus.FAILED);
             }
         }).catch((error) => {
-            this._core.CacheBookkeeping.removeFileEntry(callback.fileId);
+            this._cacheBookkeeping.removeFileEntry(callback.fileId);
             this.fulfillCallback(url, CacheStatus.FAILED);
         });
     }
@@ -424,7 +432,7 @@ export class CacheManager {
             }
 
             if(activeDownload) {
-                this._core.Api.Cache.stop();
+                this._core.Cache.stop();
             }
         } else {
             for(const url in this._callbacks) {
@@ -448,14 +456,14 @@ export class CacheManager {
         }
 
         if(deleteValue) {
-            this._core.Api.Storage.delete(StorageType.PUBLIC, 'caching.pause');
-            this._core.Api.Storage.write(StorageType.PUBLIC);
+            this._core.Storage.delete(StorageType.PUBLIC, 'caching.pause');
+            this._core.Storage.write(StorageType.PUBLIC);
         }
     }
 
     private updateProgress(position: number, finished: boolean) {
         const deltaPosition: number = position - this._currentDownloadPosition;
-        const deltaTime: number = Date.now() - this._lastProgressEvent;
+        const deltaTime: number = Date.now() - (this._lastProgressEvent || 0);
 
         if(position > 0 && deltaPosition > 102400) { // sample size must be at least 100 kilobytes
             // speed in kilobytes per second (same as bytes per millisecond)

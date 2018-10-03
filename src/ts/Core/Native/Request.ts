@@ -10,7 +10,7 @@ export enum RequestEvent {
 }
 
 export class RequestApi extends NativeApi {
-    //public Android: AndroidRequestApi;
+    public readonly Android?: AndroidRequestApi;
 
     public readonly onComplete = new Observable5<string, string, string, number, Array<[string, string]>>();
     public readonly onFailed = new Observable3<string, string, string>();

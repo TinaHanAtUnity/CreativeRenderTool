@@ -15,8 +15,8 @@ export class PermissionsApi extends NativeApi {
     public permissionRequestCode: number = 1000;
     public onPermissionsResult = new Observable2<string, boolean>();
 
-    public Android: AndroidPermissionsApi;
-    public Ios: IosPermissionsApi;
+    public readonly Android?: AndroidPermissionsApi;
+    public readonly Ios?: IosPermissionsApi;
     private readonly _currentPlatform: Platform;
 
     constructor(nativeBridge: NativeBridge) {

@@ -7,7 +7,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { Request } from 'Core/Managers/Request';
 import { Resolve } from 'Core/Managers/Resolve';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { IAndroidModuleApi, IApiModule, IIosModuleApi, IModuleApi, IPlatformModuleApi } from 'Core/Modules/IApiModule';
+import { IApiModule, IModuleApi, } from 'Core/Modules/IApiModule';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CacheApi } from 'Core/Native/Cache';
 import { ConnectivityApi } from 'Core/Native/Connectivity';
@@ -40,6 +40,8 @@ import { LifecycleApi } from './Native/Android/Lifecycle';
 import { MainBundleApi } from './Native/iOS/MainBundle';
 import { NotificationApi } from './Native/iOS/Notification';
 import { UrlSchemeApi } from './Native/iOS/UrlScheme';
+import { AndroidPreferencesApi } from './Native/Android/Preferences';
+import { IosPreferencesApi } from './Native/iOS/Preferences';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -52,51 +54,47 @@ export interface ICoreApi extends IModuleApi {
     Sdk: SdkApi;
     SensorInfo: SensorInfoApi;
     Storage: StorageApi;
-}
-
-export interface IAndroidCoreApi extends ICoreApi, IAndroidModuleApi {
-    Android: {
+    Android?: {
         Broadcast: BroadcastApi;
         Intent: IntentApi;
         Lifecycle: LifecycleApi;
+        Preferences: AndroidPreferencesApi;
     };
-}
-
-export interface IIosCoreApi extends ICoreApi, IIosModuleApi {
-    iOS: {
+    iOS?: {
         MainBundle: MainBundleApi;
         Notification: NotificationApi;
+        Preferences: IosPreferencesApi;
         UrlScheme: UrlSchemeApi;
     };
 }
 
-export class Core<P extends Platform> implements IApiModule {
+export class Core implements IApiModule {
 
     public readonly NativeBridge: NativeBridge;
 
-    public readonly Api: IAndroidCoreApi | IIosCoreApi;
+    public readonly Api: Readonly<ICoreApi>;
 
-    public readonly CacheManager: CacheManager;
     public readonly CacheBookkeeping: CacheBookkeeping;
     // public ConfigManager: ConfigManager;
-    public readonly FocusManager: FocusManager<P>;
-    public readonly JaegerManager: JaegerManager;
+    public readonly FocusManager: FocusManager;
     public readonly MetaDataManager: MetaDataManager;
-    public readonly Request: Request;
     public readonly Resolve: Resolve;
     public readonly WakeUpManager: WakeUpManager;
 
-    public ClientInfo: ClientInfo;
-    public DeviceInfo: DeviceInfo;
-    public Config: CoreConfiguration;
+    public Request?: Request;
+    public CacheManager?: CacheManager;
+    public JaegerManager?: JaegerManager;
+    public ClientInfo?: ClientInfo;
+    public DeviceInfo?: DeviceInfo;
+    public Config?: CoreConfiguration;
 
     private _initialized = false;
-    private _initializedAt: number;
+    private _initializedAt?: number;
 
     constructor(nativeBridge: NativeBridge) {
         this.NativeBridge = nativeBridge;
 
-        const api: ICoreApi = {
+        this.Api = {
             Cache: new CacheApi(nativeBridge),
             Connectivity: new ConnectivityApi(nativeBridge),
             DeviceInfo: new DeviceInfoApi(nativeBridge),
@@ -106,45 +104,26 @@ export class Core<P extends Platform> implements IApiModule {
             Resolve: new ResolveApi(nativeBridge),
             Sdk: new SdkApi(nativeBridge),
             SensorInfo: new SensorInfoApi(nativeBridge),
-            Storage: new StorageApi(nativeBridge)
+            Storage: new StorageApi(nativeBridge),
+            Android: nativeBridge.getPlatform() === Platform.ANDROID ? {
+                Broadcast: new BroadcastApi(nativeBridge),
+                Intent: new IntentApi(nativeBridge),
+                Lifecycle: new LifecycleApi(nativeBridge),
+                Preferences: new AndroidPreferencesApi(nativeBridge)
+            } : undefined,
+            iOS: nativeBridge.getPlatform() === Platform.IOS ? {
+                MainBundle: new MainBundleApi(nativeBridge),
+                Notification: new NotificationApi(nativeBridge),
+                Preferences: new IosPreferencesApi(nativeBridge),
+                UrlScheme: new UrlSchemeApi(nativeBridge)
+            } : undefined
         };
 
-        switch(nativeBridge.getPlatform()) {
-            case Platform.ANDROID:
-                this.Api = {
-                    Platform: Platform.ANDROID,
-                    ...api,
-                    Android: {
-                        Broadcast: new BroadcastApi(nativeBridge),
-                        Intent: new IntentApi(nativeBridge),
-                        Lifecycle: new LifecycleApi(nativeBridge)
-                    }
-                };
-                break;
-
-            case Platform.IOS:
-                this.Api = {
-                    Platform: Platform.IOS,
-                    ... api,
-                    iOS: {
-                        MainBundle: new MainBundleApi(nativeBridge),
-                        Notification: new NotificationApi(nativeBridge),
-                        UrlScheme: new UrlSchemeApi(nativeBridge)
-                    }
-                };
-                break;
-
-            default:
-        }
-
-        this.FocusManager = new FocusManager<P>(this.Api);
-        this.WakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
-        this.Request = new Request(this._nativeBridge, this._wakeUpManager);
-        this.CacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
-        this.CacheManager = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping);
-        this.Resolve = new Resolve(this._nativeBridge);
-        this.MetaDataManager = new MetaDataManager(this._nativeBridge);
-        this.JaegerManager = new JaegerManager(this._request);
+        this.FocusManager = new FocusManager(this.NativeBridge.getPlatform(), this.Api);
+        this.WakeUpManager = new WakeUpManager(this.Api);
+        this.CacheBookkeeping = new CacheBookkeeping(this.Api);
+        this.Resolve = new Resolve(this.Api);
+        this.MetaDataManager = new MetaDataManager(this.Api);
     }
 
     public initialize(): Promise<void> {
@@ -160,24 +139,27 @@ export class Core<P extends Platform> implements IApiModule {
             }
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
-                this.DeviceInfo = new AndroidDeviceInfo(this);
+                this.DeviceInfo = new AndroidDeviceInfo(this.Api);
+                this.Request = new Request(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager, <AndroidDeviceInfo>this.DeviceInfo);
             } else if(this.NativeBridge.getPlatform() === Platform.IOS) {
-                this.DeviceInfo = new IosDeviceInfo(this);
+                this.DeviceInfo = new IosDeviceInfo(this.Api);
+                this.Request = new Request(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
             }
-
+            this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.Request!, this.CacheBookkeeping);
+            this.JaegerManager = new JaegerManager(this.Request!);
             this.JaegerManager.addOpenSpan(jaegerInitSpan);
 
             HttpKafka.setRequest(this.Request);
             HttpKafka.setClientInfo(this.ClientInfo);
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
-                this.Api.Android!.Request.setMaximumPoolSize(8);
-                this.Api.Android!.Request.setKeepAliveTime(10000);
+                this.Api.Request.Android!.setMaximumPoolSize(8);
+                this.Api.Request.Android!.setKeepAliveTime(10000);
             } else {
                 this.Api.Request.setConcurrentRequestCount(8);
             }
 
-            return Promise.all([this.DeviceInfo.fetch(), this.setupTestEnvironment()]);
+            return Promise.all([this.DeviceInfo!.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
             HttpKafka.setDeviceInfo(this.DeviceInfo);
 
@@ -190,20 +172,20 @@ export class Core<P extends Platform> implements IApiModule {
                 this.FocusManager.setListenAndroidLifecycle(true);
             }
 
-            const configSpan = this.JaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
-            let configPromise = ConfigManager.fetch(this, configSpan);
+            const configSpan = this.JaegerManager!.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
+            let configPromise = ConfigManager.fetch(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo!, this.DeviceInfo!, this.Request!, configSpan);
 
             configPromise.then(() => {
-                this.JaegerManager.stop(configSpan);
+                this.JaegerManager!.stop(configSpan);
             }).catch(() => {
-                this.JaegerManager.stop(configSpan);
+                this.JaegerManager!.stop(configSpan);
             });
 
             configPromise = configPromise.then((configJson): [CoreConfiguration] => {
                 const coreConfig = CoreConfigurationParser.parse(configJson);
                 this.Api.Sdk.logInfo('Received configuration token ' + coreConfig.getToken() + ' (A/B group ' + coreConfig.getAbGroup() + ')');
-                if(this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo.getLimitAdTracking()) {
-                    ConfigManager.storeGamerToken(this, configJson.token);
+                if(this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo!.getLimitAdTracking()) {
+                    ConfigManager.storeGamerToken(this.Api, configJson.token);
                 }
                 return [coreConfig];
             }).catch((error) => {
@@ -224,10 +206,10 @@ export class Core<P extends Platform> implements IApiModule {
             this.Config = coreConfig;
 
             HttpKafka.setConfiguration(this.Config);
-            this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
+            this.JaegerManager!.setJaegerTracingEnabled(this.Config!.isJaegerTracingEnabled());
 
-            if (!this.Config.isEnabled()) {
-                const error = new Error('Game with ID ' + this.ClientInfo.getGameId() +  ' is not enabled');
+            if (!this.Config!.isEnabled()) {
+                const error = new Error('Game with ID ' + this.ClientInfo!.getGameId() +  ' is not enabled');
                 error.name = 'DisabledGame';
                 throw error;
             }
@@ -235,10 +217,10 @@ export class Core<P extends Platform> implements IApiModule {
             this._initialized = true;
             this._initializedAt = Date.now();
             this.Api.Sdk.initComplete();
-            this.JaegerManager.stop(jaegerInitSpan);
+            this.JaegerManager!.stop(jaegerInitSpan);
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
-                this.Api.Request.Android.setMaximumPoolSize(1);
+                this.Api.Request.Android!.setMaximumPoolSize(1);
             } else {
                 this.Api.Request.setConcurrentRequestCount(1);
             }
@@ -262,8 +244,12 @@ export class Core<P extends Platform> implements IApiModule {
         });
     }
 
+    public isInitialized() {
+        return this._initialized;
+    }
+
     private setupTestEnvironment(): Promise<void> {
-        return TestEnvironment.setup(new MetaData(this)).then(() => {
+        return TestEnvironment.setup(new MetaData(this.Api)).then(() => {
             if(TestEnvironment.get('serverUrl')) {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
             }

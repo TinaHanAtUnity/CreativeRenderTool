@@ -2,7 +2,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { RequestError } from 'Core/Errors/RequestError';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
-import { Core } from '../Core';
+import { Core, ICoreApi } from '../Core';
 import { AndroidDeviceInfo } from '../Models/AndroidDeviceInfo';
 
 const enum RequestStatus {
@@ -82,15 +82,19 @@ export class Request {
         };
     }
 
-    private _core: Core;
-    private _wakeUpManager: WakeUpManager;
+    private readonly _platform: Platform;
+    private readonly _core: ICoreApi;
+    private readonly _wakeUpManager: WakeUpManager;
+    private readonly _deviceInfo?: AndroidDeviceInfo;
 
-    constructor(core: Core) {
+    constructor(platform: Platform, core: ICoreApi, wakeUpManager: WakeUpManager, deviceInfo?: AndroidDeviceInfo) {
+        this._platform = platform;
         this._core = core;
-        this._wakeUpManager = core.WakeUpManager;
+        this._wakeUpManager = wakeUpManager;
+        this._deviceInfo = deviceInfo;
 
-        this._core.Api.Request.onComplete.subscribe((rawId, url, response, responseCode, headers) => this.onRequestComplete(rawId, url, response, responseCode, headers));
-        this._core.Api.Request.onFailed.subscribe((rawId, url, error) => this.onRequestFailed(rawId, url, error));
+        this._core.Request.onComplete.subscribe((rawId, url, response, responseCode, headers) => this.onRequestComplete(rawId, url, response, responseCode, headers));
+        this._core.Request.onFailed.subscribe((rawId, url, error) => this.onRequestFailed(rawId, url, error));
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
     }
 
@@ -137,7 +141,7 @@ export class Request {
         }
 
         // fix for Android 4.0 and older, https://code.google.com/p/android/issues/detail?id=24672
-        if(this._core.NativeBridge.getPlatform() === Platform.ANDROID && (<AndroidDeviceInfo>this._core.DeviceInfo).getApiLevel()! < 16) {
+        if(this._platform === Platform.ANDROID && this._deviceInfo!.getApiLevel() < 16) {
             headers.push(['Accept-Encoding', '']);
         }
 
@@ -207,13 +211,13 @@ export class Request {
         Request._requests[id] = nativeRequest;
         switch(nativeRequest.method) {
             case RequestMethod.GET:
-                return this._core.Api.Request.get(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
+                return this._core.Request.get(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
 
             case RequestMethod.POST:
-                return this._core.Api.Request.post(id.toString(), nativeRequest.url, nativeRequest.data || '', nativeRequest.headers, connectTimeout, readTimeout);
+                return this._core.Request.post(id.toString(), nativeRequest.url, nativeRequest.data || '', nativeRequest.headers, connectTimeout, readTimeout);
 
             case RequestMethod.HEAD:
-                return this._core.Api.Request.head(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
+                return this._core.Request.head(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
 
             default:
                 throw new Error('Unsupported request method "' + nativeRequest.method + '"');

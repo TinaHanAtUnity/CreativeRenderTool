@@ -1,5 +1,5 @@
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
-import { Core } from '../Core';
+import { Core, ICoreApi } from '../Core';
 
 export class Resolve {
 
@@ -22,18 +22,18 @@ export class Resolve {
         }
     }
 
-    private _core: Core;
+    private _core: ICoreApi;
 
-    constructor(core: Core) {
+    constructor(core: ICoreApi) {
         this._core = core;
-        this._core.Api.Resolve.onComplete.subscribe((id, host, ip) => Resolve.onResolveComplete(id, host, ip));
-        this._core.Api.Resolve.onFailed.subscribe((id, host, error, message) => Resolve.onResolveFailed(id, host, error, message));
+        this._core.Resolve.onComplete.subscribe((id, host, ip) => Resolve.onResolveComplete(id, host, ip));
+        this._core.Resolve.onFailed.subscribe((id, host, error, message) => Resolve.onResolveFailed(id, host, error, message));
     }
 
     public resolve(host: string): Promise<[string, string, string]> {
         const id = Resolve._callbackId++;
         const promise = this.registerCallback(id);
-        this._core.Api.Resolve.resolve(id.toString(), host);
+        this._core.Resolve.resolve(id.toString(), host);
         return promise;
     }
 

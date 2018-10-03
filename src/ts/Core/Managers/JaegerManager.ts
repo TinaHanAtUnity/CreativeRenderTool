@@ -1,17 +1,16 @@
 import { IJaegerSpan, JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { Request } from 'Core/Managers/Request';
-import { Core } from '../Core';
 
 export class JaegerManager {
 
     private static _openSpans: { [jaegerId: string]: IJaegerSpan } = {};
     private static _closedSpans: { [jaegerId: string]: IJaegerSpan } = {};
 
-    private _core: Core;
+    private _request: Request;
     private _isJaegerTracingEnabled: boolean = false;
 
-    constructor(core: Core) {
-        this._core = core;
+    constructor(request: Request) {
+        this._request = request;
     }
 
     public setJaegerTracingEnabled(value: boolean) {
@@ -68,7 +67,7 @@ export class JaegerManager {
 
             headers.push(['Content-Type', 'application/json']);
 
-            this._core.Request.post(url, data, headers);
+            this._request.post(url, data, headers);
         }
     }
 

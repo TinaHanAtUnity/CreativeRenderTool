@@ -1,11 +1,11 @@
 import { BaseMetaData } from 'Core/Models/MetaData/BaseMetaData';
-import { Core } from '../Core';
+import { Core, ICoreApi } from '../Core';
 
 export class MetaDataManager {
     private _metaDataCache: { [key: string]: any } = {};
-    private _core: Core;
+    private _core: ICoreApi;
 
-    constructor(core: Core) {
+    constructor(core: ICoreApi) {
         this._core = core;
     }
 

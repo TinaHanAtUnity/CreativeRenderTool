@@ -2,7 +2,7 @@ import { RingerMode } from 'Core/Constants/Android/RingerMode';
 import { StreamType } from 'Core/Constants/Android/StreamType';
 import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
 import { ISensorInfo, StorageType } from 'Core/Native/Android/DeviceInfo';
-import { Core } from '../Core';
+import { Core, ICoreApi } from '../Core';
 
 export interface IAndroidDeviceInfo extends IDeviceInfo {
     androidId: string;
@@ -42,7 +42,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
     public static GoogleMapsPackageName = 'com.google.android.gms.maps';
     public static TelephonyPackageName = 'com.android.telephony';
 
-    constructor(core: Core) {
+    constructor(core: ICoreApi) {
         super('AndroidDeviceInfo', {
             ... DeviceInfo.Schema,
             androidId: ['string'],
@@ -80,31 +80,31 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         return super.fetch().then(() => {
             const promises: Array<Promise<any>> = [];
 
-            promises.push(this._core.Api.Android!.DeviceInfo.getAndroidId().then(androidId => this.set('androidId', androidId)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getApiLevel().then(apiLevel => this.set('apiLevel', apiLevel)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getTotalSpace(StorageType.INTERNAL).then(totalInternalSpace => this.set('totalInternalSpace', totalInternalSpace)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getTotalSpace(StorageType.EXTERNAL).then(totalExternalSpace => this.set('totalExternalSpace', totalExternalSpace)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getManufacturer().then(manufacturer => this.set('manufacturer', manufacturer)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getScreenDensity().then(screenDensity => this.set('screenDensity', screenDensity)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getScreenLayout().then(screenLayout => this.set('screenLayout', screenLayout)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.isAppInstalled(AndroidDeviceInfo.GooglePlayPackageName).then(isGoogleInstalled => this.set('isGoogleStoreInstalled', isGoogleInstalled)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.isAppInstalled(AndroidDeviceInfo.XiaomiPackageName).then(isXiaomiInstalled => this.set('isXiaomiStoreInstalled', isXiaomiInstalled)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.isAppInstalled(AndroidDeviceInfo.GoogleMapsPackageName).then(isGoogleMapsInstalled => this.set('isGoogleMapsInstalled', isGoogleMapsInstalled)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.isAppInstalled(AndroidDeviceInfo.TelephonyPackageName).then(isTelephonyInstalled => this.set('isTelephonyInstalled', isTelephonyInstalled)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getDeviceMaxVolume(StreamType.STREAM_MUSIC).then(maxVolume => this.set('maxVolume', maxVolume)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getAndroidId().then(androidId => this.set('androidId', androidId)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getApiLevel().then(apiLevel => this.set('apiLevel', apiLevel)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getTotalSpace(StorageType.INTERNAL).then(totalInternalSpace => this.set('totalInternalSpace', totalInternalSpace)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getTotalSpace(StorageType.EXTERNAL).then(totalExternalSpace => this.set('totalExternalSpace', totalExternalSpace)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getManufacturer().then(manufacturer => this.set('manufacturer', manufacturer)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getScreenDensity().then(screenDensity => this.set('screenDensity', screenDensity)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getScreenLayout().then(screenLayout => this.set('screenLayout', screenLayout)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.isAppInstalled(AndroidDeviceInfo.GooglePlayPackageName).then(isGoogleInstalled => this.set('isGoogleStoreInstalled', isGoogleInstalled)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.isAppInstalled(AndroidDeviceInfo.XiaomiPackageName).then(isXiaomiInstalled => this.set('isXiaomiStoreInstalled', isXiaomiInstalled)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.isAppInstalled(AndroidDeviceInfo.GoogleMapsPackageName).then(isGoogleMapsInstalled => this.set('isGoogleMapsInstalled', isGoogleMapsInstalled)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.isAppInstalled(AndroidDeviceInfo.TelephonyPackageName).then(isTelephonyInstalled => this.set('isTelephonyInstalled', isTelephonyInstalled)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getDeviceMaxVolume(StreamType.STREAM_MUSIC).then(maxVolume => this.set('maxVolume', maxVolume)).catch(err => this.handleDeviceInfoError(err)));
             // only add this to 2.2.1 and above
-            promises.push(this._core.Api.Android!.DeviceInfo.getApkDigest().then(apkDigest => this.set('apkDigest', apkDigest)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getCertificateFingerprint().then(certificateFingerPrint => this.set('certificateFingerPrint', certificateFingerPrint)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getBoard().then(board => this.set('board', board)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getBootloader().then(bootLoader => this.set('bootLoader', bootLoader)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getBrand().then(brand => this.set('brand', brand)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getDevice().then(device => this.set('device', device)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getHardware().then(hardware => this.set('hardware', hardware)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getHost().then(host => this.set('host', host)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getProduct().then(product => this.set('product', product)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getFingerprint().then(fingerPrint => this.set('fingerPrint', fingerPrint)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getSupportedAbis().then(supportedAbis => this.set('supportedAbis', supportedAbis)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.Android!.DeviceInfo.getSensorList().then(sensorList => this.set('sensorList', sensorList)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getApkDigest().then(apkDigest => this.set('apkDigest', apkDigest)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getCertificateFingerprint().then(certificateFingerPrint => this.set('certificateFingerPrint', certificateFingerPrint)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getBoard().then(board => this.set('board', board)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getBootloader().then(bootLoader => this.set('bootLoader', bootLoader)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getBrand().then(brand => this.set('brand', brand)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getDevice().then(device => this.set('device', device)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getHardware().then(hardware => this.set('hardware', hardware)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getHost().then(host => this.set('host', host)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getProduct().then(product => this.set('product', product)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getFingerprint().then(fingerPrint => this.set('fingerPrint', fingerPrint)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getSupportedAbis().then(supportedAbis => this.set('supportedAbis', supportedAbis)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Android!.getSensorList().then(sensorList => this.set('sensorList', sensorList)).catch(err => this.handleDeviceInfoError(err)));
 
             return Promise.all(promises);
         });
@@ -166,7 +166,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
     }
 
     public getFreeSpaceExternal(): Promise<number> {
-        return this._core.Api.Android!.DeviceInfo.getFreeSpace(StorageType.EXTERNAL).then(freeSpace => {
+        return this._core.DeviceInfo.Android!.getFreeSpace(StorageType.EXTERNAL).then(freeSpace => {
             this.set('freeExternalSpace', freeSpace);
             return this.get('freeExternalSpace');
         });
@@ -177,28 +177,28 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
     }
 
     public getRingerMode(): Promise<RingerMode> {
-        return this._core.Api.Android!.DeviceInfo.getRingerMode().then(ringerMode => {
+        return this._core.DeviceInfo.Android!.getRingerMode().then(ringerMode => {
             this.set('ringerMode', ringerMode);
             return this.get('ringerMode');
         });
     }
 
     public isUSBConnected(): Promise<boolean> {
-        return this._core.Api.Android!.DeviceInfo.isUSBConnected().then(isConnected => {
+        return this._core.DeviceInfo.Android!.isUSBConnected().then(isConnected => {
             this.set('usbConnected', isConnected);
             return this.get('usbConnected');
         });
     }
 
     public getUptime(): Promise<number> {
-        return this._core.Api.Android!.DeviceInfo.getUptime().then(upTime => {
+        return this._core.DeviceInfo.Android!.getUptime().then(upTime => {
             this.set('upTime', upTime);
             return this.get('upTime');
         });
     }
 
     public getElapsedRealtime(): Promise<number> {
-        return this._core.Api.Android!.DeviceInfo.getElapsedRealtime().then(elapsedRealtime => {
+        return this._core.DeviceInfo.Android!.getElapsedRealtime().then(elapsedRealtime => {
             this.set('elapsedRealtime', elapsedRealtime);
             return this.get('elapsedRealtime');
         });
@@ -253,14 +253,14 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
     }
 
     public getNetworkMetered(): Promise<boolean> {
-        return this._core.Api.Android!.DeviceInfo.getNetworkMetered().then(isNetworkMetered => {
+        return this._core.DeviceInfo.Android!.getNetworkMetered().then(isNetworkMetered => {
             this.set('networkMetered', isNetworkMetered);
             return this.get('networkMetered');
         });
     }
 
     public getFreeSpace(): Promise<number> {
-        return this._core.Api.Android!.DeviceInfo.getFreeSpace(StorageType.INTERNAL).then(freeInternalSpace => {
+        return this._core.DeviceInfo.Android!.getFreeSpace(StorageType.INTERNAL).then(freeInternalSpace => {
             this.set('freeInternalSpace', freeInternalSpace);
             return this.get('freeInternalSpace');
         });

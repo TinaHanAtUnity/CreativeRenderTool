@@ -5,8 +5,8 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IosDeviceInfoApi } from 'Core/Native/iOS/DeviceInfo';
 
 export class DeviceInfoApi extends NativeApi {
-    public Android: AndroidDeviceInfoApi;
-    public Ios: IosDeviceInfoApi;
+    public readonly Android?: AndroidDeviceInfoApi;
+    public readonly Ios?: IosDeviceInfoApi;
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'DeviceInfo', ApiPackage.CORE);

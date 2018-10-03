@@ -1,6 +1,6 @@
 import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
 import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
-import { Core } from '../Core';
+import { Core, ICoreApi } from '../Core';
 
 export interface IIosDeviceInfo extends IDeviceInfo {
     userInterfaceIdiom: UIUserInterfaceIdiom;
@@ -14,7 +14,7 @@ export interface IIosDeviceInfo extends IDeviceInfo {
 
 export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
 
-    constructor(core: Core) {
+    constructor(core: ICoreApi) {
         super('IosDeviceInfo', {
             ... DeviceInfo.Schema,
             userInterfaceIdiom: ['number'],
@@ -31,14 +31,14 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         return super.fetch().then(() => {
             const promises: Array<Promise<any>> = [];
 
-            promises.push(this._core.Api.iOS!.DeviceInfo.getUserInterfaceIdiom().then(userInterfaceIdiom => this.set('userInterfaceIdiom', userInterfaceIdiom)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.iOS!.DeviceInfo.getScreenScale().then(screenScale => this.set('screenScale', screenScale)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.iOS!.DeviceInfo.isSimulator().then(simulator => this.set('simulator', simulator)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.iOS!.DeviceInfo.getTotalSpace().then(totalSpace => this.set('totalInternalSpace', totalSpace)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.iOS!.DeviceInfo.getStatusBarHeight().then(statusBarHeight => this.set('statusBarHeight', statusBarHeight)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.iOS!.DeviceInfo.getStatusBarWidth().then(statusBarWidth => this.set('statusBarWidth', statusBarWidth)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.iOS!.DeviceInfo.getDeviceMaxVolume().then(maxVolume => this.set('maxVolume', maxVolume)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.Api.iOS!.DeviceInfo.getSensorList().then(sensorList => this.set('sensorList', sensorList)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getUserInterfaceIdiom().then(userInterfaceIdiom => this.set('userInterfaceIdiom', userInterfaceIdiom)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getScreenScale().then(screenScale => this.set('screenScale', screenScale)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.isSimulator().then(simulator => this.set('simulator', simulator)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getTotalSpace().then(totalSpace => this.set('totalInternalSpace', totalSpace)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getStatusBarHeight().then(statusBarHeight => this.set('statusBarHeight', statusBarHeight)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getStatusBarWidth().then(statusBarWidth => this.set('statusBarWidth', statusBarWidth)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getDeviceMaxVolume().then(maxVolume => this.set('maxVolume', maxVolume)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getSensorList().then(sensorList => this.set('sensorList', sensorList)).catch(err => this.handleDeviceInfoError(err)));
 
             return Promise.all(promises);
         });
@@ -69,7 +69,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
     }
 
     public isStatusBarHidden(): Promise<boolean> {
-        return this._core.Api.iOS!.DeviceInfo.isStatusBarHidden().then(isStatusBarHidden => {
+        return this._core.DeviceInfo.Ios!.isStatusBarHidden().then(isStatusBarHidden => {
             this.set('statusBarHidden', isStatusBarHidden);
             return this.get('statusBarHidden');
         });
@@ -80,7 +80,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
     }
 
     public getFreeSpace(): Promise<number> {
-        return this._core.Api.iOS!.DeviceInfo.getFreeSpace().then(freeInternalSpace => {
+        return this._core.DeviceInfo.Ios!.getFreeSpace().then(freeInternalSpace => {
             this.set('freeInternalSpace', freeInternalSpace);
             return this.get('freeInternalSpace');
         });

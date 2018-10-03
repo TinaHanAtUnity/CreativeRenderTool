@@ -1,5 +1,5 @@
 import { Platform } from 'Core/Constants/Platform';
-import { Core } from 'Core/Core';
+import { Core, ICoreApi } from 'Core/Core';
 import { ConfigError } from 'Core/Errors/ConfigError';
 import { RequestError } from 'Core/Errors/RequestError';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
@@ -11,18 +11,22 @@ import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Url } from 'Core/Utilities/Url';
+import { DeviceInfo } from '../Models/DeviceInfo';
+import { ClientInfo } from '../Models/ClientInfo';
+import { MetaDataManager } from './MetaDataManager';
+import { Request } from 'Core/Managers/Request';
 
 export class ConfigManager {
 
-    public static fetch(core: Core, jaegerSpan: JaegerSpan): Promise<any> {
+    public static fetch(platform: Platform, core: ICoreApi, metaDataManager: MetaDataManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: Request, jaegerSpan: JaegerSpan): Promise<any> {
         return Promise.all([
-            core.MetaDataManager.fetch(FrameworkMetaData),
-            core.MetaDataManager.fetch(AdapterMetaData),
+            metaDataManager.fetch(FrameworkMetaData),
+            metaDataManager.fetch(AdapterMetaData),
             ConfigManager.fetchGamerToken(core)
         ]).then(([framework, adapter, storedGamerToken]) => {
             let gamerToken: string | undefined;
 
-            if(core.NativeBridge.getPlatform() === Platform.IOS && core.Api.DeviceInfo.getLimitAdTrackingFlag()) {
+            if(platform === Platform.IOS && core.DeviceInfo.getLimitAdTrackingFlag()) {
                 // only use stored gamerToken for iOS when ad tracking is limited
                 gamerToken = storedGamerToken;
             } else if(storedGamerToken) {
@@ -30,10 +34,10 @@ export class ConfigManager {
                 ConfigManager.deleteGamerToken(core);
             }
 
-            const url: string = ConfigManager.createConfigUrl(core, framework, adapter, gamerToken);
-            jaegerSpan.addTag(JaegerTags.DeviceType, Platform[core.NativeBridge.getPlatform()]);
-            core.Api.Sdk.logInfo('Requesting configuration from ' + url);
-            return core.Request.get(url, [], {
+            const url: string = ConfigManager.createConfigUrl(platform, core, clientInfo, deviceInfo, framework, adapter, gamerToken);
+            jaegerSpan.addTag(JaegerTags.DeviceType, Platform[platform]);
+            core.Sdk.logInfo('Requesting configuration from ' + url);
+            return request.get(url, [], {
                 retries: 2,
                 retryDelay: 10000,
                 followRedirects: false,
@@ -47,7 +51,7 @@ export class ConfigManager {
                         configUrl: url,
                         configResponse: response.response
                     });
-                    core.Api.Sdk.logError('Config request failed ' + error);
+                    core.Sdk.logError('Config request failed ' + error);
                     throw new Error(error);
                 }
             }).catch(error => {
@@ -77,10 +81,10 @@ export class ConfigManager {
     private static ConfigBaseUrl: string = 'https://publisher-config.unityads.unity3d.com/games';
     private static AbGroup: ABGroup | undefined;
 
-    private static createConfigUrl(core: Core, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): string {
+    private static createConfigUrl(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
-            core.ClientInfo.getGameId(),
+            clientInfo.getGameId(),
             'configuration'
         ].join('/');
 
@@ -90,33 +94,33 @@ export class ConfigManager {
         }
 
         url = Url.addParameters(url, {
-            bundleId: core.ClientInfo.getApplicationName(),
-            encrypted: !core.ClientInfo.isDebuggable(),
+            bundleId: clientInfo.getApplicationName(),
+            encrypted: !clientInfo.isDebuggable(),
             rooted: core.DeviceInfo.isRooted(),
-            platform: Platform[core.NativeBridge.getPlatform()].toLowerCase(),
-            sdkVersion: core.ClientInfo.getSdkVersion(),
+            platform: Platform[platform].toLowerCase(),
+            sdkVersion: clientInfo.getSdkVersion(),
             osVersion: core.DeviceInfo.getOsVersion(),
             deviceModel: core.DeviceInfo.getModel(),
-            language: core.DeviceInfo.getLanguage(),
-            test: core.ClientInfo.getTestMode(),
+            language: deviceInfo.getLanguage(),
+            test: clientInfo.getTestMode(),
             gamerToken: gamerToken,
             forceAbGroup: abGroup
         });
 
-        if(core.NativeBridge.getPlatform() === Platform.ANDROID) {
+        if(platform === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                deviceMake: (<AndroidDeviceInfo>core.DeviceInfo).getManufacturer()
+                deviceMake: (<AndroidDeviceInfo>deviceInfo).getManufacturer()
             });
         }
 
-        if(core.DeviceInfo.getAdvertisingIdentifier()) {
+        if(deviceInfo.getAdvertisingIdentifier()) {
             url = Url.addParameters(url, {
-                advertisingTrackingId: core.DeviceInfo.getAdvertisingIdentifier(),
-                limitAdTracking: core.DeviceInfo.getLimitAdTracking()
+                advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
+                limitAdTracking: deviceInfo.getLimitAdTracking()
             });
-        } else if(core.NativeBridge.getPlatform() === Platform.ANDROID) {
+        } else if(platform === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                androidId: (<AndroidDeviceInfo>core.DeviceInfo).getAndroidId()
+                androidId: (<AndroidDeviceInfo>deviceInfo).getAndroidId()
             });
         }
 
@@ -131,37 +135,37 @@ export class ConfigManager {
         return url;
     }
 
-    private static fetchValue(core: Core, key: string): Promise<string | undefined> {
-        return core.Api.Storage.get<string>(StorageType.PRIVATE, key).then(value => {
+    private static fetchValue(core: ICoreApi, key: string): Promise<string | undefined> {
+        return core.Storage.get<string>(StorageType.PRIVATE, key).then(value => {
             return value;
         }).catch(error => {
             return undefined;
         });
     }
 
-    private static storeValue(core: Core, key: string, value: string): Promise<void[]> {
+    private static storeValue(core: ICoreApi, key: string, value: string): Promise<void[]> {
         return Promise.all([
-            core.Api.Storage.set(StorageType.PRIVATE, key, value),
-            core.Api.Storage.write(StorageType.PRIVATE)
+            core.Storage.set(StorageType.PRIVATE, key, value),
+            core.Storage.write(StorageType.PRIVATE)
         ]);
     }
 
-    private static deleteValue(core: Core, key: string): Promise<void[]> {
+    private static deleteValue(core: ICoreApi, key: string): Promise<void[]> {
         return Promise.all([
-            core.Api.Storage.delete(StorageType.PRIVATE, key),
-            core.Api.Storage.write(StorageType.PRIVATE)
+            core.Storage.delete(StorageType.PRIVATE, key),
+            core.Storage.write(StorageType.PRIVATE)
         ]);
     }
 
-    private static fetchGamerToken(core: Core): Promise<string | undefined> {
+    private static fetchGamerToken(core: ICoreApi): Promise<string | undefined> {
         return this.fetchValue(core, 'gamerToken');
     }
 
-    public static storeGamerToken(core: Core, gamerToken: string): Promise<void[]> {
+    public static storeGamerToken(core: ICoreApi, gamerToken: string): Promise<void[]> {
         return this.storeValue(core, 'gamerToken', gamerToken);
     }
 
-    private static deleteGamerToken(core: Core): Promise<void[]> {
+    private static deleteGamerToken(core: ICoreApi): Promise<void[]> {
         return this.deleteValue(core, 'gamerToken');
     }
 }

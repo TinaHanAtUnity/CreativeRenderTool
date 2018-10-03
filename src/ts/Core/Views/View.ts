@@ -24,10 +24,10 @@ export abstract class View<T extends object> {
     }
 
     protected _platform: Platform;
-    protected _template: Template;
-    protected _templateData: { [key: string]: TemplateDataType | ITemplateData };
-    protected _bindings: IViewBinding[];
-    protected _container: HTMLElement;
+    protected abstract _template: Template;
+    protected _templateData: { [key: string]: TemplateDataType | ITemplateData } = {};
+    protected _bindings: IViewBinding[] = [];
+    protected _container?: HTMLElement;
     protected _handlers: T[] = [];
 
     protected _id: string;
@@ -37,7 +37,7 @@ export abstract class View<T extends object> {
         this._id = id;
     }
 
-   public addEventHandler(handler: T): T {
+    public addEventHandler(handler: T): T {
         this._handlers.push(handler);
         return handler;
     }
@@ -53,15 +53,15 @@ export abstract class View<T extends object> {
     }
 
     public render(): void {
-        this._container = document.createElement('div');
-        this._container.id = this._id;
-        this._container.innerHTML = this._template.render(this._templateData ? this._templateData : {});
+        const container = this._container = document.createElement('div');
+        container.id = this._id;
+        container.innerHTML = this._template.render(this._templateData ? this._templateData : {});
 
         const attachTap = this._platform === Platform.IOS;
 
         this._bindings.forEach((binding: IViewBinding) => {
             if(binding.selector) {
-                const elements: NodeList = this._container.querySelectorAll(binding.selector);
+                const elements: NodeList = container.querySelectorAll(binding.selector);
                 // tslint:disable:prefer-for-of
                 for(let i = 0; i < elements.length; ++i) {
                     const element = elements[i];
@@ -69,20 +69,24 @@ export abstract class View<T extends object> {
                 }
                 // tslint:enable:prefer-for-of
             } else {
-                View.addEventListener(binding, this._container, attachTap);
+                View.addEventListener(binding, container, attachTap);
             }
         });
     }
 
-    public container(): HTMLElement {
+    public container(): HTMLElement | undefined {
         return this._container;
     }
 
     public show(): void {
-        this._container.style.visibility = 'visible';
+        if(this._container) {
+            this._container.style.visibility = 'visible';
+        }
     }
 
     public hide(): void {
-        this._container.style.visibility = 'hidden';
+        if(this._container) {
+            this._container.style.visibility = 'hidden';
+        }
     }
 }
