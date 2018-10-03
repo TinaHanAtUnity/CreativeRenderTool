@@ -1,6 +1,6 @@
 @import "vars.styl";
 @import "gdpr-pop-up.styl";
-
+@import "iphone-x-series.styl";
 
 $new-video-overlay-styles = {
   base-size: unit(16px/16, "em") * $default-size,
@@ -171,7 +171,7 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
       font-size: $new-video-overlay-styles.base-size * .5;
     }
   }
-  
+
   .call-button {
     display: none;
     transform: translateX(100%);
@@ -376,7 +376,7 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
       @media (min-width: 594px) and (max-width: 792px) {
         font-size: $new-video-overlay-styles.base-size * 1.5;
       }
-    
+
       @media (min-width: 792px) and (max-width: 840px) {
         font-size: $new-video-overlay-styles.base-size * 2;
       }
@@ -422,77 +422,19 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     }
   }
 
-  /** 
-  * iPhone X safe area customizations
+  /**
+  * iPhone XS Max safe area customizations
+  */
+
+  @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+    $iphone-x-overlay-styles();
+  }
+
+  /**
+  * iPhone X & iPhone XS safe area customizations
   */
 
   @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
-    @media (orientation: portrait) {
-      &.show-gdpr-banner .bottom-container .center .gdpr-pop-up {
-        border-radius: $new-video-overlay-styles.tab-border-radius;
-      }
-    }
-
-    @media (orientation: landscape) {
-      &.show-gdpr-banner .bottom-container .center .gdpr-pop-up {
-        width: 40%;
-
-        .gdpr-text {
-          font-size: $new-video-overlay-styles.base-size * .29;
-        }
-      }
-
-      .bottom-container {
-        .center,
-        .tab {
-          bottom: 0;
-        }
-              
-        .gdpr-button .tab {
-          bottom: $new-video-overlay-styles.base-size * .28;
-        }
-      }
-    }
-
-    .bottom-container {
-      margin-bottom: constant(safe-area-inset-bottom);
-      margin-bottom: env(safe-area-inset-bottom); // @stylint ignore;
-    }
-
-    .top-container {
-      margin-top: calc(constant(safe-area-inset-top));
-      margin-top: calc(env(safe-area-inset-top)); // @stylint ignore;
-    }
-
-    .button-left .tab {
-      padding-left: constant(safe-area-inset-left);
-      padding-left: env(safe-area-inset-left); // @stylint ignore;
-    }
-
-    .button-left {
-      width: "calc(constant(safe-area-inset-left) + %s)" % $new-video-overlay-styles.touchable-area-width;
-      width: "calc(env(safe-area-inset-left) + %s)" % $new-video-overlay-styles.touchable-area-width; // @stylint ignore;
-    }
-
-    .button-right .tab {
-      padding-right: constant(safe-area-inset-right);
-      padding-right: env(safe-area-inset-right); // @stylint ignore;
-    }
-
-    .button-right {
-      width: "calc(constant(safe-area-inset-right) + %s)" % $new-video-overlay-styles.touchable-area-width;
-      width: "calc(env(safe-area-inset-right) + %s)" % $new-video-overlay-styles.touchable-area-width; // @stylint ignore;
-    }
-
-
-    .call-button {
-      width: "calc(constant(safe-area-inset-right) + %s)" % $new-video-overlay-styles.call-button-width;
-      width: "calc(env(safe-area-inset-right) + %s)" % $new-video-overlay-styles.call-button-width; // @stylint ignore;
-    }
-
-    .gdpr-button {
-      left: "calc(%s + constant(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width;
-      left: "calc(%s + env(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width; // @stylint ignore;
-    }
+    $iphone-x-overlay-styles();
   }
 }
