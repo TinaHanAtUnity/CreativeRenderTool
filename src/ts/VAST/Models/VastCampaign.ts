@@ -51,7 +51,6 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
 
     public getVideo() {
         if (this._vastCampaignHelper) {
-            this._vastCampaignHelper.refreshNetworkStatus();
             this.set('video', new Video(this._vastCampaignHelper.getOptmizedVideoUrl(), this.getSession()));
         }
 
