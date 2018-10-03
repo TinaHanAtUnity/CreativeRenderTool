@@ -52,6 +52,10 @@ export class StorageBridge {
         }
     }
 
+    public isEmpty(): boolean {
+        return this._publicStorageQueue.commands.length === 0 && this._privateStorageQueue.commands.length === 0;
+    }
+
     private executeBatch(type: StorageType, batch: IStorageBatch) {
         if(batch.commands.length === 0) {
             return;
