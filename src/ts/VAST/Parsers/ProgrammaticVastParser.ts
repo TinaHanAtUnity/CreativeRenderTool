@@ -85,10 +85,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         if(campaign.getImpressionUrls().length === 0) {
             throw new Error('Campaign does not have an impression url');
         }
-        // todo throw an Error if required events are missing. (what are the required events?)
-        if(campaign.getVast().getErrorURLTemplates().length === 0) {
-            nativeBridge.Sdk.logWarning('Campaign does not have an error url!');
-        }
+
         if(!campaign.getVideo().getUrl()) {
             const videoUrlError = new DiagnosticError(
                 new Error('Campaign does not have a video url'),

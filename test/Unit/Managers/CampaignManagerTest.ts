@@ -667,35 +667,6 @@ describe('CampaignManager', () => {
             });
         };
 
-        describe('VAST warnings', () => {
-            it('should warn about missing error urls', () => {
-                // given a VAST response that has no error URLs
-                const response = {
-                    response: OnProgrammaticVastPlcCampaignMissingErrorUrls
-                };
-
-                // when the campaign manager requests the placement
-                return verifyCampaignForResponse(response).then(() => {
-                    // then the SDK's logWarning function is called with an appropriate message
-                    assert.isTrue(warningSpy.calledWith('Campaign does not have an error url!'));
-                });
-            });
-
-            it('should not warn about missing error urls if error url exists at ad level', () => {
-                // given a VAST response that an error URL in the ad
-                const response = {
-                    response: OnProgrammaticVastPlcCampaignAdLevelErrorUrls
-                };
-
-                // when the campaign manager requests the placement
-                return verifyCampaignForResponse(response).then(() => {
-
-                    // then the SDK's logWarning function is called with an appropriate message
-                    assert.equal(warningSpy.callCount, 0);
-                });
-            });
-        });
-
         it('should process custom tracking urls', () => {
             // given a valid VAST placement
             const mockRequest = sinon.mock(request);
