@@ -11,6 +11,7 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
+import EndScreenWithImprovedStylesTemplate from 'html/EndScreenWithImprovedStyles.html';
 
 export interface IEndScreenParameters {
     nativeBridge: NativeBridge;
@@ -187,6 +188,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     private getTemplate() {
+        if (ImprovedEndScreenStyles.isValid(this._abGroup)) {
+            return EndScreenWithImprovedStylesTemplate;
+        }
+
         return EndScreenTemplate;
     }
 }
