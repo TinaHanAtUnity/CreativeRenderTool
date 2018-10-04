@@ -11,8 +11,7 @@ import { Request } from 'Core/Utilities/Request';
 import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
-import { VastCampaignHelper } from 'VAST/Utilities/VastCampaignHelper';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
 
 export class ProgrammaticVastParser extends CampaignParser {
     public static ContentType = 'programmatic/vast';
@@ -24,7 +23,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     protected _vastParser: VastParser = new VastParser();
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, deviceInfo?: DeviceInfo): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
 
         if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
@@ -33,11 +32,11 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         return this._vastParser.retrieveVast(decodedVast, nativeBridge, request).then((vast): Promise<Campaign> => {
             const campaignId = this.getProgrammaticCampaignId(nativeBridge);
-            return this.parseVastToCampaign(vast, nativeBridge, campaignId, session, response, deviceInfo);
+            return this.parseVastToCampaign(vast, nativeBridge, campaignId, session, response, connectionType);
         });
     }
 
-    protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, campaignId: string, session: Session, response: AuctionResponse, deviceInfo?: DeviceInfo): Promise<Campaign> {
+    protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, campaignId: string, session: Session, response: AuctionResponse, connectionType?: string): Promise<Campaign> {
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
@@ -83,7 +82,9 @@ export class ProgrammaticVastParser extends CampaignParser {
             isMoatEnabled: response.isMoatEnabled() || undefined
         };
 
-        const campaign = new VastCampaign(vastCampaignParms, new VastCampaignHelper(vast, deviceInfo));
+        // TODO: need ABTest
+        const campaign = new VastCampaign(vastCampaignParms, new VastMediaSelector(vast, connectionType));
+
         if(campaign.getImpressionUrls().length === 0) {
             throw new Error('Campaign does not have an impression url');
         }
