@@ -12,7 +12,7 @@ $end-screen-improved-styles-gray-border =  #CECECE;
             flex: 1;
 
             @media (orientation: portrait) {
-                @media (min-height: 0px) {
+                @media (min-height: 0) {
                     font-size: $end-screen-improved-styles-px-size * .4;
                 }
 
@@ -139,39 +139,39 @@ $end-screen-improved-styles-gray-border =  #CECECE;
     #end-screen.improved-endscreen-styles-test {
 
         .unityads-logo {
-            opacity: .6;
-            font-size: .7rem;
             max-height: 1em;
+            font-size: .7em;
+            opacity: .6;
         }
 
         .end-screen-info {
 
             .column-container {
                 display: flex;
-                margin: 2 * $end-screen-improved-styles-size 0 1 * $end-screen-improved-styles-size 0;
-                justify-content: center;
-                align-items: center;
                 flex: 1;
                 flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                margin: 2 * $end-screen-improved-styles-size 0 1 * $end-screen-improved-styles-size 0;
             }
 
             .download-container  {
-                $download-container-default(0.8 * $end-screen-improved-styles-size, false);
+                $download-container-default(.8 * $end-screen-improved-styles-size, false);
                 margin: .75 * $end-screen-improved-styles-size auto 0 auto;
             }
 
             .game-icon {
-                width: 4 * $end-screen-improved-styles-size;
-                height: 4 * $end-screen-improved-styles-size;
                 min-width: 4 * $end-screen-improved-styles-size;
                 min-height: 4 * $end-screen-improved-styles-size;
+                width: 4 * $end-screen-improved-styles-size;
+                height: 4 * $end-screen-improved-styles-size;
             }
 
             .name-container {
                 max-width: 85%;
-                font-size: 1 * $end-screen-improved-styles-size;
-                text-align: center;
                 color: $end-screen-improved-styles-text-color;
+                text-align: center;
+                font-size: 1 * $end-screen-improved-styles-size;
             }
 
             .store-container {
@@ -179,8 +179,8 @@ $end-screen-improved-styles-gray-border =  #CECECE;
             }
 
             .game-rating {
-                font-size: 0.8 * $end-screen-improved-styles-size;
-                margin-top: 0.41 * $end-screen-improved-styles-size;
+                margin-top: .41 * $end-screen-improved-styles-size;
+                font-size: .8 * $end-screen-improved-styles-size;
             }
 
             .game-rating-count {
@@ -240,10 +240,10 @@ $end-screen-improved-styles-gray-border =  #CECECE;
                 }
 
                 .game-icon {
-                    width: 3.5 * $end-screen-improved-styles-size;
-                    height: 3.5 * $end-screen-improved-styles-size;
                     min-width: 3.5 * $end-screen-improved-styles-size;
                     min-height: 3.5 * $end-screen-improved-styles-size;
+                    width: 3.5 * $end-screen-improved-styles-size;
+                    height: 3.5 * $end-screen-improved-styles-size;
                 }
             }
         }
