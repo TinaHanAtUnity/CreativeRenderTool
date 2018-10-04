@@ -9,6 +9,7 @@ import { View } from 'Core/Views/View';
 import PromoTpl from 'html/Promo.html';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { Placement } from 'Ads/Models/Placement';
 
 export class Promo extends View<{}> implements IPrivacyHandler {
 
@@ -27,7 +28,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: PromoCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+    constructor(nativeBridge: NativeBridge, campaign: PromoCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, placement: Placement) {
         super(nativeBridge, 'promo');
         this._localization = new Localization(language, 'promo');
 
@@ -42,7 +43,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
         if(campaign) {
             this._templateData = {
                 'localizedPrice': PurchasingUtilities.getProductPrice(campaign.getIapProductId()),
-                'isRewardedPromo': this._promoCampaign.getRewardedPromo()
+                'isRewardedPromo': placement.allowSkip()
             };
         }
 
