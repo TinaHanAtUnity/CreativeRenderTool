@@ -34,7 +34,7 @@ const GroupSeventeen = new ABGroup(17);
 const GroupEighteen = new ABGroup(18);
 const GroupNineteen = new ABGroup(19);
 const GroupTest = new ABGroup(99);
-const GroupDisabled = new ABGroup(666);
+export const GroupDisabled = new ABGroup(666);
 
 export class ABGroupBuilder {
     public static getAbGroup = (group: number) => {
