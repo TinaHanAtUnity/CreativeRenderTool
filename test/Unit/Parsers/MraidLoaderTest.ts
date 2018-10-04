@@ -4,8 +4,6 @@ import { assert } from 'chai';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MraidLoader } from 'MRAID/Parsers/MraidLoader';
-import { CometCampaignLoader } from 'src/ts/Performance/Parsers/CometCampaignLoader';
-import { PerformanceCampaign } from 'src/ts/Performance/Models/PerformanceCampaign';
 
 describe('MraidLoaderTest', () => {
     it('should reload playable MRAID campaign', () => {
