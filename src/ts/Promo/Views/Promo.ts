@@ -43,7 +43,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
         if(campaign) {
             this._templateData = {
                 'localizedPrice': PurchasingUtilities.getProductPrice(campaign.getIapProductId()),
-                'isRewardedPromo': placement.allowSkip()
+                'isRewardedPromo': !placement.allowSkip()
             };
         }
 
