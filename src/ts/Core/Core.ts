@@ -81,15 +81,15 @@ export class Core implements IApiModule {
     public readonly Resolve: Resolve;
     public readonly WakeUpManager: WakeUpManager;
 
-    public Request?: Request;
-    public CacheManager?: CacheManager;
-    public JaegerManager?: JaegerManager;
-    public ClientInfo?: ClientInfo;
-    public DeviceInfo?: DeviceInfo;
-    public Config?: CoreConfiguration;
+    public Request: Request;
+    public CacheManager: CacheManager;
+    public JaegerManager: JaegerManager;
+    public ClientInfo: ClientInfo;
+    public DeviceInfo: DeviceInfo;
+    public Config: CoreConfiguration;
 
     private _initialized = false;
-    private _initializedAt?: number;
+    private _initializedAt: number;
 
     constructor(nativeBridge: NativeBridge) {
         this.NativeBridge = nativeBridge;
@@ -160,7 +160,7 @@ export class Core implements IApiModule {
                 this.Api.Request.setConcurrentRequestCount(8);
             }
 
-            return Promise.all([this.DeviceInfo!.fetch(), this.setupTestEnvironment()]);
+            return Promise.all([this.DeviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
             HttpKafka.setDeviceInfo(this.DeviceInfo);
 
@@ -173,19 +173,19 @@ export class Core implements IApiModule {
                 this.FocusManager.setListenAndroidLifecycle(true);
             }
 
-            const configSpan = this.JaegerManager!.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
+            const configSpan = this.JaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
             let configPromise = ConfigManager.fetch(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo!, this.DeviceInfo!, this.Request!, configSpan);
 
             configPromise.then(() => {
-                this.JaegerManager!.stop(configSpan);
+                this.JaegerManager.stop(configSpan);
             }).catch(() => {
-                this.JaegerManager!.stop(configSpan);
+                this.JaegerManager.stop(configSpan);
             });
 
             configPromise = configPromise.then((configJson): [CoreConfiguration] => {
                 const coreConfig = CoreConfigurationParser.parse(configJson);
                 this.Api.Sdk.logInfo('Received configuration token ' + coreConfig.getToken() + ' (A/B group ' + coreConfig.getAbGroup() + ')');
-                if(this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo!.getLimitAdTracking()) {
+                if(this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo.getLimitAdTracking()) {
                     ConfigManager.storeGamerToken(this.Api, configJson.token);
                 }
                 return [coreConfig];
@@ -207,10 +207,10 @@ export class Core implements IApiModule {
             this.Config = coreConfig;
 
             HttpKafka.setConfiguration(this.Config);
-            this.JaegerManager!.setJaegerTracingEnabled(this.Config!.isJaegerTracingEnabled());
+            this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
 
-            if (!this.Config!.isEnabled()) {
-                const error = new Error('Game with ID ' + this.ClientInfo!.getGameId() +  ' is not enabled');
+            if (!this.Config.isEnabled()) {
+                const error = new Error('Game with ID ' + this.ClientInfo.getGameId() +  ' is not enabled');
                 error.name = 'DisabledGame';
                 throw error;
             }
@@ -218,7 +218,7 @@ export class Core implements IApiModule {
             this._initialized = true;
             this._initializedAt = Date.now();
             this.Api.Sdk.initComplete();
-            this.JaegerManager!.stop(jaegerInitSpan);
+            this.JaegerManager.stop(jaegerInitSpan);
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.Api.Request.Android!.setMaximumPoolSize(1);

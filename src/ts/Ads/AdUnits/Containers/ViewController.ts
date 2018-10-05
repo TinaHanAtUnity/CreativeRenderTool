@@ -11,7 +11,6 @@ import { UIInterfaceOrientationMask } from 'Core/Constants/iOS/UIInterfaceOrient
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
 import { IAdsApi } from '../../Ads';
 import { ICoreApi } from '../../../Core/Core';
@@ -33,8 +32,8 @@ export class ViewController extends AdUnitContainer {
     private _ads: IAdsApi;
     private _focusManager: FocusManager;
     private _deviceInfo: IosDeviceInfo;
-    private _showing?: boolean;
-    private _options?: IIosOptions;
+    private _showing: boolean;
+    private _options: IIosOptions;
     private _clientInfo: ClientInfo;
 
     private _onViewControllerDidAppearObserver: any;

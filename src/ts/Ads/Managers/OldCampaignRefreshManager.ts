@@ -33,7 +33,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private _wakeUpManager: WakeUpManager;
     private _campaignManager: CampaignManager;
     private _configuration: AdsConfiguration;
-    private _currentAdUnit?: AbstractAdUnit;
+    private _currentAdUnit: AbstractAdUnit;
     private _focusManager: FocusManager;
     private _sessionManager: SessionManager;
     private _clientInfo: ClientInfo;
@@ -278,7 +278,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
-                this._currentAdUnit!.onClose.unsubscribe(onCloseObserver);
+                this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                 this.setPlacementStates(PlacementState.NO_FILL, placementIds);
             });
         } else {
@@ -310,7 +310,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
-                this._currentAdUnit!.onClose.unsubscribe(onCloseObserver);
+                this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                 this.setPlacementStates(PlacementState.NO_FILL, placementIds);
             });
         } else {
@@ -363,7 +363,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private handlePlacementState(placementId: string, placementState: PlacementState) {
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
-                this._currentAdUnit!.onClose.unsubscribe(onCloseObserver);
+                this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                 this._core.Sdk.logDebug('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
                 this.setPlacementState(placementId, placementState);
                 this.sendPlacementStateChanges(placementId);

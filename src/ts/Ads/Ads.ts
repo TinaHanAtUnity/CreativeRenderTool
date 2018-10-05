@@ -72,12 +72,12 @@ export class Ads extends CoreModule implements IApiModule {
     public readonly BackupCampaignManager: BackupCampaignManager;
     public readonly ProgrammaticTrackingService: ProgrammaticTrackingService;
 
-    public Container?: Activity | ViewController;
-    public GdprManager?: GdprManager;
-    public PlacementManager?: PlacementManager;
-    public AssetManager?: AssetManager;
-    public CampaignManager?: CampaignManager;
-    public RefreshManager?: OldCampaignRefreshManager;
+    public Container: Activity | ViewController;
+    public GdprManager: GdprManager;
+    public PlacementManager: PlacementManager;
+    public AssetManager: AssetManager;
+    public CampaignManager: CampaignManager;
+    public RefreshManager: OldCampaignRefreshManager;
 
     private _cachedCampaignResponse?: INativeResponse;
 
@@ -108,7 +108,7 @@ export class Ads extends CoreModule implements IApiModule {
             document.body.classList.add('android');
             this.Container = new Activity(this.Core.Api, this.Api, <AndroidDeviceInfo>this.Core.DeviceInfo);
         } else if(this.Core.NativeBridge.getPlatform() === Platform.IOS) {
-            const model = this.Core.DeviceInfo!.getModel();
+            const model = this.Core.DeviceInfo.getModel();
             if(model.match(/iphone/i) || model.match(/ipod/i)) {
                 document.body.classList.add('iphone');
             } else if(model.match(/ipad/i)) {
@@ -157,10 +157,10 @@ export class Ads extends CoreModule implements IApiModule {
 
             SdkStats.initialize(this.Core.Api, this.Core.Request!, this.Core.Config!, this.Config, this.SessionManager, this.CampaignManager, this.Core.MetaDataManager, this.Core.ClientInfo!, this.Core.CacheManager!);
 
-            const refreshSpan = this.Core.JaegerManager!.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
+            const refreshSpan = this.Core.JaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this.Core.NativeBridge.getPlatform()]);
             let refreshPromise;
-            if(BackupCampaignTest.isValid(this.Core.Config!.getAbGroup())) {
+            if(BackupCampaignTest.isValid(this.Core.Config.getAbGroup())) {
                 refreshPromise = this.RefreshManager.refreshWithBackupCampaigns(this);
             } else if(this._cachedCampaignResponse !== undefined) {
                 refreshPromise = this.RefreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
@@ -168,18 +168,18 @@ export class Ads extends CoreModule implements IApiModule {
                 refreshPromise = this.RefreshManager.refresh();
             }
             return refreshPromise.then((resp) => {
-                this.Core.JaegerManager!.stop(refreshSpan);
+                this.Core.JaegerManager.stop(refreshSpan);
                 return resp;
             }).catch((error) => {
                 refreshSpan.addTag(JaegerTags.Error, 'true');
                 refreshSpan.addTag(JaegerTags.ErrorMessage, error.message);
-                this.Core.JaegerManager!.stop(refreshSpan);
+                this.Core.JaegerManager.stop(refreshSpan);
                 throw error;
             });
         }).then(() => {
             return this.SessionManager.sendUnsentSessions();
         }).then(() => {
-            if ((ReportAdTest.isValid(this.Core.Config!.getAbGroup()) && this.Config.isGDPREnabled())) {
+            if ((ReportAdTest.isValid(this.Core.Config.getAbGroup()) && this.Config.isGDPREnabled())) {
                 return AbstractPrivacy.setUserInformation(this.GdprManager!).catch(() => {
                     this.Core.Api.Sdk.logInfo('Failed to set up privacy information.');
                 });

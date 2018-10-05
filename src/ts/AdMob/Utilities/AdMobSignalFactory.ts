@@ -23,8 +23,8 @@ export class AdMobSignalFactory {
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _focusManager: FocusManager;
-    private _packageInstaller?: string;
-    private _packageVersionCode?: number;
+    private _packageInstaller: string;
+    private _packageVersionCode: number;
 
     constructor(platform: Platform, core: ICoreApi, ads: IAdsApi, clientInfo: ClientInfo, deviceInfo: DeviceInfo, focusManager: FocusManager) {
         this._platform = platform;

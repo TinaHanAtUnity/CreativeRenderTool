@@ -5,7 +5,6 @@ import { Rotation } from 'Core/Constants/Android/Rotation';
 import { ScreenOrientation } from 'Core/Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Core/Constants/Android/SystemUiVisibility';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IAdsApi } from '../../Ads';
 import { ICoreApi } from '../../../Core/Core';
 
@@ -38,7 +37,7 @@ export class Activity extends AdUnitContainer {
     private _onFocusGainedObserver: any;
     private _onFocusLostObserver: any;
 
-    private _androidOptions?: IAndroidOptions;
+    private _androidOptions: IAndroidOptions;
 
     constructor(core: ICoreApi, ads: IAdsApi, deviceInfo: AndroidDeviceInfo) {
         super();
