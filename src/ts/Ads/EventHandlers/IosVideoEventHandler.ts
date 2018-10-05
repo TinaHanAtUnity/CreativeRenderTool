@@ -1,6 +1,6 @@
 import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
-import { IIosVideoEventHandler } from 'Ads/Native/iOS/IosVideoPlayer';
+import { IIosVideoEventHandler } from 'Ads/Native/iOS/VideoPlayer';
 
 export class IosVideoEventHandler extends BaseVideoEventHandler implements IIosVideoEventHandler {
 
@@ -12,7 +12,7 @@ export class IosVideoEventHandler extends BaseVideoEventHandler implements IIosV
         const container = this._adUnit.getContainer();
         if(!container.isPaused() && this._adUnit.canPlayVideo() && likelyToKeepUp) {
             this._adUnit.setVideoState(VideoState.PLAYING);
-            this._nativeBridge.VideoPlayer.play();
+            this._ads.VideoPlayer.play();
         }
     }
 
@@ -25,7 +25,7 @@ export class IosVideoEventHandler extends BaseVideoEventHandler implements IIosV
     }
 
     public onGenericError(url: string, description: string): void {
-        this._nativeBridge.Sdk.logError('Unity Ads video player generic error '  + url + ' ' + description);
+        this._core.Sdk.logError('Unity Ads video player generic error '  + url + ' ' + description);
 
         this.handleVideoError('video_player_generic_error', {
             'url': url,

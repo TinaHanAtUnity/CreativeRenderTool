@@ -18,7 +18,6 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
@@ -57,8 +56,8 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     private _videoState: VideoState = VideoState.NOT_READY;
     private _clientInfo: ClientInfo;
 
-    constructor(nativeBridge: NativeBridge, parameters: IVideoAdUnitParameters<T>) {
-        super(nativeBridge, parameters);
+    constructor(parameters: IVideoAdUnitParameters<T>) {
+        super(parameters);
 
         this._video = parameters.video;
         this._videoReady = false;
@@ -97,7 +96,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this.hideChildren();
         this.unsetReferences();
 
-        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this._container.removeEventHandler(this);
 
         return this._container.close().then(() => {
@@ -152,7 +151,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             videoOrientation = 'portrait';
         }
 
-        this._nativeBridge.Sdk.logDebug('Returning ' + videoOrientation + ' as video orientation for locked orientation ' + Orientation[this._container.getLockedOrientation()]);
+        this._core.Sdk.logDebug('Returning ' + videoOrientation + ' as video orientation for locked orientation ' + Orientation[this._container.getLockedOrientation()]);
 
         return videoOrientation;
     }
@@ -163,11 +162,11 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
     public onContainerShow(): void {
         if(this.isShowing() && this.isActive()) {
-            if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
+            if(this._platform === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
                 if(this.getVideo().isCached()) {
-                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
+                    this._ads.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
                 } else {
-                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
+                    this._ads.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
                 }
             }
 
@@ -202,7 +201,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                     set the video not ready so that the onContainerForeground can
                     re-prepare the video.
                 */
-                this._nativeBridge.VideoPlayer.pause().catch((error) => {
+                this._ads.VideoPlayer.pause().catch((error) => {
                     if(error === 'VIDEOVIEW_NULL') {
                         this.setVideoState(VideoState.NOT_READY);
                     }
@@ -223,7 +222,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             */
             if(this.canShowVideo() && this.getVideoState() === VideoState.PAUSED) {
                 this.setVideoState(VideoState.PLAYING);
-                this._nativeBridge.VideoPlayer.play();
+                this._ads.VideoPlayer.play();
             } else if(this.canPrepareVideo()) {
                 this.prepareVideo();
             }
@@ -241,7 +240,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_BEGAN:
                 if(this.isShowing() && this.isActive() && this.getVideoState() === VideoState.PLAYING) {
                     this.setVideoState(VideoState.PAUSED);
-                    this._nativeBridge.VideoPlayer.pause();
+                    this._ads.VideoPlayer.pause();
                 }
                 break;
 
@@ -249,7 +248,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             case AdUnitContainerSystemMessage.AUDIO_SESSION_ROUTE_CHANGED:
                 if(this.isShowing() && this.isActive() && this.canPlayVideo()) {
                     this.setVideoState(VideoState.PLAYING);
-                    this._nativeBridge.VideoPlayer.play();
+                    this._ads.VideoPlayer.play();
                 }
                 break;
 
@@ -266,7 +265,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
         if(overlay) {
             overlay.render();
-            document.body.appendChild(overlay.container());
+            document.body.appendChild(overlay.container()!);
 
             if(!this._placement.allowSkip()) {
                 overlay.setSkipEnabled(false);
@@ -282,8 +281,9 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
         if(overlay) {
             overlay.hide();
-            if(overlay.container().parentElement) {
-                overlay.container().parentElement!.removeChild(overlay.container());
+            const container = overlay.container();
+            if(container && container.parentElement) {
+                container.parentElement!.removeChild(container);
             }
         }
     }
@@ -292,7 +292,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this.setVideoState(VideoState.PREPARING);
         this.getValidVideoUrl().then(url => {
             this._finalVideoUrl = url;
-            this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0 : 1), 10000);
+            this._ads.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0 : 1), 10000);
         });
     }
 
@@ -315,7 +315,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         // check that if we think video has been cached, it is still available on device cache directory
         return Promise.resolve().then(() => {
             if(this.getVideo().isCached() && this.getVideo().getFileId()) {
-                return this._nativeBridge.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
+                return this._core.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
                     if(result.found) {
                         const remoteVideoSize: number | undefined = this.getVideo().getSize();
                         if(remoteVideoSize && remoteVideoSize !== result.size) {

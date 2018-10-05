@@ -1,7 +1,9 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { Template } from '../../Core/Utilities/Template';
 
 export class PerformanceEndScreen extends EndScreen {
+    protected _template: Template;
     private _campaign: PerformanceCampaign;
 
     constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign) {

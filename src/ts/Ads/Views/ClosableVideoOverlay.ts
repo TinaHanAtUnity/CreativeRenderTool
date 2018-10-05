@@ -4,8 +4,11 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import InterstitialOverlayTemplate from 'html/InterstitialOverlay.html';
+import { Platform } from '../../Core/Constants/Platform';
 
 export class ClosableVideoOverlay extends AbstractVideoOverlay {
+
+    protected _template: Template;
 
     private _spinnerEnabled: boolean = false;
 
@@ -26,8 +29,8 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string) {
-        super(nativeBridge, 'closable-video-overlay', muted);
+    constructor(platform: Platform, muted: boolean, language: string, gameId: string) {
+        super(platform, 'closable-video-overlay', muted);
 
         const localization = new Localization(language, 'overlay');
         this._template = new Template(InterstitialOverlayTemplate, localization);
@@ -67,11 +70,11 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
 
     public render(): void {
         super.render();
-        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
-        this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
-        this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
-        this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
-        this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
+        this._closeElement = <HTMLElement>this._container!.querySelector('.close-region');
+        this._spinnerElement = <HTMLElement>this._container!.querySelector('.buffering-spinner');
+        this._muteButtonElement = <HTMLElement>this._container!.querySelector('.mute-button');
+        this._debugMessageElement = <HTMLElement>this._container!.querySelector('.debug-message-text');
+        this._callButtonElement = <HTMLElement>this._container!.querySelector('.call-button');
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -199,10 +202,10 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
             this._closeElement.classList.add('slide-up');
             this._muteButtonElement.classList.remove('slide-back-in-place');
             this._muteButtonElement.classList.add('slide-down');
-            this._container.style.pointerEvents = 'auto';
+            this._container!.style.pointerEvents = 'auto';
             this._fadeStatus = false;
         } else {
-            this._container.style.pointerEvents = 'none';
+            this._container!.style.pointerEvents = 'none';
             this._closeElement.classList.remove('slide-up');
             this._closeElement.classList.add('slide-back-in-place');
             this._muteButtonElement.classList.remove('slide-down');

@@ -16,6 +16,9 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Managers/Request';
+import { IAdsApi } from '../Ads';
+import { ICoreApi } from '../../Core/Core';
+import { Platform } from '../../Core/Constants/Platform';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -27,6 +30,9 @@ export interface IAdUnitParameters<T extends Campaign> {
     operativeEventManager: OperativeEventManager;
     placement: Placement;
     campaign: T;
+    platform: Platform;
+    core: ICoreApi;
+    ads: IAdsApi;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
     request: Request;
@@ -67,6 +73,10 @@ export abstract class AbstractAdUnit {
 
     protected readonly _forceOrientation: Orientation;
     protected readonly _container: AdUnitContainer;
+
+    protected readonly _platform: Platform;
+    protected readonly _core: ICoreApi;
+    protected readonly _ads: IAdsApi;
 
     private _showing: boolean;
     private _finishState: FinishState;

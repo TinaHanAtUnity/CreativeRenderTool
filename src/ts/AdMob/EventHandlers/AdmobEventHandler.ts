@@ -16,16 +16,17 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Promises } from 'Core/Utilities/Promises';
-import { Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Managers/Request';
 import { Timer } from 'Core/Utilities/Timer';
 import { Url } from 'Core/Utilities/Url';
+import { ICoreApi } from '../../Core/Core';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
     request: Request;
-    nativeBridge: NativeBridge;
+    platform: Platform;
+    core: ICoreApi;
     session: Session;
     thirdPartyEventManager: ThirdPartyEventManager;
     adMobSignalFactory: AdMobSignalFactory;
@@ -43,7 +44,8 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     }
     private static _loadTimeout: number = 5000;
     private _adUnit: AdMobAdUnit;
-    private _nativeBridge: NativeBridge;
+    private _platform: Platform;
+    private _core: ICoreApi;
     private _timeoutTimer: Timer;
     private _request: Request;
     private _session: Session;
@@ -55,7 +57,8 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     constructor(parameters: IAdMobEventHandlerParameters) {
         super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
         this._adUnit = parameters.adUnit;
-        this._nativeBridge = parameters.nativeBridge;
+        this._platform = parameters.platform;
+        this._core = parameters.core;
         this._request = parameters.request;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._session = parameters.session;
@@ -75,10 +78,10 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
         if (!isAboutPage) {
             this._adUnit.sendClickEvent();
         }
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._nativeBridge.UrlScheme.open(url);
+        if (this._platform === Platform.IOS) {
+            this._core.iOS!.UrlScheme.open(url);
         } else {
-            this._nativeBridge.Intent.launch({
+            this._core.Android!.Intent.launch({
                 action: 'android.intent.action.VIEW',
                 uri: url
             });
@@ -118,7 +121,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     }
 
     public onSetOrientationProperties(allowOrientation: boolean, forceOrientation: Orientation) {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._platform === Platform.IOS) {
             this._adUnit.getContainer().reorient(true, forceOrientation);
         } else {
             this._adUnit.getContainer().reorient(allowOrientation, forceOrientation);
@@ -126,7 +129,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     }
 
     public onOpenableIntentsRequest(request: IOpenableIntentsRequest): void {
-        this._nativeBridge.Intent.canOpenIntents(request.intents).then((results) => {
+        this._core.Android!.Intent.canOpenIntents(request.intents).then((results) => {
             this._adUnit.sendOpenableIntentsResponse({
                 id: request.id,
                 results: results

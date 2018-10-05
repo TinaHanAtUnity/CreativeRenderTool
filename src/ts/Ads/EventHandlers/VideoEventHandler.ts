@@ -60,7 +60,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
             // bugs in native videoplayer that should be ignored, these have been seen in some Android 7 devices
             const ignoreTreshold: number = lastPosition + 1000000;
             if(progress > ignoreTreshold) {
-                this._nativeBridge.Sdk.logError('Unity Ads video player ignoring too large progress from ' + lastPosition + ' to ' + progress);
+                this._core.Sdk.logError('Unity Ads video player ignoring too large progress from ' + lastPosition + ' to ' + progress);
 
                 const error: DiagnosticError = new DiagnosticError(new Error('Too large progress in video player'), {
                     position: progress,
@@ -78,7 +78,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
 
                 // if video player has been repeating the same video position for more than 5000 milliseconds, video player is stuck
                 if(repeats > repeatTreshold) {
-                    this._nativeBridge.Sdk.logError('Unity Ads video player stuck to ' + progress + 'ms position');
+                    this._core.Sdk.logError('Unity Ads video player stuck to ' + progress + 'ms position');
 
                     const error: any = {
                         repeats: repeats,
@@ -94,10 +94,10 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                     const fileId = this._video.getFileId();
 
                     if(fileId) {
-                        this._nativeBridge.Cache.getFileInfo(fileId).then((fileInfo) => {
+                        this._core.Cache.getFileInfo(fileId).then((fileInfo) => {
                             error.fileInfo = fileInfo;
                             if(fileInfo.found) {
-                                return VideoFileInfo.getVideoInfo(this._nativeBridge, fileId).then(([width, height, duration]) => {
+                                return VideoFileInfo.getVideoInfo(this._platform, this._core.Cache, fileId).then(([width, height, duration]) => {
                                     const videoInfo: any = {
                                         width: width,
                                         height: height,
@@ -197,23 +197,23 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
             overlay.setDebugMessageVisible(true);
         }
 
-        this._nativeBridge.VideoPlayer.setVolume(new Double(overlay && overlay.isMuted() ? 0 : 1)).then(() => {
+        this._ads.VideoPlayer.setVolume(new Double(overlay && overlay.isMuted() ? 0 : 1)).then(() => {
             if(this._video.getPosition() > 0) {
-                this._nativeBridge.VideoPlayer.seekTo(this._video.getPosition()).then(() => {
+                this._ads.VideoPlayer.seekTo(this._video.getPosition()).then(() => {
                     if(!this._adUnit.getContainer().isPaused() && (overlay && !overlay.isPrivacyShowing())) {
-                        this._nativeBridge.VideoPlayer.play();
+                        this._ads.VideoPlayer.play();
                     }
                 });
             } else {
                 if(!this._adUnit.getContainer().isPaused() && (overlay && !overlay.isPrivacyShowing())) {
-                    this._nativeBridge.VideoPlayer.play();
+                    this._ads.VideoPlayer.play();
                 }
             }
         });
     }
 
     public onPrepareTimeout(url: string): void {
-        this._nativeBridge.Sdk.logError('Unity Ads video player prepare timeout '  + url);
+        this._core.Sdk.logError('Unity Ads video player prepare timeout '  + url);
 
         this.handleVideoError('video_player_prepare_timeout', {
             'url': url,
@@ -222,7 +222,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     public onPlay(url: string): void {
-        this._nativeBridge.VideoPlayer.setProgressEventInterval(this._adUnit.getProgressInterval());
+        this._ads.VideoPlayer.setProgressEventInterval(this._adUnit.getProgressInterval());
     }
 
     public onPause(url: string): void {
@@ -242,7 +242,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
             this._adUnit.onStartProcessed.trigger();
         });
 
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
+        this._ads.Listener.sendStartEvent(this._placement.getId());
     }
 
     protected handleFirstQuartileEvent(progress: number): void {

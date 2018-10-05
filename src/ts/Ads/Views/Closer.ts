@@ -7,6 +7,7 @@ import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 
 import CloserTemplate from 'html/closer.html';
+import { Platform } from '../../Core/Constants/Platform';
 
 export interface ICloseHandler extends IGDPREventHandler {
     onClose(skipped: boolean): void;
@@ -16,6 +17,8 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
 
     public readonly onPrivacyOpened: Observable0 = new Observable0();
     public readonly onPrivacyClosed: Observable0 = new Observable0();
+
+    protected _template: Template;
 
     private _placement: Placement;
     private _allowClose: boolean;
@@ -28,8 +31,8 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
     private _showGDPRBanner: boolean;
     private _gdprPopupClicked: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
-        super(nativeBridge, 'closer');
+    constructor(platform: Platform, placement: Placement, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+        super(platform, 'closer');
         this._template = new Template(CloserTemplate);
         this._placement = placement;
         this._privacy = privacy;
@@ -55,7 +58,7 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
 
         this._privacy.render();
         this._privacy.hide();
-        document.body.appendChild(this._privacy.container());
+        document.body.appendChild(this._privacy.container()!);
         this._privacy.addEventHandler(this);
     }
 
@@ -74,7 +77,7 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
         super.hide();
 
         if (this._privacy) {
-            document.body.removeChild(this._privacy.container());
+            document.body.removeChild(this._privacy.container()!);
         }
 
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
@@ -87,8 +90,8 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
 
     public render() {
         super.render();
-        this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
+        this._GDPRPopupElement = <HTMLElement>this._container!.querySelector('.gdpr-pop-up');
+        this._privacyButtonElement = <HTMLElement>this._container!.querySelector('.privacy-button');
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
@@ -140,9 +143,9 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
     }
 
     private updateCircle(fraction: number) {
-        const wrapperElement = <HTMLElement>this._container.querySelector('.progress-wrapper');
-        const leftCircleElement = <HTMLElement>this._container.querySelector('.circle-left');
-        const rightCircleElement = <HTMLElement>this._container.querySelector('.circle-right');
+        const wrapperElement = <HTMLElement>this._container!.querySelector('.progress-wrapper');
+        const leftCircleElement = <HTMLElement>this._container!.querySelector('.circle-left');
+        const rightCircleElement = <HTMLElement>this._container!.querySelector('.circle-right');
 
         const degrees = fraction * 360;
         leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';

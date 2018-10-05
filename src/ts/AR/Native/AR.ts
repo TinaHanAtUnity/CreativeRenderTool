@@ -128,7 +128,7 @@ export class ARApi extends NativeApi {
                 this.onSessionInterruptionEnded.trigger();
                 break;
             default:
-                this._nativeBridge.Sdk.logError('Unknown AR event: ' + event);
+                super.handleEvent(event, parameters);
         }
     }
 }

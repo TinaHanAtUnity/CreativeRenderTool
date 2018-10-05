@@ -3,20 +3,20 @@ import { Analytics } from 'Ads/Utilities/Analytics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestError } from 'Core/Errors/RequestError';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { INativeResponse, Request } from 'Core/Managers/Request';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
+import { ICoreApi } from '../../Core/Core';
 
 export class ThirdPartyEventManager {
 
-    private _nativeBridge: NativeBridge;
+    private _core: ICoreApi;
     private _request: Request;
     private _templateValues: { [id: string]: string } = {};
 
-    constructor(nativeBridge: NativeBridge, request: Request, templateValues?: { [id: string]: string }) {
-        this._nativeBridge = nativeBridge;
+    constructor(core: ICoreApi, request: Request, templateValues?: { [id: string]: string }) {
+        this._core = core;
         this._request = request;
 
         if(templateValues) {
@@ -47,7 +47,7 @@ export class ThirdPartyEventManager {
 
         url = this.getUrl(url);
 
-        this._nativeBridge.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
+        this._core.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
         return this._request.get(url, headers, {
             retries: 0,
             retryDelay: 0,

@@ -6,8 +6,12 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
+import { Platform } from '../../Core/Constants/Platform';
+import { IAdsApi } from '../Ads';
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
+    protected _template: Template;
+    private _ads: IAdsApi;
     private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
@@ -39,9 +43,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _gameId: string;
     private _seatId: number | undefined;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean, seatId?: number) {
-        super(nativeBridge, 'new-video-overlay', muted);
+    constructor(platform: Platform, ads: IAdsApi, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean, seatId?: number) {
+        super(platform, 'new-video-overlay', muted);
 
+        this._ads = ads;
         this._localization = new Localization(language, 'overlay');
         this._showGDPRBanner = showGDPRBanner;
         this._showPrivacyDuringVideo = showPrivacyDuringVideo;
@@ -101,7 +106,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             this._privacy = privacy;
             this._privacy.render();
             this._privacy.hide();
-            document.body.appendChild(this._privacy.container());
+            document.body.appendChild(this._privacy.container()!);
             this._privacy.addEventHandler(this);
         }
 
@@ -115,7 +120,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         if (this._privacy) {
             this._privacy.hide();
-            document.body.removeChild(this._privacy.container());
+            document.body.removeChild(this._privacy.container()!);
             delete this._privacy;
         }
 
@@ -130,7 +135,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this.choosePrivacyShown();
 
         if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
-            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
+            const tencentAdTag = <HTMLElement>this._container!.querySelector('.tencent-advertisement');
             if (tencentAdTag) {
                 tencentAdTag.innerText = '广告';
             }
@@ -226,7 +231,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             this._privacy.hide();
         }
         this._isPrivacyShowing = false;
-        this._nativeBridge.VideoPlayer.play();
+        this._ads.VideoPlayer.play();
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
@@ -235,14 +240,14 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
     public choosePrivacyShown(): void {
         if (!this._showPrivacyDuringVideo) {
-            this._container.classList.remove('show-gdpr-banner');
-            this._container.classList.remove('show-gdpr-button');
+            this._container!.classList.remove('show-gdpr-banner');
+            this._container!.classList.remove('show-gdpr-button');
         } else if (!this._gdprPopupClicked && this._showGDPRBanner) {
-            this._container.classList.add('show-gdpr-banner');
-            this._container.classList.remove('show-gdpr-button');
+            this._container!.classList.add('show-gdpr-banner');
+            this._container!.classList.remove('show-gdpr-button');
         } else {
-            this._container.classList.remove('show-gdpr-banner');
-            this._container.classList.add('show-gdpr-button');
+            this._container!.classList.remove('show-gdpr-banner');
+            this._container!.classList.add('show-gdpr-button');
         }
     }
 
@@ -254,7 +259,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             this._gdprPopupClicked = true;
             this.choosePrivacyShown();
         }
-        this._nativeBridge.VideoPlayer.pause();
+        this._ads.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();
         }
@@ -264,7 +269,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._isPrivacyShowing = true;
         event.preventDefault();
         event.stopPropagation();
-        this._nativeBridge.VideoPlayer.pause();
+        this._ads.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();
         }
@@ -320,12 +325,12 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     private setupElementReferences(): void {
-        this._skipButtonElement = <HTMLElement>this._container.querySelector('.skip-button');
-        this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
-        this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
-        this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
-        this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
-        this._timerElement = <HTMLElement>this._container.querySelector('.timer');
+        this._skipButtonElement = <HTMLElement>this._container!.querySelector('.skip-button');
+        this._spinnerElement = <HTMLElement>this._container!.querySelector('.buffering-spinner');
+        this._muteButtonElement = <HTMLElement>this._container!.querySelector('.mute-button');
+        this._debugMessageElement = <HTMLElement>this._container!.querySelector('.debug-message-text');
+        this._callButtonElement = <HTMLElement>this._container!.querySelector('.call-button');
+        this._timerElement = <HTMLElement>this._container!.querySelector('.timer');
     }
 
     private showSkipButton() {
@@ -350,7 +355,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     private fadeIn() {
-        this._container.classList.add('fade-in');
+        this._container!.classList.add('fade-in');
         this._areControlsVisible = true;
         setTimeout(() => {
             this.showCallButton();
@@ -358,7 +363,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     private fadeOut() {
-        this._container.classList.remove('fade-in');
+        this._container!.classList.remove('fade-in');
         this._areControlsVisible = false;
     }
 }

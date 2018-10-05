@@ -8,6 +8,7 @@ import ReportingPrivacyTemplate from 'html/Reporting-privacy.html';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { Platform } from '../../Core/Constants/Platform';
 
 enum PrivacyCardState {
     INITIAL,
@@ -26,6 +27,7 @@ enum BadAdReason {
 
 export class ReportingPrivacy extends AbstractPrivacy {
 
+    protected _template: Template;
     private _onReport: Observable0 = new Observable0();
     private _gdprManager: GdprManager;
     private _dataDeletionConfirmation: boolean = false;
@@ -34,11 +36,11 @@ export class ReportingPrivacy extends AbstractPrivacy {
     private _reportSent: boolean = false;
     private _gdprEnabled: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: Campaign,
+    constructor(platform: Platform, campaign: Campaign,
                 gdprManager: GdprManager, gdprEnabled: boolean,
                 isCoppaCompliant: boolean) {
 
-        super(nativeBridge, isCoppaCompliant, gdprEnabled, 'reporting-privacy');
+        super(platform, isCoppaCompliant, gdprEnabled, 'reporting-privacy');
         this._templateData.badAdKeys = Object.keys(BadAdReason);
         this._templateData.badAdReasons = (<string[]>(<any>Object).values(BadAdReason));
 
@@ -91,11 +93,11 @@ export class ReportingPrivacy extends AbstractPrivacy {
         if (this._gdprEnabled) {
             const elId = this._gdprManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
-            const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
+            const activeRadioButton = <HTMLInputElement>this._container!.querySelector(`#${elId}`);
             activeRadioButton.checked = true;
         }
 
-        const agreeRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-agree-radio');
+        const agreeRadioButton = <HTMLInputElement>this._container!.querySelector('#gdpr-agree-radio');
         if (agreeRadioButton) {
             agreeRadioButton.onclick = () => {
                 const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
@@ -116,7 +118,7 @@ export class ReportingPrivacy extends AbstractPrivacy {
 
     protected onCloseEvent(event: Event): void {
         event.preventDefault();
-        const gdprReduceRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
+        const gdprReduceRadioButton = <HTMLInputElement>this._container!.querySelector('#gdpr-refuse-radio');
         if (this._gdprEnabled) {
             this._handlers.forEach(handler => handler.onGDPROptOut(gdprReduceRadioButton.checked || this._dataDeletionConfirmation));
         }
@@ -149,7 +151,7 @@ export class ReportingPrivacy extends AbstractPrivacy {
         const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
         requestContainer.classList.add('active');
 
-        const activeRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
+        const activeRadioButton = <HTMLInputElement>this._container!.querySelector('#gdpr-refuse-radio');
         activeRadioButton.checked = true;
     }
 
@@ -160,8 +162,8 @@ export class ReportingPrivacy extends AbstractPrivacy {
 
     private onReportAd(): void {
         if (!this._reportSent) {
-            const checkedReportButton = <HTMLElement>this._container.querySelector('.report-choice-radio:checked');
-            const reportText = this._container.querySelector('.report-confirmed-text');
+            const checkedReportButton = <HTMLElement>this._container!.querySelector('.report-choice-radio:checked');
+            const reportText = this._container!.querySelector('.report-confirmed-text');
             if (checkedReportButton && checkedReportButton.id) {
                 this._reportSent = true;
                 this.handleReportText(true, reportText);
@@ -189,9 +191,9 @@ export class ReportingPrivacy extends AbstractPrivacy {
 
     private setCardState(isLeftClick: boolean) {
 
-        const leftEl = <HTMLDivElement>this._container.querySelector('.left-side-link');
-        const middleEl = <HTMLDivElement>this._container.querySelector('.middle-link');
-        const classList = this._container.classList;
+        const leftEl = <HTMLDivElement>this._container!.querySelector('.left-side-link');
+        const middleEl = <HTMLDivElement>this._container!.querySelector('.middle-link');
+        const classList = this._container!.classList;
         const rCard = 'Report Ad ⚑';
         const pCard = 'Privacy info 👁';
         const bCard = 'Build info ⚙';

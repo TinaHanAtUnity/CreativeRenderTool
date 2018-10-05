@@ -13,6 +13,9 @@ import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IAdsApi } from '../Ads';
+import { ICoreApi } from '../../Core/Core';
+import { Platform } from '../../Core/Constants/Platform';
 
 export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T2 extends Campaign = Campaign, T3 extends OperativeEventManager = OperativeEventManager> {
     nativeBrige: NativeBridge;
@@ -20,6 +23,9 @@ export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T
     campaign: T2;
     operativeEventManager: T3;
     thirdPartyEventManager: ThirdPartyEventManager;
+    platform: Platform;
+    core: ICoreApi;
+    ads: IAdsApi;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
     placement: Placement;
@@ -30,13 +36,17 @@ export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T
 
 export abstract class BaseVideoEventHandler {
 
-    protected _nativeBridge: NativeBridge;
+    protected _platform: Platform;
+    protected _core: ICoreApi;
+    protected _ads: IAdsApi;
     protected _adUnit: VideoAdUnit;
     protected _campaign: Campaign;
     protected _video: Video;
 
     constructor(params: IVideoEventHandlerParams) {
-        this._nativeBridge = params.nativeBrige;
+        this._platform = params.platform;
+        this._core = params.core;
+        this._ads = params.ads;
         this._adUnit = params.adUnit;
         this._campaign = params.campaign;
         this._video = params.video;
@@ -79,10 +89,10 @@ export abstract class BaseVideoEventHandler {
 
             if(previousState === VideoState.NOT_READY || previousState === VideoState.PREPARING) {
                 this._adUnit.hide();
-                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player prepare error');
+                this._ads.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player prepare error');
             } else {
                 this._adUnit.onVideoError();
-                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
+                this._ads.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
             }
         }
     }

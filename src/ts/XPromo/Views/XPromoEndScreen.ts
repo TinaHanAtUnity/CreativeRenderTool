@@ -1,7 +1,9 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { Template } from '../../Core/Utilities/Template';
 
 export class XPromoEndScreen extends EndScreen {
+    protected _template: Template;
     private _campaign: XPromoCampaign;
 
     constructor(parameters: IEndScreenParameters, campaign: XPromoCampaign) {

@@ -18,6 +18,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
 import { INativeResponse, Request } from 'Core/Managers/Request';
 import { Url } from 'Core/Utilities/Url';
+import { ICoreApi } from '../../Core/Core';
 
 export interface IAuctionResponse {
     correlationId: string;
@@ -46,7 +47,8 @@ export interface IPlacementMedia {
 }
 
 export interface IAuctionRequestParams {
-    nativeBridge: NativeBridge;
+    platform: Platform;
+    core: ICoreApi;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
     adMobSignalFactory: AdMobSignalFactory;
@@ -100,7 +102,8 @@ export class AuctionRequest {
     private static Country: string | undefined;
     private static SessionId: string | undefined;
 
-    protected _nativeBridge: NativeBridge;
+    protected _platform: Platform;
+    protected _core: ICoreApi;
     protected _response: INativeResponse;
     private _coreConfig: CoreConfiguration;
     private _adsConfig: AdsConfiguration;
@@ -128,7 +131,8 @@ export class AuctionRequest {
     private _promise: Promise<IAuctionResponse>;
 
     constructor(params: IAuctionRequestParams) {
-        this._nativeBridge = params.nativeBridge;
+        this._platform = params.platform;
+        this._core = params.core;
         this._coreConfig = params.coreConfig;
         this._adsConfig = params.adsConfig;
         this._request = params.request;
@@ -240,7 +244,7 @@ export class AuctionRequest {
                 advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
                 limitAdTracking: this._deviceInfo.getLimitAdTracking()
             });
-        } else if (this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
+        } else if (this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
                 androidId: this._deviceInfo.getAndroidId()
             });
@@ -248,7 +252,7 @@ export class AuctionRequest {
 
         url = Url.addParameters(url, {
             deviceModel: this._deviceInfo.getModel(),
-            platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
+            platform: Platform[this._platform].toLowerCase(),
             sdkVersion: this._clientInfo.getSdkVersion(),
             stores: this._deviceInfo.getStores()
         });
@@ -259,12 +263,12 @@ export class AuctionRequest {
             });
         }
 
-        if (this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
+        if (this._platform === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
             url = Url.addParameters(url, {
                 osVersion: this._deviceInfo.getOsVersion(),
                 screenScale: this._deviceInfo.getScreenScale()
             });
-        } else if (this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
+        } else if (this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
                 deviceMake: this._deviceInfo.getManufacturer(),
                 screenSize: this._deviceInfo.getScreenLayout(),
@@ -358,7 +362,7 @@ export class AuctionRequest {
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
         promises.push(this._deviceInfo.getHeadset());
-        promises.push(this._deviceInfo.getDeviceVolume());
+        promises.push(this._deviceInfo.getDeviceVolume(this._platform));
         promises.push(this.getFullyCachedCampaigns());
         promises.push(this.getVersionCode());
         promises.push(this._adMobSignalFactory.getAdRequestSignal().then(signal => {
@@ -448,7 +452,7 @@ export class AuctionRequest {
     }
 
     private getFullyCachedCampaigns(): Promise<string[]> {
-        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
+        return this._core.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
             return campaignKeys;
         }).catch(() => {
             return [];
@@ -456,8 +460,8 @@ export class AuctionRequest {
     }
 
     private getVersionCode(): Promise<number | undefined> {
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
+        if (this._platform === Platform.ANDROID) {
+            return this._core.DeviceInfo.Android!.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
                 if (packageInfo.versionCode) {
                     return packageInfo.versionCode;
                 } else {

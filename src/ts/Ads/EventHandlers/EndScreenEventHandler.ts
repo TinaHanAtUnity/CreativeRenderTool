@@ -16,12 +16,15 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Managers/Request';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { IAdsApi } from '../Ads';
+import { ICoreApi } from '../../Core/Core';
+import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -35,19 +38,23 @@ export interface IEndScreenDownloadParameters {
 
 export abstract class EndScreenEventHandler<T extends Campaign, T2 extends AbstractAdUnit> extends GDPREventHandler implements IEndScreenHandler {
 
+    protected _platform: Platform;
+    protected _core: ICoreApi;
+    protected _ads: IAdsApi;
     protected _adUnit: T2;
     protected _campaign: T;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
-    protected _nativeBridge: NativeBridge;
 
     private _operativeEventManager: OperativeEventManager;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _placement: Placement;
 
-    constructor(nativeBridge: NativeBridge, adUnit: T2, parameters: IAdUnitParameters<T>) {
+    constructor(adUnit: T2, parameters: IAdUnitParameters<T>) {
         super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
-        this._nativeBridge = nativeBridge;
+        this._platform = parameters.platform;
+        this._core = parameters.core;
+        this._ads = parameters.ads;
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._adUnit = adUnit;
@@ -58,9 +65,9 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     public onEndScreenDownload(parameters: IEndScreenDownloadParameters): void {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._platform === Platform.IOS) {
             this.onDownloadIos(parameters);
-        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        } else if (this._platform === Platform.ANDROID) {
             this.onDownloadAndroid(parameters);
         }
     }
@@ -72,7 +79,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     public abstract onKeyEvent(keyCode: number): void;
 
     private onDownloadAndroid(parameters: IEndScreenDownloadParameters): void {
-        this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
+        this._ads.Listener.sendClickEvent(this._placement.getId());
         this._operativeEventManager.sendClick(this.getOperativeEventParams(parameters));
         if(this._campaign instanceof XPromoCampaign) {
             const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
@@ -98,7 +105,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private onDownloadIos(parameters: IEndScreenDownloadParameters): void {
-        this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
+        this._ads.Listener.sendClickEvent(this._placement.getId());
 
         this._operativeEventManager.sendClick(this.getOperativeEventParams(parameters));
         if(this._campaign instanceof XPromoCampaign) {
@@ -133,7 +140,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
-        const platform = this._nativeBridge.getPlatform();
+        const platform = this._platform;
 
         // should be safe to remove after new Comet APK rule changes are deployed
         if (parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
@@ -161,18 +168,18 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private handleClickAttributionWithRedirects(clickAttributionUrl: string, clickAttributionUrlFollowsRedirects: boolean) {
-        const platform = this._nativeBridge.getPlatform();
+        const platform = this._platform;
 
         this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
             const location = Request.getHeader(response.headers, 'location');
             if (location) {
                 if (platform === Platform.ANDROID) {
-                    this._nativeBridge.Intent.launch({
+                    this._core.Android!.Intent.launch({
                         'action': 'android.intent.action.VIEW',
                         'uri': location
                     });
                 } else if (platform === Platform.IOS) {
-                    this._nativeBridge.UrlScheme.open(location);
+                    this._core.iOS!.UrlScheme.open(location);
                 }
             } else {
                 Diagnostics.trigger('click_attribution_misconfigured', {
@@ -189,9 +196,9 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private handleAppDownloadUrl(appDownloadUrl: string) {
         appDownloadUrl = decodeURIComponent(appDownloadUrl);
 
-        if (this._nativeBridge.getApiLevel() >= 21) {
+        if ((<AndroidDeviceInfo>this._deviceInfo).getApiLevel() >= 21) {
             // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
-            this._nativeBridge.Intent.launch({
+            this._core.Android!.Intent.launch({
                 'action': 'android.intent.action.WEB_SEARCH',
                 'extras': [
                     {
@@ -201,7 +208,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 ]
             });
         } else {
-            this._nativeBridge.Intent.launch({
+            this._core.Android!.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': appDownloadUrl
             });
@@ -223,7 +230,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private openAppStore(parameters: IEndScreenDownloadParameters, isAppSheetBroken?: boolean) {
-        const platform = this._nativeBridge.getPlatform();
+        const platform = this._platform;
         let packageName: string | undefined;
 
         if(platform === Platform.ANDROID) {
@@ -239,15 +246,15 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         }
 
         if(platform === Platform.ANDROID) {
-            this._nativeBridge.Intent.launch({
+            this._core.Android!.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': appStoreUrl
             });
         } else if(platform === Platform.IOS) {
             if(isAppSheetBroken || parameters.bypassAppSheet) {
-                this._nativeBridge.UrlScheme.open(appStoreUrl);
+                this._core.iOS!.UrlScheme.open(appStoreUrl);
             } else {
-                this._nativeBridge.AppSheet.canOpen().then(canOpenAppSheet => {
+                this._ads.iOS!.AppSheet.canOpen().then(canOpenAppSheet => {
                     if(canOpenAppSheet) {
                         if(!parameters.appStoreId) {
                             Diagnostics.trigger('no_appstore_id', {
@@ -258,15 +265,15 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                         const options = {
                             id: parseInt(parameters.appStoreId, 10)
                         };
-                        this._nativeBridge.AppSheet.present(options).then(() => {
-                            this._nativeBridge.AppSheet.destroy(options);
+                        this._ads.iOS!.AppSheet.present(options).then(() => {
+                            this._ads.iOS!.AppSheet.destroy(options);
                         }).catch(([error]) => {
                             if(error === 'APPSHEET_NOT_FOUND') {
-                                this._nativeBridge.UrlScheme.open(appStoreUrl);
+                                this._core.iOS!.UrlScheme.open(appStoreUrl);
                             }
                         });
                     } else {
-                        this._nativeBridge.UrlScheme.open(appStoreUrl);
+                        this._core.iOS!.UrlScheme.open(appStoreUrl);
                     }
                 });
             }

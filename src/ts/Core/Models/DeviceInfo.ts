@@ -1,6 +1,8 @@
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
 import { ISchema, Model } from 'Core/Models/Model';
 import { ICoreApi } from 'Core/Core';
+import { StreamType } from '../Constants/Android/StreamType';
+import { Platform } from '../Constants/Platform';
 
 export interface IDeviceInfo {
     advertisingIdentifier: string | undefined | null;
@@ -123,6 +125,22 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
 
     public getOsVersion(): string {
         return this.get('osVersion');
+    }
+
+    public getDeviceVolume(platform: Platform, streamType: StreamType = StreamType.STREAM_SYSTEM): Promise<number> {
+        if (platform === Platform.IOS) {
+            return this._core.DeviceInfo.Ios!.getDeviceVolume().then(volume => {
+                this.set('volume', volume);
+                return this.get('volume');
+            });
+        } else if (platform === Platform.ANDROID) {
+            return this._core.DeviceInfo.Android!.getDeviceVolume(streamType).then(volume => {
+                this.set('volume', volume);
+                return this.get('volume');
+            });
+        } else {
+            return Promise.resolve(this.get('volume'));
+        }
     }
 
     public getScreenWidth(): Promise<number> {

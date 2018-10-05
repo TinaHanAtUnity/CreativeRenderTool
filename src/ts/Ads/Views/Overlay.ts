@@ -2,14 +2,17 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { Platform } from 'Core/Constants/Platform';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import OverlayTemplate from 'html/Overlay.html';
+import { IAdsApi } from '../Ads';
+import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
 
 export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
+    protected _template: Template;
+    private _ads: IAdsApi;
+    private _deviceInfo: AndroidDeviceInfo;
     private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
@@ -46,8 +49,8 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _gameId: string;
     private _seatId: number | undefined;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, seatId?: number) {
-        super(nativeBridge, 'overlay', muted);
+    constructor(platform: Platform, ads: IAdsApi, deviceInfo: AndroidDeviceInfo, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, seatId?: number) {
+        super(platform, 'overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
         this._showGDPRBanner = showGDPRBanner;
@@ -109,7 +112,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
             this._privacy = privacy;
             this._privacy.render();
             this._privacy.hide();
-            document.body.appendChild(this._privacy.container());
+            document.body.appendChild(this._privacy.container()!);
             this._privacy.addEventHandler(this);
         }
     }
@@ -118,7 +121,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         super.hide();
         if (this._privacy) {
             this._privacy.hide();
-            document.body.removeChild(this._privacy.container());
+            document.body.removeChild(this._privacy.container()!);
             delete this._privacy;
         }
 
@@ -131,24 +134,24 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         super.render();
 
         if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
-            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
+            const tencentAdTag = <HTMLElement>this._container!.querySelector('.tencent-advertisement');
             if (tencentAdTag) {
                 tencentAdTag.innerText = '广告';
             }
         }
 
-        this._skipElement = <HTMLElement>this._container.querySelector('.skip-hit-area');
-        this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
-        this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
-        this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
-        this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
-        this._progressElement = <HTMLElement>this._container.querySelector('.progress');
-        this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
+        this._skipElement = <HTMLElement>this._container!.querySelector('.skip-hit-area');
+        this._spinnerElement = <HTMLElement>this._container!.querySelector('.buffering-spinner');
+        this._muteButtonElement = <HTMLElement>this._container!.querySelector('.mute-button');
+        this._debugMessageElement = <HTMLElement>this._container!.querySelector('.debug-message-text');
+        this._callButtonElement = <HTMLElement>this._container!.querySelector('.call-button');
+        this._progressElement = <HTMLElement>this._container!.querySelector('.progress');
+        this._GDPRPopupElement = <HTMLElement>this._container!.querySelector('.gdpr-pop-up');
+        this._privacyButtonElement = <HTMLElement>this._container!.querySelector('.privacy-button');
         this.choosePrivacyShown();
 
         if(CustomFeatures.isCloseIconSkipApp(this._gameId)) {
-            const skipIconElement = <HTMLElement>this._container.querySelector('.skip');
+            const skipIconElement = <HTMLElement>this._container!.querySelector('.skip');
             skipIconElement.classList.add('close-icon-skip');
         }
     }
@@ -242,7 +245,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
             this._privacy.hide();
         }
         this._isPrivacyShowing = false;
-        this._nativeBridge.VideoPlayer.play();
+        this._ads.VideoPlayer.play();
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
@@ -273,7 +276,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
             this._gdprPopupClicked = true;
             this.choosePrivacyShown();
         }
-        this._nativeBridge.VideoPlayer.pause();
+        this._ads.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();
         }
@@ -282,7 +285,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private onPrivacyEvent(event: Event) {
         this._isPrivacyShowing = true;
         event.preventDefault();
-        this._nativeBridge.VideoPlayer.pause();
+        this._ads.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();
         }
@@ -340,13 +343,13 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
+        if(this._platform === Platform.ANDROID && this._deviceInfo.getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
-            this._container.style.display = 'none';
+            this._container!.style.display = 'none';
             /* tslint:disable:no-unused-expression */
-            this._container.offsetHeight;
+            this._container!.offsetHeight;
             /* tslint:enable:no-unused-expression */
-            this._container.style.display = 'block';
+            this._container!.style.display = 'block';
             return;
         }
 
@@ -365,7 +368,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private setSkipElementVisible(value: boolean) {
         if(this._skipVisible !== value) {
             this._skipVisible = value;
-            const skipIconElement = <HTMLElement>this._container.querySelector('.skip');
+            const skipIconElement = <HTMLElement>this._container!.querySelector('.skip');
 
             if(value) {
                 skipIconElement.classList.add('enabled');
@@ -394,10 +397,10 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
                 this._privacyButtonElement.classList.remove('slide-back-in-place');
                 this._privacyButtonElement.classList.add('slide-down');
             }
-            this._container.style.pointerEvents = 'auto';
+            this._container!.style.pointerEvents = 'auto';
             this._fadeStatus = false;
         } else {
-            this._container.style.pointerEvents = 'none';
+            this._container!.style.pointerEvents = 'none';
             this._skipElement.classList.remove('slide-up');
             this._skipElement.classList.add('slide-back-in-place');
             this._progressElement.classList.remove('slide-up');
