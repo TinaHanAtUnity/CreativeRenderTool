@@ -6,6 +6,8 @@ import { ScreenOrientation } from 'Core/Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Core/Constants/Android/SystemUiVisibility';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IAdsApi } from '../../Ads';
+import { ICoreApi } from '../../../Core/Core';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -20,7 +22,8 @@ interface IDisplay {
 
 export class Activity extends AdUnitContainer {
 
-    private _nativeBridge: NativeBridge;
+    private _core: ICoreApi;
+    private _ads: IAdsApi;
     private _deviceInfo: AndroidDeviceInfo;
 
     private _activityId: number;
@@ -35,22 +38,23 @@ export class Activity extends AdUnitContainer {
     private _onFocusGainedObserver: any;
     private _onFocusLostObserver: any;
 
-    private _androidOptions: IAndroidOptions;
+    private _androidOptions?: IAndroidOptions;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: AndroidDeviceInfo) {
+    constructor(core: ICoreApi, ads: IAdsApi, deviceInfo: AndroidDeviceInfo) {
         super();
 
-        this._nativeBridge = nativeBridge;
+        this._core = core;
+        this._ads = ads;
         this._deviceInfo = deviceInfo;
 
         this._activityId = 0;
         this._currentActivityFinished = false;
 
-        this._onResumeObserver = this._nativeBridge.AndroidAdUnit.onResume.subscribe((activityId) => this.onResume(activityId));
-        this._onPauseObserver = this._nativeBridge.AndroidAdUnit.onPause.subscribe((finishing, activityId) => this.onPause(finishing, activityId));
-        this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
-        this._onCreateObserver = this._nativeBridge.AndroidAdUnit.onCreate.subscribe((activityId) => this.onCreate(activityId));
-        this._onRestoreObserver = this._nativeBridge.AndroidAdUnit.onRestore.subscribe((activityId) => this.onRestore(activityId));
+        this._onResumeObserver = this._ads.Android!.AdUnit.onResume.subscribe((activityId) => this.onResume(activityId));
+        this._onPauseObserver = this._ads.Android!.AdUnit.onPause.subscribe((finishing, activityId) => this.onPause(finishing, activityId));
+        this._onDestroyObserver = this._ads.Android!.AdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
+        this._onCreateObserver = this._ads.Android!.AdUnit.onCreate.subscribe((activityId) => this.onCreate(activityId));
+        this._onRestoreObserver = this._ads.Android!.AdUnit.onRestore.subscribe((activityId) => this.onRestore(activityId));
     }
 
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IAndroidOptions): Promise<void> {
@@ -77,20 +81,20 @@ export class Activity extends AdUnitContainer {
 
         const hardwareAccel: boolean = this.isHardwareAccelerationAllowed();
 
-        this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + Orientation[this._lockedOrientation] + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
+        this._core.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + Orientation[this._lockedOrientation] + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
-        this._onFocusGainedObserver = this._nativeBridge.AndroidAdUnit.onFocusGained.subscribe(() => this.onFocusGained());
-        this._onFocusLostObserver = this._nativeBridge.AndroidAdUnit.onFocusLost.subscribe(() => this.onFocusLost());
+        this._onFocusGainedObserver = this._ads.Android!.AdUnit.onFocusGained.subscribe(() => this.onFocusGained());
+        this._onFocusLostObserver = this._ads.Android!.AdUnit.onFocusLost.subscribe(() => this.onFocusLost());
 
-        return this._nativeBridge.AndroidAdUnit.open(this._activityId, nativeViews, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent);
+        return this._ads.Android!.AdUnit.open(this._activityId, nativeViews, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent);
     }
 
     public close(): Promise<void> {
         if(!this._currentActivityFinished) {
             this._currentActivityFinished = true;
-            this._nativeBridge.AndroidAdUnit.onFocusLost.unsubscribe(this._onFocusLostObserver);
-            this._nativeBridge.AndroidAdUnit.onFocusGained.unsubscribe(this._onFocusGainedObserver);
-            return this._nativeBridge.AndroidAdUnit.close();
+            this._ads.Android!.AdUnit.onFocusLost.unsubscribe(this._onFocusLostObserver);
+            this._ads.Android!.AdUnit.onFocusGained.unsubscribe(this._onFocusGainedObserver);
+            return this._ads.Android!.AdUnit.close();
         } else {
             return Promise.resolve();
         }
@@ -105,17 +109,17 @@ export class Activity extends AdUnitContainer {
         ]).then(([screenWidth, screenHeight]) => {
             switch (configuration) {
                 case ViewConfiguration.ENDSCREEN:
-                    promises.push(this._nativeBridge.AndroidAdUnit.setViews(['webview']));
-                    promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR));
+                    promises.push(this._ads.Android!.AdUnit.setViews(['webview']));
+                    promises.push(this._ads.Android!.AdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR));
                     break;
 
                 case ViewConfiguration.LANDSCAPE_VIDEO:
-                    promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE));
-                    promises.push(this._nativeBridge.AndroidAdUnit.setViewFrame('videoplayer', 0, 0, screenHeight, screenWidth));
+                    promises.push(this._ads.Android!.AdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE));
+                    promises.push(this._ads.Android!.AdUnit.setViewFrame('videoplayer', 0, 0, screenHeight, screenWidth));
                     break;
                 case ViewConfiguration.WEB_PLAYER:
-                    promises.push(this._nativeBridge.AndroidAdUnit.setViews(['webplayer', 'webview']));
-                    promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR));
+                    promises.push(this._ads.Android!.AdUnit.setViews(['webplayer', 'webview']));
+                    promises.push(this._ads.Android!.AdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR));
 
                     break;
                 default:
@@ -125,7 +129,7 @@ export class Activity extends AdUnitContainer {
     }
 
     public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any> {
-        return this._nativeBridge.AndroidAdUnit.setOrientation(this.getOrientation(allowRotation, forceOrientation, this._androidOptions));
+        return this._ads.Android!.AdUnit.setOrientation(this.getOrientation(allowRotation, forceOrientation, this._androidOptions));
     }
 
     public isPaused() {
@@ -133,11 +137,11 @@ export class Activity extends AdUnitContainer {
     }
 
     public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
-        return this._nativeBridge.AndroidAdUnit.setViewFrame(view, x, y, width, height);
+        return this._ads.Android!.AdUnit.setViewFrame(view, x, y, width, height);
     }
 
     public getViews(): Promise<string[]> {
-        return this._nativeBridge.AndroidAdUnit.getViews();
+        return this._ads.Android!.AdUnit.getViews();
     }
 
     private getOrientation(allowRotation: boolean, forceOrientation: Orientation, options: IAndroidOptions) {
@@ -232,7 +236,7 @@ export class Activity extends AdUnitContainer {
     }
 
     private isHardwareAccelerationAllowed(): boolean {
-        if(this._nativeBridge.getApiLevel() < 18) {
+        if(this._deviceInfo.getApiLevel() < 18) {
             // hardware acceleration does not work reliably on Android 4.0 and 4.1
             // since there have been at least two reports from Android 4.2 devices being broken, it's also disabled on Android 4.2
             return false;

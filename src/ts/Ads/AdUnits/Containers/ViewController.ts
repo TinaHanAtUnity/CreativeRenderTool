@@ -13,6 +13,8 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
+import { IAdsApi } from '../../Ads';
+import { ICoreApi } from '../../../Core/Core';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -27,11 +29,12 @@ export class ViewController extends AdUnitContainer {
     private static _audioSessionInterrupt: string = 'AVAudioSessionInterruptionNotification';
     private static _audioSessionRouteChange: string = 'AVAudioSessionRouteChangeNotification';
 
-    private _nativeBridge: NativeBridge;
+    private _core: ICoreApi;
+    private _ads: IAdsApi;
     private _focusManager: FocusManager;
     private _deviceInfo: IosDeviceInfo;
-    private _showing: boolean;
-    private _options: IIosOptions;
+    private _showing?: boolean;
+    private _options?: IIosOptions;
     private _clientInfo: ClientInfo;
 
     private _onViewControllerDidAppearObserver: any;
@@ -41,18 +44,19 @@ export class ViewController extends AdUnitContainer {
     private _onAppBackgroundObserver: any;
     private _onAppForegroundObserver: any;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: IosDeviceInfo, focusManager: FocusManager, clientInfo: ClientInfo) {
+    constructor(core: ICoreApi, ads: IAdsApi, deviceInfo: IosDeviceInfo, focusManager: FocusManager, clientInfo: ClientInfo) {
         super();
 
-        this._nativeBridge = nativeBridge;
+        this._core = core;
+        this._ads = ads;
         this._focusManager = focusManager;
         this._deviceInfo = deviceInfo;
         this._clientInfo = clientInfo;
 
-        this._onViewControllerDidDisappearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidDisappear.subscribe(() => this.onViewDidDisappear());
-        this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
-        this._onMemoryWarningObserver = this._nativeBridge.IosAdUnit.onViewControllerDidReceiveMemoryWarning.subscribe(() => this.onMemoryWarning());
-        this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
+        this._onViewControllerDidDisappearObserver = this._ads.iOS!.AdUnit.onViewControllerDidDisappear.subscribe(() => this.onViewDidDisappear());
+        this._onViewControllerDidAppearObserver = this._ads.iOS!.AdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
+        this._onMemoryWarningObserver = this._ads.iOS!.AdUnit.onViewControllerDidReceiveMemoryWarning.subscribe(() => this.onMemoryWarning());
+        this._onNotificationObserver = this._core.iOS!.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
     }
 
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IIosOptions): Promise<void> {
@@ -74,17 +78,17 @@ export class ViewController extends AdUnitContainer {
 
         this._onAppBackgroundObserver = this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
         this._onAppForegroundObserver = this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
-        this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
-        this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionRouteChange, ['AVAudioSessionRouteChangeReasonKey']);
+        this._core.iOS!.Notification.addAVNotificationObserver(ViewController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
+        this._core.iOS!.Notification.addAVNotificationObserver(ViewController._audioSessionRouteChange, ['AVAudioSessionRouteChangeReasonKey']);
 
-        this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + Orientation[this._lockedOrientation]);
+        this._core.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + Orientation[this._lockedOrientation]);
 
         let hideStatusBar = true;
         if (allowStatusBar) {
             hideStatusBar = options.statusBarHidden;
         }
 
-        return this._nativeBridge.IosAdUnit.open(nativeViews, this.getOrientation(options, allowRotation, this._lockedOrientation), hideStatusBar, allowRotation, isTransparent, withAnimation);
+        return this._ads.iOS!.AdUnit.open(nativeViews, this.getOrientation(options, allowRotation, this._lockedOrientation), hideStatusBar, allowRotation, isTransparent, withAnimation);
     }
 
     public close(): Promise<void> {
@@ -96,10 +100,10 @@ export class ViewController extends AdUnitContainer {
 
         this._focusManager.onAppBackground.unsubscribe(this._onAppBackgroundObserver);
         this._focusManager.onAppForeground.unsubscribe(this._onAppForegroundObserver);
-        this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionInterrupt);
-        this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionRouteChange);
+        this._core.iOS!.Notification.removeAVNotificationObserver(ViewController._audioSessionInterrupt);
+        this._core.iOS!.Notification.removeAVNotificationObserver(ViewController._audioSessionRouteChange);
 
-        return this._nativeBridge.IosAdUnit.close();
+        return this._ads.iOS!.AdUnit.close();
     }
 
     public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
@@ -114,18 +118,18 @@ export class ViewController extends AdUnitContainer {
 
             switch(configuration) {
                 case ViewConfiguration.ENDSCREEN:
-                    promises.push(this._nativeBridge.IosAdUnit.setViews(['webview']));
-                    promises.push(this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL));
+                    promises.push(this._ads.iOS!.AdUnit.setViews(['webview']));
+                    promises.push(this._ads.iOS!.AdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL));
                     break;
 
                 case ViewConfiguration.LANDSCAPE_VIDEO:
-                    promises.push(this._nativeBridge.IosAdUnit.setViewFrame('videoplayer', new Double(0), new Double(0), new Double(width), new Double(height)));
-                    promises.push(this._nativeBridge.IosAdUnit.setTransform(new Double(1.57079632679)));
-                    promises.push(this._nativeBridge.IosAdUnit.setViewFrame('adunit', new Double(0), new Double(0), new Double(width), new Double(height)));
+                    promises.push(this._ads.iOS!.AdUnit.setViewFrame('videoplayer', new Double(0), new Double(0), new Double(width), new Double(height)));
+                    promises.push(this._ads.iOS!.AdUnit.setTransform(new Double(1.57079632679)));
+                    promises.push(this._ads.iOS!.AdUnit.setViewFrame('adunit', new Double(0), new Double(0), new Double(width), new Double(height)));
                     break;
                 case ViewConfiguration.WEB_PLAYER:
-                    promises.push(this._nativeBridge.IosAdUnit.setViews(['webplayer', 'webview']));
-                    promises.push(this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL));
+                    promises.push(this._ads.iOS!.AdUnit.setViews(['webplayer', 'webview']));
+                    promises.push(this._ads.iOS!.AdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL));
                     break;
                 default:
             }
@@ -134,8 +138,10 @@ export class ViewController extends AdUnitContainer {
     }
 
     public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any> {
-        return this._nativeBridge.IosAdUnit.setShouldAutorotate(allowRotation).then(() => {
-            return this._nativeBridge.IosAdUnit.setSupportedOrientations(this.getOrientation(this._options, allowRotation, forceOrientation));
+        return this._ads.iOS!.AdUnit.setShouldAutorotate(allowRotation).then(() => {
+            if(this._options) {
+                return this._ads.iOS!.AdUnit.setSupportedOrientations(this.getOrientation(this._options, allowRotation, forceOrientation));
+            }
         });
     }
 
@@ -152,11 +158,11 @@ export class ViewController extends AdUnitContainer {
     }
 
     public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
-        return this._nativeBridge.IosAdUnit.setViewFrame(view, new Double(x), new Double(y), new Double(width), new Double(height));
+        return this._ads.iOS!.AdUnit.setViewFrame(view, new Double(x), new Double(y), new Double(width), new Double(height));
     }
 
     public getViews(): Promise<string[]> {
-        return this._nativeBridge.IosAdUnit.getViews();
+        return this._ads.iOS!.AdUnit.getViews();
     }
 
     private getOrientation(options: IIosOptions, allowRotation: boolean, forceOrientation: Orientation) {

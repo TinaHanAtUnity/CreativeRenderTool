@@ -4,7 +4,7 @@ import { Session } from 'Ads/Models/Session';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Managers/Request';
 import { Url } from 'Core/Utilities/Url';
 
 export abstract class CampaignParser {
@@ -28,7 +28,7 @@ export abstract class CampaignParser {
 
         SessionDiagnostics.trigger('invalid_url', {
             url: url
-        });
+        }, session);
 
         throw new Error('Invalid url: ' + url);
     }

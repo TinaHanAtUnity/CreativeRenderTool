@@ -94,6 +94,7 @@ export class Core implements IApiModule {
     constructor(nativeBridge: NativeBridge) {
         this.NativeBridge = nativeBridge;
 
+        const platform = nativeBridge.getPlatform();
         this.Api = {
             Cache: new CacheApi(nativeBridge),
             Connectivity: new ConnectivityApi(nativeBridge),
@@ -105,13 +106,13 @@ export class Core implements IApiModule {
             Sdk: new SdkApi(nativeBridge),
             SensorInfo: new SensorInfoApi(nativeBridge),
             Storage: new StorageApi(nativeBridge),
-            Android: nativeBridge.getPlatform() === Platform.ANDROID ? {
+            Android: platform === Platform.ANDROID ? {
                 Broadcast: new BroadcastApi(nativeBridge),
                 Intent: new IntentApi(nativeBridge),
                 Lifecycle: new LifecycleApi(nativeBridge),
                 Preferences: new AndroidPreferencesApi(nativeBridge)
             } : undefined,
-            iOS: nativeBridge.getPlatform() === Platform.IOS ? {
+            iOS: platform === Platform.IOS ? {
                 MainBundle: new MainBundleApi(nativeBridge),
                 Notification: new NotificationApi(nativeBridge),
                 Preferences: new IosPreferencesApi(nativeBridge),

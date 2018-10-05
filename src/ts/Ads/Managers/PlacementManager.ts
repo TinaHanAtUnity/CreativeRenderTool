@@ -2,19 +2,19 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IAdsApi } from '../Ads';
 
 export interface IPlacementIdMap<T> {
     [placementId: string]: T;
 }
 
 export class PlacementManager {
-    private _nativeBridge: NativeBridge;
+    private _ads: IAdsApi;
     private _configuration: AdsConfiguration;
     private _placementCampaignMap: IPlacementIdMap<Campaign>;
 
-    constructor(nativeBridge: NativeBridge, configuration: AdsConfiguration) {
-        this._nativeBridge = nativeBridge;
+    constructor(ads: IAdsApi, configuration: AdsConfiguration) {
+        this._ads = ads;
         this._configuration = configuration;
         this._placementCampaignMap = {};
     }
@@ -88,11 +88,11 @@ export class PlacementManager {
 
     private sendPlacementStateChange(placementId: string, oldState: PlacementState, newState: PlacementState) {
         if(oldState !== newState) {
-            this._placement.setPlacementState(placementId, newState);
-            this._listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[newState]);
+            this._ads.Placement.setPlacementState(placementId, newState);
+            this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[newState]);
 
             if(newState === PlacementState.READY) {
-                this._listener.sendReadyEvent(placementId);
+                this._ads.Listener.sendReadyEvent(placementId);
                 SdkStats.setReadyEventTimestamp(placementId);
                 SdkStats.sendReadyEvent(placementId);
             }

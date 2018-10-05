@@ -18,7 +18,7 @@ import { UserCountData } from 'Ads/Utilities/UserCountData';
 import { Platform } from 'Core/Constants/Platform';
 import { RequestError } from 'Core/Errors/RequestError';
 import { WebViewError } from 'Core/Errors/WebViewError';
-import { JaegerManager } from 'Core/Jaeger/JaegerManager';
+import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ABGroup } from 'Core/Models/ABGroup';
@@ -29,11 +29,10 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CacheError } from 'Core/Native/Cache';
 import { StorageType } from 'Core/Native/Storage';
-import { CacheStatus } from 'Core/Utilities/Cache';
-import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
+import { CacheStatus } from 'Core/Managers/CacheManager';
+import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
@@ -43,6 +42,7 @@ import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { ICoreApi } from '../../Core/Core';
 
 export class CampaignManager {
 
@@ -82,7 +82,8 @@ export class CampaignManager {
     public readonly onConnectivityError = new Observable1<string[]>();
     public readonly onAdPlanReceived = new Observable2<number, number>();
 
-    protected _nativeBridge: NativeBridge;
+    protected _platform: Platform;
+    protected _core: ICoreApi;
     protected _requesting: boolean;
     protected _assetManager: AssetManager;
     protected _coreConfig: CoreConfiguration;
@@ -102,8 +103,9 @@ export class CampaignManager {
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
-        this._nativeBridge = nativeBridge;
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
+        this._platform = platform;
+        this._core = core;
         this._coreConfig = coreConfig;
         this._adsConfig = adsConfig;
         this._assetManager = assetManager;
@@ -141,7 +143,7 @@ export class CampaignManager {
             currentUrl = this.cleanCachedUrl(currentUrl);
 
             if (cachedUrl !== currentUrl) {
-                this._nativeBridge.Sdk.logInfo('Failed to use cached campaign response due to URL mismatch ' + cachedUrl + ' (cached) and ' + currentUrl + ' (current)');
+                this._core.Sdk.logInfo('Failed to use cached campaign response due to URL mismatch ' + cachedUrl + ' (cached) and ' + currentUrl + ' (current)');
                 return Promise.reject(new Error('invalidate cache'));
             }
 
@@ -152,7 +154,7 @@ export class CampaignManager {
 
             this.resetRealtimeDataForPlacements();
 
-            this._nativeBridge.Sdk.logInfo('Requesting ad plan from cache ' + cachedResponse.url);
+            this._core.Sdk.logInfo('Requesting ad plan from cache ' + cachedResponse.url);
 
             SdkStats.setAdRequestTimestamp();
         }).then(() => {
@@ -217,9 +219,9 @@ export class CampaignManager {
 
         this.resetRealtimeDataForPlacements();
         const jaegerSpan = this._jaegerManager.startSpan('CampaignManagerRequest');
-        jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
+        jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._platform]);
         return Promise.all([this.createRequestUrl(false, nofillRetry), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
-            this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
+            this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
 
             SdkStats.setAdRequestTimestamp();
@@ -283,7 +285,7 @@ export class CampaignManager {
 
     public requestRealtime(placement: Placement, session: Session): Promise<Campaign | void> {
         return Promise.all([this.createRequestUrl(true, undefined, session), this.createRequestBody(false, placement)]).then(([requestUrl, requestBody]) => {
-            this._nativeBridge.Sdk.logInfo('Requesting realtime ad plan from ' + requestUrl);
+            this._core.Sdk.logInfo('Requesting realtime ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             return this._request.post(requestUrl, body, [], {
                 retries: 0,
@@ -309,7 +311,7 @@ export class CampaignManager {
     }
 
     public getFullyCachedCampaigns(): Promise<string[]> {
-        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
+        return this._core.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
             return campaignKeys;
         }).catch(() => {
             return [];
@@ -396,7 +398,7 @@ export class CampaignManager {
             }
 
             if (!this._ignoreEvents) {
-                this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
+                this._core.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
                 this.onAdPlanReceived.trigger(refreshDelay, campaigns);
             }
             PurchasingUtilities.placementManager.clear();
@@ -522,13 +524,13 @@ export class CampaignManager {
                 return Promise.resolve(); // no fill
             }
         } else {
-            this._nativeBridge.Sdk.logError('No placements found in realtime campaign json.');
+            this._core.Sdk.logError('No placements found in realtime campaign json.');
             return Promise.resolve();
         }
     }
 
     private handleCampaign(response: AuctionResponse, session: Session, backupCampaign: boolean): Promise<void> {
-        this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
+        this._core.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
         let parser: CampaignParser;
 
         if((this._sessionManager.getGameSessionId() % 1000 === 99) && backupCampaign === false) {
@@ -594,7 +596,7 @@ export class CampaignManager {
     }
 
     private handleRealtimeCampaign(response: AuctionResponse, session: Session): Promise<Campaign> {
-        this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
+        this._core.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
 
         const parser: CampaignParser = this.getCampaignParser(response.getContentType());
 
@@ -610,7 +612,7 @@ export class CampaignManager {
     }
 
     private handleNoFill(placement: string): Promise<void> {
-        this._nativeBridge.Sdk.logDebug('PLC no fill for placement ' + placement);
+        this._core.Sdk.logDebug('PLC no fill for placement ' + placement);
         if (!this._ignoreEvents) {
             this.onNoFill.trigger(placement);
         }
@@ -618,7 +620,7 @@ export class CampaignManager {
     }
 
     private handleError(error: any, placementIds: string[], diagnosticsType: string, session?: Session): Promise<void> {
-        this._nativeBridge.Sdk.logDebug('PLC error ' + error);
+        this._core.Sdk.logDebug('PLC error ' + error);
         if (!this._ignoreEvents) {
             this.onError.trigger(error, placementIds, diagnosticsType, session);
         }
@@ -653,7 +655,7 @@ export class CampaignManager {
                 advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
                 limitAdTracking: this._deviceInfo.getLimitAdTracking()
             });
-        } else if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
+        } else if(this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
                 androidId: this._deviceInfo.getAndroidId()
             });
@@ -667,17 +669,17 @@ export class CampaignManager {
 
         url = Url.addParameters(url, {
             deviceModel: this._deviceInfo.getModel(),
-            platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
+            platform: Platform[this._platform].toLowerCase(),
             sdkVersion: this._clientInfo.getSdkVersion(),
             stores: this._deviceInfo.getStores()
         });
 
-        if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
+        if(this._platform === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
             url = Url.addParameters(url, {
                 osVersion: this._deviceInfo.getOsVersion(),
                 screenScale: this._deviceInfo.getScreenScale()
             });
-        } else if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
+        } else if(this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
                 deviceMake: this._deviceInfo.getManufacturer(),
                 screenSize:  this._deviceInfo.getScreenLayout(),
@@ -874,8 +876,8 @@ export class CampaignManager {
     }
 
     private getVersionCode(): Promise<number | undefined> {
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
+        if(this._platform === Platform.ANDROID) {
+            return this._core.DeviceInfo.Android!.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
                 if(packageInfo.versionCode) {
                     return packageInfo.versionCode;
                 } else {
@@ -893,9 +895,9 @@ export class CampaignManager {
         SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
         SdkStats.increaseAdRequestOrdinal();
 
-        UserCountData.getRequestCount(this._nativeBridge).then((requestCount) => {
+        UserCountData.getRequestCount(this._core.Storage).then((requestCount) => {
             if (typeof requestCount === 'number') {
-                UserCountData.setRequestCount(requestCount + 1, this._nativeBridge);
+                UserCountData.setRequestCount(requestCount + 1, this._core.Storage);
             }
         }).catch(() => {
             Diagnostics.trigger('request_count_failure', {

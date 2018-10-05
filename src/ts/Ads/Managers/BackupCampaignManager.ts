@@ -1,6 +1,5 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
@@ -10,16 +9,16 @@ import { CampaignLoader } from 'Ads/Parsers/CampaignLoader';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { IFileInfo } from 'Core/Native/Cache';
-import { Video } from 'Ads/Models/Assets/Video';
+import { ICoreApi } from '../../Core/Core';
 
 export class BackupCampaignManager {
     private static _maxExpiryDelay: number = 7 * 24 * 3600 * 1000; // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
 
-    private _nativeBridge: NativeBridge;
+    private _core: ICoreApi;
     private _coreConfiguration: CoreConfiguration;
 
-    constructor(nativeBridge: NativeBridge, coreConfiguration: CoreConfiguration) {
-        this._nativeBridge = nativeBridge;
+    constructor(core: ICoreApi, coreConfiguration: CoreConfiguration) {
+        this._core = core;
         this._coreConfiguration = coreConfiguration;
     }
 
@@ -31,8 +30,8 @@ export class BackupCampaignManager {
 
         const rootKey: string = 'backupcampaign.placement.' + placement.getId();
 
-        this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.mediaid', mediaId);
-        this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.adtypes', JSON.stringify(placement.getAdTypes()));
+        this._core.Storage.set(StorageType.PRIVATE, rootKey + '.mediaid', mediaId);
+        this._core.Storage.set(StorageType.PRIVATE, rootKey + '.adtypes', JSON.stringify(placement.getAdTypes()));
         // note: Storage.write is intentionally omitted as an optimization hack
         // it is enough to have Storage.write after campaigns are stored
         // if placements are not written because of this, it won't matter since campaigns would not be written either
@@ -54,10 +53,10 @@ export class BackupCampaignManager {
                 willExpireAt = Date.now() + BackupCampaignManager._maxExpiryDelay;
             }
 
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.type', campaignType);
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.data', campaign.toJSON());
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.willexpireat', willExpireAt);
-            this._nativeBridge.Storage.write(StorageType.PRIVATE);
+            this._core.Storage.set(StorageType.PRIVATE, rootKey + '.type', campaignType);
+            this._core.Storage.set(StorageType.PRIVATE, rootKey + '.data', campaign.toJSON());
+            this._core.Storage.set(StorageType.PRIVATE, rootKey + '.willexpireat', willExpireAt);
+            this._core.Storage.write(StorageType.PRIVATE);
         }
     }
 
@@ -101,8 +100,8 @@ export class BackupCampaignManager {
     }
 
     public deleteBackupCampaigns() {
-        this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'backupcampaign');
-        this._nativeBridge.Storage.write(StorageType.PRIVATE);
+        this._core.Storage.delete(StorageType.PRIVATE, 'backupcampaign');
+        this._core.Storage.write(StorageType.PRIVATE);
     }
 
     private getCampaignType(campaign: Campaign): string | undefined {
@@ -126,11 +125,11 @@ export class BackupCampaignManager {
     }
 
     private getString(key: string): Promise<string> {
-        return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, key);
+        return this._core.Storage.get<string>(StorageType.PRIVATE, key);
     }
 
     private getNumber(key: string): Promise<number> {
-        return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, key);
+        return this._core.Storage.get<number>(StorageType.PRIVATE, key);
     }
 
     private verifyCachedFiles(campaign: Campaign): Promise<boolean> {
@@ -174,7 +173,7 @@ export class BackupCampaignManager {
         const fileId = asset.getFileId();
 
         if(asset.isCached() && fileId) {
-            return this._nativeBridge.Cache.getFileInfo(fileId).then((fileInfo: IFileInfo) => {
+            return this._core.Cache.getFileInfo(fileId).then((fileInfo: IFileInfo) => {
                 if(fileInfo.found && fileInfo.size > 0) {
                     return true;
                 }

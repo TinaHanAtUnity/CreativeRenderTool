@@ -9,9 +9,8 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { IFileInfo } from 'Core/Native/Cache';
-import { Cache } from 'Core/Utilities/Cache';
+import { CacheApi, IFileInfo } from 'Core/Native/Cache';
+import { CacheManager } from 'Core/Managers/CacheManager';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Request } from 'Core/Managers/Request';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
@@ -19,7 +18,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
-import { AdsConfiguration } from '../Models/AdsConfiguration';
+import { ICoreApi } from '../../Core/Core';
 
 interface ISdkStatsEvent {
     eventTimestamp: number;
@@ -77,8 +76,8 @@ interface IEventInfo {
 }
 
 export class SdkStats {
-    public static initialize(nativeBridge: NativeBridge, request: Request, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, sessionManager: SessionManager, campaignManager: CampaignManager, metaDataManager: MetaDataManager, clientInfo: ClientInfo, cache: Cache) {
-        SdkStats._nativeBridge = nativeBridge;
+    public static initialize(core: ICoreApi, request: Request, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, sessionManager: SessionManager, campaignManager: CampaignManager, metaDataManager: MetaDataManager, clientInfo: ClientInfo, cache: CacheManager) {
+        SdkStats._core = core;
         SdkStats._request = request;
         SdkStats._coreConfig = coreConfig;
         SdkStats._adsConfig = adsConfig;
@@ -170,7 +169,7 @@ export class SdkStats {
         return SdkStats._frameSetStarted[placementId];
     }
 
-    private static _cache: CacheApi;
+    private static _core: ICoreApi;
     private static _request: Request;
     private static _coreConfig: CoreConfiguration;
     private static _adsConfig: AdsConfiguration;
@@ -192,9 +191,9 @@ export class SdkStats {
     private static _frameSetStarted: { [id: string]: number } = {};
 
     private static isTestActive(): boolean {
-        const gameSessionId: number = SdkStats._sessionManager.getGameSessionId();
+        const gameSessionId = SdkStats._sessionManager.getGameSessionId();
 
-        if(gameSessionId % 1000 === 0) {
+        if(typeof gameSessionId === 'number' && gameSessionId % 1000 === 0) {
             return true;
         }
 
@@ -303,7 +302,7 @@ export class SdkStats {
             const asset: Asset | undefined = CampaignAssetInfo.getCachedAsset(campaign);
 
             if(asset) {
-                return SdkStats._cache.getFileInfo(<string>asset.getFileId()).then((fileInfo: IFileInfo) => {
+                return SdkStats._core.Cache.getFileInfo(<string>asset.getFileId()).then((fileInfo: IFileInfo) => {
                     if(fileInfo.found) {
                         return fileInfo.size;
                     } else {

@@ -3,13 +3,12 @@ import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
+import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Request } from 'Core/Managers/Request';
-import { Ads } from '../Ads';
-import { Core } from '../../Core/Core';
+import { ICoreApi } from '../../Core/Core';
 
 export interface IGdprPersonalProperties {
     deviceModel: string;
@@ -36,13 +35,23 @@ export class GdprManager {
     private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
     private static GdprConsentStorageKey = 'gdpr.consent.value';
 
-    private readonly _core: Core;
-    private readonly _ads: Ads;
+    private readonly _platform: Platform;
+    private readonly _core: ICoreApi;
+    private readonly _coreConfig: CoreConfiguration;
+    private readonly _adsConfig: AdsConfiguration;
+    private readonly _clientInfo: ClientInfo;
+    private readonly _deviceInfo: DeviceInfo;
+    private readonly _request: Request;
 
-    constructor(core: Core, ads: Ads) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: Request) {
+        this._platform = platform;
         this._core = core;
-        this._ads = ads;
-        core.Api.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
+        this._coreConfig = coreConfig;
+        this._adsConfig = adsConfig;
+        this._clientInfo = clientInfo;
+        this._deviceInfo = deviceInfo;
+        this._request = request;
+        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
@@ -50,7 +59,7 @@ export class GdprManager {
             'adid': this._deviceInfo.getAdvertisingIdentifier(),
             'action': action,
             'projectId': this._coreConfig.getUnityProjectId(),
-            'platform': Platform[this._clientInfo.getPlatform()].toLowerCase(),
+            'platform': Platform[this._platform].toLowerCase(),
             'gameId': this._clientInfo.getGameId()
         };
         if (source) {
@@ -100,7 +109,7 @@ export class GdprManager {
             Diagnostics.trigger('gdpr_request_failed', {
                 url: url
             });
-            this._nativeBridge.Sdk.logError('Gdpr request failed' + error);
+            this._core.Sdk.logError('Gdpr request failed' + error);
             throw error;
         });
     }
@@ -111,7 +120,7 @@ export class GdprManager {
 
     private pushConsent(consent: boolean): Promise<void> {
         // get last state of gdpr consent
-        return this._storage.get(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
+        return this._core.Storage.get(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
             // only if consent has changed push to kafka
             if (consentLastSentToKafka !== consent) {
                 return this.sendGdprConsentEvent(consent);
@@ -125,7 +134,7 @@ export class GdprManager {
     }
 
     private getConsent(): Promise<boolean> {
-        return this._storage.get(StorageType.PUBLIC, GdprManager.GdprConsentStorageKey).then((data: any) => {
+        return this._core.Storage.get(StorageType.PUBLIC, GdprManager.GdprConsentStorageKey).then((data: any) => {
             const value: boolean | undefined = this.getConsentTypeHack(data);
             if(typeof(value) !== 'undefined') {
                 return Promise.resolve(value);
@@ -180,8 +189,8 @@ export class GdprManager {
             sendEvent = this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.METADATA);
         }
         return sendEvent.then(() => {
-            return this._storage.set(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey, consent).then(() => {
-                return this._storage.write(StorageType.PRIVATE);
+            return this._core.Storage.set(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey, consent).then(() => {
+                return this._core.Storage.write(StorageType.PRIVATE);
             });
         });
     }

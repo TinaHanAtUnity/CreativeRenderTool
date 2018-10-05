@@ -8,13 +8,14 @@ import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Cache, CacheStatus, HeadersType } from 'Core/Utilities/Cache';
-import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
+import { CacheManager, CacheStatus, HeadersType } from 'Core/Managers/CacheManager';
+import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { ICoreApi } from '../../Core/Core';
+import { Platform } from '../../Core/Constants/Platform';
 
 enum CacheType {
     REQUIRED,
@@ -43,7 +44,9 @@ interface IAssetQueueObject {
 
 export class AssetManager {
 
-    private _cache: Cache;
+    private _platform: Platform;
+    private _core: ICoreApi;
+    private _cache: CacheManager;
     private _cacheMode: CacheMode;
     private _cacheBookkeeping: CacheBookkeeping;
     private _pts: ProgrammaticTrackingService;
@@ -55,12 +58,13 @@ export class AssetManager {
     private _optionalQueue: IAssetQueueObject[];
     private _campaignQueue: { [id: number]: ICampaignQueueObject };
     private _queueId: number;
-    private _nativeBridge: NativeBridge;
     private _backupCampaignManager: BackupCampaignManager;
 
     private _sendCacheDiagnostics = false;
 
-    constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeeping, pts: ProgrammaticTrackingService, nativeBridge: NativeBridge, backupCampaignManager: BackupCampaignManager) {
+    constructor(platform: Platform, core: ICoreApi, cache: CacheManager, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeeping, pts: ProgrammaticTrackingService, backupCampaignManager: BackupCampaignManager) {
+        this._platform = platform;
+        this._core = core;
         this._cache = cache;
         this._cacheMode = cacheMode;
         this._cacheBookkeeping = cacheBookkeeping;
@@ -73,7 +77,6 @@ export class AssetManager {
         this._optionalQueue = [];
         this._campaignQueue = {};
         this._queueId = 0;
-        this._nativeBridge = nativeBridge;
         this._backupCampaignManager = backupCampaignManager;
 
         if(cacheMode === CacheMode.ADAPTIVE) {
@@ -306,7 +309,7 @@ export class AssetManager {
         const promises = [];
         for(const asset of assets) {
             if(asset instanceof Video) {
-                promises.push(VideoFileInfo.isVideoValid(this._nativeBridge, asset, campaign).then(valid => {
+                promises.push(VideoFileInfo.isVideoValid(this._platform, this._core.Cache, asset, campaign).then(valid => {
                     if(!valid) {
                         throw new Error('Video failed to validate: ' + asset.getOriginalUrl());
                     }

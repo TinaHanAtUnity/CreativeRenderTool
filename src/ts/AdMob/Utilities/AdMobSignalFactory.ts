@@ -2,7 +2,7 @@ import { AdMobAdUnit } from 'AdMob/AdUnits/AdMobAdUnit';
 import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
 import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { ITouchInfo } from 'AdMob/Views/AFMABridge';
-import { IMotionEvent } from 'Ads/Native/Android/AndroidAdUnit';
+import { IMotionEvent } from 'Ads/Native/Android/AdUnit';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
 import { MotionEventAction } from 'Core/Constants/Android/MotionEventAction';
@@ -12,19 +12,24 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { IAdsApi } from '../../Ads/Ads';
+import { ICoreApi } from '../../Core/Core';
 
 export class AdMobSignalFactory {
-    private _nativeBridge: NativeBridge;
+    private _platform: Platform;
+    private _core: ICoreApi;
+    private _ads: IAdsApi;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _focusManager: FocusManager;
-    private _packageInstaller: string;
-    private _packageVersionCode: number;
+    private _packageInstaller?: string;
+    private _packageVersionCode?: number;
 
-    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, focusManager: FocusManager) {
-        this._nativeBridge = nativeBridge;
+    constructor(platform: Platform, core: ICoreApi, ads: IAdsApi, clientInfo: ClientInfo, deviceInfo: DeviceInfo, focusManager: FocusManager) {
+        this._platform = platform;
+        this._core = core;
+        this._ads = ads;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._focusManager = focusManager;
@@ -42,59 +47,59 @@ export class AdMobSignalFactory {
         promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {
             signal.setDeviceBatteryLevel(batteryLevel);
         }).catch(() => {
-            this.logFailure(this._nativeBridge, 'batteryLevel');
+            this.logFailure('batteryLevel');
         }));
 
         promises.push(this._deviceInfo.getBatteryStatus().then(batteryStatus => {
-            signal.setIsDeviceCharging(this.getBatteryStatus(this._clientInfo, batteryStatus) === 2);
+            signal.setIsDeviceCharging(this.getBatteryStatus(this._platform, batteryStatus) === 2);
         }).catch(() => {
-            this.logFailure(this._nativeBridge, 'batteryStatus');
+            this.logFailure('batteryStatus');
         }));
 
         if(this._deviceInfo instanceof AndroidDeviceInfo) {
             promises.push(this._deviceInfo.getNetworkMetered().then(isNetworkMetered => {
                 signal.setIsNetworkMetered(isNetworkMetered);
             }).catch(() => {
-                this.logFailure(this._nativeBridge, 'networkMetered');
+                this.logFailure('networkMetered');
             }));
         } else {
             signal.setIsNetworkMetered(false);
         }
 
-        promises.push(UserCountData.getRequestCount(this._nativeBridge).then(requestCount => {
+        promises.push(UserCountData.getRequestCount(this._core.Storage).then(requestCount => {
             if (typeof requestCount === 'number') {
                 signal.setNumPriorUserRequests(requestCount);
             }
         }).catch(() => {
-            this.logFailure(this._nativeBridge, 'numPriorUserRequets');
+            this.logFailure('numPriorUserRequets');
         }));
 
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            promises.push(this._nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
+        if (this._platform === Platform.ANDROID) {
+            promises.push(this._core.DeviceInfo.Android!.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
                 if (packageInfo.versionCode && packageInfo.packageName) {
                     signal.setAndroidMarketVersion(`${packageInfo.versionCode}.${packageInfo.packageName}`);
                 } else {
                     signal.setAndroidMarketVersion('null');
                 }
             }).catch(() => {
-                this.logFailure(this._nativeBridge, 'androidMarketVersion');
+                this.logFailure('androidMarketVersion');
             }));
         }
 
-        promises.push(UserCountData.getClickCount(this._nativeBridge).then(clickCount => {
+        promises.push(UserCountData.getClickCount(this._core.Storage).then(clickCount => {
             if (typeof clickCount === 'number') {
                 signal.setPriorClickCount(clickCount);
             }
         }).catch(() => {
-            this.logFailure(this._nativeBridge, 'priorClickCount');
+            this.logFailure('priorClickCount');
         }));
 
-        promises.push(UserCountData.getPriorRequestToReadyTime(this._nativeBridge).then(priorReadyTime => {
+        promises.push(UserCountData.getPriorRequestToReadyTime(this._core.Storage).then(priorReadyTime => {
             if (typeof priorReadyTime === 'number') {
                 signal.setAdLoadDuration(priorReadyTime);
             }
         }).catch(() => {
-            this.logFailure(this._nativeBridge, 'PriorRequestToReadyTime');
+            this.logFailure('PriorRequestToReadyTime');
         }));
 
         promises.push(Promise.all([this._deviceInfo.getConnectionType(), this._deviceInfo.getNetworkType()]).then(([connectionType, networkType]) => {
@@ -106,13 +111,13 @@ export class AdMobSignalFactory {
                 signal.setGranularSpeedBucket('unknown');
             }
         }).catch(() => {
-            this.logFailure(this._nativeBridge, 'granularSpeedBucket');
+            this.logFailure('granularSpeedBucket');
         }));
 
         promises.push(Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
             signal.setIUSizes(`${width}x${height}|${height}x${width}`);
         }).catch(() => {
-            this.logFailure(this._nativeBridge, 'iuSizes');
+            this.logFailure('iuSizes');
         }));
 
         return Promise.all(promises).then(() => {
@@ -157,7 +162,7 @@ export class AdMobSignalFactory {
             signal.setTimeOnScreen(adUnit.getTimeOnScreen());
 
             if(signal.getScreenWidth() && signal.getScreenHeight()) {
-                if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo && this._deviceInfo.getScreenScale()) {
+                if(this._platform === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo && this._deviceInfo.getScreenScale()) {
                     signal.setAdViewWidth(this.getIosViewWidth(signal.getScreenWidth(), this._deviceInfo.getScreenScale()));
                     signal.setAdViewHeight(this.getIosViewHeight(signal.getScreenHeight(), this._deviceInfo.getScreenScale()));
                 } else if(this._deviceInfo instanceof AndroidDeviceInfo && this._deviceInfo.getScreenDensity()) {
@@ -172,8 +177,8 @@ export class AdMobSignalFactory {
 
             const promises = [];
 
-            promises.push(this._nativeBridge.SensorInfo.getAccelerometerData().then(data => {
-                if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            promises.push(this._core.SensorInfo.getAccelerometerData().then(data => {
+                if(this._platform === Platform.IOS) {
                     signal.setAccelerometerX(data.x);
                     signal.setAccelerometerY(data.y);
                     signal.setAccelerometerZ(data.z);
@@ -184,15 +189,15 @@ export class AdMobSignalFactory {
                     signal.setAccelerometerZ(data.z / androidGravityConstant * -100);
                 }
             }).catch(() => {
-                this.logFailure(this._nativeBridge, 'accelerometer');
+                this.logFailure('accelerometer');
             }));
 
-            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                promises.push(this._nativeBridge.AndroidAdUnit.getMotionEventCount([MotionEventAction.ACTION_DOWN, MotionEventAction.ACTION_UP, MotionEventAction.ACTION_MOVE, MotionEventAction.ACTION_CANCEL]).then(results => {
+            if(this._platform === Platform.ANDROID) {
+                promises.push(this._ads.Android!.AdUnit.getMotionEventCount([MotionEventAction.ACTION_DOWN, MotionEventAction.ACTION_UP, MotionEventAction.ACTION_MOVE, MotionEventAction.ACTION_CANCEL]).then(results => {
                     if(results[MotionEventAction[MotionEventAction.ACTION_DOWN]]) {
                         const downIndex: number = results[MotionEventAction[MotionEventAction.ACTION_DOWN]];
 
-                        return this._nativeBridge.AndroidAdUnit.getMotionEventData({ '0': [downIndex] }).then(motionData => {
+                        return this._ads.Android!.AdUnit.getMotionEventData({ '0': [downIndex] }).then(motionData => {
                             if(motionData['0'] && motionData['0'][downIndex.toString()]) {
                                 const motionEvent: IMotionEvent = motionData['0'][downIndex.toString()];
                                 signal.setAndroidTouchObscured(motionEvent.isObscured);
@@ -201,11 +206,11 @@ export class AdMobSignalFactory {
                                 signal.setTouchDeviceId(motionEvent.deviceId);
                             }
                         }).catch(() => {
-                            this.logFailure(this._nativeBridge, 'motionEventData');
+                            this.logFailure('motionEventData');
                         });
                     }
                 }).catch(() => {
-                    this.logFailure(this._nativeBridge, 'motionEventCount');
+                    this.logFailure('motionEventCount');
                 }));
             }
             return Promise.all(promises).then(() => {
@@ -215,11 +220,10 @@ export class AdMobSignalFactory {
     }
 
     private getCommonSignal(): Promise<AdMobSignal> {
-        const nativeBridge = this._nativeBridge;
         const signal: AdMobSignal = new AdMobSignal();
         signal.setEventTimestamp(this.getEventTimestamp());
-        signal.setSdkVersion(this.getSdkVersion(this._clientInfo));
-        signal.setOsVersion(this.getOsVersion(this._clientInfo, this._deviceInfo));
+        signal.setSdkVersion(this.getSdkVersion(this._platform, this._clientInfo));
+        signal.setOsVersion(this.getOsVersion(this._platform, this._deviceInfo));
         signal.setTimeZoneOffset(this.getTimeZoneOffset());
         signal.setAppActive(this._focusManager.isAppForeground());
         signal.setAppUptime(this.getAppUptime(this._clientInfo));
@@ -232,23 +236,23 @@ export class AdMobSignalFactory {
         promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {
             signal.setBatteryLevel(batteryLevel);
         }).catch(() => {
-            this.logFailure(nativeBridge, 'batteryLevel');
+            this.logFailure('batteryLevel');
         }));
 
         promises.push(this._deviceInfo.getBatteryStatus().then(batteryStatus => {
-            signal.setBatteryState(this.getBatteryStatus(this._clientInfo, batteryStatus));
+            signal.setBatteryState(this.getBatteryStatus(this._platform, batteryStatus));
         }).catch(() => {
-            this.logFailure(nativeBridge, 'batteryStatus');
+            this.logFailure('batteryStatus');
         }));
 
         promises.push(this._deviceInfo.getConnectionType().then(connectionType => {
             signal.setNetworkType(this.getNetworkType(connectionType));
         }).catch(() => {
-            this.logFailure(nativeBridge, 'connectionType');
+            this.logFailure('connectionType');
         }));
 
         promises.push(Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
-            if (this._nativeBridge.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
+            if (this._platform === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
                 signal.setScreenWidth(width * this._deviceInfo.getScreenScale());
                 signal.setScreenHeight(height * this._deviceInfo.getScreenScale());
             } else {
@@ -257,21 +261,21 @@ export class AdMobSignalFactory {
             }
             signal.setDeviceOrientation(this.getDeviceScreenOrientation(width, height));
         }).catch(() => {
-            this.logFailure(nativeBridge, 'screenWidth');
+            this.logFailure('screenWidth');
         }));
 
-        promises.push(this._nativeBridge.DeviceInfo.getCPUCount().then(cpucount => {
+        promises.push(this._core.DeviceInfo.getCPUCount().then(cpucount => {
             signal.setCpuCount(cpucount);
         }).catch(() => {
-            this.logFailure(nativeBridge, 'cpucount');
+            this.logFailure('cpucount');
         }));
 
-        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+        if(this._platform === Platform.ANDROID) {
             if (this._packageInstaller && this._packageVersionCode) {
                 signal.setAppInstaller(this._packageInstaller);
                 signal.setAppVersionCode(this._packageVersionCode);
             } else {
-                promises.push(nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
+                promises.push(this._core.DeviceInfo.Android!.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
                     if(packageInfo.installer) {
                         signal.setAppInstaller(packageInfo.installer);
                         this._packageInstaller = packageInfo.installer;
@@ -284,15 +288,15 @@ export class AdMobSignalFactory {
                         this._packageVersionCode = packageInfo.versionCode;
                     }
                 }).catch(() => {
-                    this.logFailure(nativeBridge, 'packageInfo');
+                    this.logFailure('packageInfo');
                 }));
             }
 
-            promises.push(this._nativeBridge.DeviceInfo.Android.isUSBConnected().then(usb => {
+            promises.push(this._core.DeviceInfo.Android!.isUSBConnected().then(usb => {
                 signal.setUsbConnected(usb ? 1 : 0);
             }).catch(() => {
                 signal.setUsbConnected(2); // failed to get usb connection status
-                this.logFailure(nativeBridge, 'usbConnected');
+                this.logFailure('usbConnected');
             }));
 
             // this should only be added to 2.2.1 and above
@@ -300,37 +304,37 @@ export class AdMobSignalFactory {
                 signal.setApkHash(this._deviceInfo.getApkDigest());
             }
 
-            promises.push(this._nativeBridge.DeviceInfo.Android.getCertificateFingerprint().then(certificate => {
+            promises.push(this._core.DeviceInfo.Android!.getCertificateFingerprint().then(certificate => {
                 signal.setApkDeveloperSigningCertificateHash(certificate);
             }).catch(() => {
-                this.logFailure(nativeBridge, 'apkDeveloperSigningCertificateHash');
+                this.logFailure('apkDeveloperSigningCertificateHash');
             }));
 
-            promises.push(this._nativeBridge.DeviceInfo.Android.getUptime().then(uptime => {
+            promises.push(this._core.DeviceInfo.Android!.getUptime().then(uptime => {
                 signal.setDeviceUptime(uptime);
             }).catch(() => {
-                this.logFailure(nativeBridge, 'deviceUptime');
+                this.logFailure('deviceUptime');
             }));
 
-            promises.push(this._nativeBridge.DeviceInfo.Android.getElapsedRealtime().then(elapsedRealtime => {
+            promises.push(this._core.DeviceInfo.Android!.getElapsedRealtime().then(elapsedRealtime => {
                 signal.setDeviceElapsedRealtime(elapsedRealtime);
             }).catch(() => {
-                this.logFailure(nativeBridge, 'elapsedRealtime');
+                this.logFailure('elapsedRealtime');
             }));
 
-            promises.push(this._nativeBridge.DeviceInfo.Android.isAdbEnabled().then(adb => {
+            promises.push(this._core.DeviceInfo.Android!.isAdbEnabled().then(adb => {
                 signal.setAdbEnabled(adb ? 1 : 0);
             }).catch(() => {
                 signal.setAdbEnabled(2);
-                this.logFailure(nativeBridge, 'adbEnabled');
+                this.logFailure('adbEnabled');
             }));
         }
 
-        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+        if(this._platform === Platform.ANDROID) {
             promises.push(this.getAndroidRooted(this._deviceInfo).then(rooted => {
                 signal.setRooted(rooted);
             }).catch(() => {
-                this.logFailure(nativeBridge, 'rooted');
+                this.logFailure('rooted');
             }));
         } else {
             signal.setRooted(this.getIosRooted(this._deviceInfo));
@@ -341,7 +345,7 @@ export class AdMobSignalFactory {
         });
     }
 
-    private logFailure(nativeBridge: NativeBridge, field: string) {
+    private logFailure(field: string) {
         Diagnostics.trigger('signal_failed', {
             signal: field
         });
@@ -351,8 +355,8 @@ export class AdMobSignalFactory {
         return Math.round(Date.now() / 1000);
     }
 
-    private getSdkVersion(clientInfo: ClientInfo): string {
-        if(this._clientInfo.getPlatform() === Platform.IOS) {
+    private getSdkVersion(platform: Platform, clientInfo: ClientInfo): string {
+        if(platform === Platform.IOS) {
             return 'unity-ios-v' + this._clientInfo.getSdkVersionName();
         } else {
             return 'unity-android-v' + this._clientInfo.getSdkVersionName();
@@ -369,8 +373,8 @@ export class AdMobSignalFactory {
         }
     }
 
-    private getOsVersion(clientInfo: ClientInfo, deviceInfo: DeviceInfo): string {
-        if(clientInfo.getPlatform() === Platform.IOS) {
+    private getOsVersion(platform: Platform, deviceInfo: DeviceInfo): string {
+        if(platform === Platform.IOS) {
             const model = deviceInfo.getModel().split(' ')[0];
             return model.replace(/[0-9]+,[0-9]+$/, '') + ' ' + deviceInfo.getOsVersion();
         } else {
@@ -402,7 +406,7 @@ export class AdMobSignalFactory {
     }
 
     private getAndroidRooted(deviceInfo: DeviceInfo): Promise<number> {
-        return this._nativeBridge.DeviceInfo.Android.getFingerprint().then(fingerprint => {
+        return this._core.DeviceInfo.Android!.getFingerprint().then(fingerprint => {
             if(fingerprint.indexOf('generic') >= 0) {
                 return 2; // simulator
             } else if(deviceInfo.isRooted()) {
@@ -429,8 +433,8 @@ export class AdMobSignalFactory {
         return height / (density / 160);
     }
 
-    private getBatteryStatus(clientInfo: ClientInfo, status: number): number {
-        if(clientInfo.getPlatform() === Platform.IOS) {
+    private getBatteryStatus(platform: Platform, status: number): number {
+        if(platform === Platform.IOS) {
             return status;
         } else {
             switch(status) {

@@ -5,17 +5,18 @@ import { VideoMetadata } from 'Core/Constants/Android/VideoMetadata';
 import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FileId } from 'Core/Utilities/FileId';
+import { CacheApi } from '../../Core/Native/Cache';
 
 export class VideoFileInfo {
 
-    public static getVideoInfo(nativeBridge: NativeBridge, fileId: string): Promise<[number, number, number]> {
-        if(nativeBridge.getPlatform() === Platform.IOS) {
-            return nativeBridge.Cache.Ios.getVideoInfo(fileId).then(([width, height, duration]) => {
+    public static getVideoInfo(platform: Platform, cache: CacheApi, fileId: string): Promise<[number, number, number]> {
+        if(platform === Platform.IOS) {
+            return cache.iOS!.getVideoInfo(fileId).then(([width, height, duration]) => {
                 return <[number, number, number]>[width, height, duration];
             });
         } else {
             const metadataKeys = [VideoMetadata.METADATA_KEY_VIDEO_WIDTH, VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, VideoMetadata.METADATA_KEY_DURATION];
-            return nativeBridge.Cache.Android.getMetaData(fileId, metadataKeys).then(results => {
+            return cache.Android!.getMetaData(fileId, metadataKeys).then(results => {
                 let width: number = 0;
                 let height: number = 0;
                 let duration: number = 0;
@@ -47,9 +48,9 @@ export class VideoFileInfo {
         }
     }
 
-    public static isVideoValid(nativeBridge: NativeBridge, video: Video, campaign: Campaign): Promise<boolean> {
-        return FileId.getFileId(video.getOriginalUrl(), nativeBridge).then(fileId => {
-            return VideoFileInfo.getVideoInfo(nativeBridge, fileId).then(([width, height, duration]) => {
+    public static isVideoValid(platform: Platform, cache: CacheApi, video: Video, campaign: Campaign): Promise<boolean> {
+        return FileId.getFileId(video.getOriginalUrl(), cache).then(fileId => {
+            return VideoFileInfo.getVideoInfo(platform, cache, fileId).then(([width, height, duration]) => {
                 const isValid = (width > 0 && height > 0 && duration > 0 && duration <= this._maxVideoDuration);
                 let errorType = 'video_validation_failed';
                 if(duration > this._maxVideoDuration) {

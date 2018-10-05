@@ -10,7 +10,6 @@ import { VideoPlayerApi } from 'Ads/Native/VideoPlayer';
 import { WebPlayerApi } from 'Ads/Native/WebPlayer';
 import { Platform } from 'Core/Constants/Platform';
 import { Core, CoreModule } from 'Core/Core';
-import { IApi, IApiModule, IModuleApi } from 'Core/Modules/ApiModule';
 import { JaegerSpan, JaegerTags } from '../Core/Jaeger/JaegerSpan';
 import { INativeResponse } from '../Core/Managers/Request';
 import { AdMobSignalFactory } from '../AdMob/Utilities/AdMobSignalFactory';
@@ -39,17 +38,10 @@ import { Overlay } from './Views/Overlay';
 import { AbstractAdUnit } from './AdUnits/AbstractAdUnit';
 import { AdUnitContainer } from './AdUnits/Containers/AdUnitContainer';
 import { AdUnitFactory } from './AdUnits/AdUnitFactory';
-
-export interface IAdsAndroidApi extends IApi {
-    AdUnit: AndroidAdUnitApi;
-    VideoPlayer: AndroidVideoPlayerApi;
-}
-
-export interface IAdsIosApi extends IApi {
-    AppSheet: AppSheetApi;
-    AdUnit: IosAdUnitApi;
-    VideoPlayer: IosVideoPlayerApi;
-}
+import { IApiModule, IModuleApi } from '../Core/Modules/IApiModule';
+import { AndroidDeviceInfo } from '../Core/Models/AndroidDeviceInfo';
+import { IosDeviceInfo } from '../Core/Models/IosDeviceInfo';
+import { ProgrammaticTrackingService } from './Utilities/ProgrammaticTrackingService';
 
 export interface IAdsApi extends IModuleApi {
     AdsProperties: AdsPropertiesApi;
@@ -57,110 +49,118 @@ export interface IAdsApi extends IModuleApi {
     Placement: PlacementApi;
     VideoPlayer: VideoPlayerApi;
     WebPlayer: WebPlayerApi;
-    Android?: IAdsAndroidApi;
-    iOS?: IAdsIosApi;
+    Android?: {
+        AdUnit: AndroidAdUnitApi;
+        VideoPlayer: AndroidVideoPlayerApi;
+    };
+    iOS?: {
+        AppSheet: AppSheetApi;
+        AdUnit: IosAdUnitApi;
+        VideoPlayer: IosVideoPlayerApi;
+    };
 }
 
-export class Ads extends CoreModule implements IApiModule<IAdsApi> {
+export class Ads extends CoreModule implements IApiModule {
 
     public readonly Api: IAdsApi;
 
-    public AdMobSignalFactory: AdMobSignalFactory;
-    public InterstitialWebPlayerContainer: InterstitialWebPlayerContainer;
-    public Container: Activity | ViewController;
-    public SessionManager: SessionManager;
-    public MissedImpressionManager: MissedImpressionManager;
-    public GdprManager: GdprManager;
-    public PlacementManager: PlacementManager;
-    public BackupCampaignManager: BackupCampaignManager;
-    public AssetManager: AssetManager;
-    public CampaignManager: CampaignManager;
-    public RefreshManager: OldCampaignRefreshManager;
+    public readonly AdMobSignalFactory: AdMobSignalFactory;
+    public readonly InterstitialWebPlayerContainer: InterstitialWebPlayerContainer;
+
+    public readonly SessionManager: SessionManager;
+    public readonly MissedImpressionManager: MissedImpressionManager;
+    public readonly BackupCampaignManager: BackupCampaignManager;
+    public readonly ProgrammaticTrackingService: ProgrammaticTrackingService;
+
+    public Container?: Activity | ViewController;
+    public GdprManager?: GdprManager;
+    public PlacementManager?: PlacementManager;
+    public AssetManager?: AssetManager;
+    public CampaignManager?: CampaignManager;
+    public RefreshManager?: OldCampaignRefreshManager;
 
     private _cachedCampaignResponse?: INativeResponse;
 
     constructor(core: Core) {
         super(core);
-        const api: IAdsApi = {
+
+        const platform = core.NativeBridge.getPlatform();
+        this.Api = {
             AdsProperties: new AdsPropertiesApi(core.NativeBridge),
             Listener: new ListenerApi(core.NativeBridge),
             Placement: new PlacementApi(core.NativeBridge),
             VideoPlayer: new VideoPlayerApi(core.NativeBridge),
-            WebPlayer: new WebPlayerApi(core.NativeBridge)
-        };
-
-        const platform = core.NativeBridge.getPlatform();
-        if(platform === Platform.ANDROID) {
-            api.Android = {
+            WebPlayer: new WebPlayerApi(core.NativeBridge),
+            Android: platform === Platform.ANDROID ? {
                 AdUnit: new AndroidAdUnitApi(core.NativeBridge),
                 VideoPlayer: new AndroidVideoPlayerApi(core.NativeBridge)
-            };
-        } else if(platform === Platform.IOS) {
-            api.iOS = {
+            } : undefined,
+            iOS: platform === Platform.IOS ? {
                 AppSheet: new AppSheetApi(core.NativeBridge),
                 AdUnit: new IosAdUnitApi(core.NativeBridge),
                 VideoPlayer: new IosVideoPlayerApi(core.NativeBridge)
-            };
-        }
+            } : undefined
+        };
 
-        this.Api = api;
+        this.AdMobSignalFactory = new AdMobSignalFactory(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Api, this.Core.ClientInfo!, this.Core.DeviceInfo!, this.Core.FocusManager);
+        this.InterstitialWebPlayerContainer = new InterstitialWebPlayerContainer(this.Api.WebPlayer);
+        if(this.Core.NativeBridge.getPlatform() === Platform.ANDROID) {
+            document.body.classList.add('android');
+            this.Container = new Activity(this.Core.Api, this.Api, <AndroidDeviceInfo>this.Core.DeviceInfo);
+        } else if(this.Core.NativeBridge.getPlatform() === Platform.IOS) {
+            const model = this.Core.DeviceInfo!.getModel();
+            if(model.match(/iphone/i) || model.match(/ipod/i)) {
+                document.body.classList.add('iphone');
+            } else if(model.match(/ipad/i)) {
+                document.body.classList.add('ipad');
+            }
+            this.Container = new ViewController(this.Core.Api, this.Api, <IosDeviceInfo>this.Core.DeviceInfo, this.Core.FocusManager!, this.Core.ClientInfo!);
+        }
+        this.SessionManager = new SessionManager(this.Core.Api.Storage, this.Core.Request!);
+        this.MissedImpressionManager = new MissedImpressionManager(this.Core.Api.Storage);
+        this.BackupCampaignManager = new BackupCampaignManager(this.Core.Api, this.Core.Config!);
+        this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.Core.Request!, this.Core.ClientInfo!, this.Core.DeviceInfo!);
     }
 
     public initialize(jaegerInitSpan: JaegerSpan): Promise<void> {
         return Promise.resolve().then(() => {
-            this.AdMobSignalFactory = new AdMobSignalFactory(this);
-            this.InterstitialWebPlayerContainer = new InterstitialWebPlayerContainer(this);
 
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
 
             return this.setupTestEnvironment();
         }).then(() => {
-            if(this.Core.NativeBridge.getPlatform() === Platform.ANDROID) {
-                document.body.classList.add('android');
-                this.Container = new Activity(this);
-            } else if(this.Core.NativeBridge.getPlatform() === Platform.IOS) {
-                const model = this.Core.DeviceInfo.getModel();
-                if(model.match(/iphone/i) || model.match(/ipod/i)) {
-                    document.body.classList.add('iphone');
-                } else if(model.match(/ipad/i)) {
-                    document.body.classList.add('ipad');
-                }
-                this.Container = new ViewController(this);
-            }
-            this.SessionManager = new SessionManager(this);
-            this.MissedImpressionManager = new MissedImpressionManager(this);
+
 
             return this.Core.CacheBookkeeping.getCachedCampaignResponse();
         }).then(cachedCampaignResponse => {
-            this.GdprManager = new GdprManager(this);
+            this.GdprManager = new GdprManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.Config!, this.Config, this.Core.ClientInfo!, this.Core.DeviceInfo!, this.Core.Request!);
             this._cachedCampaignResponse = cachedCampaignResponse;
 
-            this.PlacementManager = new PlacementManager(this);
+            this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
             return this.GdprManager.getConsentAndUpdateConfiguration().catch((error) => {
                 // do nothing
                 // error happens when consent value is undefined
             });
         }).then(() => {
-            const defaultPlacement = this._adsConfig.getDefaultPlacement();
+            const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            this.BackupCampaignManager = new BackupCampaignManager(this);
-            this.AssetManager = new AssetManager(this);
+            this.AssetManager = new AssetManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.CacheManager!, this.Config.getCacheMode(), this.Core.DeviceInfo!, this.Core.CacheBookkeeping, this.ProgrammaticTrackingService, this.BackupCampaignManager);
             if(this.SessionManager.getGameSessionId() % 10000 === 0) {
                 this.AssetManager.setCacheDiagnostics(true);
             }
 
-            this.CampaignManager = new CampaignManager(this);
-            this.RefreshManager = new OldCampaignRefreshManager(this);
+            this.CampaignManager = new CampaignManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.Config!, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this.Core.Request!, this.Core.ClientInfo!, this.Core.DeviceInfo!, this.Core.MetaDataManager, this.Core.CacheBookkeeping, this.Core.JaegerManager!, this.BackupCampaignManager);
+            this.RefreshManager = new OldCampaignRefreshManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Api, this.Core.WakeUpManager, this.CampaignManager, this.Config, this.Core.FocusManager, this.SessionManager, this.Core.ClientInfo!, this.Core.Request!, this.Core.CacheManager!);
 
-            SdkStats.initialize(this);
+            SdkStats.initialize(this.Core.Api, this.Core.Request!, this.Core.Config!, this.Config, this.SessionManager, this.CampaignManager, this.Core.MetaDataManager, this.Core.ClientInfo!, this.Core.CacheManager!);
 
-            const refreshSpan = this.Core.JaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
+            const refreshSpan = this.Core.JaegerManager!.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this.Core.NativeBridge.getPlatform()]);
             let refreshPromise;
-            if(BackupCampaignTest.isValid(this.Core.Config.getAbGroup())) {
+            if(BackupCampaignTest.isValid(this.Core.Config!.getAbGroup())) {
                 refreshPromise = this.RefreshManager.refreshWithBackupCampaigns(this);
             } else if(this._cachedCampaignResponse !== undefined) {
                 refreshPromise = this.RefreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
@@ -168,19 +168,19 @@ export class Ads extends CoreModule implements IApiModule<IAdsApi> {
                 refreshPromise = this.RefreshManager.refresh();
             }
             return refreshPromise.then((resp) => {
-                this.Core.JaegerManager.stop(refreshSpan);
+                this.Core.JaegerManager!.stop(refreshSpan);
                 return resp;
             }).catch((error) => {
                 refreshSpan.addTag(JaegerTags.Error, 'true');
                 refreshSpan.addTag(JaegerTags.ErrorMessage, error.message);
-                this.Core.JaegerManager.stop(refreshSpan);
+                this.Core.JaegerManager!.stop(refreshSpan);
                 throw error;
             });
         }).then(() => {
             return this.SessionManager.sendUnsentSessions();
         }).then(() => {
-            if ((ReportAdTest.isValid(this.Core.Config.getAbGroup()) && this.Config.isGDPREnabled())) {
-                return AbstractPrivacy.setUserInformation(this.GdprManager).catch(() => {
+            if ((ReportAdTest.isValid(this.Core.Config!.getAbGroup()) && this.Config.isGDPREnabled())) {
+                return AbstractPrivacy.setUserInformation(this.GdprManager!).catch(() => {
                     this.Core.Api.Sdk.logInfo('Failed to set up privacy information.');
                 });
             }
@@ -188,7 +188,7 @@ export class Ads extends CoreModule implements IApiModule<IAdsApi> {
     }
 
     private setupTestEnvironment(): Promise<void> {
-        return TestEnvironment.setup(new MetaData(this.Core)).then(() => {
+        return TestEnvironment.setup(new MetaData(this.Core.Api)).then(() => {
             if(TestEnvironment.get('serverUrl')) {
                 ProgrammaticOperativeEventManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));

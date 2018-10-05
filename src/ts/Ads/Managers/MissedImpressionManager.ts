@@ -1,14 +1,13 @@
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { StorageType } from 'Core/Native/Storage';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export class MissedImpressionManager {
-    private _nativeBridge: NativeBridge;
+    private _storage: StorageApi;
 
-    constructor(nativeBridge: NativeBridge) {
-        this._nativeBridge = nativeBridge;
+    constructor(storage: StorageApi) {
+        this._storage = storage;
 
-        this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
+        this._storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
     private onStorageSet(eventType: string, data: any) {
@@ -16,8 +15,8 @@ export class MissedImpressionManager {
             HttpKafka.sendEvent('ads.sdk2.events.missedimpression.json', KafkaCommonObjectType.ANONYMOUS, {
                 ordinal: data.mediation.missedImpressionOrdinal.value
             });
-            this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'mediation.missedImpressionOrdinal');
-            this._nativeBridge.Storage.write(StorageType.PUBLIC);
+            this._storage.delete(StorageType.PUBLIC, 'mediation.missedImpressionOrdinal');
+            this._storage.write(StorageType.PUBLIC);
         }
     }
 }
