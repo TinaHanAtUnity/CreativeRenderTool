@@ -1,6 +1,7 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
@@ -14,7 +15,7 @@ import { JaegerManager } from 'Core/Jaeger/JaegerManager';
 import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -24,7 +25,8 @@ import { INativeResponse, Request } from 'Core/Utilities/Request';
 export class BannerCampaignManager {
     private _nativeBridge: NativeBridge;
     private _assetManager: AssetManager;
-    private _configuration: Configuration;
+    private _coreConfig: CoreConfiguration;
+    private _adsConfig: AdsConfiguration;
     private _clientInfo: ClientInfo;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
@@ -36,9 +38,10 @@ export class BannerCampaignManager {
 
     private _promise: Promise<Campaign> | null;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerManager: JaegerManager) {
+    constructor(nativeBridge: NativeBridge, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerManager: JaegerManager) {
         this._nativeBridge = nativeBridge;
-        this._configuration = configuration;
+        this._coreConfig = coreConfig;
+        this._adsConfig = adsConfig;
         this._assetManager = assetManager;
         this._sessionManager = sessionManager;
         this._request = request;
@@ -63,7 +66,8 @@ export class BannerCampaignManager {
         const request = BannerAuctionRequest.create({
             nativeBridge: this._nativeBridge,
             adMobSignalFactory: this._adMobSignalFactory,
-            configuration: this._configuration,
+            coreConfig: this._coreConfig,
+            adsConfig: this._adsConfig,
             clientInfo: this._clientInfo,
             deviceInfo: this._deviceInfo,
             metaDataManager: this._metaDataManager,
@@ -153,6 +157,6 @@ export class BannerCampaignManager {
     }
 
     private getAbGroup() {
-        return this._configuration.getAbGroup();
+        return this._coreConfig.getAbGroup();
     }
 }

@@ -28,8 +28,10 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     transition: transform .4s ease-in;
   }
 
-  &.fade-in .button {
-    opacity: 1;
+  .top-container,
+  .bottom-container,
+  .show-skip-button {
+    display: none;
   }
 
   &.fade-in .skip-button,
@@ -37,8 +39,12 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     display: none;
   }
 
-  &.fade-in .show-skip-button {
-    display: block;
+  &.fade-in {
+    .top-container,
+    .bottom-container,
+    .show-skip-button {
+      display: block;
+    }
   }
 
   .skip-button:not(.close-icon-skip) {
@@ -62,7 +68,6 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
   .button {
     width: $new-video-overlay-styles.touchable-area-width;
     height: $new-video-overlay-styles.touchable-area-height;
-    opacity: 0;
   }
 
   .margin-fixer {
@@ -486,11 +491,6 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     }
 
     .gdpr-button {
-      left: "calc(%s + constant(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width;
-      left: "calc(%s + env(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width; // @stylint ignore;
-    }
-
-    .tencent-advertisement {
       left: "calc(%s + constant(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width;
       left: "calc(%s + env(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width; // @stylint ignore;
     }

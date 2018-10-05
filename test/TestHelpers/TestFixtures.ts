@@ -1,3 +1,4 @@
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Image } from 'Ads/Models/Assets/Image';
@@ -5,17 +6,18 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { ICampaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
+import { ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
 import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
 import { Platform } from 'Core/Constants/Platform';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { IPackageInfo } from 'Core/Native/Android/AndroidDeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
-import { ICacheDiagnostics } from 'Core/Utilities/Cache';
+import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { INativeResponse } from 'Core/Utilities/Request';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
@@ -32,6 +34,7 @@ import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCam
 import OnXPromoPlcCampaign from 'json/OnXPromoPlcCampaign.json';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
+import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { IPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 import * as sinon from 'sinon';
@@ -47,7 +50,6 @@ import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
@@ -61,7 +63,8 @@ export class TestFixtures {
             skipInSeconds: 0,
             disableBackButton: false,
             useDeviceOrientationForVideo: false,
-            muteVideo: false
+            muteVideo: false,
+            adTypes: ['TEST']
         });
     }
 
@@ -497,9 +500,14 @@ export class TestFixtures {
         return new NativeBridge(backend, platform);
     }
 
-    public static getConfiguration(): Configuration {
+    public static getCoreConfiguration(): CoreConfiguration {
         const json = JSON.parse(ConfigurationAuctionPlc);
-        return ConfigurationParser.parse(json);
+        return CoreConfigurationParser.parse(json);
+    }
+
+    public static getAdsConfiguration(): AdsConfiguration {
+        const json = JSON.parse(ConfigurationAuctionPlc);
+        return AdsConfigurationParser.parse(json);
     }
 
     public static getCacheDiagnostics(): ICacheDiagnostics {

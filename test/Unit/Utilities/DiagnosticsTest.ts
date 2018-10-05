@@ -3,7 +3,7 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
 
@@ -104,7 +104,7 @@ describe('DiagnosticsTest', () => {
             false
         ]);
 
-        const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+        const configuration = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
 
         HttpKafka.setRequest(request);
         HttpKafka.setClientInfo(clientInfo);
