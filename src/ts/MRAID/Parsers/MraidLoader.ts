@@ -31,7 +31,7 @@ export class MraidLoader extends CampaignLoader {
         }
 
         if(campaign.playableConfiguration) {
-            // todo: is playableConfiguration completely optional? is this ok? if not, how to handle playableConfiguration here?
+            // note: playableConfiguration is completely optional so for now, it's cleanly ignored
             delete campaign.playableConfiguration;
         }
 
