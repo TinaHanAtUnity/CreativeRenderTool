@@ -3,7 +3,7 @@ import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
 import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
 import { Vast } from 'VAST/Models/Vast';
-import { VastCampaignMediaSelector } from 'VAST/Utilities/VastCampaignMediaSelector';
+import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
 
 export interface IVastCampaign extends IProgrammaticCampaign {
     vast: Vast;
@@ -22,9 +22,9 @@ export interface IVastCampaign extends IProgrammaticCampaign {
 }
 
 export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
-    private _vastMediaSelector: VastCampaignMediaSelector | undefined;
+    private _vastMediaSelector: VastMediaSelector | undefined;
 
-    constructor(campaign: IVastCampaign, vastMediaSelector?: VastCampaignMediaSelector) {
+    constructor(campaign: IVastCampaign, vastMediaSelector?: VastMediaSelector) {
         super('VastCampaign', {
             ... ProgrammaticCampaign.Schema,
             vast: ['object'],

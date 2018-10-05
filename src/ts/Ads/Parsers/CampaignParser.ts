@@ -6,7 +6,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export abstract class CampaignParser {
     public abstract parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign>;
