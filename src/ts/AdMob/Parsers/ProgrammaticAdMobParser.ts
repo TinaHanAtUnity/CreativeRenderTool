@@ -9,7 +9,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FileId } from 'Core/Utilities/FileId';
-import { Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Managers/Request';
 import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { VastParser } from 'VAST/Utilities/VastParser';

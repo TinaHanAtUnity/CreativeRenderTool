@@ -4,7 +4,7 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Managers/Request';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 export class ProgrammaticMraidParser extends CampaignParser {

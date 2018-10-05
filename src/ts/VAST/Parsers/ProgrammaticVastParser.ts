@@ -7,7 +7,7 @@ import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { Platform } from 'Core/Constants/Platform';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Managers/Request';
 import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';

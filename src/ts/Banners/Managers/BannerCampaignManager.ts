@@ -20,7 +20,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { INativeResponse, Request } from 'Core/Managers/Request';
 
 export class BannerCampaignManager {
     private _nativeBridge: NativeBridge;

@@ -2,7 +2,6 @@ import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 
@@ -19,6 +18,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     public readonly onPrivacyOpened: Observable0 = new Observable0();
     public readonly onPrivacyClosed: Observable0 = new Observable0();
 
+    protected _template: Template;
     private _placement: Placement;
     private _campaign: DisplayInterstitialCampaign;
 
@@ -34,8 +34,8 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     private _timers: number[] = [];
     private _showGDPRBanner: boolean;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: DisplayInterstitialCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
-        super(nativeBridge, 'display-interstitial');
+    constructor(platform: Platform, placement: Placement, campaign: DisplayInterstitialCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+        super(platform, 'display-interstitial');
 
         this._placement = placement;
         this._campaign = campaign;
@@ -65,16 +65,16 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
 
         this._privacy.render();
         this._privacy.hide();
-        document.body.appendChild(this._privacy.container());
+        document.body.appendChild(this._privacy.container()!);
         this._privacy.addEventHandler(this);
     }
 
     public render() {
         super.render();
 
-        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
-        this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
+        this._closeElement = <HTMLElement>this._container!.querySelector('.close-region');
+        this._GDPRPopupElement = <HTMLElement>this._container!.querySelector('.gdpr-pop-up');
+        this._privacyButtonElement = <HTMLElement>this._container!.querySelector('.privacy-button');
     }
 
     public show(): void {
@@ -91,8 +91,8 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
         window.removeEventListener('message', this._messageListener);
         super.hide();
 
-        if (this._privacy.container().parentElement) {
-            document.body.removeChild(this._privacy.container());
+        if (this._privacy.container()!.parentElement) {
+            document.body.removeChild(this._privacy.container()!);
         }
 
         for (const timer of this._timers) {
@@ -139,13 +139,13 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     private updateProgressCircle(container: HTMLElement, progress: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
+        if(this._platform === Platform.ANDROID && this._deviceInfo.getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
-            this._container.style.display = 'none';
+            this._container!.style.display = 'none';
             /* tslint:disable:no-unused-expression */
-            this._container.offsetHeight;
+            this._container!.offsetHeight;
             /* tslint:enable:no-unused-expression */
-            this._container.style.display = 'block';
+            this._container!.style.display = 'block';
             return;
         }
 
@@ -192,7 +192,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
                 // this._handlers.forEach(handler => handler.onDisplayInterstitialClick(e.data.href));
                 break;
             default:
-                this._nativeBridge.Sdk.logWarning(`Unknown message: ${e.data.type}`);
+                this._core.Sdk.logWarning(`Unknown message: ${e.data.type}`);
         }
     }
 }

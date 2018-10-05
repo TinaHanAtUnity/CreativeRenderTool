@@ -63,7 +63,7 @@ import { HttpKafka } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { Promises, TimeoutError } from 'Core/Utilities/Promises';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { INativeResponse, Request } from 'Core/Managers/Request';
 import { Resolve } from 'Core/Utilities/Resolve';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';

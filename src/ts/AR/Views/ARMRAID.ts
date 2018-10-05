@@ -6,7 +6,6 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { Platform } from 'Core/Constants/Platform';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PermissionsUtil, PermissionTypes, CurrentPermission } from 'Core/Utilities/Permissions';
 import { IObserver0, IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { Localization } from 'Core/Utilities/Localization';
@@ -19,12 +18,14 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { ICoreApi } from '../../Core/Core';
 import { IARApi } from '../AR';
+import { DeviceInfo } from '../../Core/Models/DeviceInfo';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;
 
     protected _template: Template;
     private _ar: IARApi;
+    private _deviceInfo: DeviceInfo;
 
     private _localization: Localization;
 
@@ -68,10 +69,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _hasCameraPermission = false;
     private _permissionResultObserver: IObserver2<string, boolean>;
 
-    constructor(platform: Platform, core: ICoreApi, ar: IARApi, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
+    constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
         super(platform, core, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
         this._ar = ar;
+        this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
         this._localization = new Localization(language, 'loadingscreen');

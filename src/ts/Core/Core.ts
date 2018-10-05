@@ -75,7 +75,7 @@ export class Core implements IApiModule {
     public readonly Api: Readonly<ICoreApi>;
 
     public readonly CacheBookkeeping: CacheBookkeeping;
-    // public ConfigManager: ConfigManager;
+    public ConfigManager: ConfigManager;
     public readonly FocusManager: FocusManager;
     public readonly MetaDataManager: MetaDataManager;
     public readonly Resolve: Resolve;

@@ -8,8 +8,7 @@
     "baseUrl": ".",
     "paths": {
       "*": [
-        "src/ts/*",
-        "test/*"
+        "src/ts/*"
       ]
     },
     "outDir": "build",
@@ -17,7 +16,6 @@
     "inlineSourceMap": true
   },
   "include": [
-    "src/ts/**/*.ts",
-    "test/**/*.ts"
+    "src/ts/**/*.ts"
   ]
 }

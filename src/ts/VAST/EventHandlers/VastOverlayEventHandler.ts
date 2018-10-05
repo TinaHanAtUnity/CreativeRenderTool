@@ -5,7 +5,7 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { MOAT } from 'Ads/Views/MOAT';
 import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Managers/Request';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 

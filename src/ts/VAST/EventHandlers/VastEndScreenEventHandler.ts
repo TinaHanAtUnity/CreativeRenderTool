@@ -3,7 +3,7 @@ import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Managers/Request';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';

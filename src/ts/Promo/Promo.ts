@@ -1,5 +1,5 @@
 import { Ads, AdsModule } from '../Ads/Ads';
-import { IApiModule, IModuleApi } from '../Core/Modules/ApiModule';
+import { IApiModule, IModuleApi } from '../Core/Modules/IApiModule';
 import { PurchasingApi } from './Native/Purchasing';
 import { PurchasingUtilities } from './Utilities/PurchasingUtilities';
 
@@ -10,6 +10,8 @@ export interface IPromoApi extends IModuleApi {
 export class Promo extends AdsModule implements IApiModule {
 
     public readonly Api: IPromoApi;
+
+    private _initialized = false;
 
     constructor(ads: Ads) {
         super(ads);
@@ -23,6 +25,11 @@ export class Promo extends AdsModule implements IApiModule {
         PurchasingUtilities.initialize(this);
         PurchasingUtilities.sendPurchaseInitializationEvent();
         this.Api.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(iapPayload));
+        this._initialized = true;
+    }
+
+    public isInitialized() {
+        return this._initialized;
     }
 
 }
