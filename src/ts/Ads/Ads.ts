@@ -102,7 +102,7 @@ export class Ads extends CoreModule implements IApiModule {
             } : undefined
         };
 
-        this.AdMobSignalFactory = new AdMobSignalFactory(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Api, this.Core.ClientInfo!, this.Core.DeviceInfo!, this.Core.FocusManager);
+        this.AdMobSignalFactory = new AdMobSignalFactory(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Api, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.FocusManager);
         this.InterstitialWebPlayerContainer = new InterstitialWebPlayerContainer(this.Api.WebPlayer);
         if(this.Core.NativeBridge.getPlatform() === Platform.ANDROID) {
             document.body.classList.add('android');
@@ -114,12 +114,12 @@ export class Ads extends CoreModule implements IApiModule {
             } else if(model.match(/ipad/i)) {
                 document.body.classList.add('ipad');
             }
-            this.Container = new ViewController(this.Core.Api, this.Api, <IosDeviceInfo>this.Core.DeviceInfo, this.Core.FocusManager!, this.Core.ClientInfo!);
+            this.Container = new ViewController(this.Core.Api, this.Api, <IosDeviceInfo>this.Core.DeviceInfo, this.Core.FocusManager, this.Core.ClientInfo);
         }
-        this.SessionManager = new SessionManager(this.Core.Api.Storage, this.Core.Request!);
+        this.SessionManager = new SessionManager(this.Core.Api.Storage, this.Core.Request);
         this.MissedImpressionManager = new MissedImpressionManager(this.Core.Api.Storage);
-        this.BackupCampaignManager = new BackupCampaignManager(this.Core.Api, this.Core.Config!);
-        this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.Core.Request!, this.Core.ClientInfo!, this.Core.DeviceInfo!);
+        this.BackupCampaignManager = new BackupCampaignManager(this.Core.Api, this.Core.Config);
+        this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.Core.Request, this.Core.ClientInfo, this.Core.DeviceInfo);
     }
 
     public initialize(jaegerInitSpan: JaegerSpan): Promise<void> {
@@ -134,7 +134,7 @@ export class Ads extends CoreModule implements IApiModule {
 
             return this.Core.CacheBookkeeping.getCachedCampaignResponse();
         }).then(cachedCampaignResponse => {
-            this.GdprManager = new GdprManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.Config!, this.Config, this.Core.ClientInfo!, this.Core.DeviceInfo!, this.Core.Request!);
+            this.GdprManager = new GdprManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.Config, this.Config, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.Request);
             this._cachedCampaignResponse = cachedCampaignResponse;
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
@@ -147,15 +147,15 @@ export class Ads extends CoreModule implements IApiModule {
             const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            this.AssetManager = new AssetManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.CacheManager!, this.Config.getCacheMode(), this.Core.DeviceInfo!, this.Core.CacheBookkeeping, this.ProgrammaticTrackingService, this.BackupCampaignManager);
+            this.AssetManager = new AssetManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.CacheManager, this.Config.getCacheMode(), this.Core.DeviceInfo, this.Core.CacheBookkeeping, this.ProgrammaticTrackingService, this.BackupCampaignManager);
             if(this.SessionManager.getGameSessionId() % 10000 === 0) {
                 this.AssetManager.setCacheDiagnostics(true);
             }
 
-            this.CampaignManager = new CampaignManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.Config!, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this.Core.Request!, this.Core.ClientInfo!, this.Core.DeviceInfo!, this.Core.MetaDataManager, this.Core.CacheBookkeeping, this.Core.JaegerManager!, this.BackupCampaignManager);
-            this.RefreshManager = new OldCampaignRefreshManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Api, this.Core.WakeUpManager, this.CampaignManager, this.Config, this.Core.FocusManager, this.SessionManager, this.Core.ClientInfo!, this.Core.Request!, this.Core.CacheManager!);
+            this.CampaignManager = new CampaignManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this.Core.Request, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.MetaDataManager, this.Core.CacheBookkeeping, this.Core.JaegerManager, this.BackupCampaignManager);
+            this.RefreshManager = new OldCampaignRefreshManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Api, this.Core.WakeUpManager, this.CampaignManager, this.Config, this.Core.FocusManager, this.SessionManager, this.Core.ClientInfo, this.Core.Request, this.Core.CacheManager);
 
-            SdkStats.initialize(this.Core.Api, this.Core.Request!, this.Core.Config!, this.Config, this.SessionManager, this.CampaignManager, this.Core.MetaDataManager, this.Core.ClientInfo!, this.Core.CacheManager!);
+            SdkStats.initialize(this.Core.Api, this.Core.Request, this.Core.Config, this.Config, this.SessionManager, this.CampaignManager, this.Core.MetaDataManager, this.Core.ClientInfo, this.Core.CacheManager);
 
             const refreshSpan = this.Core.JaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this.Core.NativeBridge.getPlatform()]);
@@ -180,7 +180,7 @@ export class Ads extends CoreModule implements IApiModule {
             return this.SessionManager.sendUnsentSessions();
         }).then(() => {
             if ((ReportAdTest.isValid(this.Core.Config.getAbGroup()) && this.Config.isGDPREnabled())) {
-                return AbstractPrivacy.setUserInformation(this.GdprManager!).catch(() => {
+                return AbstractPrivacy.setUserInformation(this.GdprManager).catch(() => {
                     this.Core.Api.Sdk.logInfo('Failed to set up privacy information.');
                 });
             }

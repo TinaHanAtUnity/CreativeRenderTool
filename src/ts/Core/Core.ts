@@ -146,8 +146,8 @@ export class Core implements IApiModule {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
                 this.Request = new Request(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
             }
-            this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.Request!, this.CacheBookkeeping);
-            this.JaegerManager = new JaegerManager(this.Request!);
+            this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.Request, this.CacheBookkeeping);
+            this.JaegerManager = new JaegerManager(this.Request);
             this.JaegerManager.addOpenSpan(jaegerInitSpan);
 
             HttpKafka.setRequest(this.Request);
@@ -174,7 +174,7 @@ export class Core implements IApiModule {
             }
 
             const configSpan = this.JaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
-            let configPromise = ConfigManager.fetch(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo!, this.DeviceInfo!, this.Request!, configSpan);
+            let configPromise = ConfigManager.fetch(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo, this.DeviceInfo, this.Request, configSpan);
 
             configPromise.then(() => {
                 this.JaegerManager.stop(configSpan);
