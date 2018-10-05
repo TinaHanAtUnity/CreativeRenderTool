@@ -94,6 +94,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             {
                 event: 'click',
                 listener: (event: Event) => {
+                    this.onPrivacyClicked(event);
+                },
+                selector: '.launch-privacy'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => {
                     this.onShowAr();
                 },
                 selector: '.permission-accept-button'
@@ -619,5 +626,19 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private onShowFallback() {
         this.onCameraPermissionEvent(false);
+    }
+
+    private onPrivacyClicked(event: Event) {
+        event.stopPropagation();
+        event.preventDefault();
+        const url = (<HTMLLinkElement>event.target).href;
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._nativeBridge.UrlScheme.open(url);
+        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
+        }
     }
 }
