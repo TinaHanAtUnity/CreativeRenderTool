@@ -73,9 +73,6 @@ import { XPromoVideoEventHandler } from 'XPromo/EventHandlers/XPromoVideoEventHa
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
-import { Privacy } from 'Ads/Views/Privacy';
-import { ReportAdTest } from 'Core/Models/ABGroup';
 
 export class AdUnitFactory {
     private static _forcedPlayableMRAID: boolean = false;
@@ -537,14 +534,7 @@ export class AdUnitFactory {
 
     private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
 
-        let privacy: AbstractPrivacy;
-        if (ReportAdTest.isValid(parameters.coreConfig.getAbGroup())) {
-            privacy = new ReportingPrivacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
-        } else if (parameters.adsConfig.isGDPREnabled()) {
-            privacy = new GDPRPrivacy(nativeBridge, parameters.gdprManager, parameters.coreConfig.isCoppaCompliant());
-        } else {
-            privacy = new Privacy(nativeBridge, parameters.coreConfig.isCoppaCompliant());
-        }
+        const privacy = new ReportingPrivacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
         const privacyEventHandler = new PrivacyEventHandler(nativeBridge, parameters);
         privacy.addEventHandler(privacyEventHandler);
         return privacy;

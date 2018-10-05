@@ -233,6 +233,7 @@ describe('MRAIDEventHandlersTest', () => {
                     kafkaObject.timeFromPlayableStart = 12;
                     kafkaObject.backgroundTime = 0;
                     kafkaObject.auctionId = '12345';
+                    kafkaObject.abGroup = 99;
 
                     const resourceUrl = playableMraidCampaign.getResourceUrl();
                     if(resourceUrl) {
@@ -255,6 +256,7 @@ describe('MRAIDEventHandlersTest', () => {
                     kafkaObject.timeFromPlayableStart = 12;
                     kafkaObject.backgroundTime = 5;
                     kafkaObject.auctionId = '12345';
+                    kafkaObject.abGroup = 99;
 
                     const resourceUrl = playableMraidCampaign.getResourceUrl();
                     if(resourceUrl) {
