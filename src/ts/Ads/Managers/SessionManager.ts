@@ -9,7 +9,7 @@ import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoO
 export class SessionManager {
     private _storage: StorageApi;
     private _request: Request;
-    private _gameSessionId?: number;
+    private _gameSessionId: number;
 
     constructor(storage: StorageApi, request: Request) {
         this._storage = storage;
@@ -55,7 +55,7 @@ export class SessionManager {
         this._gameSessionId = gameSessionId;
     }
 
-    public getGameSessionId(): number | undefined {
+    public getGameSessionId(): number {
         return this._gameSessionId;
     }
 

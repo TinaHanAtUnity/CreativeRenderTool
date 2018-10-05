@@ -141,7 +141,7 @@ export class Request {
         }
 
         // fix for Android 4.0 and older, https://code.google.com/p/android/issues/detail?id=24672
-        if(this._platform === Platform.ANDROID && this._deviceInfo.getApiLevel() < 16) {
+        if(this._platform === Platform.ANDROID && this._deviceInfo!.getApiLevel() < 16) {
             headers.push(['Accept-Encoding', '']);
         }
 

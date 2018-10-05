@@ -30,14 +30,16 @@ export class ProgrammaticTrackingService {
     private static productionErrorServiceUrl: string = 'https://tracking.adsx.unityads.unity3d.com/tracking/sdk/error';
     private static productionMetricServiceUrl: string = 'https://tracking.adsx.unityads.unity3d.com/tracking/sdk/metric';
 
-    private request: Request;
-    private clientInfo: ClientInfo;
-    private deviceInfo: DeviceInfo;
+    private _platform: Platform;
+    private _request: Request;
+    private _clientInfo: ClientInfo;
+    private _deviceInfo: DeviceInfo;
 
-    constructor(request: Request, clientInfo: ClientInfo,  deviceInfo: DeviceInfo) {
-        this.request = request;
-        this.clientInfo = clientInfo;
-        this.deviceInfo = deviceInfo;
+    constructor(platform: Platform, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
+        this._platform = platform;
+        this._request = request;
+        this._clientInfo = clientInfo;
+        this._deviceInfo = deviceInfo;
     }
 
     public reportMetric(event: ProgrammaticTrackingMetric): Promise<INativeResponse> {
@@ -49,7 +51,7 @@ export class ProgrammaticTrackingService {
 
         headers.push(['Content-Type', 'application/json']);
 
-        return this.request.post(url, data, headers);
+        return this._request.post(url, data, headers);
     }
 
     public reportError(errorData: IProgrammaticTrackingErrorData): Promise<INativeResponse> {
@@ -59,13 +61,13 @@ export class ProgrammaticTrackingService {
 
         headers.push(['Content-Type', 'application/json']);
 
-        return this.request.post(url, data, headers);
+        return this._request.post(url, data, headers);
     }
 
     public buildErrorData(error: ProgrammaticTrackingError, adType: string, seatId: number | undefined): IProgrammaticTrackingErrorData {
-        const platform: Platform = this.clientInfo.getPlatform();
-        const osVersion: string = this.deviceInfo.getOsVersion();
-        const sdkVersion: string = this.clientInfo.getSdkVersionName();
+        const platform: Platform = this._platform;
+        const osVersion: string = this._deviceInfo.getOsVersion();
+        const sdkVersion: string = this._clientInfo.getSdkVersionName();
         return <IProgrammaticTrackingErrorData>{
             event: error,
             platform: Platform[platform],
