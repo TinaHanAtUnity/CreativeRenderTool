@@ -10,7 +10,7 @@ export class StorageBridge {
     private _nativeBridge: NativeBridge;
     private _publicStorageQueue: IStorageBatch; // queue for storage operations to public storage
     private _privateStorageQueue: IStorageBatch; // queue for storage operations to private storage
-    private _storageBatchTimer: any;
+    private _storageBatchTimer: number;
 
     private _storageBatchInterval: number = 1000; // default value is 1000 milliseconds
 
@@ -44,7 +44,7 @@ export class StorageBridge {
         }
 
         if(!this._storageBatchTimer) {
-            this._storageBatchTimer = setTimeout(() => {
+            this._storageBatchTimer = window.setTimeout(() => {
                 this.executeBatch(StorageType.PUBLIC, this._publicStorageQueue);
                 this.executeBatch(StorageType.PRIVATE, this._privateStorageQueue);
                 delete this._storageBatchTimer;
