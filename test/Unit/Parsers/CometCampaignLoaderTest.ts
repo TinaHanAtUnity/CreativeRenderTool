@@ -44,6 +44,6 @@ describe('CometCampaignLoaderTest', () => {
 
         const newCampaign: PerformanceCampaign | undefined = loader.load('test');
 
-        assert.isUndefined(newCampaign, 'broken JSON was loaded instead of failing');
+        assert.isUndefined(newCampaign, 'Comet campaign loader loaded broken JSON instead of failing');
     });
 });
