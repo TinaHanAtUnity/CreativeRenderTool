@@ -107,5 +107,4 @@ export const GreenEndScreenButtonColorTest = new ABTest(GroupSeventeen);
 export const RedEndScreenButtonColorTest = new ABTest(GroupEighteen);
 export const NavyEndScreenButtonColorTest = new ABTest(GroupNineteen);
 export const FPSCollectionTest = new ABTest(GroupSixteen);
-export const ReportAdTest = new ABTest(GroupDisabled);
 export const BackupCampaignTest = new ABTest(GroupSix, GroupSeven);
