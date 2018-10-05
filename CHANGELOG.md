@@ -1,5 +1,12 @@
 # Pending
 
+* Support serialization for MRAID campaigns [#6549](https://github.com/Applifier/unity-ads-webview/pull/6549)
+* Remove Ads deps from Core [#6544](https://github.com/Applifier/unity-ads-webview/pull/6544)
+* Add CSS media queries for iPhone XS Max [#6543](https://github.com/Applifier/unity-ads-webview/pull/6543)
+* Disable Report Bad Ads A/B test [#6550](https://github.com/Applifier/unity-ads-webview/pull/6550)
+* Fix AR permission dialog's styles [#6384](https://github.com/Applifier/unity-ads-webview/pull/6384)
+* Add abGroup to playable kpi events [#6555](https://github.com/Applifier/unity-ads-webview/pull/6555)
+* Update AR logo [#6497](https://github.com/Applifier/unity-ads-webview/pull/6497)
 * add missing 'supports' in MRAID container and remove one logWarning [#6540](https://github.com/Applifier/unity-ads-webview/pull/6540)
 
 # Mon Oct  1 11:33:41 UTC 2018
