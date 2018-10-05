@@ -18,6 +18,7 @@ export class PlayableEventHandler extends MRAIDEventHandler implements IMRAIDVie
         }
 
         kafkaObject.auctionId = this._campaign.getSession().getId();
+        kafkaObject.abGroup = this._coreConfig.getAbGroup().toNumber();
 
         HttpKafka.sendEvent('ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
