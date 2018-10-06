@@ -54,11 +54,16 @@ describe('ProgrammaticVastParser', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
                 assert.isTrue(campaign instanceof VastCampaign, 'Campaign was not an VastCampaign');
 
+                const vastParser = new VastParser();
                 const json = JSON.parse(ProgrammaticVastCampaignFlat);
-                const vast = new VastParser().parseVast(decodeURIComponent(json.content));
+                const vast = vastParser.parseVast(decodeURIComponent(json.content));
+                const vastAd = campaign.getVast().getAds()[0];
+                const vastMedia = vastAd.getCreatives()[0].getMediaFiles()[0];
+                const vastMediaFileSize = vastParser.parseMediaFileSize(vastAd.getCreatives()[0].getDuration(), vastMedia.getBitrate());
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');
+                assert.equal(vastMedia.getFileSize(), vastMediaFileSize, 'Media file size is not equal');
                 assert.equal(campaign.getVideo().getUrl(), vast.getVideoUrl(), 'Video URL is not the same');
                 assert.deepEqual(campaign.getImpressionUrls(), [impressionUrl], 'Impression URL are not the same');
             });

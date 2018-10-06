@@ -39,7 +39,7 @@ describe('VastMediaSelectorTest', () => {
         assert.equal(vastMediaSelector.getOptimizedVideoUrl(), 'https://vast_media_url_570kb');
     });
 
-    it('should return a media url if fileSize and bitrate info are missing', () => {
+    it('should return celluar range media url if fileSize and bitrate info are missing', () => {
         const vastMediaSelector = new VastMediaSelector(vast);
 
         assert.equal(vastMediaSelector.getOptimizedVideoUrl(), 'https://vast_media_url_570kb');

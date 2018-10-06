@@ -29,6 +29,10 @@ export class VastParser {
         this._maxWrapperDepth = maxWrapperDepth;
     }
 
+    public parseMediaFileSize(duration: number, kbitrate: number): number {
+        return (duration * kbitrate * 1000) / 8;
+    }
+
     public parseVast(vast: string | null): Vast {
         if (!vast) {
             throw new Error('VAST data is missing');
@@ -355,10 +359,6 @@ export class VastParser {
         }
 
         return hours + minutes + seconds;
-    }
-
-    private parseMediaFileSize(duration: number, kbitrate: number): number {
-        return (duration * kbitrate * 1000) / 8;
     }
 
     private childByName(node: any, name: string): any {
