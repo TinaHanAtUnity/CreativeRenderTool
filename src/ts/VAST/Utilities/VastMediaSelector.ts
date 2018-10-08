@@ -10,12 +10,6 @@ export enum VASTMediaFileSize {
     SDK_MAX = 20971520     // 20 MB SDK max limit for 'too_large_file' error
 }
 
-// To be tested
-//  WIFI_MIN = 10485760,    // 10 MB in Bytes
-//  WIFI_MAX = 20971520,    // 20 MB
-//  CELL_MIN = 5242880,     // 5 MB
-//  CELL_MAX = 10485760,    // 10 MB
-
 export class VastMediaSelector {
     private _vast: Vast;
     private _wifiMediaFileUrl: string | undefined;
@@ -40,9 +34,6 @@ export class VastMediaSelector {
         }
     }
 
-    // Pick the smallest size media in assigned range,
-    // if there is no media in the range or file size is 0
-    // then pick the closest to minSize below SDK_MAX size
     public getVideoUrlInRange(minSize: number, maxSize: number): string {
         let mediaUrl: string | null = null;
         let mediaMinSize = Number.MAX_SAFE_INTEGER;
@@ -57,6 +48,8 @@ export class VastMediaSelector {
                     mediaMinSize = fileSize;
                 }
             } else if (fileSize <= VASTMediaFileSize.SDK_MAX) {
+                // if there is no media in the range or file size is 0
+                // then pick the closest to minSize below SDK_MAX size
                 if (Math.abs(fileSize - minSize) < defaultMinDiff) {
                     defaultMediaUrl = mediaFile.getFileURL();
                     defaultMinDiff = Math.abs(fileSize - minSize);
