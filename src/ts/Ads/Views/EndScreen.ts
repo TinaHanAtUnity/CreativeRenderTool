@@ -103,16 +103,16 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         super.render();
 
         if (this._isSwipeToCloseEnabled) {
-            (<HTMLElement>this._container!.querySelector('.btn-close-region')).style.display = 'none';
+            (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
 
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
-            this._container!.classList.add(endScreenAlt);
+            this._container.classList.add(endScreenAlt);
         }
 
         if (this._showGDPRBanner) {
-            this._container!.classList.add('show-gdpr-banner');
+            this._container.classList.add('show-gdpr-banner');
         }
 
         this.addCustomDownloadButtonColor();
@@ -133,7 +133,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             return;
         }
 
-        (<HTMLElement>this._container!.querySelector('.download-container')).style.background = color;
+        (<HTMLElement>this._container.querySelector('.download-container')).style.background = color;
     }
 
     public show(): void {
@@ -145,7 +145,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         // this is most certainly not a proper solution to this problem but without this hack, sometimes game name
         // would prevent download button from showing which completely breaks layout and monetization
         // therefore this should be treated as an emergency fix and a proper fix needs to be figured out later
-        const nameContainer: HTMLElement = <HTMLElement>this._container!.querySelector('.name-container');
+        const nameContainer: HTMLElement = <HTMLElement>this._container.querySelector('.name-container');
         nameContainer.innerHTML = this._gameName + ' ';
 
         if (AbstractAdUnit.getAutoClose()) {
@@ -154,7 +154,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             }, AbstractAdUnit.getAutoCloseDelay());
         }
 
-        this._container!.classList.add('on-show');
+        this._container.classList.add('on-show');
     }
 
     public hide(): void {
@@ -199,7 +199,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         if (this._showGDPRBanner) {
             this._gdprPopupClicked = true;
-            this._container!.classList.remove('show-gdpr-banner');
+            this._container.classList.remove('show-gdpr-banner');
         }
 
         this._privacy.show();

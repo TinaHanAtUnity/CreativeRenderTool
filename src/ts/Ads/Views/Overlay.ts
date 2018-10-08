@@ -134,24 +134,24 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         super.render();
 
         if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
-            const tencentAdTag = <HTMLElement>this._container!.querySelector('.tencent-advertisement');
+            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
             if (tencentAdTag) {
                 tencentAdTag.innerText = '广告';
             }
         }
 
-        this._skipElement = <HTMLElement>this._container!.querySelector('.skip-hit-area');
-        this._spinnerElement = <HTMLElement>this._container!.querySelector('.buffering-spinner');
-        this._muteButtonElement = <HTMLElement>this._container!.querySelector('.mute-button');
-        this._debugMessageElement = <HTMLElement>this._container!.querySelector('.debug-message-text');
-        this._callButtonElement = <HTMLElement>this._container!.querySelector('.call-button');
-        this._progressElement = <HTMLElement>this._container!.querySelector('.progress');
-        this._GDPRPopupElement = <HTMLElement>this._container!.querySelector('.gdpr-pop-up');
-        this._privacyButtonElement = <HTMLElement>this._container!.querySelector('.privacy-button');
+        this._skipElement = <HTMLElement>this._container.querySelector('.skip-hit-area');
+        this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
+        this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
+        this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
+        this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
+        this._progressElement = <HTMLElement>this._container.querySelector('.progress');
+        this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
+        this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
         this.choosePrivacyShown();
 
         if(CustomFeatures.isCloseIconSkipApp(this._gameId)) {
-            const skipIconElement = <HTMLElement>this._container!.querySelector('.skip');
+            const skipIconElement = <HTMLElement>this._container.querySelector('.skip');
             skipIconElement.classList.add('close-icon-skip');
         }
     }
@@ -345,11 +345,11 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
         if(this._platform === Platform.ANDROID && this._deviceInfo.getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
-            this._container!.style.display = 'none';
+            this._container.style.display = 'none';
             /* tslint:disable:no-unused-expression */
-            this._container!.offsetHeight;
+            this._container.offsetHeight;
             /* tslint:enable:no-unused-expression */
-            this._container!.style.display = 'block';
+            this._container.style.display = 'block';
             return;
         }
 
@@ -368,7 +368,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private setSkipElementVisible(value: boolean) {
         if(this._skipVisible !== value) {
             this._skipVisible = value;
-            const skipIconElement = <HTMLElement>this._container!.querySelector('.skip');
+            const skipIconElement = <HTMLElement>this._container.querySelector('.skip');
 
             if(value) {
                 skipIconElement.classList.add('enabled');
@@ -397,10 +397,10 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
                 this._privacyButtonElement.classList.remove('slide-back-in-place');
                 this._privacyButtonElement.classList.add('slide-down');
             }
-            this._container!.style.pointerEvents = 'auto';
+            this._container.style.pointerEvents = 'auto';
             this._fadeStatus = false;
         } else {
-            this._container!.style.pointerEvents = 'none';
+            this._container.style.pointerEvents = 'none';
             this._skipElement.classList.remove('slide-up');
             this._skipElement.classList.add('slide-back-in-place');
             this._progressElement.classList.remove('slide-up');

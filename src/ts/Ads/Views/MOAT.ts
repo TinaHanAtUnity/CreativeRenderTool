@@ -38,7 +38,7 @@ export class MOAT extends View<VastCampaign> {
 
     public render(): void {
         super.render();
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container!.querySelector('#moat-iframe');
+        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#moat-iframe');
         iframe.srcdoc = MOATContainer;
     }
 

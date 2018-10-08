@@ -140,15 +140,15 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     public render(): void {
         super.render();
 
-        this._closeElement = <HTMLElement>this._container!.querySelector('.close-region');
-        this._loadingScreen = <HTMLElement>this._container!.querySelector('.loading-screen-ar');
+        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+        this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen-ar');
 
-        this._cameraPermissionPanel = <HTMLElement>this._container!.querySelector('.camera-permission-panel');
-        this._permissionLearnMorePanel = <HTMLElement>this._container!.querySelector('.permissions-learn-more');
+        this._cameraPermissionPanel = <HTMLElement>this._container.querySelector('.camera-permission-panel');
+        this._permissionLearnMorePanel = <HTMLElement>this._container.querySelector('.permissions-learn-more');
 
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container!.querySelector('#mraid-iframe');
-        this._gdprBanner = <HTMLElement>this._container!.querySelector('.gdpr-pop-up');
-        this._privacyButton = <HTMLElement>this._container!.querySelector('.privacy-button');
+        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
+        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
 
         ARUtil.isARSupported(this._ar).then(arSupported => {
             let container = MRAIDContainer;
@@ -357,11 +357,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         if(this._platform === Platform.ANDROID && this._deviceInfo.getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
-            this._container!.style.display = 'none';
+            this._container.style.display = 'none';
             /* tslint:disable:no-unused-expression */
-            this._container!.offsetHeight;
+            this._container.offsetHeight;
             /* tslint:enable:no-unused-expression */
-            this._container!.style.display = 'block';
+            this._container.style.display = 'block';
             return;
         }
 
