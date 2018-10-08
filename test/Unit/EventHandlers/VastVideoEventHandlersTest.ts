@@ -12,7 +12,6 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { MOAT } from 'Ads/Views/MOAT';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
@@ -29,9 +28,10 @@ import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 
 import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
 describe('VastVideoEventHandler tests', () => {
     const handleInvocation = sinon.spy();
@@ -75,7 +75,7 @@ describe('VastVideoEventHandler tests', () => {
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
-        privacy = new Privacy(nativeBridge, true);
+        privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
@@ -305,10 +305,17 @@ describe('VastVideoEventHandler tests', () => {
 
     describe('with companion ad', () => {
         let vastAdUnit: VastAdUnit;
+        let vastEndScreenParameters: IVastEndscreenParameters;
+
         beforeEach(() => {
             sandbox.restore();
-            const endScreenPrivacy = new Privacy(nativeBridge, false);
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId(), endScreenPrivacy);
+            vastEndScreenParameters = {
+                campaign: vastAdUnitParameters.campaign,
+                clientInfo: vastAdUnitParameters.clientInfo,
+                seatId: vastAdUnitParameters.campaign.getSeatId(),
+                showPrivacyDuringEndscreen: false
+            };
+            vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
             sinon.spy(vastEndScreen, 'show');
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);

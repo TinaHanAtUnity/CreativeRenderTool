@@ -5,7 +5,7 @@ import { Tap } from 'Core/Utilities/Tap';
 import { Template } from 'Core/Utilities/Template';
 import { IViewBinding } from 'Core/Views/IViewBinding';
 
-export type TemplateDataType = string | number | boolean | null | undefined;
+export type TemplateDataType = string | number | boolean | null | undefined  | string[];
 
 export interface ITemplateData {
     [key: string]: TemplateDataType;

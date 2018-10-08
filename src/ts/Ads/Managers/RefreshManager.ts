@@ -3,6 +3,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { INativeResponse } from 'Core/Utilities/Request';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export abstract class RefreshManager {
     public static NoFillDelay = 3600;
@@ -13,6 +14,7 @@ export abstract class RefreshManager {
     public abstract setCurrentAdUnit(adUnit: AbstractAdUnit): void;
     public abstract refresh(nofillRetry?: boolean): Promise<INativeResponse | void>;
     public abstract refreshFromCache(cachedResponse: INativeResponse, span: JaegerSpan): Promise<INativeResponse | void>;
+    public abstract refreshWithBackupCampaigns(backupCampaignManager: BackupCampaignManager): Promise<INativeResponse | void>;
     public abstract shouldRefill(timestamp: number): boolean;
     public abstract setPlacementState(placementId: string, placementState: PlacementState): void;
     public abstract sendPlacementStateChanges(placementId: string): void;

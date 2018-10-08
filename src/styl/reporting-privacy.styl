@@ -1,0 +1,92 @@
+@import "vars.styl";
+@import "components.styl";
+
+#reporting-privacy {
+  $full-screen-pop-up-view($default-scale-size, 9999);
+  overflow-x: hidden;
+
+  .pop-up-content {
+    .icon-gdpr {
+      display: block;
+      text-align: center;
+      font-size: 2.5rem;
+      opacity: .41;
+    }
+
+    .centered-title {
+      display: block;
+      text-align: center;
+    }
+  }
+  .build-side,
+  .report-side {
+    display: none;
+    font-size: $default-size * $default-font-size * .75;
+  }
+
+  .gdpr-text-android,
+  .gdpr-text-ios {
+    display: none;
+  }
+
+  #data-deletion-container {
+    padding: $default-size * $default-scale-size * .75 0;
+    .page-link {
+      pointer-events: none;
+    }
+    &.active {
+      .page-link {
+        pointer-events: auto;
+      }
+    }
+  }
+
+  #data-deletion-container,
+  #data-deletion-request-container {
+    display: block;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 250ms ease-in;
+
+    &.active {
+      opacity: 1;
+    }
+  }
+
+  &.build {
+    .build-side {
+      display: block;
+      word-wrap: break-word;
+
+      .build-information-key {
+        font-weight: 800;
+      }
+    }
+
+    .pop-up-content:not(.build-side) {
+      display: none;
+    }
+  }
+
+  &.report {
+    .report-side {
+      display: block;
+      word-wrap: break-word;
+    }
+
+    .pop-up-content:not(.report-side) {
+      display: none;
+    }
+  }
+}
+
+.build-information-item {
+  margin: 0;
+}
+
+body.android #reporting-privacy .gdpr-text-android,
+body.iphone #reporting-privacy .gdpr-text-ios,
+body.ipad #reporting-privacy .gdpr-text-ios {
+  display: initial;
+}
+

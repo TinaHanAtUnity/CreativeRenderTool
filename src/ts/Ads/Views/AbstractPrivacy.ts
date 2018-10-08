@@ -1,6 +1,5 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { Platform } from 'Core/Constants/Platform';
-
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -30,6 +29,17 @@ export interface IBuildInformation extends ITemplateData {
 
 export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
 
+    private static buildInformation: IBuildInformation;
+
+    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, isGDPREnabled: boolean, id: string) {
+        super(nativeBridge, id);
+        this._templateData = {
+            'isCoppaCompliant': isCoppaCompliant,
+            'isGDPREnabled': isGDPREnabled,
+            'buildInformation': AbstractPrivacy.buildInformation
+        };
+    }
+
     public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge, configuration: CoreConfiguration) {
         const date = new Date();
         AbstractPrivacy.buildInformation = {
@@ -46,17 +56,6 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
             creativeId: campaign.getCreativeId(),
             seatId: campaign.getSeatId(),
             timestamp: date.toUTCString()
-        };
-    }
-
-    private static buildInformation: IBuildInformation;
-
-    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, id: string) {
-        super(nativeBridge, id);
-
-        this._templateData = {
-            'isCoppaCompliant': isCoppaCompliant,
-            'buildInformation': AbstractPrivacy.buildInformation
         };
     }
 

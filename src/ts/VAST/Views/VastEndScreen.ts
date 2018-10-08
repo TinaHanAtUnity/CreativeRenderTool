@@ -1,12 +1,12 @@
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 
 export interface IVastEndScreenHandler {
     onVastEndScreenClick(): void;
@@ -16,23 +16,33 @@ export interface IVastEndScreenHandler {
     onOpenUrl(url: string): Promise<void>;
 }
 
+export interface IVastEndscreenParameters {
+    campaign: VastCampaign;
+    clientInfo: ClientInfo;
+    seatId: number | undefined;
+    showPrivacyDuringEndscreen: boolean;
+}
+
 export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandler {
 
     private _isSwipeToCloseEnabled: boolean = false;
     private _privacy: AbstractPrivacy;
     private _callButtonEnabled: boolean = true;
+    private _campaign: VastCampaign;
     private _seatId: number | undefined;
+    private _showPrivacyDuringEndscreen: boolean;
 
-    constructor(nativeBridge: NativeBridge, campaign: VastCampaign, gameId: string, privacy: AbstractPrivacy, seatId?: number) {
+    constructor(nativeBridge: NativeBridge, parameters: IVastEndscreenParameters, privacy: AbstractPrivacy) {
         super(nativeBridge, 'vast-end-screen');
 
+        this._campaign = parameters.campaign;
         this._template = new Template(VastEndScreenTemplate);
-        this._privacy = privacy;
-        this._seatId = seatId;
+        this._seatId = parameters.seatId;
+        this._showPrivacyDuringEndscreen = parameters.showPrivacyDuringEndscreen;
 
-        if(campaign) {
-            const landscape = campaign.getLandscape();
-            const portrait = campaign.getPortrait();
+        if(this._campaign) {
+            const landscape = this._campaign.getLandscape();
+            const portrait = this._campaign.getPortrait();
 
             this._templateData = {
                 'endScreenLandscape': (landscape ? landscape.getUrl() : (portrait ? portrait.getUrl() : undefined)),
@@ -58,7 +68,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
             }
         ];
 
-        if(CustomFeatures.isTimehopApp(gameId)) {
+        if(CustomFeatures.isTimehopApp(parameters.clientInfo.getGameId())) {
             this._isSwipeToCloseEnabled = true;
 
             this._bindings.push({
@@ -68,10 +78,13 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
             });
         }
 
-        this._privacy.render();
-        this._privacy.hide();
-        document.body.appendChild(this._privacy.container());
-        this._privacy.addEventHandler(this);
+        if (this._showPrivacyDuringEndscreen) {
+            this._privacy = privacy;
+            this._privacy.render();
+            this._privacy.hide();
+            document.body.appendChild(this._privacy.container());
+            this._privacy.addEventHandler(this);
+        }
     }
 
     public render(): void {
@@ -82,6 +95,10 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
             if (tencentAdTag) {
                 tencentAdTag.innerText = '广告';
             }
+        }
+
+        if (!this._showPrivacyDuringEndscreen) {
+            (<HTMLElement>this._container.querySelector('.privacy-button')).style.display = 'none';
         }
 
         if(this._isSwipeToCloseEnabled) {
