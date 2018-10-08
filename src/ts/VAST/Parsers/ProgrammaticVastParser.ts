@@ -83,7 +83,8 @@ export class ProgrammaticVastParser extends CampaignParser {
         };
 
         // TODO: need ABTest
-        const campaign = new VastCampaign(vastCampaignParms, new VastMediaSelector(vast, connectionType));
+        // const campaign = new VastCampaign(vastCampaignParms, new VastMediaSelector(vast, connectionType));
+        const campaign = new VastCampaign(vastCampaignParms);
 
         if(campaign.getImpressionUrls().length === 0) {
             throw new Error('Campaign does not have an impression url');
