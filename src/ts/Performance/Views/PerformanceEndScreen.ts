@@ -90,8 +90,6 @@ export class PerformanceEndScreen extends EndScreen {
                     });
                 }
             } catch (e) {
-                this._nativeBridge.Sdk.logError('smart color button failed: ' + e);
-
                 Diagnostics.trigger('smart_color_button_failed', {
                     message: e.message
                 });
