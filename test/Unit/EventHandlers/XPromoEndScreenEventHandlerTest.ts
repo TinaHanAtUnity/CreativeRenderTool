@@ -29,7 +29,7 @@ import { XPromoEndScreenEventHandler } from 'XPromo/EventHandlers/XPromoEndScree
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { StoreName, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -92,7 +92,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
             const video = new Video('', TestFixtures.getSession());
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
+            const privacy = new ReportingPrivacy(nativeBridge, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
@@ -190,7 +190,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             const video = new Video('', TestFixtures.getSession());
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
+            const privacy = new ReportingPrivacy(nativeBridge, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),

@@ -28,7 +28,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
 
 describe('DisplayInterstitialAdUnitTest', () => {
     let adUnit: DisplayInterstitialAdUnit;
@@ -85,7 +85,7 @@ describe('DisplayInterstitialAdUnitTest', () => {
                 campaign: campaign
             });
 
-            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
+            const privacy = new ReportingPrivacy(nativeBridge, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
 
             webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
             (<any>webPlayerContainer).onPageStarted = new Observable1<string>();

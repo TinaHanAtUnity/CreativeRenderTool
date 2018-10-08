@@ -27,7 +27,7 @@ import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
 
 describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;
@@ -59,7 +59,7 @@ describe('VPAIDAdUnit', () => {
             coreConfig: sinon.createStubInstance(CoreConfiguration),
             adsConfig: sinon.createStubInstance(AdsConfiguration),
             request: sinon.createStubInstance(Request),
-            privacy: sinon.createStubInstance(GDPRPrivacy),
+            privacy: sinon.createStubInstance(ReportingPrivacy),
             forceOrientation: Orientation.NONE,
             options: {},
             gdprManager: sinon.createStubInstance(GdprManager),

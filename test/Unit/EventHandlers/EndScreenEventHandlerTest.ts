@@ -30,7 +30,7 @@ import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCa
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -91,7 +91,7 @@ describe('EndScreenEventHandlerTest', () => {
 
             const video = new Video('', TestFixtures.getSession());
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
+            const privacy = new ReportingPrivacy(nativeBridge, campaign, gdprManager, false, false);
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
@@ -385,7 +385,7 @@ describe('EndScreenEventHandlerTest', () => {
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
+            const privacy = new ReportingPrivacy(nativeBridge, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),

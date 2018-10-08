@@ -9,7 +9,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -29,6 +28,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -100,7 +100,7 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false),
+                privacy: new ReportingPrivacy(nativeBridge, playableMraidCampaign, gdprManager, false, false),
                 gdprManager: gdprManager,
                 programmaticTrackingService: programmaticTrackingService
             };
@@ -299,7 +299,7 @@ describe('MRAIDEventHandlersTest', () => {
             adsConfig = TestFixtures.getAdsConfiguration();
             programmaticMraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
 
-            privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
+            privacy = new ReportingPrivacy(nativeBridge, programmaticMraidCampaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             mraidView = new MRAID(nativeBridge, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup());
 
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -330,7 +330,7 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false),
+                privacy: new ReportingPrivacy(nativeBridge, programmaticMraidCampaign, gdprManager, false, false),
                 gdprManager: gdprManager,
                 programmaticTrackingService: programmaticTrackingService
             };

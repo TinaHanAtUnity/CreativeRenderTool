@@ -10,8 +10,8 @@ import 'mocha';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { GdprManager } from 'Ads/Managers/GdprManager';
+import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
 
 describe('EndScreenTest', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -34,7 +34,8 @@ describe('EndScreenTest', () => {
 
     const createEndScreen = (language : string) : PerformanceEndScreen => {
         const gdprManager = sinon.createStubInstance(GdprManager);
-        const privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
+        const campaign = TestFixtures.getCampaign();
+        const privacy = new ReportingPrivacy(nativeBridge, campaign, gdprManager, false, false);
         const params : IEndScreenParameters = {
             nativeBridge,
             language,
@@ -43,9 +44,9 @@ describe('EndScreenTest', () => {
             abGroup: configuration.getAbGroup(),
             privacy,
             showGDPRBanner: false,
-            campaignId: TestFixtures.getCampaign().getId()
+            campaignId: campaign.getId()
         };
-        return new PerformanceEndScreen(params, TestFixtures.getCampaign());
+        return new PerformanceEndScreen(params, campaign);
     };
 
     xit('should render', () => {

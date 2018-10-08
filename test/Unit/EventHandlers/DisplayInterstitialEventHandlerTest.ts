@@ -19,7 +19,7 @@ import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
 
 describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;
@@ -67,7 +67,7 @@ describe('DisplayInterstitialEventHandler', () => {
             const coreConfig = TestFixtures.getCoreConfiguration();
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
-            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
+            const privacy = new ReportingPrivacy(nativeBridge, campaign, gdprManager, false, false);
 
             view = new DisplayInterstitial(nativeBridge, placement, campaign, privacy, false);
 
