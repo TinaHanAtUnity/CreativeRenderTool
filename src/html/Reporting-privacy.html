@@ -7,41 +7,37 @@
         <span class="not-gdpr">
             <div class="privacy-text">
                 <p>
-                        This advertisement has been served by Unity Ads. Unity Ads collects information gathered through
-                        your use of apps in order to create an individualized and more relevant user experience and to
-                        show you ads that are more likely to interest you (“personalized experiences and ads”). From
-                        your interaction with this app, here is an example of the information we use to predict which
-                        other apps might interest you:
+                    This advertisement has been served by Unity Ads. Unity Ads collects information gathered through
+                    your use of apps in order to create an individualized and more relevant user experience and to
+                    show you ads that are more likely to interest you (“personalized experiences and ads”). From
+                    your interaction with this app, here is an example of the information we use to predict which
+                    other apps might interest you:
                 </p>
-                <% if(data.userInformation) { %>
                 <p>
-                    <span id="phone-type"> - Using <% data.userInformation.deviceModel %></span>
+                    <span id="phone-type"></span>
+                </p>
+                <p>
+                    <span id="country"></span>
                 </p>
 
                 <p>
-                    <span id="country"> - Located in <% data.userInformation.country %></span>
+                    <span id="game-plays-this-week"></span>
                 </p>
 
                 <p>
-                    <span id="game-plays-this-week"> - Used this app <% data.userInformation.gamePlaysThisWeek %> times this week</span>
+                    <span id="ads-seen-in-game"></span>
                 </p>
 
                 <p>
-                    <span id="ads-seen-in-game"> - Seen <% data.userInformation.adsSeenInGameThisWeek %> ads in this app</span>
+                    <span id="games-installed-from-ads"></span>
                 </p>
-
-                <p>
-                    <span id="games-installed-from-ads"> - Installed <% data.userInformation.installsFromAds %> apps based on those ads</span>
-                </p>
-                <% } else { %>
                 <p>
                     <span id="sorry-message">Sorry. We were unable to deliver our collected information at this time.</span>
                 </p>
-                <% } %>
                 <p>
-                        Please review our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> for
-                        a full description of our data practices. You can opt-out of Unity Ads’ personalized
-                        experiences and ads through your device settings.
+                    Please review our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> for
+                    a full description of our data practices. You can opt-out of Unity Ads’ personalized
+                    experiences and ads through your device settings.
                 </p>
             </div>
         </div>

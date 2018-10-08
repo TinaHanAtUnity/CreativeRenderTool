@@ -89,8 +89,10 @@ export class ReportingPrivacy extends AbstractPrivacy {
 
     public show(): void {
         super.show();
+
+        this.editPopupPerUser();
+
         if (this._gdprEnabled) {
-            this.editPopupPerUser();
             const elId = this._gdprManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
             const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
