@@ -42,7 +42,7 @@ import { NotificationApi } from 'Core/Native/iOS/Notification';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 import { AndroidPreferencesApi } from 'Core/Native/Android/Preferences';
 import { IosPreferencesApi } from 'Core/Native/iOS/Preferences';
-import { IModule } from './Modules/IModule';
+import { IModule } from 'Core/Modules/IModule';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
