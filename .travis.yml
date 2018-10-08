@@ -1,32 +1,40 @@
 sudo: false
-
 language: python
-python: "3.6"
-
+python: '3.6'
 addons:
   apt:
     packages:
-      - libimage-exiftool-perl
-      - parallel
-
+    - libimage-exiftool-perl
+    - parallel
+env:
+  global:
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 install:
-  - . $HOME/.nvm/nvm.sh
-  - nvm install stable
-  - nvm use stable
-  - pip install awscli
-  - npm install
-
+- ". $HOME/.nvm/nvm.sh"
+- nvm install stable
+- nvm use stable
+- pip install awscli
+- npm install
 cache:
   pip: true
   directories:
-    - node_modules
-
+  - node_modules
+  - "$HOME/google-cloud-sdk/"
 script: make lint && make test-coverage && make test-integration && make build-test && make test-browser && make build-release && make deploy
-
 notifications:
   slack:
     rooms:
-      - unity:PLPHkrYyAyDCW5umUmcUDIZZ
+    - unity:PLPHkrYyAyDCW5umUmcUDIZZ
     on_success: change
     on_failure: always
     on_start: never
+before_install:
+- openssl aes-256-cbc -K $encrypted_1c97d33aa3ba_key -iv $encrypted_1c97d33aa3ba_iv -in gcs_credentials.json.enc -out gcs_credentials.json -d
+- if [ ! -e ${HOME}/google-cloud-sdk/.installed.dummy ]; then
+    rm -rf ${HOME}/google-cloud-sdk;
+    curl https://sdk.cloud.google.com | bash > /dev/null;
+    touch ${HOME}/google-cloud-sdk/.installed.dummy;
+  fi
+- echo 'source $HOME/google-cloud-sdk/path.bash.inc' > ~/.bashrc
+- source ~/google-cloud-sdk/path.bash.inc
+- gcloud auth activate-service-account --key-file gcs_credentials.json

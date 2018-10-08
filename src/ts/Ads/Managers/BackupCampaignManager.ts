@@ -10,7 +10,8 @@ import { CampaignLoader } from 'Ads/Parsers/CampaignLoader';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { IFileInfo } from 'Core/Native/Cache';
-import { Video } from 'Ads/Models/Assets/Video';
+import { MraidLoader } from 'MRAID/Parsers/MraidLoader';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 export class BackupCampaignManager {
     private static _maxExpiryDelay: number = 7 * 24 * 3600 * 1000; // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
@@ -110,6 +111,8 @@ export class BackupCampaignManager {
             return 'performance';
         } else if(campaign instanceof AdMobCampaign) {
             return 'admob';
+        } else if(campaign instanceof MRAIDCampaign) {
+            return 'mraid';
         } else {
             return undefined;
         }
@@ -120,6 +123,8 @@ export class BackupCampaignManager {
             return new CometCampaignLoader();
         } else if(campaignType === 'admob') {
             return new ProgrammaticAdMobLoader();
+        } else if (campaignType === 'mraid') {
+            return new MraidLoader();
         } else {
             return undefined;
         }

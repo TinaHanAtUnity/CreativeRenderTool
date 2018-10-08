@@ -74,38 +74,33 @@
                 <span id="coppaTag2">These partners may collect information about your advertising ID from sources other than Unity to further personalize the ads you see. Please visit the privacy policies of these third parties to review the compiled data they may have.</span>
                 <% } %>
             </p>
-
             <p>
                 From your interaction with this app, here is an example of the information we use to predict which
                 other apps might interest
                 you:
             </p>
-
-            <% if(data.userInformation) { %>
             <p>
-                <span id="phone-type"> - Using <% data.userInformation.deviceModel %>.</span>
+                <span id="phone-type"></span>
+            </p>
+            <p>
+                <span id="country"></span>
             </p>
 
             <p>
-                <span id="country"> - Playing in <% data.userInformation.country %>.</span>
+                <span id="game-plays-this-week"></span>
             </p>
 
             <p>
-                <span id="game-plays-this-week"> - Played this game <% data.userInformation.gamePlaysThisWeek %> times this week.</span>
+                <span id="ads-seen-in-game"></span>
             </p>
 
             <p>
-                <span id="ads-seen-in-game"> - Seen <% data.userInformation.adsSeenInGameThisWeek %> ads in this game.</span>
+                <span id="games-installed-from-ads"></span>
             </p>
-
-            <p>
-                <span id="games-installed-from-ads"> - Installed <% data.userInformation.installsFromAds %> games based on those ads.</span>
-            </p>
-            <% } else { %>
             <p>
                 <span id="sorry-message">Sorry. We were unable to deliver our collected information at this time.</span>
             </p>
-            <% } %>
+
 
             <p><span class="header">Selection</span></p>
             <p>
