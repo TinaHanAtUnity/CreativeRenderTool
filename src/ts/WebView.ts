@@ -99,7 +99,7 @@ export class WebView {
     private _sessionManager: SessionManager;
     private _wakeUpManager: WakeUpManager;
     private _focusManager: FocusManager;
-    private _analyticsManager: AnalyticsManager;
+    private _analyticsManager: AnalyticsManager | undefined;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _missedImpressionManager: MissedImpressionManager;
     private _gdprManager: GdprManager;
@@ -265,9 +265,10 @@ export class WebView {
 
             let analyticsPromise;
             if(this._coreConfig.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
-                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._coreConfig, this._focusManager);
+                const analyticsManager = new AnalyticsManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._coreConfig, this._focusManager);
+                this._analyticsManager = analyticsManager;
                 analyticsPromise = this._analyticsManager.init().then(() => {
-                    this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
+                    this._sessionManager.setGameSessionId(analyticsManager.getGameSessionId());
                 });
             } else {
                 const analyticsStorage: AnalyticsStorage = new AnalyticsStorage(this._nativeBridge);
@@ -299,7 +300,7 @@ export class WebView {
 
             const bannerCampaignManager = new BannerCampaignManager(this._nativeBridge, this._coreConfig, this._adsConfig, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._jaegerManager);
             const bannerWebPlayerContainer = new BannerWebPlayerContainer(this._nativeBridge);
-            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._coreConfig, this._adsConfig, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._analyticsManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer, this._programmaticTrackingService);
+            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._coreConfig, this._adsConfig, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer, this._programmaticTrackingService);
             this._bannerAdContext = new BannerAdContext(this._nativeBridge, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, this._focusManager, this._deviceInfo);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._coreConfig, this._adsConfig, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo, this._cache);

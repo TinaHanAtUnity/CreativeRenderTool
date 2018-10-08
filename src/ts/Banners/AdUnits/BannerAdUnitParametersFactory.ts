@@ -36,7 +36,7 @@ export class BannerAdUnitParametersFactory {
     private _gdprManager: GdprManager;
     private _programmaticTrackingService: ProgrammaticTrackingService;
 
-    constructor(nativeBridge: NativeBridge, request: Request, metadataManager: MetaDataManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, analyticsManager: AnalyticsManager, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer, programmaticTrackingService: ProgrammaticTrackingService) {
+    constructor(nativeBridge: NativeBridge, request: Request, metadataManager: MetaDataManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer, programmaticTrackingService: ProgrammaticTrackingService) {
         this._nativeBridge = nativeBridge;
         this._request = request;
         this._metadataManager = metadataManager;
