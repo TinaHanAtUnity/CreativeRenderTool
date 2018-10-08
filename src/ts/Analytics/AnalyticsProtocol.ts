@@ -6,7 +6,6 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
-// export type IAnalyticsCustomParams = {};
 export type IAnalyticsMessage = {};
 
 export interface IAnalyticsMonetizationExtras {
