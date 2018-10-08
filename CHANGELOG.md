@@ -1,3 +1,8 @@
+# Pending
+
+* AB Test various improvements to the endscreen layout in groups 16 & 17 [#6556](https://github.com/Applifier/unity-ads-webview/pull/6556)
+* AB Test Smart Close button in groups 18 & 19 [#6238](https://github.com/Applifier/unity-ads-webview/pull/6238) 
+
 # Fri Oct  5 21:40:11 UTC 2018
 
 * Enable Reporting Privacy for All [#6575](https://github.com/Applifier/unity-ads-webview/pull/6575)
