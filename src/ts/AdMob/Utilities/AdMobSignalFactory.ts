@@ -230,7 +230,7 @@ export class AdMobSignalFactory {
         const promises = [];
 
         promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {
-            signal.setBatteryLevel(batteryLevel);
+            signal.setBatteryLevel(batteryLevel * 100);
         }).catch(() => {
             this.logFailure(nativeBridge, 'batteryLevel');
         }));
