@@ -11,6 +11,7 @@ import { Request } from 'Core/Managers/Request';
 import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
+import { ICoreApi } from '../../Core/Core';
 
 export class ProgrammaticVastParser extends CampaignParser {
     public static ContentType = 'programmatic/vast';
@@ -22,24 +23,24 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     protected _vastParser: VastParser = new VastParser();
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
 
         if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
             this._vastParser.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
         }
 
-        return this._vastParser.retrieveVast(decodedVast, nativeBridge, request).then((vast): Promise<Campaign> => {
-            const campaignId = this.getProgrammaticCampaignId(nativeBridge);
-            return this.parseVastToCampaign(vast, nativeBridge, campaignId, session, response);
+        return this._vastParser.retrieveVast(decodedVast, core, request).then((vast): Promise<Campaign> => {
+            const campaignId = this.getProgrammaticCampaignId(platform);
+            return this.parseVastToCampaign(vast, platform, campaignId, session, response);
         });
     }
 
-    protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, campaignId: string, session: Session, response: AuctionResponse): Promise<Campaign> {
+    protected parseVastToCampaign(vast: Vast, platform: Platform, campaignId: string, session: Session, response: AuctionResponse): Promise<Campaign> {
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
-            id: this.getProgrammaticCampaignId(nativeBridge),
+            id: this.getProgrammaticCampaignId(platform),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
@@ -93,7 +94,7 @@ export class ProgrammaticVastParser extends CampaignParser {
             );
             throw videoUrlError;
         }
-        if(nativeBridge.getPlatform() === Platform.IOS && !campaign.getVideo().getUrl().match(/^https:\/\//)) {
+        if(platform === Platform.IOS && !campaign.getVideo().getUrl().match(/^https:\/\//)) {
             const videoUrlError = new DiagnosticError(
                 new Error('Campaign video url needs to be https for iOS'),
                 {rootWrapperVast: response.getContent()}

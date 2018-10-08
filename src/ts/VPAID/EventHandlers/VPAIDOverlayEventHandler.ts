@@ -3,7 +3,6 @@ import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { ICloseHandler } from 'Ads/Views/Closer';
 import { FinishState } from 'Core/Constants/FinishState';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
@@ -15,7 +14,7 @@ export class VPAIDOverlayEventHandler extends GDPREventHandler implements IClose
     private _placement: Placement;
     private _endScreen: VPAIDEndScreen | undefined;
 
-    constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
+    constructor(adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
         super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
         this._adUnit = adUnit;
         this._operativeEventManager = parameters.operativeEventManager;

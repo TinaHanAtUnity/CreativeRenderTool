@@ -16,12 +16,16 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Managers/Request';
+import { ICoreApi } from '../../Core/Core';
+import { Platform } from '../../Core/Constants/Platform';
+import { IAdsApi } from '../../Ads/Ads';
 
 export class BannerAdUnitParametersFactory {
 
-    private _nativeBridge: NativeBridge;
+    private _platform: Platform;
+    private _core: ICoreApi;
+    private _ads: IAdsApi;
     private _request: Request;
     private _metadataManager: MetaDataManager;
     private _coreConfig: CoreConfiguration;
@@ -36,8 +40,9 @@ export class BannerAdUnitParametersFactory {
     private _gdprManager: GdprManager;
     private _programmaticTrackingService: ProgrammaticTrackingService;
 
-    constructor(nativeBridge: NativeBridge, request: Request, metadataManager: MetaDataManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, analyticsManager: AnalyticsManager, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer, programmaticTrackingService: ProgrammaticTrackingService) {
-        this._nativeBridge = nativeBridge;
+    constructor(platform: Platform, core: ICoreApi, ads: IAdsApi, request: Request, metadataManager: MetaDataManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, analyticsManager: AnalyticsManager, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer, programmaticTrackingService: ProgrammaticTrackingService) {
+        this._platform = platform;
+        this._core = core;
         this._request = request;
         this._metadataManager = metadataManager;
         this._coreConfig = coreConfig;
@@ -58,18 +63,20 @@ export class BannerAdUnitParametersFactory {
             this.getDeviceOrientation()
         ]).then(([orientation]) => {
             return {
+                platform: this._platform,
+                core: this._core,
+                ads: this._ads,
                 forceOrientation: orientation,
                 webPlayerContainer: this._webPlayerContainer,
                 focusManager: this._focusManager,
                 container: this._container,
                 deviceInfo: this._deviceInfo,
                 clientInfo: this._clientInfo,
-                thirdPartyEventManager: new ThirdPartyEventManager(this._nativeBridge, this._request, {
+                thirdPartyEventManager: new ThirdPartyEventManager(this._core, this._request, {
                     '%ZONE%': placement.getId(),
                     '%SDK_VERSION%': this._clientInfo.getSdkVersion().toString()
                 }),
                 operativeEventManager: OperativeEventManagerFactory.createOperativeEventManager({
-                    nativeBridge: this._nativeBridge,
                     request: this._request,
                     metaDataManager: this._metadataManager,
                     sessionManager: this._sessionManager,
@@ -77,6 +84,9 @@ export class BannerAdUnitParametersFactory {
                     deviceInfo: this._deviceInfo,
                     coreConfig: this._coreConfig,
                     adsConfig: this._adsConfig,
+                    platform: this._platform,
+                    core: this._core,
+                    ads: this._ads,
                     campaign: campaign
                 }),
                 placement: placement,

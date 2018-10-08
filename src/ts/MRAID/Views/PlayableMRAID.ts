@@ -14,10 +14,15 @@ import MRAIDContainer from 'html/mraid/container.html';
 import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
+import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
+import { ICoreApi } from '../../Core/Core';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private static CloseLength = 30;
+
+    protected _template: Template;
+    private _deviceInfo: AndroidDeviceInfo;
 
     private _localization: Localization;
 
@@ -48,9 +53,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     protected _campaign: PerformanceMRAIDCampaign;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: PerformanceMRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
-        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: AndroidDeviceInfo, placement: Placement, campaign: PerformanceMRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
+        super(platform, core, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
+        this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
         this._localization = new Localization(language, 'loadingscreen');
@@ -125,10 +131,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this.createMRAID(container).then(mraid => {
             iframe.onload = () => this.onIframeLoaded();
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
-            this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
+            this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
         }).catch((err) => {
-            this._nativeBridge.Sdk.logError('failed to create mraid: ' + err);
+            this._core.Sdk.logError('failed to create mraid: ' + err);
 
             SessionDiagnostics.trigger('create_mraid_error', {
                 message: err.message
@@ -216,7 +222,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
 
         const frameLoadDuration = (Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId())) / 1000;
-        this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' s');
+        this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' s');
 
         if (this.isKPIDataValid({frameLoadDuration}, 'playable_mraid_playable_loading_time')) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, 0, 0, 'playable_loading_time', {}));
@@ -330,7 +336,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
+        if(this._platform && this._deviceInfo.getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
             this._container.style.display = 'none';
             /* tslint:disable:no-unused-expression */

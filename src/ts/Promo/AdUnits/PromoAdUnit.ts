@@ -10,7 +10,6 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { Promo } from 'Promo/Views/Promo';
 
@@ -30,8 +29,8 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _keyDownListener: (kc: number) => void;
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
 
-    constructor(nativeBridge: NativeBridge, parameters: IPromoAdUnitParameters) {
-        super(nativeBridge, parameters);
+    constructor(parameters: IPromoAdUnitParameters) {
+        super(parameters);
 
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._additionalTrackingEvents = parameters.campaign.getTrackingEventUrls();
@@ -45,12 +44,12 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public show(): Promise<void> {
         this.setShowing(true);
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
+        this._ads.Listener.sendStartEvent(this._placement.getId());
         this._promoView.show();
         this.sendTrackingEvent('impression');
 
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
+        if (this._platform === Platform.ANDROID) {
+            this._ads.Android!.AdUnit.onKeyDown.subscribe(this._keyDownListener);
         }
 
         this._container.addEventHandler(this);
@@ -66,8 +65,8 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
         this.setShowing(false);
 
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._keyDownListener);
+        if (this._platform === Platform.ANDROID) {
+            this._ads.Android!.AdUnit.onKeyDown.unsubscribe(this._keyDownListener);
         }
 
         this._container.removeEventHandler(this);
@@ -82,7 +81,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._promoView.container().parentElement!.removeChild(this._promoView.container());
         this.unsetReferences();
 
-        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
 
         this.onFinish.trigger();
         this.onClose.trigger();
@@ -90,7 +89,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendClick(): void {
-        this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
+        this._ads.Listener.sendClickEvent(this._placement.getId());
         this.sendTrackingEvent('click');
     }
 

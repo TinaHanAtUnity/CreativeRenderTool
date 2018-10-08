@@ -22,10 +22,11 @@ export class Promo extends AdsModule implements IApiModule {
     }
 
     public initialize(): Promise<void> {
-        PurchasingUtilities.initialize(this);
+        PurchasingUtilities.initialize(this.Ads.Core.Api, this.Api, this.Ads.Core.ClientInfo, this.Ads.Core.Config, this.Ads.Config, this.Ads.PlacementManager);
         PurchasingUtilities.sendPurchaseInitializationEvent();
         this.Api.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(iapPayload));
         this._initialized = true;
+        return Promise.resolve();
     }
 
     public isInitialized() {

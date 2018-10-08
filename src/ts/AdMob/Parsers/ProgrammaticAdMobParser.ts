@@ -13,15 +13,15 @@ import { Request } from 'Core/Managers/Request';
 import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { VastParser } from 'VAST/Utilities/VastParser';
+import { ICoreApi } from '../../Core/Core';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
-        const platform = nativeBridge.getPlatform();
         const videoPromise = this.getVideoFromMarkup(markup, request, session, platform).catch((e) => {
-            nativeBridge.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
+            core.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
             return null;
         });
 
@@ -30,7 +30,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 this.updateFileID(video);
             }
             const baseCampaignParams: ICampaign = {
-                id: this.getProgrammaticCampaignId(nativeBridge),
+                id: this.getProgrammaticCampaignId(platform),
                 willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
                 adType: response.getAdType() || undefined,
                 correlationId: response.getCorrelationId() || undefined,

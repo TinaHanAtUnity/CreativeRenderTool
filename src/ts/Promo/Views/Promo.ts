@@ -9,6 +9,7 @@ import { View } from 'Core/Views/View';
 import PromoTpl from 'html/Promo.html';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { ICoreApi } from '../../Core/Core';
 
 export class Promo extends View<{}> implements IPrivacyHandler {
 
@@ -16,6 +17,9 @@ export class Promo extends View<{}> implements IPrivacyHandler {
     public readonly onClose = new Observable0();
     public readonly onGDPRPopupSkipped = new Observable0();
 
+    protected _template: Template;
+
+    private _core: ICoreApi;
     private _promoCampaign: PromoCampaign;
     private _localization: Localization;
     private _iframe: HTMLIFrameElement | null;
@@ -27,10 +31,11 @@ export class Promo extends View<{}> implements IPrivacyHandler {
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: PromoCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
-        super(nativeBridge, 'promo');
+    constructor(platform: Platform, core: ICoreApi, campaign: PromoCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+        super(platform, 'promo');
         this._localization = new Localization(language, 'promo');
 
+        this._core = core;
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
 
@@ -168,7 +173,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
         return this.getStaticMarkup().then((markup) => {
             return this.replaceDynamicMarkupPlaceholder(markup);
         }).catch((e) => {
-            this._nativeBridge.Sdk.logError('failed to get promo markup: ' + e);
+            this._core.Sdk.logError('failed to get promo markup: ' + e);
             return '';
         });
     }
@@ -176,12 +181,12 @@ export class Promo extends View<{}> implements IPrivacyHandler {
     private getStaticMarkup(): Promise<string> {
         const resourceUrl = this._promoCampaign.getCreativeResource();
         if(resourceUrl) {
-            if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            if (this._platform === Platform.ANDROID) {
                 return XHRequest.get(resourceUrl.getUrl());
             } else {
                 const fileId = resourceUrl.getFileId();
                 if (fileId) {
-                    return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
+                    return this._core.Cache.getFileContent(fileId, 'UTF-8');
                 } else {
                     return XHRequest.get(resourceUrl.getOriginalUrl());
                 }

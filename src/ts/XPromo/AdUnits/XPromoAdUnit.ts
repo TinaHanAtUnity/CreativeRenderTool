@@ -1,7 +1,6 @@
 import { IVideoAdUnitParameters, VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 
@@ -15,7 +14,7 @@ export class XPromoAdUnit extends VideoAdUnit<XPromoCampaign> {
     private _endScreen: XPromoEndScreen;
     private _privacy: AbstractPrivacy;
 
-    constructor(nativeBridge: NativeBridge, parameters: IXPromoAdUnitParameters) {
+    constructor(parameters: IXPromoAdUnitParameters) {
         super(parameters);
 
         parameters.overlay.setSpinnerEnabled(!CampaignAssetInfo.isCached(parameters.campaign));

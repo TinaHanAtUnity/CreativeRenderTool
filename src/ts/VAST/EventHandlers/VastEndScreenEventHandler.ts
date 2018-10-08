@@ -7,17 +7,20 @@ import { Request } from 'Core/Managers/Request';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { ICoreApi } from '../../Core/Core';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
-    private _nativeBridge: NativeBridge;
     private _vastAdUnit: VastAdUnit;
     private _clientInfo: ClientInfo;
     private _request: Request;
     private _campaign: VastCampaign;
     private _vastEndScreen: VastEndScreen | null;
+    private _platform: Platform;
+    private _core: ICoreApi;
 
-    constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
-        this._nativeBridge = nativeBridge;
+    constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
+        this._platform = parameters.platform;
+        this._core = parameters.core;
         this._vastAdUnit = adUnit;
         this._clientInfo = parameters.clientInfo;
         this._request = parameters.request;
@@ -58,10 +61,10 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     }
 
     public onOpenUrl(url: string): Promise<void> {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.UrlScheme.open(url);
+        if (this._platform === Platform.IOS) {
+            return this._core.iOS!.UrlScheme.open(url);
         } else {
-            return this._nativeBridge.Intent.launch({
+            return this._core.Android!.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': url
             });

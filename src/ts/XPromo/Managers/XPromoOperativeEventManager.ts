@@ -96,8 +96,8 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
 
             return HttpKafka.sendEvent(kafkaType, KafkaCommonObjectType.PERSONAL, infoJson).catch(() => {
                 const sessionId = this._campaign.getSession().getId();
-                return this._nativeBridge.DeviceInfo.getUniqueEventId().then(eventId => {
-                    new FailedXpromoOperativeEventManager(sessionId, eventId).storeFailedEvent(this._nativeBridge, {
+                return this._core.DeviceInfo.getUniqueEventId().then(eventId => {
+                    new FailedXpromoOperativeEventManager(this._core.Storage, eventId).storeFailedEvent({
                         kafkaType: kafkaType,
                         data: JSON.stringify(infoJson)
                     });

@@ -4,21 +4,25 @@ import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { MOAT } from 'Ads/Views/MOAT';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Managers/Request';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { ICoreApi } from '../../Core/Core';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
+    private _platform: Platform;
+    private _core: ICoreApi;
     private _vastAdUnit: VastAdUnit;
     private _request: Request;
     private _vastCampaign: VastCampaign;
     private _moat?: MOAT;
     private _vastOverlay?: AbstractVideoOverlay;
 
-    constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
-        super(nativeBridge, adUnit, parameters);
+    constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
+        super(adUnit, parameters);
 
+        this._platform = parameters.platform;
+        this._core = parameters.core;
         this._vastAdUnit = adUnit;
         this._request = parameters.request;
         this._vastCampaign = parameters.campaign;
@@ -58,7 +62,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         super.onOverlayCallButton();
 
         this.setCallButtonEnabled(false);
-        this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
+        this._ads.Listener.sendClickEvent(this._placement.getId());
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
@@ -78,10 +82,10 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     }
 
     private openUrl(url: string): Promise<void> {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.UrlScheme.open(url);
+        if (this._platform === Platform.IOS) {
+            return this._core.iOS!.UrlScheme.open(url);
         } else {
-            return this._nativeBridge.Intent.launch({
+            return this._core.Android!.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': url
             });

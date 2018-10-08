@@ -27,7 +27,7 @@ export abstract class View<T extends object> {
     protected abstract _template: Template;
     protected _templateData: { [key: string]: TemplateDataType | ITemplateData } = {};
     protected _bindings: IViewBinding[] = [];
-    protected _container?: HTMLElement;
+    protected _container: HTMLElement;
     protected _handlers: T[] = [];
 
     protected _id: string;
@@ -74,7 +74,7 @@ export abstract class View<T extends object> {
         });
     }
 
-    public container(): HTMLElement | undefined {
+    public container(): HTMLElement {
         return this._container;
     }
 

@@ -3,8 +3,9 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Managers/Request';
+import { Platform } from '../../Core/Constants/Platform';
+import { ICoreApi } from '../../Core/Core';
 
 export class BannerCampaignParser extends CampaignParser {
     public static ContentTypeJS = 'programmatic/banner-js';
@@ -17,10 +18,10 @@ export class BannerCampaignParser extends CampaignParser {
         this._wrapJS = wrapJS;
     }
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: Request, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
         const markup = this._wrapJS ? this.getJSContent(response) : this.getHTMLContent(response);
         const campaign = <IBannerCampaign>{
-            id: this.getProgrammaticCampaignId(nativeBridge),
+            id: this.getProgrammaticCampaignId(platform),
             adType: response.getAdType(),
             correlationId: response.getCorrelationId(),
             mediaId: response.getMediaId(),

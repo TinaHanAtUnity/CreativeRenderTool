@@ -8,6 +8,8 @@ import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
+import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
+import { ICoreApi } from '../../Core/Core';
 
 export interface IDisplayInterstitialHandler extends IGDPREventHandler {
     onDisplayInterstitialClose(): void;
@@ -19,6 +21,8 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     public readonly onPrivacyClosed: Observable0 = new Observable0();
 
     protected _template: Template;
+    private _core: ICoreApi;
+    private _deviceInfo: AndroidDeviceInfo;
     private _placement: Placement;
     private _campaign: DisplayInterstitialCampaign;
 
@@ -34,9 +38,11 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     private _timers: number[] = [];
     private _showGDPRBanner: boolean;
 
-    constructor(platform: Platform, placement: Placement, campaign: DisplayInterstitialCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: AndroidDeviceInfo, placement: Placement, campaign: DisplayInterstitialCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(platform, 'display-interstitial');
 
+        this._core = core;
+        this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
         this._template = new Template(DisplayInterstitialTemplate);

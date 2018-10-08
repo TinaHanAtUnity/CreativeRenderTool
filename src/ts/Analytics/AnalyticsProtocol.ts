@@ -4,7 +4,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from '../Core/Core';
 
 export interface IAnalyticsObject {
     type: string;
@@ -83,17 +83,17 @@ export class AnalyticsProtocol {
         };
     }
 
-    public static getDeviceInfoObject(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<IAnalyticsObject> {
+    public static getDeviceInfoObject(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<IAnalyticsObject> {
         return Promise.all([
-            AnalyticsProtocol.getScreen(nativeBridge, deviceInfo),
-            AnalyticsProtocol.getDeviceModel(nativeBridge, deviceInfo)
+            AnalyticsProtocol.getScreen(platform, core, deviceInfo),
+            AnalyticsProtocol.getDeviceModel(platform, core, deviceInfo)
         ]).then(([screen, model]) => {
             const event: IAnalyticsDeviceInfoEvent = {
                 ts: Date.now(),
                 app_ver: clientInfo.getApplicationVersion(),
                 adsid: deviceInfo.getAdvertisingIdentifier(),
                 ads_tracking: deviceInfo.getLimitAdTracking() ? false : true, // intentionally inverted value
-                os_ver: AnalyticsProtocol.getOsVersion(nativeBridge, deviceInfo),
+                os_ver: AnalyticsProtocol.getOsVersion(platform, deviceInfo),
                 model: model,
                 app_name: clientInfo.getApplicationName(),
                 ram: Math.round(deviceInfo.getTotalMemory() / 1024), // convert DeviceInfo kilobytes to analytics megabytes
@@ -163,13 +163,13 @@ export class AnalyticsProtocol {
         }
     }
 
-    private static getScreen(nativeBridge: NativeBridge, deviceInfo: DeviceInfo): Promise<string> {
-        if(nativeBridge.getPlatform() === Platform.IOS) {
+    private static getScreen(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo): Promise<string> {
+        if(platform === Platform.IOS) {
             return Promise.all([
                 deviceInfo.getScreenWidth(),
                 deviceInfo.getScreenHeight(),
-                nativeBridge.DeviceInfo.Ios.isStatusBarHidden(),
-                nativeBridge.DeviceInfo.Ios.getStatusBarHeight()
+                core.DeviceInfo.Ios!.isStatusBarHidden(),
+                core.DeviceInfo.Ios!.getStatusBarHeight()
             ]).then(([width, height, statusBarHidden, statusBarHeight]) => {
                 let screenWidth = width;
                 let screenHeight = height;
@@ -207,11 +207,11 @@ export class AnalyticsProtocol {
         }
     }
 
-    private static getDeviceModel(nativeBridge: NativeBridge, deviceInfo: DeviceInfo): Promise<string> {
-        if(nativeBridge.getPlatform() === Platform.IOS) {
+    private static getDeviceModel(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo): Promise<string> {
+        if(platform === Platform.IOS) {
             return Promise.resolve(deviceInfo.getModel());
-        } else if (nativeBridge.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
-            return nativeBridge.DeviceInfo.Android.getDevice().then(device => {
+        } else if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
+            return core.DeviceInfo.Android!.getDevice().then(device => {
                 return deviceInfo.getManufacturer() + '/' + deviceInfo.getModel() + '/' + device;
             });
         } else {
@@ -219,10 +219,10 @@ export class AnalyticsProtocol {
         }
     }
 
-    private static getOsVersion(nativeBridge: NativeBridge, deviceInfo: DeviceInfo): string {
-        if(nativeBridge.getPlatform() === Platform.IOS) {
+    private static getOsVersion(platform: Platform, deviceInfo: DeviceInfo): string {
+        if(platform === Platform.IOS) {
             return 'iOS ' + deviceInfo.getOsVersion();
-        } else if (nativeBridge.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
+        } else if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             return 'Android OS ' + deviceInfo.getOsVersion() + ' / API-' + deviceInfo.getApiLevel();
         } else {
             return '';

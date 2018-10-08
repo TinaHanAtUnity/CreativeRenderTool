@@ -546,7 +546,7 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        return parser.parse(this._nativeBridge, this._request, response, session, this._deviceInfo.getOsVersion(), this._clientInfo.getGameId()).then((campaign) => {
+        return parser.parse(this._platform, this._core, this._request, response, session, this._deviceInfo.getOsVersion(), this._clientInfo.getGameId()).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
                 PurchasingUtilities.placementManager.addCampaignPlacementIds(placement, campaign);
@@ -600,7 +600,7 @@ export class CampaignManager {
 
         const parser: CampaignParser = this.getCampaignParser(response.getContentType());
 
-        return parser.parse(this._nativeBridge, this._request, response, session).then((campaign) => {
+        return parser.parse(this._platform, this._core, this._request, response, session).then((campaign) => {
             campaign.setMediaId(response.getMediaId());
 
             return campaign;
@@ -770,7 +770,7 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
         promises.push(this._deviceInfo.getHeadset());
-        promises.push(this._deviceInfo.getDeviceVolume());
+        promises.push(this._deviceInfo.getDeviceVolume(this._platform));
         promises.push(this.getFullyCachedCampaigns());
         promises.push(this.getVersionCode());
         promises.push(this._adMobSignalFactory.getAdRequestSignal().then(signal => {

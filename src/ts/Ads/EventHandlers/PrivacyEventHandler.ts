@@ -5,7 +5,6 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { ICoreApi } from '../../Core/Core';
 
 export class PrivacyEventHandler implements IPrivacyHandler {
@@ -16,7 +15,7 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     private _configuration: AdsConfiguration;
     private _placement: Placement;
 
-    constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
+    constructor(parameters: IAdUnitParameters<Campaign>) {
         this._platform = parameters.platform;
         this._core = parameters.core;
         this._gdprManager = parameters.gdprManager;

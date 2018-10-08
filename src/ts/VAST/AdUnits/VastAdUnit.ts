@@ -21,8 +21,8 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _events: Array<[number, string]> = [[0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
 
-    constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
-        super(nativeBridge, parameters);
+    constructor(parameters: IVastAdUnitParameters) {
+        super(parameters);
 
         parameters.overlay.setSpinnerEnabled(!parameters.campaign.getVideo().isCached());
 
@@ -37,15 +37,15 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
             document.body.appendChild(this._endScreen.container());
         }
 
-        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+        if(parameters.platform === Platform.ANDROID) {
             Promise.all([
-                nativeBridge.DeviceInfo.Android.getDeviceVolume(StreamType.STREAM_MUSIC),
-                nativeBridge.DeviceInfo.Android.getDeviceMaxVolume(StreamType.STREAM_MUSIC)
+                parameters.core.DeviceInfo.Android!.getDeviceVolume(StreamType.STREAM_MUSIC),
+                parameters.core.DeviceInfo.Android!.getDeviceMaxVolume(StreamType.STREAM_MUSIC)
             ]).then(([volume, maxVolume]) => {
                 this.setVolume(volume / maxVolume);
             });
-        } else if(nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.DeviceInfo.Ios.getDeviceVolume().then((volume) => {
+        } else if(parameters.platform === Platform.IOS) {
+            parameters.core.DeviceInfo.Ios!.getDeviceVolume().then((volume) => {
                 this.setVolume(volume);
             });
         }

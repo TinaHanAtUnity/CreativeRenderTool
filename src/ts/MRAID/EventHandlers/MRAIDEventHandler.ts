@@ -9,16 +9,16 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestError } from 'Core/Errors/RequestError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Request } from 'Core/Managers/Request';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { IAdsApi } from '../../Ads/Ads';
+import { ICoreApi } from '../../Core/Core';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
-    private _nativeBridge: NativeBridge;
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adUnit: MRAIDAdUnit;
@@ -27,11 +27,13 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _deviceInfo: DeviceInfo;
     private _request: Request;
     private _placement: Placement;
+    private _platform: Platform;
+    private _core: ICoreApi;
+    private _ads: IAdsApi;
     protected _campaign: MRAIDCampaign;
 
-    constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
+    constructor(adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
         super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
-        this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._adUnit = adUnit;
@@ -41,10 +43,13 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._request = parameters.request;
+        this._platform = parameters.platform;
+        this._core = parameters.core;
+        this._ads = parameters.ads;
     }
 
     public onMraidClick(url: string): Promise<void> {
-        this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
+        this._ads.Listener.sendClickEvent(this._placement.getId());
 
         if (this._campaign.getClickAttributionUrl()) {  // Playable MRAID from Comet
             this.sendTrackingEvents();
@@ -85,7 +90,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
 
     public onMraidOrientationProperties(orientationProperties: IOrientationProperties): void {
         if(this._adUnit.isShowing()) {
-            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            if(this._platform === Platform.IOS) {
                 this._adUnit.getContainer().reorient(true, orientationProperties.forceOrientation);
             } else {
                 this._adUnit.getContainer().reorient(orientationProperties.allowOrientationChange, orientationProperties.forceOrientation);
@@ -157,10 +162,10 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     private openUrl(url: string): Promise<void> {
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.UrlScheme.open(url);
+        if(this._platform === Platform.IOS) {
+            return this._core.iOS!.UrlScheme.open(url);
         } else {
-            return this._nativeBridge.Intent.launch({
+            return this._core.Android!.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': url // todo: these come from 3rd party sources, should be validated before general MRAID support
             });

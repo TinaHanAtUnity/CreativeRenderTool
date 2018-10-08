@@ -1,6 +1,6 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IntentData } from 'Core/Native/Android/Intent';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from '../../Core/Core';
 
 export interface IOpenableIntentsRequest {
     id: string;
@@ -79,14 +79,14 @@ export interface IAFMAHandler {
 }
 
 export class AFMABridge {
+    private _core: ICoreApi;
     private _iframe: HTMLIFrameElement;
-    private _nativeBridge: NativeBridge;
     private _handler: IAFMAHandler;
     private _messageListener: (e: Event) => void;
     private _afmaHandlers: { [eventName: string]: (msg: IAFMAMessage) => void };
 
-    constructor(nativeBridge: NativeBridge, handler: IAFMAHandler) {
-        this._nativeBridge = nativeBridge;
+    constructor(core: ICoreApi, handler: IAFMAHandler) {
+        this._core = core;
         this._handler = handler;
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
         this._afmaHandlers = {};
@@ -130,7 +130,7 @@ export class AFMABridge {
     private onMessage(e: MessageEvent) {
         const message = <IAFMAMessage>e.data;
         if (message.type === 'afma') {
-            this._nativeBridge.Sdk.logInfo(`afma: event=${message.event}, data=${JSON.stringify(message.data)}`);
+            this._core.Sdk.logInfo(`afma: event=${message.event}, data=${JSON.stringify(message.data)}`);
             if (message.event in this._afmaHandlers) {
                 const handler = this._afmaHandlers[message.event];
                 handler(message);

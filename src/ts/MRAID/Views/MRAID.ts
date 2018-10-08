@@ -8,7 +8,6 @@ import { Platform } from 'Core/Constants/Platform';
 
 import { ABGroup, FPSCollectionTest } from 'Core/Models/ABGroup';
 
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import MRAIDTemplate from 'html/MRAID.html';
@@ -16,12 +15,17 @@ import MRAIDPerfContainer from 'html/mraid/container-perf.html';
 import MRAIDContainer from 'html/mraid/container.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { ICoreApi } from '../../Core/Core';
+import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private static CloseLength = 30;
 
     private readonly onLoaded = new Observable0();
+
+    protected _template: Template;
+    private _deviceInfo: AndroidDeviceInfo;
 
     private _closeElement: HTMLElement;
     private _iframe: HTMLIFrameElement;
@@ -45,9 +49,10 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _backgroundTimestamp: number;
     private _creativeId: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
-        super(nativeBridge, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: AndroidDeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
+        super(platform, core, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
+        this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
         this._creativeId = campaign.getCreativeId();
@@ -94,16 +99,16 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this.createMRAID(
             FPSCollectionTest.isValid(this._abGroup) ? MRAIDPerfContainer : MRAIDContainer
         ).then(mraid => {
-            this._nativeBridge.Sdk.logDebug('setting iframe srcdoc (' + mraid.length + ')');
+            this._core.Sdk.logDebug('setting iframe srcdoc (' + mraid.length + ')');
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
-            this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
+            this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
 
             if (CustomFeatures.isSonicPlayable(this._creativeId)) {
                 iframe.sandbox = 'allow-scripts allow-same-origin';
             }
         }).catch(e => {
-            this._nativeBridge.Sdk.logError('failed to create mraid: ' + e);
+            this._core.Sdk.logError('failed to create mraid: ' + e);
 
             SessionDiagnostics.trigger('create_mraid_error', {
                 message: e.message
@@ -229,7 +234,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
+        if(this._platform === Platform.ANDROID && this._deviceInfo.getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
             this._container.style.display = 'none';
             /* tslint:disable:no-unused-expression */
@@ -269,7 +274,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this.onLoaded.trigger();
 
         const frameLoadDuration = (Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId())) / 1000;
-        this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' s');
+        this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' s');
 
         if (this.isKPIDataValid({frameLoadDuration}, 'mraid_playable_loading_time')) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, 0, 0, 'playable_loading_time', {}));

@@ -11,19 +11,20 @@ import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { BannerCampaignParserFactory } from 'Banners/Parsers/BannerCampaignParserFactory';
 import { BannerAuctionRequest } from 'Banners/Utilities/BannerAuctionRequest';
 import { Platform } from 'Core/Constants/Platform';
-import { JaegerManager } from 'Core/Jaeger/JaegerManager';
+import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { INativeResponse, Request } from 'Core/Managers/Request';
+import { ICoreApi } from '../../Core/Core';
 
 export class BannerCampaignManager {
-    private _nativeBridge: NativeBridge;
+    private _platform: Platform;
+    private _core: ICoreApi;
     private _assetManager: AssetManager;
     private _coreConfig: CoreConfiguration;
     private _adsConfig: AdsConfiguration;
@@ -38,8 +39,9 @@ export class BannerCampaignManager {
 
     private _promise: Promise<Campaign> | null;
 
-    constructor(nativeBridge: NativeBridge, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerManager: JaegerManager) {
-        this._nativeBridge = nativeBridge;
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerManager: JaegerManager) {
+        this._platform = platform;
+        this._core = core;
         this._coreConfig = coreConfig;
         this._adsConfig = adsConfig;
         this._assetManager = assetManager;
@@ -61,10 +63,11 @@ export class BannerCampaignManager {
         GameSessionCounters.addAdRequest();
 
         const jaegerSpan = this._jaegerManager.startSpan('BannerCampaignManagerRequest');
-        jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
+        jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._platform]);
 
         const request = BannerAuctionRequest.create({
-            nativeBridge: this._nativeBridge,
+            platform: this._platform,
+            core: this._core,
             adMobSignalFactory: this._adMobSignalFactory,
             coreConfig: this._coreConfig,
             adsConfig: this._adsConfig,
@@ -136,17 +139,17 @@ export class BannerCampaignManager {
             }
         } else {
             const e = new Error('No placements found in realtime campaign json.');
-            this._nativeBridge.Sdk.logError(e.message);
+            this._core.Sdk.logError(e.message);
             return Promise.reject(e);
         }
     }
 
     private handleBannerCampaign(response: AuctionResponse, session: Session): Promise<Campaign> {
-        this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
+        this._core.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
 
         const parser: CampaignParser = this.getCampaignParser(response.getContentType());
 
-        return parser.parse(this._nativeBridge, this._request, response, session, this._deviceInfo.getOsVersion()).then((campaign) => {
+        return parser.parse(this._platform, this._core, this._request, response, session, this._deviceInfo.getOsVersion()).then((campaign) => {
             campaign.setMediaId(response.getMediaId());
             return campaign;
         });

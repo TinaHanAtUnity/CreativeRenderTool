@@ -5,11 +5,13 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { INativeResponse, Request } from 'Core/Managers/Request';
+import { Platform } from '../Core/Constants/Platform';
+import { ICoreApi } from '../Core/Core';
 
 export class AnalyticsManager {
-    private _nativeBridge: NativeBridge;
+    private _platform: Platform;
+    private _core: ICoreApi;
     private _wakeUpManager: WakeUpManager;
     private _request: Request;
     private _clientInfo: ClientInfo;
@@ -26,15 +28,16 @@ export class AnalyticsManager {
     private _endpoint: string;
     private _newSessionTreshold: number = 1800000; // 30 minutes in milliseconds
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, focusManager: FocusManager) {
-        this._nativeBridge = nativeBridge;
+    constructor(platform: Platform, core: ICoreApi, wakeUpManager: WakeUpManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, focusManager: FocusManager) {
+        this._platform = platform;
+        this._core = core;
         this._focusManager = focusManager;
         this._wakeUpManager = wakeUpManager;
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._configuration = configuration;
-        this._storage = new AnalyticsStorage(nativeBridge);
+        this._storage = new AnalyticsStorage(core);
 
         this._endpoint = 'https://prd-lender.cdp.internal.unity3d.com/v1/events';
     }
@@ -120,7 +123,7 @@ export class AnalyticsManager {
     }
 
     private sendDeviceInfo(): void {
-        AnalyticsProtocol.getDeviceInfoObject(this._nativeBridge, this._clientInfo, this._deviceInfo).then(deviceInfoObject => {
+        AnalyticsProtocol.getDeviceInfoObject(this._platform, this._core, this._clientInfo, this._deviceInfo).then(deviceInfoObject => {
             this.send(deviceInfoObject);
         });
     }
@@ -164,7 +167,7 @@ export class AnalyticsManager {
     }
 
     private send(event: IAnalyticsObject): Promise<INativeResponse> {
-        const common: IAnalyticsCommonObject = AnalyticsProtocol.getCommonObject(this._nativeBridge.getPlatform(), this._userId, this._sessionId, this._clientInfo, this._deviceInfo, this._configuration);
+        const common: IAnalyticsCommonObject = AnalyticsProtocol.getCommonObject(this._platform, this._userId, this._sessionId, this._clientInfo, this._deviceInfo, this._configuration);
         const data: string = JSON.stringify(common) + '\n' + JSON.stringify(event) + '\n';
 
         return this._request.post(this._endpoint, data);

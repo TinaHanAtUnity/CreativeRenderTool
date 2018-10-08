@@ -1,5 +1,5 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from '../../Core/Core';
 
 export enum MRAIDEvents {
     ORIENTATION         = 'orientation'
@@ -26,14 +26,14 @@ export interface IMRAIDOrientationProperties {
 }
 
 export class MRAIDBridge {
-    private _nativeBridge: NativeBridge;
+    private _core: ICoreApi;
     private _handler: IMRAIDHandler;
     private _iframe: HTMLIFrameElement;
     private _messageListener: (e: Event) => void;
     private _mraidHandlers: { [event: string]: (msg: IMRAIDMessage) => void };
 
-    constructor(nativeBridge: NativeBridge, handler: IMRAIDHandler) {
-        this._nativeBridge = nativeBridge;
+    constructor(core: ICoreApi, handler: IMRAIDHandler) {
+        this._core = core;
         this._handler = handler;
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
         this._mraidHandlers = {};
@@ -51,7 +51,7 @@ export class MRAIDBridge {
     private onMessage(e: MessageEvent) {
         const message = <IMRAIDMessage>e.data;
         if (message.type === 'mraid') {
-            this._nativeBridge.Sdk.logDebug(`mraid: event=${message.event}, data=${message.data}`);
+            this._core.Sdk.logDebug(`mraid: event=${message.event}, data=${message.data}`);
             if (message.event in this._mraidHandlers) {
                 const handler = this._mraidHandlers[message.event];
                 handler(message);

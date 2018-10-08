@@ -4,15 +4,15 @@ import { Placement } from 'Ads/Models/Placement';
 import { Closer } from 'Ads/Views/Closer';
 import { FinishState } from 'Core/Constants/FinishState';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDHandler } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
+import { ICoreApi } from '../../Core/Core';
+import { IAdsApi } from '../../Ads/Ads';
 
 export class VPAIDEventHandler implements IVPAIDHandler {
-    private _nativeBridge: NativeBridge;
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adUnit: VPAIDAdUnit;
@@ -23,9 +23,10 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _closer: Closer;
     private _adDuration: number = -2;
     private _adRemainingTime: number = -2;
+    private _core: ICoreApi;
+    private _ads: IAdsApi;
 
-    constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
-        this._nativeBridge = nativeBridge;
+    constructor(adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._adUnit = adUnit;
@@ -33,6 +34,8 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._placement = parameters.placement;
         this._closer = parameters.closer;
         this._vpaidEndScreen = parameters.endScreen;
+        this._core = parameters.core;
+        this._ads = parameters.ads;
 
         this._vpaidEventHandlers.AdError = this.onAdError;
         this._vpaidEventHandlers.AdLoaded = this.onAdLoaded;
@@ -57,7 +60,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
             argsCopy = Array.prototype.slice.call(args);
         }
 
-        this._nativeBridge.Sdk.logDebug(`vpaid event ${eventType} with args ${argsCopy && argsCopy.length ? argsCopy.join(' ') : 'None'}`);
+        this._core.Sdk.logDebug(`vpaid event ${eventType} with args ${argsCopy && argsCopy.length ? argsCopy.join(' ') : 'None'}`);
         const handler = this._vpaidEventHandlers[eventType];
         if (handler) {
             if(argsCopy && argsCopy.length && argsCopy instanceof Array) {
@@ -148,7 +151,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     }
 
     private onAdStarted() {
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
+        this._ads.Listener.sendStartEvent(this._placement.getId());
         this._adUnit.sendTrackingEvent('creativeView');
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this._adUnit.onStartProcessed.trigger();

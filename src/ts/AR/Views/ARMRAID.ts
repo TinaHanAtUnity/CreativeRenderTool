@@ -18,14 +18,14 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { ICoreApi } from '../../Core/Core';
 import { IARApi } from '../AR';
-import { DeviceInfo } from '../../Core/Models/DeviceInfo';
+import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;
 
     protected _template: Template;
     private _ar: IARApi;
-    private _deviceInfo: DeviceInfo;
+    private _deviceInfo: AndroidDeviceInfo;
 
     private _localization: Localization;
 
@@ -69,7 +69,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _hasCameraPermission = false;
     private _permissionResultObserver: IObserver2<string, boolean>;
 
-    constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
+    constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: AndroidDeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
         super(platform, core, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
         this._ar = ar;

@@ -1,5 +1,4 @@
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Managers/Request';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';
@@ -7,6 +6,7 @@ import { VastCreative } from 'VAST/Models/VastCreative';
 import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
+import { ICoreApi } from '../../Core/Core';
 
 export class VastParser {
 
@@ -66,7 +66,7 @@ export class VastParser {
         return new Vast(ads, errorURLTemplates);
     }
 
-    public retrieveVast(vast: any, nativeBridge: NativeBridge, request: Request, parent?: Vast, depth: number = 0): Promise<Vast> {
+    public retrieveVast(vast: any, core: ICoreApi, request: Request, parent?: Vast, depth: number = 0): Promise<Vast> {
         let parsedVast: Vast;
 
         if (depth === 0) {
@@ -94,10 +94,10 @@ export class VastParser {
             throw new Error('VAST wrapper depth exceeded');
         }
 
-        nativeBridge.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
+        core.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
 
         return request.get(wrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
-            return this.retrieveVast(response.response, nativeBridge, request, parsedVast, depth + 1);
+            return this.retrieveVast(response.response, core, request, parsedVast, depth + 1);
         });
     }
 

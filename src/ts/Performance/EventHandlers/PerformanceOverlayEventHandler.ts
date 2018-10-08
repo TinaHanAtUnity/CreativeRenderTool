@@ -1,6 +1,5 @@
 import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
@@ -11,8 +10,8 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandler<Performa
     private _trackingUrls: {[key: string]: string[]};
     private _thirdPartyEventManager: ThirdPartyEventManager;
 
-    constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters) {
-        super(nativeBridge, adUnit, parameters, parameters.adUnitStyle);
+    constructor(adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters) {
+        super(adUnit, parameters, parameters.adUnitStyle);
         this._performanceAdUnit = adUnit;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._trackingUrls = parameters.campaign.getTrackingUrls();

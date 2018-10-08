@@ -1,6 +1,7 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0, Observable1 } from 'Core/Utilities/Observable';
+import { WebViewError } from '../../Core/Errors/WebViewError';
 
 enum BannerEvents {
     BannerEventResized          = 'BANNER_RESIZED',
@@ -124,7 +125,7 @@ export class BannerApi extends NativeApi {
 
     private handleBannerAttachedStateEvent(parameters: any[]) {
         if (parameters.length !== 1) {
-            this._nativeBridge.Sdk.logWarning('Banner attached state event with no attached state parameter');
+            throw new WebViewError('Banner attached state event with no attached state parameter');
         } else {
             const attached = parameters[0];
             this.onBannerAttachedState.trigger(attached);

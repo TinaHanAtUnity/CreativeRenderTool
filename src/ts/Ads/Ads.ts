@@ -42,6 +42,7 @@ import { IApiModule, IModuleApi } from '../Core/Modules/IApiModule';
 import { AndroidDeviceInfo } from '../Core/Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from '../Core/Models/IosDeviceInfo';
 import { ProgrammaticTrackingService } from './Utilities/ProgrammaticTrackingService';
+import { AdsConfiguration } from './Models/AdsConfiguration';
 
 export interface IAdsApi extends IModuleApi {
     AdsProperties: AdsPropertiesApi;
@@ -72,6 +73,7 @@ export class Ads extends CoreModule implements IApiModule {
     public readonly BackupCampaignManager: BackupCampaignManager;
     public readonly ProgrammaticTrackingService: ProgrammaticTrackingService;
 
+    public Config: AdsConfiguration;
     public Container: Activity | ViewController;
     public GdprManager: GdprManager;
     public PlacementManager: PlacementManager;
@@ -103,7 +105,7 @@ export class Ads extends CoreModule implements IApiModule {
         };
 
         this.AdMobSignalFactory = new AdMobSignalFactory(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Api, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.FocusManager);
-        this.InterstitialWebPlayerContainer = new InterstitialWebPlayerContainer(this.Api.WebPlayer);
+        this.InterstitialWebPlayerContainer = new InterstitialWebPlayerContainer(this.Api);
         if(this.Core.NativeBridge.getPlatform() === Platform.ANDROID) {
             document.body.classList.add('android');
             this.Container = new Activity(this.Core.Api, this.Api, <AndroidDeviceInfo>this.Core.DeviceInfo);
@@ -119,7 +121,7 @@ export class Ads extends CoreModule implements IApiModule {
         this.SessionManager = new SessionManager(this.Core.Api.Storage, this.Core.Request);
         this.MissedImpressionManager = new MissedImpressionManager(this.Core.Api.Storage);
         this.BackupCampaignManager = new BackupCampaignManager(this.Core.Api, this.Core.Config);
-        this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.Core.Request, this.Core.ClientInfo, this.Core.DeviceInfo);
+        this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.Core.NativeBridge.getPlatform(), this.Core.Request, this.Core.ClientInfo, this.Core.DeviceInfo);
     }
 
     public initialize(jaegerInitSpan: JaegerSpan): Promise<void> {
@@ -161,7 +163,7 @@ export class Ads extends CoreModule implements IApiModule {
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this.Core.NativeBridge.getPlatform()]);
             let refreshPromise;
             if(BackupCampaignTest.isValid(this.Core.Config.getAbGroup())) {
-                refreshPromise = this.RefreshManager.refreshWithBackupCampaigns(this);
+                refreshPromise = this.RefreshManager.refreshWithBackupCampaigns(this.BackupCampaignManager);
             } else if(this._cachedCampaignResponse !== undefined) {
                 refreshPromise = this.RefreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
             } else {

@@ -7,10 +7,12 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Managers/Request';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { Platform } from '../../Core/Constants/Platform';
+import { ICoreApi } from '../../Core/Core';
 
 export class ProgrammaticMraidUrlParser extends CampaignParser {
     public static ContentType = 'programmatic/mraid-url';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraidUrl = response.getJsonContent();
 
         if(!jsonMraidUrl) {
@@ -27,7 +29,7 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
-            id: this.getProgrammaticCampaignId(nativeBridge),
+            id: this.getProgrammaticCampaignId(platform),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
