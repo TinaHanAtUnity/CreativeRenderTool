@@ -188,7 +188,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     private getTemplate() {
-        if (ImprovedEndScreenStyles.isValid(this._abGroup)) {
+        if (ImprovedEndScreenStylesTest.isValid(this._abGroup)) {
             return EndScreenWithImprovedStylesTemplate;
         }
 

@@ -104,4 +104,4 @@ class ABTest {
 
 export const FPSCollectionTest = new ABTest(GroupSixteen);
 export const BackupCampaignTest = new ABTest(GroupSix, GroupSeven);
-export const ImprovedEndScreenStylesTest = new ABTest(GroupSeventeen);
+export const ImprovedEndScreenStylesTest = new ABTest(GroupSixteen, GroupSeventeen);
