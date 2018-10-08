@@ -25,7 +25,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._request = parameters.request;
         this._campaign = parameters.campaign;
         this._vastEndScreen = this._vastAdUnit.getEndScreen();
-        this._isAbGroup = ClickDelayTrackingTest.isValid(parameters.configuration.getAbGroup());
+        this._isAbGroup = ClickDelayTrackingTest.isValid(parameters.coreConfig.getAbGroup());
     }
 
     public onVastEndScreenClick(): Promise<void> {

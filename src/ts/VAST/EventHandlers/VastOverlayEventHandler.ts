@@ -27,7 +27,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._placement = parameters.placement;
         this._moat = MoatViewabilityService.getMoat();
         this._vastOverlay = this._vastAdUnit.getOverlay();
-        this._isAbGroup = ClickDelayTrackingTest.isValid(parameters.configuration.getAbGroup());
+        this._isAbGroup = ClickDelayTrackingTest.isValid(parameters.coreConfig.getAbGroup());
     }
 
     public onOverlaySkip(position: number): void {

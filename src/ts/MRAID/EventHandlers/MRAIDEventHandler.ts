@@ -43,7 +43,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._request = parameters.request;
-        this._isAbGroup = ClickDelayTrackingTest.isValid(parameters.configuration.getAbGroup());
+        this._isAbGroup = ClickDelayTrackingTest.isValid(parameters.coreConfig.getAbGroup());
     }
 
     public onMraidClick(url: string): Promise<void> {
