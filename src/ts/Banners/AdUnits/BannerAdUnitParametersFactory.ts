@@ -17,9 +17,9 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Request } from 'Core/Managers/Request';
-import { ICoreApi } from '../../Core/Core';
-import { Platform } from '../../Core/Constants/Platform';
-import { IAdsApi } from '../../Ads/Ads';
+import { ICoreApi } from 'Core/Core';
+import { Platform } from 'Core/Constants/Platform';
+import { IAdsApi } from 'Ads/Ads';
 
 export class BannerAdUnitParametersFactory {
 

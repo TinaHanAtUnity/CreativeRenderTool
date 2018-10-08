@@ -5,8 +5,8 @@ import { Platform } from 'Core/Constants/Platform';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import OverlayTemplate from 'html/Overlay.html';
-import { IAdsApi } from '../Ads';
-import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
+import { IAdsApi } from 'Ads/Ads';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 

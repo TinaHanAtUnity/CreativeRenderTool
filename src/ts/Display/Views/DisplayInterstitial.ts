@@ -8,8 +8,8 @@ import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
-import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
-import { ICoreApi } from '../../Core/Core';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ICoreApi } from 'Core/Core';
 
 export interface IDisplayInterstitialHandler extends IGDPREventHandler {
     onDisplayInterstitialClose(): void;

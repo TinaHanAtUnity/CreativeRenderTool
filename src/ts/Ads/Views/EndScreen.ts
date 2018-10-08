@@ -7,18 +7,16 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import {
     ABGroup,
-    OrangeEndScreenButtonColorTest,
     GreenEndScreenButtonColorTest,
-    RedEndScreenButtonColorTest,
-    NavyEndScreenButtonColorTest
+    NavyEndScreenButtonColorTest,
+    OrangeEndScreenButtonColorTest,
+    RedEndScreenButtonColorTest
 } from 'Core/Models/ABGroup';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
-import { Platform } from '../../Core/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 
 export interface IEndScreenParameters {
     platform: Platform;

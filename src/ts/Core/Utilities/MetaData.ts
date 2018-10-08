@@ -1,5 +1,5 @@
 import { StorageError, StorageType } from 'Core/Native/Storage';
-import { ICoreApi } from '../Core';
+import { ICoreApi } from 'Core/Core';
 
 export class MetaData {
     private _core: ICoreApi;

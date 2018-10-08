@@ -1,8 +1,7 @@
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Template } from 'Core/Utilities/Template';
 import PrivacyTemplate from 'html/privacy.html';
-import { Platform } from '../../Core/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 
 export class Privacy extends AbstractPrivacy {
 

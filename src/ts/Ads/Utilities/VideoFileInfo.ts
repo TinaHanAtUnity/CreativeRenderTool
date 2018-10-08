@@ -3,9 +3,8 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { VideoMetadata } from 'Core/Constants/Android/VideoMetadata';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FileId } from 'Core/Utilities/FileId';
-import { CacheApi } from '../../Core/Native/Cache';
+import { CacheApi } from 'Core/Native/Cache';
 
 export class VideoFileInfo {
 

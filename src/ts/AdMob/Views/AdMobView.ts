@@ -18,8 +18,8 @@ import AdMobContainer from 'html/admob/AdMobContainer.html';
 import AFMAContainer from 'html/admob/AFMAContainer.html';
 import MRAIDContainer from 'html/admob/MRAIDContainer.html';
 import { MRAIDBridge } from 'MRAID/Views/MRAIDBridge';
-import { Platform } from '../../Core/Constants/Platform';
-import { ICoreApi } from '../../Core/Core';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/Core';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;

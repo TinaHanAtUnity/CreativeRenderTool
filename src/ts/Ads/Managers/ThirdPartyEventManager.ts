@@ -7,7 +7,7 @@ import { INativeResponse, Request } from 'Core/Managers/Request';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
-import { ICoreApi } from '../../Core/Core';
+import { ICoreApi } from 'Core/Core';
 
 export class ThirdPartyEventManager {
 

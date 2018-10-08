@@ -23,8 +23,8 @@ import { INativeResponse, Request } from 'Core/Managers/Request';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { IAdsApi } from '../Ads';
-import { ICoreApi } from '../../Core/Core';
+import { IAdsApi } from 'Ads/Ads';
+import { ICoreApi } from 'Core/Core';
 
 export class OldCampaignRefreshManager extends RefreshManager {
     private _platform: Platform;

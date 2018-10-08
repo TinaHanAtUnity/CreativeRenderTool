@@ -11,9 +11,9 @@ import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Url } from 'Core/Utilities/Url';
-import { DeviceInfo } from '../Models/DeviceInfo';
-import { ClientInfo } from '../Models/ClientInfo';
-import { MetaDataManager } from './MetaDataManager';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { Request } from 'Core/Managers/Request';
 
 export class ConfigManager {

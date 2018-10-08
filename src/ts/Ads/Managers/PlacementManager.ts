@@ -2,7 +2,7 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
-import { IAdsApi } from '../Ads';
+import { IAdsApi } from 'Ads/Ads';
 
 export interface IPlacementIdMap<T> {
     [placementId: string]: T;

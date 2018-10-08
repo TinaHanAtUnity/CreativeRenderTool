@@ -1,10 +1,8 @@
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import InterstitialOverlayTemplate from 'html/InterstitialOverlay.html';
-import { Platform } from '../../Core/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 
 export class ClosableVideoOverlay extends AbstractVideoOverlay {
 

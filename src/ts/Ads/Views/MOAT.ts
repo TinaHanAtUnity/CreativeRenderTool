@@ -1,14 +1,12 @@
 import { IMoatData, IMoatIds } from 'Ads/Utilities/MoatViewabilityService';
 import { Platform } from 'Core/Constants/Platform';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import MOATTemplate from 'html/MOAT.html';
 import MOATContainer from 'html/moat/container.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ICoreApi } from '../../Core/Core';
+import { ICoreApi } from 'Core/Core';
 
 export enum MoatState {
     PLAYING,

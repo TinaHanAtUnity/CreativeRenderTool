@@ -21,9 +21,9 @@ import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { INativeResponse, Request } from 'Core/Managers/Request';
-import { StorageApi } from '../../Core/Native/Storage';
-import { IAdsApi } from '../Ads';
-import { ICoreApi } from '../../Core/Core';
+import { StorageApi } from 'Core/Native/Storage';
+import { IAdsApi } from 'Ads/Ads';
+import { ICoreApi } from 'Core/Core';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: Request;

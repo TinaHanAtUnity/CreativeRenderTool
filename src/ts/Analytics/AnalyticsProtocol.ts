@@ -4,7 +4,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { ICoreApi } from '../Core/Core';
+import { ICoreApi } from 'Core/Core';
 
 export interface IAnalyticsObject {
     type: string;

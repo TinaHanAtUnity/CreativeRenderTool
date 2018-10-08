@@ -1,6 +1,6 @@
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { View } from 'Core/Views/View';
-import { Platform } from '../../Core/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 
 export interface IOverlayHandler extends IGDPREventHandler {
     onOverlaySkip(position: number): void;

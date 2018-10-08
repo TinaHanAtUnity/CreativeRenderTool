@@ -1,12 +1,12 @@
-import { Ads, AdsModule } from '../Ads/Ads';
-import { BannerPlacementManager } from './Managers/BannerPlacementManager';
-import { BannerCampaignManager } from './Managers/BannerCampaignManager';
-import { BannerWebPlayerContainer } from '../Ads/Utilities/WebPlayer/BannerWebPlayerContainer';
-import { BannerAdUnitParametersFactory } from './AdUnits/BannerAdUnitParametersFactory';
-import { BannerAdContext } from './Context/BannerAdContext';
-import { IApiModule, IModuleApi } from '../Core/Modules/IApiModule';
-import { BannerApi } from './Native/Banner';
-import { BannerListenerApi } from './Native/UnityBannerListener';
+import { Ads, AdsModule } from 'Ads/Ads';
+import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
+import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
+import { BannerWebPlayerContainer } from 'Ads//Utilities/WebPlayer/BannerWebPlayerContainer';
+import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
+import { BannerAdContext } from 'Banners/Context/BannerAdContext';
+import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { BannerApi } from 'Banners/Native/Banner';
+import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 
 export interface IBannersApi extends IModuleApi {
     Banner: BannerApi;

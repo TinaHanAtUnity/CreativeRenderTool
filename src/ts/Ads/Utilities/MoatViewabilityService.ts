@@ -6,8 +6,8 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
-import { Platform } from '../../Core/Constants/Platform';
-import { ICoreApi } from '../../Core/Core';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/Core';
 
 export interface IMoatIds {
     level1: number | undefined;

@@ -1,7 +1,7 @@
-import { Ads, AdsModule } from '../Ads/Ads';
-import { CustomFeatures } from '../Ads/Utilities/CustomFeatures';
-import { AnalyticsManager } from './AnalyticsManager';
-import { AnalyticsStorage } from './AnalyticsStorage';
+import { Ads, AdsModule } from 'Ads/Ads';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { AnalyticsManager } from 'Analytics/AnalyticsManager';
+import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 
 export class Analytics extends AdsModule {
 

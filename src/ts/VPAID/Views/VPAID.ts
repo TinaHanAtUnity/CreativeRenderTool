@@ -1,8 +1,6 @@
 import { Placement } from 'Ads/Models/Placement';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Platform } from 'Core/Constants/Platform';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IObserver1 } from 'Core/Utilities/IObserver';
 import { Template } from 'Core/Utilities/Template';
 import { Timer } from 'Core/Utilities/Timer';
@@ -10,7 +8,7 @@ import { View } from 'Core/Views/View';
 import VPAIDContainerTemplate from 'html/vpaid/container.html';
 import VPAIDTemplate from 'html/vpaid/VPAID.html';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
-import { ICoreApi } from '../../Core/Core';
+import { ICoreApi } from 'Core/Core';
 
 interface InitAdOptions {
     width: number;

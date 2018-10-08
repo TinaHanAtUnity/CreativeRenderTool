@@ -34,14 +34,14 @@ import { ConfigError } from 'Core/Errors/ConfigError';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { MetaData } from 'Core/Utilities/MetaData';
-import { BroadcastApi } from './Native/Android/Broadcast';
-import { IntentApi } from './Native/Android/Intent';
-import { LifecycleApi } from './Native/Android/Lifecycle';
-import { MainBundleApi } from './Native/iOS/MainBundle';
-import { NotificationApi } from './Native/iOS/Notification';
-import { UrlSchemeApi } from './Native/iOS/UrlScheme';
-import { AndroidPreferencesApi } from './Native/Android/Preferences';
-import { IosPreferencesApi } from './Native/iOS/Preferences';
+import { BroadcastApi } from 'Core/Native/Android/Broadcast';
+import { IntentApi } from 'Core/Native/Android/Intent';
+import { LifecycleApi } from 'Core/Native/Android/Lifecycle';
+import { MainBundleApi } from 'Core/Native/iOS/MainBundle';
+import { NotificationApi } from 'Core/Native/iOS/Notification';
+import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
+import { AndroidPreferencesApi } from 'Core/Native/Android/Preferences';
+import { IosPreferencesApi } from 'Core/Native/iOS/Preferences';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;

@@ -7,8 +7,8 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Request } from 'Core/Managers/Request';
 import { IPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { Platform } from '../../Core/Constants/Platform';
-import { ICoreApi } from '../../Core/Core';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/Core';
 
 export class PromoCampaignParser extends CampaignParser {
     public static ContentType = 'purchasing/iap';

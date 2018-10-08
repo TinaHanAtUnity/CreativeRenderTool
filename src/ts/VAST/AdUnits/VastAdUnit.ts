@@ -4,7 +4,6 @@ import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { MOAT } from 'Ads/Views/MOAT';
 import { StreamType } from 'Core/Constants/Android/StreamType';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 

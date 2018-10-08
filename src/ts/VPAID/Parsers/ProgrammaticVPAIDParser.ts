@@ -1,15 +1,14 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Managers/Request';
 import { Vast } from 'VAST/Models/Vast';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { IVPAIDCampaign, VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
-import { Platform } from '../../Core/Constants/Platform';
-import { ICoreApi } from '../../Core/Core';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/Core';
 
 export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
     public static ContentType = 'programmatic/vast-vpaid';

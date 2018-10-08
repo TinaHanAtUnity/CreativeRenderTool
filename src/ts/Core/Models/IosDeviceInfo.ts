@@ -1,6 +1,6 @@
 import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
 import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
-import { ICoreApi } from '../Core';
+import { ICoreApi } from 'Core/Core';
 
 export interface IIosDeviceInfo extends IDeviceInfo {
     userInterfaceIdiom: UIUserInterfaceIdiom;

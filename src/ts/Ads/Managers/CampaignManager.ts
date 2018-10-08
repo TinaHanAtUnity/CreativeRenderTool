@@ -42,7 +42,7 @@ import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { ICoreApi } from '../../Core/Core';
+import { ICoreApi } from 'Core/Core';
 
 export class CampaignManager {
 

@@ -1,7 +1,7 @@
-import { Ads, AdsModule } from '../Ads/Ads';
-import { IApiModule, IModuleApi } from '../Core/Modules/IApiModule';
-import { PurchasingApi } from './Native/Purchasing';
-import { PurchasingUtilities } from './Utilities/PurchasingUtilities';
+import { Ads, AdsModule } from 'Ads/Ads';
+import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { PurchasingApi } from 'Promo/Native/Purchasing';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
 export interface IPromoApi extends IModuleApi {
     Purchasing: PurchasingApi;

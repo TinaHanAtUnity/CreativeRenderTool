@@ -1,13 +1,11 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
-import { Platform } from '../../Core/Constants/Platform';
-import { IAdsApi } from '../Ads';
+import { Platform } from 'Core/Constants/Platform';
+import { IAdsApi } from 'Ads/Ads';
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
     protected _template: Template;

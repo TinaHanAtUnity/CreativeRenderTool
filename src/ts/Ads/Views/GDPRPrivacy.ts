@@ -4,7 +4,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
 
 import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
-import { Platform } from '../../Core/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 
 export class GDPRPrivacy extends AbstractPrivacy {
 

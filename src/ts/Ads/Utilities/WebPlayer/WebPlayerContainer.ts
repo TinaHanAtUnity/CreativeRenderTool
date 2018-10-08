@@ -6,7 +6,7 @@ import {
     WebPlayerViewId
 } from 'Ads/Native/WebPlayer';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
-import { IAdsApi } from '../../Ads';
+import { IAdsApi } from 'Ads/Ads';
 
 /**
  * The WebPlayerContainer wraps the WebPlayerApi in a way that can be used without needing

@@ -10,7 +10,7 @@ import { IOverlayHandler } from 'Ads/Views/AbstractVideoOverlay';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Double } from 'Core/Utilities/Double';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
-import { IAdsApi } from '../Ads';
+import { IAdsApi } from 'Ads/Ads';
 
 export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler implements IOverlayHandler {
     protected _placement: Placement;

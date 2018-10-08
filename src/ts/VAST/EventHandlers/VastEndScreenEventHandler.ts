@@ -2,12 +2,11 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Managers/Request';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
-import { ICoreApi } from '../../Core/Core';
+import { ICoreApi } from 'Core/Core';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;

@@ -6,7 +6,7 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { Platform } from 'Core/Constants/Platform';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { PermissionsUtil, PermissionTypes, CurrentPermission } from 'Core/Utilities/Permissions';
+import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { IObserver0, IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
@@ -16,9 +16,9 @@ import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { ICoreApi } from '../../Core/Core';
-import { IARApi } from '../AR';
-import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
+import { ICoreApi } from 'Core/Core';
+import { IARApi } from 'AR/AR';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;

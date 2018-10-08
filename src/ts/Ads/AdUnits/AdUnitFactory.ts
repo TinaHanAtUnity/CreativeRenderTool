@@ -30,7 +30,10 @@ import { StreamType } from 'Core/Constants/Android/StreamType';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
-import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'Display/AdUnits/DisplayInterstitialAdUnit';
+import {
+    DisplayInterstitialAdUnit,
+    IDisplayInterstitialAdUnitParameters
+} from 'Display/AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitialEventHandler } from 'Display/EventHandlers/DisplayInterstitialEventHandler';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
@@ -57,7 +60,7 @@ import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEvent
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
+import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDEndScreenEventHandler } from 'VPAID/EventHandlers/VPAIDEndScreenEventHandler';
 import { VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
@@ -75,7 +78,7 @@ import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { Privacy } from 'Ads/Views/Privacy';
 import { ReportAdTest } from 'Core/Models/ABGroup';
-import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export class AdUnitFactory {
     private static _forcedPlayableMRAID: boolean = false;

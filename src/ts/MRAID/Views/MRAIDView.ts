@@ -10,7 +10,7 @@ import { XHRequest } from 'Core/Utilities/XHRequest';
 import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { ICoreApi } from '../../Core/Core';
+import { ICoreApi } from 'Core/Core';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;

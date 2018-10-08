@@ -1,8 +1,7 @@
 import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
 import { IosARApi } from 'AR/Native/iOS/IosARApi';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { IARApi } from '../AR';
+import { IARApi } from 'AR/AR';
 
 export interface IARFrameTransform {
     a: number;

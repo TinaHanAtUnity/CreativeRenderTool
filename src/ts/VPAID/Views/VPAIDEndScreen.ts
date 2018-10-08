@@ -5,7 +5,7 @@ import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
-import { Platform } from '../../Core/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 
 export interface IVPAIDEndScreenHandler {
     onVPAIDEndScreenClick(): void;

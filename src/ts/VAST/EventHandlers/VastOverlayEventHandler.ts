@@ -7,7 +7,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { Request } from 'Core/Managers/Request';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ICoreApi } from '../../Core/Core';
+import { ICoreApi } from 'Core/Core';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;

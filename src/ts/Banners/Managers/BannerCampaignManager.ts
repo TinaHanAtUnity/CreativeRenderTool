@@ -20,7 +20,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { INativeResponse, Request } from 'Core/Managers/Request';
-import { ICoreApi } from '../../Core/Core';
+import { ICoreApi } from 'Core/Core';
 
 export class BannerCampaignManager {
     private _platform: Platform;

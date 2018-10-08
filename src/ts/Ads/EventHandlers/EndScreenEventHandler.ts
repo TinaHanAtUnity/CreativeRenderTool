@@ -14,7 +14,6 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestError } from 'Core/Errors/RequestError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Request } from 'Core/Managers/Request';
 import { Url } from 'Core/Utilities/Url';
@@ -22,9 +21,9 @@ import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { IAdsApi } from '../Ads';
-import { ICoreApi } from '../../Core/Core';
-import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
+import { IAdsApi } from 'Ads/Ads';
+import { ICoreApi } from 'Core/Core';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;

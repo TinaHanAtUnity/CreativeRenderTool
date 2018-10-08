@@ -1,9 +1,9 @@
-import { Ads, AdsModule } from '../Ads/Ads';
-import { IApiModule, IModuleApi } from '../Core/Modules/IApiModule';
-import { ARApi } from './Native/AR';
-import { AndroidARApi } from './Native/Android/AndroidARApi';
-import { IosARApi } from './Native/iOS/IosARApi';
-import { Platform } from '../Core/Constants/Platform';
+import { Ads, AdsModule } from 'Ads/Ads';
+import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { ARApi } from 'AR/Native/AR';
+import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
+import { IosARApi } from 'AR/Native/iOS/IosARApi';
+import { Platform } from 'Core/Constants/Platform';
 
 export interface IARApi extends IModuleApi {
     AR: ARApi;

@@ -1,6 +1,5 @@
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Observable0, Observable1 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
@@ -9,7 +8,7 @@ import { View } from 'Core/Views/View';
 import PromoTpl from 'html/Promo.html';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { ICoreApi } from '../../Core/Core';
+import { ICoreApi } from 'Core/Core';
 
 export class Promo extends View<{}> implements IPrivacyHandler {
 

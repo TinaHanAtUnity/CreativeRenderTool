@@ -9,7 +9,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { CacheApi, IFileInfo } from 'Core/Native/Cache';
+import { IFileInfo } from 'Core/Native/Cache';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Request } from 'Core/Managers/Request';
@@ -18,7 +18,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
-import { ICoreApi } from '../../Core/Core';
+import { ICoreApi } from 'Core/Core';
 
 interface ISdkStatsEvent {
     eventTimestamp: number;

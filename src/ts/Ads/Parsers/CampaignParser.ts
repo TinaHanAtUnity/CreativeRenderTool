@@ -5,7 +5,7 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { Platform } from 'Core/Constants/Platform';
 import { Request } from 'Core/Managers/Request';
 import { Url } from 'Core/Utilities/Url';
-import { ICoreApi } from '../../Core/Core';
+import { ICoreApi } from 'Core/Core';
 
 export abstract class CampaignParser {
     public abstract parse(platform: Platform, core: ICoreApi, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign>;

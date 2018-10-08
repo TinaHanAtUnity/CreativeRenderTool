@@ -4,7 +4,7 @@ import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IosCacheApi } from 'Core/Native/iOS/Cache';
 import { Observable3, Observable5, Observable6 } from 'Core/Utilities/Observable';
-import { EventCategory } from '../Constants/EventCategory';
+import { EventCategory } from 'Core/Constants/EventCategory';
 
 export enum CacheError {
     FILE_IO_ERROR,

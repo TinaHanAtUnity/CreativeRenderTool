@@ -16,9 +16,9 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Managers/Request';
-import { IAdsApi } from '../Ads';
-import { ICoreApi } from '../../Core/Core';
-import { Platform } from '../../Core/Constants/Platform';
+import { IAdsApi } from 'Ads/Ads';
+import { ICoreApi } from 'Core/Core';
+import { Platform } from 'Core/Constants/Platform';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;

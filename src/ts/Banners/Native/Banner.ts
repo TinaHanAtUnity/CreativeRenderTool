@@ -1,7 +1,7 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0, Observable1 } from 'Core/Utilities/Observable';
-import { WebViewError } from '../../Core/Errors/WebViewError';
+import { WebViewError } from 'Core/Errors/WebViewError';
 
 enum BannerEvents {
     BannerEventResized          = 'BANNER_RESIZED',

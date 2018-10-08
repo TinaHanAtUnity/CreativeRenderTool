@@ -10,8 +10,8 @@ import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { Promises } from 'Core/Utilities/Promises';
 import { Template } from 'Core/Utilities/Template';
 import BannerContainer from 'html/banner/BannerContainer.html';
-import { IAdsApi } from '../../Ads/Ads';
-import { ICoreApi } from '../../Core/Core';
+import { IAdsApi } from 'Ads/Ads';
+import { ICoreApi } from 'Core/Core';
 
 export interface IBannerAdUnitParameters {
     platform: Platform;

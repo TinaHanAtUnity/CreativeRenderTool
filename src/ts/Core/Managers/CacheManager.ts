@@ -6,8 +6,8 @@ import { FileInfo } from 'Core/Utilities/FileInfo';
 import { Observable0, Observable1, Observable2, Observable3, Observable5 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Managers/Request';
 import { ICoreApi } from 'Core/Core';
-import { WakeUpManager } from './WakeUpManager';
-import { CacheBookkeeping } from './CacheBookkeeping';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
 
 export enum CacheStatus {
     OK,

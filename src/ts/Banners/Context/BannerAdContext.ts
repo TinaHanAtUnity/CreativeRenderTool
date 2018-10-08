@@ -9,7 +9,7 @@ import { AdUnitActivities, FocusManager } from 'Core/Managers/FocusManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { IBannersApi } from '../Banners';
+import { IBannersApi } from 'Banners/Banners';
 
 const StandardRefreshDelay = 30;
 

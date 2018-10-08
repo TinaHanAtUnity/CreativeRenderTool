@@ -1,6 +1,6 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { Template } from '../../Core/Utilities/Template';
+import { Template } from 'Core/Utilities/Template';
 
 export class MRAIDEndScreen extends EndScreen {
     protected _template: Template;

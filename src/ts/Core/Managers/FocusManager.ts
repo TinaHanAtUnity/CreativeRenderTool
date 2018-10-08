@@ -1,6 +1,6 @@
 import { Observable0, Observable1 } from 'Core/Utilities/Observable';
-import { Platform } from '../Constants/Platform';
-import { ICoreApi } from '../Core';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/Core';
 
 export const AdUnitActivities = ['com.unity3d.ads.adunit.AdUnitActivity', 'com.unity3d.ads.adunit.AdUnitTransparentActivity', 'com.unity3d.ads.adunit.AdUnitTransparentSoftwareActivity', 'com.unity3d.ads.adunit.AdUnitSoftwareActivity'];
 

@@ -7,13 +7,12 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FileId } from 'Core/Utilities/FileId';
 import { Request } from 'Core/Managers/Request';
 import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { VastParser } from 'VAST/Utilities/VastParser';
-import { ICoreApi } from '../../Core/Core';
+import { ICoreApi } from 'Core/Core';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';

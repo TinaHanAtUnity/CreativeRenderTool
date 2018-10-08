@@ -2,11 +2,10 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Managers/Request';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
-import { Platform } from '../../Core/Constants/Platform';
-import { ICoreApi } from '../../Core/Core';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/Core';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     public static ContentTypeHtml = 'programmatic/static-interstitial-html';
