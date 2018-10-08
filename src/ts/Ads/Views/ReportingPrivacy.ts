@@ -292,7 +292,8 @@ export class ReportingPrivacy extends AbstractPrivacy {
             adType: adType,
             seatId: campaign.getSeatId(),
             finishState: finishState,
-            isCached: isCached
+            isCached: isCached,
+            adPlan: campaign.getSession().getAdPlan()
         };
         Diagnostics.trigger('reported_ad', error);
     }
