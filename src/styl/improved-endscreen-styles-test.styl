@@ -1,0 +1,248 @@
+@import "vars.styl";
+
+$end-screen-improved-styles-size = unit(16px/16, "em") * $default-size;
+$end-screen-improved-styles-px-size = 16px;
+$end-screen-improved-styles-text-color = #404040;
+$end-screen-improved-styles-gray-border =  #CECECE;
+
+#end-screen {
+    &.improved-endscreen-styles-test {
+        .end-screen-info-background {
+            display:flex;
+            flex: 1;
+
+            @media (orientation: portrait) {
+                @media (min-height: 0) {
+                    font-size: $end-screen-improved-styles-px-size * .4;
+                }
+
+                @media (min-height: 250px) {
+                    font-size: $end-screen-improved-styles-px-size * .5;
+                }
+
+                @media (min-height: 320px) {
+                    font-size: $end-screen-improved-styles-px-size * .7;
+                }
+
+                @media (min-height: 380px) {
+                    font-size: $end-screen-improved-styles-px-size * .8;
+                }
+
+                @media (min-height: 460px) {
+                    font-size: $end-screen-improved-styles-px-size * 1;
+                }
+
+                @media (min-height: 560px) {
+                    font-size: $end-screen-improved-styles-px-size * 1.2;
+                }
+
+                @media (min-height: 600px) {
+                    font-size: $end-screen-improved-styles-px-size * 1.3;
+                }
+
+                @media (min-height: 680px) {
+                    font-size: $end-screen-improved-styles-px-size * 1.5;
+                }
+
+                @media (min-height: 780px) {
+                    font-size: $end-screen-improved-styles-px-size * 1.6;
+                }
+
+                @media (min-height: 980px) {
+                    font-size: $end-screen-improved-styles-px-size * 1.8;
+                }
+
+                @media (min-height: 1050px) {
+                    font-size: $end-screen-improved-styles-px-size * 2.2;
+                }
+
+                @media (min-height: 1175px) {
+                    font-size: $end-screen-improved-styles-px-size * 2.5;
+                }
+
+                @media (min-height: 1375px) {
+                    font-size: $end-screen-improved-styles-px-size * 3;
+                }
+
+                @media (min-height: 1675px) {
+                    font-size: $end-screen-improved-styles-px-size * 3.5;
+                }
+
+                @media (min-height: 1975px) {
+                    font-size: $end-screen-improved-styles-px-size * 4.4;
+                }
+
+                @media (min-height: 2275px) {
+                    font-size: $end-screen-improved-styles-px-size * 5;
+                }
+
+                @media (min-height: 2575px) {
+                    font-size: $end-screen-improved-styles-px-size * 6;
+                }
+
+                @media (min-height: 2875px) {
+                    font-size: $end-screen-improved-styles-px-size * 7;
+                }
+
+                @media (min-height: 3475px) {
+                    font-size: $end-screen-improved-styles-px-size * 8;
+                }
+            }
+
+            @media (orientation: landscape) {
+                @media (min-width: 200px) {
+                    font-size: $default-px-size * .7;
+                }
+
+                @media (min-width: 320px) {
+                    font-size: $default-px-size * .8;
+                }
+
+                @media (min-width: 460px) {
+                    font-size: $default-px-size * 1;
+                }
+
+                @media (min-width: 580px) {
+                    font-size: $default-px-size * 1.2;
+                }
+
+                @media (min-width: 760px) {
+                    font-size: $default-px-size * 1.4;
+                }
+
+                @media (min-width: 960px) {
+                    font-size: $default-px-size * 1.6;
+                }
+
+                @media (min-width: 1160px) {
+                    font-size: $default-px-size * 2.2;
+                }
+
+                @media (min-width: 1460px) {
+                    font-size: $default-px-size * 2.8;
+                }
+
+                @media (min-width: 1760px) {
+                    font-size: $default-px-size * 3.8;
+                }
+
+                @media (min-width: 2260px) {
+                    font-size: $default-px-size * 4.6;
+                }
+            }
+        }
+    }
+}
+
+.portrait,
+.landscape {
+    #end-screen.improved-endscreen-styles-test {
+
+        .unityads-logo {
+            max-height: 1em;
+            font-size: .7em;
+            opacity: .6;
+        }
+
+        .end-screen-info {
+
+            .column-container {
+                display: flex;
+                flex: 1;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                margin: 2 * $end-screen-improved-styles-size 0 1 * $end-screen-improved-styles-size 0;
+            }
+
+            .download-container  {
+                $download-container-default(.8 * $end-screen-improved-styles-size, false);
+                margin: .75 * $end-screen-improved-styles-size auto 0 auto;
+            }
+
+            .game-icon {
+                min-width: 4 * $end-screen-improved-styles-size;
+                min-height: 4 * $end-screen-improved-styles-size;
+                width: 4 * $end-screen-improved-styles-size;
+                height: 4 * $end-screen-improved-styles-size;
+            }
+
+            .name-container {
+                max-width: 85%;
+                color: $end-screen-improved-styles-text-color;
+                text-align: center;
+                font-size: 1 * $end-screen-improved-styles-size;
+            }
+
+            .store-container {
+                margin-top: 0;
+            }
+
+            .game-rating {
+                margin-top: .41 * $end-screen-improved-styles-size;
+                font-size: .8 * $end-screen-improved-styles-size;
+            }
+
+            .game-rating-count {
+                font-size: .5 * $end-screen-improved-styles-size;
+            }
+
+            .game-icon {
+                margin-bottom: .8 * $end-screen-improved-styles-size;
+            }
+
+            .icon-star:before {
+                font-size: .8 * $end-screen-improved-styles-size;
+            }
+        }
+    }
+
+    &.android {
+        #end-screen.improved-endscreen-styles-test .end-screen-info {
+        .download-container,
+        .game-icon {
+            border-radius: .4 * $end-screen-improved-styles-size;
+        }
+        }
+    }
+
+    &.ios {
+        #end-screen.improved-endscreen-styles-test .end-screen-info {
+        .game-icon {
+            border-radius: .8 * $end-screen-improved-styles-size;
+        }
+
+        .download-container {
+            border-radius: .6 * $end-screen-improved-styles-size;
+        }
+        }
+    }
+}
+
+.portrait {
+    #end-screen {
+        &.improved-endscreen-styles-test {
+
+            .game-background {
+                background-color: $end-screen-improved-styles-gray-border;
+            }
+
+            .end-screen-info {
+                .column-container {
+                    margin-top: .8 * $end-screen-improved-styles-size;
+                }
+
+                .download-container  {
+                    margin: 1 * $end-screen-improved-styles-size auto 0 auto;
+                }
+
+                .game-icon {
+                    min-width: 3.5 * $end-screen-improved-styles-size;
+                    min-height: 3.5 * $end-screen-improved-styles-size;
+                    width: 3.5 * $end-screen-improved-styles-size;
+                    height: 3.5 * $end-screen-improved-styles-size;
+                }
+            }
+        }
+    }
+}
