@@ -1,5 +1,6 @@
 
 import { Vast } from 'VAST/Models/Vast';
+import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 
 export enum VASTMediaFileSize {
     WIFI_MIN = 5242880,    // 5 MB in Bytes
@@ -47,27 +48,18 @@ export class VastMediaSelector {
         let mediaMinSize = Number.MAX_SAFE_INTEGER;
         let defaultMediaUrl: string | null = null;
         let defaultMinDiff = Number.MAX_SAFE_INTEGER;
-        const ad = this._vast.getAd();
-        if (ad) {
-            for (const creative of ad.getCreatives()) {
-                for (const mediaFile of creative.getMediaFiles()) {
-                    const mimeType = mediaFile.getMIMEType();
-                    const isSupported = mimeType && this.isSupportedMIMEType(mimeType);
-                    const fileUrl = mediaFile.getFileURL();
-                    if (isSupported && fileUrl) {
-                        const fileSize = mediaFile.getFileSize();
-                        if (fileSize >= minSize && fileSize <= maxSize) {
-                            if (fileSize < mediaMinSize) {
-                                mediaUrl = mediaFile.getFileURL();
-                                mediaMinSize = fileSize;
-                            }
-                        } else if (fileSize <= VASTMediaFileSize.SDK_MAX) {
-                            if (Math.abs(fileSize - minSize) < defaultMinDiff) {
-                                defaultMediaUrl = mediaFile.getFileURL();
-                                defaultMinDiff = Math.abs(fileSize - minSize);
-                            }
-                        }
-                    }
+        const mediaFiles = this.getVideoMediaFiles();
+        for (const mediaFile of mediaFiles) {
+            const fileSize = mediaFile.getFileSize();
+            if (fileSize >= minSize && fileSize <= maxSize) {
+                if (fileSize < mediaMinSize) {
+                    mediaUrl = mediaFile.getFileURL();
+                    mediaMinSize = fileSize;
+                }
+            } else if (fileSize <= VASTMediaFileSize.SDK_MAX) {
+                if (Math.abs(fileSize - minSize) < defaultMinDiff) {
+                    defaultMediaUrl = mediaFile.getFileURL();
+                    defaultMinDiff = Math.abs(fileSize - minSize);
                 }
             }
         }
@@ -76,9 +68,28 @@ export class VastMediaSelector {
             return mediaUrl;
         } else if (defaultMediaUrl) {
             return defaultMediaUrl;
-        } else {
-            throw new Error('No Video URL found for VAST');
         }
+
+        throw new Error('No Video URL found for VAST');
+    }
+
+    private getVideoMediaFiles(): VastMediaFile[] {
+        const ad = this._vast.getAd();
+        const mediaFiles: VastMediaFile[] = [];
+        if (ad) {
+            for (const creative of ad.getCreatives()) {
+                for (const mediaFile of creative.getMediaFiles()) {
+                    const mimeType = mediaFile.getMIMEType();
+                    const isSupported = mimeType && this.isSupportedMIMEType(mimeType);
+                    const fileUrl = mediaFile.getFileURL();
+                    if (isSupported && fileUrl) {
+                        mediaFiles.push(mediaFile);
+                    }
+                }
+            }
+        }
+
+        return mediaFiles;
     }
 
     private isSupportedMIMEType(MIMEType: string): boolean {
