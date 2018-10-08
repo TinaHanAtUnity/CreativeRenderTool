@@ -5,13 +5,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import {
-    ABGroup,
-    OrangeEndScreenButtonColorTest,
-    GreenEndScreenButtonColorTest,
-    RedEndScreenButtonColorTest,
-    NavyEndScreenButtonColorTest
-} from 'Core/Models/ABGroup';
+import { ABGroup } from 'Core/Models/ABGroup';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
@@ -105,6 +99,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
 
+        const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
+        if (ctaButtonColor) {
+            (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
+        }
+
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
@@ -113,26 +112,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         if (this._showGDPRBanner) {
             this._container.classList.add('show-gdpr-banner');
         }
-
-        this.addCustomDownloadButtonColor();
-    }
-
-    private addCustomDownloadButtonColor(): void {
-        let color: string;
-
-        if (OrangeEndScreenButtonColorTest.isValid(this._abGroup)) {
-            color = '#F8AD00';
-        } else if (GreenEndScreenButtonColorTest.isValid(this._abGroup)) {
-            color = '#83CD0C';
-        } else if (RedEndScreenButtonColorTest.isValid(this._abGroup)) {
-            color = '#ED4400';
-        } else if (NavyEndScreenButtonColorTest.isValid(this._abGroup)) {
-            color = '#2F5FAE';
-        } else {
-            return;
-        }
-
-        (<HTMLElement>this._container.querySelector('.download-container')).style.background = color;
     }
 
     public show(): void {
