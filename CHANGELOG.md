@@ -1,4 +1,4 @@
-# Pending
+# Mon Oct  8 23:15:42 UTC 2018
 
 * AB Test various improvements to the endscreen layout in groups 16 & 17 [#6556](https://github.com/Applifier/unity-ads-webview/pull/6556)
 * AB Test Smart Close button in groups 18 & 19 [#6238](https://github.com/Applifier/unity-ads-webview/pull/6238) 
