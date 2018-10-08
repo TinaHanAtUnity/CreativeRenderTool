@@ -33,6 +33,7 @@ export class ReportingPrivacy extends AbstractPrivacy {
     private _campaign: Campaign;
     private _reportSent: boolean = false;
     private _gdprEnabled: boolean = false;
+    private _personalInfoObtained: boolean = false;
 
     constructor(nativeBridge: NativeBridge, campaign: Campaign,
                 gdprManager: GdprManager, gdprEnabled: boolean,
@@ -80,7 +81,7 @@ export class ReportingPrivacy extends AbstractPrivacy {
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onReportAd(),
+                listener: (event: Event) => this.onReportAd(event),
                 selector: '.report-button'
             }
         ];
@@ -89,6 +90,7 @@ export class ReportingPrivacy extends AbstractPrivacy {
     public show(): void {
         super.show();
         if (this._gdprEnabled) {
+            this.editPopupPerUser();
             const elId = this._gdprManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
             const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
@@ -158,7 +160,8 @@ export class ReportingPrivacy extends AbstractPrivacy {
         this.setCardState(isLeftClick);
     }
 
-    private onReportAd(): void {
+    private onReportAd(event: Event): void {
+        event.preventDefault();
         if (!this._reportSent) {
             const checkedReportButton = <HTMLElement>this._container.querySelector('.report-choice-radio:checked');
             const reportText = this._container.querySelector('.report-confirmed-text');
@@ -250,11 +253,29 @@ export class ReportingPrivacy extends AbstractPrivacy {
         }
     }
 
+    private editPopupPerUser() {
+        if (!this._personalInfoObtained) {
+            this._gdprManager.retrievePersonalInformation().then((personalProperties) => {
+                this._personalInfoObtained = true;
+                document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
+                document.getElementById('phone-type')!.innerHTML = ` - Using ${personalProperties.deviceModel}.`;
+                document.getElementById('country')!.innerHTML = ` - Playing in ${personalProperties.country}.`;
+                document.getElementById('game-plays-this-week')!.innerHTML = ` - Played this game ${personalProperties.gamePlaysThisWeek} times this week.`;
+                document.getElementById('ads-seen-in-game')!.innerHTML = ` - Seen ${personalProperties.adsSeenInGameThisWeek} ads in this game.`;
+                document.getElementById('games-installed-from-ads')!.innerHTML = ` - Installed ${personalProperties.installsFromAds} games based on those ads.`;
+            }).catch(error => {
+                Diagnostics.trigger('gdpr_personal_info_failed', error);
+                document.getElementById('sorry-message')!.innerHTML = 'Sorry. We were unable to deliver our collected information at this time.';
+            });
+        }
+    }
+
     private onUserReport(campaign: Campaign, reasonKey: string): void {
         const error = {
             creativeId: campaign.getCreativeId(),
-            auctionId: campaign.getSession().getId(),
-            reason: reasonKey
+            sessionId: campaign.getSession().getId(),
+            reason: reasonKey,
+            adType: campaign.getAdType()
         };
         Diagnostics.trigger('reported_ad', error);
     }
