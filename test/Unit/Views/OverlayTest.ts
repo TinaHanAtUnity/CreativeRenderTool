@@ -6,7 +6,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 import { GdprManager } from 'Ads/Managers/GdprManager';
-import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
+import { DefaultPrivacy } from 'Ads/Views/DefaultPrivacy';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('OverlayTest', () => {
@@ -22,7 +22,7 @@ describe('OverlayTest', () => {
             handleInvocation,
             handleCallback
         });
-        privacy = new ReportingPrivacy(nativeBridge, TestFixtures.getCampaign(), sinon.createStubInstance(GdprManager), false, false);
+        privacy = new DefaultPrivacy(nativeBridge, TestFixtures.getCampaign(), sinon.createStubInstance(GdprManager), false, false);
     });
 
     it('should render', () => {

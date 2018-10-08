@@ -4,7 +4,7 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
-import ReportingPrivacyTemplate from 'html/Reporting-privacy.html';
+import DefaultPrivacyTemplate from 'html/Default-privacy.html';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -17,7 +17,7 @@ enum PrivacyCardState {
     REPORT
 }
 
-enum BadAdReason {
+enum ReportReason {
     OFFENSIVE = 'Ad is very offensive',
     NEVER_STARTED = 'Ad did not start',
     WONT_END = 'Ad will not close',
@@ -25,7 +25,7 @@ enum BadAdReason {
     OTHER = 'Other'
 }
 
-export class ReportingPrivacy extends AbstractPrivacy {
+export class DefaultPrivacy extends AbstractPrivacy {
 
     private _onReport: Observable2<Campaign, string> = new Observable2();
     private _gdprManager: GdprManager;
@@ -40,11 +40,11 @@ export class ReportingPrivacy extends AbstractPrivacy {
                 gdprManager: GdprManager, gdprEnabled: boolean,
                 isCoppaCompliant: boolean) {
 
-        super(nativeBridge, isCoppaCompliant, gdprEnabled, 'reporting-privacy');
-        this._templateData.badAdKeys = Object.keys(BadAdReason);
-        this._templateData.badAdReasons = (<string[]>(<any>Object).values(BadAdReason));
+        super(nativeBridge, isCoppaCompliant, gdprEnabled, 'default-privacy');
+        this._templateData.badAdKeys = Object.keys(ReportReason);
+        this._templateData.badAdReasons = (<string[]>(<any>Object).values(ReportReason));
 
-        this._template = new Template(ReportingPrivacyTemplate);
+        this._template = new Template(DefaultPrivacyTemplate);
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
         this._gdprManager = gdprManager;
@@ -307,7 +307,7 @@ export class ReportingPrivacy extends AbstractPrivacy {
         });
     }
 
-    public static setupReportListener(privacy: ReportingPrivacy, ad: AbstractAdUnit | AbstractVideoOverlay): void {
+    public static setupReportListener(privacy: DefaultPrivacy, ad: AbstractAdUnit | AbstractVideoOverlay): void {
         privacy._onReport.subscribe((campaign: Campaign, reasonKey: string) => {
             this.onUserReport(campaign, reasonKey, ad);
             this.timeoutAd(ad);

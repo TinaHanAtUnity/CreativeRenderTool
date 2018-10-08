@@ -7,7 +7,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
-import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
+import { DefaultPrivacy } from 'Ads/Views/DefaultPrivacy';
 
 describe('VastEndScreen', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -35,7 +35,7 @@ describe('VastEndScreen', () => {
     });
 
     it('should render', () => {
-        const privacy = new ReportingPrivacy(nativeBridge, vastEndscreenParameters.campaign, gdprManager, false, false);
+        const privacy = new DefaultPrivacy(nativeBridge, vastEndscreenParameters.campaign, gdprManager, false, false);
         const endScreen = new VastEndScreen(nativeBridge, vastEndscreenParameters, privacy);
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, VastEndScreenFixture);

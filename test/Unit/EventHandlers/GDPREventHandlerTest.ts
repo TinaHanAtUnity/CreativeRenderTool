@@ -20,7 +20,7 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
+import { DefaultPrivacy } from 'Ads/Views/DefaultPrivacy';
 
 describe('GDPREventHandlerTest', () => {
 
@@ -48,7 +48,7 @@ describe('GDPREventHandlerTest', () => {
             endScreen: sinon.createStubInstance(PerformanceEndScreen),
             overlay: sinon.createStubInstance(Overlay),
             video: sinon.createStubInstance(Video),
-            privacy: sinon.createStubInstance(ReportingPrivacy),
+            privacy: sinon.createStubInstance(DefaultPrivacy),
             gdprManager: sinon.createStubInstance(GdprManager),
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };

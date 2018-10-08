@@ -31,7 +31,7 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
+import { DefaultPrivacy } from 'Ads/Views/DefaultPrivacy';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -89,7 +89,7 @@ describe('OverlayEventHandlerTest', () => {
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         video = new Video('', TestFixtures.getSession());
         const gdprManager = sinon.createStubInstance(GdprManager);
-        const privacy = new ReportingPrivacy(nativeBridge, campaign, gdprManager, false, false);
+        const privacy = new DefaultPrivacy(nativeBridge, campaign, gdprManager, false, false);
         const endScreenParams : IEndScreenParameters = {
             nativeBridge: nativeBridge,
             language : deviceInfo.getLanguage(),

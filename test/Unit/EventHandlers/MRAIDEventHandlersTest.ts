@@ -28,7 +28,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
+import { DefaultPrivacy } from 'Ads/Views/DefaultPrivacy';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -100,7 +100,7 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new ReportingPrivacy(nativeBridge, playableMraidCampaign, gdprManager, false, false),
+                privacy: new DefaultPrivacy(nativeBridge, playableMraidCampaign, gdprManager, false, false),
                 gdprManager: gdprManager,
                 programmaticTrackingService: programmaticTrackingService
             };
@@ -299,7 +299,7 @@ describe('MRAIDEventHandlersTest', () => {
             adsConfig = TestFixtures.getAdsConfiguration();
             programmaticMraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
 
-            privacy = new ReportingPrivacy(nativeBridge, programmaticMraidCampaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+            privacy = new DefaultPrivacy(nativeBridge, programmaticMraidCampaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             mraidView = new MRAID(nativeBridge, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup());
 
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -330,7 +330,7 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new ReportingPrivacy(nativeBridge, programmaticMraidCampaign, gdprManager, false, false),
+                privacy: new DefaultPrivacy(nativeBridge, programmaticMraidCampaign, gdprManager, false, false),
                 gdprManager: gdprManager,
                 programmaticTrackingService: programmaticTrackingService
             };
