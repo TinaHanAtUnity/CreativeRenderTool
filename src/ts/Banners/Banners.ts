@@ -19,8 +19,6 @@ export class Banners extends AdsModule implements IApiModule {
 
     public BannerAdContext: BannerAdContext;
 
-    private _initialized = false;
-
     constructor(ads: Ads) {
         super(ads);
     }
@@ -31,14 +29,10 @@ export class Banners extends AdsModule implements IApiModule {
 
         const bannerCampaignManager = new BannerCampaignManager(this.Ads.Core.NativeBridge.getPlatform(), this.Ads.Core.Api, this.Ads.Core.Config, this.Ads.Config, this.Ads.AssetManager, this.Ads.SessionManager, this.Ads.AdMobSignalFactory, this.Core.Request, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.MetaDataManager, this.Core.JaegerManager);
         const bannerWebPlayerContainer = new BannerWebPlayerContainer(this.Ads.Api);
-        const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this.Ads.Core.NativeBridge.getPlatform(), this.Core.Api, this.Ads.Api, this.Core.Request, this.Core.MetaDataManager, this.Core.Config, this.Ads.Config, this.Ads.Container, this.Core.DeviceInfo, this.Core.ClientInfo, this.Ads.SessionManager, this.Core.FocusManager, this.Ads.AnalyticsManager, this.Ads.AdMobSignalFactory, this.Ads.GdprManager, bannerWebPlayerContainer, this.Ads.ProgrammaticTrackingService);
+        const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this.Ads.Core.NativeBridge.getPlatform(), this.Core.Api, this.Ads.Api, this.Core.Request, this.Core.MetaDataManager, this.Core.Config, this.Ads.Config, this.Ads.Container, this.Core.DeviceInfo, this.Core.ClientInfo, this.Ads.SessionManager, this.Core.FocusManager, this.Ads.Analytics.AnalyticsManager, this.Ads.AdMobSignalFactory, this.Ads.GdprManager, bannerWebPlayerContainer, this.Ads.ProgrammaticTrackingService);
         this.BannerAdContext = new BannerAdContext(this.Api, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, this.Core.FocusManager, this.Core.DeviceInfo);
         this._initialized = true;
         return Promise.resolve();
-    }
-
-    public isInitialized() {
-        return this._initialized;
     }
 
 }

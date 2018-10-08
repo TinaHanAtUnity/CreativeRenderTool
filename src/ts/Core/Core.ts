@@ -42,6 +42,7 @@ import { NotificationApi } from 'Core/Native/iOS/Notification';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 import { AndroidPreferencesApi } from 'Core/Native/Android/Preferences';
 import { IosPreferencesApi } from 'Core/Native/iOS/Preferences';
+import { IModule } from './Modules/IModule';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -276,12 +277,20 @@ export class Core implements IApiModule {
 
 }
 
-export abstract class CoreModule {
+export abstract class CoreModule implements IModule {
 
     public readonly Core: Core;
 
+    protected _initialized = false;
+
     protected constructor(core: Core) {
         this.Core = core;
+    }
+
+    public abstract initialize(): void | Promise<void>;
+
+    public isInitialized() {
+        return this._initialized;
     }
 
 }

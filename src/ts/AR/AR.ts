@@ -19,8 +19,6 @@ export class AR extends AdsModule implements IApiModule {
 
     public readonly Api: IARApi;
 
-    private _initialized = false;
-
     constructor(ads: Ads) {
         super(ads);
 
@@ -38,10 +36,6 @@ export class AR extends AdsModule implements IApiModule {
 
     public initialize() {
         this._initialized = true;
-    }
-
-    public isInitialized() {
-        return this._initialized;
     }
 
 }

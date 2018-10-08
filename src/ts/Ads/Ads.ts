@@ -43,6 +43,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { Analytics } from '../Analytics/Analytics';
 
 export interface IAdsApi extends IModuleApi {
     AdsProperties: AdsPropertiesApi;
@@ -65,6 +66,8 @@ export class Ads extends CoreModule implements IApiModule {
 
     public readonly Api: IAdsApi;
 
+    public readonly Analytics: Analytics;
+
     public readonly AdMobSignalFactory: AdMobSignalFactory;
     public readonly InterstitialWebPlayerContainer: InterstitialWebPlayerContainer;
 
@@ -83,8 +86,9 @@ export class Ads extends CoreModule implements IApiModule {
 
     private _cachedCampaignResponse?: INativeResponse;
 
-    constructor(core: Core) {
+    constructor(core: Core, analytics: Analytics) {
         super(core);
+        this.Analytics = analytics;
 
         const platform = core.NativeBridge.getPlatform();
         this.Api = {

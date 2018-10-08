@@ -1,31 +1,23 @@
-import { Ads, AdsModule } from 'Ads/Ads';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
-import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
+import { Core, CoreModule } from 'Core/Core';
 
-export class Analytics extends AdsModule {
+export class Analytics extends CoreModule {
 
     public AnalyticsManager: AnalyticsManager;
 
-    constructor(ads: Ads) {
-        super(ads);
+    constructor(core: Core) {
+        super(core);
     }
 
     public initialize(): Promise<void> {
-        let analyticsPromise;
         if(this.Core.Config.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this.Core.ClientInfo.getGameId())) {
-            this.AnalyticsManager = new AnalyticsManager(this);
-            analyticsPromise = this.AnalyticsManager.init().then(() => {
-                this.Ads.SessionManager.setGameSessionId(this.AnalyticsManager.getGameSessionId());
-            });
-        } else {
-            const analyticsStorage: AnalyticsStorage = new AnalyticsStorage(this);
-            analyticsPromise = analyticsStorage.getSessionId(this.Core.ClientInfo.isReinitialized()).then(gameSessionId => {
-                analyticsStorage.setSessionId(gameSessionId);
-                this.Ads.SessionManager.setGameSessionId(gameSessionId);
+            this.AnalyticsManager = new AnalyticsManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.WakeUpManager, this.Core.Request, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.Config, this.Core.FocusManager);
+            return this.AnalyticsManager.init().then(() => {
+                this._initialized = true;
             });
         }
-        return analyticsPromise;
+        return Promise.resolve();
     }
 
 }

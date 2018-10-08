@@ -11,8 +11,6 @@ export class Promo extends AdsModule implements IApiModule {
 
     public readonly Api: IPromoApi;
 
-    private _initialized = false;
-
     constructor(ads: Ads) {
         super(ads);
 
@@ -27,10 +25,6 @@ export class Promo extends AdsModule implements IApiModule {
         this.Api.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(iapPayload));
         this._initialized = true;
         return Promise.resolve();
-    }
-
-    public isInitialized() {
-        return this._initialized;
     }
 
 }
