@@ -8,18 +8,18 @@ import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/Opera
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
@@ -30,6 +30,7 @@ import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCa
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -48,7 +49,8 @@ describe('EndScreenEventHandlerTest', () => {
     let endScreenEventHandler: PerformanceEndScreenEventHandler;
     let campaign: PerformanceCampaign;
     let placement: Placement;
-    let configuration: Configuration;
+    let coreConfig: CoreConfiguration;
+    let adsConfig: AdsConfiguration;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -69,7 +71,8 @@ describe('EndScreenEventHandlerTest', () => {
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);
-            configuration = TestFixtures.getConfiguration();
+            coreConfig = TestFixtures.getCoreConfiguration();
+            adsConfig = TestFixtures.getAdsConfiguration();
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
                 request: request,
@@ -77,7 +80,8 @@ describe('EndScreenEventHandlerTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -86,22 +90,20 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.spy(nativeBridge.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-
-            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
-
+            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
                 gameId: clientInfo.getGameId(),
                 privacy: privacy,
                 showGDPRBanner: false,
-                abGroup: configuration.getAbGroup(),
+                abGroup: coreConfig.getAbGroup(),
                 targetGameName: TestFixtures.getCampaign().getGameName()
             };
             endScreen = new PerformanceEndScreen(endScreenParams, TestFixtures.getCampaign());
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             placement = TestFixtures.getPlacement();
-            const gdprManager = sinon.createStubInstance(GdprManager);
             const programmticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             performanceAdUnitParameters = {
@@ -114,7 +116,8 @@ describe('EndScreenEventHandlerTest', () => {
                 operativeEventManager: operativeEventManager,
                 placement: placement,
                 campaign: campaign,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 request: request,
                 options: {},
                 endScreen: endScreen,
@@ -375,25 +378,25 @@ describe('EndScreenEventHandlerTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: campaign
             });
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
-
-            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
                 gameId: clientInfo.getGameId(),
                 privacy: privacy,
                 showGDPRBanner: false,
-                abGroup: configuration.getAbGroup(),
+                abGroup: coreConfig.getAbGroup(),
                 targetGameName: campaign.getGameName()
             };
             endScreen = new PerformanceEndScreen(endScreenParams, campaign);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
-            const gdprManager = sinon.createStubInstance(GdprManager);
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             performanceAdUnitParameters = {
@@ -406,7 +409,8 @@ describe('EndScreenEventHandlerTest', () => {
                 operativeEventManager: operativeEventManager,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 request: request,
                 options: {},
                 endScreen: endScreen,

@@ -2,7 +2,7 @@ import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Placement } from 'Ads/Models/Placement';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { assert } from 'chai';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import MRAIDContainer from 'html/mraid/container.html';
@@ -14,15 +14,17 @@ import { MRAID } from 'MRAID/Views/MRAID';
 
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Campaign } from 'Ads/Models/Campaign';
 
 describe('MRAID', () => {
     let handleInvocation: sinon.SinonSpy;
     let handleCallback: sinon.SinonSpy;
     let nativeBridge: NativeBridge;
     let placement: Placement;
-    let configuration: Configuration;
+    let configuration: CoreConfiguration;
     let privacy: GDPRPrivacy;
     let gdprManager: GdprManager;
+    let fakeCampaign: Campaign;
 
     beforeEach(() => {
         handleInvocation = sinon.spy();
@@ -43,8 +45,9 @@ describe('MRAID', () => {
             muteVideo: false
         });
 
-        configuration = TestFixtures.getConfiguration();
+        configuration = TestFixtures.getCoreConfiguration();
         gdprManager = sinon.createStubInstance(GdprManager);
+        fakeCampaign = sinon.createStubInstance(Campaign);
         privacy = new GDPRPrivacy(nativeBridge, gdprManager, true);
     });
 

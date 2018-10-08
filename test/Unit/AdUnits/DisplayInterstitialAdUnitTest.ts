@@ -8,7 +8,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
@@ -29,8 +28,9 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
-describe('DisplayInterstitialAdUnit', () => {
+describe('DisplayInterstitialAdUnitTest', () => {
     let adUnit: DisplayInterstitialAdUnit;
     let nativeBridge: NativeBridge;
     let container: AdUnitContainer;
@@ -62,7 +62,8 @@ describe('DisplayInterstitialAdUnit', () => {
             const focusManager = new FocusManager(nativeBridge);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
-            const configuration = TestFixtures.getConfiguration();
+            const coreConfig = TestFixtures.getCoreConfiguration();
+            const adsConfig = TestFixtures.getAdsConfiguration();
             container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             sandbox.stub(container, 'open').returns(Promise.resolve());
             sandbox.stub(container, 'close').returns(Promise.resolve());
@@ -79,11 +80,12 @@ describe('DisplayInterstitialAdUnit', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: campaign
             });
 
-            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
 
             webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
             (<any>webPlayerContainer).onPageStarted = new Observable1<string>();
@@ -108,7 +110,8 @@ describe('DisplayInterstitialAdUnit', () => {
                 operativeEventManager: operativeEventManager,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 request: request,
                 options: {},
                 view: view,

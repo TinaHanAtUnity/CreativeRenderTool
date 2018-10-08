@@ -10,14 +10,7 @@ export class CustomFeatures {
     }
 
     public static isMixedPlacementExperiment(gameId: string): boolean {
-        return gameId === '1543512' ||
-               gameId === '1003628' ||
-               gameId === '1042745' ||
-               gameId === '1783249' ||
-               gameId === '1783250' ||
-               gameId === '1543513' ||
-               gameId === '1783091' || // Guild of Heroes
-               gameId === '1783092';   // Guild of Heroes
+        return false;
     }
 
     public static isSonicPlayable(creativeId: string | undefined) {
@@ -90,7 +83,18 @@ export class CustomFeatures {
     }
 
     public static isCloseIconSkipApp(gameId: string) {
-        // Clean master (Cheetah)
-        return gameId === '1196341';
+        return gameId === '1196341'
+            || gameId === '1594775'
+            || gameId === '2755671'
+            || gameId === '1451510'
+            || gameId === '1585102'
+            || gameId === '2808037'
+            || gameId === '2755670'
+            || gameId === '2625701'
+            || gameId === '2625703';
+    }
+
+    public static isAlwaysAutobatching(gameId: string): boolean {
+        return gameId === '1448666'; // for testing if this helps with Wooga ANR issue, ABT-567
     }
 }

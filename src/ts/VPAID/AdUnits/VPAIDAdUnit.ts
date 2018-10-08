@@ -4,6 +4,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { WKAudiovisualMediaTypes } from 'Ads/Native/WebPlayer';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Closer } from 'Ads/Views/Closer';
@@ -14,7 +15,6 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IObserver2 } from 'Core/Utilities/IObserver';
 import { Timer } from 'Core/Utilities/Timer';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
@@ -247,7 +247,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private onAdUnitNotLoaded() {
         this.setFinishState(FinishState.ERROR);
-        Diagnostics.trigger('vpaid_load_timeout', new DiagnosticError(new Error('VPAID failed to load within timeout'), {
+        SessionDiagnostics.trigger('vpaid_load_timeout', new DiagnosticError(new Error('VPAID failed to load within timeout'), {
             id: this._vpaidCampaign.getId()
         }), this._vpaidCampaign.getSession());
         this.hide();

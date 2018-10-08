@@ -16,13 +16,16 @@ import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOper
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { BannerWebPlayerContainer } from 'Ads/Utilities/WebPlayer/BannerWebPlayerContainer';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
@@ -45,14 +48,14 @@ import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { ABGroupBuilder, BackupCampaignTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CacheMode, Configuration } from 'Core/Models/Configuration';
+import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { CallbackStatus, INativeCallback, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { Cache } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -69,6 +72,7 @@ import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export class WebView {
 
@@ -79,9 +83,11 @@ export class WebView {
 
     private _request: Request;
     private _resolve: Resolve;
-    private _configuration: Configuration;
+    private _coreConfig: CoreConfiguration;
+    private _adsConfig: AdsConfiguration;
 
     private _campaignManager: CampaignManager;
+    private _backupCampaignManager: BackupCampaignManager;
     private _refreshManager: RefreshManager;
     private _assetManager: AssetManager;
     private _cache: Cache;
@@ -147,7 +153,7 @@ export class WebView {
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._cacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
             this._programmaticTrackingService = new ProgrammaticTrackingService(this._request, this._clientInfo, this._deviceInfo);
-            this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping, this._programmaticTrackingService);
+            this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping);
             this._resolve = new Resolve(this._nativeBridge);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
             this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo, this._focusManager);
@@ -202,15 +208,29 @@ export class WebView {
             const configSpan = this._jaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
             let configPromise;
             if(this._creativeUrl) {
-                configPromise = Promise.resolve(ConfigurationParser.parse(JsonParser.parse(CreativeUrlConfiguration)));
+                configPromise = Promise.resolve(JsonParser.parse(CreativeUrlConfiguration));
             } else {
                 configPromise = ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, configSpan);
             }
-            configPromise.then((configuration) => {
+
+            configPromise.then(() => {
                 this._jaegerManager.stop(configSpan);
-                return configuration;
+            }).catch(() => {
+                this._jaegerManager.stop(configSpan);
+            });
+
+            configPromise = configPromise.then((configJson): [CoreConfiguration, AdsConfiguration] => {
+                const coreConfig = CoreConfigurationParser.parse(configJson);
+                const adsConfig = AdsConfigurationParser.parse(configJson);
+                this._nativeBridge.Sdk.logInfo('Received configuration with ' + adsConfig.getPlacementCount() + ' placements for token ' + coreConfig.getToken() + ' (A/B group ' + coreConfig.getAbGroup() + ')');
+                if(this._nativeBridge.getPlatform() === Platform.IOS && this._deviceInfo.getLimitAdTracking()) {
+                    ConfigManager.storeGamerToken(this._nativeBridge, configJson.token);
+                }
+                return [coreConfig, adsConfig];
             }).catch((error) => {
-                this._jaegerManager.stop(configSpan);
+                configSpan.addTag(JaegerTags.Error, 'true');
+                configSpan.addTag(JaegerTags.ErrorMessage, error.message);
+                configSpan.addAnnotation(error.message);
                 throw new Error(error);
             });
 
@@ -223,27 +243,29 @@ export class WebView {
             const cachedCampaignResponsePromise = this._cacheBookkeeping.getCachedCampaignResponse();
 
             return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
-        }).then(([configuration, cachedCampaignResponse]) => {
-            this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, configuration, this._request);
-            this._configuration = configuration;
-            this._cachedCampaignResponse = cachedCampaignResponse;
-            HttpKafka.setConfiguration(this._configuration);
-            this._jaegerManager.setJaegerTracingEnabled(this._configuration.isJaegerTracingEnabled());
+        }).then(([[coreConfig, adsConfig], cachedCampaignResponse]) => {
+            this._coreConfig = coreConfig;
+            this._adsConfig = adsConfig;
 
-            const placementManager = new PlacementManager(this._nativeBridge, this._configuration);
-            PurchasingUtilities.initialize(this._clientInfo, this._configuration, this._nativeBridge, placementManager);
+            this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, this._coreConfig, this._adsConfig, this._request);
+            this._cachedCampaignResponse = cachedCampaignResponse;
+            HttpKafka.setConfiguration(this._coreConfig);
+            this._jaegerManager.setJaegerTracingEnabled(this._coreConfig.isJaegerTracingEnabled());
+
+            const placementManager = new PlacementManager(this._nativeBridge, this._adsConfig);
+            PurchasingUtilities.initialize(this._clientInfo, this._coreConfig, this._adsConfig, this._nativeBridge, placementManager);
             PurchasingUtilities.sendPurchaseInitializationEvent();
             this._nativeBridge.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(iapPayload));
 
-            if (!this._configuration.isEnabled()) {
+            if (!this._coreConfig.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
                 error.name = 'DisabledGame';
                 throw error;
             }
 
             let analyticsPromise;
-            if(this._configuration.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
-                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
+            if(this._coreConfig.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
+                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._coreConfig, this._focusManager);
                 analyticsPromise = this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
                 });
@@ -260,31 +282,34 @@ export class WebView {
             });
             return Promise.all([analyticsPromise, gdprConsentPromise]);
         }).then(() => {
-            if(this._sessionManager.getGameSessionId() % 10000 === 0) {
-                this._cache.setDiagnostics(true);
-            }
-
-            const defaultPlacement = this._configuration.getDefaultPlacement();
+            const defaultPlacement = this._adsConfig.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._nativeBridge);
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._cacheBookkeeping, this._jaegerManager);
-            this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
+            this._backupCampaignManager = new BackupCampaignManager(this._nativeBridge, this._coreConfig);
+            this._assetManager = new AssetManager(this._cache, this._adsConfig.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._programmaticTrackingService, this._nativeBridge, this._backupCampaignManager);
+            if(this._sessionManager.getGameSessionId() % 10000 === 0) {
+                this._assetManager.setCacheDiagnostics(true);
+            }
 
-            const bannerPlacementManager = new BannerPlacementManager(this._nativeBridge, this._configuration);
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._coreConfig, this._adsConfig, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._cacheBookkeeping, this._jaegerManager, this._backupCampaignManager);
+            this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._adsConfig, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
+
+            const bannerPlacementManager = new BannerPlacementManager(this._nativeBridge, this._adsConfig);
             bannerPlacementManager.sendBannersReady();
 
-            const bannerCampaignManager = new BannerCampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._jaegerManager);
+            const bannerCampaignManager = new BannerCampaignManager(this._nativeBridge, this._coreConfig, this._adsConfig, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._jaegerManager);
             const bannerWebPlayerContainer = new BannerWebPlayerContainer(this._nativeBridge);
-            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._configuration, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._analyticsManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer, this._programmaticTrackingService);
+            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._coreConfig, this._adsConfig, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._analyticsManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer, this._programmaticTrackingService);
             this._bannerAdContext = new BannerAdContext(this._nativeBridge, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, this._focusManager, this._deviceInfo);
 
-            SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
+            SdkStats.initialize(this._nativeBridge, this._request, this._coreConfig, this._adsConfig, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo, this._cache);
 
             const refreshSpan = this._jaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
             let refreshPromise;
-            if (this._cachedCampaignResponse !== undefined) {
+            if(BackupCampaignTest.isValid(this._coreConfig.getAbGroup())) {
+                refreshPromise = this._refreshManager.refreshWithBackupCampaigns(this._backupCampaignManager);
+            } else if(this._cachedCampaignResponse !== undefined) {
                 refreshPromise = this._refreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
             } else {
                 refreshPromise = this._refreshManager.refresh();
@@ -305,7 +330,9 @@ export class WebView {
             return this._sessionManager.sendUnsentSessions();
         }).then(() => {
             if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                this._nativeBridge.setAutoBatchEnabled(false);
+                if(!CustomFeatures.isAlwaysAutobatching(this._clientInfo.getGameId())) {
+                    this._nativeBridge.setAutoBatchEnabled(false);
+                }
                 this._nativeBridge.Request.Android.setMaximumPoolSize(1);
             } else {
                 this._nativeBridge.Request.setConcurrentRequestCount(1);
@@ -343,7 +370,7 @@ export class WebView {
             return;
         }
 
-        const placement: Placement = this._configuration.getPlacement(placementId);
+        const placement: Placement = this._adsConfig.getPlacement(placementId);
         if(!placement) {
             this.showError(true, placementId, 'No such placement: ' + placementId);
             return;
@@ -366,7 +393,7 @@ export class WebView {
                 id: campaign.getId(),
                 willExpireAt: campaign.getWillExpireAt()
             });
-            Diagnostics.trigger('campaign_expired', error, campaign.getSession());
+            SessionDiagnostics.trigger('campaign_expired', error, campaign.getSession());
             return;
         }
 
@@ -387,7 +414,7 @@ export class WebView {
                     placement.setCurrentCampaign(realtimeCampaign);
                     this.showAd(placement, realtimeCampaign, options);
                 } else {
-                    Diagnostics.trigger('realtime_no_fill', {}, campaign.getSession());
+                    SessionDiagnostics.trigger('realtime_no_fill', {}, campaign.getSession());
                     this._nativeBridge.Sdk.logInfo('Unity Ads received no new fill for placement ' + placement.getId() + ', opening old ad unit');
                     this.showAd(placement, campaign, options);
                 }
@@ -425,12 +452,12 @@ export class WebView {
     }
 
     private showAd(placement: Placement, campaign: Campaign, options: any) {
-        const testGroup = this._configuration.getAbGroup();
+        const testGroup = this._coreConfig.getAbGroup();
         const start = Date.now();
 
         this._showing = true;
 
-        if(this._configuration.getCacheMode() !== CacheMode.DISABLED) {
+        if(this._adsConfig.getCacheMode() !== CacheMode.DISABLED) {
             this._assetManager.stopCaching();
         }
 
@@ -446,7 +473,7 @@ export class WebView {
                 const error = new DiagnosticError(new Error('No connection is available'), {
                     id: campaign.getId()
                 });
-                Diagnostics.trigger('mraid_no_connection', error, campaign.getSession());
+                SessionDiagnostics.trigger('mraid_no_connection', error, campaign.getSession());
                 return;
             }
 
@@ -468,12 +495,14 @@ export class WebView {
                     sessionManager: this._sessionManager,
                     clientInfo: this._clientInfo,
                     deviceInfo: this._deviceInfo,
-                    configuration: this._configuration,
+                    coreConfig: this._coreConfig,
+                    adsConfig: this._adsConfig,
                     campaign: campaign
                 }),
                 placement: placement,
                 campaign: campaign,
-                configuration: this._configuration,
+                coreConfig: this._coreConfig,
+                adsConfig: this._adsConfig,
                 request: this._request,
                 options: options,
                 gdprManager: this._gdprManager,
@@ -548,7 +577,9 @@ export class WebView {
         this._showing = false;
 
         if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.setAutoBatchEnabled(false);
+            if(!CustomFeatures.isAlwaysAutobatching(this._clientInfo.getGameId())) {
+                this._nativeBridge.setAutoBatchEnabled(false);
+            }
             this._nativeBridge.Request.Android.setMaximumPoolSize(1);
         } else {
             this._nativeBridge.Request.setConcurrentRequestCount(1);
@@ -633,6 +664,10 @@ export class WebView {
 
             if(TestEnvironment.get('forcedPlayableMRAID')) {
                 AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
+            }
+
+            if(TestEnvironment.get('forcedGDPRBanner')) {
+                AdUnitFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
             }
 
             let forcedARMRAID = false;

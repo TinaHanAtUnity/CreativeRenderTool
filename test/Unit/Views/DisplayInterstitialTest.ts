@@ -1,5 +1,4 @@
 import { Placement } from 'Ads/Models/Placement';
-import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -10,10 +9,12 @@ import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampa
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { GdprManager } from 'Ads/Managers/GdprManager';
 
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 
-describe('DisplayInterstitial View', () => {
+describe('DisplayInterstitialTest', () => {
     let view: DisplayInterstitial;
     let nativeBridge: NativeBridge;
     let placement: Placement;
@@ -39,9 +40,9 @@ describe('DisplayInterstitial View', () => {
                 muteVideo: false
             });
             campaign = TestFixtures.getDisplayInterstitialCampaign();
-            const configuration = TestFixtures.getConfiguration();
-
-            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            const gdprManager = sinon.createStubInstance(GdprManager);
+            const coreConfig = TestFixtures.getCoreConfiguration();
+            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
 
             view = new DisplayInterstitial(nativeBridge, placement, campaign, privacy, false);
 

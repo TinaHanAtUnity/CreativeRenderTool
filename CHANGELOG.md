@@ -1,3 +1,51 @@
+# Fri Oct  5 21:40:11 UTC 2018
+
+* Enable Reporting Privacy for All [#6575](https://github.com/Applifier/unity-ads-webview/pull/6575)
+* Support serialization for MRAID campaigns [#6549](https://github.com/Applifier/unity-ads-webview/pull/6549)
+* Remove Ads deps from Core [#6544](https://github.com/Applifier/unity-ads-webview/pull/6544)
+* Add CSS media queries for iPhone XS Max [#6543](https://github.com/Applifier/unity-ads-webview/pull/6543)
+* Disable Report Bad Ads A/B test [#6550](https://github.com/Applifier/unity-ads-webview/pull/6550)
+* Fix AR permission dialog's styles [#6384](https://github.com/Applifier/unity-ads-webview/pull/6384)
+* Add abGroup to playable kpi events [#6555](https://github.com/Applifier/unity-ads-webview/pull/6555)
+* Update AR logo [#6497](https://github.com/Applifier/unity-ads-webview/pull/6497)
+* add missing 'supports' in MRAID container and remove one logWarning [#6540](https://github.com/Applifier/unity-ads-webview/pull/6540)
+
+# Mon Oct  1 11:33:41 UTC 2018
+
+* Enable close icon skip for specific game IDs [#6520](https://github.com/Applifier/unity-ads-webview/pull/6520)
+
+# Fri Sep 28 12:37:23 UTC 2018
+
+* Always enable autobatching for game ID 1448666 [#6498](https://github.com/Applifier/unity-ads-webview/pull/6498)
+
+# Thu Sep 27 13:33:54 UTC 2018
+
+* Refactor backup campaign implementation [#6407](https://github.com/Applifier/unity-ads-webview/pull/6407)
+* Re-run CTA button color experiment with 4 A/B group and 4 colors. Each A/B group should have one assigned color for download button (groups 16, 17, 18 & 19) [#6472](https://github.com/Applifier/unity-ads-webview/pull/6472)
+* Add metadata to force GDPR banner to be visible [#6451](https://github.com/Applifier/unity-ads-webview/pull/6451)
+
+# Wed Sep 26 21:14:54 UTC 2018
+
+* Temporarily remove Mixed Placement functionality and tests [#6474](https://github.com/Applifier/unity-ads-webview/pull/6474)
+
+# Wed Sep 26 09:51:45 UTC 2018
+
+* Reporting Bad Ads AB Test Groups 11/12 [#6297](https://github.com/Applifier/unity-ads-webview/pull/6297)
+* Move Tencent Logo to Top-left Corner [#6409](https://github.com/Applifier/unity-ads-webview/pull/6409)
+
+# Tue Sep 25 18:29:10 UTC 2018
+
+* Remove Ads dependencies from Core [#6335](https://github.com/Applifier/unity-ads-webview/pull/6335)
+
+# Mon Sep 24 09:44:02 UTC 2018 
+
+* Enable close icon skip for specific game IDs [#6406](https://github.com/Applifier/unity-ads-webview/pull/6406)
+
+# Fri Sep 21 09:07:42 UTC 2018
+
+* Use 'display' style to hide and show video-overlay content [#6382](https://github.com/Applifier/unity-ads-webview/pull/6382)
+* Fix audio route change handling on iOS [#6383](https://github.com/Applifier/unity-ads-webview/pull/6383)
+
 # Wed Sep 19 06:56:59 UTC 2018
 
 * Recognize standalone_android store type and appDownloadUrl parameter from Auction [#6029](https://github.com/Applifier/unity-ads-webview/pull/6029)

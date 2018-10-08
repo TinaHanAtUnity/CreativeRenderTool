@@ -1,13 +1,13 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { Platform } from 'Core/Constants/Platform';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PermissionsUtil, PermissionTypes, CurrentPermission } from 'Core/Utilities/Permissions';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IObserver0, IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
@@ -94,6 +94,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             {
                 event: 'click',
                 listener: (event: Event) => {
+                    this.onPrivacyClicked(event);
+                },
+                selector: '.launch-privacy'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => {
                     this.onShowAr();
                 },
                 selector: '.permission-accept-button'
@@ -168,7 +175,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }).catch((err) => {
                 this._nativeBridge.Sdk.logError('failed to create mraid: ' + err);
 
-                Diagnostics.trigger('create_mraid_error', {
+                SessionDiagnostics.trigger('create_mraid_error', {
                     message: err.message
                 }, this._campaign.getSession());
             });
@@ -281,7 +288,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                     this.updateProgressCircle(this._closeElement, 1);
 
                     const resourceUrl = this._campaign.getResourceUrl();
-                    Diagnostics.trigger('playable_prepare_timeout', {
+                    SessionDiagnostics.trigger('playable_prepare_timeout', {
                         'url': resourceUrl ? resourceUrl.getOriginalUrl() : ''
                     }, this._campaign.getSession());
 
@@ -619,5 +626,19 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private onShowFallback() {
         this.onCameraPermissionEvent(false);
+    }
+
+    private onPrivacyClicked(event: Event) {
+        event.stopPropagation();
+        event.preventDefault();
+        const url = (<HTMLLinkElement>event.target).href;
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._nativeBridge.UrlScheme.open(url);
+        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
+        }
     }
 }
