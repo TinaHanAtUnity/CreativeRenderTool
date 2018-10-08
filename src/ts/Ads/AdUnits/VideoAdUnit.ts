@@ -265,7 +265,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
         if(overlay) {
             overlay.render();
-            document.body.appendChild(overlay.container()!);
+            document.body.appendChild(overlay.container());
 
             if(!this._placement.allowSkip()) {
                 overlay.setSkipEnabled(false);

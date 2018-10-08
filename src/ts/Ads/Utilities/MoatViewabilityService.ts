@@ -34,7 +34,7 @@ export class MoatViewabilityService {
         this._moat = new MOAT(platform, core);
         this._moat.render();
         this._moat.addMessageListener();
-        document.body.appendChild(this._moat.container()!);
+        document.body.appendChild(this._moat.container());
 
         if (campaign instanceof VastCampaign || campaign instanceof VPAIDCampaign) {
             this._moatIds = {

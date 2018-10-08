@@ -95,7 +95,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         this._privacy.render();
         this._privacy.hide();
-        document.body.appendChild(this._privacy.container()!);
+        document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
     }
 

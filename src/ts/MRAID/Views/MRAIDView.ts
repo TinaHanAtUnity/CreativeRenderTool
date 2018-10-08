@@ -67,7 +67,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
         this._privacy.render();
         this._privacy.hide();
-        document.body.appendChild(this._privacy.container()!);
+        document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
 
         this._gameSessionId = gameSessionId || 0;

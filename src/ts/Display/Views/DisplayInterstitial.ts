@@ -71,7 +71,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
 
         this._privacy.render();
         this._privacy.hide();
-        document.body.appendChild(this._privacy.container()!);
+        document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
     }
 
@@ -97,8 +97,8 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
         window.removeEventListener('message', this._messageListener);
         super.hide();
 
-        if (this._privacy.container()!.parentElement) {
-            document.body.removeChild(this._privacy.container()!);
+        if (this._privacy.container().parentElement) {
+            document.body.removeChild(this._privacy.container());
         }
 
         for (const timer of this._timers) {

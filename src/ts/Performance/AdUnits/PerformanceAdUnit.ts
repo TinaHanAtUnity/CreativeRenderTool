@@ -29,7 +29,7 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         this._endScreen = parameters.endScreen;
         this._endScreen.render();
         this._endScreen.hide();
-        document.body.appendChild(this._endScreen.container()!);
+        document.body.appendChild(this._endScreen.container());
 
         this._privacy = parameters.privacy;
         this._performanceCampaign = parameters.campaign;
@@ -40,11 +40,11 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         const endScreen = this.getEndScreen();
         if(endScreen) {
             endScreen.hide();
-            endScreen.container()!.parentElement!.removeChild(endScreen.container()!);
+            endScreen.container().parentElement!.removeChild(endScreen.container());
         }
         if (this._privacy) {
             this._privacy.hide();
-            this._privacy.container()!.parentElement!.removeChild(this._privacy.container()!);
+            this._privacy.container().parentElement!.removeChild(this._privacy.container());
         }
 
         return super.hide();

@@ -106,7 +106,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             this._privacy = privacy;
             this._privacy.render();
             this._privacy.hide();
-            document.body.appendChild(this._privacy.container()!);
+            document.body.appendChild(this._privacy.container());
             this._privacy.addEventHandler(this);
         }
 
@@ -120,7 +120,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         if (this._privacy) {
             this._privacy.hide();
-            document.body.removeChild(this._privacy.container()!);
+            document.body.removeChild(this._privacy.container());
             delete this._privacy;
         }
 

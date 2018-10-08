@@ -58,7 +58,7 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
 
         this._privacy.render();
         this._privacy.hide();
-        document.body.appendChild(this._privacy.container()!);
+        document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
     }
 
@@ -77,7 +77,7 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
         super.hide();
 
         if (this._privacy) {
-            document.body.removeChild(this._privacy.container()!);
+            document.body.removeChild(this._privacy.container());
         }
 
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
