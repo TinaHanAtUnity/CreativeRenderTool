@@ -36,7 +36,7 @@ import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOper
 import { AuctionRequest } from 'Banners/Utilities/AuctionRequest';
 import { Overlay } from 'Ads/Views/Overlay';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { AdUnitContainer } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { AdUnitFactory } from 'Ads/AdUnits/AdUnitFactory';
 import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
@@ -44,6 +44,24 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Analytics } from '../Analytics/Analytics';
+import { CallbackStatus, INativeCallback } from '../Core/Native/Bridge/NativeBridge';
+import { Placement } from './Models/Placement';
+import { DiagnosticError } from '../Core/Errors/DiagnosticError';
+import { SessionDiagnostics } from './Utilities/SessionDiagnostics';
+import { Promises, TimeoutError } from '../Core/Utilities/Promises';
+import { Diagnostics } from '../Core/Utilities/Diagnostics';
+import { Campaign } from './Models/Campaign';
+import { CacheMode } from '../Core/Models/CoreConfiguration';
+import { ThirdPartyEventManager } from './Managers/ThirdPartyEventManager';
+import { OperativeEventManagerFactory } from './Managers/OperativeEventManagerFactory';
+import { PerformanceCampaign } from '../Performance/Models/PerformanceCampaign';
+import { XPromoCampaign } from '../XPromo/Models/XPromoCampaign';
+import { IosUtils } from './Utilities/IosUtils';
+import { CustomFeatures } from './Utilities/CustomFeatures';
+import { OperativeEventManager } from './Managers/OperativeEventManager';
+import { UnityAdsError } from '../Core/Constants/UnityAdsError';
+import { FinishState } from '../Core/Constants/FinishState';
+import { BannerAdContext } from '../Banners/Context/BannerAdContext';
 
 export interface IAdsApi extends IModuleApi {
     AdsProperties: AdsPropertiesApi;
@@ -84,7 +102,13 @@ export class Ads extends CoreModule implements IApiModule {
     public CampaignManager: CampaignManager;
     public RefreshManager: OldCampaignRefreshManager;
 
+    private _currentAdUnit: AbstractAdUnit;
     private _cachedCampaignResponse?: INativeResponse;
+    private _showing: boolean = false;
+    private _creativeUrl?: string;
+    private _requestDelay: number;
+    private _wasRealtimePlacement: boolean = false;
+    private _bannerAdContext: BannerAdContext;
 
     constructor(core: Core, analytics: Analytics) {
         super(core);
@@ -191,6 +215,236 @@ export class Ads extends CoreModule implements IApiModule {
                 });
             }
         });
+    }
+
+    public show(placementId: string, options: any, callback: INativeCallback): void {
+        callback(CallbackStatus.OK);
+
+        if(this._showing) {
+            // do not send finish event because there will be a finish event from currently open ad unit
+            this.showError(false, placementId, 'Can\'t show a new ad unit when ad unit is already open');
+            return;
+        }
+
+        const placement: Placement = this.Config.getPlacement(placementId);
+        if(!placement) {
+            this.showError(true, placementId, 'No such placement: ' + placementId);
+            return;
+        }
+
+        const campaign = this.RefreshManager.getCampaign(placementId);
+
+        if(!campaign) {
+            this.showError(true, placementId, 'Campaign not found');
+            return;
+        }
+
+        SdkStats.sendShowEvent(placementId);
+
+        if(campaign.isExpired()) {
+            this.showError(true, placementId, 'Campaign has expired');
+            this.RefreshManager.refresh();
+
+            const error = new DiagnosticError(new Error('Campaign expired'), {
+                id: campaign.getId(),
+                willExpireAt: campaign.getWillExpireAt()
+            });
+            SessionDiagnostics.trigger('campaign_expired', error, campaign.getSession());
+            return;
+        }
+
+        this.Core.CacheBookkeeping.deleteCachedCampaignResponse();
+
+        if (placement.getRealtimeData()) {
+            this.Core.Api.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
+            const start = Date.now();
+
+            const realtimeTimeoutInMillis = 1500;
+            Promises.withTimeout(this.CampaignManager.requestRealtime(placement, campaign.getSession()), realtimeTimeoutInMillis).then(realtimeCampaign => {
+                this._requestDelay = Date.now() - start;
+                this.Core.Api.Sdk.logInfo(`Unity Ads received a realtime request in ${this._requestDelay} ms.`);
+
+                if(realtimeCampaign) {
+                    this.Core.Api.Sdk.logInfo('Unity Ads received new fill for placement ' + placement.getId() + ', streaming new ad unit');
+                    this._wasRealtimePlacement = true;
+                    placement.setCurrentCampaign(realtimeCampaign);
+                    this.showAd(placement, realtimeCampaign, options);
+                } else {
+                    SessionDiagnostics.trigger('realtime_no_fill', {}, campaign.getSession());
+                    this.Core.Api.Sdk.logInfo('Unity Ads received no new fill for placement ' + placement.getId() + ', opening old ad unit');
+                    this.showAd(placement, campaign, options);
+                }
+            }).catch((e) => {
+                if (e instanceof TimeoutError) {
+                    Diagnostics.trigger('realtime_network_timeout', {
+                        auctionId: campaign.getSession().getId()
+                    });
+                }
+                Diagnostics.trigger('realtime_error', {
+                    error: e
+                });
+                this.Core.Api.Sdk.logInfo('Unity Ads realtime fill request for placement ' + placement.getId() + ' failed, opening old ad unit');
+                this.showAd(placement, campaign, options);
+            });
+        } else {
+            this.showAd(placement, campaign, options);
+        }
+    }
+
+    public showBanner(placementId: string, callback: INativeCallback) {
+        callback(CallbackStatus.OK);
+
+        const context = this._bannerAdContext;
+        context.load(placementId).catch((e) => {
+            this.Core.Api.Sdk.logWarning(`Could not show banner due to ${e.message}`);
+        });
+    }
+
+    public hideBanner(callback: INativeCallback) {
+        callback(CallbackStatus.OK);
+
+        const context = this._bannerAdContext;
+        context.hide();
+    }
+
+    private showAd(placement: Placement, campaign: Campaign, options: any) {
+        const testGroup = this.Core.Config.getAbGroup();
+        const start = Date.now();
+
+        this._showing = true;
+
+        if(this.Config.getCacheMode() !== CacheMode.DISABLED) {
+            this.AssetManager.stopCaching();
+        }
+
+        Promise.all([
+            this.Core.DeviceInfo.getScreenWidth(),
+            this.Core.DeviceInfo.getScreenHeight(),
+            this.Core.DeviceInfo.getConnectionType()
+        ]).then(([screenWidth, screenHeight, connectionType]) => {
+            if(campaign.isConnectionNeeded() && connectionType === 'none') {
+                this._showing = false;
+                this.showError(true, placement.getId(), 'No connection');
+
+                const error = new DiagnosticError(new Error('No connection is available'), {
+                    id: campaign.getId()
+                });
+                SessionDiagnostics.trigger('mraid_no_connection', error, campaign.getSession());
+                return;
+            }
+
+            const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
+            this._currentAdUnit = AdUnitFactory.createAdUnit({
+                platform: this.Core.NativeBridge.getPlatform(),
+                core: this.Core.Api,
+                ads: this.Api,
+                forceOrientation: orientation,
+                focusManager: this.Core.FocusManager,
+                container: this.Container,
+                deviceInfo: this.Core.DeviceInfo,
+                clientInfo: this.Core.ClientInfo,
+                thirdPartyEventManager: new ThirdPartyEventManager(this.Core.Api, this.Core.Request, {
+                    '%ZONE%': placement.getId(),
+                    '%SDK_VERSION%': this.Core.ClientInfo.getSdkVersion().toString()
+                }),
+                operativeEventManager: OperativeEventManagerFactory.createOperativeEventManager({
+                    platform: this.Core.NativeBridge.getPlatform(),
+                    core: this.Core.Api,
+                    ads: this.Api,
+                    request: this.Core.Request,
+                    metaDataManager: this.Core.MetaDataManager,
+                    sessionManager: this.SessionManager,
+                    clientInfo: this.Core.ClientInfo,
+                    deviceInfo: this.Core.DeviceInfo,
+                    coreConfig: this.Core.Config,
+                    adsConfig: this.Config,
+                    campaign: campaign
+                }),
+                placement: placement,
+                campaign: campaign,
+                coreConfig: this.Core.Config,
+                adsConfig: this.Config,
+                request: this.Core.Request,
+                options: options,
+                gdprManager: this.GdprManager,
+                adMobSignalFactory: this.AdMobSignalFactory,
+                programmaticTrackingService: this.ProgrammaticTrackingService,
+                webPlayerContainer: this.InterstitialWebPlayerContainer,
+                gameSessionId: this.SessionManager.getGameSessionId()
+            });
+            this.RefreshManager.setCurrentAdUnit(this._currentAdUnit);
+            this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
+
+            if(this.Core.NativeBridge.getPlatform() === Platform.IOS && (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign)) {
+                if(!IosUtils.isAppSheetBroken(this.Core.DeviceInfo.getOsVersion(), this.Core.DeviceInfo.getModel()) && !campaign.getBypassAppSheet()) {
+                    const appSheetOptions = {
+                        id: parseInt(campaign.getAppStoreId(), 10)
+                    };
+                    this.Api.iOS!.AppSheet.prepare(appSheetOptions).then(() => {
+                        const onCloseObserver = this.Api.iOS!.AppSheet.onClose.subscribe(() => {
+                            this.Api.iOS!.AppSheet.prepare(appSheetOptions);
+                        });
+                        this._currentAdUnit.onClose.subscribe(() => {
+                            this.Api.iOS!.AppSheet.onClose.unsubscribe(onCloseObserver);
+                            if(CustomFeatures.isSimejiJapaneseKeyboardApp(this.Core.ClientInfo.getGameId())) {
+                                // app sheet is not closed properly if the user opens or downloads the game. Reset the app sheet.
+                                this.Api.iOS!.AppSheet.destroy();
+                            } else {
+                                this.Api.iOS!.AppSheet.destroy(appSheetOptions);
+                            }
+                        });
+                    });
+                }
+            }
+
+            OperativeEventManager.setPreviousPlacementId(this.CampaignManager.getPreviousPlacementId());
+            this.CampaignManager.setPreviousPlacementId(placement.getId());
+
+            // Temporary for realtime testing purposes
+            if (this._wasRealtimePlacement) {
+                this._currentAdUnit.onStart.subscribe(() => {
+                    const startDelay = Date.now() - start;
+                    Diagnostics.trigger('realtime_delay', {
+                        requestDelay: this._requestDelay,
+                        startDelay: startDelay,
+                        totalDelay: this._requestDelay + startDelay,
+                        auctionId: campaign.getSession().getId(),
+                        adUnitDescription: this._currentAdUnit.description()
+                    });
+                });
+            }
+            this._wasRealtimePlacement = false;
+
+            this._currentAdUnit.show().then(() => {
+                if(this.Core.NativeBridge.getPlatform() === Platform.ANDROID) {
+                    this.Core.NativeBridge.setAutoBatchEnabled(true);
+                    this.Core.Api.Request.Android!.setMaximumPoolSize(8);
+                } else {
+                    this.Core.Api.Request.setConcurrentRequestCount(8);
+                }
+            });
+        });
+    }
+
+    private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
+        this.Core.Api.Sdk.logError('Show invocation failed: ' + errorMsg);
+        this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.SHOW_ERROR], errorMsg);
+        if(sendFinish) {
+            this.Api.Listener.sendFinishEvent(placementId, FinishState.ERROR);
+        }
+    }
+
+    private onAdUnitClose(): void {
+        this._showing = false;
+
+        if(this.Core.NativeBridge.getPlatform() === Platform.ANDROID) {
+            if(!CustomFeatures.isAlwaysAutobatching(this.Core.ClientInfo.getGameId())) {
+                this.Core.NativeBridge.setAutoBatchEnabled(false);
+            }
+            this.Core.Api.Request.Android!.setMaximumPoolSize(1);
+        } else {
+            this.Core.Api.Request.setConcurrentRequestCount(1);
+        }
     }
 
     private setupTestEnvironment(): Promise<void> {
