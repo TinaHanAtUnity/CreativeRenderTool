@@ -10,9 +10,10 @@ describe('VastMediaSelectorTest', () => {
     let vast: Vast;
     let vastAd: VastAd;
     let vastCreative: VastCreativeLinear;
-    const vastMediaFiles: VastMediaFile[] = [];
 
     beforeEach(() => {
+        const vastMediaFiles: VastMediaFile[] = [];
+
         const vastMedia1 = new VastMediaFile('https://vast_media_url_30mb', 'progressive', '', 'video/mp4', 16519, 0, 0, 1920, 1080, '' , 30973125);
         const vastMedia2 = new VastMediaFile('https://vast_media_url_570kb', 'progressive', '', 'video/mp4', 304, 0, 0, 640, 360, '', 570000);
         const vastMedia3 = new VastMediaFile('https://vast_media_url_3.2mb', 'progressive', '', 'video/mp4', 1745, 0, 0, 1920, 1080, '', 3271875);
