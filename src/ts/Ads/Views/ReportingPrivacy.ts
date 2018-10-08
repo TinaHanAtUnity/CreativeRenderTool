@@ -260,11 +260,11 @@ export class ReportingPrivacy extends AbstractPrivacy {
             this._gdprManager.retrievePersonalInformation().then((personalProperties) => {
                 this._personalInfoObtained = true;
                 document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
-                document.getElementById('phone-type')!.innerHTML = ` - Using ${personalProperties.deviceModel}.`;
-                document.getElementById('country')!.innerHTML = ` - Playing in ${personalProperties.country}.`;
-                document.getElementById('game-plays-this-week')!.innerHTML = ` - Played this game ${personalProperties.gamePlaysThisWeek} times this week.`;
-                document.getElementById('ads-seen-in-game')!.innerHTML = ` - Seen ${personalProperties.adsSeenInGameThisWeek} ads in this game.`;
-                document.getElementById('games-installed-from-ads')!.innerHTML = ` - Installed ${personalProperties.installsFromAds} games based on those ads.`;
+                document.getElementById('phone-type')!.innerHTML = ` - Using ${personalProperties.deviceModel}`;
+                document.getElementById('country')!.innerHTML = ` - Located in ${personalProperties.country}`;
+                document.getElementById('game-plays-this-week')!.innerHTML = ` - Used this app ${personalProperties.gamePlaysThisWeek} times this week`;
+                document.getElementById('ads-seen-in-game')!.innerHTML = ` - Seen ${personalProperties.adsSeenInGameThisWeek} ads in this app`;
+                document.getElementById('games-installed-from-ads')!.innerHTML = ` - Installed ${personalProperties.installsFromAds} apps based on those ads`;
             }).catch(error => {
                 Diagnostics.trigger('gdpr_personal_info_failed', error);
                 document.getElementById('sorry-message')!.innerHTML = 'Sorry. We were unable to deliver our collected information at this time.';
