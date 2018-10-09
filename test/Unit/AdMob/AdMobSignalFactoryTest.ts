@@ -13,12 +13,14 @@ import { unity_proto } from '../../../src/proto/unity_proto.js';
 describe('AdMobSignalFactoryTest', () => {
     xit('basic test', () => {
         const nativeBridge: NativeBridge = TestFixtures.getNativeBridge();
+        const core = TestFixtures.getCoreApi(nativeBridge);
+        const ads = TestFixtures.getAdsApi(nativeBridge);
         const clientInfo: ClientInfo = TestFixtures.getClientInfo();
         const deviceInfo: AndroidDeviceInfo = TestFixtures.getAndroidDeviceInfo();
-        const focusManager: FocusManager = new FocusManager(nativeBridge);
-        const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
+        const focusManager: FocusManager = new FocusManager(nativeBridge.getPlatform(), core);
+        const metaDataManager: MetaDataManager = new MetaDataManager(core);
 
-        return new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager).getAdRequestSignal().then(signal => {
+        return new AdMobSignalFactory(nativeBridge.getPlatform(), core, ads, clientInfo, deviceInfo, focusManager).getAdRequestSignal().then(signal => {
             const encodedMsg: string = signal.getBase64ProtoBuf();
 
             const buffer = new Uint8Array(protobuf.util.base64.length(encodedMsg));

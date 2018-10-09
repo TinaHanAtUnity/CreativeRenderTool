@@ -4,7 +4,7 @@ import { assert } from 'chai';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 
 import ProgrammaticMRAIDCampaign from 'json/campaigns/mraid/ProgrammaticMRAIDCampaign.json';
@@ -21,7 +21,7 @@ describe('ProgrammaticMraidUrlParser', () => {
 
     let parser: ProgrammaticMraidUrlParser;
     let nativeBridge: NativeBridge;
-    let request: Request;
+    let request: RequestManager;
     let session: Session;
 
     beforeEach(() => {

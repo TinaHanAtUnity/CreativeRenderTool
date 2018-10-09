@@ -20,7 +20,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { INativeResponse, Request } from 'Core/Managers/RequestManager';
 import 'mocha';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
@@ -39,7 +39,7 @@ describe('MRAIDEventHandlersTest', () => {
     let mraidView: MRAID;
     let placement: Placement;
     let focusManager: FocusManager;
-    let request: Request;
+    let request: RequestManager;
     let operativeEventManager: OperativeEventManager;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
@@ -68,7 +68,7 @@ describe('MRAIDEventHandlersTest', () => {
             container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             request = sinon.createStubInstance(Request);
             placement = TestFixtures.getPlacement();
-            request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
+            request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
@@ -286,7 +286,7 @@ describe('MRAIDEventHandlersTest', () => {
             focusManager = new FocusManager(nativeBridge);
             metaDataManager = new MetaDataManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
-            request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
+            request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
             sinon.stub(request, 'followRedirectChain').resolves();
             placement = TestFixtures.getPlacement();
             gdprManager = sinon.createStubInstance(GdprManager);

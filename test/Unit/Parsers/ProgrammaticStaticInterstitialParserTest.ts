@@ -4,7 +4,7 @@ import { assert } from 'chai';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { ProgrammaticStaticInterstitialParser } from 'Display/Parsers/ProgrammaticStaticInterstitialParser';
 
@@ -22,7 +22,7 @@ describe('ProgrammaticVPAIDParser', () => {
 
     let parser: ProgrammaticStaticInterstitialParser;
     let nativeBridge: NativeBridge;
-    let request: Request;
+    let request: RequestManager;
     let session: Session;
 
     beforeEach(() => {

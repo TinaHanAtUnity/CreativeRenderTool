@@ -30,7 +30,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 import { Double } from 'Core/Utilities/Double';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import 'mocha';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
@@ -65,7 +65,7 @@ describe('VideoEventHandlersTest', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
-    let request: Request;
+    let request: RequestManager;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let vastAdUnitParameters: IVastAdUnitParameters;
     let operativeEventManagerParams: IOperativeEventManagerParams<Campaign>;
@@ -92,7 +92,7 @@ describe('VideoEventHandlersTest', () => {
         const adsConfig = TestFixtures.getAdsConfiguration();
 
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
 

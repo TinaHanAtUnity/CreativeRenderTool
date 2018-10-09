@@ -18,7 +18,7 @@ import { RequestApi } from 'Core/Native/Request';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
 
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
@@ -178,7 +178,7 @@ describe('OperativeEventManagerTest', () => {
     let deviceInfo: AndroidDeviceInfo;
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
-    let request: Request;
+    let request: RequestManager;
     let metaDataManager: MetaDataManager;
     let sessionManager: SessionManager;
     let operativeEventManagerParams: IOperativeEventManagerParams<Campaign>;
@@ -194,10 +194,10 @@ describe('OperativeEventManagerTest', () => {
         focusManager = new FocusManager(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         requestApi = nativeBridge.RequestManager = new TestRequestApi(nativeBridge);
-        request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
+        request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
 

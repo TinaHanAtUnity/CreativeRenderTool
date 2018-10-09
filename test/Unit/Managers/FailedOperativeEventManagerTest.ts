@@ -6,7 +6,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
@@ -15,7 +15,7 @@ describe('FailedOperativeEventManagerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
-    let request: Request;
+    let request: RequestManager;
     let focusManager: FocusManager;
     let wakeUpManager: WakeUpManager;
 
@@ -27,7 +27,7 @@ describe('FailedOperativeEventManagerTest', () => {
 
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
     });
 
     describe('Handling failed events', () => {

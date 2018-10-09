@@ -10,7 +10,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { RequestApi } from 'Core/Native/Request';
 import { StorageApi, StorageError, StorageType } from 'Core/Native/Storage';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -65,7 +65,7 @@ class TestHelper {
 describe('AnalyticsManagerTest', () => {
     let nativeBridge: NativeBridge;
     let wakeUpManager: WakeUpManager;
-    let request: Request;
+    let request: RequestManager;
     let clientInfo: ClientInfo;
     let deviceInfo: DeviceInfo;
     let configuration: CoreConfiguration;
@@ -77,7 +77,7 @@ describe('AnalyticsManagerTest', () => {
         nativeBridge = TestFixtures.getNativeBridge();
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo();
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         configuration = TestFixtures.getCoreConfiguration();

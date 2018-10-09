@@ -32,7 +32,7 @@ import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { Cache } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 import { Observable0, Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { INativeResponse, Request } from 'Core/Managers/RequestManager';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
@@ -88,7 +88,7 @@ describe('CampaignManager', () => {
     let clientInfo: ClientInfo;
     let nativeBridge: NativeBridge;
     let wakeUpManager: WakeUpManager;
-    let request: Request;
+    let request: RequestManager;
     let vastParser: VastParser;
     let warningSpy: sinon.SinonSpy;
     let coreConfig: CoreConfiguration;
@@ -218,7 +218,7 @@ describe('CampaignManager', () => {
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
         deviceInfo = new AndroidDeviceInfo(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);

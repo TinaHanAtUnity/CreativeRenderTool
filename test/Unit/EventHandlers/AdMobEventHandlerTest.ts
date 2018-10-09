@@ -17,7 +17,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { IntentApi } from 'Core/Native/Android/Intent';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import * as protobuf from 'protobufjs/minimal';
 import * as sinon from 'sinon';
@@ -33,7 +33,7 @@ describe('AdMobEventHandler', () => {
     let admobEventHandler: AdMobEventHandler;
     let adUnit: AdMobAdUnit;
     let nativeBridge: NativeBridge;
-    let request: Request;
+    let request: RequestManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let session: Session;
     let adMobSignalFactory: AdMobSignalFactory;

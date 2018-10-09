@@ -10,7 +10,7 @@ import { Cache, CacheStatus } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 import { FileId } from 'Core/Utilities/FileId';
 import { FileInfo } from 'Core/Utilities/FileInfo';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 
@@ -155,7 +155,7 @@ describe('CacheTest', () => {
 
     let cacheApi: TestCacheApi;
     let storageApi: TestStorageApi;
-    let request: Request;
+    let request: RequestManager;
     let cacheBookkeeping: CacheBookkeeping;
     let programmaticTrackingService: ProgrammaticTrackingService;
     let cacheManager: Cache;
@@ -172,7 +172,7 @@ describe('CacheTest', () => {
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         const focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         cacheManager = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, {retries: 3, retryDelay: 1000});

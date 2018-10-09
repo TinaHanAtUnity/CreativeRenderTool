@@ -24,7 +24,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
@@ -48,7 +48,7 @@ describe('OverlayEventHandlerTest', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
-    let request: Request;
+    let request: RequestManager;
     let overlay: Overlay;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let overlayEventHandler: OverlayEventHandler<PerformanceCampaign>;
@@ -66,7 +66,7 @@ describe('OverlayEventHandlerTest', () => {
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         coreConfig = TestFixtures.getCoreConfiguration();

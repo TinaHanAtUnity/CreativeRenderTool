@@ -20,7 +20,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -45,7 +45,7 @@ describe('VastVideoEventHandler tests', () => {
     let overlay: Overlay;
     let vastEndScreen: VastEndScreen;
     let wakeUpManager: WakeUpManager;
-    let request: Request;
+    let request: RequestManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let sessionManager: SessionManager;
     let testAdUnit: VastAdUnit;
@@ -92,7 +92,7 @@ describe('VastVideoEventHandler tests', () => {
 
         deviceInfo = new AndroidDeviceInfo(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge, request);
 

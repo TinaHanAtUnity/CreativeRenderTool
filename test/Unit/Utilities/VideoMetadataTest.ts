@@ -10,7 +10,7 @@ import { CacheError } from 'Core/Native/Cache';
 
 import { Cache } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -26,7 +26,7 @@ describe('VideoMetadataTest', () => {
 
     let nativeBridge: NativeBridge;
     let wakeUpManager: WakeUpManager;
-    let request: Request;
+    let request: RequestManager;
     let cache: Cache;
     let focusManager: FocusManager;
     let cacheBookkeeping: CacheBookkeeping;
@@ -38,7 +38,7 @@ describe('VideoMetadataTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
             focusManager = new FocusManager(nativeBridge);
             wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-            request = new Request(nativeBridge, wakeUpManager);
+            request = new RequestManager(nativeBridge, wakeUpManager);
             cacheBookkeeping = new CacheBookkeeping(nativeBridge);
             cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
         });
@@ -73,7 +73,7 @@ describe('VideoMetadataTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
             focusManager = new FocusManager(nativeBridge);
             wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-            request = new Request(nativeBridge, wakeUpManager);
+            request = new RequestManager(nativeBridge, wakeUpManager);
             cacheBookkeeping = new CacheBookkeeping(nativeBridge);
             cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
         });

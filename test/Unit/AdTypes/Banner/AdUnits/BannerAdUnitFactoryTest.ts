@@ -22,7 +22,7 @@ describe('BannerAdUnitFactoryTest', () => {
         });
 
         it('should return a banner ad unit', () => {
-            const adUnit = BannerAdUnitFactory.createAdUnit(nativeBridge, parameters);
+            const adUnit = BannerAdUnitFactory.createAdUnit(parameters);
             assert.instanceOf(adUnit, BannerAdUnit, 'Returned ad unit is not a BannerAdUnit.');
         });
     });

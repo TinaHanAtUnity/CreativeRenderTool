@@ -8,7 +8,7 @@ import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
-import { INativeResponse } from 'Core/Utilities/Request';
+import { INativeResponse } from 'Core/Managers/RequestManager';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';

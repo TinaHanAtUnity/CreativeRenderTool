@@ -20,7 +20,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { INativeResponse, Request } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -64,7 +64,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             metaDataManager = new MetaDataManager(nativeBridge);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-            const request = new Request(nativeBridge, wakeUpManager);
+            const request = new RequestManager(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
@@ -166,7 +166,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
             container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-            const request = new Request(nativeBridge, wakeUpManager);
+            const request = new RequestManager(nativeBridge, wakeUpManager);
             deviceInfo = TestFixtures.getIosDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);

@@ -21,6 +21,11 @@ export class Banners extends AdsModule implements IApiModule {
 
     constructor(ads: Ads) {
         super(ads);
+
+        this.Api = {
+            Banner: new BannerApi(ads.Core.NativeBridge),
+            Listener: new BannerListenerApi(ads.Core.NativeBridge)
+        };
     }
 
     public initialize(): Promise<void> {

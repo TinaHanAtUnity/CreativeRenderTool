@@ -36,7 +36,7 @@ import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Observable0, Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { INativeResponse, Request } from 'Core/Managers/RequestManager';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
@@ -104,7 +104,7 @@ describe('CampaignRefreshManager', () => {
     let campaignManager: CampaignManager;
     let wakeUpManager: WakeUpManager;
     let nativeBridge: NativeBridge;
-    let request: Request;
+    let request: RequestManager;
     let assetManager: AssetManager;
     let sessionManager: SessionManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
@@ -201,7 +201,7 @@ describe('CampaignRefreshManager', () => {
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge, request);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();

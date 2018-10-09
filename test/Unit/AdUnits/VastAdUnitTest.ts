@@ -15,7 +15,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -66,7 +66,7 @@ describe('VastAdUnitTest', () => {
         const nativeBridge = TestFixtures.getNativeBridge();
         focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        const request = new Request(nativeBridge, wakeUpManager);
+        const request = new RequestManager(nativeBridge, wakeUpManager);
         const activity = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         vastCampaign = TestFixtures.getEventVastCampaign();

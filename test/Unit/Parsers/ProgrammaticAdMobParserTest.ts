@@ -7,7 +7,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
 import { FileId } from 'Core/Utilities/FileId';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import ValidAdMobCampaign from 'json/campaigns/admob/ValidAdMobCampaign.json';
 import 'mocha';
 import * as sinon from 'sinon';
@@ -22,7 +22,7 @@ describe('ProgrammaticAdMobParser', () => {
 
     let parser: ProgrammaticAdMobParser;
     let nativeBridge: NativeBridge;
-    let request: Request;
+    let request: RequestManager;
     let session: Session;
     let setFileIdSpy: sinon.SinonSpy;
 

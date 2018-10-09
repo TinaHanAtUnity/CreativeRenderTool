@@ -5,7 +5,7 @@ import { assert } from 'chai';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 
 import OnCometMraidPlcCampaign from 'json/campaigns/performance/CometMraidUrlCampaign.json';
@@ -24,7 +24,7 @@ describe('CometCampaignParser', () => {
 
     let parser: CometCampaignParser;
     let nativeBridge: NativeBridge;
-    let request: Request;
+    let request: RequestManager;
     let session: Session;
 
     beforeEach(() => {

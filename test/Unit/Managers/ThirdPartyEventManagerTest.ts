@@ -6,7 +6,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { RequestApi } from 'Core/Native/Request';
 
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
@@ -51,7 +51,7 @@ describe('ThirdPartyEventManagerTest', () => {
     let requestApi: TestRequestApi;
     let focusManager: FocusManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
-    let request: Request;
+    let request: RequestManager;
     let metaDataManager: MetaDataManager;
 
     beforeEach(() => {
@@ -63,10 +63,10 @@ describe('ThirdPartyEventManagerTest', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         requestApi = nativeBridge.RequestManager = new TestRequestApi(nativeBridge);
-        request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
+        request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
 
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
     });

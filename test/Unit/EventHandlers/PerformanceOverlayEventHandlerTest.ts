@@ -17,7 +17,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
@@ -38,7 +38,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
     let video: Video;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
-    let request: Request;
+    let request: RequestManager;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
 
@@ -56,7 +56,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         video = new Video('', TestFixtures.getSession());
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);

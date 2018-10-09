@@ -1,11 +1,10 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export class TestAdUnit extends AbstractAdUnit {
 
-    constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
-        super(nativeBridge, parameters);
+    constructor(parameters: IAdUnitParameters<Campaign>) {
+        super(parameters);
     }
 
     public show(): Promise<void> {

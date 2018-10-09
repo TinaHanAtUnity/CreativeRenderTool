@@ -22,7 +22,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { INativeResponse, Request } from 'Core/Managers/RequestManager';
 import 'mocha';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceEndScreenEventHandler } from 'Performance/EventHandlers/PerformanceEndScreenEventHandler';
@@ -66,7 +66,7 @@ describe('EndScreenEventHandlerTest', () => {
             container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             metaDataManager = new MetaDataManager(nativeBridge);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-            const request = new Request(nativeBridge, wakeUpManager);
+            const request = new RequestManager(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
@@ -357,7 +357,7 @@ describe('EndScreenEventHandlerTest', () => {
 
             container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-            const request = new Request(nativeBridge, wakeUpManager);
+            const request = new RequestManager(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
             deviceInfo = TestFixtures.getIosDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);

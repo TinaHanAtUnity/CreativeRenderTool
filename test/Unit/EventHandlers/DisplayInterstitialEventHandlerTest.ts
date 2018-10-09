@@ -8,7 +8,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import {
     DisplayInterstitialAdUnit,
     IDisplayInterstitialAdUnitParameters

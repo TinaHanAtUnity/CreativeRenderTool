@@ -13,7 +13,7 @@ import { CacheApi, CacheError, CacheEvent, IFileInfo } from 'Core/Native/Cache';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { Cache, CacheStatus } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -176,7 +176,7 @@ describe('AssetManagerTest', () => {
     let cacheApi: TestCacheApi;
     let storageApi: TestStorageApi;
     let wakeUpManager: WakeUpManager;
-    let request: Request;
+    let request: RequestManager;
     let deviceInfo: DeviceInfo;
     let focusManager: FocusManager;
     let cacheBookkeeping: CacheBookkeeping;
@@ -192,7 +192,7 @@ describe('AssetManagerTest', () => {
         });
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
         cacheApi = nativeBridge.CacheManager = new TestCacheApi(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();

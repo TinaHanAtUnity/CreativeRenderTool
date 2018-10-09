@@ -7,7 +7,7 @@ import { CacheApi, CacheError, IFileInfo } from 'Core/Native/Cache';
 import { StorageApi, StorageError, StorageType } from 'Core/Native/Storage';
 import { Cache } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { FakeSdkApi } from 'TestHelpers/FakeSdkApi';
@@ -212,7 +212,7 @@ describe('CacheCleanTest', () => {
         const nativeBridge: NativeBridge = TestFixtures.getNativeBridge();
         const focusManager = new FocusManager(nativeBridge);
         const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        const request: Request = new Request(nativeBridge, wakeUpManager);
+        const request: Request = new RequestManager(nativeBridge, wakeUpManager);
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
         cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
         cacheApi = new TestCacheApi(nativeBridge);

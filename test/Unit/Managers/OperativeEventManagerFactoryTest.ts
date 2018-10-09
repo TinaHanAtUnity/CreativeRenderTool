@@ -11,7 +11,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import { MRAIDOperativeEventManager } from 'MRAID/Managers/MRAIDOperativeEventManager';
 import * as sinon from 'sinon';
@@ -23,7 +23,7 @@ describe('OperativeEventManagerFactoryTest', () => {
     const handleCallback = sinon.spy();
 
     let nativeBridge: NativeBridge;
-    let request: Request;
+    let request: RequestManager;
     let metaDataManager: MetaDataManager;
     let sessionManager: SessionManager;
     let clientInfo: ClientInfo;

@@ -12,7 +12,7 @@ import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Observable2 } from 'Core/Utilities/Observable';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 
@@ -26,7 +26,7 @@ describe('GdprManagerTest', () => {
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
     let gdprManager: GdprManager;
-    let request: Request;
+    let request: RequestManager;
 
     let onSetStub: sinon.SinonStub;
     let getStub: sinon.SinonStub;

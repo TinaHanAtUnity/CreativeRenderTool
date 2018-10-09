@@ -1,17 +1,16 @@
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
 import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
-import { Platform } from 'Core/Constants/Platform';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/Core';
 
 import IosDefaults from 'json/FakeIosDeviceInfo.json';
 
 export class FakeIosDeviceInfo extends IosDeviceInfo {
-    private _platform: Platform;
+
     private _fakeDevice: any;
 
-    constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge);
+    constructor(core: ICoreApi) {
+        super(core);
         this._fakeDevice = JSON.parse(IosDefaults);
     }
 

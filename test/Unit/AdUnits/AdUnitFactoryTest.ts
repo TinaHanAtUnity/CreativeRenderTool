@@ -29,7 +29,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 
 import { DisplayInterstitialAdUnit } from 'Display/AdUnits/DisplayInterstitialAdUnit';
@@ -49,11 +49,15 @@ import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { ICoreApi } from '../../../src/ts/Core/Core';
+import { IAdsApi } from '../../../src/ts/Ads/Ads';
 
 describe('AdUnitFactoryTest', () => {
 
     let sandbox: sinon.SinonSandbox;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    let ads: IAdsApi;
     let focusManager: FocusManager;
     let container: AdUnitContainer;
     let deviceInfo: DeviceInfo;
@@ -64,7 +68,7 @@ describe('AdUnitFactoryTest', () => {
     let adsConfig: AdsConfiguration;
     let metaDataManager: MetaDataManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
-    let request: Request;
+    let request: RequestManager;
     let adUnitParameters: IAdUnitParameters<Campaign>;
     let wakeUpManager: WakeUpManager;
 
@@ -74,27 +78,31 @@ describe('AdUnitFactoryTest', () => {
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
-        metaDataManager = new MetaDataManager(nativeBridge);
-        focusManager = new FocusManager(nativeBridge);
-        wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+        core = TestFixtures.getCoreApi(nativeBridge);
+        ads = TestFixtures.getAdsApi(nativeBridge);
+        metaDataManager = new MetaDataManager(core);
+        focusManager = new FocusManager(nativeBridge.getPlatform(), core);
+        wakeUpManager = new WakeUpManager(core);
+        request = new RequestManager(nativeBridge.getPlatform(), core, wakeUpManager);
+        container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo());
         sandbox.stub(container, 'close').returns(Promise.resolve());
         sandbox.stub(container, 'open').returns(Promise.resolve());
-        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         const placement = TestFixtures.getPlacement();
         coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationJson));
         adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationJson));
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false, getOsVersion: () => '8.0'};
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         thirdPartyEventManager.setTemplateValues({ '%ZONE%': placement.getId(), '%SDK_VERSION%': clientInfo.getSdkVersion().toString() });
-        sessionManager = new SessionManager(nativeBridge, request);
+        sessionManager = new SessionManager(core.Storage, request);
         const campaign = TestFixtures.getCampaign();
         const gdprManager = sinon.createStubInstance(GdprManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
-            nativeBridge: nativeBridge,
+            platform: nativeBridge.getPlatform(),
+            core: core,
+            ads: ads,
             request: request,
             metaDataManager: metaDataManager,
             sessionManager: sessionManager,
@@ -113,6 +121,9 @@ describe('AdUnitFactoryTest', () => {
         asStub(webPlayerContainer.setSettings).resolves();
         asStub(webPlayerContainer.clearSettings).resolves();
         adUnitParameters = {
+            platform: nativeBridge.getPlatform(),
+            core: core,
+            ads: ads,
             webPlayerContainer: webPlayerContainer,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
@@ -133,8 +144,8 @@ describe('AdUnitFactoryTest', () => {
 
         sandbox.spy(thirdPartyEventManager, 'sendEvent');
         sandbox.spy(request, 'get');
-        sandbox.stub(nativeBridge.WebPlayer, 'setSettings').returns(Promise.resolve());
-        sandbox.stub(nativeBridge.WebPlayer, 'clearSettings').returns(Promise.resolve());
+        sandbox.stub(ads.WebPlayer, 'setSettings').returns(Promise.resolve());
+        sandbox.stub(ads.WebPlayer, 'clearSettings').returns(Promise.resolve());
         sandbox.stub(XHRequest, 'get').returns(Promise.resolve('mraid creative'));
     });
 
@@ -161,7 +172,7 @@ describe('AdUnitFactoryTest', () => {
             });
 
             it('should create MRAID view', () => {
-                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(adUnitParameters);
                 assert.isTrue(adUnit.getMRAIDView() instanceof MRAID, 'view should be MRAID');
             });
 
@@ -173,13 +184,13 @@ describe('AdUnitFactoryTest', () => {
                     resourceUrl.set('url', 'https://cdn.unityads.unity3d.com/playables/production/unity/xinstall.html');
                 }
 
-                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(adUnitParameters);
                 assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
             });
 
             it('should be forced to create PlayableMRAID view', () => {
                 AdUnitFactory.setForcedPlayableMRAID(true);
-                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(adUnitParameters);
                 assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
             });
         });
@@ -198,7 +209,7 @@ describe('AdUnitFactoryTest', () => {
             it('should not send onPlayableAnalyticsEvent for MRAIDCampaign', () => {
                 const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
                 adUnitParameters.campaign = campaign;
-                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(adUnitParameters);
                 adUnit.show();
                 assert.isFalse(httpKafkaStub.called);
             });
@@ -206,7 +217,7 @@ describe('AdUnitFactoryTest', () => {
             it('should send onPlayableAnalyticsEvent on show if ad is Sonic Playable', () => {
                 const campaign = TestFixtures.getProgrammaticMRAIDCampaign({ creativeId: '109455881' });
                 adUnitParameters.campaign = campaign;
-                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(adUnitParameters);
                 adUnit.show();
                 sinon.assert.calledWith(<sinon.SinonSpy>httpKafkaStub, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, sinon.match.has('type', 'playable_show'));
                 sinon.assert.calledOnce(httpKafkaStub);
@@ -215,7 +226,7 @@ describe('AdUnitFactoryTest', () => {
             it('should send onPlayableAnalyticsEvent for PerformanceMRAIDCampaign', () => {
                 const campaign = TestFixtures.getPerformanceMRAIDCampaign();
                 adUnitParameters.campaign = campaign;
-                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(adUnitParameters);
                 adUnit.show();
                 sinon.assert.calledWith(<sinon.SinonSpy>httpKafkaStub, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, sinon.match.has('type', 'playable_show'));
                 sinon.assert.calledOnce(httpKafkaStub);
@@ -240,7 +251,9 @@ describe('AdUnitFactoryTest', () => {
             }
 
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
-                nativeBridge: nativeBridge,
+                platform: nativeBridge.getPlatform(),
+                core: core,
+                ads: ads,
                 request: request,
                 metaDataManager: metaDataManager,
                 sessionManager: sessionManager,
@@ -258,7 +271,7 @@ describe('AdUnitFactoryTest', () => {
 
             adUnitParameters.campaign = campaign;
             adUnitParameters.operativeEventManager = operativeEventManager;
-            adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(adUnitParameters);
         });
 
         describe('on hide', () => {
@@ -348,7 +361,9 @@ describe('AdUnitFactoryTest', () => {
                 campaign = TestFixtures.getDisplayInterstitialCampaign();
                 adUnitParameters.campaign = campaign;
                 adUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
-                    nativeBridge: nativeBridge,
+                    platform: nativeBridge.getPlatform(),
+                    core: core,
+                    ads: ads,
                     request: request,
                     metaDataManager: metaDataManager,
                     sessionManager: sessionManager,
@@ -364,7 +379,7 @@ describe('AdUnitFactoryTest', () => {
                 sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
                 sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
 
-                adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(adUnitParameters);
             });
 
             describe('on show', () => {
@@ -391,7 +406,9 @@ describe('AdUnitFactoryTest', () => {
             });
             adUnitParameters.campaign = campaign;
             adUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
-                nativeBridge: nativeBridge,
+                platform: nativeBridge.getPlatform(),
+                core: core,
+                ads: ads,
                 request: request,
                 metaDataManager: metaDataManager,
                 sessionManager: sessionManager,
@@ -409,7 +426,7 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sandbox.stub(PurchasingUtilities, 'getProductType').returns('NonConsumable');
 
-            promoAdUnit = <PromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            promoAdUnit = <PromoAdUnit>AdUnitFactory.createAdUnit(adUnitParameters);
         });
         describe('on show', () => {
             it('should trigger onStart', (done) => {
@@ -441,7 +458,9 @@ describe('AdUnitFactoryTest', () => {
 
             adUnitParameters.campaign = campaign;
             adUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
-                nativeBridge: nativeBridge,
+                platform: nativeBridge.getPlatform(),
+                core: core,
+                ads: ads,
                 request: request,
                 metaDataManager: metaDataManager,
                 sessionManager: sessionManager,
@@ -457,7 +476,7 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
             sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
 
-            adUnit = <XPromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            adUnit = <XPromoAdUnit>AdUnitFactory.createAdUnit(adUnitParameters);
         });
 
         describe('on hide', () => {

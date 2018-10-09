@@ -22,7 +22,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import * as sinon from 'sinon';
@@ -46,7 +46,7 @@ describe('AndroidAdUnitTest', () => {
         const focusManager = new FocusManager(nativeBridge);
         const metaDataManager = new MetaDataManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        const request = new Request(nativeBridge, wakeUpManager);
+        const request = new RequestManager(nativeBridge, wakeUpManager);
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge, request);
         const deviceInfo = TestFixtures.getAndroidDeviceInfo();

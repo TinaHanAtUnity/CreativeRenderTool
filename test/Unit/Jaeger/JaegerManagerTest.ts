@@ -1,14 +1,14 @@
 import { assert } from 'chai';
 import { JaegerManager } from 'Core/Jaeger/JaegerManager';
 import { IJaegerSpan, JaegerSpan } from 'Core/Jaeger/JaegerSpan';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 
 describe('JaegerManager', () => {
 
     let jaegerManager: JaegerManager;
-    let request: Request;
+    let request: RequestManager;
     let requestPostStub: sinon.SinonStub;
 
     beforeEach(() => {

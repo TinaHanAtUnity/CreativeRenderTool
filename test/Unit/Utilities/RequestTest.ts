@@ -5,7 +5,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import { RequestApi } from 'Core/Native/Request';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 
@@ -134,7 +134,7 @@ describe('RequestTest', () => {
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         clock.restore();
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
     });
 
     it('Request get without headers (expect success)', () => {

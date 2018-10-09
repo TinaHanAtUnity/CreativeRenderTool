@@ -7,7 +7,7 @@ import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
 
-import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { INativeResponse, Request } from 'Core/Managers/RequestManager';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
@@ -34,7 +34,7 @@ describe('DiagnosticsTest', () => {
 
     it('should not allow primitives as root values', () => {
         const focusManager = new FocusManager(nativeBridge);
-        const request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
+        const request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
         resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
         sinon.stub(request, 'post').returns(resolvedPromise);
         sinon.stub(Date, 'now').returns(123456);
@@ -69,7 +69,7 @@ describe('DiagnosticsTest', () => {
 
     it('should generate proper request', () => {
         const focusManager = new FocusManager(nativeBridge);
-        const request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
+        const request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
         resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
         sinon.stub(request, 'post').returns(resolvedPromise);
         HttpKafka.setRequest(request);
@@ -83,7 +83,7 @@ describe('DiagnosticsTest', () => {
 
     it('should generate proper request with info', () => {
         const focusManager = new FocusManager(nativeBridge);
-        const request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
+        const request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
 
         resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
         sinon.stub(request, 'post').returns(resolvedPromise);

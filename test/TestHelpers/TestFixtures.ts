@@ -15,10 +15,9 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { IPackageInfo } from 'DeviceInfo.ts';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
-import { INativeResponse } from 'Core/Utilities/Request';
+import { INativeResponse } from 'Core/Managers/RequestManager';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
@@ -51,6 +50,40 @@ import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xm
 import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
+import { IPackageInfo } from 'Core/Native/Android/DeviceInfo';
+import { ICoreApi } from '../../src/ts/Core/Core';
+import { CacheApi } from '../../src/ts/Core/Native/Cache';
+import { ConnectivityApi } from '../../src/ts/Core/Native/Connectivity';
+import { DeviceInfoApi } from '../../src/ts/Core/Native/DeviceInfo';
+import { ListenerApi as CoreListenerApi } from '../../src/ts/Core/Native/Listener';
+import { PermissionsApi } from '../../src/ts/Core/Native/Permissions';
+import { RequestApi } from '../../src/ts/Core/Native/Request';
+import { ResolveApi } from '../../src/ts/Core/Native/Resolve';
+import { SdkApi } from '../../src/ts/Core/Native/Sdk';
+import { SensorInfoApi } from '../../src/ts/Core/Native/SensorInfo';
+import { StorageApi } from '../../src/ts/Core/Native/Storage';
+import { BroadcastApi } from '../../src/ts/Core/Native/Android/Broadcast';
+import { IntentApi } from '../../src/ts/Core/Native/Android/Intent';
+import { LifecycleApi } from '../../src/ts/Core/Native/Android/Lifecycle';
+import { AndroidPreferencesApi } from '../../src/ts/Core/Native/Android/Preferences';
+import { MainBundleApi } from '../../src/ts/Core/Native/iOS/MainBundle';
+import { NotificationApi } from '../../src/ts/Core/Native/iOS/Notification';
+import { IosPreferencesApi } from '../../src/ts/Core/Native/iOS/Preferences';
+import { UrlSchemeApi } from '../../src/ts/Core/Native/iOS/UrlScheme';
+import { AdsPropertiesApi } from '../../src/ts/Ads/Native/AdsProperties';
+import { PlacementApi } from '../../src/ts/Ads/Native/Placement';
+import { VideoPlayerApi } from '../../src/ts/Ads/Native/VideoPlayer';
+import { WebPlayerApi } from '../../src/ts/Ads/Native/WebPlayer';
+import { AndroidAdUnitApi } from '../../src/ts/Ads/Native/Android/AdUnit';
+import { AndroidVideoPlayerApi } from '../../src/ts/Ads/Native/Android/VideoPlayer';
+import { AppSheetApi } from '../../src/ts/Ads/Native/iOS/AppSheet';
+import { IosAdUnitApi } from '../../src/ts/Ads/Native/iOS/AdUnit';
+import { IosVideoPlayerApi } from '../../src/ts/Ads/Native/iOS/VideoPlayer';
+import { IAdsApi } from '../../src/ts/Ads/Ads';
+import { ListenerApi } from '../../src/ts/Ads/Native/Listener';
+import { IBannersApi } from '../../src/ts/Banners/Banners';
+import { BannerApi } from '../../src/ts/Banners/Native/Banner';
+import { BannerListenerApi } from '../../src/ts/Banners/Native/UnityBannerListener';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -444,7 +477,7 @@ export class TestFixtures {
             platform = Platform.ANDROID;
         }
 
-        return new ClientInfo(platform, [
+        return new ClientInfo([
             gameId ? gameId : '12345',
             false,
             'com.unity3d.ads.example',
@@ -462,11 +495,11 @@ export class TestFixtures {
     }
 
     public static getAndroidDeviceInfo(): AndroidDeviceInfo {
-        return new FakeAndroidDeviceInfo(TestFixtures.getNativeBridge());
+        return new FakeAndroidDeviceInfo(TestFixtures.getCoreApi(TestFixtures.getNativeBridge(Platform.ANDROID)));
     }
 
     public static getIosDeviceInfo(): IosDeviceInfo {
-        return new FakeIosDeviceInfo(TestFixtures.getNativeBridge());
+        return new FakeIosDeviceInfo(TestFixtures.getCoreApi(TestFixtures.getNativeBridge(Platform.IOS)));
     }
 
     public static getOkNativeResponse(): INativeResponse {
@@ -498,6 +531,61 @@ export class TestFixtures {
             }
         };
         return new NativeBridge(backend, platform);
+    }
+
+    public static getCoreApi(nativeBridge: NativeBridge): ICoreApi {
+        const platform = nativeBridge.getPlatform();
+        return {
+            Cache: new CacheApi(nativeBridge),
+            Connectivity: new ConnectivityApi(nativeBridge),
+            DeviceInfo: new DeviceInfoApi(nativeBridge),
+            Listener: new CoreListenerApi(nativeBridge),
+            Permissions: new PermissionsApi(nativeBridge),
+            Request: new RequestApi(nativeBridge),
+            Resolve: new ResolveApi(nativeBridge),
+            Sdk: new SdkApi(nativeBridge),
+            SensorInfo: new SensorInfoApi(nativeBridge),
+            Storage: new StorageApi(nativeBridge),
+            Android: platform === Platform.ANDROID ? {
+                Broadcast: new BroadcastApi(nativeBridge),
+                Intent: new IntentApi(nativeBridge),
+                Lifecycle: new LifecycleApi(nativeBridge),
+                Preferences: new AndroidPreferencesApi(nativeBridge)
+            } : undefined,
+                iOS: platform === Platform.IOS ? {
+                MainBundle: new MainBundleApi(nativeBridge),
+                Notification: new NotificationApi(nativeBridge),
+                Preferences: new IosPreferencesApi(nativeBridge),
+                UrlScheme: new UrlSchemeApi(nativeBridge)
+            } : undefined
+        };
+    }
+
+    public static getAdsApi(nativeBridge: NativeBridge): IAdsApi {
+        const platform = nativeBridge.getPlatform();
+        return {
+            AdsProperties: new AdsPropertiesApi(nativeBridge),
+            Listener: new ListenerApi(nativeBridge),
+            Placement: new PlacementApi(nativeBridge),
+            VideoPlayer: new VideoPlayerApi(nativeBridge),
+            WebPlayer: new WebPlayerApi(nativeBridge),
+            Android: platform === Platform.ANDROID ? {
+                AdUnit: new AndroidAdUnitApi(nativeBridge),
+                VideoPlayer: new AndroidVideoPlayerApi(nativeBridge)
+            } : undefined,
+            iOS: platform === Platform.IOS ? {
+                AppSheet: new AppSheetApi(nativeBridge),
+                AdUnit: new IosAdUnitApi(nativeBridge),
+                VideoPlayer: new IosVideoPlayerApi(nativeBridge)
+            } : undefined
+        };
+    }
+
+    public static getBannersApi(nativeBridge: NativeBridge): IBannersApi {
+        return {
+            Banner: new BannerApi(nativeBridge),
+            Listener: new BannerListenerApi(nativeBridge)
+        };
     }
 
     public static getCoreConfiguration(): CoreConfiguration {

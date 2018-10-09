@@ -17,7 +17,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -42,7 +42,7 @@ describe('VastOverlayEventHandlersTest', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
-    let request: Request;
+    let request: RequestManager;
     let vastAdUnitParameters: IVastAdUnitParameters;
     let vastOverlayEventHandler: VastOverlayEventHandler;
     let moat: MOAT;
@@ -71,12 +71,12 @@ describe('VastOverlayEventHandlersTest', () => {
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge, request);
-        request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
+        request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
         sinon.stub(request, 'followRedirectChain').callsFake((url) => {
             return Promise.resolve(url);
         });

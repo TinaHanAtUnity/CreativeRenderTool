@@ -13,7 +13,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IntentApi } from 'Core/Native/Android/Intent';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 
@@ -24,11 +23,13 @@ import * as sinon from 'sinon';
 
 import { asSpy, asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { ICoreApi } from '../../../../../src/ts/Core/Core';
 
 describe('BannerAdUnit', () => {
 
     let adUnit: BannerAdUnit;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
     let banner: BannerApi;
     let deviceInfo: DeviceInfo;
     let placement: Placement;
@@ -49,9 +50,11 @@ describe('BannerAdUnit', () => {
     beforeEach(() => {
         nativeBridge = sinon.createStubInstance(NativeBridge);
         asStub(nativeBridge.getPlatform).returns(Platform.ANDROID);
-        nativeBridge.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
-        nativeBridge.Intent = sinon.createStubInstance(IntentApi);
-        nativeBridge.BannerListener = sinon.createStubInstance(BannerListenerApi);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        const ads = TestFixtures.getAdsApi(nativeBridge);
+        const banners = TestFixtures.getBannersApi(nativeBridge);
+        core.Android!.Intent = sinon.createStubInstance(IntentApi);
+        banners.Listener = sinon.createStubInstance(BannerListenerApi);
 
         banner = sinon.createStubInstance(BannerApi);
         (<any>banner).onBannerAttachedState = new Observable1<boolean>();
@@ -60,7 +63,7 @@ describe('BannerAdUnit', () => {
         asStub(banner.load).callsFake(() => {
             return Promise.resolve().then(() => banner.onBannerLoaded.trigger());
         });
-        nativeBridge.Banner = banner;
+        banners.Banner = banner;
 
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         placement = TestFixtures.getPlacement();
@@ -81,7 +84,10 @@ describe('BannerAdUnit', () => {
         asStub(webPlayerContainer.setEventSettings).resolves();
         asStub(webPlayerContainer.setSettings).resolves();
 
-        adUnit = new BannerAdUnit(nativeBridge, {
+        adUnit = new BannerAdUnit({
+            platform: nativeBridge.getPlatform(),
+            core: TestFixtures.getCoreApi(nativeBridge),
+            ads: TestFixtures.getAdsApi(nativeBridge),
             campaign,
             placement,
             clientInfo,
@@ -184,7 +190,7 @@ describe('BannerAdUnit', () => {
                 return adUnit.load().then(() => {
                     const url = 'http://unity3d.com';
                     webPlayerContainer.onCreateWebView.trigger(url);
-                    sinon.assert.calledWith(asSpy(nativeBridge.UrlScheme.open), url);
+                    sinon.assert.calledWith(asSpy(core.iOS!.UrlScheme.open), url);
                 });
             });
         });
@@ -195,7 +201,7 @@ describe('BannerAdUnit', () => {
                 return adUnit.load().then(() => {
                     const url = 'http://unity3d.com';
                     webPlayerContainer.shouldOverrideUrlLoading.trigger(url, 'GET');
-                    sinon.assert.calledWith(asSpy(nativeBridge.Intent.launch), {
+                    sinon.assert.calledWith(asSpy(core.Android!.Intent.launch), {
                         'action': 'android.intent.action.VIEW',
                         'uri': url
                     });

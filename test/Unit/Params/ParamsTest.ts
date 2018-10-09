@@ -30,7 +30,7 @@ import { RequestApi } from 'Core/Native/Request';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { Cache } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
@@ -257,7 +257,7 @@ describe('Event parameters should match specifications', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
             const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const focusManager = new FocusManager(nativeBridge);
-            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
+            const request: Request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
             const requestSpy: any = sinon.spy(request, 'get');
             const span = sinon.createStubInstance(JaegerSpan);
             return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getAndroidDeviceInfo(), metaDataManager, span).then(() => {
@@ -271,7 +271,7 @@ describe('Event parameters should match specifications', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
             const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const focusManager = new FocusManager(nativeBridge);
-            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
+            const request: Request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
             const requestSpy: any = sinon.spy(request, 'get');
             const span = sinon.createStubInstance(JaegerSpan);
             return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getIosDeviceInfo(), metaDataManager, span).then(() => {
@@ -297,7 +297,7 @@ describe('Event parameters should match specifications', () => {
             const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const focusManager = new FocusManager(nativeBridge);
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-            const request: Request = new Request(nativeBridge, wakeUpManager);
+            const request: Request = new RequestManager(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             const deviceInfo: DeviceInfo = TestFixtures.getAndroidDeviceInfo();
@@ -328,7 +328,7 @@ describe('Event parameters should match specifications', () => {
             const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const focusManager = new FocusManager(nativeBridge);
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-            const request: Request = new Request(nativeBridge, wakeUpManager);
+            const request: Request = new RequestManager(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.IOS);
             const deviceInfo: DeviceInfo = TestFixtures.getIosDeviceInfo();
@@ -359,7 +359,7 @@ describe('Event parameters should match specifications', () => {
         it('on Android', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
             const focusManager = new FocusManager(nativeBridge);
-            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
+            const request: Request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
             const requestSpy: any = sinon.spy(request, 'post');
             const metaDataManager = new MetaDataManager(nativeBridge);
             const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
@@ -398,7 +398,7 @@ describe('Event parameters should match specifications', () => {
         it('on iOS', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.IOS);
             const focusManager = new FocusManager(nativeBridge);
-            const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
+            const request: Request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
             const requestSpy: any = sinon.spy(request, 'post');
             const metaDataManager = new MetaDataManager(nativeBridge);
             const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
@@ -436,7 +436,7 @@ describe('Event parameters should match specifications', () => {
 
     describe('with video events', () => {
         let nativeBridge: NativeBridge;
-        let request: Request;
+        let request: RequestManager;
         let requestSpy: any;
         let sessionManager: SessionManager;
         let operativeEventManager: OperativeEventManager;
@@ -447,7 +447,7 @@ describe('Event parameters should match specifications', () => {
             beforeEach(() => {
                 nativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
                 const focusManager = new FocusManager(nativeBridge);
-                request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
+                request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
                 requestSpy = sinon.spy(request, 'post');
                 const metaDataManager = new MetaDataManager(nativeBridge);
                 sessionManager = TestHelper.getSessionManager(nativeBridge, request);
@@ -530,7 +530,7 @@ describe('Event parameters should match specifications', () => {
             beforeEach(() => {
                 nativeBridge = TestHelper.getNativeBridge(Platform.IOS);
                 const focusManager = new FocusManager(nativeBridge);
-                request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
+                request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
                 requestSpy = sinon.spy(request, 'post');
                 const metaDataManager = new MetaDataManager(nativeBridge);
                 sessionManager = TestHelper.getSessionManager(nativeBridge, request);
@@ -630,7 +630,7 @@ describe('Event parameters should match specifications', () => {
             const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const focusManager = new FocusManager(nativeBridge);
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-            const request: Request = new Request(nativeBridge, wakeUpManager);
+            const request: Request = new RequestManager(nativeBridge, wakeUpManager);
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             const deviceInfo: DeviceInfo = TestFixtures.getAndroidDeviceInfo();
             const cacheBookkeeping: CacheBookkeeping = new CacheBookkeeping(nativeBridge);
@@ -662,7 +662,7 @@ describe('Event parameters should match specifications', () => {
             const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
             const focusManager = new FocusManager(nativeBridge);
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-            const request: Request = new Request(nativeBridge, wakeUpManager);
+            const request: Request = new RequestManager(nativeBridge, wakeUpManager);
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.IOS);
             const deviceInfo: DeviceInfo = TestFixtures.getIosDeviceInfo();
             const cacheBookkeeping: CacheBookkeeping = new CacheBookkeeping(nativeBridge);

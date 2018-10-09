@@ -16,7 +16,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
@@ -48,7 +48,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
 
         const focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        const request = new Request(nativeBridge, wakeUpManager);
+        const request = new RequestManager(nativeBridge, wakeUpManager);
         const metaDataManager = new MetaDataManager(nativeBridge);
         const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         const deviceInfo = TestFixtures.getAndroidDeviceInfo();

@@ -4,7 +4,7 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 
@@ -20,7 +20,7 @@ import VastWithSpaces from 'xml/VastWithSpaces.xml';
 import WrappedVast from 'xml/WrappedVast.xml';
 
 describe('VastParser', () => {
-    let request: Request;
+    let request: RequestManager;
     let nativeBridge: NativeBridge;
 
     const vastRaw = VastRaw;
@@ -277,6 +277,6 @@ describe('VastParser', () => {
         };
         const focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = new RequestManager(nativeBridge, wakeUpManager);
     });
 });

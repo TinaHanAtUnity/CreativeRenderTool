@@ -16,7 +16,7 @@ import { IntentApi } from 'Core/Native/Android/Intent';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 import { SdkApi } from 'Core/Native/Sdk';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';

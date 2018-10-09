@@ -14,7 +14,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -31,7 +31,7 @@ describe('VastEndScreenEventHandlerTest', () => {
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
     let container: AdUnitContainer;
-    let request: Request;
+    let request: RequestManager;
     let vastAdUnitParameters: IVastAdUnitParameters;
     let vastEndScreenParameters: IVastEndscreenParameters;
 
@@ -45,7 +45,7 @@ describe('VastEndScreenEventHandlerTest', () => {
         const metaDataManager = new MetaDataManager(nativeBridge);
 
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
-        request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
+        request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
         sinon.stub(request, 'followRedirectChain').callsFake((url) => {
             return Promise.resolve(url);
         });
