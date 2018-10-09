@@ -101,7 +101,7 @@ export class WebView {
     private _sessionManager: SessionManager;
     private _wakeUpManager: WakeUpManager;
     private _focusManager: FocusManager;
-    private _analyticsManager: AnalyticsManager | undefined;
+    private _analyticsManager: AnalyticsManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _missedImpressionManager: MissedImpressionManager;
     private _gdprManager: GdprManager;
@@ -268,10 +268,9 @@ export class WebView {
 
             let analyticsPromise;
             if(this._coreConfig.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
-                const analyticsManager = new AnalyticsManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._coreConfig, this._focusManager);
-                this._analyticsManager = analyticsManager;
+                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._coreConfig, this._focusManager);
                 analyticsPromise = this._analyticsManager.init().then(() => {
-                    this._sessionManager.setGameSessionId(analyticsManager.getGameSessionId());
+                    this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
                 });
             } else {
                 const analyticsStorage: AnalyticsStorage = new AnalyticsStorage(this._nativeBridge);
