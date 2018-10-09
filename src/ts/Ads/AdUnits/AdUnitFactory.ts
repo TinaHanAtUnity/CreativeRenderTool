@@ -23,7 +23,7 @@ import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { Closer } from 'Ads/Views/Closer';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
-import { DefaultPrivacy } from 'Ads/Views/DefaultPrivacy';
+import { Privacy } from 'Ads/Views/Privacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
 import { StreamType } from 'Core/Constants/Android/StreamType';
@@ -159,7 +159,7 @@ export class AdUnitFactory {
                 }
             });
         }
-        DefaultPrivacy.setupReportListener(privacy, performanceAdUnit);
+        Privacy.setupReportListener(privacy, performanceAdUnit);
 
         return performanceAdUnit;
     }
@@ -214,7 +214,7 @@ export class AdUnitFactory {
                 }
             });
         }
-        DefaultPrivacy.setupReportListener(privacy, xPromoAdUnit);
+        Privacy.setupReportListener(privacy, xPromoAdUnit);
 
         return xPromoAdUnit;
     }
@@ -290,7 +290,7 @@ export class AdUnitFactory {
             }
         });
 
-        DefaultPrivacy.setupReportListener(privacy, vastAdUnit);
+        Privacy.setupReportListener(privacy, vastAdUnit);
 
         return vastAdUnit;
     }
@@ -326,7 +326,7 @@ export class AdUnitFactory {
         const EventHandler =  (isSonicPlayable || isPlayable) ? PlayableEventHandler : MRAIDEventHandler;
         const mraidEventHandler: IMRAIDViewHandler = new EventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
         mraid.addEventHandler(mraidEventHandler);
-        DefaultPrivacy.setupReportListener(privacy, mraidAdUnit);
+        Privacy.setupReportListener(privacy, mraidAdUnit);
         return mraidAdUnit;
     }
 
@@ -365,7 +365,7 @@ export class AdUnitFactory {
             const endScreenEventHandler = new VPAIDEndScreenEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
             endScreen.addEventHandler(endScreenEventHandler);
         }
-        DefaultPrivacy.setupReportListener(privacy, vpaidAdUnit);
+        Privacy.setupReportListener(privacy, vpaidAdUnit);
 
         return vpaidAdUnit;
     }
@@ -387,7 +387,7 @@ export class AdUnitFactory {
         promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.adsConfig, parameters.gdprManager));
         promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.coreConfig.getToken(), parameters.clientInfo.getGameId(), parameters.coreConfig.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.adsConfig.isOptOutEnabled()));
         promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
-        DefaultPrivacy.setupReportListener(privacy, promoAdUnit);
+        Privacy.setupReportListener(privacy, promoAdUnit);
 
         return promoAdUnit;
     }
@@ -405,7 +405,7 @@ export class AdUnitFactory {
         const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialParameters);
         const displayInterstitialEventHandler = new DisplayInterstitialEventHandler(nativeBridge, displayInterstitialAdUnit, displayInterstitialParameters);
         view.addEventHandler(displayInterstitialEventHandler);
-        DefaultPrivacy.setupReportListener(privacy, displayInterstitialAdUnit);
+        Privacy.setupReportListener(privacy, displayInterstitialAdUnit);
 
         return displayInterstitialAdUnit;
     }
@@ -485,7 +485,7 @@ export class AdUnitFactory {
             gdprManager: parameters.gdprManager
         });
         view.addEventHandler(eventHandler);
-        DefaultPrivacy.setupReportListener(privacy, adUnit);
+        Privacy.setupReportListener(privacy, adUnit);
 
         return adUnit;
     }
@@ -532,9 +532,9 @@ export class AdUnitFactory {
         return video;
     }
 
-    private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): DefaultPrivacy {
+    private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): Privacy {
 
-        const privacy = new DefaultPrivacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
         const privacyEventHandler = new PrivacyEventHandler(nativeBridge, parameters);
         privacy.addEventHandler(privacyEventHandler);
         return privacy;

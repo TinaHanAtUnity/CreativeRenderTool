@@ -31,7 +31,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import { DefaultPrivacy } from 'Ads/Views/DefaultPrivacy';
+import { Privacy } from 'Ads/Views/Privacy';
 
 describe('VastVideoEventHandler tests', () => {
     const handleInvocation = sinon.spy();
@@ -75,7 +75,7 @@ describe('VastVideoEventHandler tests', () => {
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
-        privacy = new DefaultPrivacy(nativeBridge, campaign, gdprManager, false, false);
+        privacy = new Privacy(nativeBridge, campaign, gdprManager, false, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 

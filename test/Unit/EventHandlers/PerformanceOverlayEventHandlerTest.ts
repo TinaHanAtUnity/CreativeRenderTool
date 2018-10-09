@@ -24,7 +24,7 @@ import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/Perfor
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { DefaultPrivacy } from 'Ads/Views/DefaultPrivacy';
+import { Privacy } from 'Ads/Views/Privacy';
 
 describe('PerformanceOverlayEventHandlerTest', () => {
 
@@ -74,7 +74,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         });
 
         const gdprManager = sinon.createStubInstance(GdprManager);
-        const privacy = new DefaultPrivacy(nativeBridge, campaign, gdprManager, false, false);
+        const privacy = new Privacy(nativeBridge, campaign, gdprManager, false, false);
         const endScreenParams : IEndScreenParameters = {
             nativeBridge: nativeBridge,
             language : deviceInfo.getLanguage(),

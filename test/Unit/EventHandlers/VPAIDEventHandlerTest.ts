@@ -26,7 +26,7 @@ import { VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
-import { DefaultPrivacy } from 'Ads/Views/DefaultPrivacy';
+import { Privacy } from 'Ads/Views/Privacy';
 
 describe('VPAIDEventHandlerTest', () => {
     let eventHandler: VPAIDEventHandler;
@@ -51,7 +51,7 @@ describe('VPAIDEventHandlerTest', () => {
             coreConfig: sinon.createStubInstance(CoreConfiguration),
             adsConfig: sinon.createStubInstance(AdsConfiguration),
             request: sinon.createStubInstance(Request),
-            privacy: sinon.createStubInstance(DefaultPrivacy),
+            privacy: sinon.createStubInstance(Privacy),
             forceOrientation: Orientation.NONE,
             options: {},
             gdprManager: sinon.createStubInstance(GdprManager),

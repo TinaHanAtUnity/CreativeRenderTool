@@ -4,7 +4,7 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
-import DefaultPrivacyTemplate from 'html/Default-privacy.html';
+import PrivacyTemplate from 'html/Privacy.html';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -25,7 +25,7 @@ enum ReportReason {
     OTHER = 'Other'
 }
 
-export class DefaultPrivacy extends AbstractPrivacy {
+export class Privacy extends AbstractPrivacy {
 
     private _onReport: Observable2<Campaign, string> = new Observable2();
     private _gdprManager: GdprManager;
@@ -40,11 +40,11 @@ export class DefaultPrivacy extends AbstractPrivacy {
                 gdprManager: GdprManager, gdprEnabled: boolean,
                 isCoppaCompliant: boolean) {
 
-        super(nativeBridge, isCoppaCompliant, gdprEnabled, 'default-privacy');
+        super(nativeBridge, isCoppaCompliant, gdprEnabled, 'privacy');
         this._templateData.badAdKeys = Object.keys(ReportReason);
         this._templateData.badAdReasons = (<string[]>(<any>Object).values(ReportReason));
 
-        this._template = new Template(DefaultPrivacyTemplate);
+        this._template = new Template(PrivacyTemplate);
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
         this._gdprManager = gdprManager;
@@ -307,7 +307,7 @@ export class DefaultPrivacy extends AbstractPrivacy {
         });
     }
 
-    public static setupReportListener(privacy: DefaultPrivacy, ad: AbstractAdUnit | AbstractVideoOverlay): void {
+    public static setupReportListener(privacy: Privacy, ad: AbstractAdUnit | AbstractVideoOverlay): void {
         privacy._onReport.subscribe((campaign: Campaign, reasonKey: string) => {
             this.onUserReport(campaign, reasonKey, ad);
             this.timeoutAd(ad);
