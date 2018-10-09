@@ -29,12 +29,14 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('MRAIDEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, container: AdUnitContainer;
+    let storageBridge: StorageBridge;
     let mraidAdUnit: MRAIDAdUnit;
     let mraidView: MRAID;
     let placement: Placement;
@@ -283,6 +285,7 @@ describe('MRAIDEventHandlersTest', () => {
                 handleInvocation,
                 handleCallback
             }, Platform.ANDROID);
+            storageBridge = new StorageBridge(nativeBridge);
             focusManager = new FocusManager(nativeBridge);
             metaDataManager = new MetaDataManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
@@ -294,7 +297,7 @@ describe('MRAIDEventHandlersTest', () => {
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge, request);
+            sessionManager = new SessionManager(nativeBridge, request, storageBridge);
             coreConfig = TestFixtures.getCoreConfiguration();
             adsConfig = TestFixtures.getAdsConfiguration();
             programmaticMraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
@@ -311,6 +314,7 @@ describe('MRAIDEventHandlersTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: programmaticMraidCampaign
             });
 

@@ -18,6 +18,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 export class BannerAdUnitParametersFactory {
 
@@ -35,8 +36,9 @@ export class BannerAdUnitParametersFactory {
     private _webPlayerContainer: WebPlayerContainer;
     private _gdprManager: GdprManager;
     private _programmaticTrackingService: ProgrammaticTrackingService;
+    private _storageBridge: StorageBridge;
 
-    constructor(nativeBridge: NativeBridge, request: Request, metadataManager: MetaDataManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer, programmaticTrackingService: ProgrammaticTrackingService) {
+    constructor(nativeBridge: NativeBridge, request: Request, metadataManager: MetaDataManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, analyticsManager: AnalyticsManager | undefined, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer, programmaticTrackingService: ProgrammaticTrackingService, storageBridge: StorageBridge) {
         this._nativeBridge = nativeBridge;
         this._request = request;
         this._metadataManager = metadataManager;
@@ -51,6 +53,7 @@ export class BannerAdUnitParametersFactory {
         this._gdprManager = gdprManager;
         this._webPlayerContainer = webPlayerContainer;
         this._programmaticTrackingService = programmaticTrackingService;
+        this._storageBridge = storageBridge;
     }
 
     public create(campaign: Campaign, placement: Placement, options: any): Promise<IAdUnitParameters<Campaign>> {
@@ -77,6 +80,7 @@ export class BannerAdUnitParametersFactory {
                     deviceInfo: this._deviceInfo,
                     coreConfig: this._coreConfig,
                     adsConfig: this._adsConfig,
+                    storageBridge: this._storageBridge,
                     campaign: campaign
                 }),
                 placement: placement,

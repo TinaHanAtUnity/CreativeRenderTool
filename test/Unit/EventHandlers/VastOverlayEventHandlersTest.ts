@@ -26,6 +26,7 @@ import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHand
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -36,6 +37,7 @@ describe('VastOverlayEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
     let vastAdUnit: VastAdUnit;
     let container: AdUnitContainer;
     let sessionManager: SessionManager;
@@ -60,6 +62,7 @@ describe('VastOverlayEventHandlersTest', () => {
             handleCallback
         });
 
+        storageBridge = new StorageBridge(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
@@ -75,7 +78,7 @@ describe('VastOverlayEventHandlersTest', () => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
         sinon.stub(request, 'followRedirectChain').callsFake((url) => {
             return Promise.resolve(url);
@@ -92,6 +95,7 @@ describe('VastOverlayEventHandlersTest', () => {
             deviceInfo: deviceInfo,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: campaign
         });
 

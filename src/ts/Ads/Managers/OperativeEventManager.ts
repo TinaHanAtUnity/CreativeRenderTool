@@ -22,6 +22,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     nativeBridge: NativeBridge;
@@ -32,6 +33,7 @@ export interface IOperativeEventManagerParams<T extends Campaign> {
     deviceInfo: DeviceInfo;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
+    storageBridge: StorageBridge;
     campaign: T;
 }
 
@@ -76,6 +78,7 @@ export class OperativeEventManager {
     protected _campaign: Campaign;
     protected _metaDataManager: MetaDataManager;
     protected _nativeBridge: NativeBridge;
+    protected _storageBridge: StorageBridge;
     private _deviceInfo: DeviceInfo;
     private _request: Request;
     private _coreConfig: CoreConfiguration;
@@ -83,6 +86,7 @@ export class OperativeEventManager {
 
     constructor(params: IOperativeEventManagerParams<Campaign>) {
         this._nativeBridge = params.nativeBridge;
+        this._storageBridge = params.storageBridge;
         this._metaDataManager = params.metaDataManager;
         this._sessionManager = params.sessionManager;
         this._clientInfo = params.clientInfo;
@@ -261,7 +265,7 @@ export class OperativeEventManager {
             followRedirects: false,
             retryWithConnectionEvents: false
         }).catch(() => {
-            new FailedOperativeEventManager(sessionId, eventId).storeFailedEvent(this._nativeBridge, {
+            new FailedOperativeEventManager(sessionId, eventId).storeFailedEvent(this._storageBridge, {
                url: url,
                data: data
             });
