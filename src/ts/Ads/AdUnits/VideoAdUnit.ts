@@ -283,7 +283,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             overlay.hide();
             const container = overlay.container();
             if(container && container.parentElement) {
-                container.parentElement!.removeChild(container);
+                container.parentElement.removeChild(container);
             }
         }
     }

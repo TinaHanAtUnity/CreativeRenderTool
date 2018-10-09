@@ -7,7 +7,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { IApiModule, IModuleApi, } from 'Core/Modules/IApiModule';
+import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CacheApi } from 'Core/Native/Cache';
 import { ConnectivityApi } from 'Core/Native/Connectivity';

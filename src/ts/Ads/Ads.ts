@@ -163,8 +163,6 @@ export class Ads extends CoreModule implements IApiModule {
 
             return this.setupTestEnvironment();
         }).then(() => {
-
-
             return this.Core.CacheBookkeeping.getCachedCampaignResponse();
         }).then(cachedCampaignResponse => {
             this.GdprManager = new GdprManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.Config, this.Config, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.RequestManager);
