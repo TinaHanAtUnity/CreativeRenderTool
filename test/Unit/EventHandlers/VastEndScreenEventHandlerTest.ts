@@ -24,7 +24,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { Privacy } from 'Ads/Views/Privacy';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('VastEndScreenEventHandlerTest', () => {
@@ -73,7 +73,7 @@ describe('VastEndScreenEventHandlerTest', () => {
             campaign: campaign
         });
         const gdprManager = sinon.createStubInstance(GdprManager);
-        const privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
+        const privacy = new Privacy(nativeBridge, campaign, gdprManager, false, false);
         const video = new Video('', TestFixtures.getSession());
         const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId', privacy, false);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -109,8 +109,7 @@ describe('VastEndScreenEventHandlerTest', () => {
 
     describe('when calling onClose', () => {
         it('should hide endcard', () => {
-            const privacy = new GDPRPrivacy(nativeBridge, vastAdUnitParameters.gdprManager, false);
-            const vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
+            const vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, sinon.createStubInstance(Privacy));
             vastAdUnitParameters.endScreen = vastEndScreen;
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'hide').returns(sinon.spy());
@@ -138,7 +137,7 @@ describe('VastEndScreenEventHandlerTest', () => {
             vastAdUnitParameters.video = video;
             vastAdUnitParameters.campaign = campaign;
             vastAdUnitParameters.placement = TestFixtures.getPlacement();
-            const privacy = new GDPRPrivacy(nativeBridge, vastAdUnitParameters.gdprManager, false);
+            const privacy = sinon.createStubInstance(Privacy);
             vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
