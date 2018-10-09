@@ -62,6 +62,7 @@ import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { FinishState } from 'Core/Constants/FinishState';
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
+import { AR } from 'AR/AR';
 
 export interface IAdsApi extends IModuleApi {
     AdsProperties: AdsPropertiesApi;
@@ -85,6 +86,7 @@ export class Ads extends CoreModule implements IApiModule {
     public readonly Api: IAdsApi;
 
     public readonly Analytics: Analytics;
+    public readonly AR: AR;
 
     public readonly AdMobSignalFactory: AdMobSignalFactory;
     public readonly InterstitialWebPlayerContainer: InterstitialWebPlayerContainer;
@@ -113,6 +115,7 @@ export class Ads extends CoreModule implements IApiModule {
     constructor(core: Core, analytics: Analytics) {
         super(core);
         this.Analytics = analytics;
+        this.AR = new AR(this);
 
         const platform = core.NativeBridge.getPlatform();
         this.Api = {
@@ -338,6 +341,7 @@ export class Ads extends CoreModule implements IApiModule {
                 platform: this.Core.NativeBridge.getPlatform(),
                 core: this.Core.Api,
                 ads: this.Api,
+                ar: this.AR.Api,
                 forceOrientation: orientation,
                 focusManager: this.Core.FocusManager,
                 container: this.Container,

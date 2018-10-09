@@ -19,6 +19,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { IAdsApi } from 'Ads/Ads';
 import { ICoreApi } from 'Core/Core';
 import { Platform } from 'Core/Constants/Platform';
+import { IARApi } from 'AR/AR';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -33,6 +34,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     platform: Platform;
     core: ICoreApi;
     ads: IAdsApi;
+    ar?: IARApi;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
     request: RequestManager;

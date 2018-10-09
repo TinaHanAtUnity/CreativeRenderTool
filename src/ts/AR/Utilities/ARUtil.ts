@@ -147,9 +147,9 @@ export class ARUtil {
         return isAR;
     }
 
-    public static isARSupported(ar: IARApi): Promise<boolean> {
-        return ar.AR.Ios ? ar.AR.Ios.isARSupported() :
-            ar.AR.Android ? ARUtil.isARSupportedAndroid(ar.AR.Android) :
+    public static isARSupported(ar?: IARApi): Promise<boolean> {
+        return ar && ar.AR.Ios ? ar.AR.Ios.isARSupported() :
+            ar && ar.AR.Android ? ARUtil.isARSupportedAndroid(ar.AR.Android) :
                 Promise.resolve<boolean>(false);
     }
 

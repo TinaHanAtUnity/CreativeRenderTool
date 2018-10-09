@@ -313,7 +313,7 @@ export class AdUnitFactory {
         if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || AdUnitFactory._forcedPlayableMRAID) {
             mraid = new PlayableMRAID(parameters.platform, parameters.core, <AndroidDeviceInfo>parameters.deviceInfo, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         } else if (ARUtil.isARCreative(parameters.campaign) || AdUnitFactory._forcedARMRAID) {
-            mraid = new ARMRAID(parameters.platform, parameters.core, parameters.ar, <AndroidDeviceInfo>parameters.deviceInfo, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
+            mraid = new ARMRAID(parameters.platform, parameters.core, parameters.ar!, <AndroidDeviceInfo>parameters.deviceInfo, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         } else {
             mraid = new MRAID(parameters.platform, parameters.core, <AndroidDeviceInfo>parameters.deviceInfo, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         }
@@ -324,7 +324,7 @@ export class AdUnitFactory {
             privacy: privacy
         };
 
-        const mraidAdUnit: MRAIDAdUnit = new MRAIDAdUnit(mraidAdUnitParameters, parameters.ar);
+        const mraidAdUnit: MRAIDAdUnit = new MRAIDAdUnit(mraidAdUnitParameters);
 
         // NOTE: When content type is correct for playables we want to change this to content type check.
         const isPlayable: boolean = parameters.campaign instanceof PerformanceMRAIDCampaign;

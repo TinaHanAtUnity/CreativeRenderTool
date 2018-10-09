@@ -29,7 +29,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _mraid: MRAIDView<IMRAIDViewHandler>;
-    private _ar: IARApi;
+    private _ar?: IARApi;
     private _options: any;
     private _orientationProperties: IOrientationProperties;
     private _endScreen?: EndScreen;
@@ -40,7 +40,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _privacy: AbstractPrivacy;
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
 
-    constructor(parameters: IMRAIDAdUnitParameters, ar: IARApi) {
+    constructor(parameters: IMRAIDAdUnitParameters) {
         super(parameters);
 
         this._operativeEventManager = parameters.operativeEventManager;
@@ -52,7 +52,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
         this._privacy = parameters.privacy;
-        this._ar = ar;
+        this._ar = parameters.ar;
 
         this._mraid.render();
         document.body.appendChild(this._mraid.container());

@@ -288,7 +288,7 @@ export abstract class CoreModule implements IModule {
         this.Core = core;
     }
 
-    public abstract initialize(): void | Promise<void>;
+    public abstract initialize(...parameters: any[]): void | Promise<void>;
 
     public isInitialized() {
         return this._initialized;

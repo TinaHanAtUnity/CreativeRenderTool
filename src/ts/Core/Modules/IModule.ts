@@ -1,4 +1,4 @@
 export interface IModule {
     isInitialized(): boolean;
-    initialize(): void | Promise<void>;
+    initialize(...parameters: any[]): void | Promise<void>;
 }
