@@ -1,4 +1,4 @@
-# Pending
+# Tue Oct  9 21:46:34 UTC 2018
 
 * Improve/Rename Reporting Privacy and Remove Other Privacies [#6601](https://github.com/Applifier/unity-ads-webview/pull/6601)
 * Improvements to Banner Lifecycle Logic [#6596](https://github.com/Applifier/unity-ads-webview/pull/6596)
