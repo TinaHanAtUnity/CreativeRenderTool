@@ -170,22 +170,6 @@ $iphone-x-styles() {
     }
   }
 
-  #privacy {
-    padding-top: constant(safe-area-inset-top);
-    padding-right: constant(safe-area-inset-right);
-    padding-bottom: constant(safe-area-inset-bottom);
-    padding-left: constant(safe-area-inset-left);
-    width: calc(100% - constant(safe-area-inset-left) - constant(safe-area-inset-right));
-    height: calc(100% - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
-
-    padding-top: env(safe-area-inset-top);
-    padding-right: env(safe-area-inset-right);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    width: calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right));
-    height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  }
-
   #display-interstitial,
   #closable-video-overlay {
     .close-region {
@@ -259,18 +243,18 @@ $iphone-x-styles() {
     slide-animation(.4s, ease-in, 250%);
   }
 
-  #gdpr-privacy, #reporting-privacy {
+  #privacy {
     top: constant(safe-area-inset-top);
-    top: env(safe-area-inset-top);
+    top: env(safe-area-inset-top); // @stylint ignore;
 
     height: calc(100% - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
     height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom)); // @stylint ignore;
   }
 
   body {
-    &.landscape   #gdpr-privacy, #reporting-privacy {
+    &.landscape   #privacy {
       left: calc(constant(safe-area-inset-left) / 2);
-      left: calc(env(safe-area-inset-left) / 2);
+      left: calc(env(safe-area-inset-left) / 2); // @stylint ignore;
     }
   }
 }

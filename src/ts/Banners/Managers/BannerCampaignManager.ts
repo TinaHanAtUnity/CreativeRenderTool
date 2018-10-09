@@ -22,6 +22,9 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
 
+export class NoFillError extends Error {
+}
+
 export class BannerCampaignManager {
     private _nativeBridge: NativeBridge;
     private _assetManager: AssetManager;
@@ -116,7 +119,7 @@ export class BannerCampaignManager {
         return this._previousPlacementId;
     }
 
-    private handleError(e: Error, diagnostic: string) {
+    private handleError(e: Error, diagnostic: string): Promise<Campaign> {
         Diagnostics.trigger(diagnostic, e);
         return Promise.reject(e);
     }
@@ -132,7 +135,7 @@ export class BannerCampaignManager {
                 const auctionResponse = new AuctionResponse([placement.getId()], json.media[mediaId], mediaId, json.correlationId);
                 return this.handleBannerCampaign(auctionResponse, session);
             } else {
-                return Promise.reject(`No fill for placement ${placement.getId()}`);
+                return Promise.reject(new NoFillError(`No fill for placement ${placement.getId()}`));
             }
         } else {
             const e = new Error('No placements found in realtime campaign json.');

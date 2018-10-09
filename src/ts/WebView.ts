@@ -74,6 +74,7 @@ import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { PlacementContentManager } from 'Monetization/Managers/PlacementContentManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 export class WebView {
 
@@ -94,6 +95,7 @@ export class WebView {
     private _cache: Cache;
     private _cacheBookkeeping: CacheBookkeeping;
     private _container: AdUnitContainer;
+    private _storageBridge: StorageBridge;
 
     private _currentAdUnit: AbstractAdUnit;
 
@@ -151,6 +153,7 @@ export class WebView {
 
             this._cachedCampaignResponse = undefined;
 
+            this._storageBridge = new StorageBridge(this._nativeBridge);
             this._focusManager = new FocusManager(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
@@ -192,7 +195,7 @@ export class WebView {
                 this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager, this._clientInfo);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
-            this._sessionManager = new SessionManager(this._nativeBridge, this._request);
+            this._sessionManager = new SessionManager(this._nativeBridge, this._request, this._storageBridge);
 
             this._initializedAt = Date.now();
             this._nativeBridge.Sdk.initComplete();
@@ -309,7 +312,7 @@ export class WebView {
 
             const bannerCampaignManager = new BannerCampaignManager(this._nativeBridge, this._coreConfig, this._adsConfig, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._jaegerManager);
             const bannerWebPlayerContainer = new BannerWebPlayerContainer(this._nativeBridge);
-            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._coreConfig, this._adsConfig, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._analyticsManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer, this._programmaticTrackingService);
+            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._coreConfig, this._adsConfig, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._analyticsManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer, this._programmaticTrackingService, this._storageBridge);
             this._bannerAdContext = new BannerAdContext(this._nativeBridge, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, this._focusManager, this._deviceInfo);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._coreConfig, this._adsConfig, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo, this._cache);
@@ -507,6 +510,7 @@ export class WebView {
                     deviceInfo: this._deviceInfo,
                     coreConfig: this._coreConfig,
                     adsConfig: this._adsConfig,
+                    storageBridge: this._storageBridge,
                     campaign: campaign
                 }),
                 placement: placement,
