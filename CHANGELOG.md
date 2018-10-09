@@ -1,3 +1,10 @@
+# Pending
+
+* Improve/Rename Reporting Privacy and Remove Other Privacies [#6601](https://github.com/Applifier/unity-ads-webview/pull/6601)
+* Improvements to Banner Lifecycle Logic [#6596](https://github.com/Applifier/unity-ads-webview/pull/6596)
+* Batching storage modifications and writes [#6454](https://github.com/Applifier/unity-ads-webview/pull/6545)
+* Use Allow Skip Flag from Configuration for Rewarded Promo [#6552](https://github.com/Applifier/unity-ads-webview/pull/6552)
+
 # Mon Oct  8 23:15:42 UTC 2018
 
 * AB Test various improvements to the endscreen layout in groups 16 & 17 [#6556](https://github.com/Applifier/unity-ads-webview/pull/6556)
