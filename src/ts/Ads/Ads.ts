@@ -146,10 +146,10 @@ export class Ads extends CoreModule implements IApiModule {
             }
             this.Container = new ViewController(this.Core.Api, this.Api, <IosDeviceInfo>this.Core.DeviceInfo, this.Core.FocusManager, this.Core.ClientInfo);
         }
-        this.SessionManager = new SessionManager(this.Core.Api.Storage, this.Core.Request);
+        this.SessionManager = new SessionManager(this.Core.Api.Storage, this.Core.RequestManager);
         this.MissedImpressionManager = new MissedImpressionManager(this.Core.Api.Storage);
         this.BackupCampaignManager = new BackupCampaignManager(this.Core.Api, this.Core.Config);
-        this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.Core.NativeBridge.getPlatform(), this.Core.Request, this.Core.ClientInfo, this.Core.DeviceInfo);
+        this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.Core.NativeBridge.getPlatform(), this.Core.RequestManager, this.Core.ClientInfo, this.Core.DeviceInfo);
     }
 
     public initialize(jaegerInitSpan: JaegerSpan): Promise<void> {
@@ -164,7 +164,7 @@ export class Ads extends CoreModule implements IApiModule {
 
             return this.Core.CacheBookkeeping.getCachedCampaignResponse();
         }).then(cachedCampaignResponse => {
-            this.GdprManager = new GdprManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.Config, this.Config, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.Request);
+            this.GdprManager = new GdprManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.Config, this.Config, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.RequestManager);
             this._cachedCampaignResponse = cachedCampaignResponse;
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
@@ -182,10 +182,10 @@ export class Ads extends CoreModule implements IApiModule {
                 this.AssetManager.setCacheDiagnostics(true);
             }
 
-            this.CampaignManager = new CampaignManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this.Core.Request, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.MetaDataManager, this.Core.CacheBookkeeping, this.Core.JaegerManager, this.BackupCampaignManager);
-            this.RefreshManager = new OldCampaignRefreshManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Api, this.Core.WakeUpManager, this.CampaignManager, this.Config, this.Core.FocusManager, this.SessionManager, this.Core.ClientInfo, this.Core.Request, this.Core.CacheManager);
+            this.CampaignManager = new CampaignManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this.Core.RequestManager, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.MetaDataManager, this.Core.CacheBookkeeping, this.Core.JaegerManager, this.BackupCampaignManager);
+            this.RefreshManager = new OldCampaignRefreshManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Api, this.Core.WakeUpManager, this.CampaignManager, this.Config, this.Core.FocusManager, this.SessionManager, this.Core.ClientInfo, this.Core.RequestManager, this.Core.CacheManager);
 
-            SdkStats.initialize(this.Core.Api, this.Core.Request, this.Core.Config, this.Config, this.SessionManager, this.CampaignManager, this.Core.MetaDataManager, this.Core.ClientInfo, this.Core.CacheManager);
+            SdkStats.initialize(this.Core.Api, this.Core.RequestManager, this.Core.Config, this.Config, this.SessionManager, this.CampaignManager, this.Core.MetaDataManager, this.Core.ClientInfo, this.Core.CacheManager);
 
             const refreshSpan = this.Core.JaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this.Core.NativeBridge.getPlatform()]);
@@ -343,7 +343,7 @@ export class Ads extends CoreModule implements IApiModule {
                 container: this.Container,
                 deviceInfo: this.Core.DeviceInfo,
                 clientInfo: this.Core.ClientInfo,
-                thirdPartyEventManager: new ThirdPartyEventManager(this.Core.Api, this.Core.Request, {
+                thirdPartyEventManager: new ThirdPartyEventManager(this.Core.Api, this.Core.RequestManager, {
                     '%ZONE%': placement.getId(),
                     '%SDK_VERSION%': this.Core.ClientInfo.getSdkVersion().toString()
                 }),
@@ -351,7 +351,7 @@ export class Ads extends CoreModule implements IApiModule {
                     platform: this.Core.NativeBridge.getPlatform(),
                     core: this.Core.Api,
                     ads: this.Api,
-                    request: this.Core.Request,
+                    request: this.Core.RequestManager,
                     metaDataManager: this.Core.MetaDataManager,
                     sessionManager: this.SessionManager,
                     clientInfo: this.Core.ClientInfo,
@@ -364,7 +364,7 @@ export class Ads extends CoreModule implements IApiModule {
                 campaign: campaign,
                 coreConfig: this.Core.Config,
                 adsConfig: this.Config,
-                request: this.Core.Request,
+                request: this.Core.RequestManager,
                 options: options,
                 gdprManager: this.GdprManager,
                 adMobSignalFactory: this.AdMobSignalFactory,

@@ -12,7 +12,7 @@ export class Analytics extends CoreModule {
 
     public initialize(): Promise<void> {
         if(this.Core.Config.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this.Core.ClientInfo.getGameId())) {
-            this.AnalyticsManager = new AnalyticsManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.WakeUpManager, this.Core.Request, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.Config, this.Core.FocusManager);
+            this.AnalyticsManager = new AnalyticsManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.WakeUpManager, this.Core.RequestManager, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.Config, this.Core.FocusManager);
             return this.AnalyticsManager.init().then(() => {
                 this._initialized = true;
             });

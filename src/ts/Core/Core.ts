@@ -76,13 +76,13 @@ export class Core implements IApiModule {
     public readonly Api: Readonly<ICoreApi>;
 
     public readonly CacheBookkeeping: CacheBookkeeping;
-    public ConfigManager: ConfigManager;
     public readonly FocusManager: FocusManager;
     public readonly MetaDataManager: MetaDataManager;
-    public readonly Resolve: ResolveManager;
+    public readonly ResolveManager: ResolveManager;
     public readonly WakeUpManager: WakeUpManager;
 
-    public Request: RequestManager;
+    public ConfigManager: ConfigManager;
+    public RequestManager: RequestManager;
     public CacheManager: CacheManager;
     public JaegerManager: JaegerManager;
     public ClientInfo: ClientInfo;
@@ -124,7 +124,7 @@ export class Core implements IApiModule {
         this.FocusManager = new FocusManager(this.NativeBridge.getPlatform(), this.Api);
         this.WakeUpManager = new WakeUpManager(this.Api);
         this.CacheBookkeeping = new CacheBookkeeping(this.Api);
-        this.Resolve = new ResolveManager(this.Api);
+        this.ResolveManager = new ResolveManager(this.Api);
         this.MetaDataManager = new MetaDataManager(this.Api);
     }
 
@@ -142,16 +142,16 @@ export class Core implements IApiModule {
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.DeviceInfo = new AndroidDeviceInfo(this.Api);
-                this.Request = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager, <AndroidDeviceInfo>this.DeviceInfo);
+                this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager, <AndroidDeviceInfo>this.DeviceInfo);
             } else if(this.NativeBridge.getPlatform() === Platform.IOS) {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
-                this.Request = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
+                this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
             }
-            this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.Request, this.CacheBookkeeping);
-            this.JaegerManager = new JaegerManager(this.Request);
+            this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
+            this.JaegerManager = new JaegerManager(this.RequestManager);
             this.JaegerManager.addOpenSpan(jaegerInitSpan);
 
-            HttpKafka.setRequest(this.Request);
+            HttpKafka.setRequest(this.RequestManager);
             HttpKafka.setClientInfo(this.ClientInfo);
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
@@ -175,7 +175,8 @@ export class Core implements IApiModule {
             }
 
             const configSpan = this.JaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
-            let configPromise = ConfigManager.fetch(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo, this.DeviceInfo, this.Request, configSpan);
+            this.ConfigManager = new ConfigManager(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo, this.DeviceInfo, this.RequestManager);
+            let configPromise = this.ConfigManager.getConfig(configSpan);
 
             configPromise.then(() => {
                 this.JaegerManager.stop(configSpan);
@@ -183,14 +184,14 @@ export class Core implements IApiModule {
                 this.JaegerManager.stop(configSpan);
             });
 
-            configPromise = configPromise.then((configJson): [CoreConfiguration] => {
+            configPromise = configPromise.then((configJson: any): [CoreConfiguration] => {
                 const coreConfig = CoreConfigurationParser.parse(configJson);
                 this.Api.Sdk.logInfo('Received configuration token ' + coreConfig.getToken() + ' (A/B group ' + coreConfig.getAbGroup() + ')');
                 if(this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo.getLimitAdTracking()) {
-                    ConfigManager.storeGamerToken(this.Api, configJson.token);
+                    this.ConfigManager.storeGamerToken(configJson.token);
                 }
                 return [coreConfig];
-            }).catch((error) => {
+            }).catch((error: any) => {
                 configSpan.addTag(JaegerTags.Error, 'true');
                 configSpan.addTag(JaegerTags.ErrorMessage, error.message);
                 configSpan.addAnnotation(error.message);

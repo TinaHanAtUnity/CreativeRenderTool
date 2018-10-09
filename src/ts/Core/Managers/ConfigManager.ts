@@ -18,58 +18,6 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 
 export class ConfigManager {
 
-    public static fetch(platform: Platform, core: ICoreApi, metaDataManager: MetaDataManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, jaegerSpan: JaegerSpan): Promise<any> {
-        return Promise.all([
-            metaDataManager.fetch(FrameworkMetaData),
-            metaDataManager.fetch(AdapterMetaData),
-            ConfigManager.fetchGamerToken(core)
-        ]).then(([framework, adapter, storedGamerToken]) => {
-            let gamerToken: string | undefined;
-
-            if(platform === Platform.IOS && core.DeviceInfo.getLimitAdTrackingFlag()) {
-                // only use stored gamerToken for iOS when ad tracking is limited
-                gamerToken = storedGamerToken;
-            } else if(storedGamerToken) {
-                // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
-                ConfigManager.deleteGamerToken(core);
-            }
-
-            const url: string = ConfigManager.createConfigUrl(platform, core, clientInfo, deviceInfo, framework, adapter, gamerToken);
-            jaegerSpan.addTag(JaegerTags.DeviceType, Platform[platform]);
-            core.Sdk.logInfo('Requesting configuration from ' + url);
-            return request.get(url, [], {
-                retries: 2,
-                retryDelay: 10000,
-                followRedirects: false,
-                retryWithConnectionEvents: true
-            }).then(response => {
-                jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
-                try {
-                    return JsonParser.parse(response.response);
-                } catch(error) {
-                    Diagnostics.trigger('config_parsing_failed', {
-                        configUrl: url,
-                        configResponse: response.response
-                    });
-                    core.Sdk.logError('Config request failed ' + error);
-                    throw new Error(error);
-                }
-            }).catch(error => {
-                if (error instanceof RequestError) {
-                    const requestError = error;
-                    if (requestError.nativeResponse && requestError.nativeResponse.responseCode) {
-                        jaegerSpan.addTag(JaegerTags.StatusCode, requestError.nativeResponse.responseCode.toString());
-                    }
-                    if (requestError.nativeResponse && requestError.nativeResponse.response) {
-                        const responseObj = JsonParser.parse(requestError.nativeResponse.response);
-                        error = new ConfigError((new Error(responseObj.error)));
-                    }
-                }
-                throw error;
-            });
-        });
-    }
-
     public static setTestBaseUrl(baseUrl: string): void {
         ConfigManager.ConfigBaseUrl = baseUrl + '/games';
     }
@@ -81,10 +29,85 @@ export class ConfigManager {
     private static ConfigBaseUrl: string = 'https://publisher-config.unityads.unity3d.com/games';
     private static AbGroup: ABGroup | undefined;
 
-    private static createConfigUrl(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): string {
+    private _platform: Platform;
+    private _core: ICoreApi;
+    private _metaDataManager: MetaDataManager;
+    private _clientInfo: ClientInfo;
+    private _deviceInfo: DeviceInfo;
+    private _request: RequestManager;
+
+    private _rawConfig?: any;
+
+    constructor(platform: Platform, core: ICoreApi, metaDataManager: MetaDataManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager) {
+        this._platform = platform;
+        this._core = core;
+        this._metaDataManager = metaDataManager;
+        this._clientInfo = clientInfo;
+        this._deviceInfo = deviceInfo;
+        this._request = request;
+    }
+
+    public getConfig(jaegerSpan: JaegerSpan): any | Promise<any> {
+        if(this._rawConfig) {
+            return this._rawConfig;
+        } else {
+            return Promise.all([
+                this._metaDataManager.fetch(FrameworkMetaData),
+                this._metaDataManager.fetch(AdapterMetaData),
+                this.fetchGamerToken()
+            ]).then(([framework, adapter, storedGamerToken]) => {
+                let gamerToken: string | undefined;
+
+                if(this._platform === Platform.IOS && this._core.DeviceInfo.getLimitAdTrackingFlag()) {
+                    // only use stored gamerToken for iOS when ad tracking is limited
+                    gamerToken = storedGamerToken;
+                } else if(storedGamerToken) {
+                    // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
+                    this.deleteGamerToken();
+                }
+
+                const url: string = this.createConfigUrl(framework, adapter, gamerToken);
+                jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._platform]);
+                this._core.Sdk.logInfo('Requesting configuration from ' + url);
+                return this._request.get(url, [], {
+                    retries: 2,
+                    retryDelay: 10000,
+                    followRedirects: false,
+                    retryWithConnectionEvents: true
+                }).then(response => {
+                    jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
+                    try {
+                        this._rawConfig = JsonParser.parse(response.response);
+                        return this._rawConfig;
+                    } catch(error) {
+                        Diagnostics.trigger('config_parsing_failed', {
+                            configUrl: url,
+                            configResponse: response.response
+                        });
+                        this._core.Sdk.logError('Config request failed ' + error);
+                        throw new Error(error);
+                    }
+                }).catch(error => {
+                    if(error instanceof RequestError) {
+                        const requestError = error;
+                        if(requestError.nativeResponse && requestError.nativeResponse.responseCode) {
+                            jaegerSpan.addTag(JaegerTags.StatusCode, requestError.nativeResponse.responseCode.toString());
+                        }
+                        if(requestError.nativeResponse && requestError.nativeResponse.response) {
+                            const responseObj = JsonParser.parse(requestError.nativeResponse.response);
+                            error = new ConfigError((new Error(responseObj.error)));
+                        }
+                    }
+                    throw error;
+                });
+            });
+        }
+    }
+
+    private createConfigUrl(framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
-            clientInfo.getGameId(),
+            this._clientInfo.getGameId(),
             'configuration'
         ].join('/');
 
@@ -94,33 +117,33 @@ export class ConfigManager {
         }
 
         url = Url.addParameters(url, {
-            bundleId: clientInfo.getApplicationName(),
-            encrypted: !clientInfo.isDebuggable(),
-            rooted: core.DeviceInfo.isRooted(),
-            platform: Platform[platform].toLowerCase(),
-            sdkVersion: clientInfo.getSdkVersion(),
-            osVersion: core.DeviceInfo.getOsVersion(),
-            deviceModel: core.DeviceInfo.getModel(),
-            language: deviceInfo.getLanguage(),
-            test: clientInfo.getTestMode(),
+            bundleId: this._clientInfo.getApplicationName(),
+            encrypted: !this._clientInfo.isDebuggable(),
+            rooted: this._core.DeviceInfo.isRooted(),
+            platform: Platform[this._platform].toLowerCase(),
+            sdkVersion: this._clientInfo.getSdkVersion(),
+            osVersion: this._core.DeviceInfo.getOsVersion(),
+            deviceModel: this._core.DeviceInfo.getModel(),
+            language: this._deviceInfo.getLanguage(),
+            test: this._clientInfo.getTestMode(),
             gamerToken: gamerToken,
             forceAbGroup: abGroup
         });
 
-        if(platform === Platform.ANDROID) {
+        if(this._platform === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                deviceMake: (<AndroidDeviceInfo>deviceInfo).getManufacturer()
+                deviceMake: (<AndroidDeviceInfo>this._deviceInfo).getManufacturer()
             });
         }
 
-        if(deviceInfo.getAdvertisingIdentifier()) {
+        if(this._deviceInfo.getAdvertisingIdentifier()) {
             url = Url.addParameters(url, {
-                advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
-                limitAdTracking: deviceInfo.getLimitAdTracking()
+                advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
+                limitAdTracking: this._deviceInfo.getLimitAdTracking()
             });
-        } else if(platform === Platform.ANDROID) {
+        } else if(this._platform === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                androidId: (<AndroidDeviceInfo>deviceInfo).getAndroidId()
+                androidId: (<AndroidDeviceInfo>this._deviceInfo).getAndroidId()
             });
         }
 
@@ -135,37 +158,37 @@ export class ConfigManager {
         return url;
     }
 
-    private static fetchValue(core: ICoreApi, key: string): Promise<string | undefined> {
-        return core.Storage.get<string>(StorageType.PRIVATE, key).then(value => {
+    private fetchValue(key: string): Promise<string | undefined> {
+        return this._core.Storage.get<string>(StorageType.PRIVATE, key).then(value => {
             return value;
         }).catch(error => {
             return undefined;
         });
     }
 
-    private static storeValue(core: ICoreApi, key: string, value: string): Promise<void[]> {
+    private storeValue(key: string, value: string): Promise<void[]> {
         return Promise.all([
-            core.Storage.set(StorageType.PRIVATE, key, value),
-            core.Storage.write(StorageType.PRIVATE)
+            this._core.Storage.set(StorageType.PRIVATE, key, value),
+            this._core.Storage.write(StorageType.PRIVATE)
         ]);
     }
 
-    private static deleteValue(core: ICoreApi, key: string): Promise<void[]> {
+    private deleteValue(key: string): Promise<void[]> {
         return Promise.all([
-            core.Storage.delete(StorageType.PRIVATE, key),
-            core.Storage.write(StorageType.PRIVATE)
+            this._core.Storage.delete(StorageType.PRIVATE, key),
+            this._core.Storage.write(StorageType.PRIVATE)
         ]);
     }
 
-    private static fetchGamerToken(core: ICoreApi): Promise<string | undefined> {
-        return this.fetchValue(core, 'gamerToken');
+    private fetchGamerToken(): Promise<string | undefined> {
+        return this.fetchValue('gamerToken');
     }
 
-    public static storeGamerToken(core: ICoreApi, gamerToken: string): Promise<void[]> {
-        return this.storeValue(core, 'gamerToken', gamerToken);
+    public storeGamerToken(gamerToken: string): Promise<void[]> {
+        return this.storeValue('gamerToken', gamerToken);
     }
 
-    private static deleteGamerToken(core: ICoreApi): Promise<void[]> {
-        return this.deleteValue(core, 'gamerToken');
+    private deleteGamerToken(): Promise<void[]> {
+        return this.deleteValue('gamerToken');
     }
 }
