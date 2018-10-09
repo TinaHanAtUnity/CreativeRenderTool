@@ -32,6 +32,8 @@ import { SdkApi } from 'Core/Native/Sdk';
 import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
 import { PurchasingApi } from 'Promo/Native/Purchasing';
+import { IMonetizationServices } from 'Monetization/Native/MonetizationServices';
+import { CustomPurchasingApi } from 'Purchasing/Native/CustomPurchasing';
 
 export enum CallbackStatus {
     OK,
@@ -85,6 +87,7 @@ export class NativeBridge implements INativeBridge {
     public Banner: BannerApi;
     public BannerListener: BannerListenerApi;
     public AdsProperties: AdsPropertiesApi;
+    public Monetization: IMonetizationServices;
 
     private _callbackId: number = 1;
     private _callbackTable: {[key: number]: CallbackContainer<any>} = {};
@@ -137,6 +140,9 @@ export class NativeBridge implements INativeBridge {
         this.Banner = new BannerApi(this);
         this.BannerListener = new BannerListenerApi(this);
         this.AdsProperties = new AdsPropertiesApi(this);
+        this.Monetization = {
+            CustomPurchasing: new CustomPurchasingApi(this)
+        };
     }
 
     public registerCallback<T>(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void): number {
@@ -260,6 +266,11 @@ export class NativeBridge implements INativeBridge {
             case EventCategory[EventCategory.WEBPLAYER]:
                 this.WebPlayer.handleEvent(event, parameters);
                 break;
+
+            case EventCategory[EventCategory.CUSTOM_PURCHASING]:
+                this.Monetization.CustomPurchasing.handleEvent(event, parameters);
+                break;
+
             case EventCategory[EventCategory.AR]:
                 this.AR.handleEvent(event, parameters);
                 break;
