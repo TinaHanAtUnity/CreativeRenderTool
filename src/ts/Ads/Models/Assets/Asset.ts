@@ -82,7 +82,11 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
         throw error;
     }
 
-    protected getIgnoredSerializationKeys(): string[] {
-        return ['session'];
+    protected serializeFilter(key: string, value: any): any {
+        if(key === 'session') {
+            return undefined;
+        } else {
+            return value;
+        }
     }
 }
