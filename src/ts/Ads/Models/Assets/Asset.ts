@@ -81,4 +81,8 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
         SessionDiagnostics.trigger('set_model_value_failed', error, this.getSession());
         throw error;
     }
+
+    protected getIgnoredSerializationKeys(): string[] {
+        return ['session'];
+    }
 }

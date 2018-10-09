@@ -22,7 +22,18 @@ export abstract class Model<T extends object> {
     public abstract getDTO(): { [key: string]: any };
 
     public toJSON(): string {
-        return JSON.stringify(this._data);
+        const tmp: T = <T>{};
+        const ignoredKeys: string[] = this.getIgnoredSerializationKeys();
+
+        for(let key in this._data) {
+            if(this._data.hasOwnProperty(key)) {
+                if(ignoredKeys.indexOf(key) === -1) {
+                    tmp[key] = this._data[key];
+                }
+            }
+        }
+
+        return JSON.stringify(tmp);
     }
 
     public set<K extends keyof T>(key: K, value: T[K]): void {
@@ -51,6 +62,10 @@ export abstract class Model<T extends object> {
     protected handleError(error: WebViewError) {
         Diagnostics.trigger('set_model_value_failed', error);
         throw error;
+    }
+
+    protected getIgnoredSerializationKeys(): string[] {
+        return [];
     }
 
     private getTypeOf(value: any): string {
