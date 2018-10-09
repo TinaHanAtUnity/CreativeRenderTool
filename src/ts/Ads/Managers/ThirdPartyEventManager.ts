@@ -3,7 +3,7 @@ import { Analytics } from 'Ads/Utilities/Analytics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestError } from 'Core/Errors/RequestError';
-import { INativeResponse, Request } from 'Core/Managers/Request';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
@@ -12,10 +12,10 @@ import { ICoreApi } from 'Core/Core';
 export class ThirdPartyEventManager {
 
     private _core: ICoreApi;
-    private _request: Request;
+    private _request: RequestManager;
     private _templateValues: { [id: string]: string } = {};
 
-    constructor(core: ICoreApi, request: Request, templateValues?: { [id: string]: string }) {
+    constructor(core: ICoreApi, request: RequestManager, templateValues?: { [id: string]: string }) {
         this._core = core;
         this._request = request;
 
@@ -39,7 +39,7 @@ export class ThirdPartyEventManager {
 
     public sendEvent(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
         headers = headers || [];
-        if (!Request.getHeader(headers, 'User-Agent')) {
+        if (!RequestManager.getHeader(headers, 'User-Agent')) {
             if (typeof navigator !== 'undefined' && navigator.userAgent && useWebViewUserAgentForTracking === true) {
                 headers.push(['User-Agent', navigator.userAgent]);
             }

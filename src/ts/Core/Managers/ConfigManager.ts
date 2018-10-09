@@ -14,11 +14,11 @@ import { Url } from 'Core/Utilities/Url';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 export class ConfigManager {
 
-    public static fetch(platform: Platform, core: ICoreApi, metaDataManager: MetaDataManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: Request, jaegerSpan: JaegerSpan): Promise<any> {
+    public static fetch(platform: Platform, core: ICoreApi, metaDataManager: MetaDataManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager, jaegerSpan: JaegerSpan): Promise<any> {
         return Promise.all([
             metaDataManager.fetch(FrameworkMetaData),
             metaDataManager.fetch(AdapterMetaData),

@@ -3,15 +3,15 @@ import { Session } from 'Ads/Models/Session';
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
 
 export class SessionManager {
     private _storage: StorageApi;
-    private _request: Request;
+    private _request: RequestManager;
     private _gameSessionId: number;
 
-    constructor(storage: StorageApi, request: Request) {
+    constructor(storage: StorageApi, request: RequestManager) {
         this._storage = storage;
         this._request = request;
     }

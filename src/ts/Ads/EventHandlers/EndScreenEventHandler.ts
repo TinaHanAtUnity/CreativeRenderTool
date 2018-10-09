@@ -15,7 +15,7 @@ import { RequestError } from 'Core/Errors/RequestError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
@@ -170,7 +170,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         const platform = this._platform;
 
         this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
-            const location = Request.getHeader(response.headers, 'location');
+            const location = RequestManager.getHeader(response.headers, 'location');
             if (location) {
                 if (platform === Platform.ANDROID) {
                     this._core.Android!.Intent.launch({

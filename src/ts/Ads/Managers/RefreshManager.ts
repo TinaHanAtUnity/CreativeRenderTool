@@ -2,7 +2,7 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
-import { INativeResponse } from 'Core/Managers/Request';
+import { INativeResponse } from 'Core/Managers/RequestManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export abstract class RefreshManager {

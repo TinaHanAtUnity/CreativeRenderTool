@@ -1,7 +1,7 @@
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { INativeResponse, Request } from 'Core/Managers/Request';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 
 export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file' // a file 20mb and over are considered too large
@@ -31,11 +31,11 @@ export class ProgrammaticTrackingService {
     private static productionMetricServiceUrl: string = 'https://tracking.adsx.unityads.unity3d.com/tracking/sdk/metric';
 
     private _platform: Platform;
-    private _request: Request;
+    private _request: RequestManager;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
 
-    constructor(platform: Platform, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
+    constructor(platform: Platform, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
         this._platform = platform;
         this._request = request;
         this._clientInfo = clientInfo;

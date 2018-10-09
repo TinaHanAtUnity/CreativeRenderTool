@@ -34,7 +34,7 @@ describe('ResolveTest', () => {
             handleCallback
         });
 
-        resolveApi = nativeBridge.Resolve = new TestResolveApi(nativeBridge);
+        resolveApi = nativeBridge.ResolveManager = new TestResolveApi(nativeBridge);
         resolve = new Resolve(nativeBridge);
     });
 

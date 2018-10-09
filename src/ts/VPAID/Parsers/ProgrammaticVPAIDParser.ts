@@ -1,7 +1,7 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
@@ -15,7 +15,7 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
 
     private _vpaidParser: VPAIDParser = new VPAIDParser();
 
-    public parse(platform: Platform, core: ICoreApi, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
         return this._vastParser.retrieveVast(decodedVast, core, request).then((vast): Promise<Campaign> => {
             const vpaidMediaFile = this.getVPAIDMediaFile(vast);

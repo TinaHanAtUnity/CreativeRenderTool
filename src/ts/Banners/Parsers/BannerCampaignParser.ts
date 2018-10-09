@@ -3,7 +3,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/Core';
 
@@ -18,7 +18,7 @@ export class BannerCampaignParser extends CampaignParser {
         this._wrapJS = wrapJS;
     }
 
-    public parse(platform: Platform, core: ICoreApi, request: Request, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
         const markup = this._wrapJS ? this.getJSContent(response) : this.getHTMLContent(response);
         const campaign = <IBannerCampaign>{
             id: this.getProgrammaticCampaignId(platform),

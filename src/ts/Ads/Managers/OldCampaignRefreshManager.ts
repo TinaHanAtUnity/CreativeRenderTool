@@ -19,7 +19,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { INativeResponse, Request } from 'Core/Managers/Request';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
@@ -37,7 +37,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private _focusManager: FocusManager;
     private _sessionManager: SessionManager;
     private _clientInfo: ClientInfo;
-    private _request: Request;
+    private _request: RequestManager;
     private _cache: CacheManager;
     private _refillTimestamp: number;
     private _needsRefill = true;
@@ -51,7 +51,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
     // this constant is intentionally named "magic" constant because the value is only a best guess and not a real technical constant
     private _startRefreshMagicConstant: number = 5000;
 
-    constructor(platform: Platform, core: ICoreApi, ads: IAdsApi, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: AdsConfiguration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: Request, cache: CacheManager) {
+    constructor(platform: Platform, core: ICoreApi, ads: IAdsApi, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: AdsConfiguration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: RequestManager, cache: CacheManager) {
         super();
 
         this._platform = platform;

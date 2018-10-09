@@ -15,7 +15,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Observable0 } from 'Core/Utilities/Observable';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { IAdsApi } from 'Ads/Ads';
 import { ICoreApi } from 'Core/Core';
 import { Platform } from 'Core/Constants/Platform';
@@ -35,7 +35,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     ads: IAdsApi;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
-    request: Request;
+    request: RequestManager;
     options: any;
     gdprManager: GdprManager;
     adMobSignalFactory?: AdMobSignalFactory;

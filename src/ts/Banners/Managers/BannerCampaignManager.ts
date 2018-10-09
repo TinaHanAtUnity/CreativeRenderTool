@@ -19,7 +19,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { INativeResponse, Request } from 'Core/Managers/Request';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/Core';
 
 export class BannerCampaignManager {
@@ -32,14 +32,14 @@ export class BannerCampaignManager {
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
-    private _request: Request;
+    private _request: RequestManager;
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
     private _jaegerManager: JaegerManager;
 
     private _promise: Promise<Campaign> | null;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerManager: JaegerManager) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerManager: JaegerManager) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;

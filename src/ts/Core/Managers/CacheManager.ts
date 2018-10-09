@@ -4,7 +4,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FileId } from 'Core/Utilities/FileId';
 import { FileInfo } from 'Core/Utilities/FileInfo';
 import { Observable0, Observable1, Observable2, Observable3, Observable5 } from 'Core/Utilities/Observable';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/Core';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
@@ -67,7 +67,7 @@ export class CacheManager {
 
     private _core: ICoreApi;
     private _wakeUpManager: WakeUpManager;
-    private _request: Request;
+    private _request: RequestManager;
     private _cacheBookkeeping: CacheBookkeeping;
 
     private _callbacks: { [url: string]: ICallbackObject } = {};
@@ -84,7 +84,7 @@ export class CacheManager {
     private _lastProgressEvent?: number;
     private _fastConnectionDetected: boolean = false;
 
-    constructor(core: ICoreApi, wakeUpManager: WakeUpManager, request: Request, cacheBookkeeping: CacheBookkeeping, options?: ICacheOptions) {
+    constructor(core: ICoreApi, wakeUpManager: WakeUpManager, request: RequestManager, cacheBookkeeping: CacheBookkeeping, options?: ICacheOptions) {
         this._core = core;
         this._wakeUpManager = wakeUpManager;
         this._request = request;
@@ -283,16 +283,16 @@ export class CacheManager {
 
         const callback = this._callbacks[url];
         if(callback) {
-            if(Request.AllowedResponseCodes.exec(responseCode.toString())) {
+            if(RequestManager.AllowedResponseCodes.exec(responseCode.toString())) {
                 this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(true, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
                 this.fulfillCallback(url, CacheStatus.OK);
                 this.onFinish.trigger(CacheManager.getCacheEvent(callback));
                 return;
-            } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
+            } else if(RequestManager.RedirectResponseCodes.exec(responseCode.toString())) {
                 this.onRedirect.trigger(CacheManager.getCacheEvent(callback));
                 this._cacheBookkeeping.removeFileEntry(callback.fileId);
                 this._core.Cache.deleteFile(callback.fileId);
-                const location = Request.getHeader(headers, 'location');
+                const location = RequestManager.getHeader(headers, 'location');
                 if(location) {
                     let fileId = callback.fileId;
                     let originalUrl = url;
@@ -382,7 +382,7 @@ export class CacheManager {
 
     private handleRequestRangeError(callback: ICallbackObject, url: string): void {
         Promise.all([this._core.Cache.getFileInfo(callback.fileId), this._request.head(url)]).then(([fileInfo, response]) => {
-            const contentLength = Request.getHeader(response.headers, 'Content-Length');
+            const contentLength = RequestManager.getHeader(response.headers, 'Content-Length');
 
             if(response.responseCode === 200 && fileInfo.found && contentLength && fileInfo.size === parseInt(contentLength, 10) && fileInfo.size > 0) {
                 this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(true, fileInfo.size, fileInfo.size, FileId.getFileIdExtension(callback.fileId)));

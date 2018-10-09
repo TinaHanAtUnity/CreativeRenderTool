@@ -2,7 +2,7 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
@@ -11,7 +11,7 @@ import { ICoreApi } from 'Core/Core';
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
     private _clientInfo: ClientInfo;
-    private _request: Request;
+    private _request: RequestManager;
     private _campaign: VastCampaign;
     private _vastEndScreen: VastEndScreen | null;
     private _platform: Platform;

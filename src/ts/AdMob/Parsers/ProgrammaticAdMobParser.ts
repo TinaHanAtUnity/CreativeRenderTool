@@ -8,7 +8,7 @@ import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Platform } from 'Core/Constants/Platform';
 import { FileId } from 'Core/Utilities/FileId';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { VastParser } from 'VAST/Utilities/VastParser';
@@ -16,7 +16,7 @@ import { ICoreApi } from 'Core/Core';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
-    public parse(platform: Platform, core: ICoreApi, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
         const videoPromise = this.getVideoFromMarkup(markup, request, session, platform).catch((e) => {
@@ -57,7 +57,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
 
     }
 
-    private getVideoFromMarkup(markup: string, request: Request, session: Session, platform: Platform): Promise<AdMobVideo> {
+    private getVideoFromMarkup(markup: string, request: RequestManager, session: Session, platform: Platform): Promise<AdMobVideo> {
         try {
             const dom = new DOMParser().parseFromString(markup, 'text/html');
             if (!dom) {
@@ -100,7 +100,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         }
     }
 
-    private getRealVideoURL(videoURL: string, request: Request): Promise<string> {
+    private getRealVideoURL(videoURL: string, request: RequestManager): Promise<string> {
         return request.followRedirectChain(videoURL);
     }
 

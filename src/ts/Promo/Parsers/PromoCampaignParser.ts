@@ -4,7 +4,7 @@ import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { IPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { Platform } from 'Core/Constants/Platform';
@@ -12,7 +12,7 @@ import { ICoreApi } from 'Core/Core';
 
 export class PromoCampaignParser extends CampaignParser {
     public static ContentType = 'purchasing/iap';
-    public parse(platform: Platform, core: ICoreApi, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const promoJson = JsonParser.parse(response.getContent());
 
         const baseCampaignParams: ICampaign = {

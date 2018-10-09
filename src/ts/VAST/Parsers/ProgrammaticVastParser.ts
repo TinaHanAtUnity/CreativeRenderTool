@@ -6,7 +6,7 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { Platform } from 'Core/Constants/Platform';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
@@ -22,7 +22,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     protected _vastParser: VastParser = new VastParser();
 
-    public parse(platform: Platform, core: ICoreApi, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
 
         if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {

@@ -40,7 +40,7 @@ export interface INativeResponse {
     headers: Array<[string, string]>;
 }
 
-export class Request {
+export class RequestManager {
 
     public static AllowedResponseCodes = new RegExp('2[0-9]{2}');
     public static RedirectResponseCodes = new RegExp('30[0-8]');
@@ -100,10 +100,10 @@ export class Request {
 
     public get(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
-            options = Request.getDefaultRequestOptions();
+            options = RequestManager.getDefaultRequestOptions();
         }
 
-        const id = Request._callbackId++;
+        const id = RequestManager._callbackId++;
         const promise = this.registerCallback(id);
         this.invokeRequest(id, {
             method: RequestMethod.GET,
@@ -117,12 +117,12 @@ export class Request {
 
     public post(url: string, data: string = '', headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
-            options = Request.getDefaultRequestOptions();
+            options = RequestManager.getDefaultRequestOptions();
         }
 
         headers.push(['Content-Type', 'application/json']);
 
-        const id = Request._callbackId++;
+        const id = RequestManager._callbackId++;
         const promise = this.registerCallback(id);
         this.invokeRequest(id, {
             method: RequestMethod.POST,
@@ -137,7 +137,7 @@ export class Request {
 
     public head(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
-            options = Request.getDefaultRequestOptions();
+            options = RequestManager.getDefaultRequestOptions();
         }
 
         // fix for Android 4.0 and older, https://code.google.com/p/android/issues/detail?id=24672
@@ -145,7 +145,7 @@ export class Request {
             headers.push(['Accept-Encoding', '']);
         }
 
-        const id = Request._callbackId++;
+        const id = RequestManager._callbackId++;
         const promise = this.registerCallback(id);
         this.invokeRequest(id, {
             method: RequestMethod.HEAD,
@@ -164,21 +164,21 @@ export class Request {
             const makeRequest = (requestUrl: string) => {
                 redirectCount++;
                 requestUrl = requestUrl.trim();
-                if (redirectCount >= Request._redirectLimit) {
+                if (redirectCount >= RequestManager._redirectLimit) {
                     reject(new Error('redirect limit reached'));
                 } else if (requestUrl.indexOf('http') === -1) {
                     // market:// or itunes:// urls can be opened directly
                     resolve(requestUrl);
                 } else {
                     this.head(requestUrl).then((response: INativeResponse) => {
-                        if (Request.is3xxRedirect(response.responseCode)) {
-                            const location = Request.getHeader(response.headers, 'location');
+                        if (RequestManager.is3xxRedirect(response.responseCode)) {
+                            const location = RequestManager.getHeader(response.headers, 'location');
                             if (location) {
                                 makeRequest(location);
                             } else {
                                 reject(new Error(`${response.responseCode} response did not have a "Location" header`));
                             }
-                        } else if (Request.is2xxSuccessful(response.responseCode)) {
+                        } else if (RequestManager.is2xxSuccessful(response.responseCode)) {
                             resolve(requestUrl);
                         } else {
                             if (resolveOnHttpError) {
@@ -196,19 +196,19 @@ export class Request {
 
     private registerCallback(id: number): Promise<INativeResponse> {
         return new Promise<INativeResponse>((resolve, reject) => {
-            Request._callbacks[id] = new CallbackContainer(resolve, reject);
+            RequestManager._callbacks[id] = new CallbackContainer(resolve, reject);
         });
     }
 
     private invokeRequest(id: number, nativeRequest: INativeRequest): Promise<string> {
-        let connectTimeout = Request._connectTimeout;
-        let readTimeout = Request._readTimeout;
+        let connectTimeout = RequestManager._connectTimeout;
+        let readTimeout = RequestManager._readTimeout;
         if(nativeRequest.options.timeout) {
             connectTimeout = nativeRequest.options.timeout;
             readTimeout = nativeRequest.options.timeout;
         }
 
-        Request._requests[id] = nativeRequest;
+        RequestManager._requests[id] = nativeRequest;
         switch(nativeRequest.method) {
             case RequestMethod.GET:
                 return this._core.Request.get(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
@@ -225,15 +225,15 @@ export class Request {
     }
 
     private finishRequest(id: number, status: RequestStatus, ...parameters: any[]) {
-        const callbackObject = Request._callbacks[id];
+        const callbackObject = RequestManager._callbacks[id];
         if(callbackObject) {
             if(status === RequestStatus.COMPLETE) {
                 callbackObject.resolve(...parameters);
             } else {
                 callbackObject.reject(...parameters);
             }
-            delete Request._callbacks[id];
-            delete Request._requests[id];
+            delete RequestManager._callbacks[id];
+            delete RequestManager._requests[id];
         }
     }
 
@@ -258,17 +258,17 @@ export class Request {
             responseCode: responseCode,
             headers: headers
         };
-        const nativeRequest = Request._requests[id];
+        const nativeRequest = RequestManager._requests[id];
 
         if(!nativeRequest) {
             // ignore events without matching id, might happen when webview reinits
             return;
         }
-        if(Request.AllowedResponseCodes.exec(responseCode.toString())) {
+        if(RequestManager.AllowedResponseCodes.exec(responseCode.toString())) {
             this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
-        } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
+        } else if(RequestManager.RedirectResponseCodes.exec(responseCode.toString())) {
             if(nativeRequest.options.followRedirects) {
-                const location = Request.getHeader(headers, 'location');
+                const location = RequestManager.getHeader(headers, 'location');
                 if(location && this.followRedirects(location)) {
                     nativeRequest.url = location;
                     this.invokeRequest(id, nativeRequest);
@@ -278,7 +278,7 @@ export class Request {
             } else {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
-        } else if(Request.ErrorResponseCodes.exec(responseCode.toString())) {
+        } else if(RequestManager.ErrorResponseCodes.exec(responseCode.toString())) {
             this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_ERROR_RESPONSE', nativeRequest, nativeResponse));
         } else {
             this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_UNKNOWN_RESPONSE_CODE', nativeRequest, nativeResponse));
@@ -295,7 +295,7 @@ export class Request {
 
     private onRequestFailed(rawId: string, url: string, error: string): void {
         const id = parseInt(rawId, 10);
-        const nativeRequest = Request._requests[id];
+        const nativeRequest = RequestManager._requests[id];
 
         if(!nativeRequest) {
             // ignore events without matching id, might happen when webview reinits
@@ -306,9 +306,9 @@ export class Request {
     }
 
     private onNetworkConnected(): void {
-        for(const id in Request._requests) {
-            if(Request._requests.hasOwnProperty(id)) {
-                const request: INativeRequest = Request._requests[id];
+        for(const id in RequestManager._requests) {
+            if(RequestManager._requests.hasOwnProperty(id)) {
+                const request: INativeRequest = RequestManager._requests[id];
                 if(request.options.retryWithConnectionEvents && request.options.retries === request.retryCount) {
                     this.invokeRequest(parseInt(id, 10), request);
                 }

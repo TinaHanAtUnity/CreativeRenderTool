@@ -7,7 +7,7 @@ import { EventType } from 'Ads/Models/Session';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { INativeResponse } from 'Core/Managers/Request';
+import { INativeResponse } from 'Core/Managers/RequestManager';
 import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 

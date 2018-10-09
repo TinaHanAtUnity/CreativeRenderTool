@@ -8,7 +8,7 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { IMRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
@@ -36,7 +36,7 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeVideo = 'comet/video';
     public static ContentTypeMRAID = 'comet/mraid-url';
 
-    public parse(platform: Platform, core: ICoreApi, request: Request, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';

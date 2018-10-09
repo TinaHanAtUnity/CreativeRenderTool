@@ -10,7 +10,7 @@ import { RequestError } from 'Core/Errors/RequestError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
@@ -25,7 +25,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _mraidView: MRAIDView<IMRAIDViewHandler>;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
-    private _request: Request;
+    private _request: RequestManager;
     private _placement: Placement;
     private _platform: Platform;
     private _core: ICoreApi;
@@ -118,7 +118,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         const useWebViewUA = this._campaign.getUseWebViewUserAgentForTracking();
         if(this._campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
             this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true, useWebViewUA).then(response => {
-                const location = Request.getHeader(response.headers, 'location');
+                const location = RequestManager.getHeader(response.headers, 'location');
                 if(location) {
                     this.openUrl(location);
                 } else {

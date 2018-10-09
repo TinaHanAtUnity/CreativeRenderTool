@@ -37,7 +37,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
-import { INativeResponse, Request } from 'Core/Managers/Request';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
@@ -94,7 +94,7 @@ export class CampaignManager {
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
     private _backupCampaignManager: BackupCampaignManager;
-    private _request: Request;
+    private _request: RequestManager;
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
     private _realtimeUrl: string | undefined;
@@ -103,7 +103,7 @@ export class CampaignManager {
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;

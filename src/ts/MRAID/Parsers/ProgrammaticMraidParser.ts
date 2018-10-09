@@ -3,14 +3,14 @@ import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/Core';
 
 export class ProgrammaticMraidParser extends CampaignParser {
     public static ContentType = 'programmatic/mraid';
-    public parse(platform: Platform, core: ICoreApi, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraid = response.getJsonContent();
 
         if(!jsonMraid) {

@@ -1,15 +1,15 @@
 import { IJaegerSpan, JaegerSpan } from 'Core/Jaeger/JaegerSpan';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 export class JaegerManager {
 
     private static _openSpans: { [jaegerId: string]: IJaegerSpan } = {};
     private static _closedSpans: { [jaegerId: string]: IJaegerSpan } = {};
 
-    private _request: Request;
+    private _request: RequestManager;
     private _isJaegerTracingEnabled: boolean = false;
 
-    constructor(request: Request) {
+    constructor(request: RequestManager) {
         this._request = request;
     }
 

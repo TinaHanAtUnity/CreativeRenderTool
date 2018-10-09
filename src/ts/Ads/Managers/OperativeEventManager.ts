@@ -20,13 +20,13 @@ import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { INativeResponse, Request } from 'Core/Managers/Request';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { StorageApi } from 'Core/Native/Storage';
 import { IAdsApi } from 'Ads/Ads';
 import { ICoreApi } from 'Core/Core';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
-    request: Request;
+    request: RequestManager;
     metaDataManager: MetaDataManager;
     sessionManager: SessionManager;
     clientInfo: ClientInfo;
@@ -81,7 +81,7 @@ export class OperativeEventManager {
     protected _metaDataManager: MetaDataManager;
     protected _storage: StorageApi;
     private _deviceInfo: DeviceInfo;
-    private _request: Request;
+    private _request: RequestManager;
     private _coreConfig: CoreConfiguration;
     private _adsConfig: AdsConfiguration;
     protected _platform: Platform;

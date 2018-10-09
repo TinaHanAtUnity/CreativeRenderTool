@@ -4,7 +4,7 @@ import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { MOAT } from 'Ads/Views/MOAT';
 import { Platform } from 'Core/Constants/Platform';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ICoreApi } from 'Core/Core';
@@ -13,7 +13,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
     private _core: ICoreApi;
     private _vastAdUnit: VastAdUnit;
-    private _request: Request;
+    private _request: RequestManager;
     private _vastCampaign: VastCampaign;
     private _moat?: MOAT;
     private _vastOverlay?: AbstractVideoOverlay;

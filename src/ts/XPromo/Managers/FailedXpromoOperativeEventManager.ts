@@ -2,7 +2,7 @@ import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventMa
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
 import { StorageType } from 'Core/Native/Storage';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 export class FailedXpromoOperativeEventManager extends FailedOperativeEventManager {
 
@@ -10,7 +10,7 @@ export class FailedXpromoOperativeEventManager extends FailedOperativeEventManag
         return SessionUtils.getSessionStorageKey(this._sessionId) + '.xpromooperative';
     }
 
-    public sendFailedEvent(request: Request, writeStorage?: boolean): Promise<void> {
+    public sendFailedEvent(request: RequestManager, writeStorage?: boolean): Promise<void> {
         return this._storage.get<{ [key: string]: any }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
             const kafkaType = eventData.kafkaType;
             const data = eventData.data;
@@ -26,7 +26,7 @@ export class FailedXpromoOperativeEventManager extends FailedOperativeEventManag
         });
     }
 
-    protected getPromisesForFailedEvents(request: Request, keys: string[]): Array<Promise<any>> {
+    protected getPromisesForFailedEvents(request: RequestManager, keys: string[]): Array<Promise<any>> {
         const promises: Array<Promise<any>> = [];
         keys.map(eventId => {
             const manager = new FailedXpromoOperativeEventManager(this._storage, this._sessionId, eventId);

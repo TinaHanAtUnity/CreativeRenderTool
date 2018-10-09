@@ -7,7 +7,7 @@ import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/Core';
 import { ITemplateData } from 'Core/Views/View';
 
@@ -42,9 +42,9 @@ export class GdprManager {
     private readonly _adsConfig: AdsConfiguration;
     private readonly _clientInfo: ClientInfo;
     private readonly _deviceInfo: DeviceInfo;
-    private readonly _request: Request;
+    private readonly _request: RequestManager;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: Request) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;

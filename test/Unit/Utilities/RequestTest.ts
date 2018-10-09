@@ -129,7 +129,7 @@ describe('RequestTest', () => {
             handleCallback
         });
 
-        requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
+        requestApi = nativeBridge.RequestManager = new TestRequestApi(nativeBridge);
         const clock = sinon.useFakeTimers();
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);

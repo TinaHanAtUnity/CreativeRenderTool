@@ -62,7 +62,7 @@ describe('ThirdPartyEventManagerTest', () => {
 
         metaDataManager = new MetaDataManager(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
-        requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
+        requestApi = nativeBridge.RequestManager = new TestRequestApi(nativeBridge);
         request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);

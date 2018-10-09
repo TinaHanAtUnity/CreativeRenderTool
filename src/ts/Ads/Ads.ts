@@ -11,7 +11,7 @@ import { WebPlayerApi } from 'Ads/Native/WebPlayer';
 import { Platform } from 'Core/Constants/Platform';
 import { Core, CoreModule } from 'Core/Core';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
-import { INativeResponse } from 'Core/Managers/Request';
+import { INativeResponse } from 'Core/Managers/RequestManager';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';

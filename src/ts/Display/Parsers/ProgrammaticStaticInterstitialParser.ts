@@ -2,7 +2,7 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/Core';
@@ -17,7 +17,7 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
         this._wrapWithScriptTag = wrapWithScriptTag;
     }
 
-    public parse(platform: Platform, core: ICoreApi, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         let dynamicMarkup = decodeURIComponent(response.getContent());
         if (this._wrapWithScriptTag) {
             dynamicMarkup = '<script>' + dynamicMarkup + '</script>';

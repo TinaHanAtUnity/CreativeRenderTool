@@ -1,5 +1,5 @@
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';
 import { VastCreative } from 'VAST/Models/VastCreative';
@@ -66,7 +66,7 @@ export class VastParser {
         return new Vast(ads, errorURLTemplates);
     }
 
-    public retrieveVast(vast: any, core: ICoreApi, request: Request, parent?: Vast, depth: number = 0): Promise<Vast> {
+    public retrieveVast(vast: any, core: ICoreApi, request: RequestManager, parent?: Vast, depth: number = 0): Promise<Vast> {
         let parsedVast: Vast;
 
         if (depth === 0) {

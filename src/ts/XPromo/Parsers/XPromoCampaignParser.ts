@@ -4,7 +4,7 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { Platform } from 'Core/Constants/Platform';
@@ -12,7 +12,7 @@ import { ICoreApi } from 'Core/Core';
 
 export class XPromoCampaignParser extends CampaignParser {
     public static ContentType = 'xpromo/video';
-    public parse(platform: Platform, core: ICoreApi, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';

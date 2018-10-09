@@ -15,7 +15,7 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { StorageType } from 'Core/Native/Storage';
-import { INativeResponse, Request } from 'Core/Managers/Request';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { ICoreApi } from 'Core/Core';
 
@@ -52,7 +52,7 @@ export interface IAuctionRequestParams {
     adsConfig: AdsConfiguration;
     adMobSignalFactory: AdMobSignalFactory;
     metaDataManager: MetaDataManager;
-    request: Request;
+    request: RequestManager;
     clientInfo: ClientInfo;
     deviceInfo: DeviceInfo;
     sessionManager: SessionManager;
@@ -108,7 +108,7 @@ export class AuctionRequest {
     private _adsConfig: AdsConfiguration;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _metaDataManager: MetaDataManager;
-    private _request: Request;
+    private _request: RequestManager;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _sessionManager: SessionManager;

@@ -1,6 +1,6 @@
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 export class FailedOperativeEventManager {
 
@@ -41,7 +41,7 @@ export class FailedOperativeEventManager {
         return Promise.resolve();
     }
 
-    public sendFailedEvent(request: Request, writeStorage?: boolean): Promise<void> {
+    public sendFailedEvent(request: RequestManager, writeStorage?: boolean): Promise<void> {
         if(this._eventId) {
             return this._storage.get<{ [key: string]: any }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
                 const url = eventData.url;
@@ -61,7 +61,7 @@ export class FailedOperativeEventManager {
         return Promise.resolve();
     }
 
-    public sendFailedEvents(request: Request): Promise<void> {
+    public sendFailedEvents(request: RequestManager): Promise<void> {
         return this._storage.getKeys(StorageType.PRIVATE, this.getEventsStorageKey(), false).then(keys => {
             const promises = this.getPromisesForFailedEvents(request, keys);
             return Promise.all(promises).then(() => {
@@ -72,7 +72,7 @@ export class FailedOperativeEventManager {
         });
     }
 
-    protected getPromisesForFailedEvents(request: Request, keys: string[]): Array<Promise<any>> {
+    protected getPromisesForFailedEvents(request: RequestManager, keys: string[]): Array<Promise<any>> {
         const promises: Array<Promise<any>> = [];
         keys.map(eventId => {
             const manager = new FailedOperativeEventManager(this._storage, this._sessionId, eventId); // todo: wtf?

@@ -12,7 +12,7 @@ import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { IFileInfo } from 'Core/Native/Cache';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
@@ -76,7 +76,7 @@ interface IEventInfo {
 }
 
 export class SdkStats {
-    public static initialize(core: ICoreApi, request: Request, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, sessionManager: SessionManager, campaignManager: CampaignManager, metaDataManager: MetaDataManager, clientInfo: ClientInfo, cache: CacheManager) {
+    public static initialize(core: ICoreApi, request: RequestManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, sessionManager: SessionManager, campaignManager: CampaignManager, metaDataManager: MetaDataManager, clientInfo: ClientInfo, cache: CacheManager) {
         SdkStats._core = core;
         SdkStats._request = request;
         SdkStats._coreConfig = coreConfig;
@@ -170,7 +170,7 @@ export class SdkStats {
     }
 
     private static _core: ICoreApi;
-    private static _request: Request;
+    private static _request: RequestManager;
     private static _coreConfig: CoreConfiguration;
     private static _adsConfig: AdsConfiguration;
     private static _sessionManager: SessionManager;

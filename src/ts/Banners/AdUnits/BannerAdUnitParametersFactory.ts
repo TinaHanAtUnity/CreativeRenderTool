@@ -16,7 +16,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/Core';
 import { Platform } from 'Core/Constants/Platform';
 import { IAdsApi } from 'Ads/Ads';
@@ -26,7 +26,7 @@ export class BannerAdUnitParametersFactory {
     private _platform: Platform;
     private _core: ICoreApi;
     private _ads: IAdsApi;
-    private _request: Request;
+    private _request: RequestManager;
     private _metadataManager: MetaDataManager;
     private _coreConfig: CoreConfiguration;
     private _adsConfig: AdsConfiguration;
@@ -40,7 +40,7 @@ export class BannerAdUnitParametersFactory {
     private _gdprManager: GdprManager;
     private _programmaticTrackingService: ProgrammaticTrackingService;
 
-    constructor(platform: Platform, core: ICoreApi, ads: IAdsApi, request: Request, metadataManager: MetaDataManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, analyticsManager: AnalyticsManager, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer, programmaticTrackingService: ProgrammaticTrackingService) {
+    constructor(platform: Platform, core: ICoreApi, ads: IAdsApi, request: RequestManager, metadataManager: MetaDataManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, analyticsManager: AnalyticsManager, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer, programmaticTrackingService: ProgrammaticTrackingService) {
         this._platform = platform;
         this._core = core;
         this._request = request;

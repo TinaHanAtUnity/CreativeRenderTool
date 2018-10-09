@@ -17,14 +17,14 @@ import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Promises } from 'Core/Utilities/Promises';
-import { Request } from 'Core/Managers/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Timer } from 'Core/Utilities/Timer';
 import { Url } from 'Core/Utilities/Url';
 import { ICoreApi } from 'Core/Core';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
-    request: Request;
+    request: RequestManager;
     platform: Platform;
     core: ICoreApi;
     session: Session;
@@ -47,7 +47,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     private _platform: Platform;
     private _core: ICoreApi;
     private _timeoutTimer: Timer;
-    private _request: Request;
+    private _request: RequestManager;
     private _session: Session;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adMobSignalFactory: AdMobSignalFactory;

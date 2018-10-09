@@ -1,4 +1,4 @@
-import { INativeResponse, Request } from 'Core/Managers/Request';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -10,7 +10,7 @@ export enum KafkaCommonObjectType {
 }
 
 export class HttpKafka {
-    public static setRequest(request?: Request) {
+    public static setRequest(request?: RequestManager) {
         HttpKafka._request = request;
     }
 
@@ -55,7 +55,7 @@ export class HttpKafka {
     }
 
     private static KafkaBaseUrl: string = 'https://httpkafka.unityads.unity3d.com/v1/events';
-    private static _request: Request | undefined;
+    private static _request: RequestManager | undefined;
     private static _clientInfo: ClientInfo | undefined;
     private static _deviceInfo: DeviceInfo | undefined;
     private static _configuration: CoreConfiguration | undefined;

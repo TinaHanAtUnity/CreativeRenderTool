@@ -4,8 +4,8 @@ import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { Request } from 'Core/Managers/Request';
-import { Resolve } from 'Core/Managers/Resolve';
+import { RequestManager } from 'Core/Managers/RequestManager';
+import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { IApiModule, IModuleApi, } from 'Core/Modules/IApiModule';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -79,10 +79,10 @@ export class Core implements IApiModule {
     public ConfigManager: ConfigManager;
     public readonly FocusManager: FocusManager;
     public readonly MetaDataManager: MetaDataManager;
-    public readonly Resolve: Resolve;
+    public readonly Resolve: ResolveManager;
     public readonly WakeUpManager: WakeUpManager;
 
-    public Request: Request;
+    public Request: RequestManager;
     public CacheManager: CacheManager;
     public JaegerManager: JaegerManager;
     public ClientInfo: ClientInfo;
@@ -124,7 +124,7 @@ export class Core implements IApiModule {
         this.FocusManager = new FocusManager(this.NativeBridge.getPlatform(), this.Api);
         this.WakeUpManager = new WakeUpManager(this.Api);
         this.CacheBookkeeping = new CacheBookkeeping(this.Api);
-        this.Resolve = new Resolve(this.Api);
+        this.Resolve = new ResolveManager(this.Api);
         this.MetaDataManager = new MetaDataManager(this.Api);
     }
 
@@ -142,10 +142,10 @@ export class Core implements IApiModule {
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.DeviceInfo = new AndroidDeviceInfo(this.Api);
-                this.Request = new Request(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager, <AndroidDeviceInfo>this.DeviceInfo);
+                this.Request = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager, <AndroidDeviceInfo>this.DeviceInfo);
             } else if(this.NativeBridge.getPlatform() === Platform.IOS) {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
-                this.Request = new Request(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
+                this.Request = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
             }
             this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.Request, this.CacheBookkeeping);
             this.JaegerManager = new JaegerManager(this.Request);

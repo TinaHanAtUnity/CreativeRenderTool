@@ -5,7 +5,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { INativeResponse, Request } from 'Core/Managers/Request';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/Core';
 
@@ -13,7 +13,7 @@ export class AnalyticsManager {
     private _platform: Platform;
     private _core: ICoreApi;
     private _wakeUpManager: WakeUpManager;
-    private _request: Request;
+    private _request: RequestManager;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _configuration: CoreConfiguration;
@@ -28,7 +28,7 @@ export class AnalyticsManager {
     private _endpoint: string;
     private _newSessionTreshold: number = 1800000; // 30 minutes in milliseconds
 
-    constructor(platform: Platform, core: ICoreApi, wakeUpManager: WakeUpManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, focusManager: FocusManager) {
+    constructor(platform: Platform, core: ICoreApi, wakeUpManager: WakeUpManager, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, focusManager: FocusManager) {
         this._platform = platform;
         this._core = core;
         this._focusManager = focusManager;
