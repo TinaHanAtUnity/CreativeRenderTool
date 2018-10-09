@@ -16,7 +16,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastCampaign: VastCampaign;
     private _moat?: MOAT;
     private _vastOverlay?: AbstractVideoOverlay;
-    private _isAbGroup: boolean;
+    private _isClickTestAbGroup: boolean;
 
     constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(nativeBridge, adUnit, parameters);
@@ -27,7 +27,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._placement = parameters.placement;
         this._moat = MoatViewabilityService.getMoat();
         this._vastOverlay = this._vastAdUnit.getOverlay();
-        this._isAbGroup = ClickDelayTrackingTest.isValid(parameters.coreConfig.getAbGroup());
+        this._isClickTestAbGroup = ClickDelayTrackingTest.isValid(parameters.coreConfig.getAbGroup());
     }
 
     public onOverlaySkip(position: number): void {
@@ -62,7 +62,10 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
         this.setCallButtonEnabled(false);
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-        this.sendClickTrackingEvent(this._isAbGroup);
+
+        if (this._isClickTestAbGroup) {
+            this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+        }
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
@@ -70,7 +73,9 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                 (url: string) => {
                     return this.openUrl(url).then(() => {
                         this.setCallButtonEnabled(true);
-                        this.sendClickTrackingEvent(!this._isAbGroup);
+                        if (!this._isClickTestAbGroup) {
+                            this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+                        }
                     }).catch((e) => {
                         this.setCallButtonEnabled(true);
                     });
@@ -78,12 +83,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             );
         } else {
             return Promise.reject(new Error('No clickThroughURL was defined'));
-        }
-    }
-
-    private sendClickTrackingEvent(isAbGroup: boolean): void {
-        if (isAbGroup) {
-            this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
         }
     }
 
