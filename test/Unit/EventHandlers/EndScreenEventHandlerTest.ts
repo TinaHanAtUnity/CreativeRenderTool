@@ -31,12 +31,14 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Privacy } from 'Ads/Views/Privacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('EndScreenEventHandlerTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, container: AdUnitContainer, overlay: Overlay, endScreen: PerformanceEndScreen;
+    let storageBridge: StorageBridge;
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;
     let metaDataManager: MetaDataManager;
@@ -61,6 +63,7 @@ describe('EndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.ANDROID);
 
+            storageBridge = new StorageBridge(nativeBridge);
             campaign = TestFixtures.getCampaign();
             focusManager = new FocusManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
@@ -70,7 +73,7 @@ describe('EndScreenEventHandlerTest', () => {
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge, request);
+            sessionManager = new SessionManager(nativeBridge, request, storageBridge);
             coreConfig = TestFixtures.getCoreConfiguration();
             adsConfig = TestFixtures.getAdsConfiguration();
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -82,6 +85,7 @@ describe('EndScreenEventHandlerTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -355,13 +359,14 @@ describe('EndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.IOS);
 
+            storageBridge = new StorageBridge(nativeBridge);
             container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
             deviceInfo = TestFixtures.getIosDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge, request);
+            sessionManager = new SessionManager(nativeBridge, request, storageBridge);
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -380,6 +385,7 @@ describe('EndScreenEventHandlerTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 

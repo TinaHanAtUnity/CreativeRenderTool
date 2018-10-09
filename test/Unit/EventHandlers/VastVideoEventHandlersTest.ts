@@ -32,11 +32,13 @@ import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScree
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { Privacy } from 'Ads/Views/Privacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('VastVideoEventHandler tests', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
     let container: AdUnitContainer;
     let campaign: VastCampaign;
     let placement: Placement;
@@ -70,6 +72,7 @@ describe('VastVideoEventHandler tests', () => {
             handleCallback
         });
 
+        storageBridge = new StorageBridge(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
@@ -94,7 +97,7 @@ describe('VastVideoEventHandler tests', () => {
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
 
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
@@ -107,6 +110,7 @@ describe('VastVideoEventHandler tests', () => {
             deviceInfo: deviceInfo,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: campaign
         });
 

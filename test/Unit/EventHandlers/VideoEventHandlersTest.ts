@@ -49,12 +49,14 @@ import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEven
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('VideoEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, overlay: Overlay, endScreen: PerformanceEndScreen;
+    let storageBridge: StorageBridge;
     let container: AdUnitContainer;
     let performanceAdUnit: PerformanceAdUnit;
     let sessionManager: SessionManager;
@@ -85,6 +87,7 @@ describe('VideoEventHandlersTest', () => {
             handleCallback
         });
 
+        storageBridge = new StorageBridge(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
@@ -97,7 +100,7 @@ describe('VideoEventHandlersTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         vastCampaign = TestFixtures.getEventVastCampaign();
         performanceCampaign = TestFixtures.getCampaign();
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -111,6 +114,7 @@ describe('VideoEventHandlersTest', () => {
             deviceInfo: deviceInfo,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: performanceCampaign
         };
 

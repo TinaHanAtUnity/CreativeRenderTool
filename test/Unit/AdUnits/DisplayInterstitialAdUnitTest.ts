@@ -29,6 +29,7 @@ import * as sinon from 'sinon';
 import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Privacy } from 'Ads/Views/Privacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('DisplayInterstitialAdUnitTest', () => {
     let adUnit: DisplayInterstitialAdUnit;
@@ -56,6 +57,7 @@ describe('DisplayInterstitialAdUnitTest', () => {
 
             sandbox = sinon.sandbox.create();
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
+            const storageBridge = new StorageBridge(nativeBridge);
             placement = TestFixtures.getPlacement();
 
             const metaDataManager = new MetaDataManager(nativeBridge);
@@ -70,7 +72,7 @@ describe('DisplayInterstitialAdUnitTest', () => {
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge, request);
+            sessionManager = new SessionManager(nativeBridge, request, storageBridge);
             const gdprManager = sinon.createStubInstance(GdprManager);
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -82,6 +84,7 @@ describe('DisplayInterstitialAdUnitTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
