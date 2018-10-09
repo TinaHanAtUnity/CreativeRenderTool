@@ -72,7 +72,7 @@ describe('VastMediaSelectorTest', () => {
             assert.equal(vastMediaSelector.getOptimizedVideoUrl(), 'https://vast_media_url_3');
         });
 
-        it('should return default/first media url in none is found for cellular connection', () => {
+        it('should return default/first media url if none is found for cellular connection', () => {
             const vastMediaSelector = new VastMediaSelector(vast, 'cellular');
 
             assert.equal(vastMediaSelector.getOptimizedVideoUrl(), 'https://vast_media_url_1');

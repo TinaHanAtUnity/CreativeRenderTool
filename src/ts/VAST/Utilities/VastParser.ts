@@ -30,6 +30,7 @@ export class VastParser {
     }
 
     public parseMediaFileSize(duration: number, kbitrate: number): number {
+        // returning file size in byte from bit
         return (duration * kbitrate * 1000) / 8;
     }
 
