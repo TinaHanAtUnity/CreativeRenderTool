@@ -1,17 +1,15 @@
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
-import { Platform } from 'Core/Constants/Platform';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/Core';
 
 import AndroidDefaults from 'json/FakeAndroidDeviceInfo.json';
 
 export class FakeAndroidDeviceInfo extends AndroidDeviceInfo {
-    private _platform: Platform;
     private _fakeDevice: any;
 
-    constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge);
+    constructor(core: ICoreApi) {
+        super(core);
         this._fakeDevice = JSON.parse(AndroidDefaults);
     }
 

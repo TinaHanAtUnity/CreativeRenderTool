@@ -15,10 +15,8 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { IPackageInfo } from 'DeviceInfo.ts';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
-import { INativeResponse } from 'Core/Utilities/Request';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
@@ -51,6 +49,27 @@ import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xm
 import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
+import { INativeResponse } from 'Core/Managers/RequestManager';
+import { IPackageInfo } from 'Core/Native/Android/DeviceInfo';
+import { ICoreApi } from 'Core/Core';
+import { CacheApi } from 'Core/Native/Cache';
+import { ConnectivityApi } from 'Core/Native/Connectivity';
+import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
+import { ListenerApi } from 'Core/Native/Listener';
+import { PermissionsApi } from 'Core/Native/Permissions';
+import { RequestApi } from 'Core/Native/Request';
+import { ResolveApi } from 'Core/Native/Resolve';
+import { SdkApi } from 'Core/Native/Sdk';
+import { SensorInfoApi } from 'Core/Native/SensorInfo';
+import { StorageApi } from 'Core/Native/Storage';
+import { BroadcastApi } from 'Core/Native/Android/Broadcast';
+import { IntentApi } from 'Core/Native/Android/Intent';
+import { LifecycleApi } from 'Core/Native/Android/Lifecycle';
+import { AndroidPreferencesApi } from 'Core/Native/Android/Preferences';
+import { MainBundleApi } from 'Core/Native/iOS/MainBundle';
+import { NotificationApi } from 'Core/Native/iOS/Notification';
+import { IosPreferencesApi } from 'Core/Native/iOS/Preferences';
+import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -444,7 +463,7 @@ export class TestFixtures {
             platform = Platform.ANDROID;
         }
 
-        return new ClientInfo(platform, [
+        return new ClientInfo([
             gameId ? gameId : '12345',
             false,
             'com.unity3d.ads.example',
@@ -462,11 +481,11 @@ export class TestFixtures {
     }
 
     public static getAndroidDeviceInfo(): AndroidDeviceInfo {
-        return new FakeAndroidDeviceInfo(TestFixtures.getNativeBridge());
+        return new FakeAndroidDeviceInfo(TestFixtures.getCoreApi(TestFixtures.getNativeBridge()));
     }
 
     public static getIosDeviceInfo(): IosDeviceInfo {
-        return new FakeIosDeviceInfo(TestFixtures.getNativeBridge());
+        return new FakeIosDeviceInfo(TestFixtures.getCoreApi(TestFixtures.getNativeBridge()));
     }
 
     public static getOkNativeResponse(): INativeResponse {
@@ -498,6 +517,34 @@ export class TestFixtures {
             }
         };
         return new NativeBridge(backend, platform);
+    }
+
+    public static getCoreApi(nativeBridge: NativeBridge): ICoreApi {
+        const platform = nativeBridge.getPlatform();
+        return {
+            Cache: new CacheApi(nativeBridge),
+            Connectivity: new ConnectivityApi(nativeBridge),
+            DeviceInfo: new DeviceInfoApi(nativeBridge),
+            Listener: new ListenerApi(nativeBridge),
+            Permissions: new PermissionsApi(nativeBridge),
+            Request: new RequestApi(nativeBridge),
+            Resolve: new ResolveApi(nativeBridge),
+            Sdk: new SdkApi(nativeBridge),
+            SensorInfo: new SensorInfoApi(nativeBridge),
+            Storage: new StorageApi(nativeBridge),
+            Android: platform === Platform.ANDROID ? {
+                Broadcast: new BroadcastApi(nativeBridge),
+                Intent: new IntentApi(nativeBridge),
+                Lifecycle: new LifecycleApi(nativeBridge),
+                Preferences: new AndroidPreferencesApi(nativeBridge)
+            } : undefined,
+            iOS: platform === Platform.IOS ? {
+                MainBundle: new MainBundleApi(nativeBridge),
+                Notification: new NotificationApi(nativeBridge),
+                Preferences: new IosPreferencesApi(nativeBridge),
+                UrlScheme: new UrlSchemeApi(nativeBridge)
+            } : undefined
+        };
     }
 
     public static getCoreConfiguration(): CoreConfiguration {
