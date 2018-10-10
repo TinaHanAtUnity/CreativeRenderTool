@@ -60,8 +60,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
 
     public purchaseItem(productId: string, campaign: PromoCampaign, placementId: string) {
         const purchaseUrls = campaign.getTrackingUrlsForEvent('purchase');
-        // const modifiedPurchaseUrls = ThirdPartyEventManager.getUrls(purchaseUrls, {'%ZONE%': placementId});
-        const modifiedPurchaseUrls = [''];
+        const modifiedPurchaseUrls = ThirdPartyEventManager.getUrls(purchaseUrls, {'%ZONE%': placementId});
         const iapPayload: IPromoPayload = {
             productId: campaign.getIapProductId(),
             iapPromo: true,
@@ -74,8 +73,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
 
     public onPromoClosed(campaign: PromoCampaign, placementId: string) {
         const purchaseUrls = campaign.getTrackingUrlsForEvent('purchase');
-        // const modifiedPurchaseUrls = ThirdPartyEventManager.getUrls(purchaseUrls, {'%ZONE%': placementId});
-        const modifiedPurchaseUrls = [''];
+        const modifiedPurchaseUrls = ThirdPartyEventManager.getUrls(purchaseUrls, {'%ZONE%': placementId});
         const iapPayload: IPromoPayload = {
             gamerToken: this._coreConfiguration.getToken(),
             trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
