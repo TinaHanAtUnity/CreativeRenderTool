@@ -10,6 +10,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { RequestApi } from 'Core/Native/Request';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 
@@ -158,10 +159,23 @@ class TestRequestApi extends RequestApi {
     }
 }
 
+class TestHelper {
+    public static waitForStorageBatch(storageBridge: StorageBridge): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const storageObserver = () => {
+                storageBridge.onPrivateStorageWrite.unsubscribe(storageObserver);
+                resolve();
+            };
+            storageBridge.onPrivateStorageWrite.subscribe(storageObserver);
+        });
+    }
+}
+
 describe('SessionManagerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
 
     let storageApi: TestStorageApi;
     let requestApi: TestRequestApi;
@@ -180,6 +194,7 @@ describe('SessionManagerTest', () => {
             handleCallback
         });
 
+        storageBridge = new StorageBridge(nativeBridge, 1);
         metaDataManager = new MetaDataManager(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
@@ -192,7 +207,7 @@ describe('SessionManagerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -200,7 +215,9 @@ describe('SessionManagerTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: TestFixtures.getConfiguration(),
+            coreConfig: TestFixtures.getCoreConfiguration(),
+            adsConfig: TestFixtures.getAdsConfiguration(),
+            storageBridge: storageBridge,
             campaign: TestFixtures.getCampaign()
         });
     });
@@ -245,7 +262,11 @@ describe('SessionManagerTest', () => {
         const sessionId: string = 'new-12345';
         const sessionTsKey: string = 'session.' + sessionId + '.ts';
 
-        return sessionManager.startNewSession(sessionId).then(() => {
+        const storagePromise = TestHelper.waitForStorageBatch(storageBridge);
+
+        sessionManager.startNewSession(sessionId);
+
+        return storagePromise.then(() => {
             return storageApi.get<number>(StorageType.PRIVATE, sessionTsKey).then(timestamp => {
                 assert.equal(true, Date.now() >= timestamp, 'New session timestamp must be in present or past');
                 assert.equal(false, storageApi.isDirty(), 'Storage should not be left dirty after starting new session');
@@ -260,7 +281,11 @@ describe('SessionManagerTest', () => {
 
         storageApi.set(StorageType.PRIVATE, sessionTsKey, threeMonthsAgo);
 
+        const storagePromise = TestHelper.waitForStorageBatch(storageBridge);
+
         return sessionManager.sendUnsentSessions().then(() => {
+            return storagePromise;
+        }).then(() => {
             return storageApi.get<number>(StorageType.PRIVATE, sessionTsKey).then(() => {
                 assert.fail('Old session found in storage but it should have been deleted');
             }).catch(error => {
@@ -276,7 +301,11 @@ describe('SessionManagerTest', () => {
 
         storageApi.set(StorageType.PRIVATE, randomKey, 'test');
 
+        const storagePromise = TestHelper.waitForStorageBatch(storageBridge);
+
         return sessionManager.sendUnsentSessions().then(() => {
+            return storagePromise;
+        }).then(() => {
             return storageApi.get<number>(StorageType.PRIVATE, randomKey).then(() => {
                 assert.fail('Session without timestamp found in storage but it should have been deleted');
             }).catch(error => {

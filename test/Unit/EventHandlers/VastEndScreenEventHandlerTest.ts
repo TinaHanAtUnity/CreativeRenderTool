@@ -7,7 +7,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -22,17 +21,21 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { Privacy } from 'Ads/Views/Privacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
-describe('VastEndScreenEventHandlersTest', () => {
+describe('VastEndScreenEventHandlerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
     let container: AdUnitContainer;
     let request: Request;
     let vastAdUnitParameters: IVastAdUnitParameters;
+    let vastEndScreenParameters: IVastEndscreenParameters;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -40,6 +43,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             handleCallback
         });
 
+        storageBridge = new StorageBridge(nativeBridge);
         const focusManager = new FocusManager(nativeBridge);
         const metaDataManager = new MetaDataManager(nativeBridge);
 
@@ -53,8 +57,9 @@ describe('VastEndScreenEventHandlersTest', () => {
         const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         const deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        const sessionManager = new SessionManager(nativeBridge, request);
-        const configuration = TestFixtures.getConfiguration();
+        const sessionManager = new SessionManager(nativeBridge, request, storageBridge);
+        const coreConfig = TestFixtures.getCoreConfiguration();
+        const adsConfig = TestFixtures.getAdsConfiguration();
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -62,14 +67,15 @@ describe('VastEndScreenEventHandlersTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: campaign
         });
-
-        const privacy = new Privacy(nativeBridge, false);
+        const gdprManager = sinon.createStubInstance(GdprManager);
+        const privacy = new Privacy(nativeBridge, campaign, gdprManager, false, false);
         const video = new Video('', TestFixtures.getSession());
         const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId', privacy, false);
-        const gdprManager = sinon.createStubInstance(GdprManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         vastAdUnitParameters = {
@@ -82,7 +88,8 @@ describe('VastEndScreenEventHandlersTest', () => {
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             endScreen: undefined,
@@ -91,12 +98,18 @@ describe('VastEndScreenEventHandlersTest', () => {
             gdprManager: gdprManager,
             programmaticTrackingService: programmaticTrackingService
         };
+
+        vastEndScreenParameters = {
+            campaign: vastAdUnitParameters.campaign,
+            clientInfo: vastAdUnitParameters.clientInfo,
+            seatId: vastAdUnitParameters.campaign.getSeatId(),
+            showPrivacyDuringEndscreen: false
+        };
     });
 
     describe('when calling onClose', () => {
         it('should hide endcard', () => {
-            const endScreenPrivacy = new Privacy(nativeBridge, false);
-            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId(), endScreenPrivacy);
+            const vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, sinon.createStubInstance(Privacy));
             vastAdUnitParameters.endScreen = vastEndScreen;
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'hide').returns(sinon.spy());
@@ -124,8 +137,8 @@ describe('VastEndScreenEventHandlersTest', () => {
             vastAdUnitParameters.video = video;
             vastAdUnitParameters.campaign = campaign;
             vastAdUnitParameters.placement = TestFixtures.getPlacement();
-            const endScreenPrivacy = new Privacy(nativeBridge, false);
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId(), endScreenPrivacy);
+            const privacy = sinon.createStubInstance(Privacy);
+            vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             vastEndScreenEventHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);

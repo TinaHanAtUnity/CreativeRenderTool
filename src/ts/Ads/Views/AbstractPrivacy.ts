@@ -1,10 +1,9 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { Platform } from 'Core/Constants/Platform';
-
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { View } from 'Core/Views/View';
+import { ITemplateData, View } from 'Core/Views/View';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
@@ -12,7 +11,7 @@ export interface IPrivacyHandler {
     onGDPROptOut(optOutEnabled: boolean): void;
 }
 
-export interface IBuildInformation {
+export interface IBuildInformation extends ITemplateData {
     userAgent: string;
     platform: string;
     campaign: string;
@@ -30,7 +29,18 @@ export interface IBuildInformation {
 
 export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
 
-    public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge, configuration: Configuration) {
+    private static buildInformation: IBuildInformation;
+
+    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, isGDPREnabled: boolean, id: string) {
+        super(nativeBridge, id);
+        this._templateData = {
+            'isCoppaCompliant': isCoppaCompliant,
+            'isGDPREnabled': isGDPREnabled,
+            'buildInformation': AbstractPrivacy.buildInformation
+        };
+    }
+
+    public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge, configuration: CoreConfiguration) {
         const date = new Date();
         AbstractPrivacy.buildInformation = {
             userAgent: window.navigator.userAgent,
@@ -46,17 +56,6 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
             creativeId: campaign.getCreativeId(),
             seatId: campaign.getSeatId(),
             timestamp: date.toUTCString()
-        };
-    }
-
-    private static buildInformation: IBuildInformation;
-
-    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, id: string) {
-        super(nativeBridge, id);
-
-        this._templateData = {
-            'isCoppaCompliant': isCoppaCompliant,
-            'buildInformation': AbstractPrivacy.buildInformation
         };
     }
 

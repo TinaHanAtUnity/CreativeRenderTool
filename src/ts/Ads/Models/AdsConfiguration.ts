@@ -1,91 +1,30 @@
 import { Placement } from 'Ads/Models/Placement';
-import { ABGroup } from 'Core/Models/ABGroup';
 import { ISchema, Model } from 'Core/Models/Model';
+import { CacheMode } from 'Core/Models/CoreConfiguration';
 
-export enum CacheMode {
-    FORCED,
-    ALLOWED,
-    DISABLED,
-    ADAPTIVE
-}
-
-export interface IConfiguration {
-    enabled: boolean;
-    country: string;
-    coppaCompliant: boolean;
-    abGroup: ABGroup;
-    properties: string;
+export interface IAdsConfiguration {
     cacheMode: CacheMode;
     placements: { [id: string]: Placement };
     defaultPlacement: Placement;
-    analytics: boolean;
-    test: boolean;
-    projectId: string;
-    token: string;
-    jaegerTracing: boolean;
-    organizationId: string | undefined;
     gdprEnabled: boolean;
     optOutRecorded: boolean;
     optOutEnabled: boolean;
     defaultBannerPlacement: Placement | undefined;
 }
 
-export class Configuration extends Model<IConfiguration> {
-    public static Schema: ISchema<IConfiguration> = {
-        enabled: ['boolean'],
-        country: ['string'],
-        coppaCompliant: ['boolean'],
-        abGroup: ['object'],
-        properties: ['string'],
+export class AdsConfiguration extends Model<IAdsConfiguration> {
+    public static Schema: ISchema<IAdsConfiguration> = {
         cacheMode: ['number'],
         placements: ['object'],
         defaultPlacement: ['object'],
-        analytics: ['boolean'],
-        test: ['boolean'],
-        projectId: ['string'],
-        token: ['string'],
-        jaegerTracing: ['boolean'],
-        organizationId: ['string', 'undefined'],
         gdprEnabled: ['boolean'],
         optOutRecorded: ['boolean'],
         optOutEnabled: ['boolean'],
         defaultBannerPlacement: ['string', 'undefined']
     };
 
-    constructor(data: IConfiguration) {
-        super('Configuration', Configuration.Schema, data);
-    }
-
-    public isEnabled(): boolean {
-        return this.get('enabled');
-    }
-
-    public getCountry(): string {
-        return this.get('country');
-    }
-
-    public isCoppaCompliant(): boolean {
-        return this.get('coppaCompliant');
-    }
-
-    public isAnalyticsEnabled(): boolean {
-        return this.get('analytics');
-    }
-
-    public isJaegerTracingEnabled(): boolean {
-        return this.get('jaegerTracing');
-    }
-
-    public getAbGroup(): ABGroup {
-        return this.get('abGroup');
-    }
-
-    public getProperties(): string {
-        return this.get('properties');
-    }
-
-    public getToken(): string {
-        return this.get('token');
+    constructor(data: IAdsConfiguration) {
+        super('Configuration', AdsConfiguration.Schema, data);
     }
 
     public getCacheMode(): CacheMode {
@@ -142,10 +81,6 @@ export class Configuration extends Model<IConfiguration> {
         return this.get('defaultBannerPlacement');
     }
 
-    public getUnityProjectId(): string {
-        return this.get('projectId');
-    }
-
     public isGDPREnabled(): boolean {
         return this.get('gdprEnabled');
     }
@@ -184,23 +119,10 @@ export class Configuration extends Model<IConfiguration> {
             defaultPlacementId = defaultPlacement.getId();
         }
         return {
-            'enabled': this.isEnabled(),
-            'country': this.getCountry(),
-            'coppaCompliant': this.isCoppaCompliant(),
-            'abGroup': this.getAbGroup().toNumber(),
-            'gamerToken': this.getToken(),
             'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
             'placements': placements,
-            'defaultPlacement': defaultPlacementId,
-            'projectId': this.getUnityProjectId()
+            'defaultPlacement': defaultPlacementId
         };
     }
 
-    public getTestMode(): boolean {
-       return this.get('test');
-    }
-
-    public getOrganizationId(): string | undefined {
-        return this.get('organizationId');
-    }
 }

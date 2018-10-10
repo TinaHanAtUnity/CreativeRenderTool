@@ -10,7 +10,6 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
@@ -25,12 +24,15 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Privacy } from 'Ads/Views/Privacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, overlay: Overlay, endScreen: PerformanceEndScreen;
+    let storageBridge: StorageBridge;
     let container: AdUnitContainer;
     let performanceAdUnit: PerformanceAdUnit;
     let video: Video;
@@ -43,6 +45,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             handleCallback
         });
 
+        storageBridge = new StorageBridge(nativeBridge);
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         video = new Video('', TestFixtures.getSession());
 
@@ -53,9 +56,10 @@ describe('PerformanceVideoEventHandlersTest', () => {
         const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         const deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        const sessionManager = new SessionManager(nativeBridge, request);
+        const sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         const campaign = TestFixtures.getCampaign();
-        const configuration = TestFixtures.getConfiguration();
+        const coreConfig = TestFixtures.getCoreConfiguration();
+        const adsConfig = TestFixtures.getAdsConfiguration();
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -63,23 +67,25 @@ describe('PerformanceVideoEventHandlersTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: campaign
         });
 
-        const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+        const gdprManager = sinon.createStubInstance(GdprManager);
+        const privacy = new Privacy(nativeBridge, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
         const endScreenParams : IEndScreenParameters = {
             nativeBridge: nativeBridge,
             language : deviceInfo.getLanguage(),
             gameId: clientInfo.getGameId(),
             privacy: privacy,
             showGDPRBanner: false,
-            abGroup: configuration.getAbGroup(),
+            abGroup: coreConfig.getAbGroup(),
             targetGameName: campaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, campaign);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
-        const gdprManager = sinon.createStubInstance(GdprManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         performanceAdUnitParameters = {
@@ -92,7 +98,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             endScreen: endScreen,
@@ -111,7 +118,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             campaign: campaign,
             operativeEventManager: operativeEventManager,
             thirdPartyEventManager: thirdPartyEventManager,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             placement: TestFixtures.getPlacement(),
             video: video,
             adUnitStyle: undefined,

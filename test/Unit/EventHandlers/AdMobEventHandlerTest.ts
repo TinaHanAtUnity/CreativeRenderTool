@@ -7,12 +7,13 @@ import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { ITouchInfo } from 'AdMob/Views/AFMABridge';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Session } from 'Ads/Models/Session';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { IntentApi } from 'Core/Native/Android/Intent';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
@@ -39,7 +40,8 @@ describe('AdMobEventHandler', () => {
     let campaign: AdMobCampaign;
     let clientInfo: ClientInfo;
     const testTimeout = 250;
-    let configuration;
+    let coreConfig;
+    let adsConfig;
     let gdprManager;
 
     beforeEach(() => {
@@ -53,7 +55,8 @@ describe('AdMobEventHandler', () => {
         nativeBridge.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
         campaign = sinon.createStubInstance(AdMobCampaign);
         (<sinon.SinonStub>campaign.getSession).returns(TestFixtures.getSession());
-        configuration = sinon.createStubInstance(Configuration);
+        coreConfig = sinon.createStubInstance(CoreConfiguration);
+        adsConfig = sinon.createStubInstance(AdsConfiguration);
         gdprManager = sinon.createStubInstance(GdprManager);
 
         clientInfo = sinon.createStubInstance(ClientInfo);
@@ -68,7 +71,8 @@ describe('AdMobEventHandler', () => {
             adMobSignalFactory: adMobSignalFactory,
             campaign: campaign,
             clientInfo: clientInfo,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             gdprManager: gdprManager
         });
     });

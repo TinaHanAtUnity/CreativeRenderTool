@@ -259,8 +259,8 @@ var HybridTestReporter = (function () {
 
         var self = this;
         failures.forEach(function(test, i) {
-            if(StackTrace) {
-                self.mappings.push(StackTrace.fromError(test.err).then(function(mappedStack) {
+            if(window.StackTrace) {
+                self.mappings.push(window.StackTrace.fromError(test.err).then(function(mappedStack) {
                     printFailure(test, i, mappedStack);
                 }));
             } else {

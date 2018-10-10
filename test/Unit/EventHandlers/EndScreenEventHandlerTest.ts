@@ -8,18 +8,18 @@ import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/Opera
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
@@ -30,12 +30,15 @@ import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCa
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Privacy } from 'Ads/Views/Privacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('EndScreenEventHandlerTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, container: AdUnitContainer, overlay: Overlay, endScreen: PerformanceEndScreen;
+    let storageBridge: StorageBridge;
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;
     let metaDataManager: MetaDataManager;
@@ -48,7 +51,8 @@ describe('EndScreenEventHandlerTest', () => {
     let endScreenEventHandler: PerformanceEndScreenEventHandler;
     let campaign: PerformanceCampaign;
     let placement: Placement;
-    let configuration: Configuration;
+    let coreConfig: CoreConfiguration;
+    let adsConfig: AdsConfiguration;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -59,6 +63,7 @@ describe('EndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.ANDROID);
 
+            storageBridge = new StorageBridge(nativeBridge);
             campaign = TestFixtures.getCampaign();
             focusManager = new FocusManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
@@ -68,8 +73,9 @@ describe('EndScreenEventHandlerTest', () => {
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge, request);
-            configuration = TestFixtures.getConfiguration();
+            sessionManager = new SessionManager(nativeBridge, request, storageBridge);
+            coreConfig = TestFixtures.getCoreConfiguration();
+            adsConfig = TestFixtures.getAdsConfiguration();
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
                 request: request,
@@ -77,7 +83,9 @@ describe('EndScreenEventHandlerTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -86,22 +94,20 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.spy(nativeBridge.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-
-            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
-
+            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacy = new Privacy(nativeBridge, campaign, gdprManager, false, false);
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
                 gameId: clientInfo.getGameId(),
                 privacy: privacy,
                 showGDPRBanner: false,
-                abGroup: configuration.getAbGroup(),
+                abGroup: coreConfig.getAbGroup(),
                 targetGameName: TestFixtures.getCampaign().getGameName()
             };
             endScreen = new PerformanceEndScreen(endScreenParams, TestFixtures.getCampaign());
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             placement = TestFixtures.getPlacement();
-            const gdprManager = sinon.createStubInstance(GdprManager);
             const programmticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             performanceAdUnitParameters = {
@@ -114,7 +120,8 @@ describe('EndScreenEventHandlerTest', () => {
                 operativeEventManager: operativeEventManager,
                 placement: placement,
                 campaign: campaign,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 request: request,
                 options: {},
                 endScreen: endScreen,
@@ -144,6 +151,63 @@ describe('EndScreenEventHandlerTest', () => {
                 asset: performanceAdUnit.getVideo()
             };
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
+        });
+
+        describe('with standalone_android store type and appDownloadUrl', () => {
+            let downloadParameters: IEndScreenDownloadParameters;
+
+            beforeEach(() => {
+                performanceAdUnitParameters.campaign = TestFixtures.getCampaignStandaloneAndroid();
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+
+                downloadParameters = <IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    gameId: performanceAdUnitParameters.campaign.getGameId(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: true,
+                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl(),
+                    appDownloadUrl: performanceAdUnitParameters.campaign.getAppDownloadUrl()
+                };
+            });
+
+            it('should call click attribution if clickAttributionUrl is present', () => {
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').resolves();
+
+                endScreenEventHandler.onEndScreenDownload(downloadParameters);
+
+                return resolvedPromise.then(() => {
+                    sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.clickAttributionEvent);
+                });
+            });
+
+            it('and API is less than 21, it should launch view intent', () => {
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').resolves();
+                sinon.stub(nativeBridge, 'getApiLevel').returns(20);
+
+                endScreenEventHandler.onEndScreenDownload(downloadParameters);
+
+                return resolvedPromise.then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                        'action': 'android.intent.action.VIEW',
+                        'uri': performanceAdUnitParameters.campaign.getAppDownloadUrl()
+                    });
+                });
+            });
+
+            it('with appDownloadUrl and API is greater than or equal to 21, it should launch web search intent', () => {
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').resolves();
+                sinon.stub(nativeBridge, 'getApiLevel').returns(21);
+
+                endScreenEventHandler.onEndScreenDownload(downloadParameters);
+
+                return resolvedPromise.then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                        'action': 'android.intent.action.WEB_SEARCH',
+                        'extras': [{ key: 'query', value: performanceAdUnitParameters.campaign.getAppDownloadUrl()}]
+                    });
+                });
+            });
         });
 
         describe('with follow redirects', () => {
@@ -252,7 +316,6 @@ describe('EndScreenEventHandlerTest', () => {
                     sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
                 });
             });
-
         });
 
         describe('with no follow redirects', () => {
@@ -263,10 +326,9 @@ describe('EndScreenEventHandlerTest', () => {
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
                     store: performanceAdUnitParameters.campaign.getStore(),
-                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                    clickAttributionUrlFollowsRedirects: false,
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
                 });
-
             });
 
             it('should send a click with session manager', () => {
@@ -284,7 +346,6 @@ describe('EndScreenEventHandlerTest', () => {
                     'uri': 'market://details?id=com.iUnity.angryBots'
                 });
             });
-
         });
 
     });
@@ -298,13 +359,14 @@ describe('EndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.IOS);
 
+            storageBridge = new StorageBridge(nativeBridge);
             container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
             deviceInfo = TestFixtures.getIosDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge, request);
+            sessionManager = new SessionManager(nativeBridge, request, storageBridge);
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -321,25 +383,26 @@ describe('EndScreenEventHandlerTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
-
-            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacy = new Privacy(nativeBridge, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
                 gameId: clientInfo.getGameId(),
                 privacy: privacy,
                 showGDPRBanner: false,
-                abGroup: configuration.getAbGroup(),
+                abGroup: coreConfig.getAbGroup(),
                 targetGameName: campaign.getGameName()
             };
             endScreen = new PerformanceEndScreen(endScreenParams, campaign);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
-            const gdprManager = sinon.createStubInstance(GdprManager);
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             performanceAdUnitParameters = {
@@ -352,7 +415,8 @@ describe('EndScreenEventHandlerTest', () => {
                 operativeEventManager: operativeEventManager,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 request: request,
                 options: {},
                 endScreen: endScreen,

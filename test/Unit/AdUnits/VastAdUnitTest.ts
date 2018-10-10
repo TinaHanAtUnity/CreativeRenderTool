@@ -8,7 +8,6 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -23,11 +22,13 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { Privacy } from 'Ads/Views/Privacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
-describe('VastAdUnit', () => {
+describe('VastAdUnitTest', () => {
 
     let sandbox: sinon.SinonSandbox;
     let thirdPartyEventManager: ThirdPartyEventManager;
@@ -64,6 +65,7 @@ describe('VastAdUnit', () => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const nativeBridge = TestFixtures.getNativeBridge();
+        const storageBridge = new StorageBridge(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request = new Request(nativeBridge, wakeUpManager);
@@ -71,7 +73,8 @@ describe('VastAdUnit', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         vastCampaign = TestFixtures.getEventVastCampaign();
         const video = vastCampaign.getVideo();
-        const configuration = TestFixtures.getConfiguration();
+        const coreConfig = TestFixtures.getCoreConfiguration();
+        const adsConfig = TestFixtures.getAdsConfiguration();
 
         let duration = vastCampaign.getVast().getDuration();
         if(duration) {
@@ -79,7 +82,7 @@ describe('VastAdUnit', () => {
             video.setDuration(duration);
         }
 
-        const sessionManager = new SessionManager(nativeBridge, request);
+        const sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         const metaDataManager = new MetaDataManager(nativeBridge);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
@@ -88,13 +91,15 @@ describe('VastAdUnit', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: vastCampaign
         });
 
-        const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
-        const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         const gdprManager = sinon.createStubInstance(GdprManager);
+        const privacy = new Privacy(nativeBridge, vastCampaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         vastAdUnitParameters = {
@@ -107,7 +112,8 @@ describe('VastAdUnit', () => {
             operativeEventManager: operativeEventManager,
             placement: placement,
             campaign: vastCampaign,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             endScreen: undefined,
@@ -128,7 +134,8 @@ describe('VastAdUnit', () => {
             vastCampaign = TestFixtures.getEventVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const nativeBridge = TestFixtures.getNativeBridge();
-            const privacy = new Privacy(nativeBridge, false);
+            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacy = new Privacy(nativeBridge, vastCampaign, gdprManager, false, false);
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
@@ -187,16 +194,25 @@ describe('VastAdUnit', () => {
 
     describe('with companion ad', () => {
         let vastEndScreen: VastEndScreen;
+        let vastEndScreenParameters: IVastEndscreenParameters;
 
         beforeEach(() => {
+
+            vastEndScreenParameters = {
+                campaign: vastAdUnitParameters.campaign,
+                clientInfo: vastAdUnitParameters.clientInfo,
+                seatId: vastAdUnitParameters.campaign.getSeatId(),
+                showPrivacyDuringEndscreen: false
+            };
+
             const video = new Video('', TestFixtures.getSession());
             vastCampaign = TestFixtures.getCompanionVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const nativeBridge = TestFixtures.getNativeBridge();
-            const privacy = new Privacy(nativeBridge, false);
+            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacy = new Privacy(nativeBridge, vastCampaign, gdprManager, false, false);
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
-            const endScreenPrivacy = new Privacy(nativeBridge, false);
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId(), endScreenPrivacy);
+            vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
             vastAdUnitParameters.endScreen = vastEndScreen;

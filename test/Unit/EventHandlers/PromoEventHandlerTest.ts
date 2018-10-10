@@ -1,7 +1,7 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { FinishState } from 'Core/Constants/FinishState';
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
-import { Configuration } from 'Core/Models/Configuration';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
@@ -88,7 +88,7 @@ describe('PromoEventHandlersTest', () => {
         });
 
         it ('should set the optOutRecorded flag in the configuration', () => {
-            const config = sinon.createStubInstance(Configuration);
+            const config = sinon.createStubInstance(AdsConfiguration);
 
             config.isOptOutRecorded.returns(false);
 
@@ -97,7 +97,7 @@ describe('PromoEventHandlersTest', () => {
         });
 
         it('should send GDPR operative Event with skip', () => {
-            const config = sinon.createStubInstance(Configuration);
+            const config = sinon.createStubInstance(AdsConfiguration);
 
             config.isOptOutRecorded.returns(false);
 
@@ -106,7 +106,7 @@ describe('PromoEventHandlersTest', () => {
         });
 
         it('should not call gdpr or set optOutRecorded when already recorded', () => {
-            const config = sinon.createStubInstance(Configuration);
+            const config = sinon.createStubInstance(AdsConfiguration);
 
             config.isOptOutRecorded.returns(true);
             PromoEventHandler.onGDPRPopupSkipped(config, gdprManager);

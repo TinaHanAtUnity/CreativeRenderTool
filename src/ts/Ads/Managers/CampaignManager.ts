@@ -3,6 +3,7 @@ import { AssetManager } from 'Ads/Managers/AssetManager';
 import { CampaignParserFactory } from 'Ads/Managers/CampaignParserFactory';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
@@ -12,6 +13,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
 import { Platform } from 'Core/Constants/Platform';
 import { RequestError } from 'Core/Errors/RequestError';
@@ -22,7 +24,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
@@ -40,6 +42,7 @@ import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export class CampaignManager {
 
@@ -82,12 +85,14 @@ export class CampaignManager {
     protected _nativeBridge: NativeBridge;
     protected _requesting: boolean;
     protected _assetManager: AssetManager;
-    protected _configuration: Configuration;
+    protected _coreConfig: CoreConfiguration;
+    protected _adsConfig: AdsConfiguration;
     protected _clientInfo: ClientInfo;
     protected _cacheBookkeeping: CacheBookkeeping;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
+    private _backupCampaignManager: BackupCampaignManager;
     private _request: Request;
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
@@ -97,9 +102,10 @@ export class CampaignManager {
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping, jaegerManager: JaegerManager) {
+    constructor(nativeBridge: NativeBridge, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
         this._nativeBridge = nativeBridge;
-        this._configuration = configuration;
+        this._coreConfig = coreConfig;
+        this._adsConfig = adsConfig;
         this._assetManager = assetManager;
         this._sessionManager = sessionManager;
         this._request = request;
@@ -111,6 +117,7 @@ export class CampaignManager {
         this._requesting = false;
         this._ignoreEvents = false;
         this._jaegerManager = jaegerManager;
+        this._backupCampaignManager = backupCampaignManager;
     }
 
     public cleanCachedUrl(url: string): string {
@@ -204,6 +211,7 @@ export class CampaignManager {
 
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
+        this._backupCampaignManager.deleteBackupCampaigns();
 
         this._requesting = true;
 
@@ -245,7 +253,7 @@ export class CampaignManager {
                     this.setSDKSignalValues(requestTimestamp);
 
                     return this.parseCampaigns(response, false).catch((e) => {
-                        this.handleError(e, this._configuration.getPlacementIds(), 'parse_campaigns_error');
+                        this.handleError(e, this._adsConfig.getPlacementIds(), 'parse_campaigns_error');
                     });
                 }
                 throw new WebViewError('Empty campaign response', 'CampaignRequestError');
@@ -255,11 +263,11 @@ export class CampaignManager {
                 this._requesting = false;
                 if(error instanceof RequestError) {
                     if(!error.nativeResponse) {
-                        this.onConnectivityError.trigger(this._configuration.getPlacementIds());
+                        this.onConnectivityError.trigger(this._adsConfig.getPlacementIds());
                         return Promise.resolve();
                     }
                 }
-                return this.handleError(error, this._configuration.getPlacementIds(), 'auction_request_failed');
+                return this.handleError(error, this._adsConfig.getPlacementIds(), 'auction_request_failed');
             });
         }).then((resp) => {
             this._jaegerManager.stop(jaegerSpan);
@@ -309,7 +317,7 @@ export class CampaignManager {
     }
 
     public resetRealtimeDataForPlacements() {
-        const placements = this._configuration.getPlacements();
+        const placements = this._adsConfig.getPlacements();
         Object.keys(placements).forEach((placementId) => {
             placements[placementId].setRealtimeData(undefined);
         });
@@ -340,10 +348,10 @@ export class CampaignManager {
             const noFill: string[] = [];
             const failedToCachePlacement: string[] = [];
             if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-                json.placements = MixedPlacementUtility.insertMediaIdsIntoJSON(this._configuration, json.placements);
+                json.placements = MixedPlacementUtility.insertMediaIdsIntoJSON(this._adsConfig, json.placements);
             }
 
-            const placements = this._configuration.getPlacements();
+            const placements = this._adsConfig.getPlacements();
             for(const placement in placements) {
                 if(placements.hasOwnProperty(placement)) {
                     const mediaId: string = json.placements[placement];
@@ -354,12 +362,14 @@ export class CampaignManager {
                         } else {
                             fill[mediaId] = [placement];
                         }
+
+                        this._backupCampaignManager.storePlacement(this._adsConfig.getPlacement(placement), mediaId);
                     } else {
                         noFill.push(placement);
                     }
 
                     if(json.realtimeData && json.realtimeData[placement]) {
-                        this._configuration.getPlacement(placement).setRealtimeData(json.realtimeData[placement]);
+                        this._adsConfig.getPlacement(placement).setRealtimeData(json.realtimeData[placement]);
                     }
                 }
             }
@@ -522,7 +532,7 @@ export class CampaignManager {
         let parser: CampaignParser;
 
         if((this._sessionManager.getGameSessionId() % 1000 === 99) && backupCampaign === false) {
-            Diagnostics.trigger('ad_received', {
+            SessionDiagnostics.trigger('ad_received', {
                 contentType: response.getContentType()
             }, session);
         }
@@ -551,7 +561,7 @@ export class CampaignManager {
         const cachingTimestamp = Date.now();
         return this._assetManager.setup(campaign).then(() => {
             if((this._sessionManager.getGameSessionId() % 1000 === 99) && backupCampaign === false) {
-                Diagnostics.trigger('ad_ready', {
+                SessionDiagnostics.trigger('ad_ready', {
                     contentType: contentType
                 }, session);
             }
@@ -676,7 +686,7 @@ export class CampaignManager {
             });
         }
 
-        if(this._configuration.getTestMode()) {
+        if(this._coreConfig.getTestMode()) {
             url = Url.addParameters(url, {test: true});
         }
 
@@ -727,7 +737,7 @@ export class CampaignManager {
 
         if(realtimePlacement && this._realtimeBody) {
 
-            const placements = this._configuration.getPlacements();
+            const placements = this._adsConfig.getPlacements();
             for (const placement in placements) {
                 if (placements.hasOwnProperty(placement)) {
                     placementRequest[placement] = {
@@ -771,12 +781,12 @@ export class CampaignManager {
         const body: any = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
             bundleId: this._clientInfo.getApplicationName(),
-            coppa: this._configuration.isCoppaCompliant(),
+            coppa: this._coreConfig.isCoppaCompliant(),
             language: this._deviceInfo.getLanguage(),
             gameSessionId: this._sessionManager.getGameSessionId(),
             timeZone: this._deviceInfo.getTimeZone(),
             simulator: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
-            token: this._configuration.getToken()
+            token: this._coreConfig.getToken()
         };
 
         if (this.getPreviousPlacementId()) {
@@ -831,7 +841,7 @@ export class CampaignManager {
                 if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
                     placements = MixedPlacementUtility.originalPlacements;
                 } else {
-                    placements = this._configuration.getPlacements();
+                    placements = this._adsConfig.getPlacements();
                 }
 
                 Object.keys(placements).forEach((placementId) => {
@@ -844,16 +854,16 @@ export class CampaignManager {
                     }
                 });
                 body.placements = placementRequest;
-                body.properties = this._configuration.getProperties();
+                body.properties = this._coreConfig.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
-                body.projectId = this._configuration.getUnityProjectId();
+                body.projectId = this._coreConfig.getUnityProjectId();
                 body.gameSessionCounters = GameSessionCounters.getDTO();
-                body.gdprEnabled = this._configuration.isGDPREnabled();
-                body.optOutEnabled = this._configuration.isOptOutEnabled();
-                body.optOutRecorded = this._configuration.isOptOutRecorded();
-                body.abGroup = this._configuration.getAbGroup().toNumber();
+                body.gdprEnabled = this._adsConfig.isGDPREnabled();
+                body.optOutEnabled = this._adsConfig.isOptOutEnabled();
+                body.optOutRecorded = this._adsConfig.isOptOutRecorded();
+                body.abGroup = this._coreConfig.getAbGroup().toNumber();
 
-                const organizationId = this._configuration.getOrganizationId();
+                const organizationId = this._coreConfig.getOrganizationId();
                 if(organizationId) {
                     body.organizationId = organizationId;
                 }

@@ -9,7 +9,9 @@ import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
@@ -20,11 +22,11 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Utilities/Request';
@@ -47,18 +49,21 @@ import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('AdUnitFactoryTest', () => {
 
     let sandbox: sinon.SinonSandbox;
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
     let focusManager: FocusManager;
     let container: AdUnitContainer;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let sessionManager: SessionManager;
     let operativeEventManager: OperativeEventManager;
-    let config: Configuration;
+    let coreConfig: CoreConfiguration;
+    let adsConfig: AdsConfiguration;
     let metaDataManager: MetaDataManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
@@ -71,6 +76,7 @@ describe('AdUnitFactoryTest', () => {
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
+        storageBridge = new StorageBridge(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
@@ -80,11 +86,12 @@ describe('AdUnitFactoryTest', () => {
         sandbox.stub(container, 'open').returns(Promise.resolve());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const placement = TestFixtures.getPlacement();
-        config = ConfigurationParser.parse(JSON.parse(ConfigurationJson));
+        coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationJson));
+        adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationJson));
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false, getOsVersion: () => '8.0'};
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         thirdPartyEventManager.setTemplateValues({ '%ZONE%': placement.getId(), '%SDK_VERSION%': clientInfo.getSdkVersion().toString() });
-        sessionManager = new SessionManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         const campaign = TestFixtures.getCampaign();
         const gdprManager = sinon.createStubInstance(GdprManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -96,7 +103,9 @@ describe('AdUnitFactoryTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: config,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: campaign
         });
 
@@ -118,7 +127,8 @@ describe('AdUnitFactoryTest', () => {
             operativeEventManager: operativeEventManager,
             placement: placement,
             campaign: campaign,
-            configuration: config,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             gdprManager: gdprManager,
@@ -240,7 +250,9 @@ describe('AdUnitFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: config,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
@@ -347,7 +359,9 @@ describe('AdUnitFactoryTest', () => {
                     sessionManager: sessionManager,
                     clientInfo: clientInfo,
                     deviceInfo: deviceInfo,
-                    configuration: config,
+                    coreConfig: coreConfig,
+                    adsConfig: adsConfig,
+                    storageBridge: storageBridge,
                     campaign: campaign
                 });
 
@@ -389,7 +403,9 @@ describe('AdUnitFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: config,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
@@ -438,7 +454,9 @@ describe('AdUnitFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: config,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 

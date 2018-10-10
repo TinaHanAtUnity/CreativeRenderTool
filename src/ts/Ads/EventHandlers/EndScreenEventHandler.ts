@@ -7,6 +7,7 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { IEndScreenHandler } from 'Ads/Views/EndScreen';
 import { Platform } from 'Core/Constants/Platform';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
@@ -28,6 +29,7 @@ export interface IEndScreenDownloadParameters {
     bypassAppSheet: boolean | undefined;
     appStoreId: string | undefined;
     store: StoreName | undefined;
+    appDownloadUrl?: string | undefined;
     adUnitStyle?: AdUnitStyle;
 }
 
@@ -44,7 +46,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private _placement: Placement;
 
     constructor(nativeBridge: NativeBridge, adUnit: T2, parameters: IAdUnitParameters<T>) {
-        super(parameters.gdprManager, parameters.configuration);
+        super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
@@ -79,10 +81,15 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             }
         }
 
-        if(parameters.clickAttributionUrl) {
+        if (parameters.store === StoreName.STANDALONE_ANDROID) {
+            this.handleStandaloneAndroid(parameters);
+            return;
+        }
+
+        if (parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
 
-            if(!parameters.clickAttributionUrlFollowsRedirects) {
+            if (!parameters.clickAttributionUrlFollowsRedirects) {
                 this.openAppStore(parameters);
             }
         } else {
@@ -112,21 +119,45 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         }
     }
 
+    private handleStandaloneAndroid(parameters: IEndScreenDownloadParameters) {
+        if (parameters.clickAttributionUrl) {
+            this.handleClickAttributionWithoutRedirect(parameters.clickAttributionUrl);
+        }
+        if (parameters.appDownloadUrl) {
+            this.handleAppDownloadUrl(parameters.appDownloadUrl);
+        } else {
+            Diagnostics.trigger('standalone_android_misconfigured', {
+                message: 'missing appDownloadUrl'
+            });
+        }
+    }
+
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
         const platform = this._nativeBridge.getPlatform();
 
+        // should be safe to remove after new Comet APK rule changes are deployed
         if (parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
             const apkDownloadLink = Url.getQueryParameter(parameters.clickAttributionUrl, 'apk_download_link');
             if (apkDownloadLink && platform === Platform.ANDROID) {
-                this.handleAPKDownloadLink(apkDownloadLink, parameters.clickAttributionUrl);
+                if (parameters.clickAttributionUrl) {
+                    this.handleClickAttributionWithoutRedirect(parameters.clickAttributionUrl);
+                }
+                this.handleAppDownloadUrl(apkDownloadLink);
             } else {
                 this.handleClickAttributionWithRedirects(parameters.clickAttributionUrl, parameters.clickAttributionUrlFollowsRedirects);
             }
-        } else {
-            if (parameters.clickAttributionUrl) {
-                this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, false);
-            }
+            return;
         }
+
+        if (parameters.clickAttributionUrl) {
+            this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, false);
+        }
+    }
+
+    private handleClickAttributionWithoutRedirect(clickAttributionUrl: string) {
+        this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false).catch(error => {
+            this.triggerDiagnosticsError(error, clickAttributionUrl);
+        });
     }
 
     private handleClickAttributionWithRedirects(clickAttributionUrl: string, clickAttributionUrlFollowsRedirects: boolean) {
@@ -155,10 +186,8 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         });
     }
 
-    private handleAPKDownloadLink(apkDownloadLink: string, clickAttributionUrl: string) {
-        this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false).catch(error => {
-            this.triggerDiagnosticsError(error, clickAttributionUrl);
-        });
+    private handleAppDownloadUrl(appDownloadUrl: string) {
+        appDownloadUrl = decodeURIComponent(appDownloadUrl);
 
         if (this._nativeBridge.getApiLevel() >= 21) {
             // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
@@ -167,14 +196,14 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 'extras': [
                     {
                         'key': 'query',
-                        'value': apkDownloadLink
+                        'value': appDownloadUrl
                     }
                 ]
             });
         } else {
             this._nativeBridge.Intent.launch({
                 'action': 'android.intent.action.VIEW',
-                'uri': apkDownloadLink
+                'uri': appDownloadUrl
             });
         }
     }
@@ -190,7 +219,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 response: error.nativeResponse
             });
         }
-        Diagnostics.trigger('click_attribution_failed', error, currentSession);
+        SessionDiagnostics.trigger('click_attribution_failed', error, currentSession);
     }
 
     private openAppStore(parameters: IEndScreenDownloadParameters, isAppSheetBroken?: boolean) {
@@ -263,7 +292,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             case StoreName.GOOGLE:
                 return 'market://details?id=' + parameters.appStoreId;
             case StoreName.XIAOMI:
-                return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + this._configuration.getToken();
+                return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + this._coreConfig.getToken();
             default:
                 return '';
         }

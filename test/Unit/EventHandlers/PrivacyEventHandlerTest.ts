@@ -4,15 +4,15 @@ import { PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
 import { GDPREventSource, GdprManager } from 'Ads/Managers/GdprManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { Overlay } from 'Ads/Views/Overlay';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IntentApi } from 'Core/Native/Android/Intent';
 
@@ -25,6 +25,7 @@ import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdU
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
+import { Privacy } from 'Ads/Views/Privacy';
 
 describe('PrivacyEventHandlerTest', () => {
 
@@ -45,13 +46,14 @@ describe('PrivacyEventHandlerTest', () => {
             operativeEventManager: sinon.createStubInstance(OperativeEventManager),
             placement: sinon.createStubInstance(Placement),
             campaign: sinon.createStubInstance(PerformanceCampaign),
-            configuration: sinon.createStubInstance(Configuration),
+            coreConfig: sinon.createStubInstance(CoreConfiguration),
+            adsConfig: sinon.createStubInstance(AdsConfiguration),
             request: sinon.createStubInstance(Request),
             options: {},
             endScreen: sinon.createStubInstance(PerformanceEndScreen),
             overlay: sinon.createStubInstance(Overlay),
             video: sinon.createStubInstance(Video),
-            privacy: sinon.createStubInstance(GDPRPrivacy),
+            privacy: sinon.createStubInstance(Privacy),
             gdprManager: sinon.createStubInstance(GdprManager),
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };
@@ -92,7 +94,7 @@ describe('PrivacyEventHandlerTest', () => {
     describe('on onGDPROptOut', () => {
 
         it('should send operative event with action `optout`', () => {
-            (<sinon.SinonStub>adUnitParameters.configuration.isOptOutEnabled).returns(false);
+            (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutEnabled).returns(false);
 
             privacyEventHandler.onGDPROptOut(true);
 
@@ -100,8 +102,8 @@ describe('PrivacyEventHandlerTest', () => {
         });
 
         it('should send operative event with action `optin`', () => {
-            (<sinon.SinonStub>adUnitParameters.configuration.isOptOutEnabled).returns(true);
-            (<sinon.SinonStub>adUnitParameters.configuration.isOptOutRecorded).returns(true);
+            (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutEnabled).returns(true);
+            (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutRecorded).returns(true);
 
             privacyEventHandler.onGDPROptOut(false);
 
@@ -109,8 +111,8 @@ describe('PrivacyEventHandlerTest', () => {
         });
 
         it('should send operative event with action `skip`', () => {
-            (<sinon.SinonStub>adUnitParameters.configuration.isOptOutEnabled).returns(true);
-            (<sinon.SinonStub>adUnitParameters.configuration.isOptOutRecorded).returns(false);
+            (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutEnabled).returns(true);
+            (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutRecorded).returns(false);
 
             privacyEventHandler.onGDPROptOut(false);
 

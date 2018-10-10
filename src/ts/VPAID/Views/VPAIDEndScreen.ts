@@ -80,7 +80,11 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
     }
 
     public remove(): void {
-        document.body.removeChild(this.container());
+        const parentContainer = this.container().parentElement;
+
+        if (parentContainer) {
+            parentContainer.removeChild(this.container());
+        }
     }
 
     private onCloseEvent(event: Event): void {
