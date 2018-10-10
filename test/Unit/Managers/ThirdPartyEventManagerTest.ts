@@ -43,7 +43,7 @@ describe('ThirdPartyEventManagerTest', () => {
 
         const requestSpy = <sinon.SinonSpy>request.get;
 
-        thirdPartyEventManager.getEvent('click', 'abcde-12345', url);
+        thirdPartyEventManager.sendWithGet('click', 'abcde-12345', url);
         assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
         assert.equal(url, requestSpy.getCall(0).args[0], 'Click attribution event url does not match');
     });
@@ -63,7 +63,7 @@ describe('ThirdPartyEventManagerTest', () => {
         const url: string = 'https://www.example.net/third_party_event';
         const requestSpy = <sinon.SinonSpy>request.get;
 
-        return thirdPartyEventManager.getEvent('click', 'abcde-12345', url, true).then(() => {
+        return thirdPartyEventManager.sendWithGet('click', 'abcde-12345', url, true).then(() => {
             assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
             let userAgentHeaderExists = false;
             for(const header of requestSpy.getCall(0).args[1]) {
@@ -80,7 +80,7 @@ describe('ThirdPartyEventManagerTest', () => {
         const urlTemplate = 'http://foo.biz/%ZONE%/123';
         const placement = TestFixtures.getPlacement();
         thirdPartyEventManager.setTemplateValues({ '%ZONE%': placement.getId() });
-        thirdPartyEventManager.getEvent('eventName', 'sessionId', urlTemplate);
+        thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
         assert(requestSpy.calledOnce, 'request get should\'ve been called');
         assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/' + placement.getId() + '/123', 'Should have replaced %ZONE% from the url');
     });
@@ -89,7 +89,7 @@ describe('ThirdPartyEventManagerTest', () => {
         const requestSpy = <sinon.SinonSpy>request.get;
         const urlTemplate = 'http://foo.biz/%SDK_VERSION%/123';
         thirdPartyEventManager.setTemplateValues({ '%SDK_VERSION%': '12345' });
-        thirdPartyEventManager.getEvent('eventName', 'sessionId', urlTemplate);
+        thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
         assert(requestSpy.calledOnce, 'request get should\'ve been called');
         assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/12345/123', 'Should have replaced %SDK_VERSION% from the url');
     });
@@ -98,7 +98,7 @@ describe('ThirdPartyEventManagerTest', () => {
         const requestSpy = <sinon.SinonSpy>request.get;
         const urlTemplate = 'http://foo.biz/%SDK_VERSION%/123';
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request, { '%SDK_VERSION%': '12345' });
-        thirdPartyEventManager.getEvent('eventName', 'sessionId', urlTemplate);
+        thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
         assert(requestSpy.calledOnce, 'request get should\'ve been called');
         assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/12345/123', 'Should have replaced %SDK_VERSION% from the url');
     });
@@ -110,7 +110,7 @@ describe('ThirdPartyEventManagerTest', () => {
 
         beforeEach(() => {
             campaign = TestFixtures.getCampaign();
-            sendEventStub = sinon.spy(thirdPartyEventManager, 'getEvent');
+            sendEventStub = sinon.spy(thirdPartyEventManager, 'sendWithGet');
         });
 
         // Currently used events

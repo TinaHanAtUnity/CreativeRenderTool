@@ -56,11 +56,11 @@ export class ThirdPartyEventManager {
         });
     }
 
-    public postEvent(event: string, sessionId: string, url: string, body?: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
+    public sendWithPost(event: string, sessionId: string, url: string, body?: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
         return this.sendEvent(ThirdPartyEventMethod.POST, event, sessionId, url, body, useWebViewUserAgentForTracking, headers);
     }
 
-    public getEvent(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
+    public sendWithGet(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
         return this.sendEvent(ThirdPartyEventMethod.GET, event, sessionId, url, undefined, useWebViewUserAgentForTracking, headers);
     }
 
@@ -122,7 +122,7 @@ export class ThirdPartyEventManager {
             if (urls && urls[event] && Object.keys(urls[event]).length !== 0) {
                 for (const eventUrl of urls[event]) {
                     if (eventUrl) {
-                        this.getEvent(event, campaign.getSession().getId(), eventUrl);
+                        this.sendWithGet(event, campaign.getSession().getId(), eventUrl);
                     } else {
                         const error = {
                             eventUrl: eventUrl,

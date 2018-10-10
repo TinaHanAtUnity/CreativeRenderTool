@@ -99,7 +99,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
         }
         return urlPromise.then((clickUrl) => {
             // voidResult transforms promise to Promise<void>
-            return Promises.voidResult(this._thirdPartyEventManager.getEvent('admob click', this._session.getId(), clickUrl, true, headers));
+            return Promises.voidResult(this._thirdPartyEventManager.sendWithGet('admob click', this._session.getId(), clickUrl, true, headers));
         });
    }
 

@@ -120,7 +120,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {
-                this._thirdPartyEventManager.getEvent(`vast ${eventName}`, sessionId, url);
+                this._thirdPartyEventManager.sendWithGet(`vast ${eventName}`, sessionId, url);
             }
         }
     }
@@ -146,7 +146,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     public sendCompanionTrackingEvent(sessionId: string): void {
         const companionTrackingUrls = this._vastCampaign.getVast().getCompanionCreativeViewTrackingUrls();
         for (const url of companionTrackingUrls) {
-            this._thirdPartyEventManager.getEvent('companion', sessionId, url);
+            this._thirdPartyEventManager.sendWithGet('companion', sessionId, url);
         }
     }
 
@@ -157,7 +157,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
         if (clickTrackingEventUrls) {
             for (const clickTrackingEventUrl of clickTrackingEventUrls) {
-                this._thirdPartyEventManager.getEvent('vast video click', sessionId, clickTrackingEventUrl);
+                this._thirdPartyEventManager.sendWithGet('vast video click', sessionId, clickTrackingEventUrl);
             }
         }
     }

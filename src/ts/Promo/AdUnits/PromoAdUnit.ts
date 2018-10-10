@@ -134,7 +134,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
             if(trackingEventUrls) {
                 for (const url of trackingEventUrls) {
-                    this._thirdPartyEventManager.getEvent(eventName, sessionId, url);
+                    this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
                 }
             }
         }
