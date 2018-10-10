@@ -44,7 +44,7 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
 
         const trackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('start');
         for (const url of trackingUrls) {
-            this._thirdPartyEventManager.sendEvent('xpromo start', this._xpromoCampaign.getSession().getId(), url);
+            this._thirdPartyEventManager.getEvent('xpromo start', this._xpromoCampaign.getSession().getId(), url);
         }
 
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
@@ -62,7 +62,7 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
         this._xpromoOperativeEventManager.sendView(this.getXPromoOperativeEventParams());
         const clickTrackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('view');
         for (const clickUrl of clickTrackingUrls) {
-            this._thirdPartyEventManager.sendEvent('xpromo view', this._xpromoCampaign.getSession().getId(), clickUrl);
+            this._thirdPartyEventManager.getEvent('xpromo view', this._xpromoCampaign.getSession().getId(), clickUrl);
         }
     }
 

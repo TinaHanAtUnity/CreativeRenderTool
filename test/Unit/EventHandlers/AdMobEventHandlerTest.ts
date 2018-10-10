@@ -159,7 +159,7 @@ describe('AdMobEventHandler', () => {
             (<sinon.SinonStub>adUnit.getTimeOnScreen).returns(42);
             (<sinon.SinonStub>adUnit.getStartTime).returns(startTime);
             (<sinon.SinonStub>adUnit.getRequestToViewTime).returns(42);
-            (<sinon.SinonStub>thirdPartyEventManager.sendEvent).returns(Promise.resolve());
+            (<sinon.SinonStub>thirdPartyEventManager.getEvent).returns(Promise.resolve());
         });
 
         afterEach(() => {
@@ -170,7 +170,7 @@ describe('AdMobEventHandler', () => {
             const url = 'http://unityads.unity3d.com';
 
             return admobEventHandler.onAttribution(url, touch).then(() => {
-                const call = (<sinon.SinonStub>thirdPartyEventManager.sendEvent).getCall(0);
+                const call = (<sinon.SinonStub>thirdPartyEventManager.getEvent).getCall(0);
                 const calledUrl = call.args[2];
                 const param = Url.getQueryParameter(calledUrl, 'ms');
                 if (!param) {
@@ -190,7 +190,7 @@ describe('AdMobEventHandler', () => {
             const url = 'http://unityads.unity3d.com';
 
             return admobEventHandler.onAttribution(url, touch).then(() => {
-                const call = (<sinon.SinonStub>thirdPartyEventManager.sendEvent).getCall(0);
+                const call = (<sinon.SinonStub>thirdPartyEventManager.getEvent).getCall(0);
                 const calledUrl = call.args[2];
                 const param = Url.getQueryParameter(calledUrl, 'rvdt');
                 if (!param) {

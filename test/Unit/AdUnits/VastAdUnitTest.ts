@@ -169,23 +169,23 @@ describe('VastAdUnitTest', () => {
 
         it('should call video click tracking url', () => {
             sandbox.stub(vastCampaign.getVast(), 'getVideoClickTrackingURLs').returns(['https://www.example.com/foo/?bar=baz&inga=42&quux', 'http://wwww.tremor.com/click']);
-            sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
+            sandbox.stub(thirdPartyEventManager, 'getEvent').returns(null);
             vastAdUnit.sendVideoClickTrackingEvent('foo');
-            sinon.assert.calledTwice(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
+            sinon.assert.calledTwice(<sinon.SinonSpy>thirdPartyEventManager.getEvent);
         });
 
         it('should not call thirdPartyEvent if there are no tracking urls', () => {
             sandbox.stub(vastCampaign.getVast(), 'getVideoClickTrackingURLs').returns([]);
-            sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
+            sandbox.stub(thirdPartyEventManager, 'getEvent').returns(null);
             vastAdUnit.sendVideoClickTrackingEvent('foo');
-            sinon.assert.notCalled(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
+            sinon.assert.notCalled(<sinon.SinonSpy>thirdPartyEventManager.getEvent);
         });
     });
 
     describe('VastAdUnit progress event test', () => {
         it('sends video click through tracking event from VAST', () => {
             const mockEventManager = sinon.mock(thirdPartyEventManager);
-            mockEventManager.expects('sendEvent').withArgs('vast video click', '123', 'http://myTrackingURL.com/click');
+            mockEventManager.expects('getEvent').withArgs('vast video click', '123', 'http://myTrackingURL.com/click');
 
             vastAdUnit.sendVideoClickTrackingEvent('123');
             mockEventManager.verify();
@@ -244,7 +244,7 @@ describe('VastAdUnitTest', () => {
             assert.isTrue(companionTrackingUrls.length > 0); // make sure that there are tracking urls
             for (const companionTrackingUrl of companionTrackingUrls) {
                 // make each tracking url expected.
-                mockEventManager.expects('sendEvent').withExactArgs('companion', '123', companionTrackingUrl);
+                mockEventManager.expects('getEvent').withExactArgs('companion', '123', companionTrackingUrl);
             }
             vastAdUnit.sendCompanionTrackingEvent('123');
             mockEventManager.verify();
