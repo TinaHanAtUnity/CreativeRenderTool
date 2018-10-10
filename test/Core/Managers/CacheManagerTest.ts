@@ -93,13 +93,11 @@ describe('CacheManagerTest', () => {
         let networkTriggered: boolean = false;
 
         Cache.setInternet(false);
-        setTimeout(() => {
-            networkTriggered = true;
-            Cache.setInternet(true);
-            wakeUpManager.onNetworkConnected.trigger();
-        }, 10);
-
-        return cacheManager.cache(testUrl).then(fileUrl => {
+        const cachePromise = cacheManager.cache(testUrl);
+        networkTriggered = true;
+        Cache.setInternet(true);
+        wakeUpManager.onNetworkConnected.trigger();
+        cachePromise.then(fileUrl => {
             assert(!networkTriggered, 'Cache one file with network failure: network was not triggered');
         });
     });
@@ -114,11 +112,11 @@ describe('CacheManagerTest', () => {
         };
 
         Cache.setInternet(false);
-        setTimeout(triggerNetwork, 150);
-        setTimeout(triggerNetwork, 200);
-        setTimeout(triggerNetwork, 350);
-
-        return cacheManager.cache(testUrl).then(() => {
+        const cachePromise = cacheManager.cache(testUrl);
+        triggerNetwork();
+        triggerNetwork();
+        triggerNetwork();
+        cachePromise.then(() => {
             assert.fail('Cache one file with repeated network failures: caching should not be successful with no internet');
         }).catch(error => {
             assert.equal(networkTriggers, 3, 'Cache one file with repeated network failures: caching should have retried exactly three times');
@@ -129,10 +127,9 @@ describe('CacheManagerTest', () => {
         const testUrl: string = 'http://www.example.net/test.mp4';
 
         Cache.setInternet(false);
-
-        setTimeout(() => cacheManager.stop(), 150);
-
-        return cacheManager.cache(testUrl).then(() => {
+        const cachePromise = cacheManager.cache(testUrl);
+        cacheManager.stop();
+        cachePromise.then(() => {
             assert.fail('Caching should fail when stopped');
         }).catch(error => {
             assert.equal(error, CacheStatus.STOPPED, 'Cache status not STOPPED after caching was stopped');

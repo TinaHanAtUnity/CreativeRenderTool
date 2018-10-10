@@ -1,5 +1,5 @@
 const fs = require('fs');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const path = require('path');
@@ -11,6 +11,18 @@ const testFilter = process.env.TEST_FILTER;
 const coverage = process.env.COVERAGE;
 const isolated = process.env.ISOLATED;
 const debug = process.env.DEBUG;
+
+puppeteer.use(require('puppeteer-extra-plugin-user-preferences')({
+    userPrefs: {
+        devtools: {
+            preferences: {
+                "InspectorView.splitViewState": "{\"vertical\":{\"size\":9999}}",
+                "sourcesPanelSplitViewState": "{\"vertical\":{\"size\":450,\"showMode\":\"Both\"}}",
+                "uiTheme": "\"dark\"",
+            }
+        }
+    }
+}));
 
 const runTest = async (browser, isolated, testFilter) => {
     let page;
@@ -70,7 +82,10 @@ const runTest = async (browser, isolated, testFilter) => {
 
 (async () => { try {
     const browser = await puppeteer.launch({
-        args: ['--no-sandbox'],
+        args: [
+            '--no-sandbox',
+            '--start-maximized'
+        ],
         devtools: debug == 1
     });
     if(isolated == 1) {

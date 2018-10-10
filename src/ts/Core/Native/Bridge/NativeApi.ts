@@ -21,19 +21,16 @@ export abstract class NativeApi {
     protected _nativeBridge: NativeBridge;
     protected _apiClass: string;
     protected _apiPackage: ApiPackage;
-    protected _eventCategory?: EventCategory;
     protected _fullApiClassName: string;
 
     protected constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage, eventCategory?: EventCategory) {
         this._nativeBridge = nativeBridge;
         this._apiClass = apiClass;
         this._apiPackage = apiPackage;
-        this._eventCategory = eventCategory;
         this._fullApiClassName = this.getFullApiClassName();
-    }
-
-    public getEventCategory(): EventCategory | undefined {
-        return this._eventCategory;
+        if(eventCategory) {
+            nativeBridge.addEventHandler(eventCategory, this);
+        }
     }
 
     public handleEvent(event: string, parameters: any[]) {

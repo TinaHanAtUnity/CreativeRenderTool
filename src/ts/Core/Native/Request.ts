@@ -18,7 +18,6 @@ export class RequestApi extends NativeApi {
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Request', ApiPackage.CORE, EventCategory.REQUEST);
-        nativeBridge.addEventHandler(this);
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
             this.Android = new AndroidRequestApi(nativeBridge);

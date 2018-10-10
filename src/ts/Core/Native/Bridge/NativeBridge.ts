@@ -102,8 +102,7 @@ export class NativeBridge implements INativeBridge {
         });
     }
 
-    public addEventHandler(nativeApi: NativeApi) {
-        const eventCategory = nativeApi.getEventCategory();
+    public addEventHandler(eventCategory: EventCategory, nativeApi: NativeApi) {
         if(eventCategory && !(eventCategory in this._eventHandlers)) {
             this._eventHandlers[EventCategory[eventCategory]] = nativeApi;
         }

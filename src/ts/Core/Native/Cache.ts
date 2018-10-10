@@ -52,8 +52,6 @@ export class CacheApi extends NativeApi {
         } else {
             this.Android = new AndroidCacheApi(nativeBridge);
         }
-
-        nativeBridge.addEventHandler(this);
     }
 
     public download(url: string, fileId: string, headers: Array<[string, string]>, append: boolean): Promise<void> {
