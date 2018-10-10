@@ -15,7 +15,12 @@ export class ProgrammaticAdMobLoader extends CampaignLoader {
         }
 
         if(campaign.video) {
-            const rawAdMobVideo = JSON.parse(campaign.video);
+            let rawAdMobVideo;
+            try {
+                rawAdMobVideo = JSON.parse(campaign.video);
+            } catch(e) {
+                return undefined;
+            }
 
             if(rawAdMobVideo.video) {
                 rawAdMobVideo.video = this.loadVideo(rawAdMobVideo.video, campaign.session);
