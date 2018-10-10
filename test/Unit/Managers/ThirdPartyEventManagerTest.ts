@@ -13,42 +13,11 @@ import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
-class TestRequestApi extends RequestApi {
-
-    public get(id: string, url: string, headers?: Array<[string, string]>): Promise<string> {
-        if(url.indexOf('/fail') !== -1) {
-            setTimeout(() => {
-                this._nativeBridge.handleEvent(['REQUEST', 'FAILED', id, url, 'Fail response']);
-            }, 0);
-        } else {
-            setTimeout(() => {
-                this._nativeBridge.handleEvent(['REQUEST', 'COMPLETE', id, url, 'Success response', 200, headers]);
-            }, 0);
-        }
-        return Promise.resolve(id);
-    }
-
-    public post(id: string, url: string, body?: string, headers?: Array<[string, string]>): Promise<string> {
-        if(url.indexOf('/fail') !== -1) {
-            setTimeout(() => {
-                this._nativeBridge.handleEvent(['REQUEST', 'FAILED', id, url, 'Fail response']);
-            }, 0);
-        } else {
-            setTimeout(() => {
-                this._nativeBridge.handleEvent(['REQUEST', 'COMPLETE', id, url, 'Success response', 200, headers]);
-            }, 0);
-        }
-        return Promise.resolve(id);
-    }
-
-}
-
 describe('ThirdPartyEventManagerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
 
-    let requestApi: TestRequestApi;
     let focusManager: FocusManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
@@ -62,30 +31,27 @@ describe('ThirdPartyEventManagerTest', () => {
 
         metaDataManager = new MetaDataManager(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
-        requestApi = nativeBridge.Request = new TestRequestApi(nativeBridge);
-        request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
-        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
-
+        request = sinon.createStubInstance(Request);
+        (<sinon.SinonStub>request.get).returns(Promise.resolve({}));
+        // request = new Request(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
     });
 
     it('Send successful third party event', () => {
         const url: string = 'https://www.example.net/third_party_event';
 
-        const requestSpy = sinon.spy(request, 'get');
+        const requestSpy = <sinon.SinonSpy>request.get;
 
-        return thirdPartyEventManager.getEvent('click', 'abcde-12345', url).then(() => {
-            assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
-            assert.equal(url, requestSpy.getCall(0).args[0], 'Click attribution event url does not match');
-        });
+        thirdPartyEventManager.getEvent('click', 'abcde-12345', url);
+        assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
+        assert.equal(url, requestSpy.getCall(0).args[0], 'Click attribution event url does not match');
     });
 
     it('Send click attribution event', () => {
         const url: string = 'https://www.example.net/third_party_event';
 
-        const requestSpy = sinon.spy(request, 'get');
+        const requestSpy = <sinon.SinonSpy>request.get;
 
         return thirdPartyEventManager.clickAttributionEvent(url, false).then(() => {
             assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
@@ -95,7 +61,7 @@ describe('ThirdPartyEventManagerTest', () => {
 
     it('should send headers for event', () => {
         const url: string = 'https://www.example.net/third_party_event';
-        const requestSpy = sinon.spy(request, 'get');
+        const requestSpy = <sinon.SinonSpy>request.get;
 
         return thirdPartyEventManager.getEvent('click', 'abcde-12345', url, true).then(() => {
             assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
@@ -110,7 +76,7 @@ describe('ThirdPartyEventManagerTest', () => {
     });
 
     it('should replace "%ZONE%" in the url with the placement id', () => {
-        const requestSpy = sinon.spy(request, 'get');
+        const requestSpy = <sinon.SinonSpy>request.get;
         const urlTemplate = 'http://foo.biz/%ZONE%/123';
         const placement = TestFixtures.getPlacement();
         thirdPartyEventManager.setTemplateValues({ '%ZONE%': placement.getId() });
@@ -120,7 +86,7 @@ describe('ThirdPartyEventManagerTest', () => {
     });
 
     it('should replace "%SDK_VERSION%" in the url with the SDK version as a query parameter', () => {
-        const requestSpy = sinon.spy(request, 'get');
+        const requestSpy = <sinon.SinonSpy>request.get;
         const urlTemplate = 'http://foo.biz/%SDK_VERSION%/123';
         thirdPartyEventManager.setTemplateValues({ '%SDK_VERSION%': '12345' });
         thirdPartyEventManager.getEvent('eventName', 'sessionId', urlTemplate);
@@ -129,7 +95,7 @@ describe('ThirdPartyEventManagerTest', () => {
     });
 
     it('should replace template values given in constructor', () => {
-        const requestSpy = sinon.spy(request, 'get');
+        const requestSpy = <sinon.SinonSpy>request.get;
         const urlTemplate = 'http://foo.biz/%SDK_VERSION%/123';
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request, { '%SDK_VERSION%': '12345' });
         thirdPartyEventManager.getEvent('eventName', 'sessionId', urlTemplate);
