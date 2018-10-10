@@ -80,10 +80,10 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                                     currency: details.currency
                                 }, product.productType, details.receipt)
                                 .then((body) => {
-                                    this._thirdPartyEventManager.postEvent(purchaseKey, sessionId, url, JSON.stringify(body));
+                                    this._thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, url, JSON.stringify(body));
                                 });
                             } else {
-                                this._thirdPartyEventManager.getEvent(purchaseKey, sessionId, url);
+                                this._thirdPartyEventManager.sendWithGet(purchaseKey, sessionId, url);
                             }
                         }
                     }
@@ -118,10 +118,10 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                                     currency: product.isoCurrencyCode
                                 }, this._promoEvents.failureJson(details.storeSpecificErrorCode, details.exceptionMessage, AnalyticsManager.getPurchasingFailureReason(details.transactionError), productId))
                                 .then((body) => {
-                                    this._thirdPartyEventManager.postEvent(purchaseKey, sessionId, url, JSON.stringify(body));
+                                    this._thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, url, JSON.stringify(body));
                                 });
                             } else {
-                                this._thirdPartyEventManager.getEvent(purchaseKey, sessionId, url);
+                                this._thirdPartyEventManager.sendWithGet(purchaseKey, sessionId, url);
                             }
                         }
                     }
