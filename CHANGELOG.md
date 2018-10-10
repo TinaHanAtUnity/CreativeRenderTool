@@ -1,3 +1,8 @@
+# Pending
+
+* Multiply battery level by 100 for AdMob signal [#6600](https://github.com/Applifier/unity-ads-webview/pull/6600)
+* ABTest for click tracking swap, request from CrossInstall [#6598](https://github.com/Applifier/unity-ads-webview/pull/6598)
+
 # Tue Oct  9 21:46:34 UTC 2018
 
 * Improve/Rename Reporting Privacy and Remove Other Privacies [#6601](https://github.com/Applifier/unity-ads-webview/pull/6601)
