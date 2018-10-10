@@ -2,6 +2,7 @@
 
 * Multiply battery level by 100 for AdMob signal [#6600](https://github.com/Applifier/unity-ads-webview/pull/6600)
 * ABTest for click tracking swap, request from CrossInstall [#6598](https://github.com/Applifier/unity-ads-webview/pull/6598)
+* Fix AdMob campaign loader [#6647](https://github.com/Applifier/unity-ads-webview/pull/6647)
 
 # Tue Oct  9 21:46:34 UTC 2018
 
