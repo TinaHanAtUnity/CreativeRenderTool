@@ -1,5 +1,5 @@
 import { CampaignLoader } from 'Ads/Parsers/CampaignLoader';
-import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
+import { AdMobCampaign, AdMobVideo } from 'AdMob/Models/AdMobCampaign';
 
 export class ProgrammaticAdMobLoader extends CampaignLoader {
     public load(data: string): AdMobCampaign | undefined {
@@ -15,7 +15,13 @@ export class ProgrammaticAdMobLoader extends CampaignLoader {
         }
 
         if(campaign.video) {
-            campaign.video = this.loadVideo(campaign.video, campaign.session);
+            const rawAdMobVideo = JSON.parse(campaign.video);
+
+            if(rawAdMobVideo.video) {
+                rawAdMobVideo.video = this.loadVideo(rawAdMobVideo.video, campaign.session);
+            }
+
+            campaign.video = new AdMobVideo(rawAdMobVideo);
         }
 
         let adMobCampaign;
