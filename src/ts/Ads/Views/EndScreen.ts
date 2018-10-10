@@ -5,19 +5,13 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import {
-    ABGroup,
-    OrangeEndScreenButtonColorTest,
-    GreenEndScreenButtonColorTest,
-    RedEndScreenButtonColorTest,
-    NavyEndScreenButtonColorTest
-} from 'Core/Models/ABGroup';
-
+import { ABGroup, ImprovedEndScreenStylesTest } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
+import EndScreenWithImprovedStylesTemplate from 'html/EndScreenWithImprovedStyles.html';
 
 export interface IEndScreenParameters {
     nativeBridge: NativeBridge;
@@ -42,10 +36,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     protected _localization: Localization;
     protected _adUnitStyle?: AdUnitStyle;
+    protected _abGroup: ABGroup;
     private _gameName: string | undefined;
     private _privacy: AbstractPrivacy;
     private _isSwipeToCloseEnabled: boolean = false;
-    private _abGroup: ABGroup;
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked = false;
     private _campaignId: string | undefined;
@@ -105,6 +99,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
 
+        const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
+        if (ctaButtonColor) {
+            (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
+        }
+
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
@@ -114,25 +113,9 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             this._container.classList.add('show-gdpr-banner');
         }
 
-        this.addCustomDownloadButtonColor();
-    }
-
-    private addCustomDownloadButtonColor(): void {
-        let color: string;
-
-        if (OrangeEndScreenButtonColorTest.isValid(this._abGroup)) {
-            color = '#F8AD00';
-        } else if (GreenEndScreenButtonColorTest.isValid(this._abGroup)) {
-            color = '#83CD0C';
-        } else if (RedEndScreenButtonColorTest.isValid(this._abGroup)) {
-            color = '#ED4400';
-        } else if (NavyEndScreenButtonColorTest.isValid(this._abGroup)) {
-            color = '#2F5FAE';
-        } else {
-            return;
+        if (ImprovedEndScreenStylesTest.isValid(this._abGroup)) {
+            this._container.classList.add('improved-endscreen-styles-test');
         }
-
-        (<HTMLElement>this._container.querySelector('.download-container')).style.background = color;
     }
 
     public show(): void {
@@ -205,6 +188,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     private getTemplate() {
+        if (ImprovedEndScreenStylesTest.isValid(this._abGroup)) {
+            return EndScreenWithImprovedStylesTemplate;
+        }
+
         return EndScreenTemplate;
     }
 }
