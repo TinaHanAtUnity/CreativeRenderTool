@@ -1,5 +1,6 @@
 import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { EventCategory } from 'Core/Constants/EventCategory';
 
 export enum ApiPackage {
     CORE,
@@ -20,10 +21,10 @@ export abstract class NativeApi {
     protected _nativeBridge: NativeBridge;
     protected _apiClass: string;
     protected _apiPackage: ApiPackage;
-    protected _eventCategory?: string;
+    protected _eventCategory?: EventCategory;
     protected _fullApiClassName: string;
 
-    protected constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage, eventCategory?: string) {
+    protected constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage, eventCategory?: EventCategory) {
         this._nativeBridge = nativeBridge;
         this._apiClass = apiClass;
         this._apiPackage = apiPackage;
@@ -31,7 +32,7 @@ export abstract class NativeApi {
         this._fullApiClassName = this.getFullApiClassName();
     }
 
-    public getEventCategory(): string | undefined {
+    public getEventCategory(): EventCategory | undefined {
         return this._eventCategory;
     }
 

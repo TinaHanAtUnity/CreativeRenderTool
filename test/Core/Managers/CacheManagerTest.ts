@@ -17,7 +17,7 @@ describe('CacheManagerTest', () => {
 
     beforeEach((done) => {
         backend = new Backend();
-        nativeBridge = (<any>window).nativebridge = new NativeBridge(backend, Platform.ANDROID);
+        nativeBridge = (<any>window).nativebridge = new NativeBridge(backend, Platform.ANDROID, false);
         core = new Core(nativeBridge);
         core.initialize().then(done);
     });

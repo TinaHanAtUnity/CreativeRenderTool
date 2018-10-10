@@ -3,6 +3,7 @@ import { AndroidRequestApi } from 'Core/Native/Android/Request';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable3, Observable5 } from 'Core/Utilities/Observable';
+import { EventCategory } from 'Core/Constants/EventCategory';
 
 export enum RequestEvent {
     COMPLETE,
@@ -16,7 +17,8 @@ export class RequestApi extends NativeApi {
     public readonly onFailed = new Observable3<string, string, string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Request', ApiPackage.CORE);
+        super(nativeBridge, 'Request', ApiPackage.CORE, EventCategory.REQUEST);
+        nativeBridge.addEventHandler(this);
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
             this.Android = new AndroidRequestApi(nativeBridge);
