@@ -82,11 +82,13 @@ import WrappedVast2 from 'xml/WrappedVast2.xml';
 import WrappedVast3 from 'xml/WrappedVast3.xml';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
     let wakeUpManager: WakeUpManager;
     let request: Request;
     let vastParser: VastParser;
@@ -215,6 +217,7 @@ describe('CampaignManager', () => {
             }
         };
 
+        storageBridge = new StorageBridge(nativeBridge);
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
@@ -222,7 +225,7 @@ describe('CampaignManager', () => {
         deviceInfo = new AndroidDeviceInfo(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         jaegerManager = sinon.createStubInstance(JaegerManager);
         jaegerManager.isJaegerTracingEnabled = sinon.stub().returns(false);
@@ -666,35 +669,6 @@ describe('CampaignManager', () => {
                 assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
             });
         };
-
-        describe('VAST warnings', () => {
-            it('should warn about missing error urls', () => {
-                // given a VAST response that has no error URLs
-                const response = {
-                    response: OnProgrammaticVastPlcCampaignMissingErrorUrls
-                };
-
-                // when the campaign manager requests the placement
-                return verifyCampaignForResponse(response).then(() => {
-                    // then the SDK's logWarning function is called with an appropriate message
-                    assert.isTrue(warningSpy.calledWith('Campaign does not have an error url!'));
-                });
-            });
-
-            it('should not warn about missing error urls if error url exists at ad level', () => {
-                // given a VAST response that an error URL in the ad
-                const response = {
-                    response: OnProgrammaticVastPlcCampaignAdLevelErrorUrls
-                };
-
-                // when the campaign manager requests the placement
-                return verifyCampaignForResponse(response).then(() => {
-
-                    // then the SDK's logWarning function is called with an appropriate message
-                    assert.equal(warningSpy.callCount, 0);
-                });
-            });
-        });
 
         it('should process custom tracking urls', () => {
             // given a valid VAST placement

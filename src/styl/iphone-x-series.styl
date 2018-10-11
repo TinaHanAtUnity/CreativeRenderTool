@@ -1,0 +1,260 @@
+@import "vars.styl";
+
+$iphone-x-overlay-styles() {
+  @media (orientation: portrait) {
+    &.show-gdpr-banner .bottom-container .center .gdpr-pop-up {
+      border-radius: $new-video-overlay-styles.tab-border-radius;
+    }
+  }
+
+  @media (orientation: landscape) {
+    &.show-gdpr-banner .bottom-container .center .gdpr-pop-up {
+      width: 40%;
+
+      .gdpr-text {
+        font-size: $new-video-overlay-styles.base-size * .29;
+      }
+    }
+
+    .bottom-container {
+      .center,
+      .tab {
+        bottom: 0;
+      }
+
+      .gdpr-button .tab {
+        bottom: $new-video-overlay-styles.base-size * .28;
+      }
+    }
+  }
+
+  .bottom-container {
+    margin-bottom: constant(safe-area-inset-bottom);
+    margin-bottom: env(safe-area-inset-bottom); // @stylint ignore;
+  }
+
+  .top-container {
+    margin-top: calc(constant(safe-area-inset-top));
+    margin-top: calc(env(safe-area-inset-top)); // @stylint ignore;
+  }
+
+  .button-left .tab {
+    padding-left: constant(safe-area-inset-left);
+    padding-left: env(safe-area-inset-left); // @stylint ignore;
+  }
+
+  .button-left {
+    width: "calc(constant(safe-area-inset-left) + %s)" % $new-video-overlay-styles.touchable-area-width;
+    width: "calc(env(safe-area-inset-left) + %s)" % $new-video-overlay-styles.touchable-area-width; // @stylint ignore;
+  }
+
+  .button-right .tab {
+    padding-right: constant(safe-area-inset-right);
+    padding-right: env(safe-area-inset-right); // @stylint ignore;
+  }
+
+  .button-right {
+    width: "calc(constant(safe-area-inset-right) + %s)" % $new-video-overlay-styles.touchable-area-width;
+    width: "calc(env(safe-area-inset-right) + %s)" % $new-video-overlay-styles.touchable-area-width; // @stylint ignore;
+  }
+
+
+  .call-button {
+    width: "calc(constant(safe-area-inset-right) + %s)" % $new-video-overlay-styles.call-button-width;
+    width: "calc(env(safe-area-inset-right) + %s)" % $new-video-overlay-styles.call-button-width; // @stylint ignore;
+  }
+
+  .gdpr-button {
+    left: "calc(%s + constant(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width;
+    left: "calc(%s + env(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width; // @stylint ignore;
+  }
+}
+
+$iphone-x-styles() {
+  #mraid,
+  #playable-mraid {
+    #mraid-iframe:not(.fullscreen) {
+      padding-top: constant(safe-area-inset-top);
+      padding-right: constant(safe-area-inset-right);
+      padding-bottom: constant(safe-area-inset-bottom);
+      padding-left: constant(safe-area-inset-left);
+      width: calc(100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+      height: calc(100vh - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
+
+      padding-top: env(safe-area-inset-top);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+      height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+
+    .close-region {
+      top: constant(safe-area-inset-top);
+      right: constant(safe-area-inset-right);
+
+      top: env(safe-area-inset-top);
+      right: env(safe-area-inset-right);
+    }
+
+    .privacy-button {
+      bottom: constant(safe-area-inset-bottom);
+      left: constant(safe-area-inset-left);
+
+      bottom: env(safe-area-inset-bottom);
+      left: env(safe-area-inset-left);
+    }
+
+    .gdpr-pop-up {
+      bottom: constant(safe-area-inset-bottom);
+      left: constant(safe-area-inset-left);
+      width: calc(100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+
+
+      bottom: env(safe-area-inset-bottom);
+      left: env(safe-area-inset-left);
+      width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+    }
+  }
+
+  #end-screen,
+  #vast-end-screen {
+    padding-top: constant(safe-area-inset-top);
+    padding-right: constant(safe-area-inset-right);
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-left: constant(safe-area-inset-left);
+    width: calc(100% - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+    height: calc(100% - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
+
+    padding-top: env(safe-area-inset-top);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    width: calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right));
+    height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+
+    .btn-close-region {
+      top: constant(safe-area-inset-top);
+      right: constant(safe-area-inset-right);
+
+      top: env(safe-area-inset-top);
+      right: env(safe-area-inset-right);
+    }
+
+    .tencent-advertisement {
+      top: constant(safe-area-inset-top);
+      left: constant(safe-area-inset-left);
+
+      top: env(safe-area-inset-top);
+      left: env(safe-area-inset-left);
+    }
+
+    .privacy-button {
+      bottom: constant(safe-area-inset-bottom);
+      left: constant(safe-area-inset-left);
+
+      bottom: env(safe-area-inset-bottom);
+      left: env(safe-area-inset-left);
+    }
+  }
+
+  #end-screen {
+    .unityads-logo {
+      bottom: constant(safe-area-inset-bottom);
+      bottom: env(safe-area-inset-bottom); // @stylint ignore;
+    }
+
+    &.use-gdpr-privacy-icon .unityads-logo {
+      bottom: calc(constant(safe-area-inset-bottom) + .5rem);
+      bottom: calc(env(safe-area-inset-bottom) + .5rem); // @stylint ignore;
+    }
+  }
+
+  #display-interstitial,
+  #closable-video-overlay {
+    .close-region {
+      top: constant(safe-area-inset-top);
+      right: constant(safe-area-inset-right);
+
+      top: env(safe-area-inset-top);
+      right: env(safe-area-inset-right);
+    }
+  }
+
+  #overlay,
+  #closable-video-overlay {
+    position: absolute;
+    top: constant(safe-area-inset-top);
+    left: constant(safe-area-inset-left);
+    width: calc(100% - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+    height: calc(100% - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
+
+    top: env(safe-area-inset-top);
+    left: env(safe-area-inset-left);
+    width: calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right));
+    height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+
+    .skip-hit-area {
+      top: constant(safe-area-inset-top);
+      left: constant(safe-area-inset-left);
+
+      top: env(safe-area-inset-top);
+      left: env(safe-area-inset-left);
+    }
+
+    .progress {
+      top: constant(safe-area-inset-top);
+      right: constant(safe-area-inset-right);
+
+      top: env(safe-area-inset-top);
+      right: env(safe-area-inset-right);
+    }
+
+    .mute-button {
+      bottom: constant(safe-area-inset-bottom);
+      left: constant(safe-area-inset-left);
+
+      bottom: env(safe-area-inset-bottom);
+      left: env(safe-area-inset-left);
+    }
+
+    .call-button {
+      right: constant(safe-area-inset-right);
+      bottom: constant(safe-area-inset-bottom);
+
+      right: env(safe-area-inset-right);
+      bottom: env(safe-area-inset-bottom);
+    }
+  }
+
+  .tencent-advertisement {
+    top: constant(safe-area-inset-top);
+    left: constant(safe-area-inset-left);
+
+    top: env(safe-area-inset-top);
+    left: env(safe-area-inset-left);
+  }
+
+  .slide-up {
+    slide-animation(.4s, ease-in, -250%);
+  }
+
+  .slide-down {
+    slide-animation(.4s, ease-in, 250%);
+  }
+
+  #privacy {
+    top: constant(safe-area-inset-top);
+    top: env(safe-area-inset-top); // @stylint ignore;
+
+    height: calc(100% - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
+    height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom)); // @stylint ignore;
+  }
+
+  body {
+    &.landscape   #privacy {
+      left: calc(constant(safe-area-inset-left) / 2);
+      left: calc(env(safe-area-inset-left) / 2); // @stylint ignore;
+    }
+  }
+}

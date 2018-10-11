@@ -44,7 +44,7 @@
                     (<span class="gdpr-text-ios">Apple’s Advertising Identifier</span><span class="gdpr-text-android">Google
                         Ad Identifier</span>) and your IP address.
                 
-                <% if(!data.isCoppaCompliant) { %>
+                <% if(data.isCoppaCompliant) { %>
                 <span id="coppaTag1">By request of this app’s publisher, we do not combine the data from this app with data from any other apps.</span>
                 <% } %>
                 </span>
@@ -53,44 +53,39 @@
             <p>
                 Our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> explains how we manage your
                 data and how we work with partners who serve ads.
-                <% if(!data.isCoppaCompliant) { %>
-                <span id="coppaTag2">While these partners generally collect information about your advertising ID from sources other than Unity, Unity does not provide your advertising ID to these third parties for ads served in this app.</span>
+                <% if(data.isCoppaCompliant) { %>
+                    <span id="coppaTag2">While these partners generally collect information about your advertising ID from sources other than Unity, Unity does not provide your advertising ID to these third parties for ads served in this app.</span>
                 <% } else { %>
-                <span id="coppaTag2">These partners may collect information about your advertising ID from sources other than Unity to further personalize the ads you see. Please visit the privacy policies of these third parties to review the compiled data they may have.</span>
+                    <span id="coppaTag2">These partners may collect information about your advertising ID from sources other than Unity to further personalize the ads you see. Please visit the privacy policies of these third parties to review the compiled data they may have.</span>
                 <% } %>
             </p>
-
             <p>
                 From your interaction with this app, here is an example of the information we use to predict which
                 other apps might interest
                 you:
             </p>
-
-            <% if(data.userInformation) { %>
             <p>
-                <span id="phone-type"> - Using <% data.userInformation.deviceModel %>.</span>
+                <span id="phone-type"></span>
+            </p>
+            <p>
+                <span id="country"></span>
             </p>
 
             <p>
-                <span id="country"> - Playing in <% data.userInformation.country %>.</span>
+                <span id="game-plays-this-week"></span>
             </p>
 
             <p>
-                <span id="game-plays-this-week"> - Played this game <% data.userInformation.gamePlaysThisWeek %> times this week.</span>
+                <span id="ads-seen-in-game"></span>
             </p>
 
             <p>
-                <span id="ads-seen-in-game"> - Seen <% data.userInformation.adsSeenInGameThisWeek %> ads in this game.</span>
+                <span id="games-installed-from-ads"></span>
             </p>
-
-            <p>
-                <span id="games-installed-from-ads"> - Installed <% data.userInformation.installsFromAds %> games based on those ads.</span>
-            </p>
-            <% } else { %>
             <p>
                 <span id="sorry-message">Sorry. We were unable to deliver our collected information at this time.</span>
             </p>
-            <% } %>
+
 
             <p><span class="header">Selection</span></p>
             <p>
@@ -122,7 +117,7 @@
                 <span class="header">Data Management</span>
 
                 You can delete any data Unity has about your device by clicking <span class="data-deletion-link page-link">here</span>.
-                <% if(!data.isCoppaCompliant) { %>
+                <% if(data.isCoppaCompliant) { %>
                 <span id="coppaTag3">This will also opt you out of personalized ad experiences.</span>
                 <% } %>
                 <span id="data-deletion-container">Are you sure? <span id="data-deletion-confirm" class="page-link">Yes</span>

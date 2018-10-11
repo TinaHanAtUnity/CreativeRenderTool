@@ -50,11 +50,13 @@ import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('AdUnitFactoryTest', () => {
 
     let sandbox: sinon.SinonSandbox;
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
     let focusManager: FocusManager;
     let container: AdUnitContainer;
     let deviceInfo: DeviceInfo;
@@ -75,6 +77,7 @@ describe('AdUnitFactoryTest', () => {
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
+        storageBridge = new StorageBridge(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
@@ -89,7 +92,7 @@ describe('AdUnitFactoryTest', () => {
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false, getOsVersion: () => '8.0'};
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         thirdPartyEventManager.setTemplateValues({ '%ZONE%': placement.getId(), '%SDK_VERSION%': clientInfo.getSdkVersion().toString() });
-        sessionManager = new SessionManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         const campaign = TestFixtures.getCampaign();
         const gdprManager = sinon.createStubInstance(GdprManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -103,6 +106,7 @@ describe('AdUnitFactoryTest', () => {
             deviceInfo: deviceInfo,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: campaign
         });
 
@@ -256,6 +260,7 @@ describe('AdUnitFactoryTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
@@ -364,6 +369,7 @@ describe('AdUnitFactoryTest', () => {
                     deviceInfo: deviceInfo,
                     coreConfig: coreConfig,
                     adsConfig: adsConfig,
+                    storageBridge: storageBridge,
                     campaign: campaign
                 });
 
@@ -407,6 +413,7 @@ describe('AdUnitFactoryTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
@@ -457,6 +464,7 @@ describe('AdUnitFactoryTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 

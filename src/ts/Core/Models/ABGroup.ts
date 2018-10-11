@@ -34,6 +34,7 @@ const GroupSeventeen = new ABGroup(17);
 const GroupEighteen = new ABGroup(18);
 const GroupNineteen = new ABGroup(19);
 const GroupTest = new ABGroup(99);
+export const GroupDisabled = new ABGroup(666);
 
 export class ABGroupBuilder {
     public static getAbGroup = (group: number) => {
@@ -101,10 +102,8 @@ class ABTest {
 // Add ABTests below
 // Example : export const GdprBaseAbTest = new ABTest(GroupSixteen, GroupSeventeen);
 
-export const OrangeEndScreenButtonColorTest = new ABTest(GroupSixteen);
-export const GreenEndScreenButtonColorTest = new ABTest(GroupSeventeen);
-export const RedEndScreenButtonColorTest = new ABTest(GroupEighteen);
-export const NavyEndScreenButtonColorTest = new ABTest(GroupNineteen);
 export const FPSCollectionTest = new ABTest(GroupSixteen);
-export const ReportAdTest = new ABTest(GroupEleven, GroupTwelve);
+export const ClickDelayTrackingTest = new ABTest(GroupFourteen, GroupFifteen);
+export const SmartCloseButtonTest = new ABTest(GroupEighteen, GroupNineteen);
 export const BackupCampaignTest = new ABTest(GroupSix, GroupSeven);
+export const ImprovedEndScreenStylesTest = new ABTest(GroupSixteen, GroupSeventeen);

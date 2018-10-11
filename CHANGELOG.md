@@ -1,4 +1,45 @@
-# Staged
+# Wed Oct 10 17:36:31 UTC 2018
+
+* Multiply battery level by 100 for AdMob signal [#6600](https://github.com/Applifier/unity-ads-webview/pull/6600)
+* ABTest for click tracking swap, request from CrossInstall [#6598](https://github.com/Applifier/unity-ads-webview/pull/6598)
+* Fix AdMob campaign loader [#6647](https://github.com/Applifier/unity-ads-webview/pull/6647)
+
+# Tue Oct  9 21:46:34 UTC 2018
+
+* Improve/Rename Reporting Privacy and Remove Other Privacies [#6601](https://github.com/Applifier/unity-ads-webview/pull/6601)
+* Improvements to Banner Lifecycle Logic [#6596](https://github.com/Applifier/unity-ads-webview/pull/6596)
+* Batching storage modifications and writes [#6454](https://github.com/Applifier/unity-ads-webview/pull/6545)
+* Use Allow Skip Flag from Configuration for Rewarded Promo [#6552](https://github.com/Applifier/unity-ads-webview/pull/6552)
+* Never serialize Asset model Session object [#6603](https://github.com/Applifier/unity-ads-webview/pull/6603)
+
+# Mon Oct  8 23:15:42 UTC 2018
+
+* AB Test various improvements to the endscreen layout in groups 16 & 17 [#6556](https://github.com/Applifier/unity-ads-webview/pull/6556)
+* AB Test Smart Close button in groups 18 & 19 [#6238](https://github.com/Applifier/unity-ads-webview/pull/6238) 
+* Fix session ad plan loading for backup campaigns [#6595](https://github.com/Applifier/unity-ads-webview/pull/6595)
+* Removed CTA button color test from groups 16, 17, 18 & 19 [#6472](https://github.com/Applifier/unity-ads-webview/pull/6576/)
+
+# Fri Oct  5 21:40:11 UTC 2018
+
+* Enable Reporting Privacy for All [#6575](https://github.com/Applifier/unity-ads-webview/pull/6575)
+* Support serialization for MRAID campaigns [#6549](https://github.com/Applifier/unity-ads-webview/pull/6549)
+* Remove Ads deps from Core [#6544](https://github.com/Applifier/unity-ads-webview/pull/6544)
+* Add CSS media queries for iPhone XS Max [#6543](https://github.com/Applifier/unity-ads-webview/pull/6543)
+* Disable Report Bad Ads A/B test [#6550](https://github.com/Applifier/unity-ads-webview/pull/6550)
+* Fix AR permission dialog's styles [#6384](https://github.com/Applifier/unity-ads-webview/pull/6384)
+* Add abGroup to playable kpi events [#6555](https://github.com/Applifier/unity-ads-webview/pull/6555)
+* Update AR logo [#6497](https://github.com/Applifier/unity-ads-webview/pull/6497)
+* add missing 'supports' in MRAID container and remove one logWarning [#6540](https://github.com/Applifier/unity-ads-webview/pull/6540)
+
+# Mon Oct  1 11:33:41 UTC 2018
+
+* Enable close icon skip for specific game IDs [#6520](https://github.com/Applifier/unity-ads-webview/pull/6520)
+
+# Fri Sep 28 12:37:23 UTC 2018
+
+* Always enable autobatching for game ID 1448666 [#6498](https://github.com/Applifier/unity-ads-webview/pull/6498)
+
+# Thu Sep 27 13:33:54 UTC 2018
 
 * Refactor backup campaign implementation [#6407](https://github.com/Applifier/unity-ads-webview/pull/6407)
 * Re-run CTA button color experiment with 4 A/B group and 4 colors. Each A/B group should have one assigned color for download button (groups 16, 17, 18 & 19) [#6472](https://github.com/Applifier/unity-ads-webview/pull/6472)
@@ -6,7 +47,7 @@
 
 # Wed Sep 26 21:14:54 UTC 2018
 
-* Temporarily remove Mixed Placement functionality and tests[#6474](https://github.com/Applifier/unity-ads-webview/pull/6474)
+* Temporarily remove Mixed Placement functionality and tests [#6474](https://github.com/Applifier/unity-ads-webview/pull/6474)
 
 # Wed Sep 26 09:51:45 UTC 2018
 

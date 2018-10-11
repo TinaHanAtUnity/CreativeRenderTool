@@ -48,7 +48,7 @@ import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ABGroupBuilder, ReportAdTest, BackupCampaignTest } from 'Core/Models/ABGroup';
+import { ABGroupBuilder, BackupCampaignTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -72,8 +72,8 @@ import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 export class WebView {
 
@@ -94,6 +94,7 @@ export class WebView {
     private _cache: Cache;
     private _cacheBookkeeping: CacheBookkeeping;
     private _container: AdUnitContainer;
+    private _storageBridge: StorageBridge;
 
     private _currentAdUnit: AbstractAdUnit;
 
@@ -149,6 +150,7 @@ export class WebView {
 
             this._cachedCampaignResponse = undefined;
 
+            this._storageBridge = new StorageBridge(this._nativeBridge);
             this._focusManager = new FocusManager(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
@@ -190,7 +192,7 @@ export class WebView {
                 this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager, this._clientInfo);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
-            this._sessionManager = new SessionManager(this._nativeBridge, this._request);
+            this._sessionManager = new SessionManager(this._nativeBridge, this._request, this._storageBridge);
 
             this._initializedAt = Date.now();
             this._nativeBridge.Sdk.initComplete();
@@ -300,7 +302,7 @@ export class WebView {
 
             const bannerCampaignManager = new BannerCampaignManager(this._nativeBridge, this._coreConfig, this._adsConfig, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._jaegerManager);
             const bannerWebPlayerContainer = new BannerWebPlayerContainer(this._nativeBridge);
-            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._coreConfig, this._adsConfig, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._analyticsManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer, this._programmaticTrackingService);
+            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._coreConfig, this._adsConfig, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._analyticsManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer, this._programmaticTrackingService, this._storageBridge);
             this._bannerAdContext = new BannerAdContext(this._nativeBridge, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, this._focusManager, this._deviceInfo);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._coreConfig, this._adsConfig, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo, this._cache);
@@ -330,14 +332,10 @@ export class WebView {
 
             return this._sessionManager.sendUnsentSessions();
         }).then(() => {
-            if ((ReportAdTest.isValid(this._coreConfig.getAbGroup()) && this._adsConfig.isGDPREnabled())) {
-                return AbstractPrivacy.setUserInformation(this._gdprManager).catch(() => {
-                    this._nativeBridge.Sdk.logInfo('Failed to set up privacy information.');
-                });
-            }
-        }).then(() => {
             if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                this._nativeBridge.setAutoBatchEnabled(false);
+                if(!CustomFeatures.isAlwaysAutobatching(this._clientInfo.getGameId())) {
+                    this._nativeBridge.setAutoBatchEnabled(false);
+                }
                 this._nativeBridge.Request.Android.setMaximumPoolSize(1);
             } else {
                 this._nativeBridge.Request.setConcurrentRequestCount(1);
@@ -502,6 +500,7 @@ export class WebView {
                     deviceInfo: this._deviceInfo,
                     coreConfig: this._coreConfig,
                     adsConfig: this._adsConfig,
+                    storageBridge: this._storageBridge,
                     campaign: campaign
                 }),
                 placement: placement,
@@ -582,7 +581,9 @@ export class WebView {
         this._showing = false;
 
         if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.setAutoBatchEnabled(false);
+            if(!CustomFeatures.isAlwaysAutobatching(this._clientInfo.getGameId())) {
+                this._nativeBridge.setAutoBatchEnabled(false);
+            }
             this._nativeBridge.Request.Android.setMaximumPoolSize(1);
         } else {
             this._nativeBridge.Request.setConcurrentRequestCount(1);

@@ -9,8 +9,9 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Request } from 'Core/Utilities/Request';
+import { ITemplateData } from 'Core/Views/View';
 
-export interface IGdprPersonalProperties {
+export interface IGdprPersonalProperties extends ITemplateData {
     deviceModel: string;
     country: string;
     gamePlaysThisWeek: number;
