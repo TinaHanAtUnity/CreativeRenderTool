@@ -8,7 +8,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { Overlay } from 'Ads/Views/Overlay';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -26,6 +25,7 @@ import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdU
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
+import { Privacy } from 'Ads/Views/Privacy';
 
 describe('PrivacyEventHandlerTest', () => {
 
@@ -53,7 +53,7 @@ describe('PrivacyEventHandlerTest', () => {
             endScreen: sinon.createStubInstance(PerformanceEndScreen),
             overlay: sinon.createStubInstance(Overlay),
             video: sinon.createStubInstance(Video),
-            privacy: sinon.createStubInstance(GDPRPrivacy),
+            privacy: sinon.createStubInstance(Privacy),
             gdprManager: sinon.createStubInstance(GdprManager),
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };

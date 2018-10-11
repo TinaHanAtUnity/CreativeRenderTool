@@ -8,6 +8,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { ClickDelayTrackingTest, ABGroup } from 'Core/Models/ABGroup';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastAdUnit: VastAdUnit;
@@ -15,6 +16,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastCampaign: VastCampaign;
     private _moat?: MOAT;
     private _vastOverlay?: AbstractVideoOverlay;
+    private _isClickTestAbGroup: boolean;
 
     constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(nativeBridge, adUnit, parameters);
@@ -25,6 +27,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._placement = parameters.placement;
         this._moat = MoatViewabilityService.getMoat();
         this._vastOverlay = this._vastAdUnit.getOverlay();
+        this._isClickTestAbGroup = ClickDelayTrackingTest.isValid(parameters.coreConfig.getAbGroup());
     }
 
     public onOverlaySkip(position: number): void {
@@ -60,13 +63,19 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this.setCallButtonEnabled(false);
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
+        if (this._isClickTestAbGroup) {
+            this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+        }
+
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
             return this._request.followRedirectChain(clickThroughURL).then(
                 (url: string) => {
                     return this.openUrl(url).then(() => {
                         this.setCallButtonEnabled(true);
-                        this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+                        if (!this._isClickTestAbGroup) {
+                            this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+                        }
                     }).catch((e) => {
                         this.setCallButtonEnabled(true);
                     });

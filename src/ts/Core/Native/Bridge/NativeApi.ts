@@ -13,7 +13,7 @@ export abstract class NativeApi {
         [ApiPackage.CORE]: {android: 'com.unity3d.services.core.api', ios: 'USRVApi'},
         [ApiPackage.ADS]: {android: 'com.unity3d.services.ads.api', ios: 'UADSApi'},
         [ApiPackage.AR]: {android: 'com.unity3d.services.ar.api', ios: 'UARApi'},
-        [ApiPackage.BANNER]: {android: 'com.unity3d.services.banner.api', ios: 'UADSApi'}
+        [ApiPackage.BANNER]: {android: 'com.unity3d.services.banners.api', ios: 'UADSApi'}
     };
 
     protected _nativeBridge: NativeBridge;

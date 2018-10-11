@@ -1,5 +1,4 @@
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
@@ -11,8 +10,10 @@ import 'mocha';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { Privacy } from 'Ads/Views/Privacy';
 
-describe('EndScreen', () => {
+describe('EndScreenTest', () => {
     let handleInvocation: sinon.SinonSpy;
     let handleCallback: sinon.SinonSpy;
     let nativeBridge: NativeBridge;
@@ -32,7 +33,9 @@ describe('EndScreen', () => {
     });
 
     const createEndScreen = (language : string) : PerformanceEndScreen => {
-        const privacy = new Privacy(nativeBridge, false);
+        const gdprManager = sinon.createStubInstance(GdprManager);
+        const campaign = TestFixtures.getCampaign();
+        const privacy = new Privacy(nativeBridge, campaign, gdprManager, false, false);
         const params : IEndScreenParameters = {
             nativeBridge,
             language,
@@ -41,9 +44,9 @@ describe('EndScreen', () => {
             abGroup: configuration.getAbGroup(),
             privacy,
             showGDPRBanner: false,
-            campaignId: TestFixtures.getCampaign().getId()
+            campaignId: campaign.getId()
         };
-        return new PerformanceEndScreen(params, TestFixtures.getCampaign());
+        return new PerformanceEndScreen(params, campaign);
     };
 
     xit('should render', () => {

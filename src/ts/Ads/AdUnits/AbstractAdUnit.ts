@@ -118,4 +118,8 @@ export abstract class AbstractAdUnit {
             this._finishState = finishState;
         }
     }
+
+    public markAsSkipped() {
+        this._finishState = FinishState.SKIPPED;
+    }
 }

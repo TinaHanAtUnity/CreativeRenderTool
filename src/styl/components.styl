@@ -179,7 +179,6 @@ $radio-group-container($scale-size = $default-scale-size, $context-font-size = 1
 
 $tencent-overlay($scale-size = $default-scale-size) {
   position: fixed;
-  top: $default-scale-size * 2rem;
   padding: $default-scale-size * .7rem;
   color: $white;
   font-size: $default-scale-size * $default-font-size * .75;
@@ -235,10 +234,23 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
         font-weight: 400;
       }
 
+      .icon-gdpr {
+        display: block;
+        text-align: center;
+        font-size: $default-size * $default-font-size * 2.5;
+        opacity: .4;
+      }
+
+      .centered-title {
+        display: block;
+        text-align: center;
+      }
+
       .title {
+        margin-top: $pop-up-size * .5rem;
         margin-bottom: $pop-up-size;
         font-weight: 500;
-        font-size: $pop-up-font-size * 1.25;
+        font-size: $pop-up-font-size * 1.1;
       }
 
       .header {
@@ -254,6 +266,57 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
           min-height: $fade-out-gradient-height * 3.25;
         }
       }
+
+    .report-title {
+      margin-top: $pop-up-size;
+      margin-bottom: $pop-up-size;
+      font-size: $pop-up-font-size * 1.5;
+    }
+
+    .report-dialog {
+      display: block;
+      text-align: center;
+      font-style: italic;
+      font-size: $pop-up-font-size;
+    }
+
+    .report-disclaimer {
+        display: block;
+        margin-top: $pop-up-size * .5;
+        margin-bottom: $pop-up-size * .5;
+        text-align: center;
+        font-size: $pop-up-font-size * .6;
+    }
+
+    .report-container {
+      height: $pop-up-size * 4.5rem;
+
+      .report-button {
+        display: inline-block;
+        float: left;
+        margin: $pop-up-size * .5;
+        padding: $pop-up-size * .75 $pop-up-size * 1.5;
+        border-radius: $pop-up-size * .25;
+        background: $privacy-green;
+        color: $white;
+        font-size: $pop-up-font-size * 1.25;
+      }
+
+      .report-confirmed-text {
+        display: inline-block;
+        margin-top: $pop-up-size * .9;
+        width: 50%;
+        vertical-align: middle;
+        text-align: center;
+        font-size: $default-size * $default-font-size * .65;
+        opacity: 0;
+        transition: opacity $default-transition-ts ease-in;
+
+        &.active {
+          opacity: 1;
+        }
+      }
+    }
 
       .radio-group-container {
         $radio-group-container($scale-size, $pop-up-font-size);
@@ -271,6 +334,7 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
       bottom: 0;
       left: 0;
       width: 100%;
+      font-size: $pop-up-font-size * .75rem;
 
       .close-button {
         position: absolute;
@@ -286,10 +350,19 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
       }
 
       .left-side-link {
-        position: absolute;
+        bottom: 0;
+        display: inline-block;
+        margin-bottom: $pop-up-size * .5;
+        margin-left: $pop-up-size * .5;
+        width: 22%;
+        color: darken($end-screen-info-gray, 40%);
+      }
+
+      .middle-link {
         bottom: 0;
         display: inline-block;
         margin: $pop-up-size * .5;
+        width: 22%;
         color: darken($end-screen-info-gray, 40%);
       }
     }
@@ -300,4 +373,3 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
     }
   }
 }
-
