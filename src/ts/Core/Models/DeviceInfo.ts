@@ -27,7 +27,6 @@ export interface IDeviceInfo {
     freeMemory: number;
     totalMemory: number;
     cpuCount: number;
-    glVersion: string;
     maxVolume: number;
     headset: boolean;
 }
@@ -57,7 +56,6 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         freeMemory: ['number'],
         totalMemory: ['number'],
         cpuCount: ['integer'],
-        glVersion: ['string'],
         maxVolume: ['number'],
         headset: ['boolean']
     };
@@ -84,7 +82,6 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         promises.push(this._nativeBridge.DeviceInfo.getTimeZone(false).then(timeZone => this.set('timeZone', timeZone)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.getTotalMemory().then(totalMemory => this.set('totalMemory', totalMemory)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.getCPUCount().then(cpuCount => this.set('cpuCount', cpuCount)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getGLVersion().then(glVersion => this.set('glVersion', glVersion)).catch(err => this.handleDeviceInfoError(err)));
 
         return Promise.all(promises);
     }

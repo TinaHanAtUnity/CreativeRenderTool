@@ -9,7 +9,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -29,12 +28,15 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Privacy } from 'Ads/Views/Privacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('MRAIDEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, container: AdUnitContainer;
+    let storageBridge: StorageBridge;
     let mraidAdUnit: MRAIDAdUnit;
     let mraidView: MRAID;
     let placement: Placement;
@@ -100,7 +102,7 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false),
+                privacy: new Privacy(nativeBridge, playableMraidCampaign, gdprManager, false, false),
                 gdprManager: gdprManager,
                 programmaticTrackingService: programmaticTrackingService
             };
@@ -233,6 +235,7 @@ describe('MRAIDEventHandlersTest', () => {
                     kafkaObject.timeFromPlayableStart = 12;
                     kafkaObject.backgroundTime = 0;
                     kafkaObject.auctionId = '12345';
+                    kafkaObject.abGroup = 99;
 
                     const resourceUrl = playableMraidCampaign.getResourceUrl();
                     if(resourceUrl) {
@@ -255,6 +258,7 @@ describe('MRAIDEventHandlersTest', () => {
                     kafkaObject.timeFromPlayableStart = 12;
                     kafkaObject.backgroundTime = 5;
                     kafkaObject.auctionId = '12345';
+                    kafkaObject.abGroup = 99;
 
                     const resourceUrl = playableMraidCampaign.getResourceUrl();
                     if(resourceUrl) {
@@ -281,6 +285,7 @@ describe('MRAIDEventHandlersTest', () => {
                 handleInvocation,
                 handleCallback
             }, Platform.ANDROID);
+            storageBridge = new StorageBridge(nativeBridge);
             focusManager = new FocusManager(nativeBridge);
             metaDataManager = new MetaDataManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
@@ -292,12 +297,12 @@ describe('MRAIDEventHandlersTest', () => {
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge, request);
+            sessionManager = new SessionManager(nativeBridge, request, storageBridge);
             coreConfig = TestFixtures.getCoreConfiguration();
             adsConfig = TestFixtures.getAdsConfiguration();
             programmaticMraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
 
-            privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
+            privacy = new Privacy(nativeBridge, programmaticMraidCampaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             mraidView = new MRAID(nativeBridge, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup());
 
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -309,6 +314,7 @@ describe('MRAIDEventHandlersTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: programmaticMraidCampaign
             });
 
@@ -328,7 +334,7 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false),
+                privacy: new Privacy(nativeBridge, programmaticMraidCampaign, gdprManager, false, false),
                 gdprManager: gdprManager,
                 programmaticTrackingService: programmaticTrackingService
             };

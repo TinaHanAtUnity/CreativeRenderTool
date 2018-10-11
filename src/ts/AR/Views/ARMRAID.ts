@@ -94,6 +94,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             {
                 event: 'click',
                 listener: (event: Event) => {
+                    this.onPrivacyClicked(event);
+                },
+                selector: '.launch-privacy'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => {
                     this.onShowAr();
                 },
                 selector: '.permission-accept-button'
@@ -577,7 +584,12 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 return;
             }
 
-            PermissionsUtil.checkPermissions(this._nativeBridge, PermissionTypes.CAMERA).then(results => {
+            PermissionsUtil.checkPermissionInManifest(this._nativeBridge, PermissionTypes.CAMERA).then((available: boolean) => {
+                if (!available) {
+                    return CurrentPermission.DENIED;
+                }
+                return PermissionsUtil.checkPermissions(this._nativeBridge, PermissionTypes.CAMERA);
+            }).then((results: CurrentPermission) => {
                 const requestPermissionText = <HTMLElement>this._cameraPermissionPanel.querySelector('.request-text');
                 if (results === CurrentPermission.DENIED) {
                     this.onCameraPermissionEvent(false);
@@ -611,13 +623,24 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this.onCameraPermissionEvent(granted);
             }
         });
-
-        PermissionsUtil.requestPermission(this._nativeBridge, PermissionTypes.CAMERA).then(() => {
-            this._nativeBridge.Sdk.logDebug('Required permission for showing camera');
-        });
+        PermissionsUtil.requestPermission(this._nativeBridge, PermissionTypes.CAMERA);
     }
 
     private onShowFallback() {
         this.onCameraPermissionEvent(false);
+    }
+
+    private onPrivacyClicked(event: Event) {
+        event.stopPropagation();
+        event.preventDefault();
+        const url = (<HTMLLinkElement>event.target).href;
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._nativeBridge.UrlScheme.open(url);
+        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
+        }
     }
 }
