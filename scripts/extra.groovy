@@ -1,29 +1,36 @@
 def main() {
-    if (env.BRANCH_NAME =~ /^PR-/) {
+    //TODO: use if clause below instead before pushing to master
+    //if (env.BRANCH_NAME =~ /^PR-/) {
+    if (env.BRANCH_NAME =~ /feature\/jenkinsfile/) {
         stage('Run tests') {
-            if (env.BRANCH_NAME =~ /^staging/) {
+            //TODO: use if clause below instead before pushing to master
+            //if (env.BRANCH_NAME =~ /^staging/) {
+            if (env.BRANCH_NAME =~ /feature\/jenkinsfile/) {
                 parallel (
                     // run hybrid tests for staging branches
+                    // TODO: add tests for iOS
                     'Hybrid tests': {
-                        // build(
-                        //   job: "Applifier/unity-ads-sdk-tests/ads-sdk-hybrid-test-android/",
-                        //   propagate: true,
-                        //   parameters: [
-                        //     string(name: 'WEBVIEW_BRANCH', value: env.BRANCH_NAME),
-                        //   ],
-                        // )
-                        echo "This is a placeholder for running hybrid tests for webview staging branch: ${env.BRANCH_NAME}"
+                        build(
+                          job: "Applifier/unity-ads-sdk-tests/ads-sdk-hybrid-test-android/",
+                          propagate: true,
+                          parameters: [
+                            string(name: 'WEBVIEW_BRANCH', value: env.BRANCH_NAME),
+                          ],
+                        )
                     },
                     // run deployment tests for staging branches
+                    // TODO: add iOS system tests
                     'System tests': {
-                        // build(
-                        //   job: "Applifier/unity-ads-sdk-tests/ads-sdk-systest-android/",
-                        //   propagate: true,
-                        //   parameters: [
-                        //     string(name: 'WEBVIEW_BRANCH', value: env.BRANCH_NAME),
-                        //   ],
-                        // )
-                        echo "This is a placeholder for running system (deployment) tests for webview staging branch:  ${env.BRANCH_NAME}"
+                        //TODO: uncomment the line below before pushing to master
+                        //def nativeBranch = env.BRANCH_NAME.replace("staging/", "");
+                        build(
+                          job: "Applifier/unity-ads-sdk-tests/ads-sdk-systest-android/",
+                          propagate: true,
+                          parameters: [
+                            string(name: 'WEBVIEW_BRANCH', value: env.BRANCH_NAME),
+                            string(name: 'UNITY_ADS_ANDROID_BRANCH', value: nativeBranch)
+                          ],
+                        )
                     }
                 )
             } else {
