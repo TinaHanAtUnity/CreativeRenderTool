@@ -152,7 +152,10 @@ export class AdUnitFactory {
         this.prepareVideoPlayer(PerformanceVideoEventHandler, <IVideoEventHandlerParams<PerformanceAdUnit>>videoEventHandlerParams);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
+            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
+                endScreenEventHandler.onKeyEvent(keyCode);
+                performanceOverlayEventHandler.onKeyEvent(keyCode);
+            });
             performanceAdUnit.onClose.subscribe(() => {
                 if(onBackKeyObserver) {
                     nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
@@ -207,7 +210,10 @@ export class AdUnitFactory {
         this.prepareVideoPlayer(XPromoVideoEventHandler, <IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>>videoEventHandlerParams);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
+            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
+                endScreenEventHandler.onKeyEvent(keyCode);
+                xPromoOverlayEventHandler.onKeyEvent(keyCode);
+            });
             xPromoAdUnit.onClose.subscribe(() => {
                 if(onBackKeyObserver) {
                     nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
@@ -255,7 +261,10 @@ export class AdUnitFactory {
             vastEndScreen.addEventHandler(vastEndScreenHandler);
 
             if (nativeBridge.getPlatform() === Platform.ANDROID) {
-                const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => vastEndScreenHandler.onKeyEvent(keyCode));
+                const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) =>  {
+                    vastEndScreenHandler.onKeyEvent(keyCode);
+                    vastOverlayHandler.onKeyEvent(keyCode);
+                });
                 vastAdUnit.onClose.subscribe(() => {
                     nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
                 });
