@@ -41,6 +41,7 @@ import { MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import { PlayableMRAID } from 'MRAID/Views/PlayableMRAID';
+import { ARMRAID } from 'AR/Views/ARMRAID';
 import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
@@ -160,8 +161,9 @@ describe('AdUnitFactoryTest', () => {
                 adUnitParameters.campaign = campaign;
             });
 
-            after(() => {
+            afterEach(() => {
                 AdUnitFactory.setForcedPlayableMRAID(false);
+                AdUnitFactory.setForcedARMRAID(false);
             });
 
             it('should create MRAID view', () => {
@@ -185,6 +187,12 @@ describe('AdUnitFactoryTest', () => {
                 AdUnitFactory.setForcedPlayableMRAID(true);
                 const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
                 assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
+            });
+
+            it('should be forced to create ARMRAID view', () => {
+               AdUnitFactory.setForcedARMRAID(true);
+               const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+               assert.isTrue(adUnit.getMRAIDView() instanceof ARMRAID, 'view should be ARMRAID');
             });
         });
 
