@@ -72,7 +72,7 @@ describe('ABGroup tests', () => {
         tests.forEach((t) => {
             it(`expected group is ${t.expectedGroup} and the metadata group is ${t.metaDataGroup}`, () => {
                 const nativeBridge: NativeBridge = sinon.createStubInstance(NativeBridge);
-                const webview: any = new WebView(nativeBridge);
+                const webview = new WebView(nativeBridge);
                 const setupStub: sinon.SinonStub = sinon.stub(TestEnvironment, 'setup').resolves();
                 const getStub: sinon.SinonStub = sinon.stub(TestEnvironment, 'get');
                 getStub.withArgs('abGroup').returns(t.metaDataGroup);

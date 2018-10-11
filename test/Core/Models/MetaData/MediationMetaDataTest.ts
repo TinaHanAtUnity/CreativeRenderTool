@@ -6,83 +6,39 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 import 'mocha';
 import * as sinon from 'sinon';
+import { Backend } from '../../../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../../../src/ts/Core/Core';
+import { TestFixtures } from '../../../TestHelpers/TestFixtures';
+import { Platform } from '../../../../src/ts/Core/Constants/Platform';
 
-class TestStorageApi extends StorageApi {
-
-    private _storage: any;
-
-    public setStorage(data: any) {
-        this._storage = data;
-    }
-
-    public get<T>(storageType: StorageType, key: string): Promise<T> {
-        try {
-            switch(key) {
-                case 'mediation.name.value':
-                    return Promise.resolve(this._storage.mediation.name.value);
-
-                case 'mediation.version.value':
-                    return Promise.resolve(this._storage.mediation.version.value);
-
-                case 'mediation.ordinal.value':
-                    return Promise.resolve(this._storage.mediation.ordinal.value);
-
-                default:
-                    throw new Error('Unknown mediation key "' + key + '"');
-            }
-        } catch(error) {
-            return Promise.reject(['COULDNT_GET_VALUE', key]);
-        }
-    }
-
-    public delete(storageType: StorageType, key: string): Promise<void> {
-        if(key === 'mediation') {
-            delete this._storage.mediation;
-        }
-        return Promise.resolve(void(0));
-    }
-
-    public getKeys(storageType: StorageType, key: string, recursive: boolean): Promise<string[]> {
-        try {
-            if(key === 'mediation') {
-                return Promise.resolve(Object.keys(this._storage.mediation));
-            }
-            return Promise.resolve([]);
-        } catch(error) {
-            return Promise.resolve([]);
-        }
-    }
-}
-
+[Platform.ANDROID, Platform.IOS].forEach(platform => {
 describe('MediationMetaDataTest', () => {
-    const handleInvocation = sinon.spy();
-    const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, storageApi: TestStorageApi;
+    let backend: Backend;
+    let nativeBridge: NativeBridge;
+    let core: ICoreApi;
 
     before(() => {
-        nativeBridge = new NativeBridge({
-            handleInvocation,
-            handleCallback
-        });
-        nativeBridge.Storage = storageApi = new TestStorageApi(nativeBridge);
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
     });
 
     it('should return undefined when data doesnt exist', () => {
-        const metaDataManager = new MetaDataManager(nativeBridge);
+        const metaDataManager = new MetaDataManager(core);
         return metaDataManager.fetch(MediationMetaData).then(metaData => {
             assert.isUndefined(metaData, 'Returned MediationMetaData even when it doesnt exist');
         });
     });
 
     it('should fetch correctly', () => {
-        storageApi.setStorage({
+        backend.Api.Storage.setStorageContents({
             mediation: {
                 name: {value: 'test_name'},
                 version: {value: 'test_version'}
             }
         });
 
-        const metaDataManager = new MetaDataManager(nativeBridge);
+        const metaDataManager = new MetaDataManager(core);
         return metaDataManager.fetch(MediationMetaData, true, ['name', 'version']).then(metaData => {
             if(metaData) {
                 assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
@@ -99,7 +55,7 @@ describe('MediationMetaDataTest', () => {
     });
 
     it('should update correctly', () => {
-        storageApi.setStorage({
+        backend.Api.Storage.setStorageContents({
             mediation: {
                 name: {value: 'test_name'},
                 version: {value: 'test_version'},
@@ -107,7 +63,7 @@ describe('MediationMetaDataTest', () => {
             }
         });
 
-        const metaDataManager = new MetaDataManager(nativeBridge);
+        const metaDataManager = new MetaDataManager(core);
         return metaDataManager.fetch(MediationMetaData, true, ['name', 'version']).then(metaData => {
             if(metaData) {
                 assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');
@@ -136,7 +92,7 @@ describe('MediationMetaDataTest', () => {
     });
 
     it('should not fetch when data is undefined', () => {
-        storageApi.setStorage({
+        backend.Api.Storage.setStorageContents({
             mediation: {
                 name: undefined,
                 version: undefined,
@@ -144,20 +100,20 @@ describe('MediationMetaDataTest', () => {
             }
         });
 
-        const metaDataManager = new MetaDataManager(nativeBridge);
+        const metaDataManager = new MetaDataManager(core);
         return metaDataManager.fetch(MediationMetaData).then(metaData => {
             assert.isUndefined(metaData, 'MediationMetaData is defined');
         });
     });
 
     it('should fetch correctly when data is partially undefined', () => {
-        storageApi.setStorage({
+        backend.Api.Storage.setStorageContents({
             mediation: {
                 name: {value: 'test_name'}
             }
         });
 
-        const metaDataManager = new MetaDataManager(nativeBridge);
+        const metaDataManager = new MetaDataManager(core);
         return metaDataManager.fetch(MediationMetaData).then(metaData => {
             if(metaData) {
                 assert.equal(metaData.getName(), 'test_name', 'MediationMetaData.getName() did not pass through correctly');

@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 
-import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import 'mocha';
+import { ClientInfoData } from '../../../src/ts/Core/Native/Sdk';
 
 describe('ClientInfoTest', () => {
 
@@ -11,7 +11,7 @@ describe('ClientInfoTest', () => {
     it('Get ClientInfo DTO', () => {
         // gameId, testMode, applicationName, applicationVersion, sdkVersion, sdkVersionName
         // debuggable, configUrl, webviewUrl, webviewHash, webviewVersion
-        const data: any[] = [
+        const data: ClientInfoData = [
             '11111',
             true,
             'com.unity3d.ads.test',
@@ -24,11 +24,10 @@ describe('ClientInfoTest', () => {
             '54321',
             '2.0.0-webview-test',
             0,
-            false,
-            {'asd': 'asd'}
+            false
         ];
 
-        clientInfo = new ClientInfo(Platform.TEST, data);
+        clientInfo = new ClientInfo(data);
         const dto: any = clientInfo.getDTO();
 
         assert.equal(dto.gameId, '11111');
@@ -42,12 +41,11 @@ describe('ClientInfoTest', () => {
         assert.equal(dto.webviewUrl, 'http://test.com/index.html');
         assert.equal(dto.webviewHash, '54321');
         assert.equal(dto.webviewVersion, '2.0.0-webview-test');
-        assert.equal(dto.platform, 'test');
 
     });
 
     it('Construct with invalid gameId', () => {
-        const data: any[] = [
+        const data: ClientInfoData = [
             'abc1111',
             true,
             'com.unity3d.ads.test',
@@ -60,11 +58,10 @@ describe('ClientInfoTest', () => {
             '54321',
             '2.0.0-webview-test',
             0,
-            false,
-            {'asd': 'asd'}
+            false
         ];
 
-        clientInfo = new ClientInfo(Platform.TEST, data);
+        clientInfo = new ClientInfo(data);
         const dto: any = clientInfo.getDTO();
 
         assert.equal(dto.gameId, 'abc1111');

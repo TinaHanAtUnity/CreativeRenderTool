@@ -10,7 +10,7 @@ import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
 import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
 import 'mocha';
 import * as sinon from 'sinon';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { TestFixtures } from '../../../test/TestHelpers/TestFixtures';
 
 describe('DeviceInfoTest', () => {
 

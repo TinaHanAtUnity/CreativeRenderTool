@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { JaegerManager } from 'Core/Jaeger/JaegerManager';
+import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { IJaegerSpan, JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
