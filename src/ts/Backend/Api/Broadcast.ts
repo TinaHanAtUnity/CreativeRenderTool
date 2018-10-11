@@ -6,4 +6,8 @@ export class Broadcast extends BackendApi {
         return;
     }
 
+    public removeBroadcastListener(name: string) {
+        return;
+    }
+
 }
