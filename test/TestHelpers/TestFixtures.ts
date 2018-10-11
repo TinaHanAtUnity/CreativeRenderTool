@@ -84,6 +84,7 @@ import { ListenerApi } from '../../src/ts/Ads/Native/Listener';
 import { IBannersApi } from '../../src/ts/Banners/Banners';
 import { BannerApi } from '../../src/ts/Banners/Native/Banner';
 import { BannerListenerApi } from '../../src/ts/Banners/Native/UnityBannerListener';
+import { Backend } from '../../src/ts/Backend/Backend';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -518,19 +519,11 @@ export class TestFixtures {
         return vastParser;
     }
 
-    public static getNativeBridge(platform?: Platform): NativeBridge {
-        if(typeof platform === 'undefined') {
-            platform = Platform.TEST;
-        }
-        const backend = {
-            handleInvocation: () => {
-                // no-op
-            },
-            handleCallback: () => {
-                // no-op
-            }
-        };
-        return new NativeBridge(backend, platform);
+    public static getNativeBridge(platform: Platform): NativeBridge {
+        const backend = new Backend(platform);
+        const nativeBridge = new NativeBridge(backend, platform, false);
+        backend.setNativeBridge(nativeBridge);
+        return nativeBridge;
     }
 
     public static getCoreApi(nativeBridge: NativeBridge): ICoreApi {
