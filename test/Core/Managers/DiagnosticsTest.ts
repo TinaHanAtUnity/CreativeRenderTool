@@ -13,15 +13,18 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ICoreApi } from '../../../src/ts/Core/Core';
+import { Backend } from '../../../src/ts/Backend/Backend';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(Platform[platform] + ' - DiagnosticsTest', () => {
+        let backend: Backend;
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
         let resolvedPromise: Promise<INativeResponse>;
 
         beforeEach(() => {
-            nativeBridge = TestFixtures.getNativeBridge(platform);
+            backend = TestFixtures.getBackend(platform);
+            nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
         });
 

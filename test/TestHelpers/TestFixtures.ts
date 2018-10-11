@@ -495,12 +495,12 @@ export class TestFixtures {
         ]);
     }
 
-    public static getAndroidDeviceInfo(): AndroidDeviceInfo {
-        return new FakeAndroidDeviceInfo(TestFixtures.getCoreApi(TestFixtures.getNativeBridge(Platform.ANDROID)));
+    public static getAndroidDeviceInfo(core: ICoreApi): AndroidDeviceInfo {
+        return new FakeAndroidDeviceInfo(core);
     }
 
-    public static getIosDeviceInfo(): IosDeviceInfo {
-        return new FakeIosDeviceInfo(TestFixtures.getCoreApi(TestFixtures.getNativeBridge(Platform.IOS)));
+    public static getIosDeviceInfo(core: ICoreApi): IosDeviceInfo {
+        return new FakeIosDeviceInfo(core);
     }
 
     public static getOkNativeResponse(): INativeResponse {
@@ -519,8 +519,11 @@ export class TestFixtures {
         return vastParser;
     }
 
-    public static getNativeBridge(platform: Platform): NativeBridge {
-        const backend = new Backend(platform);
+    public static getBackend(platform: Platform): Backend {
+        return new Backend(platform);
+    }
+
+    public static getNativeBridge(platform: Platform, backend: Backend): NativeBridge {
         const nativeBridge = new NativeBridge(backend, platform, false);
         backend.setNativeBridge(nativeBridge);
         return nativeBridge;

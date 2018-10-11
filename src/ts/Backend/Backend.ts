@@ -18,6 +18,7 @@ import { VideoPlayer } from 'Backend/Api/VideoPlayer';
 import { Platform } from 'Core/Constants/Platform';
 import { CallbackStatus, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { BackendApi } from './BackendApi';
+import { Resolve } from './Api/Resolve';
 
 interface IInvocation {
     className: string;
@@ -77,6 +78,7 @@ export class Backend implements IWebViewBridge {
             Placement: new Placement(this),
             Purchasing: new Purchasing(this),
             Request: new Request(this),
+            Resolve: new Resolve(this),
             Sdk: new Sdk(this),
             Storage: new Storage(this),
             UrlScheme: new UrlScheme(this),
