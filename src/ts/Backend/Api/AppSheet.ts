@@ -1,14 +1,16 @@
-export class AppSheet {
+import { BackendApi } from '../BackendApi';
 
-    public static canOpen() {
+export class AppSheet extends BackendApi {
+
+    public canOpen() {
         return false;
     }
 
-    public static prepare(options: any, timeout: number) {
+    public prepare(options: any, timeout: number) {
         return;
     }
 
-    public static destroy(options: any) {
+    public destroy(options: any) {
         return;
     }
 

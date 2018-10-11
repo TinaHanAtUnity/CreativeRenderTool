@@ -1,9 +1,9 @@
-import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
+import { BackendApi } from '../BackendApi';
 
-export class AdUnit {
+export class AdUnit extends BackendApi {
 
-    public static open(activityId: number, views: string[], orientation: number, keyEvents: string[], systemUiVisibility: number, hardwareAcceleration: boolean) {
+    public open(activityId: number, views: string[], orientation: number, keyEvents: string[], systemUiVisibility: number, hardwareAcceleration: boolean) {
         const videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
         const webView = <HTMLIFrameElement>window.parent.document.getElementById('webView');
 
@@ -15,25 +15,25 @@ export class AdUnit {
             webView.style.display = 'block';
         }
 
-        const platform = Backend.getPlatform();
+        const platform = this._backend.getPlatform();
         if(platform === Platform.ANDROID) {
             setTimeout(() => {
-                Backend.sendEvent('ADUNIT', 'ON_CREATE', activityId);
-                Backend.sendEvent('ADUNIT', 'ON_START', activityId);
-                Backend.sendEvent('ADUNIT', 'ON_RESUME', activityId);
+                this._backend.sendEvent('ADUNIT', 'ON_CREATE', activityId);
+                this._backend.sendEvent('ADUNIT', 'ON_START', activityId);
+                this._backend.sendEvent('ADUNIT', 'ON_RESUME', activityId);
             }, 0);
         } else if(platform === Platform.IOS) {
             setTimeout(() => {
-                Backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_DID_LOAD');
-                Backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_INIT');
-                Backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_DID_APPEAR');
+                this._backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_DID_LOAD');
+                this._backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_INIT');
+                this._backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_DID_APPEAR');
             }, 0);
         }
 
         return [];
     }
 
-    public static close() {
+    public close() {
         const videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
         const webView = <HTMLIFrameElement>window.parent.document.getElementById('webView');
 
@@ -46,23 +46,23 @@ export class AdUnit {
         }
     }
 
-    public static setViews(views: string[]) {
+    public setViews(views: string[]) {
         return;
     }
 
-    public static setOrientation(orientation: number) {
+    public setOrientation(orientation: number) {
         return;
     }
 
-    public static setSupportedOrientations(orientations: number) {
+    public setSupportedOrientations(orientations: number) {
         return;
     }
 
-    public static setTransform(rotation: number) {
+    public setTransform(rotation: number) {
         return;
     }
 
-    public static setViewFrame(view: string, x: number, y: number, width: number, height: number) {
+    public setViewFrame(view: string, x: number, y: number, width: number, height: number) {
         return;
     }
 

@@ -32,7 +32,7 @@ import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { CacheError } from 'Core/Native/Cache';
 import { StorageType } from 'Core/Native/Storage';
 import { CacheStatus } from 'Core/Managers/CacheManager';
-import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
@@ -89,7 +89,7 @@ export class CampaignManager {
     protected _coreConfig: CoreConfiguration;
     protected _adsConfig: AdsConfiguration;
     protected _clientInfo: ClientInfo;
-    protected _cacheBookkeeping: CacheBookkeeping;
+    protected _cacheBookkeeping: CacheBookkeepingManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
@@ -103,7 +103,7 @@ export class CampaignManager {
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;

@@ -9,7 +9,7 @@ import { WebViewError } from 'Core/Errors/WebViewError';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { CacheManager, CacheStatus, HeadersType } from 'Core/Managers/CacheManager';
-import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
@@ -48,7 +48,7 @@ export class AssetManager {
     private _core: ICoreApi;
     private _cache: CacheManager;
     private _cacheMode: CacheMode;
-    private _cacheBookkeeping: CacheBookkeeping;
+    private _cacheBookkeeping: CacheBookkeepingManager;
     private _pts: ProgrammaticTrackingService;
     private _deviceInfo: DeviceInfo;
     private _stopped: boolean;
@@ -62,7 +62,7 @@ export class AssetManager {
 
     private _sendCacheDiagnostics = false;
 
-    constructor(platform: Platform, core: ICoreApi, cache: CacheManager, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeeping, pts: ProgrammaticTrackingService, backupCampaignManager: BackupCampaignManager) {
+    constructor(platform: Platform, core: ICoreApi, cache: CacheManager, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeepingManager, pts: ProgrammaticTrackingService, backupCampaignManager: BackupCampaignManager) {
         this._platform = platform;
         this._core = core;
         this._cache = cache;

@@ -1,5 +1,5 @@
 import { CacheApi, IFileInfo } from 'Core/Native/Cache';
-import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { FileId } from 'Core/Utilities/FileId';
 
 export class FileInfo {
@@ -9,7 +9,7 @@ export class FileInfo {
         });
     }
 
-    public static isCached(cache: CacheApi, cacheBookkeeping: CacheBookkeeping, url: string): Promise<boolean> {
+    public static isCached(cache: CacheApi, cacheBookkeeping: CacheBookkeepingManager, url: string): Promise<boolean> {
         return FileId.getFileId(url, cache).then(fileId => {
             return this.getFileInfo(cache, fileId).then(fileInfo => {
                 if(fileInfo && fileInfo.found && fileInfo.size > 0) {

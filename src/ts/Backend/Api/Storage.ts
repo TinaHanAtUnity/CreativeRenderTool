@@ -1,44 +1,45 @@
 import { StorageType } from 'Core/Native/Storage';
+import { BackendApi } from '../BackendApi';
 
-export class Storage {
+export class Storage extends BackendApi {
 
-    private static _storage = {};
-    private static _dirty: boolean = false;
+    private _storage: any = {};
+    private _dirty: boolean = false;
 
-    public static set<T>(storageType: StorageType, key: string, value: T): Promise<void> {
-        Storage._dirty = true;
-        Storage._storage = Storage.setInMemoryValue(Storage._storage, key, value);
+    public set<T>(storageType: StorageType, key: string, value: T): Promise<void> {
+        this._dirty = true;
+        this._storage = this.setInMemoryValue(this._storage, key, value);
         return Promise.resolve(void(0));
     }
 
-    public static get<T>(storageType: StorageType, key: string): Promise<T> {
-        const retValue = Storage.getInMemoryValue(Storage._storage, key);
+    public get<T>(storageType: StorageType, key: string): Promise<T> {
+        const retValue = this.getInMemoryValue(this._storage, key);
         if(!retValue) {
             return Promise.reject(['COULDNT_GET_VALUE', key]);
         }
         return Promise.resolve(retValue);
     }
 
-    public static getKeys(storageType: StorageType, key: string, recursive: boolean): Promise<string[]> {
-        return Promise.resolve(Storage.getInMemoryKeys(Storage._storage, key));
+    public getKeys(storageType: StorageType, key: string, recursive: boolean): Promise<string[]> {
+        return Promise.resolve(this.getInMemoryKeys(this._storage, key));
     }
 
-    public static write(storageType: StorageType): Promise<void> {
-        Storage._dirty = false;
+    public write(storageType: StorageType): Promise<void> {
+        this._dirty = false;
         return Promise.resolve(void(0));
     }
 
-    public static delete(storageType: StorageType, key: string): Promise<void> {
-        Storage._dirty = true;
-        Storage._storage = Storage.deleteInMemoryValue(Storage._storage, key);
+    public delete(storageType: StorageType, key: string): Promise<void> {
+        this._dirty = true;
+        this._storage = this.deleteInMemoryValue(this._storage, key);
         return Promise.resolve(void(0));
     }
 
-    public static isDirty(): boolean {
-        return Storage._dirty;
+    public isDirty(): boolean {
+        return this._dirty;
     }
 
-    private static setInMemoryValue(storage: { [key: string]: any }, key: string, value: any): {} {
+    private setInMemoryValue(storage: { [key: string]: any }, key: string, value: any): {} {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -46,7 +47,7 @@ export class Storage {
                 storage[keyArray[0]] = {};
             }
 
-            storage[keyArray[0]] = Storage.setInMemoryValue(storage[keyArray[0]], keyArray.slice(1).join('.'), value);
+            storage[keyArray[0]] = this.setInMemoryValue(storage[keyArray[0]], keyArray.slice(1).join('.'), value);
             return storage;
         } else {
             storage[keyArray[0]] = value;
@@ -54,7 +55,7 @@ export class Storage {
         }
     }
 
-    private static getInMemoryValue(storage: { [key: string]: any }, key: string): any {
+    private getInMemoryValue(storage: { [key: string]: any }, key: string): any {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -62,13 +63,13 @@ export class Storage {
                 return null;
             }
 
-            return Storage.getInMemoryValue(storage[keyArray[0]], keyArray.slice(1).join('.'));
+            return this.getInMemoryValue(storage[keyArray[0]], keyArray.slice(1).join('.'));
         } else {
             return storage[key];
         }
     }
 
-    private static getInMemoryKeys(storage: { [key: string]: any }, key: string): string[] {
+    private getInMemoryKeys(storage: { [key: string]: any }, key: string): string[] {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -76,7 +77,7 @@ export class Storage {
                 return [];
             }
 
-            return Storage.getInMemoryKeys(storage[keyArray[0]], keyArray.slice(1).join('.'));
+            return this.getInMemoryKeys(storage[keyArray[0]], keyArray.slice(1).join('.'));
         } else {
             if(!storage[key]) {
                 return [];
@@ -93,7 +94,7 @@ export class Storage {
         }
     }
 
-    private static deleteInMemoryValue(storage: { [key: string]: any }, key: string): {} {
+    private deleteInMemoryValue(storage: { [key: string]: any }, key: string): {} {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -101,12 +102,33 @@ export class Storage {
                 storage[keyArray[0]] = {};
             }
 
-            storage[keyArray[0]] = Storage.deleteInMemoryValue(storage[keyArray[0]], keyArray.slice(1).join('.'));
+            storage[keyArray[0]] = this.deleteInMemoryValue(storage[keyArray[0]], keyArray.slice(1).join('.'));
             return storage;
         } else {
             delete storage[keyArray[0]];
             return storage;
         }
+    }
+
+    public hasFileEntry(fileId: string): boolean {
+        fileId = fileId.split('.')[0];
+        if(this._storage && this._storage.cache && this._storage.cache.files && this._storage.cache.files[fileId]) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public hasCampaignEntry(id: string): boolean {
+        if(this._storage && this._storage.cache && this._storage.cache.campaigns && this._storage.cache.campaigns[id]) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public setStorageContents(contents: any): void {
+        this._storage = contents;
     }
 
 }

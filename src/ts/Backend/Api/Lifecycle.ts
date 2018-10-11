@@ -1,10 +1,12 @@
-export class Lifecycle {
+import { BackendApi } from '../BackendApi';
 
-    public static register(events: string[]) {
+export class Lifecycle extends BackendApi {
+
+    public register(events: string[]) {
         // not implemented
     }
 
-    public static unregister() {
+    public unregister() {
         // not implemented
     }
 

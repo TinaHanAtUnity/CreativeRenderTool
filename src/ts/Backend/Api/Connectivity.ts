@@ -1,6 +1,8 @@
-export class Connectivity {
+import { BackendApi } from '../BackendApi';
 
-    public static setConnectionMonitoring(value: boolean) {
+export class Connectivity extends BackendApi {
+
+    public setConnectionMonitoring(value: boolean) {
         return;
     }
 

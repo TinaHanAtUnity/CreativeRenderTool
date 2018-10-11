@@ -1,507 +1,508 @@
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { BackendApi } from '../BackendApi';
 
-export class DeviceInfo {
+export class DeviceInfo extends BackendApi {
 
-    public static setAdvertisingTrackingId(value: string) {
-        DeviceInfo._advertisingTrackingId = value;
+    public setAdvertisingTrackingId(value: string) {
+        this._advertisingTrackingId = value;
     }
 
-    public static setLimitAdTrackingFlag(value: boolean) {
-        DeviceInfo._limitAdTrackingFlag = value;
+    public setLimitAdTrackingFlag(value: boolean) {
+        this._limitAdTrackingFlag = value;
     }
 
-    public static setOsVersion(value: string) {
-        DeviceInfo._osVersion = value;
+    public setOsVersion(value: string) {
+        this._osVersion = value;
     }
 
-    public static setModel(value: string) {
-        DeviceInfo._model = value;
+    public setModel(value: string) {
+        this._model = value;
     }
 
-    public static setScreenWidth(value: number) {
-        DeviceInfo._screenWidth = value;
+    public setScreenWidth(value: number) {
+        this._screenWidth = value;
     }
 
-    public static setScreenHeight(value: number) {
-        DeviceInfo._screenHeight = value;
+    public setScreenHeight(value: number) {
+        this._screenHeight = value;
     }
 
-    public static setSystemLanguage(value: string) {
-        DeviceInfo._systemLanguage = value;
+    public setSystemLanguage(value: string) {
+        this._systemLanguage = value;
     }
 
-    public static setRooted(value: boolean) {
-        DeviceInfo._rooted = value;
+    public setRooted(value: boolean) {
+        this._rooted = value;
     }
 
-    public static setTimeZone(value: string) {
-        DeviceInfo._timeZone = value;
+    public setTimeZone(value: string) {
+        this._timeZone = value;
     }
 
-    public static setTotalMemory(value: number) {
-        DeviceInfo._totalMemory = value;
+    public setTotalMemory(value: number) {
+        this._totalMemory = value;
     }
 
-    public static setAndroidId(value: string) {
-        DeviceInfo._androidId = value;
+    public setAndroidId(value: string) {
+        this._androidId = value;
     }
 
-    public static setApiLevel(value: number) {
-        DeviceInfo._apiLevel = value;
+    public setApiLevel(value: number) {
+        this._apiLevel = value;
     }
 
-    public static setTotalSpace(value: number) {
-        DeviceInfo._totalSpace = value;
+    public setTotalSpace(value: number) {
+        this._totalSpace = value;
     }
 
-    public static setManufacturer(value: string) {
-        DeviceInfo._manufacturer = value;
+    public setManufacturer(value: string) {
+        this._manufacturer = value;
     }
 
-    public static setScreenDensity(value: number) {
-        DeviceInfo._screenDensity = value;
+    public setScreenDensity(value: number) {
+        this._screenDensity = value;
     }
 
-    public static setScreenLayout(value: number) {
-        DeviceInfo._screenLayout = value;
+    public setScreenLayout(value: number) {
+        this._screenLayout = value;
     }
 
-    public static setConnectionType(value: string) {
-        DeviceInfo._connectionType = value;
+    public setConnectionType(value: string) {
+        this._connectionType = value;
     }
 
-    public static setNetworkType(value: number) {
-        DeviceInfo._networkType = value;
+    public setNetworkType(value: number) {
+        this._networkType = value;
     }
 
-    public static setNetworkOperator(value: string) {
-        DeviceInfo._networkOperator = value;
+    public setNetworkOperator(value: string) {
+        this._networkOperator = value;
     }
 
-    public static setNetworkOperatorName(value: string) {
-        DeviceInfo._networkOperatorName = value;
+    public setNetworkOperatorName(value: string) {
+        this._networkOperatorName = value;
     }
 
-    public static setNetworkMetered(value: boolean) {
-        DeviceInfo._networkMetered = value;
+    public setNetworkMetered(value: boolean) {
+        this._networkMetered = value;
     }
 
-    public static setHeadset(value: boolean) {
-        DeviceInfo._headset = value;
+    public setHeadset(value: boolean) {
+        this._headset = value;
     }
 
-    public static setDeviceVolume(value: number) {
-        DeviceInfo._deviceVolume = value;
+    public setDeviceVolume(value: number) {
+        this._deviceVolume = value;
     }
 
-    public static setScreenBrightness(value: number) {
-        DeviceInfo._screenBrightness = value;
+    public setScreenBrightness(value: number) {
+        this._screenBrightness = value;
     }
 
-    public static setFreeSpace(value: number) {
-        DeviceInfo._freeSpace = value;
+    public setFreeSpace(value: number) {
+        this._freeSpace = value;
     }
 
-    public static setBatteryLevel(value: number) {
-        DeviceInfo._batteryLevel = value;
+    public setBatteryLevel(value: number) {
+        this._batteryLevel = value;
     }
 
-    public static setBatteryStatus(value: number) {
-        DeviceInfo._batteryStatus = value;
+    public setBatteryStatus(value: number) {
+        this._batteryStatus = value;
     }
 
-    public static setFreeMemory(value: number) {
-        DeviceInfo._freeMemory = value;
+    public setFreeMemory(value: number) {
+        this._freeMemory = value;
     }
 
-    public static setRingerMode(value: number) {
-        DeviceInfo._ringerMode = value;
+    public setRingerMode(value: number) {
+        this._ringerMode = value;
     }
 
-    public static setUserInterfaceIdiom(value: number) {
-        DeviceInfo._userInterfaceIdiom = value;
+    public setUserInterfaceIdiom(value: number) {
+        this._userInterfaceIdiom = value;
     }
 
-    public static setScreenScale(value: number) {
-        DeviceInfo._screenScale = value;
+    public setScreenScale(value: number) {
+        this._screenScale = value;
     }
 
-    public static setSimulator(value: boolean) {
-        DeviceInfo._simulator = value;
+    public setSimulator(value: boolean) {
+        this._simulator = value;
     }
 
-    public static setStatusBarHeight(value: number) {
-        DeviceInfo._statusBarHeight = value;
+    public setStatusBarHeight(value: number) {
+        this._statusBarHeight = value;
     }
 
-    public static setCPUCount(count: number) {
-        DeviceInfo._cpuCount = count;
+    public setCPUCount(count: number) {
+        this._cpuCount = count;
     }
 
-    public static setGLVersion(version: string) {
-        DeviceInfo._glVersion = version;
+    public setGLVersion(version: string) {
+        this._glVersion = version;
     }
 
-    public static setApkDigest(digest: string) {
-        DeviceInfo._apkDigest = digest;
+    public setApkDigest(digest: string) {
+        this._apkDigest = digest;
     }
 
-    public static setCertificateFingerprint(fingerPrint: string) {
-        DeviceInfo._certificateFingerprint = fingerPrint;
+    public setCertificateFingerprint(fingerPrint: string) {
+        this._certificateFingerprint = fingerPrint;
     }
 
-    public static setBoard(board: string) {
-        DeviceInfo._board = board;
+    public setBoard(board: string) {
+        this._board = board;
     }
 
-    public static setBootloader(bootLoader: string) {
-        DeviceInfo._bootLoader = bootLoader;
+    public setBootloader(bootLoader: string) {
+        this._bootLoader = bootLoader;
     }
 
-    public static setBrand(brand: string) {
-        DeviceInfo._brand = brand;
+    public setBrand(brand: string) {
+        this._brand = brand;
     }
 
-    public static setDevice(device: string) {
-        DeviceInfo._device = device;
+    public setDevice(device: string) {
+        this._device = device;
     }
 
-    public static setHardware(hardware: string) {
-        DeviceInfo._hardware = hardware;
+    public setHardware(hardware: string) {
+        this._hardware = hardware;
     }
 
-    public static setHost(host: string) {
-        DeviceInfo._host = host;
+    public setHost(host: string) {
+        this._host = host;
     }
 
-    public static setProduct(product: string) {
-        DeviceInfo._product = product;
+    public setProduct(product: string) {
+        this._product = product;
     }
 
-    public static setFingerprint(fingerPrint: string) {
-        DeviceInfo._fingerPrint = fingerPrint;
+    public setFingerprint(fingerPrint: string) {
+        this._fingerPrint = fingerPrint;
     }
 
-    public static setSupportedAbis(supportedAbis: string[]) {
-        DeviceInfo._supportedAbis = supportedAbis;
+    public setSupportedAbis(supportedAbis: string[]) {
+        this._supportedAbis = supportedAbis;
     }
 
-    public static setSensorList(sensorList: object[]) {
-        DeviceInfo._sensorList = sensorList;
+    public setSensorList(sensorList: object[]) {
+        this._sensorList = sensorList;
     }
 
-    public static setIsUSBConnected(connected: boolean) {
-        DeviceInfo._usbConnected = connected;
+    public setIsUSBConnected(connected: boolean) {
+        this._usbConnected = connected;
     }
 
-    public static setUptime(upTime: number) {
-        DeviceInfo._upTime = upTime;
+    public setUptime(upTime: number) {
+        this._upTime = upTime;
     }
 
-    public static setElapsedRealtime(realtime: number) {
-        DeviceInfo._elapsedRealtime = realtime;
+    public setElapsedRealtime(realtime: number) {
+        this._elapsedRealtime = realtime;
     }
 
-    public static setStatusBarWidth(width: number) {
-        DeviceInfo._statusBarWidth = width;
+    public setStatusBarWidth(width: number) {
+        this._statusBarWidth = width;
     }
 
-    public static setIsStatusBarHidden(hidden: boolean) {
-        DeviceInfo._statusBarHidden = hidden;
+    public setIsStatusBarHidden(hidden: boolean) {
+        this._statusBarHidden = hidden;
     }
 
-    public static getAdvertisingTrackingId() {
-        return DeviceInfo._advertisingTrackingId;
+    public getAdvertisingTrackingId() {
+        return this._advertisingTrackingId;
     }
 
-    public static getLimitAdTrackingFlag() {
-        return DeviceInfo._limitAdTrackingFlag;
+    public getLimitAdTrackingFlag() {
+        return this._limitAdTrackingFlag;
     }
 
-    public static getOsVersion() {
-        return DeviceInfo._osVersion;
+    public getOsVersion() {
+        return this._osVersion;
     }
 
-    public static getModel() {
-        return DeviceInfo._model;
+    public getModel() {
+        return this._model;
     }
 
-    public static getScreenWidth() {
-        return DeviceInfo._screenWidth;
+    public getScreenWidth() {
+        return this._screenWidth;
     }
 
-    public static getScreenHeight() {
-        return DeviceInfo._screenHeight;
+    public getScreenHeight() {
+        return this._screenHeight;
     }
 
-    public static getSystemLanguage() {
-        return DeviceInfo._systemLanguage;
+    public getSystemLanguage() {
+        return this._systemLanguage;
     }
 
-    public static isRooted() {
-        return DeviceInfo._rooted;
+    public isRooted() {
+        return this._rooted;
     }
 
-    public static getTimeZone(dst: boolean) {
-        return DeviceInfo._timeZone;
+    public getTimeZone(dst: boolean) {
+        return this._timeZone;
     }
 
-    public static getTotalMemory() {
-        return DeviceInfo._totalMemory;
+    public getTotalMemory() {
+        return this._totalMemory;
     }
 
-    public static getAndroidId() {
-        return DeviceInfo._androidId;
+    public getAndroidId() {
+        return this._androidId;
     }
 
-    public static getApiLevel() {
-        return DeviceInfo._apiLevel;
+    public getApiLevel() {
+        return this._apiLevel;
     }
 
-    public static getTotalSpace(storageType: string) {
-        return DeviceInfo._totalSpace;
+    public getTotalSpace(storageType: string) {
+        return this._totalSpace;
     }
 
-    public static getManufacturer() {
-        return DeviceInfo._manufacturer;
+    public getManufacturer() {
+        return this._manufacturer;
     }
 
-    public static getScreenDensity() {
-        return DeviceInfo._screenDensity;
+    public getScreenDensity() {
+        return this._screenDensity;
     }
 
-    public static getScreenLayout() {
-        return DeviceInfo._screenLayout;
+    public getScreenLayout() {
+        return this._screenLayout;
     }
 
-    public static getConnectionType() {
-        return DeviceInfo._connectionType;
+    public getConnectionType() {
+        return this._connectionType;
     }
 
-    public static getNetworkType() {
-        return DeviceInfo._networkType;
+    public getNetworkType() {
+        return this._networkType;
     }
 
-    public static getNetworkOperator() {
-        return DeviceInfo._networkOperator;
+    public getNetworkOperator() {
+        return this._networkOperator;
     }
 
-    public static getNetworkOperatorName() {
-        return DeviceInfo._networkOperatorName;
+    public getNetworkOperatorName() {
+        return this._networkOperatorName;
     }
 
-    public static getNetworkMetered() {
-        return DeviceInfo._networkMetered;
+    public getNetworkMetered() {
+        return this._networkMetered;
     }
 
-    public static getHeadset() {
-        return DeviceInfo._headset;
+    public getHeadset() {
+        return this._headset;
     }
 
-    public static getDeviceVolume(volumeStream: number) {
-        return DeviceInfo._deviceVolume;
+    public getDeviceVolume(volumeStream: number) {
+        return this._deviceVolume;
     }
 
-    public static getScreenBrightness() {
-        return DeviceInfo._screenBrightness;
+    public getScreenBrightness() {
+        return this._screenBrightness;
     }
 
-    public static getFreeSpace(storageType: string) {
-        return DeviceInfo._freeSpace;
+    public getFreeSpace(storageType: string) {
+        return this._freeSpace;
     }
 
-    public static getBatteryLevel() {
-        return DeviceInfo._batteryLevel;
+    public getBatteryLevel() {
+        return this._batteryLevel;
     }
 
-    public static getBatteryStatus() {
-        return DeviceInfo._batteryStatus;
+    public getBatteryStatus() {
+        return this._batteryStatus;
     }
 
-    public static getFreeMemory() {
-        return DeviceInfo._freeMemory;
+    public getFreeMemory() {
+        return this._freeMemory;
     }
 
-    public static getRingerMode() {
-        return DeviceInfo._ringerMode;
+    public getRingerMode() {
+        return this._ringerMode;
     }
 
-    public static getUniqueEventId() {
-        return DeviceInfo.getGuid();
+    public getUniqueEventId() {
+        return this.getGuid();
     }
 
-    public static getUserInterfaceIdiom() {
-        return DeviceInfo._userInterfaceIdiom;
+    public getUserInterfaceIdiom() {
+        return this._userInterfaceIdiom;
     }
 
-    public static getScreenScale() {
-        return DeviceInfo._screenScale;
+    public getScreenScale() {
+        return this._screenScale;
     }
 
-    public static getDeviceMaxVolume() {
-        return DeviceInfo._maxVolume;
+    public getDeviceMaxVolume() {
+        return this._maxVolume;
     }
 
-    public static registerVolumeChangeListener() {
+    public registerVolumeChangeListener() {
         return undefined;
     }
 
-    public static unregisterVolumeChangeListener() {
+    public unregisterVolumeChangeListener() {
         return undefined;
     }
 
-    public static getPackageInfo() {
+    public getPackageInfo() {
         return {};
     }
 
-    public static isSimulator() {
-        return DeviceInfo._simulator;
+    public isSimulator() {
+        return this._simulator;
     }
 
-    public static isAppInstalled(packageName: string) {
+    public isAppInstalled(packageName: string) {
         return packageName === AndroidDeviceInfo.GooglePlayPackageName;
     }
 
-    public static getStatusBarHeight() {
-        return DeviceInfo._statusBarHeight;
+    public getStatusBarHeight() {
+        return this._statusBarHeight;
     }
 
-    public static getCPUCount() {
-        return DeviceInfo._cpuCount;
+    public getCPUCount() {
+        return this._cpuCount;
     }
 
-    public static getGLVersion() {
-        return DeviceInfo._glVersion;
+    public getGLVersion() {
+        return this._glVersion;
     }
 
-    public static getApkDigest() {
-        return DeviceInfo._apkDigest;
+    public getApkDigest() {
+        return this._apkDigest;
     }
 
-    public static getCertificateFingerprint() {
-        return DeviceInfo._certificateFingerprint;
+    public getCertificateFingerprint() {
+        return this._certificateFingerprint;
     }
 
-    public static getBoard() {
-        return DeviceInfo._board;
+    public getBoard() {
+        return this._board;
     }
 
-    public static getBootloader() {
-        return DeviceInfo._bootLoader;
+    public getBootloader() {
+        return this._bootLoader;
     }
 
-    public static getBrand() {
-        return DeviceInfo._brand;
+    public getBrand() {
+        return this._brand;
     }
 
-    public static getDevice() {
-        return DeviceInfo._device;
+    public getDevice() {
+        return this._device;
     }
 
-    public static getHardware() {
-        return DeviceInfo._hardware;
+    public getHardware() {
+        return this._hardware;
     }
 
-    public static getHost() {
-        return DeviceInfo._host;
+    public getHost() {
+        return this._host;
     }
 
-    public static getProduct() {
-        return DeviceInfo._product;
+    public getProduct() {
+        return this._product;
     }
 
-    public static getFingerprint() {
-        return DeviceInfo._fingerPrint;
+    public getFingerprint() {
+        return this._fingerPrint;
     }
 
-    public static getSupportedAbis() {
-        return DeviceInfo._supportedAbis;
+    public getSupportedAbis() {
+        return this._supportedAbis;
     }
 
-    public static getSensorList() {
-        return DeviceInfo._sensorList;
+    public getSensorList() {
+        return this._sensorList;
     }
 
-    public static isUSBConnected() {
-        return DeviceInfo._usbConnected;
+    public isUSBConnected() {
+        return this._usbConnected;
     }
 
-    public static getUptime() {
-        return DeviceInfo._upTime;
+    public getUptime() {
+        return this._upTime;
     }
 
-    public static getElapsedRealtime() {
-        return DeviceInfo._elapsedRealtime;
+    public getElapsedRealtime() {
+        return this._elapsedRealtime;
     }
 
-    public static getStatusBarWidth() {
-        return DeviceInfo._statusBarWidth;
+    public getStatusBarWidth() {
+        return this._statusBarWidth;
     }
 
-    public static isStatusBarHidden() {
-        return DeviceInfo._statusBarHidden;
+    public isStatusBarHidden() {
+        return this._statusBarHidden;
     }
 
-    public static isAdbEnabled() {
-        return DeviceInfo._adbEnabled;
+    public isAdbEnabled() {
+        return this._adbEnabled;
     }
 
-    private static _advertisingTrackingId: string = 'DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21';
-    private static _limitAdTrackingFlag: boolean = true;
-    private static _osVersion: string = '10.1.1';
-    private static _model: string = 'iPhone7,2';
-    private static _screenWidth: number = 647;
-    private static _screenHeight: number = 357;
-    private static _systemLanguage: string = 'en_US';
-    private static _rooted: boolean = false;
-    private static _timeZone: string = '+0200';
-    private static _totalMemory: number = 1899508;
-    private static _androidId: string = 'de88c6a5d783745b';
-    private static _apiLevel: number = 23;
-    private static _totalSpace: number = 13162172;
-    private static _manufacturer: string = 'Apple';
-    private static _screenDensity: number = 480;
-    private static _screenLayout: number = 268435794;
-    private static _connectionType: string = 'wifi';
-    private static _networkType: number = 0;
-    private static _networkOperator: string = '24412';
-    private static _networkOperatorName: string = 'DNA';
-    private static _networkMetered: boolean = false;
-    private static _headset: boolean = false;
-    private static _deviceVolume: number = 1;
-    private static _screenBrightness: number = 1;
-    private static _freeSpace: number = 10159440;
-    private static _batteryLevel: number = 1;
-    private static _batteryStatus: number = 1;
-    private static _freeMemory: number = 1000000;
-    private static _ringerMode: number = 0;
-    private static _userInterfaceIdiom: number = 0;
-    private static _screenScale: number = 2;
-    private static _simulator: boolean = false;
-    private static _statusBarHeight: number = 0;
-    private static _maxVolume: number = 1;
-    private static _cpuCount: number = 1;
-    private static _glVersion: string = '2.0';
-    private static _apkDigest: string = 'apkDigest';
-    private static _certificateFingerprint: string = 'certificateFingerprint';
-    private static _board: string = 'board';
-    private static _bootLoader: string = 'bootLoader';
-    private static _brand: string = 'brand';
-    private static _device: string = 'device';
-    private static _hardware: string = 'hardware';
-    private static _host: string = 'host';
-    private static _product: string = 'product';
-    private static _fingerPrint: string = 'fingerPrint';
-    private static _supportedAbis: string[] = ['supported_abi_1', 'supported_abi_2'];
-    private static _sensorList: object[] = [];
-    private static _usbConnected: boolean = false;
-    private static _upTime: number = 10000;
-    private static _elapsedRealtime: number = 10000;
-    private static _statusBarWidth: number = 0;
-    private static _statusBarHidden: boolean = true;
-    private static _adbEnabled = false;
+    private _advertisingTrackingId: string = 'DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21';
+    private _limitAdTrackingFlag: boolean = true;
+    private _osVersion: string = '10.1.1';
+    private _model: string = 'iPhone7,2';
+    private _screenWidth: number = 647;
+    private _screenHeight: number = 357;
+    private _systemLanguage: string = 'en_US';
+    private _rooted: boolean = false;
+    private _timeZone: string = '+0200';
+    private _totalMemory: number = 1899508;
+    private _androidId: string = 'de88c6a5d783745b';
+    private _apiLevel: number = 23;
+    private _totalSpace: number = 13162172;
+    private _manufacturer: string = 'Apple';
+    private _screenDensity: number = 480;
+    private _screenLayout: number = 268435794;
+    private _connectionType: string = 'wifi';
+    private _networkType: number = 0;
+    private _networkOperator: string = '24412';
+    private _networkOperatorName: string = 'DNA';
+    private _networkMetered: boolean = false;
+    private _headset: boolean = false;
+    private _deviceVolume: number = 1;
+    private _screenBrightness: number = 1;
+    private _freeSpace: number = 10159440;
+    private _batteryLevel: number = 1;
+    private _batteryStatus: number = 1;
+    private _freeMemory: number = 1000000;
+    private _ringerMode: number = 0;
+    private _userInterfaceIdiom: number = 0;
+    private _screenScale: number = 2;
+    private _simulator: boolean = false;
+    private _statusBarHeight: number = 0;
+    private _maxVolume: number = 1;
+    private _cpuCount: number = 1;
+    private _glVersion: string = '2.0';
+    private _apkDigest: string = 'apkDigest';
+    private _certificateFingerprint: string = 'certificateFingerprint';
+    private _board: string = 'board';
+    private _bootLoader: string = 'bootLoader';
+    private _brand: string = 'brand';
+    private _device: string = 'device';
+    private _hardware: string = 'hardware';
+    private _host: string = 'host';
+    private _product: string = 'product';
+    private _fingerPrint: string = 'fingerPrint';
+    private _supportedAbis: string[] = ['supported_abi_1', 'supported_abi_2'];
+    private _sensorList: object[] = [];
+    private _usbConnected: boolean = false;
+    private _upTime: number = 10000;
+    private _elapsedRealtime: number = 10000;
+    private _statusBarWidth: number = 0;
+    private _statusBarHidden: boolean = true;
+    private _adbEnabled = false;
 
-    private static getGuid() {
+    private getGuid() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {
             const randomValue = Math.random() * 16 | 0;
             const value = char === 'x' ? randomValue : (randomValue & 0x3 | 0x8);

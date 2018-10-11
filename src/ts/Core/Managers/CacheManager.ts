@@ -7,7 +7,7 @@ import { Observable0, Observable1, Observable2, Observable3, Observable5 } from 
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/Core';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 
 export enum CacheStatus {
     OK,
@@ -68,7 +68,7 @@ export class CacheManager {
     private _core: ICoreApi;
     private _wakeUpManager: WakeUpManager;
     private _request: RequestManager;
-    private _cacheBookkeeping: CacheBookkeeping;
+    private _cacheBookkeeping: CacheBookkeepingManager;
 
     private _callbacks: { [url: string]: ICallbackObject } = {};
 
@@ -84,7 +84,7 @@ export class CacheManager {
     private _lastProgressEvent?: number;
     private _fastConnectionDetected: boolean = false;
 
-    constructor(core: ICoreApi, wakeUpManager: WakeUpManager, request: RequestManager, cacheBookkeeping: CacheBookkeeping, options?: ICacheOptions) {
+    constructor(core: ICoreApi, wakeUpManager: WakeUpManager, request: RequestManager, cacheBookkeeping: CacheBookkeepingManager, options?: ICacheOptions) {
         this._core = core;
         this._wakeUpManager = wakeUpManager;
         this._request = request;

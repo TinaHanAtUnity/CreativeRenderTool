@@ -1,18 +1,20 @@
-export class Notification {
+import { BackendApi } from '../BackendApi';
 
-    public static addNotificationObserver(name: string, keys: string[]) {
+export class Notification extends BackendApi {
+
+    public addNotificationObserver(name: string, keys: string[]) {
         return;
     }
 
-    public static removeNotificationObserver(name: string) {
+    public removeNotificationObserver(name: string) {
         return;
     }
 
-    public static addAVNotificationObserver(name: string, keys: string[]) {
+    public addAVNotificationObserver(name: string, keys: string[]) {
         return;
     }
 
-    public static removeAVNotificationObserver(name: string) {
+    public removeAVNotificationObserver(name: string) {
         return;
     }
 }

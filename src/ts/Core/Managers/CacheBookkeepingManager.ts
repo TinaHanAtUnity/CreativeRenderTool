@@ -19,7 +19,7 @@ enum CacheKey {
     CAMPAIGNS = 'campaigns'
 }
 
-export class CacheBookkeeping {
+export class CacheBookkeepingManager {
     private _core: ICoreApi;
     private _rootKey: string = 'cache';
 

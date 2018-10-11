@@ -2,7 +2,6 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { Backend } from 'Backend/Backend';
-import { Cache } from 'Backend/Api/Cache';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/Core';
 import { CacheStatus, CacheManager } from 'Core/Managers/CacheManager';
@@ -11,7 +10,7 @@ import { FileId } from 'Core/Utilities/FileId';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 
 [Platform.ANDROID, Platform.IOS].forEach((platform) => {
     describe(Platform[platform] + ' - CacheManagerTest', () => {
@@ -21,16 +20,17 @@ import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
         let core: ICoreApi;
         let wakeUpManager: WakeUpManager;
         let requestManager: RequestManager;
-        let cacheBookkeeping: CacheBookkeeping;
+        let cacheBookkeeping: CacheBookkeepingManager;
         let cacheManager: CacheManager;
 
         beforeEach(() => {
-            backend = new Backend();
-            nativeBridge = (<any>window).nativebridge = new NativeBridge(backend, platform, false);
+            backend = new Backend(platform);
+            nativeBridge = new NativeBridge(backend, platform, false);
+            backend.setNativeBridge(nativeBridge);
             core = TestFixtures.getCoreApi(nativeBridge);
             wakeUpManager = new WakeUpManager(core);
             requestManager = new RequestManager(nativeBridge.getPlatform(), core, wakeUpManager);
-            cacheBookkeeping = new CacheBookkeeping(core);
+            cacheBookkeeping = new CacheBookkeepingManager(core);
             cacheManager = new CacheManager(core, wakeUpManager, requestManager, cacheBookkeeping);
         });
 
@@ -38,7 +38,7 @@ import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
             const testUrl: string = 'http://www.example.net/test.mp4';
             const testFileUrl = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
 
-            Cache.addPreviouslyDownloadedFile(testUrl);
+            backend.Api.Cache.addPreviouslyDownloadedFile(testUrl);
 
             return FileId.getFileId(testUrl, core.Cache).then(fileId => FileId.getFileUrl(fileId, core.Cache)).then(fileUrl => {
                 assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
@@ -49,7 +49,7 @@ import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
             const testUrl: string = 'http://www.example.net/test.mp4';
             const testFileUrl = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
 
-            const cacheSpy = sinon.spy(Cache, 'download');
+            const cacheSpy = sinon.spy(backend.Api.Cache, 'download');
 
             return cacheManager.cache(testUrl).then(([fileId, fileUrl]) => {
                 assert(cacheSpy.calledOnce, 'Cache one file did not send download request');
@@ -69,7 +69,7 @@ import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
             const testFileUrl2: string = 'file:///test/cache/dir/UnityAdsCache-158720486.jpg';
             const testFileUrl3: string = 'file:///test/cache/dir/UnityAdsCache-929022075.jpg';
 
-            const cacheSpy = sinon.spy(Cache, 'download');
+            const cacheSpy = sinon.spy(backend.Api.Cache, 'download');
 
             return cacheManager.cache(testUrl1).then(([fileId, fileUrl]) => {
                 assert.equal(testUrl1, cacheSpy.getCall(0).args[0], 'Cache three files first download request url does not match');
@@ -93,10 +93,10 @@ import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
             const testUrl: string = 'http://www.example.net/test.mp4';
             let networkTriggered: boolean = false;
 
-            Cache.setInternet(false);
+            backend.Api.Cache.setInternet(false);
             const cachePromise = cacheManager.cache(testUrl);
             networkTriggered = true;
-            Cache.setInternet(true);
+            backend.Api.Cache.setInternet(true);
             wakeUpManager.onNetworkConnected.trigger();
             cachePromise.then(fileUrl => {
                 assert(!networkTriggered, 'Cache one file with network failure: network was not triggered');
@@ -112,7 +112,7 @@ import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
                 wakeUpManager.onNetworkConnected.trigger();
             };
 
-            Cache.setInternet(false);
+            backend.Api.Cache.setInternet(false);
             const cachePromise = cacheManager.cache(testUrl);
             triggerNetwork();
             triggerNetwork();
@@ -127,7 +127,7 @@ import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
         it('Stop caching', () => {
             const testUrl: string = 'http://www.example.net/test.mp4';
 
-            Cache.setInternet(false);
+            backend.Api.Cache.setInternet(false);
             const cachePromise = cacheManager.cache(testUrl);
             cacheManager.stop();
             cachePromise.then(() => {
@@ -141,8 +141,8 @@ import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
             const testUrl: string = 'http://www.example.net/test.mp4';
             const testFileUrl: string = 'file:///test/cache/dir/UnityAdsCache--960478764.mp4';
 
-            Cache.addPreviouslyDownloadedFile(testUrl);
-            cacheBookkeeping.writeFileEntry(Cache.getHashDirect(testUrl) + '.' + Cache.getExtension(testUrl), {
+            backend.Api.Cache.addPreviouslyDownloadedFile(testUrl);
+            cacheBookkeeping.writeFileEntry(backend.Api.Cache.getHashDirect(testUrl) + '.' + backend.Api.Cache.getExtension(testUrl), {
                 fullyDownloaded: true,
                 size: 123,
                 totalSize: 123,

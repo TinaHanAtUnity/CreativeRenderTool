@@ -1,33 +1,33 @@
 import { CacheError, CacheEvent, IFileInfo } from 'Core/Native/Cache';
-import { Backend } from 'Backend/Backend';
+import { BackendApi } from '../BackendApi';
 
-export class Cache {
+export class Cache extends BackendApi {
 
-    private static _filePrefix = '/test/cache/dir/UnityAdsCache-';
-    private static _internet: boolean = true;
-    private static _files: { [key: string]: IFileInfo } = {};
-    private static _currentFile: string;
+    private _filePrefix = '/test/cache/dir/UnityAdsCache-';
+    private _internet: boolean = true;
+    private _files: { [key: string]: IFileInfo } = {};
+    private _currentFile: string;
 
-    public static setProgressInterval() {
+    public setProgressInterval() {
         return;
     }
 
-    public static download(url: string, fileId: string, headers: Array<[string, string]>, append: boolean): Promise<void> {
+    public download(url: string, fileId: string, headers: Array<[string, string]>, append: boolean): Promise<void> {
         const byteCount: number = 12345;
         const duration: number = 6789;
         const responseCode: number = 200;
 
-        if(Cache._currentFile !== undefined) {
+        if(this._currentFile !== undefined) {
             return Promise.reject(CacheError[CacheError.FILE_ALREADY_CACHING]);
         }
 
-        Cache.addFile(fileId, 123, 123);
+        this.addFile(fileId, 123, 123);
 
-        if(Cache._internet) {
-            Cache._currentFile = url;
+        if(this._internet) {
+            this._currentFile = url;
             setTimeout(() => {
-                delete Cache._currentFile;
-                Backend.sendEvent('CACHE', CacheEvent[CacheEvent.DOWNLOAD_END], url, byteCount, byteCount, duration, responseCode, []);
+                delete this._currentFile;
+                this._backend.sendEvent('CACHE', CacheEvent[CacheEvent.DOWNLOAD_END], url, byteCount, byteCount, duration, responseCode, []);
             }, 1);
             return Promise.resolve(void(0));
         } else {
@@ -35,39 +35,39 @@ export class Cache {
         }
     }
 
-    public static isCaching(): Promise<boolean> {
-        return Promise.resolve(Cache._currentFile !== undefined);
+    public isCaching(): Promise<boolean> {
+        return Promise.resolve(this._currentFile !== undefined);
     }
 
-    public static getFilePath(fileId: string): Promise<string> {
-        if(fileId in Cache._files) {
-            return Promise.resolve(Cache._filePrefix + fileId);
+    public getFilePath(fileId: string): Promise<string> {
+        if(fileId in this._files) {
+            return Promise.resolve(this._filePrefix + fileId);
         }
         return Promise.reject(new Error(CacheError[CacheError.FILE_NOT_FOUND]));
     }
 
-    public static getFiles(): Promise<IFileInfo[]> {
+    public getFiles(): Promise<IFileInfo[]> {
         const files: IFileInfo[] = [];
-        for(const key in Cache._files) {
-            if(Cache._files.hasOwnProperty(key)) {
-                files.push(Cache._files[key]);
+        for(const key in this._files) {
+            if(this._files.hasOwnProperty(key)) {
+                files.push(this._files[key]);
             }
         }
         return Promise.resolve(files);
     }
 
-    public static getFileInfo(fileId: string): Promise<IFileInfo> {
-        if(fileId in Cache._files) {
-            return Promise.resolve(Cache._files[fileId]);
+    public getFileInfo(fileId: string): Promise<IFileInfo> {
+        if(fileId in this._files) {
+            return Promise.resolve(this._files[fileId]);
         }
         return Promise.reject(new Error(CacheError[CacheError.FILE_NOT_FOUND]));
     }
 
-    public static getHash(value: string): Promise<string> {
-        return Promise.resolve(Cache.getHashDirect(value));
+    public getHash(value: string): Promise<string> {
+        return Promise.resolve(this.getHashDirect(value));
     }
 
-    public static getHashDirect(value: string): string {
+    public getHashDirect(value: string): string {
         let hash = 0;
         if(!value.length) {
             return hash.toString();
@@ -80,20 +80,20 @@ export class Cache {
         return hash.toString();
     }
 
-    public static deleteFile(fileId: string): Promise<void> {
+    public deleteFile(fileId: string): Promise<void> {
         return Promise.resolve(void(0));
     }
 
-    public static setInternet(internet: boolean): void {
-        Cache._internet = internet;
+    public setInternet(internet: boolean): void {
+        this._internet = internet;
     }
 
-    public static addFile(id: string, mtime: number, size: number): void {
+    public addFile(id: string, mtime: number, size: number): void {
         const fileInfo: IFileInfo = {id: id, mtime: mtime, size: size, found: true};
-        Cache._files[id] = fileInfo;
+        this._files[id] = fileInfo;
     }
 
-    public static getExtension(url: string): string {
+    public getExtension(url: string): string {
         const splittedUrl = url.split('.');
         let extension: string = '';
         if(splittedUrl.length > 1) {
@@ -102,14 +102,14 @@ export class Cache {
         return extension;
     }
 
-    public static addPreviouslyDownloadedFile(url: string) {
-        Cache.addFile(Cache.getHashDirect(url) + '.' + Cache.getExtension(url), 123, 123);
+    public addPreviouslyDownloadedFile(url: string) {
+        this.addFile(this.getHashDirect(url) + '.' + this.getExtension(url), 123, 123);
     }
 
-    public static getDownloadedFilesCount(): number {
+    public getDownloadedFilesCount(): number {
         let fileCount = 0;
-        for(const key in Cache._files) {
-            if(Cache._files.hasOwnProperty(key)) {
+        for(const key in this._files) {
+            if(this._files.hasOwnProperty(key)) {
                 ++fileCount;
             }
         }

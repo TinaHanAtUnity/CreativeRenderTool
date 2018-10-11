@@ -1,57 +1,58 @@
 import { Backend } from 'Backend/Backend';
+import { BackendApi } from '../BackendApi';
 
-export class Request {
+export class Request extends BackendApi {
 
-    public static getLog() {
-        return Request._requestLog;
+    public getLog() {
+        return this._requestLog;
     }
 
-    public static setLog(requestLog: string[]) {
-        Request._requestLog = requestLog;
+    public setLog(requestLog: string[]) {
+        this._requestLog = requestLog;
     }
 
-    public static get(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
-        Request._requestLog.push(url);
+    public get(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
+        this._requestLog.push(url);
         const xhr = new XMLHttpRequest();
         xhr.onload = (event: Event) => {
-            Backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
+            this._backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
         };
         xhr.open('GET', url);
         xhr.send();
     }
 
-    public static head(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
-        Request._requestLog.push(url);
+    public head(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
+        this._requestLog.push(url);
         const xhr = new XMLHttpRequest();
         xhr.onload = (event: Event) => {
-            Backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
+            this._backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
         };
         xhr.open('HEAD', url);
         xhr.send();
     }
 
-    public static post(id: string, url: string, body: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
-        Request._requestLog.push(url);
+    public post(id: string, url: string, body: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
+        this._requestLog.push(url);
         const xhr = new XMLHttpRequest();
         xhr.onload = (event: Event) => {
-            Backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
+            this._backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
         };
         xhr.open('POST', url);
         xhr.send(body);
     }
 
-    public static setConcurrentRequestCount(count: number) {
+    public setConcurrentRequestCount(count: number) {
         return;
     }
 
-    public static setMaximumPoolSize(count: number) {
+    public setMaximumPoolSize(count: number) {
         return;
     }
 
-    public static setKeepAliveTime(keepAliveTime: number) {
+    public setKeepAliveTime(keepAliveTime: number) {
         return;
     }
 
-    private static _requestLog: string[] = [];
+    private _requestLog: string[] = [];
 
 }

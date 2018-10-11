@@ -1,5 +1,5 @@
 import { Platform } from 'Core/Constants/Platform';
-import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
@@ -75,7 +75,7 @@ export class Core implements IApiModule {
 
     public readonly Api: Readonly<ICoreApi>;
 
-    public readonly CacheBookkeeping: CacheBookkeeping;
+    public readonly CacheBookkeeping: CacheBookkeepingManager;
     public readonly FocusManager: FocusManager;
     public readonly MetaDataManager: MetaDataManager;
     public readonly ResolveManager: ResolveManager;
@@ -123,7 +123,7 @@ export class Core implements IApiModule {
 
         this.FocusManager = new FocusManager(this.NativeBridge.getPlatform(), this.Api);
         this.WakeUpManager = new WakeUpManager(this.Api);
-        this.CacheBookkeeping = new CacheBookkeeping(this.Api);
+        this.CacheBookkeeping = new CacheBookkeepingManager(this.Api);
         this.ResolveManager = new ResolveManager(this.Api);
         this.MetaDataManager = new MetaDataManager(this.Api);
     }

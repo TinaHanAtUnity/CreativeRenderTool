@@ -1,6 +1,6 @@
 # Options
 
-MAKEFLAGS += -rR
+MAKEFLAGS += -rRs
 
 # Binaries
 
