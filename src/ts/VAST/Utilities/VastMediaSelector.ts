@@ -16,7 +16,7 @@ export class VastMediaSelector {
     private _cellMediaFileUrl: string | undefined;
     private _connectionType: string | undefined;
 
-    constructor(vast:Vast, connectionType?: string) {
+    constructor(vast: Vast, connectionType?: string) {
         this._vast = vast;
         this._connectionType = connectionType;
     }
