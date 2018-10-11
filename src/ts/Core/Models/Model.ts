@@ -22,7 +22,7 @@ export abstract class Model<T extends object> {
     public abstract getDTO(): { [key: string]: any };
 
     public toJSON(): string {
-        return JSON.stringify(this._data);
+        return JSON.stringify(this._data, this.serializeFilter);
     }
 
     public set<K extends keyof T>(key: K, value: T[K]): void {
@@ -51,6 +51,10 @@ export abstract class Model<T extends object> {
     protected handleError(error: WebViewError) {
         Diagnostics.trigger('set_model_value_failed', error);
         throw error;
+    }
+
+    protected serializeFilter(key: string, value: any): any {
+        return value;
     }
 
     private getTypeOf(value: any): string {
