@@ -1,6 +1,6 @@
 # Options
 
-MAKEFLAGS += -rRs
+MAKEFLAGS += -rR
 
 # Binaries
 
@@ -50,8 +50,8 @@ JSON_SOURCES := $(filter %.json, $(SOURCES))
 XML_SOURCES := $(filter %.xml, $(SOURCES))
 
 TESTS := $(shell find $(TEST_DIR) -type f -name '*.ts' -and -not -name '*.d.ts')
-UNIT_TESTS := $(shell find $(TEST_DIR)/Unit -type f -name '*Test.ts' -and -not -name '*.d.ts')
-INTEGRATION_TESTS := $(shell find $(TEST_DIR)/Integration -type f -name '*Test.ts' -and -not -name '*.d.ts')
+UNIT_TESTS := $(shell find $(TEST_DIR) -type f -name '*Test.ts' -and -not -name '*.d.ts')
+INTEGRATION_TESTS := $(shell find $(TEST_DIR) -type f -name '*Test.ts' -and -not -name '*.d.ts')
 
 # Targets
 

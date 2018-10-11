@@ -3,6 +3,7 @@ import { BatchInvocation } from 'Core/Native/Bridge/BatchInvocation';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 import { INativeBridge } from 'Core/Native/Bridge/INativeBridge';
 import { NativeApi } from 'Core/Native/Bridge/NativeApi';
+import { EventCategory } from 'Core/Constants/EventCategory';
 
 export enum CallbackStatus {
     OK,
@@ -101,10 +102,9 @@ export class NativeBridge implements INativeBridge {
         });
     }
 
-    public addEventHandler(nativeApi: NativeApi) {
-        const eventCategory = nativeApi.getEventCategory();
+    public addEventHandler(eventCategory: EventCategory, nativeApi: NativeApi) {
         if(eventCategory && !(eventCategory in this._eventHandlers)) {
-            this._eventHandlers[eventCategory] = nativeApi;
+            this._eventHandlers[EventCategory[eventCategory]] = nativeApi;
         }
     }
 

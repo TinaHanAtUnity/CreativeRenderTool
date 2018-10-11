@@ -45,15 +45,13 @@ export class CacheApi extends NativeApi {
     public readonly onDownloadError = new Observable3<string, string, string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Cache', ApiPackage.CORE, EventCategory[EventCategory.CACHE]);
+        super(nativeBridge, 'Cache', ApiPackage.CORE, EventCategory.CACHE);
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
             this.iOS = new IosCacheApi(nativeBridge);
         } else {
             this.Android = new AndroidCacheApi(nativeBridge);
         }
-
-        nativeBridge.addEventHandler(this);
     }
 
     public download(url: string, fileId: string, headers: Array<[string, string]>, append: boolean): Promise<void> {

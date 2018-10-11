@@ -552,7 +552,7 @@ export class TestFixtures {
                 Lifecycle: new LifecycleApi(nativeBridge),
                 Preferences: new AndroidPreferencesApi(nativeBridge)
             } : undefined,
-                iOS: platform === Platform.IOS ? {
+            iOS: platform === Platform.IOS ? {
                 MainBundle: new MainBundleApi(nativeBridge),
                 Notification: new NotificationApi(nativeBridge),
                 Preferences: new IosPreferencesApi(nativeBridge),
