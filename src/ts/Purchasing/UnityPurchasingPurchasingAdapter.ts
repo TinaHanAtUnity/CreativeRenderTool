@@ -58,7 +58,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         return this._initPromise;
     }
 
-    public purchaseItem(productId: string, campaign: PromoCampaign, placementId: string) {
+    public purchaseItem(productId: string, campaign: PromoCampaign, placementId: string): Promise<ITransactionDetails> {
         const purchaseUrls = campaign.getTrackingUrlsForEvent('purchase');
         const modifiedPurchaseUrls = ThirdPartyEventManager.getUrls(purchaseUrls, {'%ZONE%': placementId});
         const iapPayload: IPromoPayload = {
@@ -71,7 +71,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         return Promise.resolve(<ITransactionDetails>{});
     }
 
-    public onPromoClosed(campaign: PromoCampaign, placementId: string) {
+    public onPromoClosed(campaign: PromoCampaign, placementId: string): void {
         const purchaseUrls = campaign.getTrackingUrlsForEvent('purchase');
         const modifiedPurchaseUrls = ThirdPartyEventManager.getUrls(purchaseUrls, {'%ZONE%': placementId});
         const iapPayload: IPromoPayload = {
@@ -86,7 +86,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         this.sendPromoPayload(iapPayload);
     }
 
-    public refreshCatalog() {
+    public refreshCatalog(): Promise<IProduct[]> {
         return new Promise<IProduct[]>((resolve, reject) => {
             const observer = this._nativeBridge.Purchasing.onGetPromoCatalog.subscribe((promoCatalogJSON) => {
                 this._nativeBridge.Purchasing.onGetPromoCatalog.unsubscribe(observer);
