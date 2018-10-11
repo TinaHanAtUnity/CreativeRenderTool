@@ -23,6 +23,7 @@ def main() {
                     'System tests': {
                         //TODO: uncomment the line below before pushing to master
                         //def nativeBranch = env.BRANCH_NAME.replace("staging/", "");
+                        def nativeBranch = "master"
                         build(
                           job: "Applifier/unity-ads-sdk-tests/ads-sdk-systest-android/",
                           propagate: true,
