@@ -68,6 +68,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
             purchaseTrackingUrls: modifiedPurchaseUrls
         };
         this.sendPromoPayload(iapPayload);
+        // Currently resolves with empty object until UnityPurchasing SDK sends us the relevant details
         return Promise.resolve(<ITransactionDetails>{});
     }
 
