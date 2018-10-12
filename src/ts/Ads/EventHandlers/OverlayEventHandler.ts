@@ -11,8 +11,7 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
-import { KeyCode } from "../../Core/Constants/Android/KeyCode";
-import { Video } from "../Models/Assets/Video";
+import { KeyCode } from 'Core/Constants/Android/KeyCode';
 
 export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler implements IOverlayHandler {
     protected _placement: Placement;
@@ -73,7 +72,6 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
     }
 
     public onKeyEvent(keyCode: number): void {
-        // todo: add source game ID check
         if(keyCode === KeyCode.BACK && this.canSkipVideo()) {
             this.onOverlaySkip(this._adUnit.getVideo().getPosition());
         }

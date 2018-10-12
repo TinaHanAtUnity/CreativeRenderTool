@@ -262,6 +262,9 @@ export class AdUnitFactory {
 
         const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
 
+        const vastOverlayHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
+        overlay.addEventHandler(vastOverlayHandler);
+
         if(parameters.campaign.hasEndscreen() && vastEndScreen) {
             const vastEndScreenHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
             vastEndScreen.addEventHandler(vastEndScreenHandler);
@@ -279,9 +282,6 @@ export class AdUnitFactory {
                 });
             }
         }
-
-        const vastOverlayHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
-        overlay.addEventHandler(vastOverlayHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, vastAdUnit, parameters.campaign.getVideo(), undefined, vastAdUnitParameters);
         const vastVideoEventHandler = this.prepareVideoPlayer(VastVideoEventHandler, <IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
