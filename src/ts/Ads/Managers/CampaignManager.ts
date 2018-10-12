@@ -211,7 +211,6 @@ export class CampaignManager {
 
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
-        this._backupCampaignManager.deleteBackupCampaigns();
 
         this._requesting = true;
 
@@ -342,6 +341,8 @@ export class CampaignManager {
 
         const session: Session = this._sessionManager.create(json.auctionId);
         session.setAdPlan(response.response);
+
+        this._backupCampaignManager.deleteBackupCampaigns();
 
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};

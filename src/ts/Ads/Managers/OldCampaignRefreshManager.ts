@@ -138,7 +138,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this.invalidateCampaigns(false, this._configuration.getPlacementIds());
         this._campaignCount = 0;
 
-        const promises = [];
+        const promises = [this._campaignManager.request()];
 
         const placements = this._configuration.getPlacements();
         for(const placement in this._configuration.getPlacements()) {
@@ -152,7 +152,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         }
 
         return Promise.all(promises).then(() => {
-            return this._campaignManager.request();
+            return Promise.resolve(); // todo: this is silly type hack to make different A/B tested implementations compatible. types should be fixed once A/B testing is over.
         });
     }
 
