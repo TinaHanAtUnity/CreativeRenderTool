@@ -43,7 +43,9 @@ export class CustomFeatures {
             || gameId === '1782302';// Hayday Android
     }
 
-    public static isCloseIconSkipApp(gameId: string) {
+    public static isCheetahGame(gameId: string) {
+        // skip icon is replaced with the close icon
+        // Android back button enabled on video overlays for skipping the video ads
         return gameId === '1196341'
             || gameId === '1594775'
             || gameId === '2755671'
