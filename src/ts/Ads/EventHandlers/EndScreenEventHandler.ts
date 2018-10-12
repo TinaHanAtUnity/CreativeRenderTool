@@ -133,24 +133,13 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
-        const platform = this._nativeBridge.getPlatform();
-
-        // should be safe to remove after new Comet APK rule changes are deployed
         if (parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
-            const apkDownloadLink = Url.getQueryParameter(parameters.clickAttributionUrl, 'apk_download_link');
-            if (apkDownloadLink && platform === Platform.ANDROID) {
-                if (parameters.clickAttributionUrl) {
-                    this.handleClickAttributionWithoutRedirect(parameters.clickAttributionUrl);
-                }
-                this.handleAppDownloadUrl(apkDownloadLink);
-            } else {
-                this.handleClickAttributionWithRedirects(parameters.clickAttributionUrl, parameters.clickAttributionUrlFollowsRedirects);
-            }
+            this.handleClickAttributionWithRedirects(parameters.clickAttributionUrl, parameters.clickAttributionUrlFollowsRedirects);
             return;
         }
 
         if (parameters.clickAttributionUrl) {
-            this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, false);
+            this.handleClickAttributionWithoutRedirect(parameters.clickAttributionUrl);
         }
     }
 
