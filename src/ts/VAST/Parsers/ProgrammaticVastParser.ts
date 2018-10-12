@@ -11,7 +11,7 @@ import { Request } from 'Core/Utilities/Request';
 import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
-import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
+import { getOptimizedVideoUrl } from 'VAST/Utilities/VastMediaSelector';
 
 export class ProgrammaticVastParser extends CampaignParser {
     public static ContentType = 'programmatic/vast';
@@ -20,6 +20,7 @@ export class ProgrammaticVastParser extends CampaignParser {
     }
 
     private static VAST_PARSER_MAX_DEPTH: number;
+    private _isMediaExperiment: boolean = false;
 
     protected _vastParser: VastParser = new VastParser();
 
@@ -63,10 +64,20 @@ export class ProgrammaticVastParser extends CampaignParser {
             landscapeAsset = new Image(this.validateAndEncodeUrl(landscapeUrl, session), session);
         }
 
+        let videoUrl;
+        if (this._isMediaExperiment && connectionType) {    // TODO: ab test with auction feature flag
+            videoUrl = getOptimizedVideoUrl(vast.getVideoMedialFiles(), connectionType);
+            if (!videoUrl) {
+                throw new Error('No video URL found for VAST');
+            }
+        } else {
+            videoUrl = vast.getVideoUrl();
+        }
+
         const vastCampaignParms: IVastCampaign = {
             ... baseCampaignParams,
             vast: vast,
-            video: new Video(this.validateAndEncodeUrl(vast.getVideoUrl(), session), session),
+            video: new Video(this.validateAndEncodeUrl(videoUrl, session), session),
             hasEndscreen: !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(),
             portrait: portraitAsset,
             landscape: landscapeAsset,
@@ -82,8 +93,6 @@ export class ProgrammaticVastParser extends CampaignParser {
             isMoatEnabled: response.isMoatEnabled() || undefined
         };
 
-        // TODO: need ABTest
-        // const campaign = new VastCampaign(vastCampaignParms, new VastMediaSelector(vast, connectionType));
         const campaign = new VastCampaign(vastCampaignParms);
 
         if(campaign.getImpressionUrls().length === 0) {

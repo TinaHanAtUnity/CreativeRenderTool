@@ -3,7 +3,6 @@ import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
 import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
 import { Vast } from 'VAST/Models/Vast';
-import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
 
 export interface IVastCampaign extends IProgrammaticCampaign {
     vast: Vast;
@@ -22,9 +21,7 @@ export interface IVastCampaign extends IProgrammaticCampaign {
 }
 
 export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
-    private _vastMediaSelector: VastMediaSelector | undefined;
-
-    constructor(campaign: IVastCampaign, vastMediaSelector?: VastMediaSelector) {
+    constructor(campaign: IVastCampaign) {
         super('VastCampaign', {
             ... ProgrammaticCampaign.Schema,
             vast: ['object'],
@@ -41,7 +38,6 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             impressionUrls: ['array'],
             isMoatEnabled: ['boolean', 'undefined']
         }, campaign);
-        this._vastMediaSelector = vastMediaSelector;
         this.processCustomTracking(campaign.trackingUrls);
     }
 
@@ -50,10 +46,6 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
     }
 
     public getVideo() {
-        if (this._vastMediaSelector) {
-            this.set('video', new Video(this._vastMediaSelector.getOptimizedVideoUrl(), this.getSession()));
-        }
-
         if(!this.get('video')) {
             this.set('video', new Video(this.get('vast').getVideoUrl(), this.getSession()));
         }
