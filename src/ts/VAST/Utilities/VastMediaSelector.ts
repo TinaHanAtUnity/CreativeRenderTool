@@ -9,14 +9,6 @@ export enum VASTMediaFileSize {
     SDK_MAX = 20971520     // 20 MB SDK max limit for 'too_large_file' error
 }
 
-export function getOptimizedVideoUrl(mediaFiles: VastMediaFile[], connectionType?: string): string | null {
-    if (connectionType && connectionType === 'wifi') {
-        return VastMediaSelector.getVideoUrlInRange(mediaFiles, VASTMediaFileSize.WIFI_MIN, VASTMediaFileSize.WIFI_MAX);
-    } else {
-        return VastMediaSelector.getVideoUrlInRange(mediaFiles, VASTMediaFileSize.CELL_MIN, VASTMediaFileSize.CELL_MAX);
-    }
-}
-
 export class VastMediaSelector {
     public static getVideoUrlInRange(mediaFiles: VastMediaFile[], minSize: number, maxSize: number): string | null {
         let mediaUrl: string | null = null;
@@ -45,5 +37,13 @@ export class VastMediaSelector {
         }
 
         return defaultMediaUrl;
+    }
+}
+
+export function getOptimizedVideoUrl(mediaFiles: VastMediaFile[], connectionType?: string): string | null {
+    if (connectionType && connectionType === 'wifi') {
+        return VastMediaSelector.getVideoUrlInRange(mediaFiles, VASTMediaFileSize.WIFI_MIN, VASTMediaFileSize.WIFI_MAX);
+    } else {
+        return VastMediaSelector.getVideoUrlInRange(mediaFiles, VASTMediaFileSize.CELL_MIN, VASTMediaFileSize.CELL_MAX);
     }
 }
