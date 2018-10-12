@@ -36,10 +36,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     protected _localization: Localization;
     protected _adUnitStyle?: AdUnitStyle;
-    protected _abGroup: ABGroup;
     private _gameName: string | undefined;
     private _privacy: AbstractPrivacy;
     private _isSwipeToCloseEnabled: boolean = false;
+    private _abGroup: ABGroup;
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked = false;
     private _campaignId: string | undefined;
