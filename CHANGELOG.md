@@ -1,5 +1,8 @@
 # Pending
 
+* AB Test various improvements to the endscreen layout v2 [#6674](https://github.com/Applifier/unity-ads-webview/pull/6674)
+* Remove smart close button test [#6673](https://github.com/Applifier/unity-ads-webview/pull/6673)
+* Android back button skip for Cheetah [#6675](https://github.com/Applifier/unity-ads-webview/pull/6675)
 * Add check that requested permissions are in manifest [#6358](https://github.com/Applifier/unity-ads-webview/pull/6358)
 * Add tests for AR and Permission APIs [#6495](https://github.com/Applifier/unity-ads-webview/pull/6495)
 * Add method to set authorization header for http request from Webview [#6379](https://github.com/Applifier/unity-ads-webview/pull/6379)
