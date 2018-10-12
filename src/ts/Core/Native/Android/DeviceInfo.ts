@@ -3,6 +3,7 @@ import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
 import { Observable3 } from 'Core/Utilities/Observable';
+import { EventCategory } from '../../Constants/EventCategory';
 
 export enum StorageType {
     EXTERNAL,
@@ -33,7 +34,7 @@ export class AndroidDeviceInfoApi extends NativeApi {
     public readonly onVolumeChanged = new Observable3<number, number, number>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'DeviceInfo', ApiPackage.CORE);
+        super(nativeBridge, 'DeviceInfo', ApiPackage.CORE, EventCategory.DEVICEINFO);
     }
 
     public getAndroidId(): Promise<string> {

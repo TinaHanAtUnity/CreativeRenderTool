@@ -1,6 +1,7 @@
 import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
 import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
 import { ICoreApi } from 'Core/Core';
+import { Platform } from '../Constants/Platform';
 
 export interface IIosDeviceInfo extends IDeviceInfo {
     userInterfaceIdiom: UIUserInterfaceIdiom;
@@ -24,7 +25,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
             statusBarHidden: ['boolean'],
             simulator: ['boolean'],
             sensorList: ['array']
-        }, core);
+        }, Platform.IOS, core);
     }
 
     public fetch(): Promise<any[]> {

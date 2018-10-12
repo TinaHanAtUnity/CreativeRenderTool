@@ -770,7 +770,7 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
         promises.push(this._deviceInfo.getHeadset());
-        promises.push(this._deviceInfo.getDeviceVolume(this._platform));
+        promises.push(this._deviceInfo.getDeviceVolume());
         promises.push(this.getFullyCachedCampaigns());
         promises.push(this.getVersionCode());
         promises.push(this._adMobSignalFactory.getAdRequestSignal().then(signal => {

@@ -3,12 +3,13 @@ import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
 import { Observable2 } from 'Core/Utilities/Observable';
+import { EventCategory } from '../../Constants/EventCategory';
 
 export class IosDeviceInfoApi extends NativeApi {
     public readonly onVolumeChanged = new Observable2<number, number>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'DeviceInfo', ApiPackage.CORE);
+        super(nativeBridge, 'DeviceInfo', ApiPackage.CORE, EventCategory.DEVICEINFO);
     }
 
     public getScreenScale(): Promise<number> {

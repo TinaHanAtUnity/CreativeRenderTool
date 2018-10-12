@@ -3,6 +3,7 @@ import { StreamType } from 'Core/Constants/Android/StreamType';
 import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
 import { ISensorInfo, StorageType } from 'Core/Native/Android/DeviceInfo';
 import { ICoreApi } from 'Core/Core';
+import { Platform } from '../Constants/Platform';
 
 export interface IAndroidDeviceInfo extends IDeviceInfo {
     androidId: string;
@@ -73,7 +74,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             elapsedRealtime: ['number'],
             sensorList: ['array'],
             networkMetered: ['boolean']
-        }, core);
+        }, Platform.ANDROID, core);
     }
 
     public fetch(): Promise<any[]> {

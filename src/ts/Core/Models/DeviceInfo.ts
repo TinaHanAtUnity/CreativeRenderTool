@@ -1,8 +1,8 @@
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
-import { ISchema, Model } from 'Core/Models/Model';
-import { ICoreApi } from 'Core/Core';
 import { StreamType } from 'Core/Constants/Android/StreamType';
 import { Platform } from 'Core/Constants/Platform';
+import { ISchema, Model } from 'Core/Models/Model';
+import { ICoreApi } from '../Core';
 
 export interface IDeviceInfo {
     advertisingIdentifier: string | undefined | null;
@@ -27,7 +27,6 @@ export interface IDeviceInfo {
     freeMemory: number;
     totalMemory: number;
     cpuCount: number;
-    glVersion: string;
     maxVolume: number;
     headset: boolean;
 }
@@ -57,15 +56,17 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         freeMemory: ['number'],
         totalMemory: ['number'],
         cpuCount: ['integer'],
-        glVersion: ['string'],
         maxVolume: ['number'],
         headset: ['boolean']
     };
 
+    protected _platform: Platform;
     protected _core: ICoreApi;
 
-    constructor(name: string, schema: ISchema<T>, core: ICoreApi) {
+    constructor(name: string, schema: ISchema<T>, platform: Platform, core: ICoreApi) {
         super('DeviceInfo', schema);
+
+        this._platform = platform;
         this._core = core;
     }
 
@@ -83,7 +84,6 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         promises.push(this._core.DeviceInfo.getTimeZone(false).then(timeZone => this.set('timeZone', timeZone)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._core.DeviceInfo.getTotalMemory().then(totalMemory => this.set('totalMemory', totalMemory)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._core.DeviceInfo.getCPUCount().then(cpuCount => this.set('cpuCount', cpuCount)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._core.DeviceInfo.getGLVersion().then(glVersion => this.set('glVersion', glVersion)).catch(err => this.handleDeviceInfoError(err)));
 
         return Promise.all(promises);
     }
@@ -110,37 +110,29 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
     }
 
     public getNetworkOperator(): Promise<string | null> {
-        return this._core.DeviceInfo.getNetworkOperator().then(networkOperator => {
-            this.set('networkOperator', networkOperator);
-            return this.get('networkOperator');
-        });
+        if (this._platform === Platform.IOS || this._platform === Platform.ANDROID) {
+            return this._core.DeviceInfo.getNetworkOperator().then(networkOperator => {
+                this.set('networkOperator', networkOperator);
+                return this.get('networkOperator');
+            });
+        } else {
+            return Promise.resolve(this.get('networkOperator'));
+        }
     }
 
     public getNetworkOperatorName(): Promise<string | null> {
-        return this._core.DeviceInfo.getNetworkOperatorName().then(networkOperatorName => {
-            this.set('networkOperatorName', networkOperatorName);
-            return this.get('networkOperatorName');
-        });
+        if (this._platform === Platform.IOS || this._platform === Platform.ANDROID) {
+            return this._core.DeviceInfo.getNetworkOperatorName().then(networkOperatorName => {
+                this.set('networkOperatorName', networkOperatorName);
+                return this.get('networkOperatorName');
+            });
+        } else {
+            return Promise.resolve(this.get('networkOperatorName'));
+        }
     }
 
     public getOsVersion(): string {
         return this.get('osVersion');
-    }
-
-    public getDeviceVolume(platform: Platform, streamType: StreamType = StreamType.STREAM_SYSTEM): Promise<number> {
-        if (platform === Platform.IOS) {
-            return this._core.DeviceInfo.Ios!.getDeviceVolume().then(volume => {
-                this.set('volume', volume);
-                return this.get('volume');
-            });
-        } else if (platform === Platform.ANDROID) {
-            return this._core.DeviceInfo.Android!.getDeviceVolume(streamType).then(volume => {
-                this.set('volume', volume);
-                return this.get('volume');
-            });
-        } else {
-            return Promise.resolve(this.get('volume'));
-        }
     }
 
     public getScreenWidth(): Promise<number> {
@@ -189,6 +181,22 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
             this.set('headset', headset);
             return this.get('headset');
         });
+    }
+
+    public getDeviceVolume(streamType: StreamType = StreamType.STREAM_SYSTEM): Promise<number> {
+        if (this._platform  === Platform.IOS) {
+            return this._core.DeviceInfo.Ios!.getDeviceVolume().then(volume => {
+                this.set('volume', volume);
+                return this.get('volume');
+            });
+        } else if (this._platform === Platform.ANDROID) {
+            return this._core.DeviceInfo.Android!.getDeviceVolume(streamType).then(volume => {
+                this.set('volume', volume);
+                return this.get('volume');
+            });
+        } else {
+            return Promise.resolve(this.get('volume'));
+        }
     }
 
     public getScreenBrightness(): Promise<number> {
@@ -241,6 +249,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
             this.getNetworkOperator().catch(err => this.handleDeviceInfoError(err)),
             this.getNetworkOperatorName().catch(err => this.handleDeviceInfoError(err)),
             this.getHeadset().catch(err => this.handleDeviceInfoError(err)),
+            this.getDeviceVolume().catch(err => this.handleDeviceInfoError(err)),
             this.getScreenWidth().catch(err => this.handleDeviceInfoError(err)),
             this.getScreenHeight().catch(err => this.handleDeviceInfoError(err)),
             this.getScreenBrightness().catch(err => this.handleDeviceInfoError(err)),
@@ -254,6 +263,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
             networkOperator,
             networkOperatorName,
             headset,
+            deviceVolume,
             screenWidth,
             screenHeight,
             screenBrightness,
@@ -274,6 +284,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
                 'timeZone': this.getTimeZone(),
                 'headset': headset,
                 'language': this.getLanguage(),
+                'deviceVolume': deviceVolume,
                 'screenBrightness': screenBrightness,
                 'freeSpaceInternal': freeSpace,
                 'totalSpaceInternal': this.getTotalSpace(),
