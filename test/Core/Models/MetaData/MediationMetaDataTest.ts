@@ -3,9 +3,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
 import 'mocha';
-import * as sinon from 'sinon';
 import { Backend } from '../../../../src/ts/Backend/Backend';
 import { ICoreApi } from '../../../../src/ts/Core/Core';
 import { TestFixtures } from '../../../TestHelpers/TestFixtures';
