@@ -19,7 +19,7 @@ export class ThirdPartyEventManager {
     private _request: Request;
     private _templateValues: { [id: string]: string } = {};
 
-    public static getUrls(urls: string[], templateValues: { [id: string]: string }): string[] {
+    public static replaceUrlTemplateValues(urls: string[], templateValues: { [id: string]: string }): string[] {
         const modifiedUrls: string[] = [];
         for (const url of urls) {
             if(url) {
