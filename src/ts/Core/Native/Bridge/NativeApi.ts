@@ -4,6 +4,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 export enum ApiPackage {
     CORE,
     ADS,
+    MONETIZATION_CORE,
     AR,
     BANNER
 }
@@ -12,6 +13,7 @@ export abstract class NativeApi {
     private static _apiPackageMapping = {
         [ApiPackage.CORE]: {android: 'com.unity3d.services.core.api', ios: 'USRVApi'},
         [ApiPackage.ADS]: {android: 'com.unity3d.services.ads.api', ios: 'UADSApi'},
+        [ApiPackage.MONETIZATION_CORE]: {android: 'com.unity3d.services.monetization.core.api', ios: 'UMONApi'},
         [ApiPackage.AR]: {android: 'com.unity3d.services.ar.api', ios: 'UARApi'},
         [ApiPackage.BANNER]: {android: 'com.unity3d.services.banners.api', ios: 'UADSApi'}
     };
