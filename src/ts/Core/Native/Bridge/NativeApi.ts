@@ -5,6 +5,8 @@ export enum ApiPackage {
     CORE,
     ADS,
     MONETIZATION_CORE,
+    PURCHASING_CORE,
+    ANALYTICS,
     AR,
     BANNER
 }
@@ -14,6 +16,8 @@ export abstract class NativeApi {
         [ApiPackage.CORE]: {android: 'com.unity3d.services.core.api', ios: 'USRVApi'},
         [ApiPackage.ADS]: {android: 'com.unity3d.services.ads.api', ios: 'UADSApi'},
         [ApiPackage.MONETIZATION_CORE]: {android: 'com.unity3d.services.monetization.core.api', ios: 'UMONApi'},
+        [ApiPackage.PURCHASING_CORE]: {android: 'com.unity3d.services.purchasing.core.api', ios: 'UPURApi'},
+        [ApiPackage.ANALYTICS]: {android: 'com.unity3d.services.analytics.core.api', ios: 'UANAApi'},
         [ApiPackage.AR]: {android: 'com.unity3d.services.ar.api', ios: 'UARApi'},
         [ApiPackage.BANNER]: {android: 'com.unity3d.services.banners.api', ios: 'UADSApi'}
     };

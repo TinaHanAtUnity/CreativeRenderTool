@@ -77,7 +77,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         if(this._campaign instanceof XPromoCampaign) {
             const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
             for (const url of clickTrackingUrls) {
-                this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
+                this._thirdPartyEventManager.sendWithGet('xpromo click', this._campaign.getSession().getId(), url);
             }
         }
 
@@ -104,7 +104,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         if(this._campaign instanceof XPromoCampaign) {
             const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
             for (const url of clickTrackingUrls) {
-                this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
+                this._thirdPartyEventManager.sendWithGet('xpromo click', this._campaign.getSession().getId(), url);
             }
         }
 

@@ -15,6 +15,7 @@ import { Sdk } from 'Backend/Api/Sdk';
 import { Storage } from 'Backend/Api/Storage';
 import { UrlScheme } from 'Backend/Api/UrlScheme';
 import { VideoPlayer } from 'Backend/Api/VideoPlayer';
+import { Analytics } from 'Backend/Api/Analytics';
 import { Platform } from 'Core/Constants/Platform';
 import { CallbackStatus } from 'Core/Native/Bridge/NativeBridge';
 import { MonetizationListener } from 'Backend/Api/MonetizationListener';
@@ -68,6 +69,7 @@ export class Backend implements IWebViewBridge {
         '.*Storage': Storage,
         '.*UrlScheme': UrlScheme,
         '.*VideoPlayer': VideoPlayer,
+        '.*Analytics': Analytics,
         '.*PlacementContents': PlacementContents
     };
 
