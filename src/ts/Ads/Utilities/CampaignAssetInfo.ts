@@ -8,7 +8,6 @@ import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
-import { CachedAdMobCampaign } from 'AdMob/Models/CachedAdMobCampaign';
 
 export enum VideoType {
     CACHE,
@@ -32,7 +31,7 @@ export class CampaignAssetInfo {
             }
         } else if(campaign instanceof PromoCampaign) {
             return campaign.getCreativeResource().isCached();
-        } else if(campaign instanceof AdMobCampaign || campaign instanceof CachedAdMobCampaign) {
+        } else if(campaign instanceof AdMobCampaign) {
             const video = campaign.getVideo();
             if (video && video.getVideo() && video.getVideo().isCached()) {
                 return true;
