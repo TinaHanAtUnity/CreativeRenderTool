@@ -134,7 +134,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
         if (parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
-            this.handleClickAttributionWithRedirects(parameters.clickAttributionUrl, parameters.clickAttributionUrlFollowsRedirects);
+            this.handleClickAttributionWithRedirects(parameters.clickAttributionUrl);
             return;
         }
 
@@ -149,7 +149,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         });
     }
 
-    private handleClickAttributionWithRedirects(clickAttributionUrl: string, clickAttributionUrlFollowsRedirects: boolean) {
+    private handleClickAttributionWithRedirects(clickAttributionUrl: string) {
         const platform = this._nativeBridge.getPlatform();
 
         this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
@@ -166,7 +166,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             } else {
                 Diagnostics.trigger('click_attribution_misconfigured', {
                     url: clickAttributionUrl,
-                    followsRedirects: clickAttributionUrlFollowsRedirects,
+                    followsRedirects: true,
                     response: response
                 });
             }
