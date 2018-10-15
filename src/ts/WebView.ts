@@ -252,7 +252,6 @@ export class WebView {
             this._coreConfig = coreConfig;
             this._adsConfig = adsConfig;
             this._clientInfo.setMonetizationInUse(monetizationEnabled);
-
             this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, this._coreConfig, this._adsConfig, this._request);
             this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._coreConfig);
@@ -679,6 +678,17 @@ export class WebView {
 
             if(TestEnvironment.get('forcedPlayableMRAID')) {
                 AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
+            }
+
+            if(TestEnvironment.get('forceAuthorization')) {
+                const value = TestEnvironment.get('forceAuthorization');
+                const params = value.split('|');
+
+                if (params.length % 2 === 0) {
+                    for (let i = 0; i < params.length; i += 2) {
+                        Request.setAuthorizationHeaderForHost(params[i + 0], params[i + 1]);
+                    }
+                }
             }
 
             if(TestEnvironment.get('forcedGDPRBanner')) {

@@ -5,30 +5,50 @@
 
         <% if(!data.isGDPREnabled) { %>
         <span class="not-gdpr">
-                <% if(!data.isCoppaCompliant) { %>
-                <div class="privacy-text">
-                    <p>
-                            This advertisement has been served by Unity Ads.
-                            Unity Ads collects and uses information gathered through your use of your apps in order to create an
-                            individualized and more relevant user experience, to predict your preferences, and to show you ads that are more
-                            likely to interest you (“personalized ads”).
-                    </p>
-                    <p>
-                            Please read our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> for a full description of
-                            our data practices.
-                    </p>
-                    <p>
-                            You may be able to opt-out of Unity Ads’ collection and use of your mobile app data for personalized ads through
-                            your device settings.
-                    </p>
-                </div>
+            <div class="privacy-text">
+                <% if(data.isCoppaCompliant) { %>
+                <p>
+                    This advertisement has been served by Unity Ads. By request of this app’s publisher, we do not
+                    combine the data from this app with data from any other apps.
+                </p>
                 <% } else { %>
-                <div class="privacy-simple-text">
-                    This advertisement has been served by Unity Ads. Please read our <a href="https://unity3d.com/legal/privacy-policy">Privacy
-                        Policy</a> for a full description of our data
-                    practices.
-                </div>
+                <p>
+                    This advertisement has been served by Unity Ads. Unity Ads collects information gathered through
+                    your use of apps in order to create an individualized and more relevant user experience and to show
+                    you ads that are more likely to interest you (“personalized experiences and ads”).
+                </p>
                 <% } %>
+                <p>
+                    From your interaction with this app, here is an example of the information we use to predict which
+                    other apps might interest you:
+                </p>
+                <p>
+                    <span id="phone-type"></span>
+                </p>
+                <p>
+                    <span id="country"></span>
+                </p>
+
+                <p>
+                    <span id="game-plays-this-week"></span>
+                </p>
+
+                <p>
+                    <span id="ads-seen-in-game"></span>
+                </p>
+
+                <p>
+                    <span id="games-installed-from-ads"></span>
+                </p>
+                <p>
+                    <span id="sorry-message">Sorry. We were unable to deliver our collected information at this time.</span>
+                </p>
+                <p>
+                    Please review our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> for
+                    a full description of our data practices. You can opt-out of Unity Ads’ personalized
+                    experiences and ads through your device settings.
+                </p>
+            </div>
         </div>
 
         <% } else { %>
@@ -122,9 +142,9 @@
                 <% } %>
                 <span id="data-deletion-container">Are you sure? <span id="data-deletion-confirm" class="page-link">Yes</span>
                     / <span class="data-deletion-reject page-link">No</span></span>
-                <span id="data-deletion-request-container">We will process your request and your data will be deleted
-                    in 30 days. We will also
-                    opt you out of personalized ads.
+                <span id="data-deletion-request-container">We will process your request and your data for profile purposes
+                    will be deleted in 30 days. We will also opt you out of personalized ads immediately.
+                    Please note we may retain your data for invoicing and fraud prevention purposes for 90 days.
                 </span>
             </p>
         </div>
