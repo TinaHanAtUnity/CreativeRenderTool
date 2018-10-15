@@ -114,8 +114,6 @@ export class WebView {
     private _showing: boolean = false;
     private _initialized: boolean = false;
     private _initializedAt: number;
-    private _monetizationEnabled = false;
-
     private _metadataManager: MetaDataManager;
 
     private _creativeUrl?: string;
@@ -253,8 +251,7 @@ export class WebView {
         }).then(([[coreConfig, adsConfig], cachedCampaignResponse, monetizationEnabled]) => {
             this._coreConfig = coreConfig;
             this._adsConfig = adsConfig;
-            this._monetizationEnabled = monetizationEnabled;
-
+            this._clientInfo.setMonetizationInUse(monetizationEnabled);
             this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, this._coreConfig, this._adsConfig, this._request);
             this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._coreConfig);
@@ -303,7 +300,7 @@ export class WebView {
             this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._adsConfig, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
             const placementManager = new PlacementManager(this._nativeBridge, this._adsConfig);
 
-            if (this._monetizationEnabled) {
+            if (this._clientInfo.isMonetizationInUse()) {
                 this._placementContentManager = new PlacementContentManager(this._nativeBridge, this._adsConfig, this._campaignManager, placementManager);
             }
 
@@ -526,7 +523,7 @@ export class WebView {
                 gameSessionId: this._sessionManager.getGameSessionId()
             });
             this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
-            if (this._monetizationEnabled) {
+            if (this._clientInfo.isMonetizationInUse()) {
                 this._placementContentManager.setCurrentAdUnit(placement.getId(), this._currentAdUnit);
             }
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
