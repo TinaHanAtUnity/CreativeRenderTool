@@ -22,7 +22,7 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { Closer } from 'Ads/Views/Closer';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
+import { Privacy } from 'Ads/Views/Privacy';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
@@ -159,7 +159,7 @@ export class AdUnitFactory {
                 }
             });
         }
-        ReportingPrivacy.setupReportListener(privacy, performanceAdUnit);
+        Privacy.setupReportListener(privacy, performanceAdUnit);
 
         return performanceAdUnit;
     }
@@ -214,7 +214,7 @@ export class AdUnitFactory {
                 }
             });
         }
-        ReportingPrivacy.setupReportListener(privacy, xPromoAdUnit);
+        Privacy.setupReportListener(privacy, xPromoAdUnit);
 
         return xPromoAdUnit;
     }
@@ -290,7 +290,7 @@ export class AdUnitFactory {
             }
         });
 
-        ReportingPrivacy.setupReportListener(privacy, vastAdUnit);
+        Privacy.setupReportListener(privacy, vastAdUnit);
 
         return vastAdUnit;
     }
@@ -326,7 +326,7 @@ export class AdUnitFactory {
         const EventHandler =  (isSonicPlayable || isPlayable) ? PlayableEventHandler : MRAIDEventHandler;
         const mraidEventHandler: IMRAIDViewHandler = new EventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
         mraid.addEventHandler(mraidEventHandler);
-        ReportingPrivacy.setupReportListener(privacy, mraidAdUnit);
+        Privacy.setupReportListener(privacy, mraidAdUnit);
         return mraidAdUnit;
     }
 
@@ -365,7 +365,7 @@ export class AdUnitFactory {
             const endScreenEventHandler = new VPAIDEndScreenEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
             endScreen.addEventHandler(endScreenEventHandler);
         }
-        ReportingPrivacy.setupReportListener(privacy, vpaidAdUnit);
+        Privacy.setupReportListener(privacy, vpaidAdUnit);
 
         return vpaidAdUnit;
     }
@@ -374,7 +374,7 @@ export class AdUnitFactory {
         const privacy = this.createPrivacy(nativeBridge, parameters);
         const showGDPRBanner = this.showGDPRBanner(parameters);
 
-        const promoView = new Promo(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner);
+        const promoView = new Promo(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.placement);
         const promoAdUnit = new PromoAdUnit(nativeBridge, {
             ...parameters,
             view: promoView,
@@ -387,7 +387,7 @@ export class AdUnitFactory {
         promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.adsConfig, parameters.gdprManager));
         promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.campaign, parameters.placement.getId()));
         promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromoClick(promoAdUnit, parameters.campaign, parameters.placement.getId()));
-        ReportingPrivacy.setupReportListener(privacy, promoAdUnit);
+        Privacy.setupReportListener(privacy, promoAdUnit);
 
         return promoAdUnit;
     }
@@ -405,7 +405,7 @@ export class AdUnitFactory {
         const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialParameters);
         const displayInterstitialEventHandler = new DisplayInterstitialEventHandler(nativeBridge, displayInterstitialAdUnit, displayInterstitialParameters);
         view.addEventHandler(displayInterstitialEventHandler);
-        ReportingPrivacy.setupReportListener(privacy, displayInterstitialAdUnit);
+        Privacy.setupReportListener(privacy, displayInterstitialAdUnit);
 
         return displayInterstitialAdUnit;
     }
@@ -485,7 +485,7 @@ export class AdUnitFactory {
             gdprManager: parameters.gdprManager
         });
         view.addEventHandler(eventHandler);
-        ReportingPrivacy.setupReportListener(privacy, adUnit);
+        Privacy.setupReportListener(privacy, adUnit);
 
         return adUnit;
     }
@@ -532,9 +532,9 @@ export class AdUnitFactory {
         return video;
     }
 
-    private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
+    private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): Privacy {
 
-        const privacy = new ReportingPrivacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
         const privacyEventHandler = new PrivacyEventHandler(nativeBridge, parameters);
         privacy.addEventHandler(privacyEventHandler);
         return privacy;

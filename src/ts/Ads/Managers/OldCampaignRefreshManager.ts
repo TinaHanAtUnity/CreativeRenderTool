@@ -23,6 +23,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export class OldCampaignRefreshManager extends RefreshManager {
@@ -98,6 +99,13 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this._currentAdUnit.onStartProcessed.subscribe(() => this.onAdUnitStartProcessed());
         this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
         this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
+    }
+
+    public subscribeNativePromoEvents(eventHandler : NativePromoEventHandler): void {
+        eventHandler.onClose.subscribe(() => {
+            this._needsRefill = true;
+            this.refresh();
+        });
     }
 
     public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -221,6 +229,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     private onCampaign(placementId: string, campaign: Campaign) {
+        PurchasingUtilities.addCampaignPlacementIds(placementId, campaign);
         this._parsingErrorCount = 0;
         const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
         const isMixedPlacementExperiment = CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId());
