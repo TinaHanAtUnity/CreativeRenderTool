@@ -204,7 +204,7 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
-    public getVideoMedialFiles(): VastMediaFile[] {
+    public getVideoMediaFiles(): VastMediaFile[] {
         const ad = this.getAd();
         const mediaFiles: VastMediaFile[] = [];
         if (ad) {

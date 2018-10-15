@@ -66,7 +66,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         let videoUrl;
         if (this._isMediaExperiment && connectionType) {    // TODO: ab test with auction feature flag
-            videoUrl = getOptimizedVideoUrl(vast.getVideoMedialFiles(), connectionType);
+            videoUrl = getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
             if (!videoUrl) {
                 throw new Error('No video URL found for VAST');
             }

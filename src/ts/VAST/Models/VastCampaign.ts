@@ -38,6 +38,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             impressionUrls: ['array'],
             isMoatEnabled: ['boolean', 'undefined']
         }, campaign);
+
         this.processCustomTracking(campaign.trackingUrls);
     }
 
