@@ -273,7 +273,7 @@ export class WebView {
 
             let analyticsPromise;
             if(this._coreConfig.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
-                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._coreConfig, this._focusManager);
+                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._coreConfig, this._focusManager);
                 analyticsPromise = this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
                 });

@@ -18,5 +18,6 @@ export enum EventCategory {
     PLACEMENT_CONTENT,
     BANNER,
     AR,
+    ANALYTICS,
     PERMISSIONS
 }
