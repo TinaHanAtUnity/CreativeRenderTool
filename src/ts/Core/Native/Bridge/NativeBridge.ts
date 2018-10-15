@@ -32,6 +32,7 @@ import { SdkApi } from 'Core/Native/Sdk';
 import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
 import { PurchasingApi } from 'Promo/Native/Purchasing';
+import { CustomPurchasingApi } from 'Purchasing/Native/CustomPurchasing';
 import { AnalyticsApi } from 'Analytics/Native/Analytics';
 import { IMonetizationServices } from 'Monetization/Native/MonetizationServices';
 import { PlacementContentsApi } from 'Monetization/Native/PlacementContents';
@@ -145,6 +146,7 @@ export class NativeBridge implements INativeBridge {
         this.AdsProperties = new AdsPropertiesApi(this);
         this.Analytics = new AnalyticsApi(this);
         this.Monetization = {
+      CustomPurchasing: new CustomPurchasingApi(this),
             PlacementContents: new PlacementContentsApi(this),
             Listener: new MonetizationListenerApi(this)
         };
@@ -275,6 +277,11 @@ export class NativeBridge implements INativeBridge {
             case EventCategory[EventCategory.WEBPLAYER]:
                 this.WebPlayer.handleEvent(event, parameters);
                 break;
+
+            case EventCategory[EventCategory.CUSTOM_PURCHASING]:
+                this.Monetization.CustomPurchasing.handleEvent(event, parameters);
+                break;
+
             case EventCategory[EventCategory.PLACEMENT_CONTENT]:
                 this.Monetization.PlacementContents.handleEvent(event, parameters);
                 break;
