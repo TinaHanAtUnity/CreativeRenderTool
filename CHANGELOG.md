@@ -1,4 +1,4 @@
-# Pending
+# Mon Oct 15 20:37:20 UTC 2018
 
 * AB Test various improvements to the endscreen layout v2 [#6674](https://github.com/Applifier/unity-ads-webview/pull/6674)
 * Remove smart close button test [#6673](https://github.com/Applifier/unity-ads-webview/pull/6673)
