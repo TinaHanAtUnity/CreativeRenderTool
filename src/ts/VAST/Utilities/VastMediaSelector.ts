@@ -10,7 +10,16 @@ export enum VASTMediaFileSize {
 }
 
 export class VastMediaSelector {
-    public static getVideoUrlInRange(mediaFiles: VastMediaFile[], minSize: number, maxSize: number): string | null {
+
+    public static getOptimizedVideoUrl(mediaFiles: VastMediaFile[], connectionType?: string): string | null {
+        if (connectionType && connectionType === 'wifi') {
+            return VastMediaSelector.getVideoUrlInRange(mediaFiles, VASTMediaFileSize.WIFI_MIN, VASTMediaFileSize.WIFI_MAX);
+        } else {
+            return VastMediaSelector.getVideoUrlInRange(mediaFiles, VASTMediaFileSize.CELL_MIN, VASTMediaFileSize.CELL_MAX);
+        }
+    }
+
+    private static getVideoUrlInRange(mediaFiles: VastMediaFile[], minSize: number, maxSize: number): string | null {
         let mediaUrl: string | null = null;
         let mediaMinSize = Number.MAX_SAFE_INTEGER;
         let defaultMediaUrl: string | null = null;
@@ -37,13 +46,5 @@ export class VastMediaSelector {
         }
 
         return defaultMediaUrl;
-    }
-}
-
-export function getOptimizedVideoUrl(mediaFiles: VastMediaFile[], connectionType?: string): string | null {
-    if (connectionType && connectionType === 'wifi') {
-        return VastMediaSelector.getVideoUrlInRange(mediaFiles, VASTMediaFileSize.WIFI_MIN, VASTMediaFileSize.WIFI_MAX);
-    } else {
-        return VastMediaSelector.getVideoUrlInRange(mediaFiles, VASTMediaFileSize.CELL_MIN, VASTMediaFileSize.CELL_MAX);
     }
 }

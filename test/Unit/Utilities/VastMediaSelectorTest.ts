@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import 'mocha';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
-import { getOptimizedVideoUrl } from 'VAST/Utilities/VastMediaSelector';
+import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
 
 describe('VastMediaSelectorTest for getOptimizedVideoUrl', () => {
     let vastMediaFiles: VastMediaFile[];
@@ -20,15 +20,15 @@ describe('VastMediaSelectorTest for getOptimizedVideoUrl', () => {
         });
 
         it('should return wifi range media url in wifi connection', () => {
-            assert.equal(getOptimizedVideoUrl(vastMediaFiles, 'wifi'), 'https://vast_media_url_3.2mb');
+            assert.equal(VastMediaSelector.getOptimizedVideoUrl(vastMediaFiles, 'wifi'), 'https://vast_media_url_3.2mb');
         });
 
         it('should return celluar range media url in cellular connection', () => {
-            assert.equal(getOptimizedVideoUrl(vastMediaFiles, 'cellular'), 'https://vast_media_url_570kb');
+            assert.equal(VastMediaSelector.getOptimizedVideoUrl(vastMediaFiles, 'cellular'), 'https://vast_media_url_570kb');
         });
 
         it('should return celluar range media url if connection info is missing', () => {
-            assert.equal(getOptimizedVideoUrl(vastMediaFiles), 'https://vast_media_url_570kb');
+            assert.equal(VastMediaSelector.getOptimizedVideoUrl(vastMediaFiles), 'https://vast_media_url_570kb');
         });
     });
 
@@ -46,15 +46,15 @@ describe('VastMediaSelectorTest for getOptimizedVideoUrl', () => {
         });
 
         it('should return wifi range media url in wifi connection', () => {
-            assert.equal(getOptimizedVideoUrl(vastMediaFiles, 'wifi'), 'https://vast_media_url_3');
+            assert.equal(VastMediaSelector.getOptimizedVideoUrl(vastMediaFiles, 'wifi'), 'https://vast_media_url_3');
         });
 
         it('should return default/first media url if none is found for cellular connection', () => {
-            assert.equal(getOptimizedVideoUrl(vastMediaFiles, 'cellular'), 'https://vast_media_url_1');
+            assert.equal(VastMediaSelector.getOptimizedVideoUrl(vastMediaFiles, 'cellular'), 'https://vast_media_url_1');
         });
 
         it('should return default/first media url if connection info is missing', () => {
-            assert.equal(getOptimizedVideoUrl(vastMediaFiles), 'https://vast_media_url_1');
+            assert.equal(VastMediaSelector.getOptimizedVideoUrl(vastMediaFiles), 'https://vast_media_url_1');
         });
     });
 
@@ -73,15 +73,15 @@ describe('VastMediaSelectorTest for getOptimizedVideoUrl', () => {
         });
 
         it('should return null if file sizes are too large in wifi', () => {
-            assert.equal(getOptimizedVideoUrl(vastMediaFiles, 'wifi'), null);
+            assert.equal(VastMediaSelector.getOptimizedVideoUrl(vastMediaFiles, 'wifi'), null);
         });
 
         it('should return null if file sizes are too large for cellular connection', () => {
-            assert.equal(getOptimizedVideoUrl(vastMediaFiles, 'cellular'), null);
+            assert.equal(VastMediaSelector.getOptimizedVideoUrl(vastMediaFiles, 'cellular'), null);
         });
 
         it('should return null if file sizes are too large when connection info is missing', () => {
-            assert.equal(getOptimizedVideoUrl(vastMediaFiles), null);
+            assert.equal(VastMediaSelector.getOptimizedVideoUrl(vastMediaFiles), null);
         });
     });
 });

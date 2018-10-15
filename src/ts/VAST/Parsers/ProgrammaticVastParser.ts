@@ -11,7 +11,7 @@ import { Request } from 'Core/Utilities/Request';
 import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
-import { getOptimizedVideoUrl } from 'VAST/Utilities/VastMediaSelector';
+import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
 
 export class ProgrammaticVastParser extends CampaignParser {
     public static ContentType = 'programmatic/vast';
@@ -66,7 +66,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         let videoUrl;
         if (this._isMediaExperiment && connectionType) {    // TODO: ab test with auction feature flag
-            videoUrl = getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
+            videoUrl = VastMediaSelector.getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
             if (!videoUrl) {
                 throw new Error('No video URL found for VAST');
             }
