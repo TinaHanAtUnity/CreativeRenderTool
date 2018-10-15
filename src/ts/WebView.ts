@@ -72,6 +72,7 @@ import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { PlacementContentManager } from 'Monetization/Managers/PlacementContentManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
@@ -108,10 +109,12 @@ export class WebView {
     private _jaegerManager: JaegerManager;
     private _interstitialWebPlayerContainer: WebPlayerContainer;
     private _programmaticTrackingService: ProgrammaticTrackingService;
+    private _placementContentManager: PlacementContentManager;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
     private _initializedAt: number;
+    private _monetizationEnabled = false;
 
     private _metadataManager: MetaDataManager;
 
@@ -244,11 +247,13 @@ export class WebView {
             });
 
             const cachedCampaignResponsePromise = this._cacheBookkeeping.getCachedCampaignResponse();
+            const monetizationEnabledPromise = this._nativeBridge.Monetization.Listener.isMonetizationEnabled();
 
-            return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
-        }).then(([[coreConfig, adsConfig], cachedCampaignResponse]) => {
+            return Promise.all([configPromise, cachedCampaignResponsePromise, monetizationEnabledPromise, cachePromise]);
+        }).then(([[coreConfig, adsConfig], cachedCampaignResponse, monetizationEnabled]) => {
             this._coreConfig = coreConfig;
             this._adsConfig = adsConfig;
+            this._monetizationEnabled = monetizationEnabled;
 
             this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, this._coreConfig, this._adsConfig, this._request);
             this._cachedCampaignResponse = cachedCampaignResponse;
@@ -268,7 +273,7 @@ export class WebView {
 
             let analyticsPromise;
             if(this._coreConfig.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
-                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._coreConfig, this._focusManager);
+                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._coreConfig, this._focusManager);
                 analyticsPromise = this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
                 });
@@ -296,6 +301,11 @@ export class WebView {
 
             this._campaignManager = new CampaignManager(this._nativeBridge, this._coreConfig, this._adsConfig, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._cacheBookkeeping, this._jaegerManager, this._backupCampaignManager);
             this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._adsConfig, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
+            const placementManager = new PlacementManager(this._nativeBridge, this._adsConfig);
+
+            if (this._monetizationEnabled) {
+                this._placementContentManager = new PlacementContentManager(this._nativeBridge, this._adsConfig, this._campaignManager, placementManager);
+            }
 
             const bannerPlacementManager = new BannerPlacementManager(this._nativeBridge, this._adsConfig);
             bannerPlacementManager.sendBannersReady();
@@ -355,7 +365,7 @@ export class WebView {
                 return;
             }
 
-            this._nativeBridge.Sdk.logError(JSON.stringify(error));
+            this._nativeBridge.Sdk.logError(`Init error: ${JSON.stringify(error)}`);
             Diagnostics.trigger('initialization_error', error);
         });
     }
@@ -516,6 +526,9 @@ export class WebView {
                 gameSessionId: this._sessionManager.getGameSessionId()
             });
             this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
+            if (this._monetizationEnabled) {
+                this._placementContentManager.setCurrentAdUnit(placement.getId(), this._currentAdUnit);
+            }
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
             if(this._nativeBridge.getPlatform() === Platform.IOS && (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign)) {
@@ -668,6 +681,17 @@ export class WebView {
 
             if(TestEnvironment.get('forcedPlayableMRAID')) {
                 AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
+            }
+
+            if(TestEnvironment.get('forceAuthorization')) {
+                const value = TestEnvironment.get('forceAuthorization');
+                const params = value.split('|');
+
+                if (params.length % 2 === 0) {
+                    for (let i = 0; i < params.length; i += 2) {
+                        Request.setAuthorizationHeaderForHost(params[i + 0], params[i + 1]);
+                    }
+                }
             }
 
             if(TestEnvironment.get('forcedGDPRBanner')) {

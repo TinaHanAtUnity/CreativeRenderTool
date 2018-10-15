@@ -17,7 +17,7 @@ export enum EventCategory {
     DECISION,
     PLACEMENT_CONTENT,
     BANNER,
-    ANALYTICS,
     AR,
+    ANALYTICS,
     PERMISSIONS
 }

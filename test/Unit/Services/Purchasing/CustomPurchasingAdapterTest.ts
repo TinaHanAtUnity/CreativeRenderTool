@@ -42,8 +42,8 @@ describe('CustomPurchasingAdapter', () => {
         (<any>nativeBridge).Monetization.CustomPurchasing.onTransactionError = new Observable1<ITransactionErrorDetails>();
 
         purchasingAdapter = new CustomPurchasingAdapter(nativeBridge, analyticsManager, promoEvents, request);
-        sandbox.stub((<any>purchasingAdapter)._thirdPartyEventManager, 'getEvent');
-        sandbox.stub((<any>purchasingAdapter)._thirdPartyEventManager, 'postEvent');
+        sandbox.stub((<any>purchasingAdapter)._thirdPartyEventManager, 'sendWithGet');
+        sandbox.stub((<any>purchasingAdapter)._thirdPartyEventManager, 'sendWithPost');
     });
 
     const triggerRefreshCatalog = (value: IProduct[]) => {
@@ -160,7 +160,7 @@ describe('CustomPurchasingAdapter', () => {
                                 .then(() => {
                                     return purchaseItemPromise.then((transactionDets) => {
                                         sinon.assert.calledOnce(<sinon.SinonStub>promoEvents.onPurchaseSuccess);
-                                        sinon.assert.calledOnce((<any>purchasingAdapter)._thirdPartyEventManager.postEvent);
+                                        sinon.assert.calledOnce((<any>purchasingAdapter)._thirdPartyEventManager.sendWithPost);
                                         assert.deepEqual(transactionDets, transactionDetails);
                                     });
                             });
@@ -181,7 +181,7 @@ describe('CustomPurchasingAdapter', () => {
                                 .then(() => {
                                     return purchaseItemPromise.then((transactionDets) => {
                                         sinon.assert.calledOnce(<sinon.SinonStub>promoEvents.onPurchaseSuccess);
-                                        sinon.assert.calledOnce((<any>purchasingAdapter)._thirdPartyEventManager.getEvent);
+                                        sinon.assert.calledOnce((<any>purchasingAdapter)._thirdPartyEventManager.sendWithGet);
                                         assert.deepEqual(transactionDets, transactionDetails);
                                     });
                             });
@@ -260,7 +260,7 @@ describe('CustomPurchasingAdapter', () => {
                                         assert.fail('purchaseItem worked when it shouldn\'t\'ve');
                                     }).catch((e) => {
                                         sinon.assert.calledOnce(<sinon.SinonStub>analyticsManager.onPurchaseFailed);
-                                        sinon.assert.calledOnce((<any>purchasingAdapter)._thirdPartyEventManager.postEvent);
+                                        sinon.assert.calledOnce((<any>purchasingAdapter)._thirdPartyEventManager.sendWithPost);
                                         assert.equal(e.message, 'Did not complete transaction due to error:twas a problem');
                                     });
                             });
@@ -283,7 +283,7 @@ describe('CustomPurchasingAdapter', () => {
                                         assert.fail('purchaseItem worked when it shouldn\'t\'ve');
                                     }).catch((e) => {
                                         sinon.assert.calledOnce(<sinon.SinonStub>analyticsManager.onPurchaseFailed);
-                                        sinon.assert.calledWith((<any>purchasingAdapter)._thirdPartyEventManager.getEvent, 'purchase', '12345', 'http://test.purchase.com/purchase');
+                                        sinon.assert.calledWith((<any>purchasingAdapter)._thirdPartyEventManager.sendWithGet, 'purchase', '12345', 'http://test.purchase.com/purchase');
                                         assert.equal(e.message, 'Did not complete transaction due to error:twas a problem');
                                     });
                             });

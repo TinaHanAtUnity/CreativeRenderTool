@@ -1,3 +1,18 @@
+# Mon Oct 15 20:37:20 UTC 2018
+
+* AB Test various improvements to the endscreen layout v2 [#6674](https://github.com/Applifier/unity-ads-webview/pull/6674)
+* Remove smart close button test [#6673](https://github.com/Applifier/unity-ads-webview/pull/6673)
+* Android back button skip for Cheetah [#6675](https://github.com/Applifier/unity-ads-webview/pull/6675)
+* Add check that requested permissions are in manifest [#6358](https://github.com/Applifier/unity-ads-webview/pull/6358)
+* Add tests for AR and Permission APIs [#6495](https://github.com/Applifier/unity-ads-webview/pull/6495)
+* Add method to set authorization header for http request from Webview [#6379](https://github.com/Applifier/unity-ads-webview/pull/6379)
+* Remove calling getSensorList API method on initialization [#6541](https://github.com/Applifier/unity-ads-webview/pull/6541)
+* Remove OpenGL version from DeviceInfo [#6651](https://github.com/Applifier/unity-ads-webview/pull/6651)
+* Show target information in Non-GDPR Privacy Dialog [#6646](https://github.com/Applifier/unity-ads-webview/pull/6646)
+* Add error throwing when API is missing in browser build [#6604](https://github.com/Applifier/unity-ads-webview/pull/6604)
+* Add isCached checking support for Admob Campaigns [#6652](https://github.com/Applifier/unity-ads-webview/pull/6652)
+
+
 # Wed Oct 10 17:36:31 UTC 2018
 
 * Multiply battery level by 100 for AdMob signal [#6600](https://github.com/Applifier/unity-ads-webview/pull/6600)

@@ -32,8 +32,11 @@ import { SdkApi } from 'Core/Native/Sdk';
 import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
 import { PurchasingApi } from 'Promo/Native/Purchasing';
-import { IMonetizationServices } from 'Monetization/Native/MonetizationServices';
 import { CustomPurchasingApi } from 'Purchasing/Native/CustomPurchasing';
+import { AnalyticsApi } from 'Analytics/Native/Analytics';
+import { IMonetizationServices } from 'Monetization/Native/MonetizationServices';
+import { PlacementContentsApi } from 'Monetization/Native/PlacementContents';
+import { MonetizationListenerApi } from 'Monetization/Native/MonetizationListener';
 
 export enum CallbackStatus {
     OK,
@@ -87,6 +90,7 @@ export class NativeBridge implements INativeBridge {
     public Banner: BannerApi;
     public BannerListener: BannerListenerApi;
     public AdsProperties: AdsPropertiesApi;
+    public Analytics: AnalyticsApi;
     public Monetization: IMonetizationServices;
 
     private _callbackId: number = 1;
@@ -140,8 +144,11 @@ export class NativeBridge implements INativeBridge {
         this.Banner = new BannerApi(this);
         this.BannerListener = new BannerListenerApi(this);
         this.AdsProperties = new AdsPropertiesApi(this);
+        this.Analytics = new AnalyticsApi(this);
         this.Monetization = {
-            CustomPurchasing: new CustomPurchasingApi(this)
+      CustomPurchasing: new CustomPurchasingApi(this),
+            PlacementContents: new PlacementContentsApi(this),
+            Listener: new MonetizationListenerApi(this)
         };
     }
 
@@ -263,6 +270,10 @@ export class NativeBridge implements INativeBridge {
                 }
                 break;
 
+            case EventCategory[EventCategory.ANALYTICS]:
+                this.Analytics.handleEvent(event, parameters);
+                break;
+
             case EventCategory[EventCategory.WEBPLAYER]:
                 this.WebPlayer.handleEvent(event, parameters);
                 break;
@@ -271,6 +282,9 @@ export class NativeBridge implements INativeBridge {
                 this.Monetization.CustomPurchasing.handleEvent(event, parameters);
                 break;
 
+            case EventCategory[EventCategory.PLACEMENT_CONTENT]:
+                this.Monetization.PlacementContents.handleEvent(event, parameters);
+                break;
             case EventCategory[EventCategory.AR]:
                 this.AR.handleEvent(event, parameters);
                 break;

@@ -14,7 +14,11 @@ class TestRequestApi extends RequestApi {
     private _toggleUrl: boolean = false;
 
     public get(id: string, url: string, headers: Array<[string, string]>): Promise<string> {
-        if(url.indexOf('/success') !== -1) {
+        if(url.indexOf('/auth') !== -1) {
+            const header = headers.find((x) => x[0] === 'Authorization');
+            const auth = header === undefined ? '' : header[1];
+            this.sendSuccessResponse(id, url, auth, 200, []);
+        } else if(url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
         } else if(url.indexOf('/fail') !== -1) {
             this.sendFailResponse(id, url, 'Fail response');
@@ -60,7 +64,11 @@ class TestRequestApi extends RequestApi {
     }
 
     public post(id: string, url: string, body: string, headers: Array<[string, string]>): Promise<string> {
-        if(url.indexOf('/success') !== -1) {
+        if(url.indexOf('/auth') !== -1) {
+            const header = headers.find((x) => x[0] === 'Authorization');
+            const auth = header === undefined ? '' : header[1];
+            this.sendSuccessResponse(id, url, auth, 200, []);
+        } else if(url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
         } else if(url.indexOf('/fail') !== -1) {
             this.sendFailResponse(id, url, 'Fail response');
@@ -381,6 +389,113 @@ describe('RequestTest', () => {
                 assert.fail('Should not resolve');
             }).catch(error => {
                 assert.equal(error.message, 'redirect limit reached');
+            });
+        });
+    });
+
+    describe('Request Authorization', () => {
+        afterEach(() => {
+            Request.clearAllAuthorization();
+        });
+
+        it('get', () => {
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = 'Bearer 1234567890';
+
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
+
+            return request.get(successUrl).then((response) => {
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
+            }).catch(error => {
+                error = <RequestError>error;
+                throw new Error('Get without headers failed: ' + error.message);
+            });
+        });
+
+        it('post', () => {
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = 'Bearer 1234567890';
+
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
+
+            return request.post(successUrl).then((response) => {
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
+            }).catch(error => {
+                error = <RequestError>error;
+                throw new Error('Get without headers failed: ' + error.message);
+            });
+        });
+
+        it('get for https', () => {
+            const successUrl: string = 'https://www.example.org/auth';
+            const expectedToken = 'Bearer 1234567890';
+
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
+
+            return request.get(successUrl).then((response) => {
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
+            }).catch(error => {
+                error = <RequestError>error;
+                throw new Error('Get without headers failed: ' + error.message);
+            });
+        });
+
+        it('get multiple auth', () => {
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = 'Bearer 0987654321';
+
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
+            Request.setAuthorizationHeaderForHost('www.example.org', 'Bearer 1234567890');
+
+            return request.get(successUrl).then((response) => {
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
+            }).catch(error => {
+                error = <RequestError>error;
+                throw new Error('Get without headers failed: ' + error.message);
+            });
+        });
+
+        it('get trim token string', () => {
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = '   Bearer 0987654321   ';
+
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
+
+            return request.get(successUrl).then((response) => {
+                assert.equal(expectedToken.trim(), response.response, 'Did not receive correct response');
+            }).catch(error => {
+                error = <RequestError>error;
+                throw new Error('Get without headers failed: ' + error.message);
+            });
+        });
+
+        it('get ignore host', () => {
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = 'Bearer 0987654321';
+
+            Request.setAuthorizationHeaderForHost('www.not-example.org', 'Bearer 1234567890');
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
+
+            return request.get(successUrl).then((response) => {
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
+            }).catch(error => {
+                error = <RequestError>error;
+                throw new Error('Get without headers failed: ' + error.message);
+            });
+        });
+
+        it('get no auth for host', () => {
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = '';
+
+            Request.setAuthorizationHeaderForHost('www.not-example.org', 'Bearer 1234567890');
+            Request.setAuthorizationHeaderForHost('www.google.org', 'Bearer 1');
+
+            return request.get(successUrl).then((response) => {
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
+            }).catch(error => {
+                error = <RequestError>error;
+                throw new Error('Get without headers failed: ' + error.message);
             });
         });
     });
