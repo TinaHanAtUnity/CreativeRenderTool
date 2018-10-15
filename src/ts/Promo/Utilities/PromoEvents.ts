@@ -270,14 +270,9 @@ export class PromoEvents {
                 const advertisingIdentifier = this.deviceInfo.getAdvertisingIdentifier();
                 if (advertisingIdentifier) {
                     return advertisingIdentifier;
-                } else {
-                    return '';
                 }
-            } else {
-                return '';
             }
-        } else {
-            return '';
         }
+        return '';
     }
 }
