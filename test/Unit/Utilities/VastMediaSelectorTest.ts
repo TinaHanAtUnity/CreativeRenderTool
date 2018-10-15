@@ -53,8 +53,35 @@ describe('VastMediaSelectorTest for getOptimizedVideoUrl', () => {
             assert.equal(getOptimizedVideoUrl(vastMediaFiles, 'cellular'), 'https://vast_media_url_1');
         });
 
-        it('should return default/first media url if fileSize and bitrate info are missing', () => {
+        it('should return default/first media url if connection info is missing', () => {
             assert.equal(getOptimizedVideoUrl(vastMediaFiles), 'https://vast_media_url_1');
+        });
+    });
+
+    describe('returning null where file sizes are too large', () => {
+        beforeEach(() => {
+            vastMediaFiles = [];
+
+            // 30MB, 22MB, 40MB
+            const vastMedia1 = new VastMediaFile('https://vast_media_url_1', 'progressive', '', 'video/mp4', 16519, 0, 0, 1920, 1080, '', 30973125);
+            const vastMedia2 = new VastMediaFile('https://vast_media_url_2', 'progressive', '', 'video/mp4', 16519, 0, 0, 1280, 720, '', 22020096);
+            const vastMedia3 = new VastMediaFile('https://vast_media_url_2', 'progressive', '', 'video/mp4', 16519, 0, 0, 1920, 1080, '', 41943040);
+
+            vastMediaFiles.push(vastMedia1);
+            vastMediaFiles.push(vastMedia2);
+            vastMediaFiles.push(vastMedia3);
+        });
+
+        it('should return null if file sizes are too large in wifi', () => {
+            assert.equal(getOptimizedVideoUrl(vastMediaFiles, 'wifi'), null);
+        });
+
+        it('should return null if file sizes are too large for cellular connection', () => {
+            assert.equal(getOptimizedVideoUrl(vastMediaFiles, 'cellular'), null);
+        });
+
+        it('should return null if file sizes are too large when connection info is missing', () => {
+            assert.equal(getOptimizedVideoUrl(vastMediaFiles), null);
         });
     });
 });
