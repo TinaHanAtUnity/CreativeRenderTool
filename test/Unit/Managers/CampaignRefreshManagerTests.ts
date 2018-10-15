@@ -52,7 +52,6 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -105,7 +104,6 @@ describe('CampaignRefreshManager', () => {
     let campaignManager: CampaignManager;
     let wakeUpManager: WakeUpManager;
     let nativeBridge: NativeBridge;
-    let storageBridge: StorageBridge;
     let request: Request;
     let assetManager: AssetManager;
     let sessionManager: SessionManager;
@@ -198,15 +196,13 @@ describe('CampaignRefreshManager', () => {
             }
         };
 
-        storageBridge = new StorageBridge(nativeBridge);
         placementManager = sinon.createStubInstance(PlacementManager);
-        PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
+        sessionManager = new SessionManager(nativeBridge, request);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -224,7 +220,6 @@ describe('CampaignRefreshManager', () => {
             deviceInfo: deviceInfo,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
-            storageBridge: storageBridge,
             campaign: campaign
         });
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);

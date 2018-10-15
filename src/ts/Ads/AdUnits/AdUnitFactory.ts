@@ -22,8 +22,8 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { Closer } from 'Ads/Views/Closer';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
 import { StreamType } from 'Core/Constants/Android/StreamType';
@@ -58,7 +58,7 @@ import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEvent
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDEndScreenEventHandler } from 'VPAID/EventHandlers/VPAIDEndScreenEventHandler';
 import { VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
@@ -152,20 +152,14 @@ export class AdUnitFactory {
         this.prepareVideoPlayer(PerformanceVideoEventHandler, <IVideoEventHandlerParams<PerformanceAdUnit>>videoEventHandlerParams);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
-                endScreenEventHandler.onKeyEvent(keyCode);
-
-                if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
-                    performanceOverlayEventHandler.onKeyEvent(keyCode);
-                }
-            });
+            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
             performanceAdUnit.onClose.subscribe(() => {
                 if(onBackKeyObserver) {
                     nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
                 }
             });
         }
-        Privacy.setupReportListener(privacy, performanceAdUnit);
+        ReportingPrivacy.setupReportListener(privacy, performanceAdUnit);
 
         return performanceAdUnit;
     }
@@ -213,20 +207,14 @@ export class AdUnitFactory {
         this.prepareVideoPlayer(XPromoVideoEventHandler, <IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>>videoEventHandlerParams);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
-                endScreenEventHandler.onKeyEvent(keyCode);
-
-                if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
-                    xPromoOverlayEventHandler.onKeyEvent(keyCode);
-                }
-            });
+            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
             xPromoAdUnit.onClose.subscribe(() => {
                 if(onBackKeyObserver) {
                     nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
                 }
             });
         }
-        Privacy.setupReportListener(privacy, xPromoAdUnit);
+        ReportingPrivacy.setupReportListener(privacy, xPromoAdUnit);
 
         return xPromoAdUnit;
     }
@@ -262,26 +250,20 @@ export class AdUnitFactory {
 
         const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
 
-        const vastOverlayHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
-        overlay.addEventHandler(vastOverlayHandler);
-
         if(parameters.campaign.hasEndscreen() && vastEndScreen) {
             const vastEndScreenHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
             vastEndScreen.addEventHandler(vastEndScreenHandler);
 
             if (nativeBridge.getPlatform() === Platform.ANDROID) {
-                const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) =>  {
-                    vastEndScreenHandler.onKeyEvent(keyCode);
-
-                    if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
-                        vastOverlayHandler.onKeyEvent(keyCode);
-                    }
-                });
+                const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => vastEndScreenHandler.onKeyEvent(keyCode));
                 vastAdUnit.onClose.subscribe(() => {
                     nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
                 });
             }
         }
+
+        const vastOverlayHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
+        overlay.addEventHandler(vastOverlayHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, vastAdUnit, parameters.campaign.getVideo(), undefined, vastAdUnitParameters);
         const vastVideoEventHandler = this.prepareVideoPlayer(VastVideoEventHandler, <IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
@@ -308,7 +290,7 @@ export class AdUnitFactory {
             }
         });
 
-        Privacy.setupReportListener(privacy, vastAdUnit);
+        ReportingPrivacy.setupReportListener(privacy, vastAdUnit);
 
         return vastAdUnit;
     }
@@ -344,7 +326,7 @@ export class AdUnitFactory {
         const EventHandler =  (isSonicPlayable || isPlayable) ? PlayableEventHandler : MRAIDEventHandler;
         const mraidEventHandler: IMRAIDViewHandler = new EventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
         mraid.addEventHandler(mraidEventHandler);
-        Privacy.setupReportListener(privacy, mraidAdUnit);
+        ReportingPrivacy.setupReportListener(privacy, mraidAdUnit);
         return mraidAdUnit;
     }
 
@@ -383,7 +365,7 @@ export class AdUnitFactory {
             const endScreenEventHandler = new VPAIDEndScreenEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
             endScreen.addEventHandler(endScreenEventHandler);
         }
-        Privacy.setupReportListener(privacy, vpaidAdUnit);
+        ReportingPrivacy.setupReportListener(privacy, vpaidAdUnit);
 
         return vpaidAdUnit;
     }
@@ -392,7 +374,7 @@ export class AdUnitFactory {
         const privacy = this.createPrivacy(nativeBridge, parameters);
         const showGDPRBanner = this.showGDPRBanner(parameters);
 
-        const promoView = new Promo(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.placement);
+        const promoView = new Promo(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner);
         const promoAdUnit = new PromoAdUnit(nativeBridge, {
             ...parameters,
             view: promoView,
@@ -403,9 +385,9 @@ export class AdUnitFactory {
         document.body.appendChild(promoView.container());
 
         promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.adsConfig, parameters.gdprManager));
-        promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.coreConfig.getToken(), parameters.clientInfo.getGameId(), parameters.coreConfig.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.adsConfig.isOptOutEnabled()));
-        promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
-        Privacy.setupReportListener(privacy, promoAdUnit);
+        promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.campaign, parameters.placement.getId()));
+        promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromoClick(promoAdUnit, parameters.campaign, parameters.placement.getId()));
+        ReportingPrivacy.setupReportListener(privacy, promoAdUnit);
 
         return promoAdUnit;
     }
@@ -423,7 +405,7 @@ export class AdUnitFactory {
         const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialParameters);
         const displayInterstitialEventHandler = new DisplayInterstitialEventHandler(nativeBridge, displayInterstitialAdUnit, displayInterstitialParameters);
         view.addEventHandler(displayInterstitialEventHandler);
-        Privacy.setupReportListener(privacy, displayInterstitialAdUnit);
+        ReportingPrivacy.setupReportListener(privacy, displayInterstitialAdUnit);
 
         return displayInterstitialAdUnit;
     }
@@ -503,7 +485,7 @@ export class AdUnitFactory {
             gdprManager: parameters.gdprManager
         });
         view.addEventHandler(eventHandler);
-        Privacy.setupReportListener(privacy, adUnit);
+        ReportingPrivacy.setupReportListener(privacy, adUnit);
 
         return adUnit;
     }
@@ -550,9 +532,9 @@ export class AdUnitFactory {
         return video;
     }
 
-    private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): Privacy {
+    private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
 
-        const privacy = new Privacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
+        const privacy = new ReportingPrivacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
         const privacyEventHandler = new PrivacyEventHandler(nativeBridge, parameters);
         privacy.addEventHandler(privacyEventHandler);
         return privacy;

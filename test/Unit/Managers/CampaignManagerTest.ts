@@ -82,13 +82,11 @@ import WrappedVast2 from 'xml/WrappedVast2.xml';
 import WrappedVast3 from 'xml/WrappedVast3.xml';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let nativeBridge: NativeBridge;
-    let storageBridge: StorageBridge;
     let wakeUpManager: WakeUpManager;
     let request: Request;
     let vastParser: VastParser;
@@ -217,7 +215,6 @@ describe('CampaignManager', () => {
             }
         };
 
-        storageBridge = new StorageBridge(nativeBridge);
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
@@ -225,7 +222,7 @@ describe('CampaignManager', () => {
         deviceInfo = new AndroidDeviceInfo(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
+        sessionManager = new SessionManager(nativeBridge, request);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         jaegerManager = sinon.createStubInstance(JaegerManager);
         jaegerManager.isJaegerTracingEnabled = sinon.stub().returns(false);
@@ -233,7 +230,6 @@ describe('CampaignManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
         placementManager = sinon.createStubInstance(PlacementManager);
-        PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         backupCampaignManager = new BackupCampaignManager(nativeBridge, coreConfig);
     });

@@ -58,7 +58,7 @@ export class NativePromoEventHandler {
             const trackingEventUrls = trackingEvents[eventName];
             if (trackingEventUrls) {
                 for (const url of trackingEventUrls) {
-                    this._thirdPartyEventManager.getEvent(eventName, sessionId, url);
+                    this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
                 }
             }
         }
