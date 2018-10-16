@@ -48,7 +48,7 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
         });
     }
 
-    public purchaseItem(productId: string, campaign: PromoCampaign, placementId: string) {
+    public purchaseItem(productId: string, campaign: PromoCampaign, placementId: string): Promise<ITransactionDetails> {
         return new Promise<ITransactionDetails>((resolve, reject) => {
             let onError: IObserver1<ITransactionErrorDetails>;
             let onSuccess: IObserver1<ITransactionDetails>;

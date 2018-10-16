@@ -51,6 +51,7 @@ import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xm
 import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
+import { ProductInfo, IProductInfo, ProductInfoType } from 'Models/Promo/ProductInfo';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -343,13 +344,35 @@ export class TestFixtures {
     public static getPromoCampaignParams(json: any, adType?: string, rewardedPromo?: boolean): IPromoCampaign {
         const session = this.getSession();
         const isRewardedPromo = (rewardedPromo !== undefined) ? rewardedPromo : false;
+        const costProductInfoList = new Array<ProductInfo>();
+        const payoutProductInfoList = new Array<ProductInfo>();
+        const costProductInfo: IProductInfo = {
+            productId: 'fakeProductID',
+            type: ProductInfoType.PREMIUM,
+            quantity: 1
+        };
+        costProductInfoList.push(new ProductInfo(costProductInfo));
+        const payoutProductInfo: IProductInfo = {
+            productId: 'fakeProductID2',
+            type: ProductInfoType.VIRTUAL,
+            quantity: 1
+        };
+        payoutProductInfoList.push(new ProductInfo(payoutProductInfo));
+        const premiumProduct: IProductInfo = {
+            productId: 'fakeProductID2',
+            type: ProductInfoType.PREMIUM,
+            quantity: 1
+        };
         return {
             ... this.getCometCampaignBaseParams(session, json.promo.id, json.meta, adType),
-            iapProductId: json.promo.iapProductId,
             additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
             dynamicMarkup: json.promo.dynamicMarkup,
             creativeAsset: new HTML(json.promo.creativeUrl, session),
-            rewardedPromo: isRewardedPromo
+            rewardedPromo: isRewardedPromo,
+            limitedTimeOffer: undefined,
+            costs: costProductInfoList,
+            payouts: payoutProductInfoList,
+            premiumProduct: new ProductInfo(premiumProduct)
         };
     }
 
