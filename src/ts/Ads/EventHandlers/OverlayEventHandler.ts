@@ -73,7 +73,11 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
 
     public onKeyEvent(keyCode: number): void {
         if(keyCode === KeyCode.BACK && this.canSkipVideo()) {
-            this.onOverlaySkip(this._adUnit.getVideo().getPosition());
+            if(!this._placement.skipEndCardOnClose()) {
+                this.onOverlaySkip(this._adUnit.getVideo().getPosition());
+            } else {
+                this.onOverlayClose();
+            }
         }
     }
 
