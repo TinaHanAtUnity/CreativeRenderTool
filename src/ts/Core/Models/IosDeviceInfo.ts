@@ -39,7 +39,6 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
             promises.push(this._core.DeviceInfo.Ios!.getStatusBarHeight().then(statusBarHeight => this.set('statusBarHeight', statusBarHeight)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Ios!.getStatusBarWidth().then(statusBarWidth => this.set('statusBarWidth', statusBarWidth)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Ios!.getDeviceMaxVolume().then(maxVolume => this.set('maxVolume', maxVolume)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.DeviceInfo.Ios!.getSensorList().then(sensorList => this.set('sensorList', sensorList)).catch(err => this.handleDeviceInfoError(err)));
 
             return Promise.all(promises);
         });
@@ -76,8 +75,11 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         });
     }
 
-    public getSensorList(): string[] {
-        return this.get('sensorList');
+    public getSensorList(): Promise<string[]> {
+        return this._core.DeviceInfo.Ios!.getSensorList().then(sensorList => {
+            this.set('sensorList', sensorList);
+            return this.get('sensorList');
+        });
     }
 
     public getFreeSpace(): Promise<number> {

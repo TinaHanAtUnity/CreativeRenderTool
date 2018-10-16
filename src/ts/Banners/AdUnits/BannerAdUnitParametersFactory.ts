@@ -20,6 +20,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { ICoreApi } from 'Core/Core';
 import { Platform } from 'Core/Constants/Platform';
 import { IAdsApi } from 'Ads/Ads';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 export class BannerAdUnitParametersFactory {
 
@@ -39,8 +40,9 @@ export class BannerAdUnitParametersFactory {
     private _webPlayerContainer: WebPlayerContainer;
     private _gdprManager: GdprManager;
     private _programmaticTrackingService: ProgrammaticTrackingService;
+    private _storageBridge: StorageBridge;
 
-    constructor(platform: Platform, core: ICoreApi, ads: IAdsApi, request: RequestManager, metadataManager: MetaDataManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, analyticsManager: AnalyticsManager, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer, programmaticTrackingService: ProgrammaticTrackingService) {
+    constructor(platform: Platform, core: ICoreApi, ads: IAdsApi, request: RequestManager, metadataManager: MetaDataManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, analyticsManager: AnalyticsManager, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer, programmaticTrackingService: ProgrammaticTrackingService, storageBridge: StorageBridge) {
         this._platform = platform;
         this._core = core;
         this._request = request;
@@ -56,6 +58,7 @@ export class BannerAdUnitParametersFactory {
         this._gdprManager = gdprManager;
         this._webPlayerContainer = webPlayerContainer;
         this._programmaticTrackingService = programmaticTrackingService;
+        this._storageBridge = storageBridge;
     }
 
     public create(campaign: Campaign, placement: Placement, options: any): Promise<IAdUnitParameters<Campaign>> {
@@ -87,6 +90,7 @@ export class BannerAdUnitParametersFactory {
                     platform: this._platform,
                     core: this._core,
                     ads: this._ads,
+                    storageBridge: this._storageBridge,
                     campaign: campaign
                 }),
                 placement: placement,

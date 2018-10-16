@@ -35,6 +35,7 @@ export class BannerAdUnit {
     private _webPlayerContainer: WebPlayerContainer;
     private _template: Template;
 
+    private _clickEventsSent = false;
     private _impressionEventsSent = false;
     private _urlLoadingObserver: IObserver2<string, string>;
     private _onCreateWebViewObserver: IObserver1<string>;
@@ -159,7 +160,10 @@ export class BannerAdUnit {
 
     private onOpenURL(url: string) {
         if (url && url.indexOf('about:blank') === -1) {
-            this.sendTrackingEvent('click');
+            if (!this._clickEventsSent) {
+                this._clickEventsSent = true;
+                this.sendTrackingEvent('click');
+            }
             if (this._platform === Platform.IOS) {
                 this._core.iOS!.UrlScheme.open(url);
             } else if (this._platform === Platform.ANDROID) {

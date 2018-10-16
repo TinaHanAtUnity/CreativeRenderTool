@@ -29,13 +29,15 @@ import { XPromoEndScreenEventHandler } from 'XPromo/EventHandlers/XPromoEndScree
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { StoreName, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { Privacy } from 'Ads/Views/Privacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, container: AdUnitContainer, overlay: Overlay, endScreen: XPromoEndScreen;
+    let storageBridge: StorageBridge;
     let sessionManager: SessionManager;
     let xPromoAdUnit: XPromoAdUnit;
     let metaDataManager: MetaDataManager;
@@ -59,6 +61,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.ANDROID);
 
+            storageBridge = new StorageBridge(nativeBridge);
             campaign = TestFixtures.getXPromoCampaign();
             focusManager = new FocusManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
@@ -68,7 +71,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge, request);
+            sessionManager = new SessionManager(nativeBridge, request, storageBridge);
             const coreConfig = TestFixtures.getCoreConfiguration();
             const adsConfig = TestFixtures.getAdsConfiguration();
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -81,6 +84,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -92,7 +96,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
             const video = new Video('', TestFixtures.getSession());
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
+            const privacy = new Privacy(nativeBridge, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
@@ -159,6 +163,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.IOS);
 
+            storageBridge = new StorageBridge(nativeBridge);
+
             campaign = TestFixtures.getXPromoCampaign();
             campaign.set('store', StoreName.APPLE);
             campaign.set('appStoreId', '11111');
@@ -169,7 +175,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             const request = new RequestManager(nativeBridge, wakeUpManager);
             deviceInfo = TestFixtures.getIosDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge, request);
+            sessionManager = new SessionManager(nativeBridge, request, storageBridge);
             const coreConfig = TestFixtures.getCoreConfiguration();
             const adsConfig = TestFixtures.getAdsConfiguration();
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
@@ -181,6 +187,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -190,7 +197,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             const video = new Video('', TestFixtures.getSession());
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
+            const privacy = new Privacy(nativeBridge, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),

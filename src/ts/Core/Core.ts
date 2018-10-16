@@ -43,6 +43,7 @@ import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 import { AndroidPreferencesApi } from 'Core/Native/Android/Preferences';
 import { IosPreferencesApi } from 'Core/Native/iOS/Preferences';
 import { IModule } from 'Core/Modules/IModule';
+import { StorageBridge } from './Utilities/StorageBridge';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -80,6 +81,7 @@ export class Core implements IApiModule {
     public readonly MetaDataManager: MetaDataManager;
     public readonly ResolveManager: ResolveManager;
     public readonly WakeUpManager: WakeUpManager;
+    public readonly StorageBridge: StorageBridge;
 
     public ConfigManager: ConfigManager;
     public RequestManager: RequestManager;
@@ -126,6 +128,7 @@ export class Core implements IApiModule {
         this.CacheBookkeeping = new CacheBookkeepingManager(this.Api);
         this.ResolveManager = new ResolveManager(this.Api);
         this.MetaDataManager = new MetaDataManager(this.Api);
+        this.StorageBridge = new StorageBridge(this.Api);
     }
 
     public initialize(): Promise<void> {
@@ -288,7 +291,7 @@ export abstract class CoreModule implements IModule {
         this.Core = core;
     }
 
-    public abstract initialize(...parameters: any[]): void | Promise<void>;
+    public abstract initialize(...parameters: any[]): any | Promise<any>;
 
     public isInitialized() {
         return this._initialized;

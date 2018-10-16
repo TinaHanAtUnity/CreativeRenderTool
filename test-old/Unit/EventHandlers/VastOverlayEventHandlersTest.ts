@@ -25,7 +25,8 @@ import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { Privacy } from 'Ads/Views/Privacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -36,6 +37,7 @@ describe('VastOverlayEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
     let vastAdUnit: VastAdUnit;
     let container: AdUnitContainer;
     let sessionManager: SessionManager;
@@ -60,12 +62,13 @@ describe('VastOverlayEventHandlersTest', () => {
             handleCallback
         });
 
+        storageBridge = new StorageBridge(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
         const gdprManager = sinon.createStubInstance(GdprManager);
-        privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
+        privacy = new Privacy(nativeBridge, campaign, gdprManager, false, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -75,8 +78,13 @@ describe('VastOverlayEventHandlersTest', () => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+<<<<<<< HEAD:test-old/Unit/EventHandlers/VastOverlayEventHandlersTest.ts
         sessionManager = new SessionManager(nativeBridge, request);
         request = new RequestManager(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
+=======
+        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
+        request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
+>>>>>>> master:test/Unit/EventHandlers/VastOverlayEventHandlersTest.ts
         sinon.stub(request, 'followRedirectChain').callsFake((url) => {
             return Promise.resolve(url);
         });
@@ -92,6 +100,7 @@ describe('VastOverlayEventHandlersTest', () => {
             deviceInfo: deviceInfo,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: campaign
         });
 

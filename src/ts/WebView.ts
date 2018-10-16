@@ -46,5 +46,4 @@ export class WebView {
         });
         return true; // returning true from window.onerror will suppress the error (in theory)
     }
-
 }

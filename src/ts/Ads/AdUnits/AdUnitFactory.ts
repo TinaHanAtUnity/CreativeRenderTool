@@ -22,8 +22,8 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { Closer } from 'Ads/Views/Closer';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
+import { Privacy } from 'Ads/Views/Privacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
 import { StreamType } from 'Core/Constants/Android/StreamType';
@@ -75,9 +75,6 @@ import { XPromoVideoEventHandler } from 'XPromo/EventHandlers/XPromoVideoEventHa
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
-import { Privacy } from 'Ads/Views/Privacy';
-import { ReportAdTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export class AdUnitFactory {
@@ -165,7 +162,7 @@ export class AdUnitFactory {
                 }
             });
         }
-        ReportingPrivacy.setupReportListener(privacy, performanceAdUnit);
+        Privacy.setupReportListener(privacy, performanceAdUnit);
 
         return performanceAdUnit;
     }
@@ -174,6 +171,7 @@ export class AdUnitFactory {
         const showGDPRBanner = this.showGDPRBanner(parameters);
         return {
             platform: parameters.platform,
+            core: parameters.core,
             language: parameters.deviceInfo.getLanguage(),
             gameId: parameters.clientInfo.getGameId(),
             targetGameName: targetGameName,
@@ -220,7 +218,7 @@ export class AdUnitFactory {
                 }
             });
         }
-        ReportingPrivacy.setupReportListener(privacy, xPromoAdUnit);
+        Privacy.setupReportListener(privacy, xPromoAdUnit);
 
         return xPromoAdUnit;
     }
@@ -296,7 +294,7 @@ export class AdUnitFactory {
             }
         });
 
-        ReportingPrivacy.setupReportListener(privacy, vastAdUnit);
+        Privacy.setupReportListener(privacy, vastAdUnit);
 
         return vastAdUnit;
     }
@@ -332,7 +330,7 @@ export class AdUnitFactory {
         const EventHandler =  (isSonicPlayable || isPlayable) ? PlayableEventHandler : MRAIDEventHandler;
         const mraidEventHandler: IMRAIDViewHandler = new EventHandler(mraidAdUnit, mraidAdUnitParameters);
         mraid.addEventHandler(mraidEventHandler);
-        ReportingPrivacy.setupReportListener(privacy, mraidAdUnit);
+        Privacy.setupReportListener(privacy, mraidAdUnit);
         return mraidAdUnit;
     }
 
@@ -371,7 +369,7 @@ export class AdUnitFactory {
             const endScreenEventHandler = new VPAIDEndScreenEventHandler(vpaidAdUnit, vpaidAdUnitParameters);
             endScreen.addEventHandler(endScreenEventHandler);
         }
-        ReportingPrivacy.setupReportListener(privacy, vpaidAdUnit);
+        Privacy.setupReportListener(privacy, vpaidAdUnit);
 
         return vpaidAdUnit;
     }
@@ -380,7 +378,7 @@ export class AdUnitFactory {
         const privacy = this.createPrivacy(parameters);
         const showGDPRBanner = this.showGDPRBanner(parameters);
 
-        const promoView = new Promo(parameters.platform, parameters.core, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner);
+        const promoView = new Promo(parameters.platform, parameters.core, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.placement);
         const promoAdUnit = new PromoAdUnit({
             ...parameters,
             view: promoView,
@@ -393,7 +391,7 @@ export class AdUnitFactory {
         promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.adsConfig, parameters.gdprManager));
         promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.coreConfig.getToken(), parameters.clientInfo.getGameId(), parameters.coreConfig.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.adsConfig.isOptOutEnabled()));
         promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
-        ReportingPrivacy.setupReportListener(privacy, promoAdUnit);
+        Privacy.setupReportListener(privacy, promoAdUnit);
 
         return promoAdUnit;
     }
@@ -411,7 +409,7 @@ export class AdUnitFactory {
         const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(displayInterstitialParameters);
         const displayInterstitialEventHandler = new DisplayInterstitialEventHandler(displayInterstitialAdUnit, displayInterstitialParameters);
         view.addEventHandler(displayInterstitialEventHandler);
-        ReportingPrivacy.setupReportListener(privacy, displayInterstitialAdUnit);
+        Privacy.setupReportListener(privacy, displayInterstitialAdUnit);
 
         return displayInterstitialAdUnit;
     }
@@ -489,7 +487,7 @@ export class AdUnitFactory {
             gdprManager: parameters.gdprManager
         });
         view.addEventHandler(eventHandler);
-        ReportingPrivacy.setupReportListener(privacy, adUnit);
+        Privacy.setupReportListener(privacy, adUnit);
 
         return adUnit;
     }
@@ -538,16 +536,8 @@ export class AdUnitFactory {
         return video;
     }
 
-    private static createPrivacy(parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
-
-        let privacy: AbstractPrivacy;
-        if (ReportAdTest.isValid(parameters.coreConfig.getAbGroup())) {
-            privacy = new ReportingPrivacy(parameters.platform, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
-        } else if (parameters.adsConfig.isGDPREnabled()) {
-            privacy = new GDPRPrivacy(parameters.platform, parameters.gdprManager, parameters.coreConfig.isCoppaCompliant());
-        } else {
-            privacy = new Privacy(parameters.platform, parameters.coreConfig.isCoppaCompliant());
-        }
+    private static createPrivacy(parameters: IAdUnitParameters<Campaign>): Privacy {
+        const privacy = new Privacy(parameters.platform, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
         const privacyEventHandler = new PrivacyEventHandler(parameters);
         privacy.addEventHandler(privacyEventHandler);
         return privacy;

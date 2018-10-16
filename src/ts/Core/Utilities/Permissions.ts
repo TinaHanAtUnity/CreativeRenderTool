@@ -1,7 +1,7 @@
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/Core';
 import { AndroidPermission } from 'Core/Native/Android/Permissions';
-import { IosPermission } from 'Core/Native/iOS/Permissions';
+import { IosBundleKeys, IosPermission } from 'Core/Native/iOS/Permissions';
 
 export enum CurrentPermission {
     UNKNOWN,
@@ -17,6 +17,16 @@ export enum PermissionTypes {
 
 export class PermissionsUtil {
     private static readonly ANDROID_PERMISSIONS_ASKED_KEY = 'unity-ads-permissions-asked';
+
+    public static checkPermissionInManifest(platform: Platform, core: ICoreApi, permission: PermissionTypes): Promise<boolean> {
+        const platformPermission = PermissionsUtil.getPlatformPermission(platform, permission);
+        if (platform === Platform.ANDROID) {
+            return PermissionsUtil.checkAndroidPermissionInManifest(core, platformPermission);
+        } else {
+            return PermissionsUtil.checkIosPermissionInManifest(core, platformPermission);
+        }
+        return Promise.resolve(false);
+    }
 
     public static checkPermissions(platform: Platform, core: ICoreApi, permission: PermissionTypes): Promise<CurrentPermission> {
         if (platform === Platform.ANDROID) {
@@ -60,6 +70,26 @@ export class PermissionsUtil {
             return PermissionTypes.AUDIO;
         }
         return PermissionTypes.INVALID;
+    }
+
+    private static checkAndroidPermissionInManifest(core: ICoreApi, permission: string): Promise<boolean> {
+        return core.Permissions.Android!.getPermissions()
+            .then((permissions: string[]) => permissions.some((key: string) => key === permission))
+            .catch(() => false);
+    }
+
+    private static checkIosPermissionInManifest(core: ICoreApi, permission: string): Promise<boolean> {
+        let key = '';
+        if (permission === IosPermission.AVMediaTypeVideo) {
+            key = IosBundleKeys.Camera;
+        } else if (permission === IosPermission.AVMediaTypeAudio) {
+            key = IosBundleKeys.Audio;
+        } else {
+            return Promise.resolve(false);
+        }
+        return core.iOS!.MainBundle.getDataForKey(key)
+            .then((value: [string, any]) => value[0] !== '')
+            .catch(() => false);
     }
 
     private static checkAndroidPermission(core: ICoreApi, permission: PermissionTypes): Promise<CurrentPermission> {

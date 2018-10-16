@@ -592,7 +592,12 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 return;
             }
 
-            PermissionsUtil.checkPermissions(this._platform, this._core, PermissionTypes.CAMERA).then(results => {
+            PermissionsUtil.checkPermissionInManifest(this._platform, this._core, PermissionTypes.CAMERA).then((available: boolean) => {
+                if (!available) {
+                    return CurrentPermission.DENIED;
+                }
+                return PermissionsUtil.checkPermissions(this._platform, this._core, PermissionTypes.CAMERA);
+            }).then((results: CurrentPermission) => {
                 const requestPermissionText = <HTMLElement>this._cameraPermissionPanel.querySelector('.request-text');
                 if (results === CurrentPermission.DENIED) {
                     this.onCameraPermissionEvent(false);
@@ -627,9 +632,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }
         });
 
-        PermissionsUtil.requestPermission(this._platform, this._core, PermissionTypes.CAMERA).then(() => {
-            this._core.Sdk.logDebug('Required permission for showing camera');
-        });
+        PermissionsUtil.requestPermission(this._platform, this._core, PermissionTypes.CAMERA);
     }
 
     private onShowFallback() {

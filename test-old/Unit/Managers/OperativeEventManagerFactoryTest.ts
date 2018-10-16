@@ -17,13 +17,19 @@ import { MRAIDOperativeEventManager } from 'MRAID/Managers/MRAIDOperativeEventMa
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('OperativeEventManagerFactoryTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
 
     let nativeBridge: NativeBridge;
+<<<<<<< HEAD:test-old/Unit/Managers/OperativeEventManagerFactoryTest.ts
     let request: RequestManager;
+=======
+    let storageBridge: StorageBridge;
+    let request: Request;
+>>>>>>> master:test/Unit/Managers/OperativeEventManagerFactoryTest.ts
     let metaDataManager: MetaDataManager;
     let sessionManager: SessionManager;
     let clientInfo: ClientInfo;
@@ -37,6 +43,7 @@ describe('OperativeEventManagerFactoryTest', () => {
             handleCallback
         }, Platform.ANDROID);
 
+        storageBridge = new StorageBridge(nativeBridge);
         request = sinon.createStubInstance(Request);
         sessionManager = sinon.createStubInstance(SessionManager);
         metaDataManager = new MetaDataManager(nativeBridge);
@@ -58,6 +65,7 @@ describe('OperativeEventManagerFactoryTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
@@ -75,6 +83,7 @@ describe('OperativeEventManagerFactoryTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
@@ -92,6 +101,7 @@ describe('OperativeEventManagerFactoryTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
@@ -109,6 +119,7 @@ describe('OperativeEventManagerFactoryTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 

@@ -28,8 +28,7 @@ import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
-import { BackupCampaignTest, ReportAdTest } from 'Core/Models/ABGroup';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { BackupCampaignTest } from 'Core/Models/ABGroup';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
@@ -146,13 +145,13 @@ export class Ads extends CoreModule implements IApiModule {
             }
             this.Container = new ViewController(this.Core.Api, this.Api, <IosDeviceInfo>this.Core.DeviceInfo, this.Core.FocusManager, this.Core.ClientInfo);
         }
-        this.SessionManager = new SessionManager(this.Core.Api.Storage, this.Core.RequestManager);
+        this.SessionManager = new SessionManager(this.Core.Api.Storage, this.Core.RequestManager, this.Core.StorageBridge);
         this.MissedImpressionManager = new MissedImpressionManager(this.Core.Api.Storage);
         this.BackupCampaignManager = new BackupCampaignManager(this.Core.Api, this.Core.Config);
         this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.Core.NativeBridge.getPlatform(), this.Core.RequestManager, this.Core.ClientInfo, this.Core.DeviceInfo);
     }
 
-    public initialize(jaegerInitSpan: JaegerSpan): Promise<void> {
+    public initialize(jaegerInitSpan: JaegerSpan): Promise<any> {
         return Promise.resolve().then(() => {
 
             SdkStats.setInitTimestamp();
@@ -206,12 +205,6 @@ export class Ads extends CoreModule implements IApiModule {
             });
         }).then(() => {
             return this.SessionManager.sendUnsentSessions();
-        }).then(() => {
-            if ((ReportAdTest.isValid(this.Core.Config.getAbGroup()) && this.Config.isGDPREnabled())) {
-                return AbstractPrivacy.setUserInformation(this.GdprManager).catch(() => {
-                    this.Core.Api.Sdk.logInfo('Failed to set up privacy information.');
-                });
-            }
         });
     }
 
@@ -356,6 +349,7 @@ export class Ads extends CoreModule implements IApiModule {
                     deviceInfo: this.Core.DeviceInfo,
                     coreConfig: this.Core.Config,
                     adsConfig: this.Config,
+                    storageBridge: this.Core.StorageBridge,
                     campaign: campaign
                 }),
                 placement: placement,

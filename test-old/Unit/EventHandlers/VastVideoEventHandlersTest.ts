@@ -31,12 +31,14 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { Privacy } from 'Ads/Views/Privacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('VastVideoEventHandler tests', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
     let container: AdUnitContainer;
     let campaign: VastCampaign;
     let placement: Placement;
@@ -70,12 +72,13 @@ describe('VastVideoEventHandler tests', () => {
             handleCallback
         });
 
+        storageBridge = new StorageBridge(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
-        privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
+        privacy = new Privacy(nativeBridge, campaign, gdprManager, false, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
@@ -94,7 +97,7 @@ describe('VastVideoEventHandler tests', () => {
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new RequestManager(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
 
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
@@ -107,6 +110,7 @@ describe('VastVideoEventHandler tests', () => {
             deviceInfo: deviceInfo,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: campaign
         });
 

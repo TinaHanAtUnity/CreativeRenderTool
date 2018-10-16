@@ -28,6 +28,7 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import * as sinon from 'sinon';
 import { TestAdUnit } from 'TestHelpers/TestAdUnit';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('AndroidAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -42,13 +43,14 @@ describe('AndroidAdUnitTest', () => {
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
+        const storageBridge = new StorageBridge(nativeBridge);
         const clientInfo = TestFixtures.getClientInfo();
         const focusManager = new FocusManager(nativeBridge);
         const metaDataManager = new MetaDataManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request = new RequestManager(nativeBridge, wakeUpManager);
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        const sessionManager = new SessionManager(nativeBridge, request);
+        const sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         const deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
@@ -64,6 +66,7 @@ describe('AndroidAdUnitTest', () => {
             deviceInfo: deviceInfo,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: TestFixtures.getCampaign()
         });
 

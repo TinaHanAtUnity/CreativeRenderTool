@@ -72,6 +72,7 @@ export class RequestManager {
     private static _callbackId: number = 1;
     private static _callbacks: { [key: number]: CallbackContainer<INativeResponse> } = {};
     private static _requests: { [key: number]: INativeRequest } = {};
+    private static _authorizations: Array<{ host: RegExp; authorizationHeader: string }> = [];
 
     private static getDefaultRequestOptions(): IRequestOptions {
         return {
@@ -98,6 +99,41 @@ export class RequestManager {
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
     }
 
+    public static setAuthorizationHeaderForHost(hostRegex: string, authorizationHeader: string) {
+        RequestManager._authorizations.push({
+            host: new RegExp(hostRegex),
+            authorizationHeader: authorizationHeader.trim()
+        });
+    }
+
+    public static clearAllAuthorization() {
+        RequestManager._authorizations = [];
+    }
+
+    public static applyAuthorizationHeader(url: string, headers: Array<[string, string]> = []): Array<[string, string]> {
+        if (this._authorizations.length === 0) {
+            return headers;
+        }
+
+        let authorizationHeader = '';
+
+        for (const pair of RequestManager._authorizations) {
+            if (pair.host.test(url)) {
+                authorizationHeader = pair.authorizationHeader;
+                break;
+            }
+        }
+
+        if (authorizationHeader.length === 0) {
+            return headers;
+        }
+
+        return [
+            ...headers,
+            ['Authorization', authorizationHeader]
+        ];
+    }
+
     public get(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
             options = RequestManager.getDefaultRequestOptions();
@@ -108,7 +144,7 @@ export class RequestManager {
         this.invokeRequest(id, {
             method: RequestMethod.GET,
             url: url,
-            headers: headers,
+            headers: RequestManager.applyAuthorizationHeader(url, headers),
             retryCount: 0,
             options: options
         });
@@ -128,7 +164,7 @@ export class RequestManager {
             method: RequestMethod.POST,
             url: url,
             data: data,
-            headers: headers,
+            headers: RequestManager.applyAuthorizationHeader(url, headers),
             retryCount: 0,
             options: options
         });

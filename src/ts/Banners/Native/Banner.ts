@@ -63,6 +63,10 @@ export class BannerApi extends NativeApi {
         return this._nativeBridge.invoke(this._apiClass, 'setViewFrame', [view, x, y, width, height]);
     }
 
+    public setBannerFrame(style: string, width: number, height: number) {
+        return this._nativeBridge.invoke(this._fullApiClassName, 'setBannerFrame', [style, width, height]);
+    }
+
     public setViews(views: BannerViewType[]) {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setViews', [views]);
     }

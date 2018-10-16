@@ -52,6 +52,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -104,7 +105,12 @@ describe('CampaignRefreshManager', () => {
     let campaignManager: CampaignManager;
     let wakeUpManager: WakeUpManager;
     let nativeBridge: NativeBridge;
+<<<<<<< HEAD:test-old/Unit/Managers/CampaignRefreshManagerTests.ts
     let request: RequestManager;
+=======
+    let storageBridge: StorageBridge;
+    let request: Request;
+>>>>>>> master:test/Unit/Managers/CampaignRefreshManagerTests.ts
     let assetManager: AssetManager;
     let sessionManager: SessionManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
@@ -196,6 +202,7 @@ describe('CampaignRefreshManager', () => {
             }
         };
 
+        storageBridge = new StorageBridge(nativeBridge);
         placementManager = sinon.createStubInstance(PlacementManager);
         PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
         focusManager = new FocusManager(nativeBridge);
@@ -203,7 +210,7 @@ describe('CampaignRefreshManager', () => {
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new RequestManager(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -221,6 +228,7 @@ describe('CampaignRefreshManager', () => {
             deviceInfo: deviceInfo,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: campaign
         });
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);

@@ -41,6 +41,7 @@ import { MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import { PlayableMRAID } from 'MRAID/Views/PlayableMRAID';
+import { ARMRAID } from 'AR/Views/ARMRAID';
 import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
@@ -49,15 +50,23 @@ import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+<<<<<<< HEAD:test-old/Unit/AdUnits/AdUnitFactoryTest.ts
 import { ICoreApi } from '../../../src/ts/Core/Core';
 import { IAdsApi } from '../../../src/ts/Ads/Ads';
+=======
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
+>>>>>>> master:test/Unit/AdUnits/AdUnitFactoryTest.ts
 
 describe('AdUnitFactoryTest', () => {
 
     let sandbox: sinon.SinonSandbox;
     let nativeBridge: NativeBridge;
+<<<<<<< HEAD:test-old/Unit/AdUnits/AdUnitFactoryTest.ts
     let core: ICoreApi;
     let ads: IAdsApi;
+=======
+    let storageBridge: StorageBridge;
+>>>>>>> master:test/Unit/AdUnits/AdUnitFactoryTest.ts
     let focusManager: FocusManager;
     let container: AdUnitContainer;
     let deviceInfo: DeviceInfo;
@@ -78,6 +87,7 @@ describe('AdUnitFactoryTest', () => {
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
+<<<<<<< HEAD:test-old/Unit/AdUnits/AdUnitFactoryTest.ts
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
         metaDataManager = new MetaDataManager(core);
@@ -85,6 +95,14 @@ describe('AdUnitFactoryTest', () => {
         wakeUpManager = new WakeUpManager(core);
         request = new RequestManager(nativeBridge.getPlatform(), core, wakeUpManager);
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo());
+=======
+        storageBridge = new StorageBridge(nativeBridge);
+        metaDataManager = new MetaDataManager(nativeBridge);
+        focusManager = new FocusManager(nativeBridge);
+        wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
+        request = new Request(nativeBridge, wakeUpManager);
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+>>>>>>> master:test/Unit/AdUnits/AdUnitFactoryTest.ts
         sandbox.stub(container, 'close').returns(Promise.resolve());
         sandbox.stub(container, 'open').returns(Promise.resolve());
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
@@ -94,7 +112,11 @@ describe('AdUnitFactoryTest', () => {
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false, getOsVersion: () => '8.0'};
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         thirdPartyEventManager.setTemplateValues({ '%ZONE%': placement.getId(), '%SDK_VERSION%': clientInfo.getSdkVersion().toString() });
+<<<<<<< HEAD:test-old/Unit/AdUnits/AdUnitFactoryTest.ts
         sessionManager = new SessionManager(core.Storage, request);
+=======
+        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
+>>>>>>> master:test/Unit/AdUnits/AdUnitFactoryTest.ts
         const campaign = TestFixtures.getCampaign();
         const gdprManager = sinon.createStubInstance(GdprManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -110,6 +132,7 @@ describe('AdUnitFactoryTest', () => {
             deviceInfo: deviceInfo,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: campaign
         });
 
@@ -167,8 +190,9 @@ describe('AdUnitFactoryTest', () => {
                 adUnitParameters.campaign = campaign;
             });
 
-            after(() => {
+            afterEach(() => {
                 AdUnitFactory.setForcedPlayableMRAID(false);
+                AdUnitFactory.setForcedARMRAID(false);
             });
 
             it('should create MRAID view', () => {
@@ -192,6 +216,12 @@ describe('AdUnitFactoryTest', () => {
                 AdUnitFactory.setForcedPlayableMRAID(true);
                 const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(adUnitParameters);
                 assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
+            });
+
+            it('should be forced to create ARMRAID view', () => {
+               AdUnitFactory.setForcedARMRAID(true);
+               const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+               assert.isTrue(adUnit.getMRAIDView() instanceof ARMRAID, 'view should be ARMRAID');
             });
         });
 
@@ -261,6 +291,7 @@ describe('AdUnitFactoryTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
@@ -371,6 +402,7 @@ describe('AdUnitFactoryTest', () => {
                     deviceInfo: deviceInfo,
                     coreConfig: coreConfig,
                     adsConfig: adsConfig,
+                    storageBridge: storageBridge,
                     campaign: campaign
                 });
 
@@ -416,6 +448,7 @@ describe('AdUnitFactoryTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
@@ -468,6 +501,7 @@ describe('AdUnitFactoryTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 

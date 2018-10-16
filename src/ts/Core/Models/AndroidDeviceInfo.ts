@@ -105,7 +105,6 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             promises.push(this._core.DeviceInfo.Android!.getProduct().then(product => this.set('product', product)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Android!.getFingerprint().then(fingerPrint => this.set('fingerPrint', fingerPrint)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Android!.getSupportedAbis().then(supportedAbis => this.set('supportedAbis', supportedAbis)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._core.DeviceInfo.Android!.getSensorList().then(sensorList => this.set('sensorList', sensorList)).catch(err => this.handleDeviceInfoError(err)));
 
             return Promise.all(promises);
         });
@@ -249,8 +248,11 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         return this.get('supportedAbis');
     }
 
-    public getSensorList(): ISensorInfo[] {
-        return this.get('sensorList');
+    public getSensorList(): Promise<ISensorInfo[]> {
+        return this._core.DeviceInfo.Android!.getSensorList().then(sensorList => {
+            this.set('sensorList', sensorList);
+            return this.get('sensorList');
+        });
     }
 
     public getNetworkMetered(): Promise<boolean> {

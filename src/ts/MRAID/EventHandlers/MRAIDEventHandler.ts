@@ -16,6 +16,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { IAdsApi } from 'Ads/Ads';
 import { ICoreApi } from 'Core/Core';
+import { ClickDelayTrackingTest } from 'Core/Models/ABGroup';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -31,6 +32,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _core: ICoreApi;
     private _ads: IAdsApi;
     protected _campaign: MRAIDCampaign;
+    private _isClickTestAbGroup: boolean;
 
     constructor(adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
         super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
@@ -46,6 +48,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._platform = parameters.platform;
         this._core = parameters.core;
         this._ads = parameters.ads;
+        this._isClickTestAbGroup = ClickDelayTrackingTest.isValid(parameters.coreConfig.getAbGroup());
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -61,13 +64,20 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             }
         } else {    // DSP MRAID
             this.setCallButtonEnabled(false);
+            if (this._isClickTestAbGroup) {
+                this.sendTrackingEvents();
+            }
             return this._request.followRedirectChain(url).then((storeUrl) => {
                 return this.openUrl(storeUrl).then(() => {
                     this.setCallButtonEnabled(true);
-                    this.sendTrackingEvents();
+                    if (!this._isClickTestAbGroup) {
+                        this.sendTrackingEvents();
+                    }
                 }).catch((e) => {
                     this.setCallButtonEnabled(true);
-                    this.sendTrackingEvents();
+                    if (!this._isClickTestAbGroup) {
+                        this.sendTrackingEvents();
+                    }
                 });
             });
         }

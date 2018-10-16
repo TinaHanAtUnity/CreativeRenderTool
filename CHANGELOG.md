@@ -1,5 +1,39 @@
 # Pending
 
+* Add check that requested permissions are in manifest [#6358](https://github.com/Applifier/unity-ads-webview/pull/6358)
+* Add tests for AR and Permission APIs [#6495](https://github.com/Applifier/unity-ads-webview/pull/6495)
+* Add method to set authorization header for http request from Webview [#6379](https://github.com/Applifier/unity-ads-webview/pull/6379)
+* Remove calling getSensorList API method on initialization [#6541](https://github.com/Applifier/unity-ads-webview/pull/6541)
+* Remove OpenGL version from DeviceInfo [#6651](https://github.com/Applifier/unity-ads-webview/pull/6651)
+* Show target information in Non-GDPR Privacy Dialog [#6646](https://github.com/Applifier/unity-ads-webview/pull/6646)
+* Add error throwing when API is missing in browser build [#6604](https://github.com/Applifier/unity-ads-webview/pull/6604)
+* Add isCached checking support for Admob Campaigns [#6652](https://github.com/Applifier/unity-ads-webview/pull/6652)
+
+
+# Wed Oct 10 17:36:31 UTC 2018
+
+* Multiply battery level by 100 for AdMob signal [#6600](https://github.com/Applifier/unity-ads-webview/pull/6600)
+* ABTest for click tracking swap, request from CrossInstall [#6598](https://github.com/Applifier/unity-ads-webview/pull/6598)
+* Fix AdMob campaign loader [#6647](https://github.com/Applifier/unity-ads-webview/pull/6647)
+
+# Tue Oct  9 21:46:34 UTC 2018
+
+* Improve/Rename Reporting Privacy and Remove Other Privacies [#6601](https://github.com/Applifier/unity-ads-webview/pull/6601)
+* Improvements to Banner Lifecycle Logic [#6596](https://github.com/Applifier/unity-ads-webview/pull/6596)
+* Batching storage modifications and writes [#6454](https://github.com/Applifier/unity-ads-webview/pull/6545)
+* Use Allow Skip Flag from Configuration for Rewarded Promo [#6552](https://github.com/Applifier/unity-ads-webview/pull/6552)
+* Never serialize Asset model Session object [#6603](https://github.com/Applifier/unity-ads-webview/pull/6603)
+
+# Mon Oct  8 23:15:42 UTC 2018
+
+* AB Test various improvements to the endscreen layout in groups 16 & 17 [#6556](https://github.com/Applifier/unity-ads-webview/pull/6556)
+* AB Test Smart Close button in groups 18 & 19 [#6238](https://github.com/Applifier/unity-ads-webview/pull/6238) 
+* Fix session ad plan loading for backup campaigns [#6595](https://github.com/Applifier/unity-ads-webview/pull/6595)
+* Removed CTA button color test from groups 16, 17, 18 & 19 [#6472](https://github.com/Applifier/unity-ads-webview/pull/6576/)
+
+# Fri Oct  5 21:40:11 UTC 2018
+
+* Enable Reporting Privacy for All [#6575](https://github.com/Applifier/unity-ads-webview/pull/6575)
 * Support serialization for MRAID campaigns [#6549](https://github.com/Applifier/unity-ads-webview/pull/6549)
 * Remove Ads deps from Core [#6544](https://github.com/Applifier/unity-ads-webview/pull/6544)
 * Add CSS media queries for iPhone XS Max [#6543](https://github.com/Applifier/unity-ads-webview/pull/6543)

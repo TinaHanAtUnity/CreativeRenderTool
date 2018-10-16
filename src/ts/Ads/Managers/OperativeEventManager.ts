@@ -24,6 +24,7 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { StorageApi } from 'Core/Native/Storage';
 import { IAdsApi } from 'Ads/Ads';
 import { ICoreApi } from 'Core/Core';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: RequestManager;
@@ -36,6 +37,7 @@ export interface IOperativeEventManagerParams<T extends Campaign> {
     platform: Platform;
     core: ICoreApi;
     ads: IAdsApi;
+    storageBridge: StorageBridge;
     campaign: T;
 }
 
@@ -80,6 +82,7 @@ export class OperativeEventManager {
     protected _campaign: Campaign;
     protected _metaDataManager: MetaDataManager;
     protected _storage: StorageApi;
+    protected _storageBridge: StorageBridge;
     private _deviceInfo: DeviceInfo;
     private _request: RequestManager;
     private _coreConfig: CoreConfiguration;
@@ -89,6 +92,7 @@ export class OperativeEventManager {
     protected _ads: IAdsApi;
 
     constructor(params: IOperativeEventManagerParams<Campaign>) {
+        this._storageBridge = params.storageBridge;
         this._metaDataManager = params.metaDataManager;
         this._sessionManager = params.sessionManager;
         this._clientInfo = params.clientInfo;
@@ -270,7 +274,7 @@ export class OperativeEventManager {
             followRedirects: false,
             retryWithConnectionEvents: false
         }).catch(() => {
-            new FailedOperativeEventManager(this._storage, sessionId, eventId).storeFailedEvent({
+            new FailedOperativeEventManager(this._storage, sessionId, eventId).storeFailedEvent(this._storageBridge, {
                url: url,
                data: data
             });

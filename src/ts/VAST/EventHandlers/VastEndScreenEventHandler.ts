@@ -7,6 +7,7 @@ import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { ICoreApi } from 'Core/Core';
+import { ClickDelayTrackingTest } from 'Core/Models/ABGroup';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
@@ -16,6 +17,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastEndScreen: VastEndScreen | null;
     private _platform: Platform;
     private _core: ICoreApi;
+    private _isClickTestAbGroup: boolean;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         this._platform = parameters.platform;
@@ -25,18 +27,23 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._request = parameters.request;
         this._campaign = parameters.campaign;
         this._vastEndScreen = this._vastAdUnit.getEndScreen();
+        this._isClickTestAbGroup = ClickDelayTrackingTest.isValid(parameters.coreConfig.getAbGroup());
     }
 
     public onVastEndScreenClick(): Promise<void> {
         this.setCallButtonEnabled(false);
+        if (this._isClickTestAbGroup) {
+            this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._campaign.getSession().getId());
+        }
 
         const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
-
         if (clickThroughURL) {
             return this._request.followRedirectChain(clickThroughURL).then((url: string) => {
                 return this.onOpenUrl(url).then(() => {
                     this.setCallButtonEnabled(true);
-                    this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._campaign.getSession().getId());
+                    if (!this._isClickTestAbGroup) {
+                        this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._campaign.getSession().getId());
+                    }
                 }).catch((e) => {
                     this.setCallButtonEnabled(true);
                 });

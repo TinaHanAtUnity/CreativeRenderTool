@@ -1,4 +1,3 @@
-import { GdprManager, IGdprPersonalProperties } from 'Ads/Managers/GdprManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -31,15 +30,13 @@ export interface IBuildInformation extends ITemplateData {
 export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
 
     private static buildInformation: IBuildInformation;
-    private static userInformation: IGdprPersonalProperties;
 
     constructor(platform: Platform, isCoppaCompliant: boolean, isGDPREnabled: boolean, id: string) {
         super(platform, id);
         this._templateData = {
             'isCoppaCompliant': isCoppaCompliant,
             'isGDPREnabled': isGDPREnabled,
-            'buildInformation': AbstractPrivacy.buildInformation,
-            'userInformation': AbstractPrivacy.userInformation
+            'buildInformation': AbstractPrivacy.buildInformation
         };
     }
 
@@ -60,12 +57,6 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
             seatId: campaign.getSeatId(),
             timestamp: date.toUTCString()
         };
-    }
-
-    public static setUserInformation(gdprManager: GdprManager) {
-        return gdprManager.retrievePersonalInformation().then((personalProperties) => {
-            AbstractPrivacy.userInformation = personalProperties;
-        });
     }
 
     protected abstract onCloseEvent(event: Event): void;
