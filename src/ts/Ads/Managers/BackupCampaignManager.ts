@@ -81,18 +81,7 @@ export class BackupCampaignManager {
                             const campaign = loader.load(data);
 
                             if(campaign) {
-                                return this.verifyCachedFiles(campaign).then(cached => {
-                                    if(cached) {
-                                        return campaign;
-                                    } else {
-                                        Diagnostics.trigger('backup_campaign_not_cached', {
-                                            type: type,
-                                            data: data,
-                                            willExpireAt: willexpireat
-                                        });
-                                        return undefined;
-                                    }
-                                });
+                                return this.verifyCachedFiles(campaign);
                             } else {
                                 Diagnostics.trigger('backup_campaign_loading_failed', {
                                     type: type,
@@ -103,7 +92,7 @@ export class BackupCampaignManager {
                         }
                     }
 
-                    return undefined;
+                    return Promise.resolve(undefined);
                 });
             } else {
                 return undefined;
@@ -150,12 +139,12 @@ export class BackupCampaignManager {
         return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, key);
     }
 
-    private verifyCachedFiles(campaign: Campaign): Promise<boolean> {
+    private verifyCachedFiles(campaign: Campaign): Promise<Campaign> {
         const requiredAssets = campaign.getRequiredAssets();
         const optionalAssets = campaign.getOptionalAssets();
 
         if(requiredAssets.length === 0 && optionalAssets.length === 0) {
-            return Promise.resolve(true);
+            return Promise.resolve(campaign);
         }
 
         const promises = [];
@@ -167,10 +156,10 @@ export class BackupCampaignManager {
             const portraitVideo = campaign.getPortraitVideo();
             if(video && video.isCached()) {
                 promises.push(this.verifyCachedAsset(video));
-            } else if(portraitVideo && portraitVideo.isCached()) {
+            }
+
+            if(portraitVideo && portraitVideo.isCached()) {
                 promises.push(this.verifyCachedAsset(portraitVideo));
-            } else {
-                return Promise.resolve(false);
             }
         }
 
@@ -182,24 +171,26 @@ export class BackupCampaignManager {
             promises.push(this.verifyCachedAsset(optionalAsset));
         }
 
-        return Promise.all(promises).then((values: boolean[]) => {
-            return values.every(value => value);
+        return Promise.all(promises).then(() => {
+            return campaign;
         });
     }
 
-    private verifyCachedAsset(asset: Asset): Promise<boolean> {
+    private verifyCachedAsset(asset: Asset): Promise<void> {
         const fileId = asset.getFileId();
 
         if(asset.isCached() && fileId) {
             return this._nativeBridge.Cache.getFileInfo(fileId).then((fileInfo: IFileInfo) => {
                 if(fileInfo.found && fileInfo.size > 0) {
-                    return true;
+                    return;
+                } else {
+                    asset.setCachedUrl(undefined);
+                    asset.setFileId(undefined);
+                    return;
                 }
-
-                return false;
             });
         } else {
-            return Promise.resolve(false);
+            return Promise.resolve();
         }
     }
 }
