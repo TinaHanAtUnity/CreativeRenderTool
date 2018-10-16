@@ -215,7 +215,7 @@ export class AdUnitFactory {
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
                 endScreenEventHandler.onKeyEvent(keyCode);
-                 if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
                     xPromoOverlayEventHandler.onKeyEvent(keyCode);
                 }
             });
@@ -271,7 +271,7 @@ export class AdUnitFactory {
             if (nativeBridge.getPlatform() === Platform.ANDROID) {
                 const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) =>  {
                     vastEndScreenHandler.onKeyEvent(keyCode);
-                     if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                    if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
                         vastOverlayHandler.onKeyEvent(keyCode);
                     }
                 });
