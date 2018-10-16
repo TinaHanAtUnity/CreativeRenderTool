@@ -378,7 +378,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 .then(() => {
                     sinon.assert.called(<sinon.SinonStub>purchasing.initiatePurchasingCommand);
                     sinon.assert.calledWith((<sinon.SinonStub>purchasing.initiatePurchasingCommand).getCall(1), JSON.stringify({
-                        productId: 'com.example.iap.product1',
+                        productId: TestFixtures.getPromoCampaign().getIapProductId(),
                         iapPromo: true,
                         request: 'purchase',
                         purchaseTrackingUrls: ['https://events.iap.unity3d.com/events/v1/purchase','http://test.purchase.com/purchase']
