@@ -15,6 +15,13 @@ import { VastParser } from 'VAST/Utilities/VastParser';
 import { ICoreApi } from 'Core/Core';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
+
+    public static ContentType = 'programmatic/admob-video';
+
+    public getContentTypes() {
+        return [ProgrammaticAdMobParser.ContentType];
+    }
+
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
@@ -30,6 +37,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
             const baseCampaignParams: ICampaign = {
                 id: this.getProgrammaticCampaignId(platform),
                 willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
+                contentType: ProgrammaticAdMobParser.ContentType,
                 adType: response.getAdType() || undefined,
                 correlationId: response.getCorrelationId() || undefined,
                 creativeId: response.getCreativeId() || undefined,

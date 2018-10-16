@@ -15,12 +15,6 @@ import { Privacy } from '../../Ads/Views/Privacy';
 
 export class VastAdUnitFactory extends AbstractAdUnitFactory {
 
-    public static ContentType = 'programmatic/vast';
-
-    public canCreateAdUnit(contentType: string): boolean {
-        return contentType === VastAdUnitFactory.ContentType;
-    }
-
     public createAdUnit(parameters: IAdUnitParameters<VastCampaign>): VastAdUnit {
         const privacy = this.createPrivacy(parameters);
         const showPrivacyDuringVideo = !parameters.campaign.hasEndscreen() || this.showGDPRBanner(parameters);

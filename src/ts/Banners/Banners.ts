@@ -4,21 +4,28 @@ import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
 import { BannerWebPlayerContainer } from 'Ads//Utilities/WebPlayer/BannerWebPlayerContainer';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
-import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { IAPIModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { BannerApi } from 'Banners/Native/Banner';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { StorageBridge } from '../Core/Utilities/StorageBridge';
+import { IParserModule } from '../Ads/Modules/IParserModule';
+import { BannerCampaignParser } from './Parsers/BannerCampaignParser';
+import { BannerAdUnitFactory } from './AdUnits/BannerAdUnitFactory';
 
 export interface IBannersApi extends IModuleApi {
     Banner: BannerApi;
     Listener: BannerListenerApi;
 }
 
-export class Banners extends AdsModule implements IApiModule {
+export class Banners extends AdsModule implements IAPIModule, IParserModule {
 
     public readonly Api: IBannersApi;
 
     public BannerAdContext: BannerAdContext;
+
+    private readonly _parserHtml: BannerCampaignParser;
+    private readonly _parserJs: BannerCampaignParser;
+    private readonly _adUnitFactory: BannerAdUnitFactory;
 
     constructor(ads: Ads) {
         super(ads);
@@ -39,6 +46,32 @@ export class Banners extends AdsModule implements IApiModule {
         this.BannerAdContext = new BannerAdContext(this.Api, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, this.Core.FocusManager, this.Core.DeviceInfo);
         this._initialized = true;
         return Promise.resolve();
+    }
+
+    public canParse(contentType: string) {
+        return contentType === BannerCampaignParser.ContentTypeHTML || contentType === BannerCampaignParser.ContentTypeJS;
+    }
+
+    public getParser(contentType: string) {
+        switch(contentType) {
+            case BannerCampaignParser.ContentTypeHTML:
+                return this._parserHtml;
+            case BannerCampaignParser.ContentTypeJS:
+                return this._parserJs;
+            default:
+                throw new Error('Banner module cannot handle content type: ' + contentType);
+        }
+    }
+
+    public getParsers() {
+        return [
+            this._parserJs,
+            this._parserHtml
+        ];
+    }
+
+    public getAdUnitFactory() {
+        return this._adUnitFactory;
     }
 
 }

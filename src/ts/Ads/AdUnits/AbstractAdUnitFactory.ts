@@ -24,7 +24,6 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 export abstract class AbstractAdUnitFactory {
     private static _forceGDPRBanner: boolean = false;
 
-    public abstract canCreateAdUnit(contentType: string): boolean;
     public abstract createAdUnit(parameters: IAdUnitParameters<Campaign>): AbstractAdUnit;
 
     public static setForcedGDPRBanner(value: boolean) {

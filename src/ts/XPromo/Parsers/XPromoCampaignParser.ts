@@ -12,6 +12,12 @@ import { ICoreApi } from 'Core/Core';
 
 export class XPromoCampaignParser extends CampaignParser {
 
+    public static ContentType = 'xpromo/video';
+
+    public getContentTypes() {
+        return [XPromoCampaignParser.ContentType];
+    }
+
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const json = response.getJsonContent();
 
@@ -36,6 +42,7 @@ export class XPromoCampaignParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: json.id,
             willExpireAt: undefined,
+            contentType: XPromoCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,
             creativeId: response.getCreativeId(),

@@ -36,6 +36,14 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeVideo = 'comet/video';
     public static ContentTypeMRAID = 'comet/mraid-url';
 
+    public getContentTypes() {
+        return [
+            CometCampaignParser.ContentType,
+            CometCampaignParser.ContentTypeVideo,
+            CometCampaignParser.ContentTypeMRAID
+        ];
+    }
+
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
         const json = response.getJsonContent();
 
@@ -61,6 +69,7 @@ export class CometCampaignParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: json.id,
             willExpireAt: undefined,
+            contentType: CometCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,
             creativeId: undefined,

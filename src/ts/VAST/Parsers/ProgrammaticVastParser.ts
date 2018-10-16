@@ -13,6 +13,9 @@ import { VastParser } from 'VAST/Utilities/VastParser';
 import { ICoreApi } from 'Core/Core';
 
 export class ProgrammaticVastParser extends CampaignParser {
+
+    public static ContentType = 'programmatic/vast';
+
     public static setVastParserMaxDepth(depth: number): void {
         ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH = depth;
     }
@@ -20,6 +23,10 @@ export class ProgrammaticVastParser extends CampaignParser {
     private static VAST_PARSER_MAX_DEPTH: number;
 
     protected _vastParser: VastParser = new VastParser();
+
+    public getContentTypes() {
+        return [ProgrammaticVastParser.ContentType];
+    }
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
@@ -40,6 +47,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(platform),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
+            contentType: ProgrammaticVastParser.ContentType,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
             creativeId: response.getCreativeId() || undefined,

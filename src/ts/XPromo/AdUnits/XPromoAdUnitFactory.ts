@@ -13,12 +13,6 @@ import { Privacy } from '../../Ads/Views/Privacy';
 
 export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
 
-    public static ContentType = 'xpromo/video';
-
-    public canCreateAdUnit(contentType: string): boolean {
-        return contentType === XPromoAdUnitFactory.ContentType;
-    }
-
     public createAdUnit(parameters: IAdUnitParameters<XPromoCampaign>): XPromoAdUnit {
         const privacy = this.createPrivacy(parameters);
         const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose();

@@ -85,6 +85,11 @@ import { IBannersApi } from '../../src/ts/Banners/Banners';
 import { BannerApi } from '../../src/ts/Banners/Native/Banner';
 import { BannerListenerApi } from '../../src/ts/Banners/Native/UnityBannerListener';
 import { Backend } from '../../src/ts/Backend/Backend';
+import { CometCampaignParser } from '../../src/ts/Performance/Parsers/CometCampaignParser';
+import { ProgrammaticMraidParser } from '../../src/ts/MRAID/Parsers/ProgrammaticMraidParser';
+import { ProgrammaticVastParser } from '../../src/ts/VAST/Parsers/ProgrammaticVastParser';
+import { ProgrammaticVPAIDParser } from '../../src/ts/VPAID/Parsers/ProgrammaticVPAIDParser';
+import { ProgrammaticStaticInterstitialParser } from '../../src/ts/Display/Parsers/ProgrammaticStaticInterstitialParser';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -106,6 +111,7 @@ export class TestFixtures {
         return {
             id: campaignId,
             willExpireAt: undefined,
+            contentType: CometCampaignParser.ContentType,
             adType: adType || undefined,
             correlationId: undefined,
             creativeId: undefined,
@@ -230,6 +236,7 @@ export class TestFixtures {
         return {
             id: campaignId,
             willExpireAt: undefined,
+            contentType: ProgrammaticMraidParser.ContentType,
             adType: mraidJson.adType || undefined,
             correlationId: json.correlationId || undefined,
             creativeId: mraidJson.creativeId || undefined,
@@ -275,6 +282,7 @@ export class TestFixtures {
         return {
             id: campaignId,
             willExpireAt: undefined,
+            contentType: ProgrammaticVastParser.ContentType,
             adType: 'adType',
             correlationId: 'correlationId',
             creativeId: 'creativeId',
@@ -325,6 +333,7 @@ export class TestFixtures {
         const baseCampaignParams: ICampaign = {
             id: campaignId,
             willExpireAt: json.cacheTTL ? Date.now() + json.cacheTTL * 1000 : undefined,
+            contentType: ProgrammaticStaticInterstitialParser.ContentTypeHtml,
             adType: json.adType || undefined,
             correlationId: json.correlationId || undefined,
             creativeId: json.creativeId || undefined,
@@ -349,6 +358,7 @@ export class TestFixtures {
         return {
             id: json.campaignId,
             willExpireAt: json.cacheTTL ? Date.now() + json.cacheTTL * 1000 : undefined,
+            contentType: ProgrammaticVPAIDParser.ContentType,
             adType: json.adType || undefined,
             correlationId: json.correlationId || undefined,
             creativeId: json.creativeId || undefined,

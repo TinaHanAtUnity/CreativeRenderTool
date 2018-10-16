@@ -8,11 +8,22 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/Core';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
+
+    public static ContentTypeHtml = 'programmatic/static-interstitial-html';
+    public static ContentTypeJs = 'programmatic/static-interstitial-js';
+
     private _wrapWithScriptTag: boolean;
 
     constructor(wrapWithScriptTag: boolean) {
         super();
         this._wrapWithScriptTag = wrapWithScriptTag;
+    }
+
+    public getContentTypes() {
+        return [
+            ProgrammaticStaticInterstitialParser.ContentTypeHtml,
+            ProgrammaticStaticInterstitialParser.ContentTypeJs
+        ];
     }
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -25,6 +36,7 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(platform),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
+            contentType: this._wrapWithScriptTag ? ProgrammaticStaticInterstitialParser.ContentTypeJs : ProgrammaticStaticInterstitialParser.ContentTypeHtml,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
             creativeId: response.getCreativeId() || undefined,

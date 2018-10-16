@@ -11,12 +11,20 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/Core';
 
 export class PromoCampaignParser extends CampaignParser {
+
+    public static ContentType = 'purchasing/iap';
+
+    public getContentTypes() {
+        return [PromoCampaignParser.ContentType];
+    }
+
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const promoJson = JsonParser.parse(response.getContent());
 
         const baseCampaignParams: ICampaign = {
             id: promoJson.id,
             willExpireAt: promoJson.expiry ? parseInt(promoJson.expiry, 10) * 1000 : undefined,
+            contentType: PromoCampaignParser.ContentType,
             adType: promoJson.contentType || response.getContentType(),
             correlationId: undefined,
             creativeId: undefined,

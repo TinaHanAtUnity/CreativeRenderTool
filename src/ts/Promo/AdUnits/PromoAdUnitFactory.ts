@@ -8,12 +8,6 @@ import { Privacy } from '../../Ads/Views/Privacy';
 
 export class PromoAdUnitFactory extends AbstractAdUnitFactory {
 
-    public static ContentType = 'purchasing/iap';
-
-    public canCreateAdUnit(contentType: string): boolean {
-        return contentType === PromoAdUnitFactory.ContentType;
-    }
-
     public createAdUnit(parameters: IAdUnitParameters<PromoCampaign>): PromoAdUnit {
         const privacy = this.createPrivacy(parameters);
         const showGDPRBanner = this.showGDPRBanner(parameters);

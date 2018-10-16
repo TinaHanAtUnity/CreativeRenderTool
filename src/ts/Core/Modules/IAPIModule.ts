@@ -7,6 +7,6 @@ export interface IModuleApi {
     readonly iOS?: IModuleApi;
 }
 
-export interface IApiModule extends IModule {
+export interface IAPIModule extends IModule {
     readonly Api: IModuleApi;
 }

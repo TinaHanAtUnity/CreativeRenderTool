@@ -9,7 +9,13 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/Core';
 
 export class ProgrammaticMraidParser extends CampaignParser {
+
     public static ContentType = 'programmatic/mraid';
+
+    public getContentTypes() {
+        return [ProgrammaticMraidParser.ContentType];
+    }
+
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraid = response.getJsonContent();
 
@@ -30,6 +36,7 @@ export class ProgrammaticMraidParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(platform),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
+            contentType: ProgrammaticMraidParser.ContentType,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
             creativeId: response.getCreativeId() || undefined,

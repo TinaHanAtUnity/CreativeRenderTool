@@ -16,9 +16,6 @@ import { Privacy } from '../../Ads/Views/Privacy';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
 
-    public static ContentType = 'programmatic/mraid';
-    public static ContentTypeURL = 'programmatic/mraid-url';
-
     private static _forcedPlayableMRAID: boolean = false;
     private static _forcedARMRAID: boolean = false;
 
@@ -28,10 +25,6 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
 
     public static setForcedARMRAID(value: boolean) {
         MRAIDAdUnitFactory._forcedARMRAID = value;
-    }
-
-    public canCreateAdUnit(contentType: string): boolean {
-        return contentType === MRAIDAdUnitFactory.ContentType || contentType === MRAIDAdUnitFactory.ContentTypeURL;
     }
 
     public createAdUnit(parameters: IAdUnitParameters<MRAIDCampaign>): MRAIDAdUnit {

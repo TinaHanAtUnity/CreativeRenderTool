@@ -37,7 +37,7 @@ import { Overlay } from 'Ads/Views/Overlay';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { IAPIModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
@@ -62,6 +62,16 @@ import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { FinishState } from 'Core/Constants/FinishState';
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
 import { MRAIDAdUnitFactory } from '../MRAID/AdUnits/MRAIDAdUnitFactory';
+import { CampaignParserManager } from './Managers/CampaignParserManager';
+import { AdMob } from '../AdMob/AdMob';
+import { Banners } from '../Banners/Banners';
+import { MRAID } from '../MRAID/MRAID';
+import { Display } from '../Display/Display';
+import { Performance } from '../Performance/Performance';
+import { Promo } from '../Promo/Promo';
+import { VAST } from '../VAST/VAST';
+import { VPAID } from '../VPAID/VPAID';
+import { XPromo } from '../XPromo/XPromo';
 
 export interface IAdsApi extends IModuleApi {
     AdsProperties: AdsPropertiesApi;
@@ -80,7 +90,7 @@ export interface IAdsApi extends IModuleApi {
     };
 }
 
-export class Ads extends CoreModule implements IApiModule {
+export class Ads extends CoreModule implements IAPIModule {
 
     public readonly Api: IAdsApi;
 
@@ -93,6 +103,7 @@ export class Ads extends CoreModule implements IApiModule {
     public readonly MissedImpressionManager: MissedImpressionManager;
     public readonly BackupCampaignManager: BackupCampaignManager;
     public readonly ProgrammaticTrackingService: ProgrammaticTrackingService;
+    public readonly CampaignParserManager: CampaignParserManager;
 
     public Config: AdsConfiguration;
     public Container: Activity | ViewController;
@@ -109,6 +120,8 @@ export class Ads extends CoreModule implements IApiModule {
     private _requestDelay: number;
     private _wasRealtimePlacement: boolean = false;
     private _bannerAdContext: BannerAdContext;
+
+    private _adUnitFactories: { [key: string]: AbstractAdUnitFactory } = {};
 
     constructor(core: Core, analytics: Analytics) {
         super(core);
@@ -150,6 +163,7 @@ export class Ads extends CoreModule implements IApiModule {
         this.MissedImpressionManager = new MissedImpressionManager(this.Core.Api.Storage);
         this.BackupCampaignManager = new BackupCampaignManager(this.Core.Api, this.Core.Config);
         this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this.Core.NativeBridge.getPlatform(), this.Core.RequestManager, this.Core.ClientInfo, this.Core.DeviceInfo);
+        this.CampaignParserManager = new CampaignParserManager();
     }
 
     public initialize(jaegerInitSpan: JaegerSpan): Promise<any> {
@@ -180,7 +194,20 @@ export class Ads extends CoreModule implements IApiModule {
                 this.AssetManager.setCacheDiagnostics(true);
             }
 
-            this.CampaignManager = new CampaignManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this.Core.RequestManager, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.MetaDataManager, this.Core.CacheBookkeeping, this.Core.JaegerManager, this.BackupCampaignManager);
+            const modules = [AdMob, Banners, Display, MRAID, Performance, Promo, VAST, VPAID, XPromo];
+            modules.forEach(moduleConstructor => {
+                const module = new moduleConstructor(this);
+                module.initialize();
+                const parsers = module.getParsers();
+                this.CampaignParserManager.addParsers(parsers);
+                parsers.forEach(parser => {
+                    parser.getContentTypes().forEach(contentType => {
+                        this._adUnitFactories[contentType] = module.getAdUnitFactory();
+                    });
+                });
+            });
+
+            this.CampaignManager = new CampaignManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this.Core.RequestManager, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.MetaDataManager, this.Core.CacheBookkeeping, this.CampaignParserManager, this.Core.JaegerManager, this.BackupCampaignManager);
             this.RefreshManager = new OldCampaignRefreshManager(this.Core.NativeBridge.getPlatform(), this.Core.Api, this.Api, this.Core.WakeUpManager, this.CampaignManager, this.Config, this.Core.FocusManager, this.SessionManager, this.Core.ClientInfo, this.Core.RequestManager, this.Core.CacheManager);
 
             SdkStats.initialize(this.Core.Api, this.Core.RequestManager, this.Core.Config, this.Config, this.SessionManager, this.CampaignManager, this.Core.MetaDataManager, this.Core.ClientInfo, this.Core.CacheManager);
@@ -326,7 +353,7 @@ export class Ads extends CoreModule implements IApiModule {
             }
 
             const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
-            this._currentAdUnit = AbstractAdUnitFactory.createAdUnit({
+            this._currentAdUnit = this.getAdUnitFactory(campaign).createAdUnit({
                 platform: this.Core.NativeBridge.getPlatform(),
                 core: this.Core.Api,
                 ads: this.Api,
@@ -417,6 +444,11 @@ export class Ads extends CoreModule implements IApiModule {
                 }
             });
         });
+    }
+
+    private getAdUnitFactory(campaign: Campaign) {
+        const contentType = campaign.getContentType();
+        return this._adUnitFactories[contentType];
     }
 
     private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {

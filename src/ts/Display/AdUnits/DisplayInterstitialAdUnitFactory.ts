@@ -9,13 +9,6 @@ import { Privacy } from '../../Ads/Views/Privacy';
 
 export class DisplayInterstitialAdUnitFactory extends AbstractAdUnitFactory {
 
-    public static ContentTypeHtml = 'programmatic/static-interstitial-html';
-    public static ContentTypeJs = 'programmatic/static-interstitial-js';
-
-    public canCreateAdUnit(contentType: string): boolean {
-        return contentType === DisplayInterstitialAdUnitFactory.ContentTypeHtml || contentType === DisplayInterstitialAdUnitFactory.ContentTypeJs;
-    }
-
     public createAdUnit(parameters: IAdUnitParameters<DisplayInterstitialCampaign>): DisplayInterstitialAdUnit {
         const privacy = this.createPrivacy(parameters);
 

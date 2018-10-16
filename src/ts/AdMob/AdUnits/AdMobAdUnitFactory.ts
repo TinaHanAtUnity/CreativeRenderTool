@@ -8,12 +8,6 @@ import { Privacy } from '../../Ads/Views/Privacy';
 
 export class AdMobAdUnitFactory extends AbstractAdUnitFactory {
 
-    public static ContentType = 'programmatic/admob-video';
-
-    public canCreateAdUnit(contentType: string): boolean {
-        return contentType === AdMobAdUnitFactory.ContentType;
-    }
-
     public createAdUnit(parameters: IAdUnitParameters<AdMobCampaign>): AdMobAdUnit {
         // AdMobSignalFactory will always be defined, checking and throwing just to remove the undefined type.
         if (!parameters.adMobSignalFactory) {

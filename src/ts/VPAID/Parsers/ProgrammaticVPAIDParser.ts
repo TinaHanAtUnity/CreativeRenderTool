@@ -14,6 +14,10 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
 
     private _vpaidParser: VPAIDParser = new VPAIDParser();
 
+    public getContentTypes() {
+        return [ProgrammaticVPAIDParser.ContentType];
+    }
+
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
         return this._vastParser.retrieveVast(decodedVast, core, request).then((vast): Promise<Campaign> => {
@@ -27,6 +31,7 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
                 const baseCampaignParams: ICampaign = {
                     id: this.getProgrammaticCampaignId(platform),
                     willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
+                    contentType: ProgrammaticVPAIDParser.ContentType,
                     adType: response.getAdType() || undefined,
                     correlationId: response.getCorrelationId() || undefined,
                     creativeId: response.getCreativeId() || undefined,
