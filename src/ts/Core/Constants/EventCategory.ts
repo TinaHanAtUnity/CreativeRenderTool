@@ -13,7 +13,11 @@ export enum EventCategory {
     DEVICEINFO,
     WEBPLAYER,
     PURCHASING,
-    PERMISSIONS,
+    CUSTOM_PURCHASING,
+    DECISION,
+    PLACEMENT_CONTENT,
+    BANNER,
     AR,
-    BANNER
+    ANALYTICS,
+    PERMISSIONS
 }

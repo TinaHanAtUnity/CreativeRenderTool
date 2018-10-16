@@ -14,6 +14,8 @@ import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
+import { Platform } from 'Core/Constants/Platform';
 
 class FakeStorageApi extends StorageApi {
     private _values: { [key: string]: any } = {};
@@ -74,23 +76,26 @@ describe('AnalyticsManagerTest', () => {
     let focusManager: FocusManager;
 
     beforeEach(() => {
-        nativeBridge = TestFixtures.getNativeBridge();
+        nativeBridge = TestFixtures.getNativeBridge(Platform.TEST);
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new Request(nativeBridge, wakeUpManager);
+        request = sinon.createStubInstance(Request);
         clientInfo = TestFixtures.getClientInfo();
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         configuration = TestFixtures.getCoreConfiguration();
 
         sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('6c7fa2c0-4333-47be-8de2-2f24e33e710c'));
+        (<sinon.SinonStub>request.post).callsFake(() => {
+            return Promise.resolve();
+        });
         storage = new FakeStorageApi(nativeBridge);
         nativeBridge.Storage = storage;
 
-        analyticsManager = new AnalyticsManager(nativeBridge, wakeUpManager, request, clientInfo, deviceInfo, configuration, focusManager);
+        analyticsManager = new AnalyticsManager(nativeBridge, request, clientInfo, deviceInfo, configuration, focusManager);
     });
 
     it('should send session start event', () => {
-        const requestSpy = sinon.spy(request, 'post');
+        const requestSpy = <sinon.SinonStub>request.post;
 
         return analyticsManager.init().then(() => {
             sinon.assert.called(requestSpy);
@@ -100,7 +105,8 @@ describe('AnalyticsManagerTest', () => {
 
     it('should send session running event', () => {
         return analyticsManager.init().then(() => {
-            const requestSpy = sinon.spy(request, 'post');
+            const requestSpy = <sinon.SinonStub>request.post;
+            requestSpy.resetHistory();
 
             focusManager.onActivityPaused.trigger('com.test.activity');
 
@@ -108,4 +114,80 @@ describe('AnalyticsManagerTest', () => {
             assert.equal(TestHelper.getEventType(requestSpy.getCall(0).args[1]), 'analytics.appRunning.v1');
         });
     });
+
+    it('should clear queue after event is sent', () => {
+        // tslint:disable:no-string-literal
+        return analyticsManager.init().then(() => {
+            const eventQueue: any = analyticsManager['_analyticsEventQueue'];
+            const promise = analyticsManager.onIapTransaction('fakeProductId', 'fakeReceipt', 'USD', 1.99).then(() => {
+                assert.equal(Object.keys(eventQueue).length, 0);
+            });
+            assert.equal(Object.keys(eventQueue).length, 1);
+            return promise;
+        });
+        // tslint:enable:no-string-literal
+    });
+
+    it('should clear queue after multiple events are sent', () => {
+        // tslint:disable:no-string-literal
+        return analyticsManager.init().then(() => {
+            const eventQueue: any = analyticsManager['_analyticsEventQueue'];
+            const postStub = <sinon.SinonStub>request.post;
+            postStub.resetHistory();
+            const first = analyticsManager.onIapTransaction('fakeProductId', 'fakeReceipt', 'USD', 1.99).catch((error) => {
+                assert.fail(error);
+            });
+            const second = analyticsManager.onIapTransaction('fakeProductId2', 'fakeReceipt', 'USD', 1.99).catch((error) => {
+                assert.fail(error);
+            });
+            assert.equal(Object.keys(eventQueue).length, 2);
+            return Promise.all([first, second]).then(() => {
+                let cdpPostCalls: number = 0;
+                postStub.getCalls().map((call) => {
+                    const url = call.args[0];
+                    if (url === 'https://cdp.cloud.unity3d.com/v1/events') {
+                        cdpPostCalls++;
+                    }
+                });
+                assert.equal(JSON.stringify(eventQueue), '{}');
+                assert.equal(cdpPostCalls, 2);
+                assert.equal(Object.keys(eventQueue).length, 0);
+            });
+        });
+        // tslint:enable:no-string-literal
+    });
+
+    it('should clear queue when first send fails and second succeeds', () => {
+        // tslint:disable:no-string-literal
+        return analyticsManager.init().then(() => {
+            const eventQueue: any = analyticsManager['_analyticsEventQueue'];
+            const postStub = <sinon.SinonStub>request.post;
+            postStub.resetHistory();
+            postStub.rejects();
+            return analyticsManager.onIapTransaction('fakeProductId', 'fakeReceipt', 'USD', 1.99).then(() => {
+                assert.fail('should throw');
+            }).catch(() => {
+                assert.equal(Object.keys(eventQueue).length, 1);
+                postStub.resolves();
+                return analyticsManager.onIapTransaction('fakeProductId2', 'fakeReceipt', 'USD', 1.99)
+                .then(() => {
+                    let cdpPostCalls: number = 0;
+                    postStub.getCalls().map((call) => {
+                        const url = call.args[0];
+                        if (url === 'https://cdp.cloud.unity3d.com/v1/events') {
+                            cdpPostCalls++;
+                        }
+                    });
+                    assert.equal(JSON.stringify(eventQueue), '{}');
+                    assert.equal(cdpPostCalls, 2);
+                    assert.equal(Object.keys(eventQueue).length, 0);
+                })
+                .catch(() => {
+                    assert.fail('should not throw');
+                });
+            });
+        });
+        // tslint:enable:no-string-literal
+    });
+
 });
