@@ -15,8 +15,12 @@ import { Sdk } from 'Backend/Api/Sdk';
 import { Storage } from 'Backend/Api/Storage';
 import { UrlScheme } from 'Backend/Api/UrlScheme';
 import { VideoPlayer } from 'Backend/Api/VideoPlayer';
+import { Analytics } from 'Backend/Api/Analytics';
 import { Platform } from 'Core/Constants/Platform';
 import { CallbackStatus } from 'Core/Native/Bridge/NativeBridge';
+import { MonetizationListener } from 'Backend/Api/MonetizationListener';
+import { CustomPurchasing } from 'Backend/Api/CustomPurchasing';
+import { PlacementContents } from 'Backend/Api/PlacementContents';
 
 interface IInvocation {
     className: string;
@@ -54,15 +58,19 @@ export class Backend implements IWebViewBridge {
         '.*DeviceInfo': DeviceInfo,
         '.*Intent': Intent,
         '.*Lifecycle': Lifecycle,
+        '.*MonetizationListener': MonetizationListener,
+        '.*CustomPurchasing': CustomPurchasing,
         '.*Listener': Listener,
         '.*Notification': Notification,
-        '.*Placement': Placement,
+        '.*Placement$': Placement,
         '.*Purchasing': Purchasing,
         '.*Request': Request,
         '.*Sdk': Sdk,
         '.*Storage': Storage,
         '.*UrlScheme': UrlScheme,
-        '.*VideoPlayer': VideoPlayer
+        '.*VideoPlayer': VideoPlayer,
+        '.*Analytics': Analytics,
+        '.*PlacementContents': PlacementContents
     };
 
     public handleInvocation(rawInvocations: string): void {
