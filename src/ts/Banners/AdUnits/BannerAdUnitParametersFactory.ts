@@ -21,6 +21,7 @@ import { ICoreApi } from 'Core/Core';
 import { Platform } from 'Core/Constants/Platform';
 import { IAdsApi } from 'Ads/Ads';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { BannerCampaign } from '../Models/BannerCampaign';
 
 export class BannerAdUnitParametersFactory {
 
@@ -61,7 +62,7 @@ export class BannerAdUnitParametersFactory {
         this._storageBridge = storageBridge;
     }
 
-    public create(campaign: Campaign, placement: Placement, options: any): Promise<IAdUnitParameters<Campaign>> {
+    public create(campaign: BannerCampaign, placement: Placement, options: any): Promise<IAdUnitParameters<BannerCampaign>> {
         return Promise.all([
             this.getDeviceOrientation()
         ]).then(([orientation]) => {

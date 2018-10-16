@@ -10,13 +10,9 @@ import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { Promises } from 'Core/Utilities/Promises';
 import { Template } from 'Core/Utilities/Template';
 import BannerContainer from 'html/banner/BannerContainer.html';
-import { IAdsApi } from 'Ads/Ads';
-import { ICoreApi } from 'Core/Core';
+import { AbstractAdUnit, IAdUnitParameters } from '../../Ads/AdUnits/AbstractAdUnit';
 
-export interface IBannerAdUnitParameters {
-    platform: Platform;
-    core: ICoreApi;
-    ads: IAdsApi;
+export interface IBannerAdUnitParameters extends IAdUnitParameters<BannerCampaign> {
     placement: Placement;
     campaign: BannerCampaign;
     clientInfo: ClientInfo;
@@ -24,10 +20,7 @@ export interface IBannerAdUnitParameters {
     webPlayerContainer: WebPlayerContainer;
 }
 
-export class BannerAdUnit {
-    private _platform: Platform;
-    private _core: ICoreApi;
-    private _ads: IAdsApi;
+export class BannerAdUnit extends AbstractAdUnit {
     private _campaign: BannerCampaign;
     private _placement: Placement;
     private _clientInfo: ClientInfo;
@@ -41,9 +34,7 @@ export class BannerAdUnit {
     private _onCreateWebViewObserver: IObserver1<string>;
 
     constructor(parameters: IBannerAdUnitParameters) {
-        this._platform = parameters.platform;
-        this._core = parameters.core;
-        this._ads = parameters.ads;
+        super(parameters);
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
         this._clientInfo = parameters.clientInfo;
@@ -89,6 +80,10 @@ export class BannerAdUnit {
 
     public hide(): Promise<void> {
         return Promise.resolve();
+    }
+
+    public description(): string {
+        return 'banner';
     }
 
     private setUpBannerPlayer(): Promise<void> {

@@ -1,10 +1,18 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { Campaign } from 'Ads/Models/Campaign';
 import { BannerAdUnit, IBannerAdUnitParameters } from 'Banners/AdUnits/BannerAdUnit';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
+import { AbstractAdUnitFactory } from '../../Ads/AdUnits/AbstractAdUnitFactory';
 
-export class BannerAdUnitFactory {
-    public static createAdUnit(parameters: IAdUnitParameters<Campaign>): BannerAdUnit {
+export class BannerAdUnitFactory extends AbstractAdUnitFactory {
+
+    public static ContentTypeJS = 'programmatic/banner-js';
+    public static ContentTypeHTML = 'programmatic/banner-html';
+
+    public canCreateAdUnit(contentType: string): boolean {
+        return contentType === BannerAdUnitFactory.ContentTypeJS || contentType === BannerAdUnitFactory.ContentTypeHTML;
+    }
+
+    public createAdUnit(parameters: IAdUnitParameters<BannerCampaign>): BannerAdUnit {
         if (parameters.campaign instanceof BannerCampaign) {
             return this.createBannerAdUnit(<IAdUnitParameters<BannerCampaign>>parameters);
         } else {
@@ -12,7 +20,7 @@ export class BannerAdUnitFactory {
         }
     }
 
-    private static createBannerAdUnit(parameters: IAdUnitParameters<BannerCampaign>): BannerAdUnit {
+    private createBannerAdUnit(parameters: IAdUnitParameters<BannerCampaign>): BannerAdUnit {
         return new BannerAdUnit(<IBannerAdUnitParameters>parameters);
     }
 }

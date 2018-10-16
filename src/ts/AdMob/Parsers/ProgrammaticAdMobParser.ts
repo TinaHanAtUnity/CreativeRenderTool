@@ -15,7 +15,6 @@ import { VastParser } from 'VAST/Utilities/VastParser';
 import { ICoreApi } from 'Core/Core';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
-    public static ContentType = 'programmatic/admob-video';
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();

@@ -36,7 +36,7 @@ import { AuctionRequest } from 'Banners/Utilities/AuctionRequest';
 import { Overlay } from 'Ads/Views/Overlay';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { AdUnitFactory } from 'Ads/AdUnits/AdUnitFactory';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
@@ -61,6 +61,7 @@ import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { FinishState } from 'Core/Constants/FinishState';
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
+import { MRAIDAdUnitFactory } from '../MRAID/AdUnits/MRAIDAdUnitFactory';
 
 export interface IAdsApi extends IModuleApi {
     AdsProperties: AdsPropertiesApi;
@@ -325,7 +326,7 @@ export class Ads extends CoreModule implements IApiModule {
             }
 
             const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
-            this._currentAdUnit = AdUnitFactory.createAdUnit({
+            this._currentAdUnit = AbstractAdUnitFactory.createAdUnit({
                 platform: this.Core.NativeBridge.getPlatform(),
                 core: this.Core.Api,
                 ads: this.Api,
@@ -484,17 +485,17 @@ export class Ads extends CoreModule implements IApiModule {
             }
 
             if(TestEnvironment.get('forcedPlayableMRAID')) {
-                AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
+                MRAIDAdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
             }
 
             if(TestEnvironment.get('forcedGDPRBanner')) {
-                AdUnitFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
+                AbstractAdUnitFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
             }
 
             let forcedARMRAID = false;
             if (TestEnvironment.get('forcedARMRAID')) {
                 forcedARMRAID = TestEnvironment.get('forcedARMRAID');
-                AdUnitFactory.setForcedARMRAID(forcedARMRAID);
+                MRAIDAdUnitFactory.setForcedARMRAID(forcedARMRAID);
             }
         });
     }

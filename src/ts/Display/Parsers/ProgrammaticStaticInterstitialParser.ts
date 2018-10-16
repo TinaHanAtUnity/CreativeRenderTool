@@ -8,8 +8,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/Core';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
-    public static ContentTypeHtml = 'programmatic/static-interstitial-html';
-    public static ContentTypeJs = 'programmatic/static-interstitial-js';
     private _wrapWithScriptTag: boolean;
 
     constructor(wrapWithScriptTag: boolean) {

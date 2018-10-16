@@ -11,7 +11,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/Core';
 
 export class XPromoCampaignParser extends CampaignParser {
-    public static ContentType = 'xpromo/video';
+
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const json = response.getJsonContent();
 

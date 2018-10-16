@@ -13,7 +13,6 @@ import { VastParser } from 'VAST/Utilities/VastParser';
 import { ICoreApi } from 'Core/Core';
 
 export class ProgrammaticVastParser extends CampaignParser {
-    public static ContentType = 'programmatic/vast';
     public static setVastParserMaxDepth(depth: number): void {
         ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH = depth;
     }

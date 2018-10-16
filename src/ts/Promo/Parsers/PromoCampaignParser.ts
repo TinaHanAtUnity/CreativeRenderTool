@@ -11,7 +11,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/Core';
 
 export class PromoCampaignParser extends CampaignParser {
-    public static ContentType = 'purchasing/iap';
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const promoJson = JsonParser.parse(response.getContent());
 

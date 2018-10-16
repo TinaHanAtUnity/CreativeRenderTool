@@ -205,7 +205,7 @@ export class BannerAdContext {
     private createAdUnit() {
         return this._adUnitParametersFactory.create(this._campaign, this._placement, {})
             .then((parameters) => {
-                return BannerAdUnitFactory.createAdUnit(parameters);
+                return new BannerAdUnitFactory().createAdUnit(parameters);
             });
     }
 

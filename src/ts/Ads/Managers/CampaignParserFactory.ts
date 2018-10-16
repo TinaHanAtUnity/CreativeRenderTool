@@ -8,31 +8,39 @@ import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { XPromoCampaignParser } from 'XPromo/Parsers/XPromoCampaignParser';
+import { VastAdUnitFactory } from '../../VAST/AdUnits/VastAdUnitFactory';
+import { PerformanceAdUnitFactory } from '../../Performance/AdUnits/PerformanceAdUnitFactory';
+import { XPromoAdUnitFactory } from '../../XPromo/AdUnits/XPromoAdUnitFactory';
+import { MRAIDAdUnitFactory } from '../../MRAID/AdUnits/MRAIDAdUnitFactory';
+import { DisplayInterstitialAdUnitFactory } from '../../Display/AdUnits/DisplayInterstitialAdUnitFactory';
+import { AdMobAdUnitFactory } from '../../AdMob/AdUnits/AdMobAdUnitFactory';
+import { VPAIDAdUnitFactory } from '../../VPAID/AdUnits/VPAIDAdUnitFactory';
+import { PromoAdUnitFactory } from '../../Promo/AdUnits/PromoAdUnitFactory';
 
 export class CampaignParserFactory {
     public static getCampaignParser(contentType: string): CampaignParser {
         switch (contentType) {
-            case CometCampaignParser.ContentType:
-            case CometCampaignParser.ContentTypeVideo:
-            case CometCampaignParser.ContentTypeMRAID:
+            case PerformanceAdUnitFactory.ContentType:
+            case PerformanceAdUnitFactory.ContentTypeVideo:
+            case PerformanceAdUnitFactory.ContentTypeMRAID:
                 return new CometCampaignParser();
-            case XPromoCampaignParser.ContentType:
+            case XPromoAdUnitFactory.ContentType:
                 return new XPromoCampaignParser();
-            case ProgrammaticVastParser.ContentType:
+            case VastAdUnitFactory.ContentType:
                 return new ProgrammaticVastParser();
-            case ProgrammaticMraidUrlParser.ContentType:
+            case MRAIDAdUnitFactory.ContentTypeURL:
                 return new ProgrammaticMraidUrlParser();
-            case ProgrammaticMraidParser.ContentType:
+            case MRAIDAdUnitFactory.ContentType:
                 return new ProgrammaticMraidParser();
-            case ProgrammaticStaticInterstitialParser.ContentTypeHtml:
+            case DisplayInterstitialAdUnitFactory.ContentTypeHtml:
                 return new ProgrammaticStaticInterstitialParser(false);
-            case ProgrammaticStaticInterstitialParser.ContentTypeJs:
+            case DisplayInterstitialAdUnitFactory.ContentTypeJs:
                 return new ProgrammaticStaticInterstitialParser(true);
-            case ProgrammaticAdMobParser.ContentType:
+            case AdMobAdUnitFactory.ContentType:
                 return new ProgrammaticAdMobParser();
-            case ProgrammaticVPAIDParser.ContentType:
+            case VPAIDAdUnitFactory.ContentType:
                 return new ProgrammaticVPAIDParser();
-            case PromoCampaignParser.ContentType:
+            case PromoAdUnitFactory.ContentType:
                 return new PromoCampaignParser();
             default:
         }

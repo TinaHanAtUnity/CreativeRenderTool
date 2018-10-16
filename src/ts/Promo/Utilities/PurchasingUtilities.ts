@@ -9,6 +9,7 @@ import { PurchasingCatalog } from 'Promo/Models/PurchasingCatalog';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { IPromoApi } from 'Promo/Promo';
 import { ICoreApi } from 'Core/Core';
+import { PromoAdUnitFactory } from '../AdUnits/PromoAdUnitFactory';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -133,7 +134,7 @@ export class PurchasingUtilities {
     private static _isInitialized = false;
 
     private static setProductPlacementStates(): void {
-        const placementCampaignMap = this.placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType);
+        const placementCampaignMap = this.placementManager.getPlacementCampaignMap(PromoAdUnitFactory.ContentType);
         const promoPlacementIds = Object.keys(placementCampaignMap);
         for (const placementId of promoPlacementIds) {
             const currentCampaign = placementCampaignMap[placementId];
