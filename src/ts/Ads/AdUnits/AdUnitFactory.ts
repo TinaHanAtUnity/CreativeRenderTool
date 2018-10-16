@@ -152,7 +152,13 @@ export class AdUnitFactory {
         this.prepareVideoPlayer(PerformanceVideoEventHandler, <IVideoEventHandlerParams<PerformanceAdUnit>>videoEventHandlerParams);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
+            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
+                endScreenEventHandler.onKeyEvent(keyCode);
+
+                if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                    performanceOverlayEventHandler.onKeyEvent(keyCode);
+                }
+            });
             performanceAdUnit.onClose.subscribe(() => {
                 if(onBackKeyObserver) {
                     nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
@@ -207,7 +213,12 @@ export class AdUnitFactory {
         this.prepareVideoPlayer(XPromoVideoEventHandler, <IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>>videoEventHandlerParams);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
+            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
+                endScreenEventHandler.onKeyEvent(keyCode);
+                 if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                    xPromoOverlayEventHandler.onKeyEvent(keyCode);
+                }
+            });
             xPromoAdUnit.onClose.subscribe(() => {
                 if(onBackKeyObserver) {
                     nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
@@ -250,20 +261,26 @@ export class AdUnitFactory {
 
         const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
 
+        const vastOverlayHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
+        overlay.addEventHandler(vastOverlayHandler);
+
         if(parameters.campaign.hasEndscreen() && vastEndScreen) {
             const vastEndScreenHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
             vastEndScreen.addEventHandler(vastEndScreenHandler);
 
             if (nativeBridge.getPlatform() === Platform.ANDROID) {
-                const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => vastEndScreenHandler.onKeyEvent(keyCode));
+                const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) =>  {
+                    vastEndScreenHandler.onKeyEvent(keyCode);
+                     if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                        vastOverlayHandler.onKeyEvent(keyCode);
+                    }
+                });
+
                 vastAdUnit.onClose.subscribe(() => {
                     nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
                 });
             }
         }
-
-        const vastOverlayHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
-        overlay.addEventHandler(vastOverlayHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, vastAdUnit, parameters.campaign.getVideo(), undefined, vastAdUnitParameters);
         const vastVideoEventHandler = this.prepareVideoPlayer(VastVideoEventHandler, <IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
