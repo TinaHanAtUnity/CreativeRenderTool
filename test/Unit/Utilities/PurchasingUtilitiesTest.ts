@@ -215,10 +215,10 @@ describe('PurchasingUtilitiesTest', () => {
     });
 
     describe('onPromoClosed', () => {
-        xit('should resolve and do nothing for CustomPurchasingAdapter', () => {
-            return PurchasingUtilities.onPromoClosed(TestFixtures.getPromoCampaign(), 'myCoolPlacement').then(() => {
-                sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Purchasing.initiatePurchasingCommand);
-            });
+        it('should resolve and do nothing for CustomPurchasingAdapter', () => {
+            sandbox.stub(((<any>PurchasingUtilities)._purchasingAdapter), 'onPromoClosed');
+            PurchasingUtilities.onPromoClosed(TestFixtures.getPromoCampaign(), 'myCoolPlacement');
+            sinon.assert.called(((<any>PurchasingUtilities)._purchasingAdapter).onPromoClosed);
         });
     });
 

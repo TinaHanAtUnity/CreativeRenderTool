@@ -63,9 +63,8 @@ export class PurchasingUtilities {
     public static onPurchase(productId: string, campaign: PromoCampaign, placementId: string) {
         return this._purchasingAdapter.purchaseItem(productId, campaign, placementId);
     }
-    public static onPromoClosed(campaign: PromoCampaign, placementId: string) {
+    public static onPromoClosed(campaign: PromoCampaign, placementId: string): void {
         this._purchasingAdapter.onPromoClosed(campaign, placementId);
-        return Promise.resolve();
     }
 
     public static refreshCatalog(): Promise<void> {
