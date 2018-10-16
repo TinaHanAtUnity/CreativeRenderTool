@@ -7,7 +7,6 @@ import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilit
 import { Backend } from '../../../src/ts/Backend/Backend';
 import { ICoreApi } from '../../../src/ts/Core/Core';
 import { TestFixtures } from '../../TestHelpers/TestFixtures';
-import { SinonStub } from 'sinon';
 
 describe('PermissionsUtil Test', () => {
     const ANDROID_PERMISSIONS_ASKED_KEY = 'unity-ads-permissions-asked';
@@ -82,7 +81,7 @@ describe('PermissionsUtil Test', () => {
 
             return PermissionsUtil.requestPermission(Platform.ANDROID, core, PERMISSION_TYPE).then(() => {
                 assert.equal(core.Permissions.permissionRequestCode, reqCode + 1);
-                sinon.assert.calledWith(<SinonStub>core.Android!.Preferences.setBoolean, ANDROID_PERMISSIONS_ASKED_KEY, PERMISSION_TYPE.toString(), true);
+                sinon.assert.calledWith(<sinon.SinonStub>core.Android!.Preferences.setBoolean, ANDROID_PERMISSIONS_ASKED_KEY, PERMISSION_TYPE.toString(), true);
                 return Promise.resolve();
             });
         });
