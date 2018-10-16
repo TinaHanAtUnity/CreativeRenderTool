@@ -58,7 +58,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         return this._initPromise;
     }
 
-    public purchaseItem(productId: string, campaign: PromoCampaign, placementId: string): Promise<ITransactionDetails> {
+    public purchaseItem(productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails> {
         const purchaseUrls = campaign.getTrackingUrlsForEvent('purchase');
         const modifiedPurchaseUrls = ThirdPartyEventManager.replaceUrlTemplateValues(purchaseUrls, {'%ZONE%': placementId});
         const iapPayload: IPromoPayload = {

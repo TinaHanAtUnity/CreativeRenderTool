@@ -45,7 +45,7 @@ export class NativePromoEventHandler {
         this._thirdPartyEventManager.setTemplateValue('%ZONE%', placementId);
         this.sendTrackingEvent('click', campaign);
 
-        PurchasingUtilities.onPurchase(productId, campaign, placementId);
+        PurchasingUtilities.onPurchase(productId, campaign, placementId, true);
     }
 
     private sendTrackingEvent(eventName: string, campaign: PromoCampaign) {

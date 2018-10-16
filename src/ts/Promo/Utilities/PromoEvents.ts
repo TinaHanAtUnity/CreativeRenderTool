@@ -19,6 +19,7 @@ export interface IPurchaseCommon {
     storeSpecificId: string;
     amount: number | undefined;
     currency: string | undefined;
+    native: boolean;
 }
 
 // internal fields
@@ -100,7 +101,17 @@ export class PromoEvents {
         this.analyticsStorage = new AnalyticsStorage(nativeBridge);
     }
 
-    public onPurchaseFailed(url: string, body: IPurchaseCommon, failureJson: IFailureJson): Promise<IPromoPurchaseFailed> {
+    public static getAppStoreFromReceipt(receipt: string | undefined): string {
+        if (receipt) {
+            const data = JSON.parse(receipt);
+            if (data && data.Store) {
+                return data.Store;
+            }
+        }
+        return 'unknown';
+    }
+
+    public onPurchaseFailed(body: IPurchaseCommon, failureJson: IFailureJson): Promise<IPromoPurchaseFailed> {
         return Promise.all([
             this.deviceInfo.getScreenWidth(),
             this.deviceInfo.getScreenHeight(),
@@ -136,7 +147,7 @@ export class PromoEvents {
         });
     }
 
-    public onPurchaseSuccess(url: string, body: IPurchaseCommon, productType: string | undefined, receipt: string): Promise<IPromoPurchaseSucceeded> {
+    public onPurchaseSuccess(body: IPurchaseCommon, productType: string | undefined, receipt: string): Promise<IPromoPurchaseSucceeded> {
         return Promise.all([
             this.deviceInfo.getScreenWidth(),
             this.deviceInfo.getScreenHeight(),
