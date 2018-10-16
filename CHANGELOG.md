@@ -1,3 +1,7 @@
+# Pending
+
+* Add support for all SDK 3.0.0 Webview Functionality
+
 # Tue Oct 16 12:43:43 UTC 2018
 
 * Minor optimizations to backup campaign implementation [#6676](https://github.com/Applifier/unity-ads-webview/pull/6676)
