@@ -1,7 +1,7 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
-import { IAdsApi } from 'Ads/Ads';
+import { IAdsApi } from 'Ads/IAds';
 
 interface IPlacementMap {
     [id: string]: Placement;

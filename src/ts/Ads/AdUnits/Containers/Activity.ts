@@ -5,8 +5,8 @@ import { Rotation } from 'Core/Constants/Android/Rotation';
 import { ScreenOrientation } from 'Core/Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Core/Constants/Android/SystemUiVisibility';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { IAdsApi } from 'Ads/Ads';
-import { ICoreApi } from 'Core/Core';
+import { IAdsApi } from 'Ads/IAds';
+import { ICoreApi } from 'Core/ICore';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;

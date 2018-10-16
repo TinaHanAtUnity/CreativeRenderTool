@@ -12,7 +12,7 @@ import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
 import EndScreenWithImprovedStylesTemplate from 'html/EndScreenWithImprovedStyles.html';
 import { Platform } from '../../Core/Constants/Platform';
-import { ICoreApi } from '../../Core/Core';
+import { ICoreApi } from '../../Core/ICore';
 
 export interface IEndScreenParameters {
     platform: Platform;

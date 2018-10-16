@@ -6,7 +6,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 import { ClickDelayTrackingTest } from 'Core/Models/ABGroup';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {

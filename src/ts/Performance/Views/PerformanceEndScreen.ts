@@ -5,7 +5,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Template } from 'Core/Utilities/Template';
-import { ICoreApi } from '../../Core/Core';
+import { ICoreApi } from '../../Core/ICore';
 
 export class PerformanceEndScreen extends EndScreen {
     protected _template: Template;

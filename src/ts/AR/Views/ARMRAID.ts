@@ -16,7 +16,7 @@ import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 import { IARApi } from 'AR/AR';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 

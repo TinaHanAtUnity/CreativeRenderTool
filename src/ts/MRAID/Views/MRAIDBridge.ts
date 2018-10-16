@@ -1,5 +1,5 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export enum MRAIDEvents {
     ORIENTATION         = 'orientation'

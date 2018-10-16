@@ -1,5 +1,5 @@
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 import { ConfigError } from 'Core/Errors/ConfigError';
 import { RequestError } from 'Core/Errors/RequestError';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';

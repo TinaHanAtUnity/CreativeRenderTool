@@ -2,7 +2,7 @@ import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
 import { StreamType } from 'Core/Constants/Android/StreamType';
 import { Platform } from 'Core/Constants/Platform';
 import { ISchema, Model } from 'Core/Models/Model';
-import { ICoreApi } from '../Core';
+import { ICoreApi } from '../ICore';
 
 export interface IDeviceInfo {
     advertisingIdentifier: string | undefined | null;

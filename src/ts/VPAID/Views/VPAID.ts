@@ -8,7 +8,7 @@ import { View } from 'Core/Views/View';
 import VPAIDContainerTemplate from 'html/vpaid/container.html';
 import VPAIDTemplate from 'html/vpaid/VPAID.html';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 interface InitAdOptions {
     width: number;

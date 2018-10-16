@@ -8,7 +8,7 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { IVPAIDCampaign, VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
 

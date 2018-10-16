@@ -8,7 +8,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 import { ITemplateData } from 'Core/Views/View';
 
 export interface IGdprPersonalProperties extends ITemplateData {

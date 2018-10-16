@@ -1,4 +1,3 @@
-import { IModule } from 'Core/Modules/IModule';
 import { NativeApi } from 'Core/Native/Bridge/NativeApi';
 
 export interface IModuleApi {
@@ -7,6 +6,6 @@ export interface IModuleApi {
     readonly iOS?: IModuleApi;
 }
 
-export interface IApiModule extends IModule {
+export interface IApiModule {
     readonly Api: IModuleApi;
 }

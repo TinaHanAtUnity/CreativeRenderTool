@@ -7,7 +7,7 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export class ProgrammaticMraidUrlParser extends CampaignParser {
 

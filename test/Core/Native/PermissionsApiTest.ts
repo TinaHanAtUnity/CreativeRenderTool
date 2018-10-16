@@ -9,7 +9,7 @@ import { AndroidPermission } from 'Core/Native/Android/Permissions';
 import { PermissionTypes } from 'Core/Utilities/Permissions';
 import { IObserver2 } from 'Core/Utilities/IObserver';
 import { Backend } from '../../../src/ts/Backend/Backend';
-import { ICoreApi } from '../../../src/ts/Core/Core';
+import { ICoreApi } from '../../../src/ts/Core/ICore';
 import { TestFixtures } from '../../TestHelpers/TestFixtures';
 
 describe('PermissionsApi Test', () => {

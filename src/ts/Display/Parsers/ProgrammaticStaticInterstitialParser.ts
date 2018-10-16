@@ -5,7 +5,7 @@ import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
 

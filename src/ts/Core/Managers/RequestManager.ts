@@ -2,7 +2,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { RequestError } from 'Core/Errors/RequestError';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 const enum RequestStatus {

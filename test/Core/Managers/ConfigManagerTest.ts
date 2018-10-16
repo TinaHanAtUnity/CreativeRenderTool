@@ -14,7 +14,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Backend } from '../../../src/ts/Backend/Backend';
-import { ICoreApi } from '../../../src/ts/Core/Core';
+import { ICoreApi } from '../../../src/ts/Core/ICore';
 import { Platform } from '../../../src/ts/Core/Constants/Platform';
 import { WakeUpManager } from '../../../src/ts/Core/Managers/WakeUpManager';
 

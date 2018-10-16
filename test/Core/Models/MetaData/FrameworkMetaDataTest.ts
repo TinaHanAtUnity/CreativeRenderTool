@@ -5,7 +5,7 @@ import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import { Backend } from '../../../../src/ts/Backend/Backend';
-import { ICoreApi } from '../../../../src/ts/Core/Core';
+import { ICoreApi } from '../../../../src/ts/Core/ICore';
 import { TestFixtures } from '../../../TestHelpers/TestFixtures';
 import { Platform } from '../../../../src/ts/Core/Constants/Platform';
 

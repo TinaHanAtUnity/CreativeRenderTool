@@ -7,7 +7,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export class AnalyticsManager {
     private _platform: Platform;

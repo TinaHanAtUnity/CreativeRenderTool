@@ -1,7 +1,7 @@
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
 import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 import IosDefaults from 'json/FakeIosDeviceInfo.json';
 

@@ -12,7 +12,7 @@ import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ICoreApi } from '../../../src/ts/Core/Core';
+import { ICoreApi } from '../../../src/ts/Core/ICore';
 import { Backend } from '../../../src/ts/Backend/Backend';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {

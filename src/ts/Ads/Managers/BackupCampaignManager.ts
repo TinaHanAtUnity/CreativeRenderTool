@@ -9,7 +9,7 @@ import { CampaignLoader } from 'Ads/Parsers/CampaignLoader';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { IFileInfo } from 'Core/Native/Cache';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 import { MraidLoader } from 'MRAID/Parsers/MraidLoader';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 

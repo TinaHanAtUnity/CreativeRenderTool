@@ -7,8 +7,8 @@ import { Platform } from 'Core/Constants/Platform';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ICoreApi } from 'Core/Core';
-import { ClickDelayTrackingTest, ABGroup } from 'Core/Models/ABGroup';
+import { ICoreApi } from 'Core/ICore';
+import { ClickDelayTrackingTest } from 'Core/Models/ABGroup';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;

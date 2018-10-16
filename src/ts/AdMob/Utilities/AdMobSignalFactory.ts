@@ -13,8 +13,8 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { IAdsApi } from 'Ads/Ads';
-import { ICoreApi } from 'Core/Core';
+import { IAdsApi } from 'Ads/IAds';
+import { ICoreApi } from 'Core/ICore';
 
 export class AdMobSignalFactory {
     private _platform: Platform;

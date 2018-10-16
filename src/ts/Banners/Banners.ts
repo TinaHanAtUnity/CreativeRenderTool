@@ -1,4 +1,3 @@
-import { Ads, AdsModule } from 'Ads/Ads';
 import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
 import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
 import { BannerWebPlayerContainer } from 'Ads//Utilities/WebPlayer/BannerWebPlayerContainer';
@@ -7,17 +6,19 @@ import { BannerAdContext } from 'Banners/Context/BannerAdContext';
 import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { BannerApi } from 'Banners/Native/Banner';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
-import { StorageBridge } from '../Core/Utilities/StorageBridge';
 import { IParserModule } from '../Ads/Modules/IParserModule';
 import { BannerCampaignParser } from './Parsers/BannerCampaignParser';
 import { BannerAdUnitFactory } from './AdUnits/BannerAdUnitFactory';
+import { ICore } from '../Core/ICore';
+import { IAds } from '../Ads/IAds';
+import { IAnalytics } from '../Analytics/IAnalytics';
 
 export interface IBannersApi extends IModuleApi {
     Banner: BannerApi;
     Listener: BannerListenerApi;
 }
 
-export class Banners extends AdsModule implements IApiModule, IParserModule {
+export class Banners implements IApiModule, IParserModule {
 
     public readonly Api: IBannersApi;
 
@@ -27,25 +28,19 @@ export class Banners extends AdsModule implements IApiModule, IParserModule {
     private readonly _parserJs: BannerCampaignParser;
     private readonly _adUnitFactory: BannerAdUnitFactory;
 
-    constructor(ads: Ads) {
-        super(ads);
-
+    constructor(core: ICore, ads: IAds, analytics: IAnalytics) {
         this.Api = {
-            Banner: new BannerApi(ads.Core.NativeBridge),
-            Listener: new BannerListenerApi(ads.Core.NativeBridge)
+            Banner: new BannerApi(core.NativeBridge),
+            Listener: new BannerListenerApi(core.NativeBridge)
         };
-    }
 
-    public initialize(): Promise<void> {
-        const bannerPlacementManager = new BannerPlacementManager(this.Ads.Api, this.Ads.Config);
+        const bannerPlacementManager = new BannerPlacementManager(ads.Api, ads.Config);
         bannerPlacementManager.sendBannersReady();
 
-        const bannerCampaignManager = new BannerCampaignManager(this.Ads.Core.NativeBridge.getPlatform(), this.Ads.Core.Api, this.Ads.Core.Config, this.Ads.Config, this.Ads.AssetManager, this.Ads.SessionManager, this.Ads.AdMobSignalFactory, this.Core.RequestManager, this.Core.ClientInfo, this.Core.DeviceInfo, this.Core.MetaDataManager, this.Core.JaegerManager);
-        const bannerWebPlayerContainer = new BannerWebPlayerContainer(this.Ads.Api);
-        const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this.Ads.Core.NativeBridge.getPlatform(), this.Core.Api, this.Ads.Api, this.Core.RequestManager, this.Core.MetaDataManager, this.Core.Config, this.Ads.Config, this.Ads.Container, this.Core.DeviceInfo, this.Core.ClientInfo, this.Ads.SessionManager, this.Core.FocusManager, this.Ads.Analytics.AnalyticsManager, this.Ads.AdMobSignalFactory, this.Ads.GdprManager, bannerWebPlayerContainer, this.Ads.ProgrammaticTrackingService, new StorageBridge(this.Core.Api));
-        this.BannerAdContext = new BannerAdContext(this.Api, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, this.Core.FocusManager, this.Core.DeviceInfo);
-        this._initialized = true;
-        return Promise.resolve();
+        const bannerCampaignManager = new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, ads.AssetManager, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager);
+        const bannerWebPlayerContainer = new BannerWebPlayerContainer(ads.Api);
+        const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(core.NativeBridge.getPlatform(), core.Api, ads.Api, core.RequestManager, core.MetaDataManager, core.Config, ads.Config, ads.Container, core.DeviceInfo, core.ClientInfo, ads.SessionManager, core.FocusManager, analytics.AnalyticsManager, ads.AdMobSignalFactory, ads.GdprManager, bannerWebPlayerContainer, ads.ProgrammaticTrackingService, core.StorageBridge);
+        this.BannerAdContext = new BannerAdContext(this.Api, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, core.FocusManager, core.DeviceInfo);
     }
 
     public canParse(contentType: string) {

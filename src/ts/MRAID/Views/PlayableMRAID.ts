@@ -13,7 +13,7 @@ import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 

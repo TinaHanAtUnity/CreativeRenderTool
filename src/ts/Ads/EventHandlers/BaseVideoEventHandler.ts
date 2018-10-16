@@ -12,8 +12,8 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { IAdsApi } from 'Ads/Ads';
-import { ICoreApi } from 'Core/Core';
+import { IAdsApi } from 'Ads/IAds';
+import { ICoreApi } from 'Core/ICore';
 import { Platform } from 'Core/Constants/Platform';
 
 export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T2 extends Campaign = Campaign, T3 extends OperativeEventManager = OperativeEventManager> {

@@ -7,7 +7,6 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CacheApi } from 'Core/Native/Cache';
 import { ConnectivityApi } from 'Core/Native/Connectivity';
@@ -42,35 +41,10 @@ import { NotificationApi } from 'Core/Native/iOS/Notification';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 import { AndroidPreferencesApi } from 'Core/Native/Android/Preferences';
 import { IosPreferencesApi } from 'Core/Native/iOS/Preferences';
-import { IModule } from 'Core/Modules/IModule';
 import { StorageBridge } from './Utilities/StorageBridge';
+import { ICore, ICoreApi } from './ICore';
 
-export interface ICoreApi extends IModuleApi {
-    Cache: CacheApi;
-    Connectivity: ConnectivityApi;
-    DeviceInfo: DeviceInfoApi;
-    Listener: ListenerApi;
-    Permissions: PermissionsApi;
-    Request: RequestApi;
-    Resolve: ResolveApi;
-    Sdk: SdkApi;
-    SensorInfo: SensorInfoApi;
-    Storage: StorageApi;
-    Android?: {
-        Broadcast: BroadcastApi;
-        Intent: IntentApi;
-        Lifecycle: LifecycleApi;
-        Preferences: AndroidPreferencesApi;
-    };
-    iOS?: {
-        MainBundle: MainBundleApi;
-        Notification: NotificationApi;
-        Preferences: IosPreferencesApi;
-        UrlScheme: UrlSchemeApi;
-    };
-}
-
-export class Core implements IApiModule {
+export class Core implements ICore {
 
     public readonly NativeBridge: NativeBridge;
 
@@ -250,10 +224,6 @@ export class Core implements IApiModule {
         });
     }
 
-    public isInitialized() {
-        return this._initialized;
-    }
-
     private setupTestEnvironment(): Promise<void> {
         return TestEnvironment.setup(new MetaData(this.Api)).then(() => {
             if(TestEnvironment.get('serverUrl')) {
@@ -277,24 +247,6 @@ export class Core implements IApiModule {
                 }
             }
         });
-    }
-
-}
-
-export abstract class CoreModule implements IModule {
-
-    public readonly Core: Core;
-
-    protected _initialized = false;
-
-    protected constructor(core: Core) {
-        this.Core = core;
-    }
-
-    public abstract initialize(...parameters: any[]): any | Promise<any>;
-
-    public isInitialized() {
-        return this._initialized;
     }
 
 }

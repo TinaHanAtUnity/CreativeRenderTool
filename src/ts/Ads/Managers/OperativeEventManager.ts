@@ -22,8 +22,8 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { StorageApi } from 'Core/Native/Storage';
-import { IAdsApi } from 'Ads/Ads';
-import { ICoreApi } from 'Core/Core';
+import { IAdsApi } from 'Ads/IAds';
+import { ICoreApi } from 'Core/ICore';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {

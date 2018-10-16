@@ -1,4 +1,3 @@
-import { Backend } from 'Backend/Backend';
 import { BackendApi } from '../BackendApi';
 
 export class VideoPlayer extends BackendApi {

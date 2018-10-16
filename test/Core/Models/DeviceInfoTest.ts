@@ -11,7 +11,7 @@ import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from '../../TestHelpers/TestFixtures';
-import { ICoreApi } from '../../../src/ts/Core/Core';
+import { ICoreApi } from '../../../src/ts/Core/ICore';
 import { Backend } from '../../../src/ts/Backend/Backend';
 
 describe('DeviceInfoTest', () => {

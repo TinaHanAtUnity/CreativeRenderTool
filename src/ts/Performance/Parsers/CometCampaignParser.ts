@@ -13,7 +13,7 @@ import { IMRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 // Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
 export enum ICometTrackingUrlEvents {

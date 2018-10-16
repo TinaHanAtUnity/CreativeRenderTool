@@ -12,7 +12,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { VastParser } from 'VAST/Utilities/VastParser';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
 

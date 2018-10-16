@@ -8,8 +8,7 @@ import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingCatalog } from 'Promo/Models/PurchasingCatalog';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { IPromoApi } from 'Promo/Promo';
-import { ICoreApi } from 'Core/Core';
-import { PromoAdUnitFactory } from '../AdUnits/PromoAdUnitFactory';
+import { ICoreApi } from 'Core/ICore';
 
 export enum IPromoRequest {
     SETIDS = 'setids',

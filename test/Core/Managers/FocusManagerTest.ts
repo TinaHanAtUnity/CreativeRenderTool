@@ -6,7 +6,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 import { Backend } from '../../../src/ts/Backend/Backend';
-import { ICoreApi } from '../../../src/ts/Core/Core';
+import { ICoreApi } from '../../../src/ts/Core/ICore';
 import { TestFixtures } from '../../TestHelpers/TestFixtures';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {

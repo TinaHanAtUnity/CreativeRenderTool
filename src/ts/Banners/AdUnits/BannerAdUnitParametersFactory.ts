@@ -6,7 +6,6 @@ import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManager
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
@@ -17,9 +16,9 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 import { Platform } from 'Core/Constants/Platform';
-import { IAdsApi } from 'Ads/Ads';
+import { IAdsApi } from 'Ads/IAds';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { BannerCampaign } from '../Models/BannerCampaign';
 

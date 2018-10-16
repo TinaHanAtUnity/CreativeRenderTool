@@ -5,7 +5,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export class PrivacyEventHandler implements IPrivacyHandler {
 

@@ -13,7 +13,7 @@ import { Backend } from '../../../src/ts/Backend/Backend';
 import { Cache } from '../../../src/ts/Backend/Api/Cache';
 import { Storage } from '../../../src/ts/Backend/Api/Storage';
 import { Platform } from '../../../src/ts/Core/Constants/Platform';
-import { ICoreApi } from '../../../src/ts/Core/Core';
+import { ICoreApi } from '../../../src/ts/Core/ICore';
 
 class TestHelper {
     private _cache: Cache;

@@ -1,23 +1,17 @@
-import { Ads, AdsModule } from '../Ads/Ads';
 import { IParserModule } from '../Ads/Modules/IParserModule';
 import { ProgrammaticStaticInterstitialParser } from './Parsers/ProgrammaticStaticInterstitialParser';
 import { DisplayInterstitialAdUnitFactory } from './AdUnits/DisplayInterstitialAdUnitFactory';
 
-export class Display extends AdsModule implements IParserModule {
+export class Display implements IParserModule {
 
     private readonly _htmlParser: ProgrammaticStaticInterstitialParser;
     private readonly _jsParser: ProgrammaticStaticInterstitialParser;
     private readonly _adUnitFactory: DisplayInterstitialAdUnitFactory;
 
-    constructor(ads: Ads) {
-        super(ads);
+    constructor() {
         this._htmlParser = new ProgrammaticStaticInterstitialParser(false);
         this._jsParser = new ProgrammaticStaticInterstitialParser(true);
         this._adUnitFactory = new DisplayInterstitialAdUnitFactory();
-    }
-
-    public initialize() {
-        this._initialized = true;
     }
 
     public canParse(contentType: string): boolean {

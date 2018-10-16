@@ -18,7 +18,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 interface ISdkStatsEvent {
     eventTimestamp: number;

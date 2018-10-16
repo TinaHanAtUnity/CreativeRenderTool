@@ -1,5 +1,5 @@
 import { Observable0 } from 'Core/Utilities/Observable';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export class WakeUpManager {
     public readonly onNetworkConnected = new Observable0();

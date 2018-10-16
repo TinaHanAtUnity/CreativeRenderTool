@@ -6,7 +6,7 @@ import { View } from 'Core/Views/View';
 import MOATTemplate from 'html/MOAT.html';
 import MOATContainer from 'html/moat/container.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export enum MoatState {
     PLAYING,

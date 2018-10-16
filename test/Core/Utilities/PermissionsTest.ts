@@ -5,7 +5,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { Backend } from '../../../src/ts/Backend/Backend';
-import { ICoreApi } from '../../../src/ts/Core/Core';
+import { ICoreApi } from '../../../src/ts/Core/ICore';
 import { TestFixtures } from '../../TestHelpers/TestFixtures';
 
 describe('PermissionsUtil Test', () => {

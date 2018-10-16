@@ -8,7 +8,7 @@ import { View } from 'Core/Views/View';
 import PromoTpl from 'html/Promo.html';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 import { Placement } from 'Ads/Models/Placement';
 
 export class Promo extends View<{}> implements IPrivacyHandler {

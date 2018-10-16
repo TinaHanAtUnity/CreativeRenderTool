@@ -21,8 +21,8 @@ import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { IAdsApi } from 'Ads/Ads';
-import { ICoreApi } from 'Core/Core';
+import { IAdsApi } from 'Ads/IAds';
+import { ICoreApi } from 'Core/ICore';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export interface IEndScreenDownloadParameters {

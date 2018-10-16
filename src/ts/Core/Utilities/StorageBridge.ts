@@ -1,7 +1,7 @@
 import { StorageType } from 'Core/Native/Storage';
-import { StorageOperation, IStorageBatch, IStorageCommand, StorageCommandType } from 'Core/Utilities/StorageOperation';
+import { IStorageBatch, IStorageCommand, StorageCommandType, StorageOperation } from 'Core/Utilities/StorageOperation';
 import { Observable0 } from 'Core/Utilities/Observable';
-import { ICoreApi } from '../Core';
+import { ICoreApi } from '../ICore';
 
 export class StorageBridge {
     public onPublicStorageWrite = new Observable0();

@@ -17,7 +17,7 @@ import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { StorageType } from 'Core/Native/Storage';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export interface IAuctionResponse {
     correlationId: string;

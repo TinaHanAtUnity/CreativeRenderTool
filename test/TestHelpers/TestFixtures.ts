@@ -51,7 +51,7 @@ import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParamete
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 import { IPackageInfo } from 'Core/Native/Android/DeviceInfo';
-import { ICoreApi } from '../../src/ts/Core/Core';
+import { ICoreApi } from '../../src/ts/Core/ICore';
 import { CacheApi } from '../../src/ts/Core/Native/Cache';
 import { ConnectivityApi } from '../../src/ts/Core/Native/Connectivity';
 import { DeviceInfoApi } from '../../src/ts/Core/Native/DeviceInfo';
@@ -79,7 +79,7 @@ import { AndroidVideoPlayerApi } from '../../src/ts/Ads/Native/Android/VideoPlay
 import { AppSheetApi } from '../../src/ts/Ads/Native/iOS/AppSheet';
 import { IosAdUnitApi } from '../../src/ts/Ads/Native/iOS/AdUnit';
 import { IosVideoPlayerApi } from '../../src/ts/Ads/Native/iOS/VideoPlayer';
-import { IAdsApi } from '../../src/ts/Ads/Ads';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
 import { ListenerApi } from '../../src/ts/Ads/Native/Listener';
 import { IBannersApi } from '../../src/ts/Banners/Banners';
 import { BannerApi } from '../../src/ts/Banners/Native/Banner';

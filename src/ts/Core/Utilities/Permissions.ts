@@ -1,5 +1,5 @@
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 import { AndroidPermission } from 'Core/Native/Android/Permissions';
 import { IosBundleKeys, IosPermission } from 'Core/Native/iOS/Permissions';
 

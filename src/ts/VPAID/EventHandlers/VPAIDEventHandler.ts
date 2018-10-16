@@ -9,8 +9,8 @@ import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDHandler } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
-import { ICoreApi } from 'Core/Core';
-import { IAdsApi } from 'Ads/Ads';
+import { ICoreApi } from 'Core/ICore';
+import { IAdsApi } from 'Ads/IAds';
 
 export class VPAIDEventHandler implements IVPAIDHandler {
     private _operativeEventManager: OperativeEventManager;

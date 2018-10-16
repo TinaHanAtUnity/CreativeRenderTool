@@ -6,7 +6,7 @@ import 'mocha';
 import { TestFixtures } from '../../TestHelpers/TestFixtures';
 import { Platform } from '../../../src/ts/Core/Constants/Platform';
 import { Backend } from '../../../src/ts/Backend/Backend';
-import { ICoreApi } from '../../../src/ts/Core/Core';
+import { ICoreApi } from '../../../src/ts/Core/ICore';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('ResolveTest', () => {

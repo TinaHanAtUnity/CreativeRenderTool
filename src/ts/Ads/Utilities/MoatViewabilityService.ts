@@ -7,7 +7,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export interface IMoatIds {
     level1: number | undefined;

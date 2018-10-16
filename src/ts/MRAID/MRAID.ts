@@ -1,24 +1,18 @@
-import { Ads, AdsModule } from '../Ads/Ads';
 import { IParserModule } from '../Ads/Modules/IParserModule';
 import { ProgrammaticMraidParser } from './Parsers/ProgrammaticMraidParser';
 import { ProgrammaticMraidUrlParser } from './Parsers/ProgrammaticMraidUrlParser';
 import { MRAIDAdUnitFactory } from './AdUnits/MRAIDAdUnitFactory';
 
-export class MRAID extends AdsModule implements IParserModule {
+export class MRAID implements IParserModule {
 
     private readonly _parser: ProgrammaticMraidParser;
     private readonly _urlParser: ProgrammaticMraidUrlParser;
     private readonly _adUnitFactory: MRAIDAdUnitFactory;
 
-    constructor(ads: Ads) {
-        super(ads);
+    constructor() {
         this._parser = new ProgrammaticMraidParser();
         this._urlParser = new ProgrammaticMraidUrlParser();
         this._adUnitFactory = new MRAIDAdUnitFactory();
-    }
-
-    public initialize() {
-        this._initialized = true;
     }
 
     public canParse(contentType: string) {

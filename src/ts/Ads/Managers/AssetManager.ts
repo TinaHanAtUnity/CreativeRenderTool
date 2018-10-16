@@ -14,7 +14,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 import { Platform } from 'Core/Constants/Platform';
 
 enum CacheType {

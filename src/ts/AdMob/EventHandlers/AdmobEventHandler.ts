@@ -20,7 +20,7 @@ import { Promises } from 'Core/Utilities/Promises';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Timer } from 'Core/Utilities/Timer';
 import { Url } from 'Core/Utilities/Url';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;

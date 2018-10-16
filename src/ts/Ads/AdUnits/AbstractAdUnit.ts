@@ -16,8 +16,8 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { IAdsApi } from 'Ads/Ads';
-import { ICoreApi } from 'Core/Core';
+import { IAdsApi } from 'Ads/IAds';
+import { ICoreApi } from 'Core/ICore';
 import { Platform } from 'Core/Constants/Platform';
 import { IARApi } from 'AR/AR';
 

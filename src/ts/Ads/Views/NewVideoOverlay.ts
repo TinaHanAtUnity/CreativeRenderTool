@@ -5,7 +5,7 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
 import { Platform } from 'Core/Constants/Platform';
-import { IAdsApi } from 'Ads/Ads';
+import { IAdsApi } from 'Ads/IAds';
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
     protected _template: Template;

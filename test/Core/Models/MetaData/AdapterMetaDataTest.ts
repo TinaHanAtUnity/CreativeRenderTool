@@ -4,7 +4,7 @@ import { AdapterMetaData } from 'Core/Models/MetaData/AdapterMetaData';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
-import { ICoreApi } from '../../../../src/ts/Core/Core';
+import { ICoreApi } from '../../../../src/ts/Core/ICore';
 import { Backend } from '../../../../src/ts/Backend/Backend';
 import { TestFixtures } from '../../../TestHelpers/TestFixtures';
 import { Platform } from '../../../../src/ts/Core/Constants/Platform';

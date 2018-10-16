@@ -6,7 +6,7 @@ import { VastCreative } from 'VAST/Models/VastCreative';
 import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export class VastParser {
 

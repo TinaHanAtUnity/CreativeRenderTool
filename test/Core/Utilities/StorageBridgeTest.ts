@@ -8,7 +8,7 @@ import { StorageOperation } from 'Core/Utilities/StorageOperation';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Platform } from '../../../src/ts/Core/Constants/Platform';
 import { Backend } from '../../../src/ts/Backend/Backend';
-import { ICoreApi } from '../../../src/ts/Core/Core';
+import { ICoreApi } from '../../../src/ts/Core/ICore';
 
 class TestHelper {
     public static waitForPublicStorageBatch(storageBridge: StorageBridge): Promise<void> {

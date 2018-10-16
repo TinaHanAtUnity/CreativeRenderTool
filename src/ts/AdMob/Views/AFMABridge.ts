@@ -1,6 +1,6 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IntentData } from 'Core/Native/Android/Intent';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export interface IOpenableIntentsRequest {
     id: string;

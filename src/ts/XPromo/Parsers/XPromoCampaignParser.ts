@@ -8,7 +8,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export class XPromoCampaignParser extends CampaignParser {
 

@@ -6,7 +6,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from '../../TestHelpers/TestFixtures';
 import { Backend } from '../../../src/ts/Backend/Backend';
-import { ICoreApi } from '../../../src/ts/Core/Core';
+import { ICoreApi } from '../../../src/ts/Core/ICore';
 
 describe('BroadcastApi', () => {
     let backend: Backend;

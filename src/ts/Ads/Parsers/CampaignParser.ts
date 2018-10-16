@@ -5,7 +5,7 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { Platform } from 'Core/Constants/Platform';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 export abstract class CampaignParser {
     public abstract getContentTypes(): string[];

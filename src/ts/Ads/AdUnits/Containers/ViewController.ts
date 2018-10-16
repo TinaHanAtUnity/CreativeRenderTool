@@ -12,8 +12,8 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { Double } from 'Core/Utilities/Double';
-import { IAdsApi } from 'Ads/Ads';
-import { ICoreApi } from 'Core/Core';
+import { IAdsApi } from 'Ads/IAds';
+import { ICoreApi } from 'Core/ICore';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;

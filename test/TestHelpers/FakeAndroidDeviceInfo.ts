@@ -1,7 +1,7 @@
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 
 import AndroidDefaults from 'json/FakeAndroidDeviceInfo.json';
 

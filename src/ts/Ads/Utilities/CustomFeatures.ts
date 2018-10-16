@@ -1,4 +1,4 @@
-import { SmartCloseButtonTest, ABGroup } from 'Core/Models/ABGroup';
+import { ABGroup, SmartCloseButtonTest } from 'Core/Models/ABGroup';
 
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {

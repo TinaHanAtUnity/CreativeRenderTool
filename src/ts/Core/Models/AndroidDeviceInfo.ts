@@ -2,7 +2,7 @@ import { RingerMode } from 'Core/Constants/Android/RingerMode';
 import { StreamType } from 'Core/Constants/Android/StreamType';
 import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
 import { ISensorInfo, StorageType } from 'Core/Native/Android/DeviceInfo';
-import { ICoreApi } from 'Core/Core';
+import { ICoreApi } from 'Core/ICore';
 import { Platform } from '../Constants/Platform';
 
 export interface IAndroidDeviceInfo extends IDeviceInfo {

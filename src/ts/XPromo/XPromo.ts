@@ -1,21 +1,15 @@
-import { Ads, AdsModule } from '../Ads/Ads';
 import { IParserModule } from '../Ads/Modules/IParserModule';
 import { XPromoCampaignParser } from './Parsers/XPromoCampaignParser';
 import { XPromoAdUnitFactory } from './AdUnits/XPromoAdUnitFactory';
 
-export class XPromo extends AdsModule implements IParserModule {
+export class XPromo implements IParserModule {
 
     private readonly _parser: XPromoCampaignParser;
     private readonly _adUnitFactory: XPromoAdUnitFactory;
 
-    constructor(ads: Ads) {
-        super(ads);
+    constructor() {
         this._parser = new XPromoCampaignParser();
         this._adUnitFactory = new XPromoAdUnitFactory();
-    }
-
-    public initialize() {
-        this._initialized = true;
     }
 
     public canParse(contentType: string) {

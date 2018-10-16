@@ -14,8 +14,8 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { IAdsApi } from 'Ads/Ads';
-import { ICoreApi } from 'Core/Core';
+import { IAdsApi } from 'Ads/IAds';
+import { ICoreApi } from 'Core/ICore';
 import { ClickDelayTrackingTest } from 'Core/Models/ABGroup';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
