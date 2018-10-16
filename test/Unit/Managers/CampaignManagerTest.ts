@@ -234,7 +234,6 @@ describe('CampaignManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
         placementManager = sinon.createStubInstance(PlacementManager);
-        PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         backupCampaignManager = new BackupCampaignManager(nativeBridge, coreConfig);
     });
