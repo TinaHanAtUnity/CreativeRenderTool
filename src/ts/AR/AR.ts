@@ -1,5 +1,5 @@
 import { Ads, AdsModule } from 'Ads/Ads';
-import { IAPIModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { ARApi } from 'AR/Native/AR';
 import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
 import { IosARApi } from 'AR/Native/iOS/IosARApi';
@@ -15,7 +15,7 @@ export interface IARApi extends IModuleApi {
     };
 }
 
-export class AR extends AdsModule implements IAPIModule {
+export class AR extends AdsModule implements IApiModule {
 
     public readonly Api: IARApi;
 

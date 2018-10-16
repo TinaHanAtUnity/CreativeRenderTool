@@ -37,7 +37,7 @@ import { Overlay } from 'Ads/Views/Overlay';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { IAPIModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
@@ -90,7 +90,7 @@ export interface IAdsApi extends IModuleApi {
     };
 }
 
-export class Ads extends CoreModule implements IAPIModule {
+export class Ads extends CoreModule implements IApiModule {
 
     public readonly Api: IAdsApi;
 

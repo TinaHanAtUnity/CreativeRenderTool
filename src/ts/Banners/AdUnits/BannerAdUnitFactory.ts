@@ -14,7 +14,7 @@ export class BannerAdUnitFactory extends AbstractAdUnitFactory {
 
     public createAdUnit(parameters: IAdUnitParameters<BannerCampaign>): BannerAdUnit {
         if (parameters.campaign instanceof BannerCampaign) {
-            return this.createBannerAdUnit(<IAdUnitParameters<BannerCampaign>>parameters);
+            return this.createBannerAdUnit(parameters);
         } else {
             throw new Error('Unknown campaign instance type');
         }

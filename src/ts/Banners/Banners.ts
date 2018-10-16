@@ -4,7 +4,7 @@ import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
 import { BannerWebPlayerContainer } from 'Ads//Utilities/WebPlayer/BannerWebPlayerContainer';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
-import { IAPIModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { BannerApi } from 'Banners/Native/Banner';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { StorageBridge } from '../Core/Utilities/StorageBridge';
@@ -17,7 +17,7 @@ export interface IBannersApi extends IModuleApi {
     Listener: BannerListenerApi;
 }
 
-export class Banners extends AdsModule implements IAPIModule, IParserModule {
+export class Banners extends AdsModule implements IApiModule, IParserModule {
 
     public readonly Api: IBannersApi;
 

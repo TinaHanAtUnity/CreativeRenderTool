@@ -1,5 +1,5 @@
 import { Ads, AdsModule } from 'Ads/Ads';
-import { IAPIModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { PurchasingApi } from 'Promo/Native/Purchasing';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IParserModule } from '../Ads/Modules/IParserModule';
@@ -10,7 +10,7 @@ export interface IPromoApi extends IModuleApi {
     Purchasing: PurchasingApi;
 }
 
-export class Promo extends AdsModule implements IAPIModule, IParserModule {
+export class Promo extends AdsModule implements IApiModule, IParserModule {
 
     public readonly Api: IPromoApi;
 
