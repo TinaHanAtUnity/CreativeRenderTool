@@ -12,6 +12,7 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { IFileInfo } from 'Core/Native/Cache';
 import { MraidLoader } from 'MRAID/Parsers/MraidLoader';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export class BackupCampaignManager {
     private static _maxExpiryDelay: number = 7 * 24 * 3600 * 1000; // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
@@ -84,8 +85,19 @@ export class BackupCampaignManager {
                                     if(cached) {
                                         return campaign;
                                     } else {
+                                        Diagnostics.trigger('backup_campaign_not_cached', {
+                                            type: type,
+                                            data: data,
+                                            willExpireAt: willexpireat
+                                        });
                                         return undefined;
                                     }
+                                });
+                            } else {
+                                Diagnostics.trigger('backup_campaign_loading_failed', {
+                                    type: type,
+                                    data: data,
+                                    willExpireAt: willexpireat
                                 });
                             }
                         }

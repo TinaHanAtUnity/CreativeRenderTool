@@ -1,3 +1,8 @@
+# Tue Oct 16 12:43:43 UTC 2018
+
+* Minor optimizations to backup campaign implementation [#6676](https://github.com/Applifier/unity-ads-webview/pull/6676)
+* Enable Android back button on Closable video overlay for Cheetah [#6679](https://github.com/Applifier/unity-ads-webview/pull/6679)
+
 # Mon Oct 15 20:37:20 UTC 2018
 
 * AB Test various improvements to the endscreen layout v2 [#6674](https://github.com/Applifier/unity-ads-webview/pull/6674)
