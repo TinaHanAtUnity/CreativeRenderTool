@@ -20,9 +20,9 @@ describe('ConnectivityApi', () => {
     });
 
     it('should call Connectivity.setConnectionMonitoring on native bridge', () => {
-        core.Connectivity.setListeningStatus(true);
         const spy = sinon.spy(backend, 'handleInvocation');
-        sinon.assert.calledWith(spy, JSON.stringify([['Connectivity', 'setConnectionMonitoring', [true], '1']]));
+        core.Connectivity.setListeningStatus(true);
+        sinon.assert.calledWith(spy, JSON.stringify([['com.unity3d.services.core.api.Connectivity','setConnectionMonitoring',[true],'1']]));
     });
 
     it('should trigger onConnected', () => {
