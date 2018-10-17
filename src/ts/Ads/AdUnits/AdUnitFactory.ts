@@ -147,7 +147,7 @@ export class AdUnitFactory {
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
-        let performanceOverlayEventHandler;
+        let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
 
         if (overlay instanceof PerformanceVideoOverlayWithCTAButton) {
             performanceOverlayEventHandler = new PerformanceOverlayWithCTAButtonEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
