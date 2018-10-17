@@ -8,7 +8,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { FinishState } from 'Core/Constants/FinishState';
-import { ProductInfo } from 'Models/Promo/ProductInfo';
+import { ProductInfo } from 'Promo/Models/ProductInfo';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 

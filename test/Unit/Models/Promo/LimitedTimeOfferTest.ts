@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { LimitedTimeOffer, ILimitedTimeOfferData } from 'Models/Promo/LimitedTimeOffer';
+import { LimitedTimeOffer, ILimitedTimeOfferData } from 'Promo/Models/LimitedTimeOffer';
 
 describe('LimitedTimeOffer', () => {
     describe('isExpired', () => {
