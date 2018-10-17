@@ -7,8 +7,8 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { IPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { LimitedTimeOffer, ILimitedTimeOfferData } from 'Models/Promo/LimitedTimeOffer';
-import { ProductInfo, ProductInfoType, IProductInfo } from 'Models/Promo/ProductInfo';
+import { LimitedTimeOffer, ILimitedTimeOfferData } from 'Promo/Models/LimitedTimeOffer';
+import { ProductInfo, ProductInfoType, IProductInfo } from 'Promo/Models/ProductInfo';
 
 export class PromoCampaignParser extends CampaignParser {
     public static ContentType = 'purchasing/iap';
