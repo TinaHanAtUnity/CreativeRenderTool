@@ -91,6 +91,8 @@ import { ProgrammaticVastParser } from '../../src/ts/VAST/Parsers/ProgrammaticVa
 import { ProgrammaticVPAIDParser } from '../../src/ts/VPAID/Parsers/ProgrammaticVPAIDParser';
 import { ProgrammaticStaticInterstitialParser } from '../../src/ts/Display/Parsers/ProgrammaticStaticInterstitialParser';
 import { ProductInfo, IProductInfo, ProductInfoType } from 'Promo/Models/ProductInfo';
+import { IAnalyticsApi } from '../../src/ts/Analytics/IAnalytics';
+import { AnalyticsApi } from '../../src/ts/Analytics/Native/Analytics';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -607,6 +609,12 @@ export class TestFixtures {
                 AdUnit: new IosAdUnitApi(nativeBridge),
                 VideoPlayer: new IosVideoPlayerApi(nativeBridge)
             } : undefined
+        };
+    }
+
+    public static getAnalyticsApi(nativeBridge: NativeBridge): IAnalyticsApi {
+        return {
+            Analytics: new AnalyticsApi(nativeBridge)
         };
     }
 
