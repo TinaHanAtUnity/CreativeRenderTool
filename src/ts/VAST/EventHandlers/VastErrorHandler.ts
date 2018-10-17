@@ -1,3 +1,5 @@
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Request, INativeResponse } from 'Core/Utilities/Request';
 
 // VAST Error code defined in 3.0
 // https://wiki.iabtechlab.com/index.php?title=VAST_Error_Code_Troubleshooting_Matrix
@@ -58,5 +60,23 @@ export class VastErrorHandler {
             formattedUrl.replace(/[ASSETURI]/, assetUrl);
         }
         return formattedUrl;
+    }
+
+    public static sendVastErrorEventThirdParty(thirdPartyEventManager: ThirdPartyEventManager, sessionId: string, errorUrl: string, errorCode?: VastErrorCode, assetUrl?: string): Promise<INativeResponse> {
+        if (!errorCode) {
+            errorCode = VastErrorCode.UNDEFINED_ERROR;
+        }
+        const eventName = 'VAST error code ' + errorCode + ' tracking';
+        const vastErrorUrl = VastErrorHandler.formatVASTErrorURL(errorUrl, errorCode, assetUrl);
+        return thirdPartyEventManager.sendWithGet(eventName, sessionId, vastErrorUrl);
+    }
+
+    public static sendVastErrorEventRequest(request: Request, errorUrl: string, errorCode?: VastErrorCode, assetUrl?: string): Promise<INativeResponse> {
+        if (!errorCode) {
+            errorCode = VastErrorCode.UNDEFINED_ERROR;
+        }
+        const vastErrorUrl = VastErrorHandler.formatVASTErrorURL(errorUrl, errorCode, assetUrl);
+
+        return request.get(vastErrorUrl, []);
     }
 }

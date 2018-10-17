@@ -501,12 +501,13 @@ describe('CampaignManager', () => {
                 assert.equal(triggeredError.message, expectedErrorMessage);
             });
         };
-
+// tslint:disable:no-console
         const verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, done?: () => void): void => {
             // given a VAST placement that wraps another VAST
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
             mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
+            mockRequest.expects('get').withArgs('http://my401rrorURL/error', []).returns(Promise.resolve());
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
@@ -514,6 +515,7 @@ describe('CampaignManager', () => {
             const verify = () => {
                 // then the onError observable is triggered with an appropriate error
                 mockRequest.verify();
+                console.log('verify Wrapped response');
                 if(triggeredError instanceof Error) {
                     assert.equal(triggeredError.message, expectedErrorMessage);
                 } else if (triggeredError instanceof WebViewError) {
@@ -524,6 +526,7 @@ describe('CampaignManager', () => {
             };
 
             campaignManager.onError.subscribe((error: WebViewError) => {
+                console.log('verify Wrapped response error ' + error.message);
                 triggeredError = error;
                 if (done) {
                     // then the onError observable is triggered with an appropriate error

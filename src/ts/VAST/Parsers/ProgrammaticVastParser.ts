@@ -11,7 +11,9 @@ import { Request } from 'Core/Utilities/Request';
 import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
-
+import { VastErrorHandler, VastErrorCode, VastErrorMessage } from 'VAST/EventHandlers/VastErrorHandler';
+import { Url } from 'Core/Utilities/Url';
+// tslint:disable:no-console
 export class ProgrammaticVastParser extends CampaignParser {
     public static ContentType = 'programmatic/vast';
     public static setVastParserMaxDepth(depth: number): void {
@@ -31,11 +33,11 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         return this._vastParser.retrieveVast(decodedVast, nativeBridge, request).then((vast): Promise<Campaign> => {
             const campaignId = this.getProgrammaticCampaignId(nativeBridge);
-            return this.parseVastToCampaign(vast, nativeBridge, campaignId, session, response);
+            return this.parseVastToCampaign(vast, nativeBridge, request, campaignId, session, response);
         });
     }
 
-    protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, campaignId: string, session: Session, response: AuctionResponse): Promise<Campaign> {
+    protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, request: Request, campaignId: string, session: Session, response: AuctionResponse): Promise<Campaign> {
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
@@ -49,7 +51,7 @@ export class ProgrammaticVastParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId()
         };
-
+        console.log('parseVastToCampaign ----- ');
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
         if(portraitUrl) {
@@ -62,10 +64,43 @@ export class ProgrammaticVastParser extends CampaignParser {
             landscapeAsset = new Image(this.validateAndEncodeUrl(landscapeUrl, session), session);
         }
 
+        const vastErrorTrackingUrl = vast.getErrorURLTemplate();
+        let mediaVideoUrl = vast.getMediaVideoUrl();
+        console.log('parseVastToCampaign ----- mediaVideoUrl ' + mediaVideoUrl);
+        if (!mediaVideoUrl) {
+            if (vastErrorTrackingUrl) {
+                VastErrorHandler.sendVastErrorEventRequest(request, vastErrorTrackingUrl, VastErrorCode.MEDIA_FILE_NOT_FOUND);
+            }
+            console.log('parseVastToCampaign ----- media file not found error!!! vastErrorUrl ' + vastErrorTrackingUrl);
+            throw new Error(VastErrorMessage.MEDIA_FILE_NOT_FOUND);
+        }
+        console.log('parseVastToCampaign ----- ongoing');
+        if (nativeBridge.getPlatform() === Platform.IOS && !mediaVideoUrl.match(/^https:\/\//)) {
+            if (vastErrorTrackingUrl) {
+                VastErrorHandler.sendVastErrorEventRequest(request, vastErrorTrackingUrl, VastErrorCode.MEDIA_FILE_PLAY_ERROR);
+            }
+
+            const videoUrlError = new DiagnosticError(
+                new Error('Campaign video url needs to be https for iOS'),
+                { rootWrapperVast: response.getContent() }
+            );
+            throw videoUrlError;
+        }
+
+        if (!Url.isValid(mediaVideoUrl)) {
+            if (vastErrorTrackingUrl) {
+                VastErrorHandler.sendVastErrorEventRequest(request, vastErrorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED);
+            }
+
+            throw new Error('Invalid Url in VAST Media url');
+        }
+
+        mediaVideoUrl = Url.encode(mediaVideoUrl);
+
         const vastCampaignParms: IVastCampaign = {
             ... baseCampaignParams,
             vast: vast,
-            video: new Video(this.validateAndEncodeUrl(vast.getVideoUrl(), session), session),
+            video: new Video(mediaVideoUrl, session),
             hasEndscreen: !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(),
             portrait: portraitAsset,
             landscape: landscapeAsset,
@@ -86,20 +121,6 @@ export class ProgrammaticVastParser extends CampaignParser {
             throw new Error('Campaign does not have an impression url');
         }
 
-        if(!campaign.getVideo().getUrl()) {
-            const videoUrlError = new DiagnosticError(
-                new Error('Campaign does not have a video url'),
-                {rootWrapperVast: response.getContent()}
-            );
-            throw videoUrlError;
-        }
-        if(nativeBridge.getPlatform() === Platform.IOS && !campaign.getVideo().getUrl().match(/^https:\/\//)) {
-            const videoUrlError = new DiagnosticError(
-                new Error('Campaign video url needs to be https for iOS'),
-                {rootWrapperVast: response.getContent()}
-            );
-            throw videoUrlError;
-        }
         return Promise.resolve(campaign);
     }
 }

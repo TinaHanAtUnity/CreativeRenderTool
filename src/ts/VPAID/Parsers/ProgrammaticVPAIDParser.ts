@@ -51,7 +51,7 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
 
                 return Promise.resolve(new VPAIDCampaign(vpaidCampaignParams));
             } else {
-                return this.parseVastToCampaign(vast, nativeBridge, campaignId, session, response);
+                return this.parseVastToCampaign(vast, nativeBridge, request, campaignId, session, response);
             }
         });
     }
