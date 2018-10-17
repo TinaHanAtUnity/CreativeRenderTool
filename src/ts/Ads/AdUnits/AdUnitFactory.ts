@@ -22,8 +22,8 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { Closer } from 'Ads/Views/Closer';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
+import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
 import { StreamType } from 'Core/Constants/Android/StreamType';
@@ -58,7 +58,7 @@ import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEvent
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDEndScreenEventHandler } from 'VPAID/EventHandlers/VPAIDEndScreenEventHandler';
 import { VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
@@ -215,7 +215,6 @@ export class AdUnitFactory {
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
                 endScreenEventHandler.onKeyEvent(keyCode);
-
                 if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
                     xPromoOverlayEventHandler.onKeyEvent(keyCode);
                 }
@@ -272,11 +271,11 @@ export class AdUnitFactory {
             if (nativeBridge.getPlatform() === Platform.ANDROID) {
                 const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) =>  {
                     vastEndScreenHandler.onKeyEvent(keyCode);
-
                     if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
                         vastOverlayHandler.onKeyEvent(keyCode);
                     }
                 });
+
                 vastAdUnit.onClose.subscribe(() => {
                     nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
                 });
@@ -403,8 +402,8 @@ export class AdUnitFactory {
         document.body.appendChild(promoView.container());
 
         promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.adsConfig, parameters.gdprManager));
-        promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.coreConfig.getToken(), parameters.clientInfo.getGameId(), parameters.coreConfig.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.adsConfig.isOptOutEnabled()));
-        promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
+        promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.campaign, parameters.placement.getId()));
+        promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromoClick(promoAdUnit, parameters.campaign, parameters.placement.getId()));
         Privacy.setupReportListener(privacy, promoAdUnit);
 
         return promoAdUnit;
