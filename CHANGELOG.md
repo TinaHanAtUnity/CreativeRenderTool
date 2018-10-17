@@ -5,6 +5,7 @@
 * Switch AB groups for the Improved endscreen styles test [#6728](https://github.com/Applifier/unity-ads-webview/pull/6726)
 * Move Promo models to Promo Module [#6728](https://github.com/Applifier/unity-ads-webview/pull/6728)
 * Allow streaming of backup campaigns [#6727](https://github.com/Applifier/unity-ads-webview/pull/6727)
+* Update promo parse to use IAP Product ID as a fallback [#6730](https://github.com/Applifier/unity-ads-webview/pull/6730)
 
 # Wed Oct 17 18:20:47 UTC 2018
 
@@ -28,7 +29,6 @@
 * Show target information in Non-GDPR Privacy Dialog [#6646](https://github.com/Applifier/unity-ads-webview/pull/6646)
 * Add error throwing when API is missing in browser build [#6604](https://github.com/Applifier/unity-ads-webview/pull/6604)
 * Add isCached checking support for Admob Campaigns [#6652](https://github.com/Applifier/unity-ads-webview/pull/6652)
-
 
 # Wed Oct 10 17:36:31 UTC 2018
 
