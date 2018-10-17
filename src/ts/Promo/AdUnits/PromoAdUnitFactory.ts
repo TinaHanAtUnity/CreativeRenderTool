@@ -23,8 +23,7 @@ export class PromoAdUnitFactory extends AbstractAdUnitFactory {
         document.body.appendChild(promoView.container());
 
         promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.adsConfig, parameters.gdprManager));
-        promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.coreConfig.getToken(), parameters.clientInfo.getGameId(), parameters.coreConfig.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.adsConfig.isOptOutEnabled()));
-        promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
+        promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.campaign, parameters.placement.getId()));
         Privacy.setupReportListener(privacy, promoAdUnit);
 
         return promoAdUnit;

@@ -9,7 +9,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -21,6 +20,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { IAdsApi } from 'Ads/IAds';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { BannerCampaign } from '../Models/BannerCampaign';
+import { AnalyticsManager } from '../../Analytics/AnalyticsManager';
 
 export class BannerAdUnitParametersFactory {
 
@@ -41,6 +41,7 @@ export class BannerAdUnitParametersFactory {
     private _gdprManager: GdprManager;
     private _programmaticTrackingService: ProgrammaticTrackingService;
     private _storageBridge: StorageBridge;
+    private _analyticsManager: AnalyticsManager;
 
     constructor(platform: Platform, core: ICoreApi, ads: IAdsApi, request: RequestManager, metadataManager: MetaDataManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, analyticsManager: AnalyticsManager, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer, programmaticTrackingService: ProgrammaticTrackingService, storageBridge: StorageBridge) {
         this._platform = platform;
@@ -59,6 +60,7 @@ export class BannerAdUnitParametersFactory {
         this._webPlayerContainer = webPlayerContainer;
         this._programmaticTrackingService = programmaticTrackingService;
         this._storageBridge = storageBridge;
+        this._analyticsManager = analyticsManager;
     }
 
     public create(campaign: BannerCampaign, placement: Placement, options: any): Promise<IAdUnitParameters<BannerCampaign>> {

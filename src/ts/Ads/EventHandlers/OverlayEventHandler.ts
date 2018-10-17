@@ -11,6 +11,7 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { Double } from 'Core/Utilities/Double';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { IAdsApi } from 'Ads/IAds';
+import { KeyCode } from 'Core/Constants/Android/KeyCode';
 
 export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler implements IOverlayHandler {
     protected _placement: Placement;
@@ -68,6 +69,26 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
 
         this._adUnit.onFinish.trigger();
         this._adUnit.hide();
+    }
+
+    public onKeyEvent(keyCode: number): void {
+        if(keyCode === KeyCode.BACK && this.canSkipVideo()) {
+            if(!this._placement.skipEndCardOnClose()) {
+                this.onOverlaySkip(this._adUnit.getVideo().getPosition());
+            } else {
+                this.onOverlayClose();
+            }
+        }
+    }
+
+    private canSkipVideo(): boolean {
+        if(!this._placement.allowSkip() || !this._adUnit.isShowing() || !this._adUnit.canPlayVideo()) {
+            return false;
+        }
+
+        const position = this._adUnit.getVideo().getPosition();
+        const allowSkipInMs = this._placement.allowSkipInSeconds() * 1000;
+        return position >= allowSkipInMs;
     }
 
     private getVideoOrientation(): string | undefined {

@@ -206,7 +206,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         this._clickEventHasBeenSent = true;
 
         for (const trackingUrl of this._campaign.getTrackingUrlsForEvent('click')) {
-            this._thirdPartyEventManager.sendEvent('display click', this._campaign.getSession().getId(), trackingUrl);
+            this._thirdPartyEventManager.sendWithGet('display click', this._campaign.getSession().getId(), trackingUrl);
         }
     }
 
@@ -254,7 +254,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
 
     private sendStartEvents(): void {
         for (const url of (this._campaign).getTrackingUrlsForEvent('impression')) {
-            this._thirdPartyEventManager.sendEvent('display impression', this._campaign.getSession().getId(), url);
+            this._thirdPartyEventManager.sendWithGet('display impression', this._campaign.getSession().getId(), url);
         }
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();

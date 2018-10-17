@@ -150,7 +150,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
         this.choosePrivacyShown();
 
-        if(CustomFeatures.isCloseIconSkipApp(this._gameId)) {
+        if(CustomFeatures.isCheetahGame(this._gameId)) {
             const skipIconElement = <HTMLElement>this._container.querySelector('.skip');
             skipIconElement.classList.add('close-icon-skip');
         }

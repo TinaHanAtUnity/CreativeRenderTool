@@ -72,7 +72,7 @@ describe('BannerAdUnit', () => {
 
         clientInfo = TestFixtures.getClientInfo();
         thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
-        asStub(thirdPartyEventManager.sendEvent).resolves();
+        asStub(thirdPartyEventManager.sendWithGet).resolves();
 
         webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
         (<any>webPlayerContainer).onPageFinished = new Observable1();

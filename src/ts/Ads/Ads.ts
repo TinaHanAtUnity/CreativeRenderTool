@@ -128,7 +128,7 @@ export class Ads implements IAds {
         };
 
         this.AdMobSignalFactory = new AdMobSignalFactory(this._core.NativeBridge.getPlatform(), this._core.Api, this.Api, this._core.ClientInfo, this._core.DeviceInfo, this._core.FocusManager);
-        this.InterstitialWebPlayerContainer = new InterstitialWebPlayerContainer(this.Api);
+        this.InterstitialWebPlayerContainer = new InterstitialWebPlayerContainer(this._core.NativeBridge.getPlatform(), this.Api);
         if(this._core.NativeBridge.getPlatform() === Platform.ANDROID) {
             document.body.classList.add('android');
             this.Container = new Activity(this._core.Api, this.Api, <AndroidDeviceInfo>this._core.DeviceInfo);

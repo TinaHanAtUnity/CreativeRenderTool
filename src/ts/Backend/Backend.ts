@@ -15,10 +15,14 @@ import { Sdk } from 'Backend/Api/Sdk';
 import { Storage } from 'Backend/Api/Storage';
 import { UrlScheme } from 'Backend/Api/UrlScheme';
 import { VideoPlayer } from 'Backend/Api/VideoPlayer';
+import { Analytics } from 'Backend/Api/Analytics';
 import { Platform } from 'Core/Constants/Platform';
 import { CallbackStatus, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { BackendApi } from './BackendApi';
 import { Resolve } from './Api/Resolve';
+import { MonetizationListener } from 'Backend/Api/MonetizationListener';
+import { CustomPurchasing } from 'Backend/Api/CustomPurchasing';
+import { PlacementContents } from 'Backend/Api/PlacementContents';
 
 interface IInvocation {
     className: string;
@@ -66,16 +70,20 @@ export class Backend implements IWebViewBridge {
 
         this.Api = {
             AdUnit: new AdUnit(this),
+            Analytics: new Analytics(this),
             AppSheet: new AppSheet(this),
             Broadcast: new Broadcast(this),
             Cache: new Cache(this),
             Connectivity: new Connectivity(this),
+            CustomPurchasing: new CustomPurchasing(this),
             DeviceInfo: new DeviceInfo(this),
             Intent: new Intent(this),
             Lifecycle: new Lifecycle(this),
             Listener: new Listener(this),
+            MonetizationListener: new MonetizationListener(this),
             Notification: new Notification(this),
             Placement: new Placement(this),
+            PlacementContents: new PlacementContents(this),
             Purchasing: new Purchasing(this),
             Request: new Request(this),
             Resolve: new Resolve(this),

@@ -33,6 +33,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { KeyCode } from 'Core/Constants/Android/KeyCode';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -104,7 +105,7 @@ describe('OverlayEventHandlerTest', () => {
             targetGameName: campaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, campaign);
-        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
+        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false, true);
         placement = TestFixtures.getPlacement();
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
@@ -195,4 +196,61 @@ describe('OverlayEventHandlerTest', () => {
         });
     });
 
+    describe('When calling onKeyCode', () => {
+        beforeEach(() => {
+            sinon.spy(overlayEventHandler, 'onOverlaySkip');
+            sinon.spy(overlayEventHandler, 'onOverlayClose');
+            sinon.stub(placement, 'allowSkipInSeconds').returns(3);
+            sinon.stub(performanceAdUnit, 'isShowing').returns(true);
+            sinon.stub(performanceAdUnit, 'canPlayVideo').returns(true);
+
+        });
+
+        it('should call onOverlaySkip if video is playing and skipping is allowed', () => {
+            sinon.stub(placement, 'allowSkip').returns(true);
+            sinon.stub(video, 'getPosition').returns(3001);
+
+            overlayEventHandler.onKeyEvent(KeyCode.BACK);
+
+            sinon.assert.called(<sinon.SinonSpy>overlayEventHandler.onOverlaySkip);
+        });
+
+        it('should not call onOverlaySkip if progress < allowSkipInSeconds', () => {
+            sinon.stub(placement, 'allowSkip').returns(true);
+            sinon.stub(video, 'getPosition').returns(2900);
+
+            overlayEventHandler.onKeyEvent(KeyCode.BACK);
+
+            sinon.assert.notCalled(<sinon.SinonSpy>overlayEventHandler.onOverlaySkip);
+        });
+
+        it('should not call onOverlaySkip if the key code is wrong', () => {
+            sinon.stub(placement, 'allowSkip').returns(true);
+            sinon.stub(video, 'getPosition').returns(3001);
+
+            overlayEventHandler.onKeyEvent(3);
+
+            sinon.assert.notCalled(<sinon.SinonSpy>overlayEventHandler.onOverlaySkip);
+        });
+
+        it('should not call onOverlaySkip if skipping is not allowed', () => {
+            sinon.stub(placement, 'allowSkip').returns(false);
+            sinon.stub(video, 'getPosition').returns(3001);
+
+            overlayEventHandler.onKeyEvent(KeyCode.BACK);
+
+            sinon.assert.notCalled(<sinon.SinonSpy>overlayEventHandler.onOverlaySkip);
+        });
+
+        it('should call onOverlayClose if skipEndCardOnClose is enabled', () => {
+            sinon.stub(placement, 'allowSkip').returns(true);
+            sinon.stub(video, 'getPosition').returns(3001);
+            sinon.stub(placement, 'skipEndCardOnClose').returns(true);
+
+            overlayEventHandler.onKeyEvent(KeyCode.BACK);
+
+            sinon.assert.called(<sinon.SinonSpy>overlayEventHandler.onOverlayClose);
+            sinon.assert.notCalled(<sinon.SinonSpy>overlayEventHandler.onOverlaySkip);
+        });
+    });
 });

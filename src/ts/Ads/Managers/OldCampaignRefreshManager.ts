@@ -22,6 +22,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { IAdsApi } from 'Ads/IAds';
 import { ICoreApi } from 'Core/ICore';
@@ -105,6 +106,13 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
     }
 
+    public subscribeNativePromoEvents(eventHandler : NativePromoEventHandler): void {
+        eventHandler.onClose.subscribe(() => {
+            this._needsRefill = true;
+            this.refresh();
+        });
+    }
+
     public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
         if(this.shouldRefill(this._refillTimestamp)) {
             this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
@@ -143,7 +151,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this.invalidateCampaigns(false, this._configuration.getPlacementIds());
         this._campaignCount = 0;
 
-        const promises = [];
+        const promises = [this._campaignManager.request()];
 
         const placements = this._configuration.getPlacements();
         for(const placement in this._configuration.getPlacements()) {
@@ -157,7 +165,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         }
 
         return Promise.all(promises).then(() => {
-            return this._campaignManager.request();
+            return Promise.resolve(); // todo: this is silly type hack to make different A/B tested implementations compatible. types should be fixed once A/B testing is over.
         });
     }
 
@@ -226,6 +234,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     private onCampaign(placementId: string, campaign: Campaign) {
+        PurchasingUtilities.addCampaignPlacementIds(placementId, campaign);
         this._parsingErrorCount = 0;
         const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
         const isMixedPlacementExperiment = CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId());

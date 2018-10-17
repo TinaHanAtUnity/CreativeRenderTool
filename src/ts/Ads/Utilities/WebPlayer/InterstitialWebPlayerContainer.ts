@@ -1,9 +1,10 @@
 import { WebPlayerViewId } from 'Ads/Native/WebPlayer';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { IAdsApi } from 'Ads/IAds';
+import { Platform } from '../../../Core/Constants/Platform';
 
 export class InterstitialWebPlayerContainer extends WebPlayerContainer {
-    constructor(ads: IAdsApi) {
-        super(ads, WebPlayerViewId.WebPlayer);
+    constructor(platform: Platform, ads: IAdsApi) {
+        super(platform, ads, WebPlayerViewId.WebPlayer);
     }
 }

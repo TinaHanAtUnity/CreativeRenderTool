@@ -139,7 +139,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             }
         }
 
-        if(CustomFeatures.isCloseIconSkipApp(this._gameId)) {
+        if(CustomFeatures.isCheetahGame(this._gameId)) {
             this._skipButtonElement.classList.add('close-icon-skip');
         }
     }

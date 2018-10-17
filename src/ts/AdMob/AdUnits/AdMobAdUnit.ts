@@ -139,7 +139,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public sendTrackingEvent(event: string) {
         const urls = this._campaign.getTrackingUrlsForEvent(event);
         for (const url of urls) {
-            this._thirdPartyEventManager.sendEvent(`admob ${event}`, this._campaign.getSession().getId(), url);
+            this._thirdPartyEventManager.sendWithGet(`admob ${event}`, this._campaign.getSession().getId(), url);
         }
     }
 

@@ -9,11 +9,30 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { ICoreApi } from 'Core/ICore';
 
+enum ThirdPartyEventMethod {
+    POST,
+    GET
+}
 export class ThirdPartyEventManager {
 
     private _core: ICoreApi;
     private _request: RequestManager;
     private _templateValues: { [id: string]: string } = {};
+
+    public static replaceUrlTemplateValues(urls: string[], templateValues: { [id: string]: string }): string[] {
+        const modifiedUrls: string[] = [];
+        for (const url of urls) {
+            if(url) {
+                for(const key in templateValues) {
+                    if(templateValues.hasOwnProperty(key)) {
+                        const modifiedUrl = url.replace(key, templateValues[key]);
+                        modifiedUrls.push(modifiedUrl);
+                    }
+                }
+            }
+        }
+        return modifiedUrls;
+    }
 
     constructor(core: ICoreApi, request: RequestManager, templateValues?: { [id: string]: string }) {
         this._core = core;
@@ -37,7 +56,15 @@ export class ThirdPartyEventManager {
         });
     }
 
-    public sendEvent(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
+    public sendWithPost(event: string, sessionId: string, url: string, body?: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
+        return this.sendEvent(ThirdPartyEventMethod.POST, event, sessionId, url, body, useWebViewUserAgentForTracking, headers);
+    }
+
+    public sendWithGet(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
+        return this.sendEvent(ThirdPartyEventMethod.GET, event, sessionId, url, undefined, useWebViewUserAgentForTracking, headers);
+    }
+
+    private sendEvent(method: ThirdPartyEventMethod, event: string, sessionId: string, url: string, body?: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
         headers = headers || [];
         if (!RequestManager.getHeader(headers, 'User-Agent')) {
             if (typeof navigator !== 'undefined' && navigator.userAgent && useWebViewUserAgentForTracking === true) {
@@ -48,12 +75,22 @@ export class ThirdPartyEventManager {
         url = this.getUrl(url);
 
         this._core.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
-        return this._request.get(url, headers, {
+        const options = {
             retries: 0,
             retryDelay: 0,
             followRedirects: true,
             retryWithConnectionEvents: false
-        }).catch(error => {
+        };
+        let request: Promise<INativeResponse>;
+        switch(method) {
+            case ThirdPartyEventMethod.POST:
+                request = this._request.post(url, body, headers, options);
+                break;
+            case ThirdPartyEventMethod.GET:
+            default:
+                request = this._request.get(url, headers, options);
+        }
+        return request.catch(error => {
             const urlParts = Url.parse(url);
             if(error instanceof RequestError) {
                 error = new DiagnosticError(new Error(error.message), {
@@ -85,7 +122,7 @@ export class ThirdPartyEventManager {
             if (urls && urls[event] && Object.keys(urls[event]).length !== 0) {
                 for (const eventUrl of urls[event]) {
                     if (eventUrl) {
-                        this.sendEvent(event, campaign.getSession().getId(), eventUrl);
+                        this.sendWithGet(event, campaign.getSession().getId(), eventUrl);
                     } else {
                         const error = {
                             eventUrl: eventUrl,
@@ -104,7 +141,6 @@ export class ThirdPartyEventManager {
             for(const key in this._templateValues) {
                 if(this._templateValues.hasOwnProperty(key)) {
                     url = url.replace(key, this._templateValues[key]);
-
                 }
             }
         }

@@ -6,6 +6,9 @@ import { PromoCampaignParser } from './Parsers/PromoCampaignParser';
 import { PromoAdUnitFactory } from './AdUnits/PromoAdUnitFactory';
 import { IAds } from '../Ads/IAds';
 import { ICore } from '../Core/ICore';
+import { IPurchasing } from '../Purchasing/IPurchasing';
+import { PromoEvents } from './Utilities/PromoEvents';
+import { IAnalytics } from '../Analytics/IAnalytics';
 
 export interface IPromoApi extends IModuleApi {
     Purchasing: PurchasingApi;
@@ -15,13 +18,15 @@ export class Promo implements IParserModule, IApiModule {
 
     public readonly Api: IPromoApi;
 
+    public readonly PromoEvents: PromoEvents;
+
     private readonly _core: ICore;
     private readonly _ads: IAds;
 
     private readonly _parser: PromoCampaignParser;
     private readonly _adUnitFactory: PromoAdUnitFactory;
 
-    constructor(core: ICore, ads: IAds) {
+    constructor(core: ICore, ads: IAds, purchasing: IPurchasing, analytics: IAnalytics) {
         this._core = core;
         this._ads = ads;
 
@@ -29,10 +34,8 @@ export class Promo implements IParserModule, IApiModule {
             Purchasing: new PurchasingApi(this._core.NativeBridge)
         };
 
-        PurchasingUtilities.initialize(this._core.Api, this.Api, this._core.ClientInfo, this._core.Config, this._ads.Config, this._ads.PlacementManager);
-        PurchasingUtilities.sendPurchaseInitializationEvent();
-        this.Api.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(iapPayload));
-
+        this.PromoEvents = new PromoEvents(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ClientInfo, core.DeviceInfo);
+        PurchasingUtilities.initialize(this._core.Api, this.Api, purchasing.Api, this._core.ClientInfo, this._core.Config, this._ads.Config, this._ads.PlacementManager, this._ads.CampaignManager, this.PromoEvents, core.RequestManager, analytics.AnalyticsManager);
     }
 
     public canParse(contentType: string) {

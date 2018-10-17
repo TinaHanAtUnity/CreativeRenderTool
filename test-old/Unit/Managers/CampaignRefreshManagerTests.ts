@@ -204,7 +204,6 @@ describe('CampaignRefreshManager', () => {
 
         storageBridge = new StorageBridge(nativeBridge);
         placementManager = sinon.createStubInstance(PlacementManager);
-        PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);

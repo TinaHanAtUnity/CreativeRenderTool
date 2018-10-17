@@ -31,7 +31,11 @@ export class CampaignAssetInfo {
                 return true;
             }
         } else if(campaign instanceof PromoCampaign) {
-            return campaign.getCreativeResource().isCached();
+            const resource = campaign.getCreativeResource();
+            if (resource) {
+                return resource.isCached();
+            }
+            return true;
         } else if(campaign instanceof AdMobCampaign || campaign instanceof CachedAdMobCampaign) {
             const video = campaign.getVideo();
             if (video && video.getVideo() && video.getVideo().isCached()) {

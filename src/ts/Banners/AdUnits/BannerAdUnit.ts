@@ -149,7 +149,7 @@ export class BannerAdUnit extends AbstractAdUnit {
         for (let url of urls) {
             url = url.replace(/%ZONE%/, placementId);
             url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-            this._thirdPartyEventManager.sendEvent(`banner ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
+            this._thirdPartyEventManager.sendWithGet(`banner ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
         }
     }
 

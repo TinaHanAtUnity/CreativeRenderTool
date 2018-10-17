@@ -38,7 +38,7 @@ export class Banners implements IApiModule, IParserModule {
         bannerPlacementManager.sendBannersReady();
 
         const bannerCampaignManager = new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, ads.AssetManager, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager);
-        const bannerWebPlayerContainer = new BannerWebPlayerContainer(ads.Api);
+        const bannerWebPlayerContainer = new BannerWebPlayerContainer(core.NativeBridge.getPlatform(), ads.Api);
         const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(core.NativeBridge.getPlatform(), core.Api, ads.Api, core.RequestManager, core.MetaDataManager, core.Config, ads.Config, ads.Container, core.DeviceInfo, core.ClientInfo, ads.SessionManager, core.FocusManager, analytics.AnalyticsManager, ads.AdMobSignalFactory, ads.GdprManager, bannerWebPlayerContainer, ads.ProgrammaticTrackingService, core.StorageBridge);
         this.BannerAdContext = new BannerAdContext(this.Api, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, core.FocusManager, core.DeviceInfo);
     }

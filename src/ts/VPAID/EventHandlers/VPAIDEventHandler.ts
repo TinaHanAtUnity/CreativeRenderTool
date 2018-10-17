@@ -83,7 +83,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         if (companion) {
             const urls = companion.getEventTrackingUrls('creativeView');
             for (const url of urls) {
-                this._thirdPartyEventManager.sendEvent('vpaid companion creativeView', sessionId, url);
+                this._thirdPartyEventManager.sendWithGet('vpaid companion creativeView', sessionId, url);
             }
         }
     }
@@ -228,7 +228,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         const sessionId = this._vpaidCampaign.getSession().getId();
 
         for (const url of urls) {
-            this._thirdPartyEventManager.sendEvent('vpaid video click', sessionId, url);
+            this._thirdPartyEventManager.sendWithGet('vpaid video click', sessionId, url);
         }
     }
 

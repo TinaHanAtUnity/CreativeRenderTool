@@ -225,7 +225,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
             if(trackingEventUrls) {
                 for (const url of trackingEventUrls) {
-                    this._thirdPartyEventManager.sendEvent(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
+                    this._thirdPartyEventManager.sendWithGet(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
                 }
             }
         }

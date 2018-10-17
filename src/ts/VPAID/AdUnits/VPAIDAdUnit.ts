@@ -119,7 +119,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         const sessionId = this._vpaidCampaign.getSession().getId();
 
         for (const url of urls) {
-            this._thirdPartyEventManager.sendEvent(`vpaid ${eventType}`, sessionId, url);
+            this._thirdPartyEventManager.sendWithGet(`vpaid ${eventType}`, sessionId, url);
         }
     }
 
@@ -128,7 +128,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         const sessionId = this._vpaidCampaign.getSession().getId();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
-                this._thirdPartyEventManager.sendEvent('vpaid impression', sessionId, impressionUrl);
+                this._thirdPartyEventManager.sendWithGet('vpaid impression', sessionId, impressionUrl);
             }
         }
     }
