@@ -64,22 +64,15 @@ export class ProgrammaticVastParser extends CampaignParser {
             landscapeAsset = new Image(this.validateAndEncodeUrl(landscapeUrl, session), session);
         }
 
-        const vastErrorTrackingUrl = vast.getErrorURLTemplate();
         let mediaVideoUrl = vast.getMediaVideoUrl();
         console.log('parseVastToCampaign ----- mediaVideoUrl ' + mediaVideoUrl);
         if (!mediaVideoUrl) {
-            if (vastErrorTrackingUrl) {
-                VastErrorHandler.sendVastErrorEventRequest(request, vastErrorTrackingUrl, VastErrorCode.MEDIA_FILE_NOT_FOUND);
-            }
-            console.log('parseVastToCampaign ----- media file not found error!!! vastErrorUrl ' + vastErrorTrackingUrl);
+            VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_NOT_FOUND);
             throw new Error(VastErrorMessage.MEDIA_FILE_NOT_FOUND);
         }
         console.log('parseVastToCampaign ----- ongoing');
         if (nativeBridge.getPlatform() === Platform.IOS && !mediaVideoUrl.match(/^https:\/\//)) {
-            if (vastErrorTrackingUrl) {
-                VastErrorHandler.sendVastErrorEventRequest(request, vastErrorTrackingUrl, VastErrorCode.MEDIA_FILE_PLAY_ERROR);
-            }
-
+            VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_PLAY_ERROR);
             const videoUrlError = new DiagnosticError(
                 new Error('Campaign video url needs to be https for iOS'),
                 { rootWrapperVast: response.getContent() }
@@ -88,10 +81,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         }
 
         if (!Url.isValid(mediaVideoUrl)) {
-            if (vastErrorTrackingUrl) {
-                VastErrorHandler.sendVastErrorEventRequest(request, vastErrorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED);
-            }
-
+            VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_UNSUPPORTED);
             throw new Error('Invalid Url in VAST Media url');
         }
 
@@ -117,9 +107,6 @@ export class ProgrammaticVastParser extends CampaignParser {
         };
 
         const campaign = new VastCampaign(vastCampaignParms);
-        if(campaign.getImpressionUrls().length === 0) {
-            throw new Error('Campaign does not have an impression url');
-        }
 
         return Promise.resolve(campaign);
     }

@@ -622,13 +622,6 @@ describe('CampaignManager', () => {
                 });
             });
 
-            it('should trigger onError after requesting a vast placement without an impression url', () => {
-                const response = {
-                    response: OnProgrammaticVastPlcCampaignNoImpression
-                };
-                return verifyErrorForResponse(response, 'Campaign does not have an impression url');
-            });
-
             it('should bail out when max wrapper depth is reached for a wrapped VAST', () => {
 
                 // given a valid VAST response containing a wrapper

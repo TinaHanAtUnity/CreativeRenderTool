@@ -1,5 +1,6 @@
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Request, INativeResponse } from 'Core/Utilities/Request';
+import { Vast } from 'VAST/Models/Vast';
 
 // VAST Error code defined in 3.0
 // https://wiki.iabtechlab.com/index.php?title=VAST_Error_Code_Troubleshooting_Matrix
@@ -54,15 +55,24 @@ export enum VastErrorMessage {
 }
 
 export class VastErrorHandler {
-    public static formatVASTErrorURL(errorUrl: string, errorCode: VastErrorCode, assetUrl?: string): string {
-        const formattedUrl = errorUrl.replace(/[ERRORCODE]/, errorCode.toString());
-        if (assetUrl) {
-            formattedUrl.replace(/[ASSETURI]/, assetUrl);
+
+    public static sendVastErrorEventWithThirdParty(vast: Vast, thirdPartyEventManager: ThirdPartyEventManager, sessionId: string, errorCode?: VastErrorCode, assetUrl?: string): Promise<INativeResponse> {
+        const errorTrackingUrl = vast.getErrorURLTemplate();
+        if (errorTrackingUrl) {
+            return VastErrorHandler.sendErrorEventWithThirdParty(thirdPartyEventManager, sessionId, errorTrackingUrl, errorCode, assetUrl);
         }
-        return formattedUrl;
+        return Promise.reject();
     }
 
-    public static sendVastErrorEventThirdParty(thirdPartyEventManager: ThirdPartyEventManager, sessionId: string, errorUrl: string, errorCode?: VastErrorCode, assetUrl?: string): Promise<INativeResponse> {
+    public static sendVastErrorEventWithRequest(vast: Vast, request: Request, errorCode?: VastErrorCode, assetUrl?: string): Promise<INativeResponse> {
+        const errorTrackingUrl = vast.getErrorURLTemplate();
+        if (errorTrackingUrl) {
+            return VastErrorHandler.sendErrorEventWithRequest(request, errorTrackingUrl, errorCode, assetUrl);
+        }
+        return Promise.reject();
+    }
+
+    private static sendErrorEventWithThirdParty(thirdPartyEventManager: ThirdPartyEventManager, sessionId: string, errorUrl: string, errorCode?: VastErrorCode, assetUrl?: string): Promise<INativeResponse> {
         if (!errorCode) {
             errorCode = VastErrorCode.UNDEFINED_ERROR;
         }
@@ -71,7 +81,7 @@ export class VastErrorHandler {
         return thirdPartyEventManager.sendWithGet(eventName, sessionId, vastErrorUrl);
     }
 
-    public static sendVastErrorEventRequest(request: Request, errorUrl: string, errorCode?: VastErrorCode, assetUrl?: string): Promise<INativeResponse> {
+    private static sendErrorEventWithRequest(request: Request, errorUrl: string, errorCode?: VastErrorCode, assetUrl?: string): Promise<INativeResponse> {
         if (!errorCode) {
             errorCode = VastErrorCode.UNDEFINED_ERROR;
         }
@@ -79,4 +89,13 @@ export class VastErrorHandler {
 
         return request.get(vastErrorUrl, []);
     }
+
+    private static formatVASTErrorURL(errorUrl: string, errorCode: VastErrorCode, assetUrl?: string): string {
+        const formattedUrl = errorUrl.replace(/[ERRORCODE]/, errorCode.toString());
+        if (assetUrl) {
+            formattedUrl.replace(/[ASSETURI]/, assetUrl);
+        }
+        return formattedUrl;
+    }
+
 }
