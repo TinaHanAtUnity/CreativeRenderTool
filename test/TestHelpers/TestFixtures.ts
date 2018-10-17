@@ -51,7 +51,7 @@ import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xm
 import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
-import { ProductInfo, IProductInfo, ProductInfoType } from 'Models/Promo/ProductInfo';
+import { ProductInfo, IProductInfo, ProductInfoType } from 'Promo/Models/ProductInfo';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
