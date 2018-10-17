@@ -19,31 +19,11 @@ import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
-    private static CloseLength = 30;
-
     private readonly onLoaded = new Observable0();
-
-    private _closeElement: HTMLElement;
-    private _iframe: HTMLIFrameElement;
-    private _gdprBanner: HTMLElement;
-    private _privacyButton: HTMLElement;
-    private _loaded = false;
-
-    private _messageListener: any;
-
-    private _canClose = false;
-    private _canSkip = false;
-    private _didReward = false;
-
-    private _closeRemaining: number;
-    private _showTimestamp: number;
-    private _updateInterval: any;
-
-    // analytics data
-    private _playableStartTimestamp: number;
-    private _backgroundTime: number = 0;
-    private _backgroundTimestamp: number;
+    private _domContentLoaded = false;
     private _creativeId: string | undefined;
+
+    private _iframe: HTMLIFrameElement;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(nativeBridge, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
@@ -53,43 +33,71 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this._creativeId = campaign.getCreativeId();
 
         this._template = new Template(MRAIDTemplate);
-
-        this._bindings = [
-            {
-                event: 'click',
-                listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.close-region'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.privacy-button'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => {
-                                                this.onGDPRPopupEvent(event);
-                                                this._gdprPopupClicked = true;
-                                                this.choosePrivacyShown();
-                                            },
-                selector: '.gdpr-link'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.icon-gdpr'
-            }
-        ];
     }
 
     public render(): void {
         super.render();
 
-        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+        this.loadIframe();
+        // this._messageListener = (event: MessageEvent) => this.onMessage(event);
+        // window.addEventListener('message', this._messageListener, false);
+    }
 
+    public show(): void {
+        super.show();
+
+        this.choosePrivacyShown();
+        this._showTimestamp = Date.now();
+        this.prepareProgressCircle();
+
+        if(this._domContentLoaded) {
+            this.setViewableState(true);
+            this.sendMraidAnalyticsEvent('playable_show');
+            // this.sendPlayableAnalyticsStart();
+        } else {
+            const observer = this.onLoaded.subscribe(() => {
+                this.setViewableState(true);
+                this.sendMraidAnalyticsEvent('playable_show');
+                // this.sendPlayableAnalyticsStart();
+                this.onLoaded.unsubscribe(observer);
+            });
+        }
+    }
+
+    // public hide() {
+    //     if(this._messageListener) {
+    //         window.removeEventListener('message', this._messageListener, false);
+    //         this._messageListener = undefined;
+    //     }
+
+    //     super.hide();
+    // }
+
+    public setViewableState(viewable: boolean) {
+        if(this._domContentLoaded) {
+            // if(this._loaded) {
+            //     this._iframe.contentWindow!.postMessage({
+            //         type: 'viewable',
+            //         value: viewable
+            //     }, '*');
+            // }
+            // this._mraidBridge.sendViewableEvent(viewable);
+            this.setAnalyticsBackgroundTime(viewable);
+        }
+    }
+
+    private sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
+        const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
+        const backgroundTime = this._backgroundTime / 1000;
+        const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;
+
+        if (this.isKPIDataValid({timeFromShow, backgroundTime, timeFromPlayableStart}, 'mraid_' + eventName)) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
+        }
+    }
+
+    private loadIframe(): void {
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
 
         this.createMRAID(
             FPSCollectionTest.isValid(this._abGroup) ? MRAIDPerfContainer : MRAIDContainer
@@ -109,163 +117,10 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 message: e.message
             }, this._campaign.getSession());
         });
-
-        this._messageListener = (event: MessageEvent) => this.onMessage(event);
-        window.addEventListener('message', this._messageListener, false);
-    }
-
-    public show(): void {
-        super.show();
-        this.choosePrivacyShown();
-        this._showTimestamp = Date.now();
-        this.sendMraidAnalyticsEvent('playable_show');
-
-        if(this._placement.allowSkip()) {
-            const skipLength = this._placement.allowSkipInSeconds();
-            this._closeRemaining = MRAID.CloseLength;
-            let skipRemaining = skipLength;
-            this._updateInterval = setInterval(() => {
-                if(this._closeRemaining > 0) {
-                    this._closeRemaining--;
-                }
-                if(skipRemaining > 0) {
-                    skipRemaining--;
-                    this.updateProgressCircle(this._closeElement, (skipLength - skipRemaining) / skipLength);
-                }
-                if(skipRemaining <= 0) {
-                    this._canSkip = true;
-                    this._closeElement.style.opacity = '1';
-                    this.updateProgressCircle(this._closeElement, 1);
-                }
-                if (this._closeRemaining <= 0) {
-                    clearInterval(this._updateInterval);
-                    this._canClose = true;
-                }
-            }, 1000);
-        } else {
-            this._closeRemaining = MRAID.CloseLength;
-            this._updateInterval = setInterval(() => {
-                const progress = (MRAID.CloseLength - this._closeRemaining) / MRAID.CloseLength;
-                if(progress >= 0.75 && !this._didReward) {
-                    this._handlers.forEach(handler => handler.onMraidReward());
-                    this._didReward = true;
-                }
-                if(this._closeRemaining > 0) {
-                    this._closeRemaining--;
-                    this.updateProgressCircle(this._closeElement, progress);
-                }
-                if (this._closeRemaining <= 0) {
-                    clearInterval(this._updateInterval);
-                    this._canClose = true;
-                    this._closeElement.style.opacity = '1';
-                    this.updateProgressCircle(this._closeElement, 1);
-                }
-            }, 1000);
-        }
-
-        if(this._loaded) {
-            this.setViewableState(true);
-        } else {
-            const observer = this.onLoaded.subscribe(() => {
-                this.setViewableState(true);
-                this.onLoaded.unsubscribe(observer);
-            });
-        }
-    }
-
-    public hide() {
-        this.setViewableState(false);
-        if(this._messageListener) {
-            window.removeEventListener('message', this._messageListener, false);
-            this._messageListener = undefined;
-        }
-        if(this._updateInterval) {
-            clearInterval(this._updateInterval);
-            this._updateInterval = undefined;
-        }
-        super.hide();
-    }
-
-    public setViewableState(viewable: boolean) {
-        if(this._loaded) {
-            this._iframe.contentWindow!.postMessage({
-                type: 'viewable',
-                value: viewable
-            }, '*');
-        }
-
-        // background time for analytics
-        if(!viewable) {
-            this._backgroundTimestamp = Date.now();
-        } else {
-            if (this._backgroundTimestamp) {
-                this._backgroundTime += Date.now() - this._backgroundTimestamp;
-            }
-        }
-    }
-
-    protected choosePrivacyShown(): void {
-        if (this._showGDPRBanner && !this._gdprPopupClicked) {
-            this._gdprBanner.style.visibility = 'visible';
-            this._privacyButton.style.pointerEvents = '1';
-            this._privacyButton.style.visibility = 'hidden';
-        } else {
-            this._privacyButton.style.visibility = 'visible';
-            this._gdprBanner.style.pointerEvents = '1';
-            this._gdprBanner.style.visibility = 'hidden';
-        }
-    }
-
-    private sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
-        const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
-        const backgroundTime = this._backgroundTime / 1000;
-        const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;
-
-        if (this.isKPIDataValid({timeFromShow, backgroundTime, timeFromPlayableStart}, 'mraid_' + eventName)) {
-            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
-        }
-    }
-
-    private updateProgressCircle(container: HTMLElement, value: number) {
-        const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
-
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
-            wrapperElement.style.display = 'none';
-            this._container.style.display = 'none';
-            /* tslint:disable:no-unused-expression */
-            this._container.offsetHeight;
-            /* tslint:enable:no-unused-expression */
-            this._container.style.display = 'block';
-            return;
-        }
-
-        const leftCircleElement = <HTMLElement>container.querySelector('.circle-left');
-        const rightCircleElement = <HTMLElement>container.querySelector('.circle-right');
-
-        const degrees = value * 360;
-        leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
-
-        if(value >= 0.5) {
-            wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
-            rightCircleElement.style.webkitAnimationName = 'right-spin';
-        }
-    }
-
-    private onCloseEvent(event: Event): void {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if(this._canSkip && !this._canClose) {
-            this._handlers.forEach(handler => handler.onMraidSkip());
-            this.sendMraidAnalyticsEvent('playable_skip');
-        } else if(this._canClose) {
-            this._handlers.forEach(handler => handler.onMraidClose());
-            this.sendMraidAnalyticsEvent('playable_close');
-        }
     }
 
     private onLoadedEvent(event: Event): void {
-        this._loaded = true;
+        this._domContentLoaded = true;
         this.onLoaded.trigger();
 
         const frameLoadDuration = (Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId())) / 1000;
@@ -340,5 +195,44 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             return;
         }
         this._handlers.forEach(handler => handler.onMraidClick(url));
+    }
+
+    public onPrivacyClose(): void {
+        if(this._privacy) {
+            this._privacy.hide();
+            // this._handlers.forEach((handler) => {
+            //     handler.onWebViewResize(false).then(() => {
+            //         this._privacy.hide();
+            //     });
+            // });
+        }
+    }
+
+    public onPrivacyEvent(event: Event): void {
+        event.preventDefault();
+        this._privacy.show();
+        // this._handlers.forEach((handler) => {
+        //     handler.onWebViewResize(true).then(() => {
+        //         this._privacy.show();
+        //     });
+        // });
+    }
+
+    public onGDPRPopupEvent(event: Event) {
+        event.preventDefault();
+        this._gdprPopupClicked = true;
+        this._privacy.show();
+        // this._handlers.forEach((handler) => {
+        //     handler.onWebViewResize(true).then(() => {
+        //         this._privacy.show();
+        //     });
+        // });
+    }
+
+    public onMRAIDLoaded() {
+        this._domContentLoaded = true;
+        this.onLoaded.trigger();
+        const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
+        this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
     }
 }

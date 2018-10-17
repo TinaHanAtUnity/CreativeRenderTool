@@ -17,33 +17,13 @@ import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCam
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
-    private static CloseLength = 30;
-
-    private _localization: Localization;
-
-    private _closeElement: HTMLElement;
     private _loadingScreen: HTMLElement;
-    private _iframe: HTMLIFrameElement;
-    private _gdprBanner: HTMLElement;
-    private _privacyButton: HTMLElement;
-
-    private _iframeLoaded = false;
-
-    private _messageListener: any;
     private _loadingScreenTimeout: any;
     private _prepareTimeout: any;
-    private _updateInterval: any;
 
-    private _canClose = false;
-    private _canSkip = false;
-    private _didReward = false;
+    private _iframe: HTMLIFrameElement;
 
-    private _closeRemaining: number;
-    private _showTimestamp: number;
-    private _playableStartTimestamp: number;
-    private _backgroundTime: number = 0;
-    private _backgroundTimestamp: number;
-
+    private _localization: Localization;
     private _configuration: any;
 
     protected _campaign: PerformanceMRAIDCampaign;
@@ -75,39 +55,92 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._templateData.ratingCount = this._localization.abbreviate(ratingCount);
             }
         }
-
-        this._bindings = [
-            {
-                event: 'click',
-                listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.close-region'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.privacy-button'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => {
-                    this.onGDPRPopupEvent(event);
-                    this.choosePrivacyShown();
-                },
-                selector: '.gdpr-link'
-            }
-        ];
     }
 
     public render(): void {
         super.render();
 
-        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
         this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
+        this.loadIframe();
 
+        // this._messageListener = (event: MessageEvent) => this.onMessage(event);
+        // window.addEventListener('message', this._messageListener, false);
+
+        // this.choosePrivacyShown();
+    }
+
+    public show(): void {
+        super.show();
+        this.choosePrivacyShown();
+        this._showTimestamp = Date.now();
+        this.sendMraidAnalyticsEvent('playable_show');
+        this.showLoadingScreen();
+    }
+
+    public hide() {
+        // this._iframe.contentWindow!.postMessage({
+        //     type: 'viewable',
+        //     value: false
+        // }, '*');
+        // if(this._messageListener) {
+        //     window.removeEventListener('message', this._messageListener, false);
+        //     this._messageListener = undefined;
+        // }
+
+        if(this._loadingScreenTimeout) {
+            clearTimeout(this._loadingScreenTimeout);
+            this._loadingScreenTimeout = undefined;
+        }
+
+        if(this._prepareTimeout) {
+            clearTimeout(this._prepareTimeout);
+            this._prepareTimeout = undefined;
+        }
+
+        super.hide();
+    }
+
+    public setViewableState(viewable: boolean) {
+        if(this._isLoaded && !this._loadingScreenTimeout) {
+            this._iframe.contentWindow!.postMessage({
+                type: 'viewable',
+                value: viewable
+            }, '*');
+            // this._mraidBridge.sendViewableEvent(viewable);
+            this.setAnalyticsBackgroundTime(viewable);
+        }
+    }
+
+    public onPrivacyClose(): void {
+        if(this._privacy) {
+            this._privacy.hide();
+        }
+    }
+
+    public onPrivacyEvent(event: Event): void {
+        event.preventDefault();
+        this._privacy.show();
+    }
+
+    public onGDPRPopupEvent(event: Event) {
+        event.preventDefault();
+        this._gdprPopupClicked = true;
+        this._privacy.show();
+    }
+
+    private loadIframe(): void {
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
+        // this._mraidBridge.connect(iframe);
+        const container = this.setUpMraidContainer();
+        this.createMRAID(container).then(mraid => {
+            iframe.onload = () => this.onIframeLoaded();
+            SdkStats.setFrameSetStartTimestamp(this._placement.getId());
+            this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
+            iframe.srcdoc = mraid;
+        });
+    }
 
+    private setUpMraidContainer(): string {
         let container = FPSCollectionTest.isValid(this._abGroup) ? MRAIDPerfContainer : MRAIDContainer;
         const playableConfiguration = this._campaign.getPlayableConfiguration();
         if(playableConfiguration) {
@@ -122,96 +155,15 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             }
             container = container.replace('var playableConfiguration = {};', 'var playableConfiguration = ' + JSON.stringify(this._configuration) + ';');
         }
-        this.createMRAID(container).then(mraid => {
-            iframe.onload = () => this.onIframeLoaded();
-            SdkStats.setFrameSetStartTimestamp(this._placement.getId());
-            this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
-            iframe.srcdoc = mraid;
-        }).catch((err) => {
-            this._nativeBridge.Sdk.logError('failed to create mraid: ' + err);
-
-            SessionDiagnostics.trigger('create_mraid_error', {
-                message: err.message
-            }, this._campaign.getSession());
-        });
-
-        this._messageListener = (event: MessageEvent) => this.onMessage(event);
-        window.addEventListener('message', this._messageListener, false);
-
-        this.choosePrivacyShown();
-    }
-
-    public show(): void {
-        super.show();
-        this._showTimestamp = Date.now();
-        this.sendMraidAnalyticsEvent('playable_show');
-        this.showLoadingScreen();
-    }
-
-    public hide() {
-        this._iframe.contentWindow!.postMessage({
-            type: 'viewable',
-            value: false
-        }, '*');
-        if(this._messageListener) {
-            window.removeEventListener('message', this._messageListener, false);
-            this._messageListener = undefined;
-        }
-
-        if(this._loadingScreenTimeout) {
-            clearTimeout(this._loadingScreenTimeout);
-            this._loadingScreenTimeout = undefined;
-        }
-
-        if(this._prepareTimeout) {
-            clearTimeout(this._prepareTimeout);
-            this._prepareTimeout = undefined;
-        }
-
-        if(this._updateInterval) {
-            clearInterval(this._updateInterval);
-            this._updateInterval = undefined;
-        }
-        super.hide();
-    }
-
-    public setViewableState(viewable: boolean) {
-        if(this._iframeLoaded && !this._loadingScreenTimeout) {
-            this._iframe.contentWindow!.postMessage({
-                type: 'viewable',
-                value: viewable
-            }, '*');
-        }
-
-        // background time for analytics
-        if(!viewable) {
-            this._backgroundTimestamp = Date.now();
-        } else {
-            if (this._backgroundTimestamp) {
-                this._backgroundTime += Date.now() - this._backgroundTimestamp;
-            }
-        }
-    }
-
-    protected choosePrivacyShown(): void {
-        if (this._showGDPRBanner && !this._gdprPopupClicked) {
-            this._gdprBanner.style.visibility = 'visible';
-            this._privacyButton.style.pointerEvents = '1';
-            this._privacyButton.style.visibility = 'hidden';
-        } else {
-            this._privacyButton.style.visibility = 'visible';
-            this._gdprBanner.style.pointerEvents = '1';
-            this._gdprBanner.style.visibility = 'hidden';
-        }
+        return container;
     }
 
     private onIframeLoaded() {
-        this._iframeLoaded = true;
+        this._isLoaded = true;
 
         if(!this._loadingScreenTimeout) {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
-
             this.showMRAIDAd();
         }
 
@@ -226,7 +178,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private showLoadingScreen() {
         this._loadingScreen.style.display = 'block';
         this._loadingScreenTimeout = setTimeout(() => {
-            if(this._iframeLoaded) {
+            if(this._isLoaded) {
                 this.showMRAIDAd();
             } else {
                 // start the prepare timeout and wait for the onload event
@@ -249,48 +201,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private showMRAIDAd() {
-        if(this._placement.allowSkip()) {
-            const skipLength = this._placement.allowSkipInSeconds();
-            this._closeRemaining = PlayableMRAID.CloseLength;
-            let skipRemaining = skipLength;
-            this._updateInterval = setInterval(() => {
-                if(this._closeRemaining > 0) {
-                    this._closeRemaining--;
-                }
-                if(skipRemaining > 0) {
-                    skipRemaining--;
-                    this.updateProgressCircle(this._closeElement, (skipLength - skipRemaining) / skipLength);
-                }
-                if(skipRemaining <= 0) {
-                    this._canSkip = true;
-                    this._closeElement.style.opacity = '1';
-                    this.updateProgressCircle(this._closeElement, 1);
-                }
-                if (this._closeRemaining <= 0) {
-                    clearInterval(this._updateInterval);
-                    this._canClose = true;
-                }
-            }, 1000);
-        } else {
-            this._closeRemaining = PlayableMRAID.CloseLength;
-            const updateInterval = setInterval(() => {
-                const progress = (PlayableMRAID.CloseLength - this._closeRemaining) / PlayableMRAID.CloseLength;
-                if(progress >= 0.75 && !this._didReward) {
-                    this._handlers.forEach(handler => handler.onMraidReward());
-                    this._didReward = true;
-                }
-                if(this._closeRemaining > 0) {
-                    this._closeRemaining--;
-                    this.updateProgressCircle(this._closeElement, progress);
-                }
-                if (this._closeRemaining <= 0) {
-                    clearInterval(updateInterval);
-                    this._canClose = true;
-                    this._closeElement.style.opacity = '1';
-                    this.updateProgressCircle(this._closeElement, 1);
-                }
-            }, 1000);
-        }
+        this.prepareProgressCircle();
 
         ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
             if(this._loadingScreen.style.display === 'none') {
@@ -301,11 +212,14 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
+
                 this.sendMraidAnalyticsEvent('playable_start');
                 this._iframe.contentWindow!.postMessage({
                     type: 'viewable',
                     value: true
                 }, '*');
+
+                // this._mraidBridge.sendViewableEvent(true);
 
                 this._loadingScreen.style.display = 'none';
             }, false);
@@ -327,42 +241,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private updateProgressCircle(container: HTMLElement, value: number) {
-        const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
-
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
-            wrapperElement.style.display = 'none';
-            this._container.style.display = 'none';
-            /* tslint:disable:no-unused-expression */
-            this._container.offsetHeight;
-            /* tslint:enable:no-unused-expression */
-            this._container.style.display = 'block';
-            return;
-        }
-
-        const leftCircleElement = <HTMLElement>container.querySelector('.circle-left');
-        const rightCircleElement = <HTMLElement>container.querySelector('.circle-right');
-
-        const degrees = value * 360;
-        leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
-
-        if(value >= 0.5) {
-            wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
-            rightCircleElement.style.webkitAnimationName = 'right-spin';
-        }
-    }
-
-    private onCloseEvent(event: Event): void {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (this._canSkip && !this._canClose) {
-            this._handlers.forEach(handler => handler.onMraidSkip());
-            this.sendMraidAnalyticsEvent('playable_skip');
-        } else if (this._canClose) {
-            this._handlers.forEach(handler => handler.onMraidClose());
-            this.sendMraidAnalyticsEvent('playable_close');
-        }
+    public onMRAIDLoaded() {
+        // do nothing
     }
 
     private onMessage(event: MessageEvent) {

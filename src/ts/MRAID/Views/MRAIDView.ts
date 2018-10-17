@@ -53,6 +53,25 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected _callButtonEnabled: boolean = true;
 
+    protected _isLoaded = false;
+
+    protected _gdprBanner: HTMLElement;
+    protected _privacyButton: HTMLElement;
+
+    protected _canClose = false;
+    protected _canSkip = false;
+
+    protected _closeElement: HTMLElement;
+    protected _didReward = false;
+    protected _updateInterval: any;
+    protected _closeRemaining: number;
+    protected _CLOSE_LENGTH = 30;
+
+    protected _showTimestamp: number;
+    protected _playableStartTimestamp: number;
+    protected _backgroundTime: number = 0;
+    protected _backgroundTimestamp: number;
+
     constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(nativeBridge, id);
 
@@ -68,17 +87,59 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
 
+        this._bindings = [
+            {
+                event: 'click',
+                listener: (event: Event) => this.onCloseEvent(event),
+                selector: '.close-region'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.privacy-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => {
+                    this.onGDPRPopupEvent(event);
+                    this._gdprPopupClicked = true;
+                    this.choosePrivacyShown();
+                },
+                selector: '.gdpr-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.icon-gdpr'
+            }
+        ];
+
         this._gameSessionId = gameSessionId || 0;
     }
 
     public abstract setViewableState(viewable: boolean): void;
 
+    public render() {
+        super.render();
+        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
+        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
+    }
+
     public hide() {
+        this.setViewableState(false);
+
+        if(this._updateInterval) {
+            clearInterval(this._updateInterval);
+            this._updateInterval = undefined;
+        }
+
         super.hide();
 
         if(this._privacy) {
             this._privacy.removeEventHandler(this);
             this._privacy.hide();
+            this._privacy.container().parentElement!.removeChild(this._privacy.container());
         }
 
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
@@ -139,11 +200,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         return valid;
     }
 
-    public onPrivacyClose(): void {
-        if(this._privacy) {
-            this._privacy.hide();
-        }
-    }
+    public abstract onPrivacyClose(): void;
 
     public onPrivacy(url: string): void {
         // do nothing
@@ -159,19 +216,29 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    protected onPrivacyEvent(event: Event): void {
-        event.preventDefault();
+    // protected onPrivacyEvent(event: Event): void {
+    //     event.preventDefault();
 
-        this._privacy.show();
+    //     this._privacy.show();
+    // }
+
+    // protected onGDPRPopupEvent(event: Event) {
+    //     event.preventDefault();
+    //     this._gdprPopupClicked = true;
+    //     this._privacy.show();
+    // }
+
+    protected choosePrivacyShown(): void {
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
+            this._gdprBanner.style.visibility = 'visible';
+            this._privacyButton.style.pointerEvents = '1';
+            this._privacyButton.style.visibility = 'hidden';
+        } else {
+            this._privacyButton.style.visibility = 'visible';
+            this._gdprBanner.style.pointerEvents = '1';
+            this._gdprBanner.style.visibility = 'hidden';
+        }
     }
-
-    protected onGDPRPopupEvent(event: Event) {
-        event.preventDefault();
-        this._gdprPopupClicked = true;
-        this._privacy.show();
-    }
-
-    protected abstract choosePrivacyShown(): void;
 
     protected updateStats(stats: IMRAIDStats): void {
         this._stats = {
@@ -179,6 +246,108 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             averageFps: stats.frameCount / stats.totalTime,
             averagePlayFps: stats.frameCount / stats.playTime
         };
+    }
+
+    protected getMraidAsUrl(mraid: string): Promise<string> {
+        mraid = this._nativeBridge.getPlatform() === Platform.ANDROID ? decodeURIComponent(mraid) : mraid;
+        return this._nativeBridge.Cache.setFileContent('webPlayerMraid', 'UTF-8', mraid)
+        .then(() => {
+            return this._nativeBridge.Cache.getFilePath('webPlayerMraid');
+        });
+    }
+
+    protected prepareProgressCircle() {
+        if(this._placement.allowSkip()) {
+            const skipLength = this._placement.allowSkipInSeconds();
+            this._closeRemaining = this._CLOSE_LENGTH;
+            let skipRemaining = skipLength;
+            this._updateInterval = setInterval(() => {
+                if(this._closeRemaining > 0) {
+                    this._closeRemaining--;
+                }
+                if(skipRemaining > 0) {
+                    skipRemaining--;
+                    this.updateProgressCircle(this._closeElement, (skipLength - skipRemaining) / skipLength);
+                }
+                if(skipRemaining <= 0) {
+                    this._canSkip = true;
+                    this._closeElement.style.opacity = '1';
+                    this.updateProgressCircle(this._closeElement, 1);
+                }
+                if (this._closeRemaining <= 0) {
+                    clearInterval(this._updateInterval);
+                    this._canClose = true;
+                }
+            }, 1000);
+        } else {
+            this._closeRemaining = this._CLOSE_LENGTH;
+            this._updateInterval = setInterval(() => {
+                const progress = (this._CLOSE_LENGTH - this._closeRemaining) / this._CLOSE_LENGTH;
+                if(progress >= 0.75 && !this._didReward) {
+                    this._handlers.forEach(handler => handler.onMraidReward());
+                    this._didReward = true;
+                }
+                if(this._closeRemaining > 0) {
+                    this._closeRemaining--;
+                    this.updateProgressCircle(this._closeElement, progress);
+                }
+                if (this._closeRemaining <= 0) {
+                    clearInterval(this._updateInterval);
+                    this._canClose = true;
+                    this._closeElement.style.opacity = '1';
+                    this.updateProgressCircle(this._closeElement, 1);
+                }
+            }, 1000);
+        }
+    }
+
+    protected updateProgressCircle(container: HTMLElement, value: number) {
+        const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
+
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
+            wrapperElement.style.display = 'none';
+            this._container.style.display = 'none';
+            /* tslint:disable:no-unused-expression */
+            this._container.offsetHeight;
+            /* tslint:enable:no-unused-expression */
+            this._container.style.display = 'block';
+            return;
+        }
+
+        const leftCircleElement = <HTMLElement>container.querySelector('.circle-left');
+        const rightCircleElement = <HTMLElement>container.querySelector('.circle-right');
+
+        const degrees = value * 360;
+        leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
+
+        if(value >= 0.5) {
+            wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
+            rightCircleElement.style.webkitAnimationName = 'right-spin';
+        }
+    }
+
+    // protected sendPlayableAnalyticsStart() {
+    //     this._playableStartTimestamp = Date.now();
+    //     const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+    //     const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+    //     this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+    // }
+
+    protected setAnalyticsBackgroundTime(viewable: boolean) {
+        if(!viewable) {
+            this._backgroundTimestamp = Date.now();
+        } else {
+            if (this._backgroundTimestamp) {
+                this._backgroundTime += Date.now() - this._backgroundTimestamp;
+            }
+        }
+    }
+
+    protected checkIsValid(timeInSeconds: number): number | undefined {
+        if (timeInSeconds < 0 || timeInSeconds > 600) {
+            return undefined;
+        }
+        return timeInSeconds;
     }
 
     private replaceMraidSources(mraid: string): string {
@@ -198,12 +367,12 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             return mraid;
         }
 
-        const src = dom.documentElement.querySelector('script[src^="mraid.js"]');
+        const src = dom.documentElement!.querySelector('script[src^="mraid.js"]');
         if(src && src.parentNode) {
             src.parentNode.removeChild(src);
         }
 
-        return dom.documentElement.outerHTML;
+        return dom.documentElement!.outerHTML;
     }
 
     private fetchMRAID(): Promise<string | undefined> {
@@ -222,4 +391,53 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
         return Promise.resolve(this._campaign.getResource());
     }
+
+    protected abstract onPrivacyEvent(event: Event): void;
+
+    protected abstract onGDPRPopupEvent(event: Event): void;
+
+    protected abstract onMRAIDLoaded(): void;
+
+    private onCloseEvent(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+        if(this._canSkip && !this._canClose) {
+            this._handlers.forEach(handler => handler.onMraidSkip());
+        } else if(this._canClose) {
+            this._handlers.forEach(handler => handler.onMraidClose());
+        }
+    }
+
+    protected onSetOrientationProperties(allowOrientationChange: boolean, forceOrientation: Orientation) {
+        this._handlers.forEach(handler => handler.onMraidOrientationProperties({
+            allowOrientationChange: allowOrientationChange,
+            forceOrientation: forceOrientation
+        }));
+    }
+    protected onOpen(url: string) {
+        this._handlers.forEach(handler => handler.onMraidClick(url));
+    }
+
+    protected onAnalyticsEvent(event: string, eventData: string) {
+        const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
+        const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
+        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event, eventData));
+    }
+
+    protected onClose() {
+        this._handlers.forEach(handler => handler.onMraidClose());
+    }
+
+    protected onCustomState(customState: string) {
+        if(customState === 'completed') {
+            if(!this._placement.allowSkip() && this._closeRemaining > 5) {
+                this._closeRemaining = 5;
+            }
+        }
+    }
+
+    // protected onResizeWebview() {
+    //     this._handlers.forEach(handler => handler.onWebViewResize(false));
+    // }
 }

@@ -23,11 +23,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _localization: Localization;
 
-    private _closeElement: HTMLElement;
+    // private _closeElement: HTMLElement;
     private _loadingScreen: HTMLElement;
     private _iframe: HTMLIFrameElement;
-    private _gdprBanner: HTMLElement;
-    private _privacyButton: HTMLElement;
+    // private _gdprBanner: HTMLElement;
+    // private _privacyButton: HTMLElement;
     private _cameraPermissionPanel: HTMLElement;
     private _permissionLearnMorePanel: HTMLElement;
 
@@ -37,17 +37,17 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _deviceorientationListener: any;
     private _loadingScreenTimeout: any;
     private _prepareTimeout: any;
-    private _updateInterval: any;
+    // private _updateInterval: any;
 
-    private _canClose = false;
-    private _canSkip = false;
-    private _didReward = false;
+    // private _canClose = false;
+    // private _canSkip = false;
+    // private _didReward = false;
 
-    private _closeRemaining: number;
-    private _showTimestamp: number;
-    private _playableStartTimestamp: number;
-    private _backgroundTime: number = 0;
-    private _backgroundTimestamp: number;
+    // private _closeRemaining: number;
+    // private _showTimestamp: number;
+    // private _playableStartTimestamp: number;
+    // private _backgroundTime: number = 0;
+    // private _backgroundTimestamp: number;
 
     private _arFrameUpdatedObserver: IObserver1<string>;
     private _arPlanesAddedObserver: IObserver1<string>;
@@ -75,7 +75,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._bindings = [
             {
                 event: 'click',
-                listener: (event: Event) => this.onCloseEvent(event),
+                listener: (event: Event) => this.onCloseEvent2(event),
                 selector: '.close-region'
             },
             {
@@ -262,6 +262,27 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         super.hide();
     }
 
+    public onGDPRPopupEvent(event: Event) {
+        event.preventDefault();
+        this._gdprPopupClicked = true;
+        this._privacy.show();
+    }
+
+    public onMRAIDLoaded() {
+        // do nothing
+    }
+
+    public onPrivacyClose(): void {
+        if(this._privacy) {
+            this._privacy.hide();
+        }
+    }
+
+    public onPrivacyEvent(event: Event): void {
+        event.preventDefault();
+        this._privacy.show();
+    }
+
     protected choosePrivacyShown(): void {
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._gdprBanner.style.visibility = 'visible';
@@ -344,32 +365,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private updateProgressCircle(container: HTMLElement, value: number) {
-        const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
-
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
-            wrapperElement.style.display = 'none';
-            this._container.style.display = 'none';
-            /* tslint:disable:no-unused-expression */
-            this._container.offsetHeight;
-            /* tslint:enable:no-unused-expression */
-            this._container.style.display = 'block';
-            return;
-        }
-
-        const leftCircleElement = <HTMLElement>container.querySelector('.circle-left');
-        const rightCircleElement = <HTMLElement>container.querySelector('.circle-right');
-
-        const degrees = value * 360;
-        leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
-
-        if(value >= 0.5) {
-            wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
-            rightCircleElement.style.webkitAnimationName = 'right-spin';
-        }
-    }
-
-    private onCloseEvent(event: Event): void {
+    private onCloseEvent2(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
 
