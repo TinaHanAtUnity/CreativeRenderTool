@@ -2,6 +2,9 @@
 
 * MediaFile selection based on file size for VAST, ready for auction abTest [#6547](https://github.com/Applifier/unity-ads-webview/pull/6547)
 * Remove CachedAdmobCampaign [#6681](https://github.com/Applifier/unity-ads-webview/pull/6681)
+* Switch AB groups for the Improved endscreen styles test [#6728](https://github.com/Applifier/unity-ads-webview/pull/6726)
+* Move Promo models to Promo Module [#6728](https://github.com/Applifier/unity-ads-webview/pull/6728)
+* Allow streaming of backup campaigns [#6727](https://github.com/Applifier/unity-ads-webview/pull/6727)
 
 # Wed Oct 17 18:20:47 UTC 2018
 
