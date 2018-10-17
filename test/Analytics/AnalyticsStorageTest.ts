@@ -18,7 +18,7 @@ import { Platform } from '../../src/ts/Core/Constants/Platform';
         let analyticsStorage: AnalyticsStorage;
 
         beforeEach(() => {
-            backend = TestFixtures.getBackend(platform)
+            backend = TestFixtures.getBackend(platform);
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             analyticsStorage = new AnalyticsStorage(core);
