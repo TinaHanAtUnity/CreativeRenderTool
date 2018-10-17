@@ -144,12 +144,12 @@ export class NativeBridge implements INativeBridge {
         this.Banner = new BannerApi(this);
         this.BannerListener = new BannerListenerApi(this);
         this.AdsProperties = new AdsPropertiesApi(this);
-        this.Analytics = new AnalyticsApi(this);
         this.Monetization = {
-      CustomPurchasing: new CustomPurchasingApi(this),
             PlacementContents: new PlacementContentsApi(this),
-            Listener: new MonetizationListenerApi(this)
+            Listener: new MonetizationListenerApi(this),
+            CustomPurchasing: new CustomPurchasingApi(this)
         };
+        this.Analytics = new AnalyticsApi(this);
     }
 
     public registerCallback<T>(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void): number {
@@ -281,7 +281,6 @@ export class NativeBridge implements INativeBridge {
             case EventCategory[EventCategory.CUSTOM_PURCHASING]:
                 this.Monetization.CustomPurchasing.handleEvent(event, parameters);
                 break;
-
             case EventCategory[EventCategory.PLACEMENT_CONTENT]:
                 this.Monetization.PlacementContents.handleEvent(event, parameters);
                 break;

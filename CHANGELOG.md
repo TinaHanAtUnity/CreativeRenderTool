@@ -1,3 +1,7 @@
+# Pending
+
+* Add support for all SDK 3.0.0 Webview Functionality: [List of PRs](https://github.com/Applifier/unity-ads-webview/pulls?q=is%3Apr+is%3Aclosed+label%3A3.0)
+
 # Tue Oct 16 12:43:43 UTC 2018
 
 * Minor optimizations to backup campaign implementation [#6676](https://github.com/Applifier/unity-ads-webview/pull/6676)

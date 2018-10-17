@@ -64,6 +64,17 @@ describe('PlacementContentManager', () => {
             matcher: Matcher;
         }
 
+        let sandbox: sinon.SinonSandbox;
+        beforeEach(() => {
+            sandbox = sinon.createSandbox();
+            sandbox.stub(PurchasingUtilities, 'getProductName').returns('Example Product');
+            sandbox.stub(PurchasingUtilities, 'getProductLocalizedPrice').returns('$1.99');
+            sandbox.stub(PurchasingUtilities, 'addCampaignPlacementIds');
+        });
+        afterEach(() => {
+            sandbox.restore();
+        });
+
         const t: ITest[] = [{
             name: 'Performance Campaign (Rewarded)',
             placementId: 'rewardedVideoZone',
@@ -71,6 +82,29 @@ describe('PlacementContentManager', () => {
             matcher: (placement, campaign, params) => {
                 assert.equal(params.type, IPlacementContentType.SHOW_AD);
                 assert.equal(params.rewarded, !placement.allowSkip());
+            }
+        }, {
+            name: 'Promo Campaign',
+            placementId: 'rewardedVideoZone',
+            campaign: TestFixtures.getPromoCampaign(),
+            matcher: (placement, campaign, params) => {
+                if (campaign instanceof PromoCampaign) {
+                    assert.equal(params.type, IPlacementContentType.PROMO_AD);
+                    assert.equal(params.product.localizedPrice, PurchasingUtilities.getProductLocalizedPrice(params.productId));
+                    assert.equal(params.product.localizedPriceString, PurchasingUtilities.getProductPrice(params.productId));
+                    assert.equal(params.product.localizedTitle, PurchasingUtilities.getProductName(params.productId));
+                    assert.equal(params.product.productId, campaign.getIapProductId());
+                    assert.equal(params.costs.length, campaign.getCosts().length);
+                    assert.equal(params.costs[0].itemId, campaign.getCosts()[0].getId());
+                    assert.equal(params.costs[0].quantity, campaign.getCosts()[0].getQuantity());
+                    assert.equal(params.costs[0].type, campaign.getCosts()[0].getType());
+                    assert.equal(params.payouts.length, campaign.getPayouts().length);
+                    assert.equal(params.payouts[0].itemId, campaign.getPayouts()[0].getId());
+                    assert.equal(params.payouts[0].type, campaign.getPayouts()[0].getType());
+                    assert.equal(params.payouts[0].quantity, campaign.getPayouts()[0].getQuantity());
+                } else {
+                    assert.fail('campaign must be of type PromoCampaign');
+                }
             }
         }];
 
@@ -162,6 +196,63 @@ describe('PlacementContentManager', () => {
 
             it('should call the ad finished listeners for this placement content', () => {
                 nativeBridge.Monetization.PlacementContents.sendAdFinished(placementId, finishState);
+            });
+        });
+    });
+
+    describe('Handling PlacementContent SendEvent', () => {
+        let sandbox: sinon.SinonSandbox;
+
+        beforeEach(() => {
+            sandbox = sinon.createSandbox();
+            sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve([{
+                productId: 'asdf',
+                localizedPriceString: 'asdf',
+                localizedTitle: 'asdf',
+                productType: 'asdfasdf',
+                isoCurrencyCode: 'asdfa',
+                localizedPrice: 1
+            }]));
+        });
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        it('Should call refresh catalog when IAP payload type is CatalogUpdated', () => {
+            nativeBridge.Purchasing.onIAPSendEvent.trigger('{"type": "CatalogUpdated"}');
+
+            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+        });
+
+        it('should not handle update when passed IAP payload type is not CatalogUpdated', () => {
+            nativeBridge.Purchasing.onIAPSendEvent.trigger('{"type": "CatalogUpdaed"}');
+
+            sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+        });
+
+        describe('if product is not in the catalog', () => {
+            beforeEach(() => {
+                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
+
+                nativeBridge.Purchasing.onIAPSendEvent.trigger('{"type": "CatalogUpdated"}');
+                return new Promise(setTimeout);
+            });
+
+            it('should set the current placementContent state to waiting', () => {
+                sinon.assert.calledWith(asStub(nativeBridge.Monetization.Listener.sendPlacementContentStateChanged), 'promoId', PlacementContentState.NOT_AVAILABLE, PlacementContentState.WAITING);
+            });
+        });
+
+        describe('if product is in the catalog', () => {
+            beforeEach(() => {
+                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
+
+                nativeBridge.Purchasing.onIAPSendEvent.trigger('{"type": "CatalogUpdated"}');
+                return new Promise(setTimeout);
+            });
+
+            it('should mark placement as ready if product is in the catalog', () => {
+                sinon.assert.calledWith(asStub(nativeBridge.Monetization.Listener.sendPlacementContentReady), 'promoId');
             });
         });
     });
