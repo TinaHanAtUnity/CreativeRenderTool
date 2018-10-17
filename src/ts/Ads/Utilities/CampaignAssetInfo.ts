@@ -34,7 +34,6 @@ export class CampaignAssetInfo {
             if (resource) {
                 return resource.isCached();
             }
-            return true;
         } else if(campaign instanceof AdMobCampaign) {
             const video = campaign.getVideo();
             if (video && video.getVideo() && video.getVideo().isCached()) {
