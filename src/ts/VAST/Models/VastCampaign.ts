@@ -53,10 +53,6 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
         return this.get('video');
     }
 
-    public getOriginalVideoUrl(): string {
-        return this.get('vast').getVideoUrl() || '';
-    }
-
     public getRequiredAssets(): Asset[] {
         return [
             this.get('video')
