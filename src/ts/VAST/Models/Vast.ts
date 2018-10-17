@@ -2,6 +2,7 @@ import { Model } from 'Core/Models/Model';
 import { VastAd } from 'VAST/Models/VastAd';
 import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
 import { VastErrorMessage } from 'VAST/EventHandlers/VastErrorHandler';
+import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 
 interface IVast {
     ads: VastAd[];
@@ -61,7 +62,7 @@ export class Vast extends Model<IVast> {
             for (const creative of ad.getCreatives()) {
                 for (const mediaFile of creative.getMediaFiles()) {
                     const mimeType = mediaFile.getMIMEType();
-                    const playable = mimeType && this.isPlayableMIMEType(mimeType);
+                    const playable = mimeType && this.isSupportedMIMEType(mimeType);
                     const fileUrl = mediaFile.getFileURL();
                     if (fileUrl && playable) {
                         return fileUrl;
@@ -79,7 +80,7 @@ export class Vast extends Model<IVast> {
             for (const creative of ad.getCreatives()) {
                 for (const mediaFile of creative.getMediaFiles()) {
                     const mimeType = mediaFile.getMIMEType();
-                    const playable = mimeType && this.isPlayableMIMEType(mimeType);
+                    const playable = mimeType && this.isSupportedMIMEType(mimeType);
                     const fileUrl = mediaFile.getFileURL();
                     if (fileUrl && playable) {
                         return fileUrl;
@@ -230,6 +231,25 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
+    public getVideoMediaFiles(): VastMediaFile[] {
+        const ad = this.getAd();
+        const mediaFiles: VastMediaFile[] = [];
+        if (ad) {
+            for (const creative of ad.getCreatives()) {
+                for (const mediaFile of creative.getMediaFiles()) {
+                    const mimeType = mediaFile.getMIMEType();
+                    const isSupported = mimeType && this.isSupportedMIMEType(mimeType);
+                    const fileUrl = mediaFile.getFileURL();
+                    if (isSupported && fileUrl) {
+                        mediaFiles.push(mediaFile);
+                    }
+                }
+            }
+        }
+
+        return mediaFiles;
+    }
+
     public getDTO(): { [key: string]: any } {
         const ads = [];
         for (const ad of this.get('ads')) {
@@ -268,7 +288,7 @@ export class Vast extends Model<IVast> {
         return !!creativeType && reg.test(creativeType);
     }
 
-    private isPlayableMIMEType(MIMEType: string): boolean {
+    private isSupportedMIMEType(MIMEType: string): boolean {
         const playableMIMEType = 'video/mp4';
         MIMEType = MIMEType.toLowerCase();
         return MIMEType === playableMIMEType;

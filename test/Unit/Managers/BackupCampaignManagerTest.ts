@@ -205,13 +205,13 @@ describe('BackupCampaignManagerTest', () => {
 
         return backupCampaignManager.loadCampaign(placement).then(loadedCampaign => {
             assert.isDefined(loadedCampaign, 'campaign was not loaded when campaign was stored and cached');
-            if (loadedCampaign) {
+            if(loadedCampaign) {
                 assert.equal(loadedCampaign.getId(), campaign.getId(), 'loaded campaign identifier does not match');
             }
         });
     });
 
-    it('should not load campaign when campaign is stored and but cached files have been deleted', () => {
+    it('should load campaign when campaign is stored and cached files have been deleted', () => {
         const placement: Placement = TestFixtures.getPlacement();
         const campaign: PerformanceCampaign = TestFixtures.getCampaign();
         const testMediaId: string = 'beefcace-abcdefg-deadbeef';
@@ -221,22 +221,22 @@ describe('BackupCampaignManagerTest', () => {
         const portrait = campaign.getPortrait();
         const landscape = campaign.getLandscape();
 
-        if (video) {
+        if(video) {
             video.setCachedUrl('file:///video.mp4');
             video.setFileId('video.mp4');
         }
 
-        if (gameIcon) {
+        if(gameIcon) {
             gameIcon.setCachedUrl('file:///gameicon.jpg');
             gameIcon.setFileId('gameicon.jpg');
         }
 
-        if (portrait) {
+        if(portrait) {
             portrait.setCachedUrl('file:///portrait.jpg');
             portrait.setFileId('portrait.jpg');
         }
 
-        if (landscape) {
+        if(landscape) {
             landscape.setCachedUrl('file:///landscape.jpg');
             landscape.setFileId('landscape.jpg');
         }
@@ -244,16 +244,16 @@ describe('BackupCampaignManagerTest', () => {
         const nativeBridge: NativeBridge = <NativeBridge><any>{
             Storage: {
                 get: sinon.stub().callsFake((type: StorageType, key: string) => {
-                    if (type === StorageType.PRIVATE) {
+                    if(type === StorageType.PRIVATE) {
                         if (key === 'backupcampaign.placement.' + placement.getId() + '.mediaid') {
                             return Promise.resolve(testMediaId);
-                        } else if (key === 'backupcampaign.placement.' + placement.getId() + '.adtypes') {
+                        } else if(key === 'backupcampaign.placement.' + placement.getId() + '.adtypes') {
                             return Promise.resolve(JSON.stringify(placement.getAdTypes()));
-                        } else if (key === 'backupcampaign.campaign.' + testMediaId + '.type') {
+                        } else if(key === 'backupcampaign.campaign.' + testMediaId + '.type') {
                             return Promise.resolve('performance');
-                        } else if (key === 'backupcampaign.campaign.' + testMediaId + '.data') {
+                        } else if(key === 'backupcampaign.campaign.' + testMediaId + '.data') {
                             return Promise.resolve(campaign.toJSON());
-                        } else if (key === 'backupcampaign.campaign.' + testMediaId + '.willexpireat') {
+                        } else if(key === 'backupcampaign.campaign.' + testMediaId + '.willexpireat') {
                             return Promise.resolve(Date.now() + 7 * 24 * 3600 * 1000);
                         }
                     }
@@ -270,7 +270,18 @@ describe('BackupCampaignManagerTest', () => {
         const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
 
         return backupCampaignManager.loadCampaign(placement).then(loadedCampaign => {
-            assert.isUndefined(loadedCampaign, 'campaign was loaded when campaign was stored but cached files were deleted');
+            assert.isDefined(loadedCampaign, 'campaign was not loaded when campaign was stored and cached files were deleted');
+            if(loadedCampaign) {
+                assert.equal(loadedCampaign.getId(), campaign.getId(), 'loaded campaign identifier does not match');
+
+                const loadedVideo = (<PerformanceCampaign>loadedCampaign).getVideo();
+
+                assert.isDefined(loadedVideo, 'loaded campaign video not defined');
+
+                if(loadedVideo) {
+                    assert.isUndefined(loadedVideo.getCachedUrl(), 'loaded campaign video cached url was not reset when cached video file was deleted');
+                }
+            }
         });
     });
 });

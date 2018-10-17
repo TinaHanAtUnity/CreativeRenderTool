@@ -14,6 +14,8 @@ import { VastParser } from 'VAST/Utilities/VastParser';
 import { VastErrorHandler, VastErrorCode, VastErrorMessage } from 'VAST/EventHandlers/VastErrorHandler';
 import { Url } from 'Core/Utilities/Url';
 // tslint:disable:no-console
+import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
+
 export class ProgrammaticVastParser extends CampaignParser {
     public static ContentType = 'programmatic/vast';
     public static setVastParserMaxDepth(depth: number): void {
@@ -21,10 +23,11 @@ export class ProgrammaticVastParser extends CampaignParser {
     }
 
     private static VAST_PARSER_MAX_DEPTH: number;
+    private _isMediaExperiment: boolean = false;
 
     protected _vastParser: VastParser = new VastParser();
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
 
         if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
@@ -33,11 +36,11 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         return this._vastParser.retrieveVast(decodedVast, nativeBridge, request).then((vast): Promise<Campaign> => {
             const campaignId = this.getProgrammaticCampaignId(nativeBridge);
-            return this.parseVastToCampaign(vast, nativeBridge, request, campaignId, session, response);
+            return this.parseVastToCampaign(vast, nativeBridge, request, campaignId, session, response, connectionType);
         });
     }
 
-    protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, request: Request, campaignId: string, session: Session, response: AuctionResponse): Promise<Campaign> {
+    protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, request: Request, campaignId: string, session: Session, response: AuctionResponse, connectionType?: string): Promise<Campaign> {
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
@@ -65,6 +68,10 @@ export class ProgrammaticVastParser extends CampaignParser {
         }
 
         let mediaVideoUrl = vast.getMediaVideoUrl();
+        if (this._isMediaExperiment && connectionType) {    // TODO: ab test with auction feature flag
+            mediaVideoUrl = VastMediaSelector.getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
+        }
+
         console.log('parseVastToCampaign ----- mediaVideoUrl ' + mediaVideoUrl);
         if (!mediaVideoUrl) {
             VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_NOT_FOUND);

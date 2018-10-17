@@ -1,24 +1,32 @@
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
+import { ProductInfo } from 'Promo/Models/ProductInfo';
 
 export interface IPromoCampaign extends ICampaign {
-    iapProductId: string;
     additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
     dynamicMarkup: string | undefined;
-    creativeAsset: HTML;
+    creativeAsset: HTML | undefined;
     rewardedPromo: boolean;
+    limitedTimeOffer: LimitedTimeOffer | undefined;
+    costs: ProductInfo[];
+    payouts: ProductInfo[];
+    premiumProduct: ProductInfo;
 }
 
 export class PromoCampaign extends Campaign<IPromoCampaign> {
     constructor(campaign: IPromoCampaign) {
         super('PromoCampaign', {
             ... Campaign.Schema,
-            iapProductId: ['string'],
             additionalTrackingEvents: ['object', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
-            creativeAsset: ['object'],
-            rewardedPromo: ['boolean']
+            creativeAsset: ['object', 'undefined'],
+            rewardedPromo: ['boolean'],
+            limitedTimeOffer: ['object', 'undefined'],
+            payouts: ['array'],
+            costs: ['array'],
+            premiumProduct: ['object']
         }, campaign);
     }
 
@@ -26,7 +34,10 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         const resource = this.getCreativeResource();
         // If the static resource is not cached we will need to download it, therefore
         // a connection is necessary.
-        return !resource.getFileId();
+        if (resource) {
+            return !resource.getFileId();
+        }
+        return false;
     }
 
     private createTrackingEventUrlsWithProductType(productType: string): { [url: string]: string[] } {
@@ -63,7 +74,7 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         return [];
     }
 
-    public getCreativeResource(): HTML {
+    public getCreativeResource(): HTML | undefined {
         return this.get('creativeAsset');
     }
 
@@ -72,11 +83,23 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
     }
 
     public getIapProductId(): string {
-        return this.get('iapProductId');
+        return this.get('premiumProduct').getId();
     }
 
-    public getRequiredAssets() {
-        return [this.getCreativeResource()];
+    public getRequiredAssets() : HTML[] {
+        const creativeResource = this.getCreativeResource();
+        if (creativeResource) {
+            return [creativeResource];
+        }
+        return [];
+    }
+
+    public getPayouts() : ProductInfo[] {
+        return this.get('payouts');
+    }
+
+    public getCosts() : ProductInfo[] {
+        return this.get('costs');
     }
 
     public getOptionalAssets() {
@@ -85,5 +108,9 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
 
     public getRewardedPromo(): boolean {
         return this.get('rewardedPromo');
+    }
+
+    public getLimitedTimeOffer(): LimitedTimeOffer | undefined {
+        return this.get('limitedTimeOffer');
     }
 }
