@@ -1,5 +1,14 @@
 # Pending
 
+* Add support for all SDK 3.0.0 Webview Functionality: [List of PRs](https://github.com/Applifier/unity-ads-webview/pulls?q=is%3Apr+is%3Aclosed+label%3A3.0)
+
+# Tue Oct 16 12:43:43 UTC 2018
+
+* Minor optimizations to backup campaign implementation [#6676](https://github.com/Applifier/unity-ads-webview/pull/6676)
+* Enable Android back button on Closable video overlay for Cheetah [#6679](https://github.com/Applifier/unity-ads-webview/pull/6679)
+
+# Mon Oct 15 20:37:20 UTC 2018
+
 * AB Test various improvements to the endscreen layout v2 [#6674](https://github.com/Applifier/unity-ads-webview/pull/6674)
 * Remove smart close button test [#6673](https://github.com/Applifier/unity-ads-webview/pull/6673)
 * Android back button skip for Cheetah [#6675](https://github.com/Applifier/unity-ads-webview/pull/6675)

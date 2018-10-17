@@ -51,7 +51,7 @@ export class ConfigManager {
                         configUrl: url,
                         configResponse: response.response
                     });
-                    nativeBridge.Sdk.logError('Config request failed ' + error);
+                    nativeBridge.Sdk.logError('Config request failed ' + error.message);
                     throw new Error(error);
                 }
             }).catch(error => {

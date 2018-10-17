@@ -3,6 +3,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { INativeResponse } from 'Core/Utilities/Request';
+import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export abstract class RefreshManager {
@@ -19,4 +20,5 @@ export abstract class RefreshManager {
     public abstract setPlacementState(placementId: string, placementState: PlacementState): void;
     public abstract sendPlacementStateChanges(placementId: string): void;
     public abstract setPlacementStates(placementState: PlacementState, placementIds: string[]): void;
+    public abstract subscribeNativePromoEvents(eventHandler: NativePromoEventHandler): void;
 }

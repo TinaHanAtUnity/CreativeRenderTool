@@ -11,6 +11,7 @@ import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
 import { PromoEventHandler } from 'Promo/EventHandlers/PromoEventHandler';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('PromoEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
@@ -27,7 +28,8 @@ describe('PromoEventHandlersTest', () => {
             handleInvocation,
             handleCallback
         });
-        sandbox.stub(PurchasingUtilities, 'sendPromoPayload');
+        sandbox.stub(PurchasingUtilities, 'onPromoClosed');
+        sandbox.stub(PurchasingUtilities, 'onPurchase');
     });
 
     afterEach(() => {
@@ -38,45 +40,45 @@ describe('PromoEventHandlersTest', () => {
         it('should hide adunit', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroupBuilder.getAbGroup(1), [purchaseTrackingUrls], false);
+            PromoEventHandler.onClose(promoAdUnit, TestFixtures.getPromoCampaign(), 'myCoolPlacement');
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
 
         it('should set adunit finish state to completed', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroupBuilder.getAbGroup(1), [purchaseTrackingUrls], false);
+            PromoEventHandler.onClose(promoAdUnit, TestFixtures.getPromoCampaign(), 'myCoolPlacement');
             sinon.assert.calledWith(<sinon.SinonStub>promoAdUnit.setFinishState, FinishState.COMPLETED);
         });
 
         it('should call sendPromoPayload', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroupBuilder.getAbGroup(1), [purchaseTrackingUrls], false);
-            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPromoPayload);
+            PromoEventHandler.onClose(promoAdUnit, TestFixtures.getPromoCampaign(), 'myCoolPlacement');
+            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.onPromoClosed);
         });
     });
 
-    describe('when calling onPromo', () => {
+    describe('when calling onPromoClick', () => {
         it('should hide adunit', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onPromo(promoAdUnit, 'com.unit.test.iapproductid', [purchaseTrackingUrls]);
+            PromoEventHandler.onPromoClick(promoAdUnit, TestFixtures.getPromoCampaign(), 'myCoolPlacement');
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
 
         it('should set adunit finish state to completed', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onPromo(promoAdUnit, 'com.unit.test.iapproductid', [purchaseTrackingUrls]);
+            PromoEventHandler.onPromoClick(promoAdUnit, TestFixtures.getPromoCampaign(), 'myCoolPlacement');
             sinon.assert.calledWith(<sinon.SinonStub>promoAdUnit.setFinishState, FinishState.COMPLETED);
         });
 
-        it('should call sendPromoPayload', () => {
+        it('should call onPurchase', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onPromo(promoAdUnit, 'com.unit.test.iapproductid', [purchaseTrackingUrls]);
-            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPromoPayload);
+            PromoEventHandler.onPromoClick(promoAdUnit, TestFixtures.getPromoCampaign(), 'myCoolPlacement');
+            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.onPurchase);
         });
     });
 
