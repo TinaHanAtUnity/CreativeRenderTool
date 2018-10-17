@@ -12,7 +12,7 @@ export interface IPromoCampaign extends ICampaign {
     limitedTimeOffer: LimitedTimeOffer | undefined;
     costs: ProductInfo[];
     payouts: ProductInfo[];
-    premiumProduct: ProductInfo | undefined;
+    premiumProduct: ProductInfo;
 }
 
 export class PromoCampaign extends Campaign<IPromoCampaign> {
