@@ -22,7 +22,7 @@ export class PromoCampaignParser extends CampaignParser {
             willExpireAt = response.getCacheTTL();
         }
 
-        const premiumProduct = this.getProductInfo(promoJson.premiumProduct);
+        const premiumProduct: ProductInfo = this.getProductInfo(promoJson);
         const baseCampaignParams: ICampaign = {
             id: premiumProduct.getId(),
             willExpireAt: willExpireAt ? Date.now() + (willExpireAt * 1000) : undefined,
@@ -83,12 +83,22 @@ export class PromoCampaignParser extends CampaignParser {
         return productInfoList;
     }
 
-    private getProductInfo(promoProductJson: any) {
-        const iPremiumInfo: IProductInfo = {
-            productId: promoProductJson.productId,
-            type: promoProductJson.type === 'PREMIUM' ? ProductInfoType.PREMIUM : ProductInfoType.VIRTUAL,
-            quantity: promoProductJson.quantity
-        };
-        return new ProductInfo(iPremiumInfo);
+    private getProductInfo(promoJson: any) {
+        let productInfo: IProductInfo;
+        if (promoJson.premiumProduct) {
+            const promoProductJson = promoJson.premiumProduct;
+            productInfo = {
+                productId: promoProductJson.productId,
+                type: promoProductJson.type === 'PREMIUM' ? ProductInfoType.PREMIUM : ProductInfoType.VIRTUAL,
+                quantity: promoProductJson.quantity
+            };
+        } else {
+            productInfo = {
+                productId: promoJson.iapProductId,
+                quantity: 1,
+                type: ProductInfoType.PREMIUM
+            };
+        }
+        return new ProductInfo(productInfo);
     }
 }
