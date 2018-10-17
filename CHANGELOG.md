@@ -1,6 +1,6 @@
 # Pending
 
-* Add support for all SDK 3.0.0 Webview Functionality [List](https://github.com/Applifier/unity-ads-webview/pulls?q=is%3Apr+is%3Aclosed+label%3A3.0)
+* Add support for all SDK 3.0.0 Webview Functionality: [List of PRs](https://github.com/Applifier/unity-ads-webview/pulls?q=is%3Apr+is%3Aclosed+label%3A3.0)
 
 # Tue Oct 16 12:43:43 UTC 2018
 
