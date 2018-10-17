@@ -274,12 +274,12 @@ describe('BackupCampaignManagerTest', () => {
             if(loadedCampaign) {
                 assert.equal(loadedCampaign.getId(), campaign.getId(), 'loaded campaign identifier does not match');
 
-                const video = (<PerformanceCampaign>loadedCampaign).getVideo();
+                const loadedVideo = (<PerformanceCampaign>loadedCampaign).getVideo();
 
-                assert.isDefined(video, 'loaded campaign video not defined');
+                assert.isDefined(loadedVideo, 'loaded campaign video not defined');
 
-                if(video) {
-                    assert.isUndefined(video.getCachedUrl(), 'loaded campaign video cached url was not reset when cached video file was deleted');
+                if(loadedVideo) {
+                    assert.isUndefined(loadedVideo.getCachedUrl(), 'loaded campaign video cached url was not reset when cached video file was deleted');
                 }
             }
         });
