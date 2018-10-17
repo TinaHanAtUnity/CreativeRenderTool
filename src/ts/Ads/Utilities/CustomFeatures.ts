@@ -34,15 +34,6 @@ export class CustomFeatures {
         return gameId === '1795561';
     }
 
-    public static isAdmobCachedVideoGame(gameId: string) {
-        return gameId === '1475967' // CSR2 Racing iOS
-            || gameId === '1475968' // CSR2 Racing Android
-            || gameId === '1787178' // BrawlStars iOS
-            || gameId === '2391158' // Brawlstars Android
-            || gameId === '1782301' // Hayday iOS
-            || gameId === '1782302';// Hayday Android
-    }
-
     public static isCheetahGame(gameId: string) {
         // skip icon is replaced with the close icon
         // Android back button enabled on video overlays for skipping the video ads
