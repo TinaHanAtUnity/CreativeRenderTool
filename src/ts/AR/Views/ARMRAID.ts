@@ -61,24 +61,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._bindings = [
             {
                 event: 'click',
-                listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.close-region'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.privacy-button'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => {
-                    this.onGDPRPopupEvent(event);
-                    this.choosePrivacyShown();
-                },
-                selector: '.gdpr-link'
-            },
-            {
-                event: 'click',
                 listener: (event: Event) => {
                     this.onPrivacyClicked(event);
                 },
@@ -246,27 +228,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._updateInterval = undefined;
         }
         super.hide();
-    }
-
-    public onGDPRPopupEvent(event: Event) {
-        event.preventDefault();
-        this._gdprPopupClicked = true;
-        this._privacy.show();
-    }
-
-    public onMRAIDLoaded() {
-        // do nothing
-    }
-
-    public onPrivacyClose(): void {
-        if(this._privacy) {
-            this._privacy.hide();
-        }
-    }
-
-    public onPrivacyEvent(event: Event): void {
-        event.preventDefault();
-        this._privacy.show();
     }
 
     protected choosePrivacyShown(): void {
