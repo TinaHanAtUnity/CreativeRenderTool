@@ -4,7 +4,6 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { Platform } from 'Core/Constants/Platform';
 
 import { ABGroup, FPSCollectionTest } from 'Core/Models/ABGroup';
 
@@ -49,6 +48,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this.choosePrivacyShown();
         this._showTimestamp = Date.now();
         this.prepareProgressCircle();
+        // this.sendPlayableAnalyticsStart();
+        this.sendMraidAnalyticsEvent('playable_show');
 
         if(this._domContentLoaded) {
             this.setViewableState(true);
@@ -86,7 +87,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
+    protected sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
         const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
         const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;

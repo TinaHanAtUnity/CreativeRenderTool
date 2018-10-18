@@ -139,7 +139,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         if(this._privacy) {
             this._privacy.removeEventHandler(this);
             this._privacy.hide();
-            this._privacy.container().parentElement!.removeChild(this._privacy.container());
+            // this._privacy.container().parentElement!.removeChild(this._privacy.container());
         }
 
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
@@ -326,12 +326,12 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    // protected sendPlayableAnalyticsStart() {
-    //     this._playableStartTimestamp = Date.now();
-    //     const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
-    //     const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-    //     this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
-    // }
+    protected sendPlayableAnalyticsStart() {
+        this._playableStartTimestamp = Date.now();
+        const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+    }
 
     protected setAnalyticsBackgroundTime(viewable: boolean) {
         if(!viewable) {
@@ -398,13 +398,17 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected abstract onMRAIDLoaded(): void;
 
+    // protected abstract sendMraidAnalyticsEvent(eventName: string, eventData?: any): void;
+
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
         if(this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onMraidSkip());
+            // this.sendMraidAnalyticsEvent('playable_skip');
         } else if(this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
+            // this.sendMraidAnalyticsEvent('playable_close');
         }
     }
 
@@ -418,12 +422,12 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._handlers.forEach(handler => handler.onMraidClick(url));
     }
 
-    protected onAnalyticsEvent(event: string, eventData: string) {
-        const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
-        const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
-        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event, eventData));
-    }
+    // protected onAnalyticsEvent(event: string, eventData: string) {
+    //     const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
+    //     const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
+    //     const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+    //     this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event, eventData));
+    // }
 
     protected onClose() {
         this._handlers.forEach(handler => handler.onMraidClose());
@@ -437,7 +441,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    // protected onResizeWebview() {
-    //     this._handlers.forEach(handler => handler.onWebViewResize(false));
-    // }
+    protected onResizeWebview() {
+        // this._handlers.forEach(handler => handler.onWebViewResize(false));
+    }
 }
