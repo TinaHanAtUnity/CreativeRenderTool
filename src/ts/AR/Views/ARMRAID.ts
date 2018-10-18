@@ -23,11 +23,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _localization: Localization;
 
-    // private _closeElement: HTMLElement;
     private _loadingScreen: HTMLElement;
     private _iframe: HTMLIFrameElement;
-    // private _gdprBanner: HTMLElement;
-    // private _privacyButton: HTMLElement;
     private _cameraPermissionPanel: HTMLElement;
     private _permissionLearnMorePanel: HTMLElement;
 
@@ -37,17 +34,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _deviceorientationListener: any;
     private _loadingScreenTimeout: any;
     private _prepareTimeout: any;
-    // private _updateInterval: any;
-
-    // private _canClose = false;
-    // private _canSkip = false;
-    // private _didReward = false;
-
-    // private _closeRemaining: number;
-    // private _showTimestamp: number;
-    // private _playableStartTimestamp: number;
-    // private _backgroundTime: number = 0;
-    // private _backgroundTimestamp: number;
 
     private _arFrameUpdatedObserver: IObserver1<string>;
     private _arPlanesAddedObserver: IObserver1<string>;
@@ -75,7 +61,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._bindings = [
             {
                 event: 'click',
-                listener: (event: Event) => this.onCloseEvent2(event),
+                listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.close-region'
             },
             {
@@ -365,7 +351,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private onCloseEvent2(event: Event): void {
+    protected onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
 

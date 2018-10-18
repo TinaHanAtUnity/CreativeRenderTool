@@ -139,7 +139,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         if(this._privacy) {
             this._privacy.removeEventHandler(this);
             this._privacy.hide();
-            // this._privacy.container().parentElement!.removeChild(this._privacy.container());
         }
 
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
@@ -200,8 +199,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         return valid;
     }
 
-    public abstract onPrivacyClose(): void;
-
     public onPrivacy(url: string): void {
         // do nothing
     }
@@ -215,18 +212,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             this._callButtonEnabled = value;
         }
     }
-
-    // protected onPrivacyEvent(event: Event): void {
-    //     event.preventDefault();
-
-    //     this._privacy.show();
-    // }
-
-    // protected onGDPRPopupEvent(event: Event) {
-    //     event.preventDefault();
-    //     this._gdprPopupClicked = true;
-    //     this._privacy.show();
-    // }
 
     protected choosePrivacyShown(): void {
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
@@ -326,13 +311,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    protected sendPlayableAnalyticsStart() {
-        this._playableStartTimestamp = Date.now();
-        const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
-        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
-    }
-
     protected setAnalyticsBackgroundTime(viewable: boolean) {
         if(!viewable) {
             this._backgroundTimestamp = Date.now();
@@ -392,24 +370,23 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         return Promise.resolve(this._campaign.getResource());
     }
 
-    protected abstract onPrivacyEvent(event: Event): void;
+    protected abstract onCloseEvent(event: Event): void;
 
-    protected abstract onGDPRPopupEvent(event: Event): void;
-
-    protected abstract onMRAIDLoaded(): void;
-
-    // protected abstract sendMraidAnalyticsEvent(eventName: string, eventData?: any): void;
-
-    private onCloseEvent(event: Event): void {
-        event.preventDefault();
-        event.stopPropagation();
-        if(this._canSkip && !this._canClose) {
-            this._handlers.forEach(handler => handler.onMraidSkip());
-            // this.sendMraidAnalyticsEvent('playable_skip');
-        } else if(this._canClose) {
-            this._handlers.forEach(handler => handler.onMraidClose());
-            // this.sendMraidAnalyticsEvent('playable_close');
+    public onPrivacyClose(): void {
+        if(this._privacy) {
+            this._privacy.hide();
         }
+    }
+
+    public onPrivacyEvent(event: Event): void {
+        event.preventDefault();
+        this._privacy.show();
+    }
+
+    public onGDPRPopupEvent(event: Event) {
+        event.preventDefault();
+        this._gdprPopupClicked = true;
+        this._privacy.show();
     }
 
     protected onSetOrientationProperties(allowOrientationChange: boolean, forceOrientation: Orientation) {
@@ -418,16 +395,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             forceOrientation: forceOrientation
         }));
     }
+
     protected onOpen(url: string) {
         this._handlers.forEach(handler => handler.onMraidClick(url));
     }
-
-    // protected onAnalyticsEvent(event: string, eventData: string) {
-    //     const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
-    //     const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
-    //     const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-    //     this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event, eventData));
-    // }
 
     protected onClose() {
         this._handlers.forEach(handler => handler.onMraidClose());

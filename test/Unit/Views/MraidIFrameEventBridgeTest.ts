@@ -20,7 +20,8 @@ describe('MraidIframeEventBridge', () => {
             onAnalyticsEvent: sinon.spy(),
             onClose: sinon.spy(),
             onStateChange: sinon.spy(),
-            onResizeWebview: sinon.spy()
+            onResizeWebview: sinon.spy(),
+            onSendStats: sinon.spy()
         };
         mraidBridge = new MraidIFrameEventBridge(nativeBridge, handler);
         iframe = document.createElement('iframe');
@@ -81,6 +82,14 @@ describe('MraidIframeEventBridge', () => {
                 state: 'test'
             },
             verify: (msg?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onStateChange, msg.state)
+        }, {
+            msg: {
+                type: MRAIDEvents.SEND_STATS,
+                totalTime: 20,
+                playTime: 10,
+                frameCount: 200
+            },
+            verify: (msg?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onSendStats, msg.totalTime, msg.playTime, msg.frameCount)
         }];
 
         describe(`${tests[0].msg.type} MRAID event`, () => {
@@ -192,6 +201,24 @@ describe('MraidIframeEventBridge', () => {
             };
             beforeEach(sendEvent(tests[6].msg.type, tests[6].msg.state));
             it(`should handle the ${tests[6].msg.type} event`, () => tests[6].verify(tests[6].msg));
+        });
+
+        describe(`${tests[7].msg.type} MRAID event`, () => {
+            const sendEvent = (e: string, totalTime: any, playTime: any, frameCount: any) => {
+                return () => {
+                    return new Promise((res) => {
+                        window.postMessage({
+                            type: e,
+                            totalTime: totalTime,
+                            playTime: playTime,
+                            frameCount: frameCount
+                        }, '*');
+                        setTimeout(res);
+                    });
+                };
+            };
+            beforeEach(sendEvent(tests[7].msg.type, tests[7].msg.totalTime, tests[7].msg.playTime, tests[7].msg.frameCount));
+            it(`should handle the ${tests[7].msg.type} event`, () => tests[7].verify(tests[7].msg));
         });
     });
 });

@@ -35,11 +35,16 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._mraidBridge = new MraidIFrameEventBridge(nativeBridge, {
             onSetOrientationProperties: (allowOrientationChange: boolean, forceOrientation: Orientation) => this.onSetOrientationProperties(allowOrientationChange, forceOrientation),
             onOpen: (url: string) => this.onOpen(url),
-            onLoaded: () => this.onMRAIDLoaded(),
+            onLoaded: () => this.onLoadedEvent(),
             onAnalyticsEvent: (event: string, eventData: string) => this.sendMraidAnalyticsEvent(event, eventData),
             onClose: () => this.onClose(),
             onStateChange: (customState: string) => this.onCustomState(customState),
-            onResizeWebview: () => this.onResizeWebview()
+            onResizeWebview: () => this.onResizeWebview(),
+            onSendStats: (totalTime: number, playTime: number, frameCount: number) => this.updateStats({
+                totalTime: totalTime,
+                playTime: playTime,
+                frameCount: frameCount
+            })
         });
 
         this._placement = placement;
@@ -73,15 +78,11 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
         this.loadIframe();
-
-        // this._messageListener = (event: MessageEvent) => this.onMessage(event);
-        // window.addEventListener('message', this._messageListener, false);
-
-        // this.choosePrivacyShown();
     }
 
     public show(): void {
         super.show();
+
         this.choosePrivacyShown();
         this._showTimestamp = Date.now();
         this.sendMraidAnalyticsEvent('playable_show');
@@ -89,10 +90,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     public hide() {
-        // this._iframe.contentWindow!.postMessage({
-        //     type: 'viewable',
-        //     value: false
-        // }, '*');
         if(this._loadingScreenTimeout) {
             clearTimeout(this._loadingScreenTimeout);
             this._loadingScreenTimeout = undefined;
@@ -227,7 +224,20 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._loadingScreen.classList.add('hidden');
     }
 
-    protected sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
+    protected onCloseEvent(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (this._canSkip && !this._canClose) {
+            this._handlers.forEach(handler => handler.onMraidSkip());
+            this.sendMraidAnalyticsEvent('playable_skip');
+        } else if (this._canClose) {
+            this._handlers.forEach(handler => handler.onMraidClose());
+            this.sendMraidAnalyticsEvent('playable_close');
+        }
+    }
+
+    private sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
         const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
         const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;
@@ -240,7 +250,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    public onMRAIDLoaded() {
+    private onLoadedEvent(): void {
         // do nothing
     }
 }
