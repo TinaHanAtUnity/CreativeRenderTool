@@ -14,6 +14,9 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { Backend } from '../../src/ts/Backend/Backend';
 
 describe('ProgrammaticVPAIDParser', () => {
     const placements = ['TestPlacement'];
@@ -21,13 +24,19 @@ describe('ProgrammaticVPAIDParser', () => {
     const correlationId = '583dfda0d933a3630a53249c';
 
     let parser: ProgrammaticStaticInterstitialParser;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
     let request: RequestManager;
     let session: Session;
 
     beforeEach(() => {
-        nativeBridge = sinon.createStubInstance(NativeBridge);
-        (<any>nativeBridge.Sdk) = sinon.createStubInstance(SdkApi);
+        const platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+
+        (<any>core.Sdk) = sinon.createStubInstance(SdkApi);
 
         request = sinon.createStubInstance(Request);
         session = TestFixtures.getSession();
@@ -43,7 +52,7 @@ describe('ProgrammaticVPAIDParser', () => {
             let campaign: DisplayInterstitialCampaign;
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                return parser.parse(Platform.ANDROID, core, request, response, session).then((parsedCampaign) => {
                     campaign = <DisplayInterstitialCampaign>parsedCampaign;
                 });
             };
@@ -74,7 +83,7 @@ describe('ProgrammaticVPAIDParser', () => {
             let campaign: DisplayInterstitialCampaign;
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                return parser.parse(Platform.ANDROID, core, request, response, session).then((parsedCampaign) => {
                     campaign = <DisplayInterstitialCampaign>parsedCampaign;
                 });
             };

@@ -11,12 +11,16 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Privacy } from 'Ads/Views/Privacy';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
 
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 
 describe('DisplayInterstitialTest', () => {
     let view: DisplayInterstitial;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
     let placement: Placement;
     let campaign: DisplayInterstitialCampaign;
     let sandbox: sinon.SinonSandbox;
@@ -28,7 +32,9 @@ describe('DisplayInterstitialTest', () => {
     function viewUnitTests() {
         beforeEach(() => {
             sandbox = sinon.sandbox.create();
-            nativeBridge = TestFixtures.getNativeBridge();
+            const platform = Platform.ANDROID;
+            backend = TestFixtures.getBackend(platform);
+            nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             placement = new Placement({
                 id: '123',
                 name: 'test',
@@ -42,12 +48,13 @@ describe('DisplayInterstitialTest', () => {
             campaign = TestFixtures.getDisplayInterstitialCampaign();
             const gdprManager = sinon.createStubInstance(GdprManager);
             const coreConfig = TestFixtures.getCoreConfiguration();
-            const privacy = new Privacy(nativeBridge, campaign, gdprManager, false, coreConfig.isCoppaCompliant());
+            const privacy = new Privacy(platform, campaign, gdprManager, false, coreConfig.isCoppaCompliant());
 
-            view = new DisplayInterstitial(nativeBridge, placement, campaign, privacy, false);
+            const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+            view = new DisplayInterstitial(platform, core, deviceInfo, placement, campaign, privacy, false);
 
             sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
-            sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
+            sandbox.stub(deviceInfo, 'getApiLevel').returns(16);
         });
 
         afterEach(() => {

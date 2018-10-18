@@ -20,10 +20,16 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Privacy } from 'Ads/Views/Privacy';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
 
 describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    let ads: IAdsApi;
     let placement: Placement;
     let campaign: DisplayInterstitialCampaign;
     let sandbox: sinon.SinonSandbox;
@@ -39,7 +45,11 @@ describe('DisplayInterstitialEventHandler', () => {
     function eventHandlerTests() {
         beforeEach(() => {
             sandbox = sinon.sandbox.create();
-            nativeBridge = TestFixtures.getNativeBridge();
+            const platform = Platform.ANDROID;
+            backend = TestFixtures.getBackend(platform);
+            nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+            core = TestFixtures.getCoreApi(nativeBridge);
+            ads = TestFixtures.getAdsApi(nativeBridge);
             placement = new Placement({
                 id: '123',
                 name: 'test',
@@ -53,13 +63,13 @@ describe('DisplayInterstitialEventHandler', () => {
 
             campaign = TestFixtures.getDisplayInterstitialCampaign();
 
-            sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
+            const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+            sandbox.stub(deviceInfo, 'getApiLevel').returns(16);
 
-            const container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+            const container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
             const focusManager = sinon.createStubInstance(FocusManager);
-            const request = sinon.createStubInstance(Request);
+            const request = sinon.createStubInstance(RequestManager);
             const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            const deviceInfo = TestFixtures.getAndroidDeviceInfo();
             const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
             const gdprManager = sinon.createStubInstance(GdprManager);
@@ -67,11 +77,14 @@ describe('DisplayInterstitialEventHandler', () => {
             const coreConfig = TestFixtures.getCoreConfiguration();
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
-            const privacy = new Privacy(nativeBridge, campaign, gdprManager, false, false);
+            const privacy = new Privacy(platform, campaign, gdprManager, false, false);
 
-            view = new DisplayInterstitial(nativeBridge, placement, campaign, privacy, false);
+            view = new DisplayInterstitial(platform, core, deviceInfo, placement, campaign, privacy, false);
 
             displayInterstitialAdUnitParameters = {
+                platform: platform,
+                core: core,
+                ads: ads,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -90,8 +103,8 @@ describe('DisplayInterstitialEventHandler', () => {
                 programmaticTrackingService: programmaticTrackingService
             };
 
-            displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialAdUnitParameters);
-            displayInterstitialEventHandler = new DisplayInterstitialEventHandler(nativeBridge, displayInterstitialAdUnit, displayInterstitialAdUnitParameters);
+            displayInterstitialAdUnit = new DisplayInterstitialAdUnit(displayInterstitialAdUnitParameters);
+            displayInterstitialEventHandler = new DisplayInterstitialEventHandler(displayInterstitialAdUnit, displayInterstitialAdUnitParameters);
             view.addEventHandler(displayInterstitialEventHandler);
             view.render();
             return view.show();
@@ -101,28 +114,6 @@ describe('DisplayInterstitialEventHandler', () => {
             view.hide();
             sandbox.restore();
         });
-
-        // TODO: Not sure about this test...
-        /*
-        it('should redirect when the redirect message is sent', () => {
-            const spy = sinon.spy();
-
-            displayInterstitialEventHandler.onDisplayInterstitialClick = spy;
-            window.postMessage({ type: 'redirect', href: 'https://unity3d.com' }, '*');
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    try {
-                        assert.isTrue(spy.calledWith('https://unity3d.com'));
-                        view.hide();
-                        resolve();
-                    } catch (e) {
-                        view.hide();
-                        reject(e);
-                    }
-                }, 100);
-            });
-        });
-        */
 
         describe('on close', () => {
             it('should hide the adUnit', () => {

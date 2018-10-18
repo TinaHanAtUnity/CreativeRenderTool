@@ -85,6 +85,9 @@ export abstract class AbstractAdUnit {
     private _baseCampaign: Campaign;
 
     constructor(parameters: IAdUnitParameters<Campaign>) {
+        this._platform = parameters.platform;
+        this._core = parameters.core;
+        this._ads = parameters.ads;
         this._forceOrientation = parameters.forceOrientation;
         this._container = parameters.container;
         this._showing = false;
