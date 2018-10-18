@@ -18,10 +18,10 @@ enum PrivacyCardState {
 }
 
 enum ReportReason {
+    NOT_SHOWING = 'Ad is not showing',
     OFFENSIVE = 'Ad is very offensive',
-    NEVER_STARTED = 'Ad did not start',
-    WONT_END = 'Ad will not close',
     MALFORMED = 'Ad does not look right',
+    DISLIKE = 'I don\'t like this ad',
     OTHER = 'Other'
 }
 
@@ -289,13 +289,11 @@ export class Privacy extends AbstractPrivacy {
 
         const error = {
             creativeId: campaign.getCreativeId(),
-            sessionId: campaign.getSession().getId(),
             reason: reasonKey,
             adType: adType,
             seatId: campaign.getSeatId(),
             finishState: finishState,
-            isCached: isCached,
-            adPlan: campaign.getSession().getAdPlan()
+            isCached: isCached
         };
         Diagnostics.trigger('reported_ad', error);
     }

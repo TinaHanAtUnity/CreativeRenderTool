@@ -1,3 +1,7 @@
+# Pending
+
+* Minor adjustments to Reported Ads [#6771](https://github.com/Applifier/unity-ads-webview/pull/6771)
+
 # Thu Oct 18 17:01:37 UTC 2018
 
 * Test CTA button in video overlay [#6403](https://github.com/Applifier/unity-ads-webview/pull/6403)
