@@ -19,8 +19,7 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
     protected _campaign: T;
     protected _operativeEventManager: OperativeEventManager;
     protected _adUnit: VideoAdUnit<T>;
-
-    private _adUnitStyle?: AdUnitStyle;
+    protected _adUnitStyle?: AdUnitStyle;
 
     constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
         super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
@@ -34,8 +33,10 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
 
     public onOverlaySkip(position: number): void {
         this._nativeBridge.VideoPlayer.pause();
+
         this._adUnit.setVideoState(VideoState.SKIPPED);
         this._adUnit.setFinishState(FinishState.SKIPPED);
+
         this._operativeEventManager.sendSkip(this.getOperativeSkipEventParams());
 
         this._adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
@@ -81,7 +82,7 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
         }
     }
 
-    private canSkipVideo(): boolean {
+    protected canSkipVideo(): boolean {
         if(!this._placement.allowSkip() || !this._adUnit.isShowing() || !this._adUnit.canPlayVideo()) {
             return false;
         }

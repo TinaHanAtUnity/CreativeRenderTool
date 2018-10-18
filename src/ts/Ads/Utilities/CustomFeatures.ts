@@ -1,3 +1,7 @@
+import { ABGroup, AllowRewardedSkipTest } from 'Core/Models/ABGroup';
+import { Campaign } from 'Ads/Models/Campaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
         return gameId === '14850' || gameId === '14851';
@@ -43,5 +47,9 @@ export class CustomFeatures {
             || gameId === '2625701'
             || gameId === '2625703'
             || gameId === '2845426';
+    }
+
+    public static allowSkipInRewardedVideos(abGroup: ABGroup, campaign: Campaign): boolean {
+        return AllowRewardedSkipTest.isValid(abGroup) && campaign instanceof PerformanceCampaign;
     }
 }

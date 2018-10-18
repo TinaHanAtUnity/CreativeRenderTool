@@ -76,6 +76,7 @@ import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { PerformanceVideoOverlayCTAButtonTest } from 'Core/Models/ABGroup';
 import { PerformanceVideoOverlayWithCTAButton } from 'Ads/Views/PerformanceVideoOverlayWithCTAButton';
+import { PerformanceOverlayEventHandlerWithAllowSkip } from 'Performance/EventHandlers/PerformanceOverlayEventHandlerWithAllowSkip';
 
 export class AdUnitFactory {
     private static _forcedPlayableMRAID: boolean = false;
@@ -151,6 +152,8 @@ export class AdUnitFactory {
 
         if (overlay instanceof PerformanceVideoOverlayWithCTAButton) {
             performanceOverlayEventHandler = new PerformanceOverlayWithCTAButtonEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
+        } else if (CustomFeatures.allowSkipInRewardedVideos(parameters.coreConfig.getAbGroup(), parameters.campaign)) {
+            performanceOverlayEventHandler = new PerformanceOverlayEventHandlerWithAllowSkip(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         } else {
             performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         }

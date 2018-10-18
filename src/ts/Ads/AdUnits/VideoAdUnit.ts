@@ -22,6 +22,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { ABGroup } from 'Core/Models/ABGroup';
 
 export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParameters<T> {
     video: Video;
@@ -56,6 +57,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     private _finalVideoUrl: string;
     private _videoState: VideoState = VideoState.NOT_READY;
     private _clientInfo: ClientInfo;
+    private _abGroup: ABGroup;
 
     constructor(nativeBridge: NativeBridge, parameters: IVideoAdUnitParameters<T>) {
         super(nativeBridge, parameters);
@@ -71,6 +73,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
         this._clientInfo = parameters.clientInfo;
+        this._abGroup = parameters.coreConfig.getAbGroup();
 
         this.prepareOverlay();
     }
@@ -97,6 +100,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this.hideChildren();
         this.unsetReferences();
 
+        // TODO: Send finished state as completed
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this._container.removeEventHandler(this);
 
@@ -268,7 +272,11 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             overlay.render();
             document.body.appendChild(overlay.container());
 
-            if(!this._placement.allowSkip()) {
+            if (CustomFeatures.allowSkipInRewardedVideos(this._abGroup, this._campaign)) {
+                overlay.setSkipEnabled(true);
+                //TODO: Change to actual time, 15s?
+                overlay.setSkipDuration(5);
+            } else if(!this._placement.allowSkip()) {
                 overlay.setSkipEnabled(false);
             } else {
                 overlay.setSkipEnabled(true);
