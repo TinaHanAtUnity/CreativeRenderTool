@@ -26,7 +26,7 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
             limitedTimeOffer: ['object', 'undefined'],
             payouts: ['array'],
             costs: ['array'],
-            premiumProduct: ['object']
+            premiumProduct: ['object', 'undefined']
         }, campaign);
     }
 
