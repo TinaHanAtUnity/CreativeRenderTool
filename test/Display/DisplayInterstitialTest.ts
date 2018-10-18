@@ -35,6 +35,7 @@ describe('DisplayInterstitialTest', () => {
             const platform = Platform.ANDROID;
             backend = TestFixtures.getBackend(platform);
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+            core = TestFixtures.getCoreApi(nativeBridge);
             placement = new Placement({
                 id: '123',
                 name: 'test',
