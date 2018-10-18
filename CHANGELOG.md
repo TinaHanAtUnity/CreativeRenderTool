@@ -1,4 +1,4 @@
-# Pending
+# Thu Oct 18 10:52:21 UTC 2018
 
 * MediaFile selection based on file size for VAST, ready for auction abTest [#6547](https://github.com/Applifier/unity-ads-webview/pull/6547)
 * Remove CachedAdmobCampaign [#6681](https://github.com/Applifier/unity-ads-webview/pull/6681)
