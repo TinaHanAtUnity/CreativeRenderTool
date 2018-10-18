@@ -8,6 +8,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Placement } from 'Ads/Models/Placement';
 import { StorageError, StorageType } from 'Core/Native/Storage';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('BackupCampaignManagerTest', () => {
     it('should store placement data', () => {
@@ -18,8 +19,9 @@ describe('BackupCampaignManagerTest', () => {
                 set: setSpy
             }
         };
+        const storageBridge: StorageBridge = new StorageBridge(nativeBridge, 1);
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, storageBridge, TestFixtures.getCoreConfiguration());
         const placement: Placement = TestFixtures.getPlacement();
         const testMediaId: string = '12345';
 
@@ -46,8 +48,9 @@ describe('BackupCampaignManagerTest', () => {
                 write: writeSpy
             }
         };
+        const storageBridge: StorageBridge = new StorageBridge(nativeBridge, 1);
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, storageBridge, TestFixtures.getCoreConfiguration());
 
         const campaign: PerformanceCampaign = TestFixtures.getCampaign();
         const testMediaId: string = 'beefcace-abcdefg-deadbeef';
@@ -83,10 +86,11 @@ describe('BackupCampaignManagerTest', () => {
                 write: writeSpy
             }
         };
+        const storageBridge: StorageBridge = new StorageBridge(nativeBridge, 1);
 
         const configuration = TestFixtures.getCoreConfiguration();
         sinon.stub(configuration, 'getTestMode').returns(true);
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, configuration);
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, storageBridge, configuration);
         const placement: Placement = TestFixtures.getPlacement();
         const testMediaId: string = '12345';
 
@@ -106,10 +110,11 @@ describe('BackupCampaignManagerTest', () => {
                 write: writeSpy
             }
         };
+        const storageBridge: StorageBridge = new StorageBridge(nativeBridge, 1);
 
         const configuration = TestFixtures.getCoreConfiguration();
         sinon.stub(configuration, 'getTestMode').returns(true);
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, configuration);
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, storageBridge, configuration);
         const campaign: PerformanceCampaign = TestFixtures.getCampaign();
 
         backupCampaignManager.storeCampaign(campaign);
@@ -121,7 +126,9 @@ describe('BackupCampaignManagerTest', () => {
     it('should not load campaigns when test mode is active', () => {
         const configuration = TestFixtures.getCoreConfiguration();
         sinon.stub(configuration, 'getTestMode').returns(true);
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(TestFixtures.getNativeBridge(), configuration);
+        const nativeBridge: NativeBridge = TestFixtures.getNativeBridge();
+        const storageBridge: StorageBridge = new StorageBridge(nativeBridge, 1);
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, storageBridge, configuration);
 
         return backupCampaignManager.loadCampaign(TestFixtures.getPlacement()).then(campaign => {
             assert.isUndefined(campaign, 'campaign was loaded when test mode is active');
@@ -134,8 +141,9 @@ describe('BackupCampaignManagerTest', () => {
                 get: sinon.stub().returns(Promise.reject(StorageError.COULDNT_GET_VALUE))
             }
         };
+        const storageBridge: StorageBridge = new StorageBridge(nativeBridge, 1);
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, storageBridge, TestFixtures.getCoreConfiguration());
 
         return backupCampaignManager.loadCampaign(TestFixtures.getPlacement()).then(campaign => {
             assert.isUndefined(campaign, 'campaign was loaded when storage is empty');
@@ -200,8 +208,9 @@ describe('BackupCampaignManagerTest', () => {
                 }))
             }
         };
+        const storageBridge: StorageBridge = new StorageBridge(nativeBridge, 1);
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, storageBridge, TestFixtures.getCoreConfiguration());
 
         return backupCampaignManager.loadCampaign(placement).then(loadedCampaign => {
             assert.isDefined(loadedCampaign, 'campaign was not loaded when campaign was stored and cached');
@@ -266,8 +275,9 @@ describe('BackupCampaignManagerTest', () => {
                 }))
             }
         };
+        const storageBridge: StorageBridge = new StorageBridge(nativeBridge, 1);
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, storageBridge, TestFixtures.getCoreConfiguration());
 
         return backupCampaignManager.loadCampaign(placement).then(loadedCampaign => {
             assert.isDefined(loadedCampaign, 'campaign was not loaded when campaign was stored and cached files were deleted');
