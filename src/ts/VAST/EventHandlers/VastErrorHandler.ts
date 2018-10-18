@@ -19,6 +19,7 @@ export enum VastErrorCode {
     MEDIA_FILE_NOT_FOUND = 401,
     MEDIA_FILE_TIMEOUT = 402,
     MEDIA_FILE_UNSUPPORTED = 403,
+    MEDIA_FILE_UNSUPPORTED_IOS = 404,
     MEDIA_FILE_PLAY_ERROR = 405,
     COMPANION_GENERAL_ERROR = 600,   // code 5xx for Non-Linear ads
     COMPANION_SIZE_UNSUPPORTED = 601,
@@ -44,6 +45,7 @@ export enum VastErrorMessage {
     MEDIA_FILE_NOT_FOUND = 'No video URL found for VAST',
     MEDIA_FILE_TIMEOUT = 'Media file URI timed out',
     MEDIA_FILE_UNSUPPORTED = 'No Media file found supported in Video Player',
+    MEDIA_FILE_UNSUPPORTED_IOS = 'Campaign video url needs to be https for iOS',
     MEDIA_FILE_PLAY_ERROR = 'Problem displaying Media file',
     COMPANION_GENERAL_ERROR = 'General error from Companion Ad',   // code 5xx for Non-Linear ads
     COMPANION_SIZE_UNSUPPORTED = 'Companion creative size unsupported',

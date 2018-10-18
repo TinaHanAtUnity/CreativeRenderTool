@@ -81,7 +81,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         if (nativeBridge.getPlatform() === Platform.IOS && !mediaVideoUrl.match(/^https:\/\//)) {
             VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_PLAY_ERROR);
             const videoUrlError = new DiagnosticError(
-                new Error('Campaign video url needs to be https for iOS'),
+                new Error(VastErrorMessage.MEDIA_FILE_UNSUPPORTED_IOS),
                 { rootWrapperVast: response.getContent() }
             );
             throw videoUrlError;
@@ -89,7 +89,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         if (!Url.isValid(mediaVideoUrl)) {
             VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_UNSUPPORTED);
-            throw new Error('Invalid Url in VAST Media url');
+            throw new Error(VastErrorMessage.MEDIA_FILE_UNSUPPORTED);
         }
 
         mediaVideoUrl = Url.encode(mediaVideoUrl);
