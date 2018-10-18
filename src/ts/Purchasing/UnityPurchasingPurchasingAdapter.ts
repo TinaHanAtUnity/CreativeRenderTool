@@ -7,6 +7,8 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { PromoEvents } from 'Promo/Utilities/PromoEvents';
+import { Url } from 'Core/Utilities/Url';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -23,6 +25,7 @@ export interface IPromoPayload {
     iapPromo: boolean;
     request: IPromoRequest;
     purchaseTrackingUrls: string[];
+    native?: boolean;
 }
 
 export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
@@ -60,12 +63,18 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
 
     public purchaseItem(productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails> {
         const purchaseUrls = campaign.getTrackingUrlsForEvent('purchase');
-        const modifiedPurchaseUrls = ThirdPartyEventManager.replaceUrlTemplateValues(purchaseUrls, {'%ZONE%': placementId});
+        const modifiedPurchaseUrls = ThirdPartyEventManager.replaceUrlTemplateValues(purchaseUrls, {'%ZONE%': placementId}).map((value: string): string => {
+            if (PromoEvents.purchaseHostnameRegex.test(value)) {
+                return Url.addParameters(value, {'native': isNative, 'iap_service': true});
+            }
+            return value;
+        });
         const iapPayload: IPromoPayload = {
             productId: campaign.getIapProductId(),
             iapPromo: true,
             request: IPromoRequest.PURCHASE,
-            purchaseTrackingUrls: modifiedPurchaseUrls
+            purchaseTrackingUrls: modifiedPurchaseUrls,
+            native: isNative // tells iap if promo was shown as a native promo
         };
         this.sendPromoPayload(iapPayload);
         // Currently resolves with empty object until UnityPurchasing SDK sends us the relevant details

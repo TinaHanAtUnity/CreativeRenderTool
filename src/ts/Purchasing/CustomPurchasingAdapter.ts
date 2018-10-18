@@ -17,9 +17,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
     private _products: {[productId: string]: IProduct};
     private _thirdPartyEventManager: ThirdPartyEventManager;
 
-    private static purchasePathRegex = new RegExp('events\/v1\/purchase');
-    private static purchaseHostnameRegex = new RegExp('events\.iap\.unity3d\.com');
-
     constructor(nativeBridge: NativeBridge, analyticsManager: AnalyticsManager | undefined, promoEvents: PromoEvents, request: Request) {
         this._nativeBridge = nativeBridge;
         this._analyticsManager = analyticsManager;
@@ -71,9 +68,9 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                         for (const url of purchaseEventUrls) {
                             const urlData = Url.parse(url);
                             const sessionId = campaign.getSession().getId();
-                            if (CustomPurchasingAdapter.purchaseHostnameRegex.test(urlData.hostname) && CustomPurchasingAdapter.purchasePathRegex.test(urlData.pathname)) {
+                            if (PromoEvents.purchaseHostnameRegex.test(urlData.hostname) && PromoEvents.purchasePathRegex.test(urlData.pathname)) {
                                 this._promoEvents.onPurchaseSuccess({
-                                    store: PromoEvents.getAppStoreFromReceipt(details.receipt),
+                                    store: this._promoEvents.getAppStoreFromReceipt(details.receipt),
                                     productId: details.productId,
                                     storeSpecificId: details.productId,
                                     amount: details.price,
@@ -81,7 +78,7 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                                     native: isNative
                                 }, product.productType, details.receipt)
                                 .then((body) => {
-                                    this._thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, url, JSON.stringify(body));
+                                    this._thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, Url.addParameters(url, {'native': isNative, 'iap_service': false}), JSON.stringify(body));
                                 });
                             } else {
                                 this._thirdPartyEventManager.sendWithGet(purchaseKey, sessionId, url);
@@ -110,7 +107,7 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                         for (const url of purchaseEventUrls) {
                             const urlData = Url.parse(url);
                             const sessionId = campaign.getSession().getId();
-                            if (CustomPurchasingAdapter.purchaseHostnameRegex.test(urlData.hostname) && CustomPurchasingAdapter.purchasePathRegex.test(urlData.pathname)) {
+                            if (PromoEvents.purchaseHostnameRegex.test(urlData.hostname) && PromoEvents.purchasePathRegex.test(urlData.pathname)) {
                                 this._promoEvents.onPurchaseFailed({
                                     store: details.store,
                                     productId: productId,
@@ -120,7 +117,7 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                                     native: isNative
                                 }, this._promoEvents.failureJson(details.storeSpecificErrorCode, details.exceptionMessage, AnalyticsManager.getPurchasingFailureReason(details.transactionError), productId))
                                 .then((body) => {
-                                    this._thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, url, JSON.stringify(body));
+                                    this._thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, Url.addParameters(url, {'native': isNative, 'iap_service': false}), JSON.stringify(body));
                                 });
                             } else {
                                 this._thirdPartyEventManager.sendWithGet(purchaseKey, sessionId, url);
