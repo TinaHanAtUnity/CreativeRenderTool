@@ -1,11 +1,9 @@
 import { AdMobCampaign, AdMobVideo, IAdMobCampaign } from 'AdMob/Models/AdMobCampaign';
-import { CachedAdMobCampaign } from 'AdMob/Models/CachedAdMobCampaign';
 import { Video } from 'Ads/Models/Assets/Video';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FileId } from 'Core/Utilities/FileId';
@@ -49,11 +47,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 video: video
             };
 
-            if (gameId && CustomFeatures.isAdmobCachedVideoGame(gameId)) {
-                return Promise.resolve(new CachedAdMobCampaign(adMobCampaignParams));
-            } else {
-                return Promise.resolve(new AdMobCampaign(adMobCampaignParams));
-            }
+            return Promise.resolve(new AdMobCampaign(adMobCampaignParams));
         });
 
     }

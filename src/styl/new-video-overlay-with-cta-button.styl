@@ -1,0 +1,37 @@
+@import "vars.styl";
+@import "new-video-overlay.styl";
+
+#new-video-overlay {
+  .call-button {
+    .download-wrapper {
+      $new-video-overlay-styles-download-element-height = $new-video-overlay-styles.base-size * 1;
+      $new-video-overlay-styles-download-element-margin = $new-video-overlay-styles.base-size * .26;
+      $new-video-overlay-styles-download-element-border-radius = $new-video-overlay-styles.base-size * .2;
+
+      position: relative;
+
+      .game-icon {
+        $set-image($new-video-overlay-styles-download-element-height, $new-video-overlay-styles-download-element-height, $new-video-overlay-styles-download-element-border-radius);
+        margin: $new-video-overlay-styles-download-element-margin;
+      }
+
+      .download-container {
+        position: absolute;
+        top: 0;
+        left: $new-video-overlay-styles-download-element-height + 2 * $new-video-overlay-styles-download-element-margin;
+        width: $new-video-overlay-styles.base-size * 4;
+        height: $new-video-overlay-styles-download-element-height;
+        border-radius: $new-video-overlay-styles-download-element-border-radius;
+        background: $blue;
+        color: $white;
+        text-align: center;
+        line-height: $new-video-overlay-styles.base-size * .75;
+      }
+
+      .download-text {
+        text-shadow: none;
+        font-size: $new-video-overlay-styles.base-size * .5;
+      }
+    }
+  }
+}

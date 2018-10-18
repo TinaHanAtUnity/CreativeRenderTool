@@ -13,14 +13,15 @@ interface IVastMediaFile {
     apiFramework: string | null;
     scalable: boolean | null;
     maintainAspectRatio: boolean | null;
+    fileSize: number;
 }
 
 export class VastMediaFile extends Model<IVastMediaFile> {
     constructor();
     constructor(fileURL: string, deliveryType: string, codec: string, mimeType: string, bitrate: number,
-                minBitrate: number, maxBitrate: number, width: number, height: number, apiFramework: string);
+                minBitrate: number, maxBitrate: number, width: number, height: number, apiFramework: string, fileSize: number);
     constructor(fileURL?: string, deliveryType?: string, codec?: string, mimeType?: string, bitrate?: number,
-                minBitrate?: number, maxBitrate?: number, width?: number, height?: number, apiFramework?: string) {
+                minBitrate?: number, maxBitrate?: number, width?: number, height?: number, apiFramework?: string, fileSize?: number) {
         super('VastMediaFile', {
             fileURL: ['string', 'null'],
             deliveryType: ['string'],
@@ -33,7 +34,8 @@ export class VastMediaFile extends Model<IVastMediaFile> {
             height: ['number'],
             apiFramework: ['string', 'null'],
             scalable: ['boolean', 'null'],
-            maintainAspectRatio: ['boolean', 'null']
+            maintainAspectRatio: ['boolean', 'null'],
+            fileSize: ['number']
         });
 
         this.set('fileURL', fileURL || null);
@@ -48,6 +50,7 @@ export class VastMediaFile extends Model<IVastMediaFile> {
         this.set('apiFramework', apiFramework || null);
         this.set('scalable', null);
         this.set('maintainAspectRatio', null);
+        this.set('fileSize', fileSize || 0);
     }
 
     public getFileURL(): string | null {
@@ -98,6 +101,10 @@ export class VastMediaFile extends Model<IVastMediaFile> {
         return this.get('maintainAspectRatio');
     }
 
+    public getFileSize(): number {
+        return this.get('fileSize');
+    }
+
     public getDTO(): { [key: string]: any } {
         return {
             'fileURL': this.getFileURL(),
@@ -111,7 +118,8 @@ export class VastMediaFile extends Model<IVastMediaFile> {
             'height': this.getHeight(),
             'apiFramework': this.getApiFramework(),
             'scalable': this.getScalable(),
-            'maintainAspectRatio': this.getMaintainAspectRation()
+            'maintainAspectRatio': this.getMaintainAspectRation(),
+            'fileSize': this.getFileSize()
         };
     }
 }
