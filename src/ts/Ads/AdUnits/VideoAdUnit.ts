@@ -100,7 +100,6 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this.hideChildren();
         this.unsetReferences();
 
-        // TODO: Send finished state as completed
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this._container.removeEventHandler(this);
 
