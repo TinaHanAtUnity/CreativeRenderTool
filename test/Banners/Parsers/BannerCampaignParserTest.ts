@@ -11,7 +11,7 @@ import BannerCampaignJSON from 'json/campaigns/banner/ValidBannerCampaign.json';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ICoreApi } from '../../../../../src/ts/Core/Core';
+import { ICoreApi } from '../../../src/ts/Core/ICore';
 
 describe('BannerCampaignParser', () => {
     const placements = ['TestPlacement'];

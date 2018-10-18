@@ -18,7 +18,7 @@ export interface IBannersApi extends IModuleApi {
     Listener: BannerListenerApi;
 }
 
-export class Banners implements IApiModule, IParserModule {
+export class Banners implements IApiModule {
 
     public readonly Api: IBannersApi;
 

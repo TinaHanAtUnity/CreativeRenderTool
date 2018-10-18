@@ -22,7 +22,8 @@ describe('BannerAdUnitFactoryTest', () => {
         });
 
         it('should return a banner ad unit', () => {
-            const adUnit = BannerAdUnitFactory.createAdUnit(parameters);
+            const factory = new BannerAdUnitFactory();
+            const adUnit = factory.createAdUnit(parameters);
             assert.instanceOf(adUnit, BannerAdUnit, 'Returned ad unit is not a BannerAdUnit.');
         });
     });

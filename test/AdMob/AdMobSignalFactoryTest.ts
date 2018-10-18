@@ -8,17 +8,19 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as protobuf from 'protobufjs/minimal';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { unity_proto } from '../../../src/proto/unity_proto.js';
+import { unity_proto } from '../../src/proto/unity_proto';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
 
 describe('AdMobSignalFactoryTest', () => {
-    xit('basic test', () => {
-        const nativeBridge: NativeBridge = TestFixtures.getNativeBridge();
+    it('basic test', () => {
+        const platform = Platform.ANDROID;
+        const backend = TestFixtures.getBackend(platform);
+        const nativeBridge: NativeBridge = TestFixtures.getNativeBridge(platform, backend);
         const core = TestFixtures.getCoreApi(nativeBridge);
         const ads = TestFixtures.getAdsApi(nativeBridge);
         const clientInfo: ClientInfo = TestFixtures.getClientInfo();
-        const deviceInfo: AndroidDeviceInfo = TestFixtures.getAndroidDeviceInfo();
+        const deviceInfo: AndroidDeviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         const focusManager: FocusManager = new FocusManager(nativeBridge.getPlatform(), core);
-        const metaDataManager: MetaDataManager = new MetaDataManager(core);
 
         return new AdMobSignalFactory(nativeBridge.getPlatform(), core, ads, clientInfo, deviceInfo, focusManager).getAdRequestSignal().then(signal => {
             const encodedMsg: string = signal.getBase64ProtoBuf();

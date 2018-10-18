@@ -1,9 +1,8 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { BannerAdUnit, IBannerAdUnitParameters } from 'Banners/AdUnits/BannerAdUnit';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
-import { AbstractAdUnitFactory } from '../../Ads/AdUnits/AbstractAdUnitFactory';
 
-export class BannerAdUnitFactory extends AbstractAdUnitFactory {
+export class BannerAdUnitFactory {
 
     public static ContentTypeJS = 'programmatic/banner-js';
     public static ContentTypeHTML = 'programmatic/banner-html';
