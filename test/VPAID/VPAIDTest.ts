@@ -11,7 +11,6 @@ import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDHandler, VPAID } from 'VPAID/Views/VPAID';
 import { Platform } from '../../src/ts/Core/Constants/Platform';
 import { Backend } from '../../src/ts/Backend/Backend';
-import { IAdsApi } from '../../src/ts/Ads/IAds';
 import { ICoreApi } from '../../src/ts/Core/ICore';
 
 describe('VPAID View', () => {
@@ -19,7 +18,6 @@ describe('VPAID View', () => {
     let backend: Backend;
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
-    let ads: IAdsApi;
     let campaign: VPAIDCampaign;
     let eventHandler: IVPAIDHandler;
     let webPlayerContainer: WebPlayerContainer;
