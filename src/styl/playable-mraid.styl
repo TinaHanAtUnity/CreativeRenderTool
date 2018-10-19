@@ -6,6 +6,7 @@ $filling-bar-width = $progress-bar-width * .3;
 $permissions-max-width = 300px;
 $permissions-gray = #a6a6a6;
 $camera-permission-panel-color = #fafafa;
+$camera-permission-panel-height = 100vw;
 
 #playable-mraid {
 
@@ -64,6 +65,10 @@ $camera-permission-panel-color = #fafafa;
 
   #mraid-iframe {
     $iframe-default();
+  }
+
+  .mraid-iframe-camera-permission-dialog {
+    height: $camera-permission-panel-height !important;
   }
 
   .close-region {
@@ -249,7 +254,7 @@ $camera-permission-panel-color = #fafafa;
 
   .camera-permission-panel {
     position: absolute;
-    top: 100vw;
+    top: $camera-permission-panel-height;
     right: 0;
     bottom: 0;
     left: 0;
@@ -334,6 +339,11 @@ $camera-permission-panel-color = #fafafa;
 
 .landscape {
   #playable-mraid {
+    .mraid-iframe-camera-permission-dialog {
+      width: 100vh !important;
+      height: 100vh !important; 
+    }
+
     .camera-permission-panel {
       position: absolute;
       top: 0;
