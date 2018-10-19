@@ -106,8 +106,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     public setViewableState(viewable: boolean) {
         if(this._isLoaded && !this._loadingScreenTimeout) {
             this._mraidBridge.sendViewableEvent(viewable);
+            this.setAnalyticsBackgroundTime(viewable);
         }
-        this.setAnalyticsBackgroundTime(viewable);
     }
 
     private loadIframe(): void {
