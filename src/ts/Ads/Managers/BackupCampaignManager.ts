@@ -13,15 +13,19 @@ import { IFileInfo } from 'Core/Native/Cache';
 import { MraidLoader } from 'MRAID/Parsers/MraidLoader';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { StorageOperation } from 'Core/Utilities/StorageOperation';
 
 export class BackupCampaignManager {
     private static _maxExpiryDelay: number = 7 * 24 * 3600 * 1000; // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
 
     private _nativeBridge: NativeBridge;
+    private _storageBridge: StorageBridge;
     private _coreConfiguration: CoreConfiguration;
 
-    constructor(nativeBridge: NativeBridge, coreConfiguration: CoreConfiguration) {
+    constructor(nativeBridge: NativeBridge, storageBridge: StorageBridge, coreConfiguration: CoreConfiguration) {
         this._nativeBridge = nativeBridge;
+        this._storageBridge = storageBridge;
         this._coreConfiguration = coreConfiguration;
     }
 
@@ -33,11 +37,10 @@ export class BackupCampaignManager {
 
         const rootKey: string = 'backupcampaign.placement.' + placement.getId();
 
-        this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.mediaid', mediaId);
-        this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.adtypes', JSON.stringify(placement.getAdTypes()));
-        // note: Storage.write is intentionally omitted as an optimization hack
-        // it is enough to have Storage.write after campaigns are stored
-        // if placements are not written because of this, it won't matter since campaigns would not be written either
+        const operation = new StorageOperation(StorageType.PRIVATE);
+        operation.set(rootKey + '.mediaid', mediaId);
+        operation.set(rootKey + '.adtypes', JSON.stringify(placement.getAdTypes()));
+        this._storageBridge.queue(operation);
     }
 
     public storeCampaign(campaign: Campaign) {
@@ -56,10 +59,11 @@ export class BackupCampaignManager {
                 willExpireAt = Date.now() + BackupCampaignManager._maxExpiryDelay;
             }
 
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.type', campaignType);
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.data', campaign.toJSON());
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.willexpireat', willExpireAt);
-            this._nativeBridge.Storage.write(StorageType.PRIVATE);
+            const operation = new StorageOperation(StorageType.PRIVATE);
+            operation.set(rootKey + '.type', campaignType);
+            operation.set(rootKey + '.data', campaign.toJSON());
+            operation.set(rootKey + '.willexpireat', willExpireAt);
+            this._storageBridge.queue(operation);
         }
     }
 
@@ -103,8 +107,9 @@ export class BackupCampaignManager {
     }
 
     public deleteBackupCampaigns() {
-        this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'backupcampaign');
-        this._nativeBridge.Storage.write(StorageType.PRIVATE);
+        const operation = new StorageOperation(StorageType.PRIVATE);
+        operation.delete('backupcampaign');
+        this._storageBridge.queue(operation);
     }
 
     private getCampaignType(campaign: Campaign): string | undefined {
