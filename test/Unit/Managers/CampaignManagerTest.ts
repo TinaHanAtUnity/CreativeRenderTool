@@ -501,7 +501,7 @@ describe('CampaignManager', () => {
                 assert.equal(triggeredError.message, expectedErrorMessage);
             });
         };
-// tslint:disable:no-console
+
         const verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, done?: () => void): void => {
             // given a VAST placement that wraps another VAST
             const mockRequest = sinon.mock(request);

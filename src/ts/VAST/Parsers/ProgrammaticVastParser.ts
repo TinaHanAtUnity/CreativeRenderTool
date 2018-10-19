@@ -81,7 +81,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         if (nativeBridge.getPlatform() === Platform.IOS && !mediaVideoUrl.match(/^https:\/\//)) {
             if (this._isErrorTrackingExperiment) {
-                VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_PLAY_ERROR);
+                VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS);
             }
             const videoUrlError = new DiagnosticError(
                 new Error(VastErrorMessage.MEDIA_FILE_UNSUPPORTED_IOS),
