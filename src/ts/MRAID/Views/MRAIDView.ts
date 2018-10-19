@@ -233,14 +233,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         };
     }
 
-    protected getMraidAsUrl(mraid: string): Promise<string> {
-        mraid = this._nativeBridge.getPlatform() === Platform.ANDROID ? decodeURIComponent(mraid) : mraid;
-        return this._nativeBridge.Cache.setFileContent('webPlayerMraid', 'UTF-8', mraid)
-        .then(() => {
-            return this._nativeBridge.Cache.getFilePath('webPlayerMraid');
-        });
-    }
-
     protected prepareProgressCircle() {
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
@@ -319,13 +311,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
                 this._backgroundTime += Date.now() - this._backgroundTimestamp;
             }
         }
-    }
-
-    protected checkIsValid(timeInSeconds: number): number | undefined {
-        if (timeInSeconds < 0 || timeInSeconds > 600) {
-            return undefined;
-        }
-        return timeInSeconds;
     }
 
     private replaceMraidSources(mraid: string): string {
