@@ -514,7 +514,6 @@ describe('CampaignManager', () => {
             const verify = () => {
                 // then the onError observable is triggered with an appropriate error
                 mockRequest.verify();
-                console.log('verify Wrapped response');
                 if(triggeredError instanceof Error) {
                     assert.equal(triggeredError.message, expectedErrorMessage);
                 } else if (triggeredError instanceof WebViewError) {
@@ -525,7 +524,6 @@ describe('CampaignManager', () => {
             };
 
             campaignManager.onError.subscribe((error: WebViewError) => {
-                console.log('verify Wrapped response error ' + error.message);
                 triggeredError = error;
                 if (done) {
                     // then the onError observable is triggered with an appropriate error
