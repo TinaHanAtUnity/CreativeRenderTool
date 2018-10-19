@@ -13,6 +13,9 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
 
 describe('ProgrammaticVPAIDParser', () => {
     const placements = ['TestPlacement'];
@@ -20,13 +23,19 @@ describe('ProgrammaticVPAIDParser', () => {
     const correlationId = '583dfda0d933a3630a53249c';
 
     let parser: ProgrammaticVPAIDParser;
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
     let request: RequestManager;
     let session: Session;
 
     beforeEach(() => {
-        nativeBridge = sinon.createStubInstance(NativeBridge);
-        (<any>nativeBridge.Sdk) = sinon.createStubInstance(SdkApi);
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        (<any>core.Sdk) = sinon.createStubInstance(SdkApi);
 
         request = sinon.createStubInstance(Request);
         session = TestFixtures.getSession();
@@ -39,7 +48,7 @@ describe('ProgrammaticVPAIDParser', () => {
             let campaign: VPAIDCampaign;
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
                     campaign = <VPAIDCampaign>parsedCampaign;
                 });
             };

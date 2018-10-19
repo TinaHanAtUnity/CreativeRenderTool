@@ -15,13 +15,22 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
-import { TestFixtures } from 'test/TestHelpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
+import { IPromoApi } from '../../src/ts/Promo/IPromo';
+import { IPurchasingApi } from '../../src/ts/Purchasing/IPurchasing';
 
 describe('UnityPurchasingPurchasingAdapter', () => {
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    let promo: IPromoApi;
     let sandbox: sinon.SinonSandbox;
     let clientInfo: ClientInfo;
-    let purchasing: PurchasingApi;
     let sdk: SdkApi;
 
     let purchasingAdapter: IPurchasingAdapter;
@@ -49,44 +58,44 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
     const triggerInitialize = (initialized: boolean) => {
         return new Promise((resolve) => {
-            nativeBridge.Purchasing.onInitialize.trigger(initialized ? 'True' : 'False');
+            promo.Purchasing.onInitialize.trigger(initialized ? 'True' : 'False');
             setTimeout(resolve);
         });
     };
 
     const triggerGetPromoVersion = (promoVersion: string) => {
         return new Promise((resolve) => {
-            nativeBridge.Purchasing.onGetPromoVersion.trigger(promoVersion);
+            promo.Purchasing.onGetPromoVersion.trigger(promoVersion);
             setTimeout(resolve);
         });
     };
 
     const triggerPurchasingCommand = (success: boolean) => {
         return new Promise((resolve) => {
-            nativeBridge.Purchasing.onCommandResult.trigger(success ? 'True' : 'False');
+            promo.Purchasing.onCommandResult.trigger(success ? 'True' : 'False');
             setTimeout(resolve);
         });
     };
 
     beforeEach(() => {
-        nativeBridge = sinon.createStubInstance(NativeBridge);
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        promo = TestFixtures.getPromoApi(nativeBridge);
         clientInfo = sinon.createStubInstance(ClientInfo);
-        purchasing = sinon.createStubInstance(PurchasingApi);
         sdk = sinon.createStubInstance(SdkApi);
         sandbox = sinon.createSandbox();
 
-        (<sinon.SinonStub>purchasing.getPromoCatalog).returns(Promise.resolve());
-        (<sinon.SinonStub>purchasing.getPromoVersion).returns(Promise.resolve());
-        (<sinon.SinonStub>purchasing.initiatePurchasingCommand).returns(Promise.resolve());
-        (<sinon.SinonStub>purchasing.initializePurchasing).returns(Promise.resolve());
-        (<any>purchasing).onInitialize = new Observable1<string>();
-        (<any>purchasing).onGetPromoVersion = new Observable1<string>();
-        (<any>purchasing).onCommandResult = new Observable1<string>();
-        (<any>purchasing).onIAPSendEvent = new Observable1<string>();
-        (<any>purchasing).onGetPromoCatalog = new Observable1<string>();
-
-        nativeBridge.Sdk = sdk;
-        nativeBridge.Purchasing = purchasing;
+        (<sinon.SinonStub>promo.Purchasing.getPromoCatalog).returns(Promise.resolve());
+        (<sinon.SinonStub>promo.Purchasing.getPromoVersion).returns(Promise.resolve());
+        (<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand).returns(Promise.resolve());
+        (<sinon.SinonStub>promo.Purchasing.initializePurchasing).returns(Promise.resolve());
+        (<any>promo.Purchasing).onInitialize = new Observable1<string>();
+        (<any>promo.Purchasing).onGetPromoVersion = new Observable1<string>();
+        (<any>promo.Purchasing).onCommandResult = new Observable1<string>();
+        (<any>promo.Purchasing).onIAPSendEvent = new Observable1<string>();
+        (<any>promo.Purchasing).onGetPromoCatalog = new Observable1<string>();
     });
 
     afterEach(() => {
@@ -98,19 +107,19 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         it('should resolve without calling sendPurchasingCommand if configuration does not include promo', () => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(nativeBridge, coreConfiguration, adsConfiguration, clientInfo);
+            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo);
 
             return purchasingAdapter.initialize().then(() => {
-                sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initializePurchasing);
-                sinon.assert.notCalled(<sinon.SinonSpy>purchasing.getPromoVersion);
-                sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
+                sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initializePurchasing);
+                sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.getPromoVersion);
+                sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
             });
         });
 
         it('should fail with IAP Promo was not ready if purchasing is not ready', () => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(nativeBridge, coreConfiguration, adsConfiguration, clientInfo);
+            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo);
 
             const initializePromise = purchasingAdapter.initialize();
 
@@ -118,7 +127,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
                     .catch((e) => {
                         assert.equal(e.message, 'Purchasing SDK not detected. You have likely configured a promo placement but have not included the Unity Purchasing SDK in your game.');
-                        sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
+                        sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
                     });
             });
         });
@@ -127,7 +136,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             const promoVersion = '1.15';
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(nativeBridge, coreConfiguration, adsConfiguration, clientInfo);
+            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo);
 
             const initializePromise = purchasingAdapter.initialize();
 
@@ -137,7 +146,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
                     .catch((e) => {
                         assert.equal(e.message, `Promo version: ${promoVersion} is not supported. Initialize UnityPurchasing 1.16+ to ensure Promos are marked as ready`);
-                        sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
+                        sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
                     });
                 });
         });
@@ -146,7 +155,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             const promoVersion = '1';
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(nativeBridge, coreConfiguration, adsConfiguration, clientInfo);
+            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo);
 
             const initializePromise = purchasingAdapter.initialize();
 
@@ -156,7 +165,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
                     .catch((e) => {
                         assert.equal(e.message, `Promo version: ${promoVersion} is not supported. Initialize UnityPurchasing 1.16+ to ensure Promos are marked as ready`);
-                        sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
+                        sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
                     });
                 });
         });
@@ -164,7 +173,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         it('should fail and not set isInitialized to true if command result is false', () => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(nativeBridge, coreConfiguration, adsConfiguration, clientInfo);
+            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo);
 
             const initializePromise = purchasingAdapter.initialize();
 
@@ -175,7 +184,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
                     .catch((e) => {
                         assert.equal(e.message, 'Purchase command attempt failed with command False');
-                        sinon.assert.called(<sinon.SinonStub>purchasing.initiatePurchasingCommand);
+                        sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
                     });
                 });
         });
@@ -183,28 +192,28 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         it('should fail when initializePurchasing rejects', () => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(nativeBridge, coreConfiguration, adsConfiguration, clientInfo);
+            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo);
 
-            (<sinon.SinonStub>purchasing.initializePurchasing).rejects();
+            (<sinon.SinonStub>promo.Purchasing.initializePurchasing).rejects();
             return purchasingAdapter.initialize().catch((e: any) => {
                 assert.equal(e.message, 'Purchase initialization failed');
-                sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
+                sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
             });
         });
 
         it('should fail when getPromoVersion rejects', () => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(nativeBridge, coreConfiguration, adsConfiguration, clientInfo);
+            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo);
 
             const initializePromise = purchasingAdapter.initialize();
 
-            (<sinon.SinonStub>purchasing.getPromoVersion).rejects();
+            (<sinon.SinonStub>promo.Purchasing.getPromoVersion).rejects();
             return triggerInitialize(true).then(() => {
                 return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
                     .catch((e) => {
                         assert.equal(e.message, 'Promo version check failed');
-                        sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
+                        sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
                     });
             });
         });
@@ -212,11 +221,11 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         it('should fail when initiatePurchasingCommand rejects', () => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(nativeBridge, coreConfiguration, adsConfiguration, clientInfo);
+            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo);
 
             const initializePromise = purchasingAdapter.initialize();
 
-            (<sinon.SinonStub>purchasing.initiatePurchasingCommand).rejects();
+            (<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand).rejects();
             return triggerInitialize(true)
                 .then(() => triggerGetPromoVersion('1.16'))
                 .then(() => {
@@ -230,7 +239,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         it('should call SendPurchasingCommand on successful trigger of all underlying promises', () => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(nativeBridge, coreConfiguration, adsConfiguration, clientInfo);
+            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo);
 
             const initializePromise = purchasingAdapter.initialize();
 
@@ -239,7 +248,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 .then(() => triggerPurchasingCommand(true))
                 .then(() => {
                     return initializePromise.then(() => {
-                        sinon.assert.called(<sinon.SinonStub>purchasing.initiatePurchasingCommand);
+                        sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
                     });
                 });
         });
@@ -249,12 +258,12 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         beforeEach(() => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(nativeBridge, coreConfiguration, adsConfiguration, clientInfo);
+            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo);
         });
 
         const triggerRefreshCatalog = (value: string) => {
             return new Promise((resolve) => {
-                nativeBridge.Purchasing.onGetPromoCatalog.trigger(value);
+                promo.Purchasing.onGetPromoCatalog.trigger(value);
                 setTimeout(resolve);
             });
         };
@@ -284,7 +293,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         });
 
         it('should fail when onGetPromoCatalog rejects', () => {
-            (<sinon.SinonStub>purchasing.getPromoCatalog).rejects();
+            (<sinon.SinonStub>promo.Purchasing.getPromoCatalog).rejects();
 
             return purchasingAdapter.refreshCatalog().catch((e: any) => {
                 assert.equal(e.message, 'Purchasing Catalog failed to refresh');
@@ -321,8 +330,8 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
         const triggerRefreshCatalog = (value: string, payloadType: string) => {
             return new Promise((resolve) => {
-                nativeBridge.Purchasing.onIAPSendEvent.trigger(payloadType);
-                nativeBridge.Purchasing.onGetPromoCatalog.trigger(value);
+                promo.Purchasing.onIAPSendEvent.trigger(payloadType);
+                promo.Purchasing.onGetPromoCatalog.trigger(value);
                 setTimeout(resolve);
             });
         };
@@ -340,7 +349,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             sandbox = sinon.createSandbox();
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(nativeBridge, coreConfiguration, adsConfiguration, clientInfo);
+            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo);
             sandbox.stub(purchasingAdapter.onCatalogRefreshed, 'trigger');
         });
 
@@ -367,7 +376,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         beforeEach(() => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(nativeBridge, coreConfiguration, adsConfiguration, clientInfo);
+            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo);
         });
 
         it('should send the promo payload with Purchase request value', () => {
@@ -376,8 +385,8 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 return purchasingAdapter.purchaseItem('com.example.iap.product1', TestFixtures.getPromoCampaign(), 'testId')
                 .then(() => triggerPurchasingCommand(true))
                 .then(() => {
-                    sinon.assert.called(<sinon.SinonStub>purchasing.initiatePurchasingCommand);
-                    sinon.assert.calledWith((<sinon.SinonStub>purchasing.initiatePurchasingCommand).getCall(1), JSON.stringify({
+                    sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
+                    sinon.assert.calledWith((<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand).getCall(1), JSON.stringify({
                         productId: TestFixtures.getPromoCampaign().getIapProductId(),
                         iapPromo: true,
                         request: 'purchase',
@@ -402,15 +411,15 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         beforeEach(() => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(nativeBridge, coreConfiguration, adsConfiguration, clientInfo);
+            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo);
         });
 
         it('should send the promo payload with Close request value', () => {
 
             const callPromoClosed = () => {
                 purchasingAdapter.onPromoClosed(TestFixtures.getPromoCampaign(), '');
-                sinon.assert.called(<sinon.SinonStub>purchasing.initiatePurchasingCommand);
-                sinon.assert.calledWith((<sinon.SinonSpy>purchasing.initiatePurchasingCommand).getCall(1), JSON.stringify({
+                sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
+                sinon.assert.calledWith((<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand).getCall(1), JSON.stringify({
                     'gamerToken':'abcd.1234.5678',
                     'trackingOptOut':false,
                     'iapPromo':true,

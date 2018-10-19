@@ -18,12 +18,17 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
 
 describe('OperativeEventManagerFactoryTest', () => {
-    const handleInvocation = sinon.spy();
-    const handleCallback = sinon.spy();
 
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    let ads: IAdsApi;
     let request: RequestManager;
     let storageBridge: StorageBridge;
     let metaDataManager: MetaDataManager;
@@ -34,17 +39,18 @@ describe('OperativeEventManagerFactoryTest', () => {
     let adsConfig: AdsConfiguration;
 
     beforeEach(() => {
-        nativeBridge = new NativeBridge({
-            handleInvocation,
-            handleCallback
-        }, Platform.ANDROID);
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        ads = TestFixtures.getAdsApi(nativeBridge);
 
-        storageBridge = new StorageBridge(nativeBridge);
-        request = sinon.createStubInstance(Request);
+        storageBridge = new StorageBridge(core);
+        request = sinon.createStubInstance(RequestManager);
         sessionManager = sinon.createStubInstance(SessionManager);
-        metaDataManager = new MetaDataManager(nativeBridge);
+        metaDataManager = new MetaDataManager(core);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        deviceInfo = TestFixtures.getAndroidDeviceInfo();
+        deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         coreConfig = TestFixtures.getCoreConfiguration();
         adsConfig = TestFixtures.getAdsConfiguration();
     });
@@ -53,7 +59,9 @@ describe('OperativeEventManagerFactoryTest', () => {
         it('with PerformanceCampaign', () => {
             const campaign = TestFixtures.getCampaign();
             const manager = OperativeEventManagerFactory.createOperativeEventManager({
-                nativeBridge: nativeBridge,
+                platform,
+                core,
+                ads,
                 request: request,
                 metaDataManager: metaDataManager,
                 sessionManager: sessionManager,
@@ -71,7 +79,9 @@ describe('OperativeEventManagerFactoryTest', () => {
         it('with XPromoCampaign', () => {
             const campaign = TestFixtures.getXPromoCampaign();
             const manager = OperativeEventManagerFactory.createOperativeEventManager({
-                nativeBridge: nativeBridge,
+                platform,
+                core,
+                ads,
                 request: request,
                 metaDataManager: metaDataManager,
                 sessionManager: sessionManager,
@@ -89,7 +99,9 @@ describe('OperativeEventManagerFactoryTest', () => {
         it('with MRAIDCampaign', () => {
             const campaign = TestFixtures.getPlayableMRAIDCampaign();
             const manager = OperativeEventManagerFactory.createOperativeEventManager({
-                nativeBridge: nativeBridge,
+                platform,
+                core,
+                ads,
                 request: request,
                 metaDataManager: metaDataManager,
                 sessionManager: sessionManager,
@@ -107,7 +119,9 @@ describe('OperativeEventManagerFactoryTest', () => {
         it('with all other campaign types', () => {
             const campaign = TestFixtures.getPromoCampaign();
             const manager = OperativeEventManagerFactory.createOperativeEventManager({
-                nativeBridge: nativeBridge,
+                platform,
+                core,
+                ads,
                 request: request,
                 metaDataManager: metaDataManager,
                 sessionManager: sessionManager,

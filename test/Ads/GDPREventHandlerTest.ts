@@ -21,17 +21,33 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Privacy } from 'Ads/Views/Privacy';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
 
 describe('GDPREventHandlerTest', () => {
 
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    let ads: IAdsApi;
     let adUnit: PerformanceAdUnit;
     let adUnitParameters: IPerformanceAdUnitParameters;
 
     let gdprEventHandler: OverlayEventHandler<PerformanceCampaign>;
 
     beforeEach(() => {
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        ads = TestFixtures.getAdsApi(nativeBridge);
         adUnitParameters = {
+            platform,
+            core,
+            ads,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: sinon.createStubInstance(FocusManager),
             container: sinon.createStubInstance(ViewController),
@@ -54,8 +70,7 @@ describe('GDPREventHandlerTest', () => {
         };
 
         adUnit = sinon.createStubInstance(PerformanceAdUnit);
-        nativeBridge = sinon.createStubInstance(NativeBridge);
-        gdprEventHandler = new OverlayEventHandler(nativeBridge, adUnit, adUnitParameters);
+        gdprEventHandler = new OverlayEventHandler(adUnit, adUnitParameters);
     });
 
     describe('When calling onGDPRPopupSkipped', () => {

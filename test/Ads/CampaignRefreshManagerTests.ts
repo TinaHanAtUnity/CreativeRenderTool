@@ -35,7 +35,6 @@ import { CacheManager, CacheStatus } from 'Core/Managers/CacheManager';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Observable0, Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
@@ -53,6 +52,52 @@ import { VastParser } from 'VAST/Utilities/VastParser';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
+import { CampaignParserManager } from '../../src/ts/Ads/Managers/CampaignParserManager';
+
+export class TestContainer extends AdUnitContainer {
+    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
+        return Promise.resolve();
+    }
+    public close(): Promise<void> {
+        return Promise.resolve();
+    }
+    public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
+        return Promise.all([]);
+    }
+    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any[]> {
+        return Promise.all([]);
+    }
+    public isPaused(): boolean {
+        return false;
+    }
+    public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
+        return Promise.resolve();
+    }
+    public getViews(): Promise<string[]> {
+        return Promise.all([]);
+    }
+}
+
+export class TestAdUnit extends AbstractAdUnit {
+    public show(): Promise<void> {
+        return Promise.resolve();
+    }
+    public hide(): Promise<void> {
+        return Promise.resolve();
+    }
+    public description(): string {
+        return 'TestAdUnit';
+    }
+    public isShowing() {
+        return true;
+    }
+    public isCached() {
+        return false;
+    }
+}
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -62,7 +107,11 @@ describe('CampaignRefreshManager', () => {
     let adsConfig: AdsConfiguration;
     let campaignManager: CampaignManager;
     let wakeUpManager: WakeUpManager;
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    let ads: IAdsApi;
     let request: RequestManager;
     let storageBridge: StorageBridge;
     let assetManager: AssetManager;
@@ -82,98 +131,38 @@ describe('CampaignRefreshManager', () => {
     let programmaticTrackingService: ProgrammaticTrackingService;
     let placementManager: PlacementManager;
     let backupCampaignManager: BackupCampaignManager;
+    let campaignParserManager: CampaignParserManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
         vastParser = TestFixtures.getVastParser();
-        nativeBridge = <NativeBridge><any>{
-            Placement: {
-                setPlacementState: sinon.spy()
-            },
-            Listener: {
-                sendPlacementStateChangedEvent: sinon.spy(),
-                sendReadyEvent: sinon.spy()
-            },
-            Storage: {
-                get: (storageType: number, key: string) => {
-                    return Promise.resolve('123');
-                },
-                set: () => {
-                    return Promise.resolve();
-                },
-                write: () => {
-                    return Promise.resolve();
-                },
-                delete: () => {
-                    return Promise.resolve();
-                },
-                getKeys: sinon.stub().returns(Promise.resolve([])),
-                onSet: new Observable2()
-            },
-            Request: {
-                onComplete: {
-                    subscribe: sinon.spy()
-                },
-                onFailed: {
-                    subscribe: sinon.spy()
-                }
-            },
-            Cache: {
-                setProgressInterval: sinon.spy(),
-                onDownloadStarted: new Observable0(),
-                onDownloadProgress: new Observable0(),
-                onDownloadEnd: new Observable0(),
-                onDownloadStopped: new Observable0(),
-                onDownloadError: new Observable0()
-            },
-            Sdk: {
-                logWarning: sinon.spy(),
-                logInfo: sinon.spy(),
-                logError: sinon.spy(),
-                logDebug: sinon.spy()
-            },
-            Connectivity: {
-                onConnected: new Observable2()
-            },
-            Broadcast: {
-                onBroadcastAction: new Observable4()
-            },
-            Notification: {
-                onNotification: new Observable2()
-            },
-            DeviceInfo: {
-                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
-                getNetworkType: sinon.stub().returns(Promise.resolve(0)),
-                getUniqueEventId: sinon.stub().returns(Promise.resolve('12345'))
-            },
-            Lifecycle: {
-                onActivityResumed: new Observable1(),
-                onActivityPaused: new Observable1(),
-                onActivityDestroyed: new Observable1()
-            },
-            getPlatform: () => {
-                return Platform.TEST;
-            }
-        };
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        ads = TestFixtures.getAdsApi(nativeBridge);
 
-        storageBridge = new StorageBridge(nativeBridge);
+        storageBridge = new StorageBridge(core);
         placementManager = sinon.createStubInstance(PlacementManager);
-        focusManager = new FocusManager(nativeBridge);
-        metaDataManager = new MetaDataManager(nativeBridge);
-        wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new RequestManager(nativeBridge, wakeUpManager);
-        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
-        deviceInfo = TestFixtures.getAndroidDeviceInfo();
-        cacheBookkeeping = new CacheBookkeeping(nativeBridge);
+        focusManager = new FocusManager(platform, core);
+        metaDataManager = new MetaDataManager(core);
+        wakeUpManager = new WakeUpManager(core);
+        request = new RequestManager(platform, core, wakeUpManager);
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request);
+        sessionManager = new SessionManager(core.Storage, request, storageBridge);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+        cacheBookkeeping = new CacheBookkeepingManager(core);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
-        backupCampaignManager = new BackupCampaignManager(nativeBridge, coreConfig);
-        assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, nativeBridge, backupCampaignManager);
+        cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
+        backupCampaignManager = new BackupCampaignManager(core, coreConfig);
+        campaignParserManager = new CampaignParserManager();
+        assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
         container = new TestContainer();
         const campaign = TestFixtures.getCampaign();
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
-            nativeBridge: nativeBridge,
+            platform,
+            core,
+            ads,
             request: request,
             metaDataManager: metaDataManager,
             sessionManager: sessionManager,
@@ -191,6 +180,9 @@ describe('CampaignRefreshManager', () => {
         gdprManager = sinon.createStubInstance(GdprManager);
 
         adUnitParams = {
+            platform,
+            core,
+            ads,
             forceOrientation: Orientation.NONE,
             focusManager: focusManager,
             container: container,
@@ -218,8 +210,8 @@ describe('CampaignRefreshManager', () => {
         beforeEach(() => {
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
-            campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
+            campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
+            campaignRefreshManager = new OldCampaignRefreshManager(platform, core, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
         it('get campaign should return undefined', () => {
@@ -401,7 +393,7 @@ describe('CampaignRefreshManager', () => {
             const placement: Placement = adsConfig.getPlacement('premium');
             adUnitParams.campaign = campaign;
             adUnitParams.placement = placement;
-            const currentAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
+            const currentAdUnit = new TestAdUnit(adUnitParams);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign());
@@ -437,7 +429,7 @@ describe('CampaignRefreshManager', () => {
             const placement: Placement = adsConfig.getPlacement('premium');
             adUnitParams.campaign = campaign;
             adUnitParams.placement = placement;
-            const currentAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
+            const currentAdUnit = new TestAdUnit(adUnitParams);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', campaign);
@@ -619,8 +611,8 @@ describe('CampaignRefreshManager', () => {
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '00000');
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
-            campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfoPromoGame, request, cache);
+            campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
+            campaignRefreshManager = new OldCampaignRefreshManager(platform, core, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
         afterEach(() => {
@@ -669,8 +661,8 @@ describe('CampaignRefreshManager', () => {
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
-            campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfoPromoGame, request, cache);
+            campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
+            campaignRefreshManager = new OldCampaignRefreshManager(platform, core, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
         afterEach(() => {
@@ -785,7 +777,7 @@ describe('CampaignRefreshManager', () => {
             const placement: Placement = adsConfig.getPlacement('premium');
             adUnitParams.campaign = campaign;
             adUnitParams.placement = placement;
-            const currentAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
+            const currentAdUnit = new TestAdUnit(adUnitParams);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('mixedPlacement-promo', TestFixtures.getPromoCampaign('purchasing/iap'));

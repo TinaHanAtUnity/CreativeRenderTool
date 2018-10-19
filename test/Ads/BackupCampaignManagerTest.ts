@@ -8,18 +8,18 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Placement } from 'Ads/Models/Placement';
 import { StorageError, StorageType } from 'Core/Native/Storage';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
 
 describe('BackupCampaignManagerTest', () => {
     it('should store placement data', () => {
         const setSpy = sinon.spy();
 
-        const nativeBridge: NativeBridge = <NativeBridge><any>{
-            Storage: {
-                set: setSpy
-            }
-        };
+        const platform = Platform.ANDROID;
+        const backend = TestFixtures.getBackend(platform);
+        const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        const core = TestFixtures.getCoreApi(nativeBridge);
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, TestFixtures.getCoreConfiguration());
         const placement: Placement = TestFixtures.getPlacement();
         const testMediaId: string = '12345';
 
@@ -40,14 +40,12 @@ describe('BackupCampaignManagerTest', () => {
         const setSpy = sinon.spy();
         const writeSpy = sinon.spy();
 
-        const nativeBridge: NativeBridge = <NativeBridge><any>{
-            Storage: {
-                set: setSpy,
-                write: writeSpy
-            }
-        };
+        const platform = Platform.ANDROID;
+        const backend = TestFixtures.getBackend(platform);
+        const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        const core = TestFixtures.getCoreApi(nativeBridge);
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, TestFixtures.getCoreConfiguration());
 
         const campaign: PerformanceCampaign = TestFixtures.getCampaign();
         const testMediaId: string = 'beefcace-abcdefg-deadbeef';
@@ -77,16 +75,14 @@ describe('BackupCampaignManagerTest', () => {
         const setSpy = sinon.spy();
         const writeSpy = sinon.spy();
 
-        const nativeBridge: NativeBridge = <NativeBridge><any>{
-            Storage: {
-                set: setSpy,
-                write: writeSpy
-            }
-        };
+        const platform = Platform.ANDROID;
+        const backend = TestFixtures.getBackend(platform);
+        const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        const core = TestFixtures.getCoreApi(nativeBridge);
 
         const configuration = TestFixtures.getCoreConfiguration();
         sinon.stub(configuration, 'getTestMode').returns(true);
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, configuration);
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, configuration);
         const placement: Placement = TestFixtures.getPlacement();
         const testMediaId: string = '12345';
 
@@ -100,16 +96,14 @@ describe('BackupCampaignManagerTest', () => {
         const setSpy = sinon.spy();
         const writeSpy = sinon.spy();
 
-        const nativeBridge: NativeBridge = <NativeBridge><any>{
-            Storage: {
-                set: setSpy,
-                write: writeSpy
-            }
-        };
+        const platform = Platform.ANDROID;
+        const backend = TestFixtures.getBackend(platform);
+        const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        const core = TestFixtures.getCoreApi(nativeBridge);
 
         const configuration = TestFixtures.getCoreConfiguration();
         sinon.stub(configuration, 'getTestMode').returns(true);
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, configuration);
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, configuration);
         const campaign: PerformanceCampaign = TestFixtures.getCampaign();
 
         backupCampaignManager.storeCampaign(campaign);
@@ -121,7 +115,12 @@ describe('BackupCampaignManagerTest', () => {
     it('should not load campaigns when test mode is active', () => {
         const configuration = TestFixtures.getCoreConfiguration();
         sinon.stub(configuration, 'getTestMode').returns(true);
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(TestFixtures.getNativeBridge(), configuration);
+        const platform = Platform.ANDROID;
+        const backend = TestFixtures.getBackend(platform);
+        const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        const core = TestFixtures.getCoreApi(nativeBridge);
+
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, configuration);
 
         return backupCampaignManager.loadCampaign(TestFixtures.getPlacement()).then(campaign => {
             assert.isUndefined(campaign, 'campaign was loaded when test mode is active');
@@ -129,13 +128,12 @@ describe('BackupCampaignManagerTest', () => {
     });
 
     it('should not load campaign when storage is empty', () => {
-        const nativeBridge: NativeBridge = <NativeBridge><any>{
-            Storage: {
-                get: sinon.stub().returns(Promise.reject(StorageError.COULDNT_GET_VALUE))
-            }
-        };
+        const platform = Platform.ANDROID;
+        const backend = TestFixtures.getBackend(platform);
+        const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        const core = TestFixtures.getCoreApi(nativeBridge);
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, TestFixtures.getCoreConfiguration());
 
         return backupCampaignManager.loadCampaign(TestFixtures.getPlacement()).then(campaign => {
             assert.isUndefined(campaign, 'campaign was loaded when storage is empty');
@@ -172,36 +170,12 @@ describe('BackupCampaignManagerTest', () => {
             landscape.setFileId('landscape.jpg');
         }
 
-        const nativeBridge: NativeBridge = <NativeBridge><any>{
-            Storage: {
-                get: sinon.stub().callsFake((type: StorageType, key: string) => {
-                    if (type === StorageType.PRIVATE) {
-                        if (key === 'backupcampaign.placement.' + placement.getId() + '.mediaid') {
-                            return Promise.resolve(testMediaId);
-                        } else if (key === 'backupcampaign.placement.' + placement.getId() + '.adtypes') {
-                            return Promise.resolve(JSON.stringify(placement.getAdTypes()));
-                        } else if (key === 'backupcampaign.campaign.' + testMediaId + '.type') {
-                            return Promise.resolve('performance');
-                        } else if (key === 'backupcampaign.campaign.' + testMediaId + '.data') {
-                            return Promise.resolve(campaign.toJSON());
-                        } else if (key === 'backupcampaign.campaign.' + testMediaId + '.willexpireat') {
-                            return Promise.resolve(Date.now() + 7 * 24 * 3600 * 1000);
-                        }
-                    }
-                    return Promise.reject(StorageError.COULDNT_GET_VALUE);
-                })
-            },
-            Cache: {
-                getFileInfo: sinon.stub().returns(Promise.resolve({
-                    id: 'test',
-                    found: true,
-                    size: 12345,
-                    mtime: Date.now()
-                }))
-            }
-        };
+        const platform = Platform.ANDROID;
+        const backend = TestFixtures.getBackend(platform);
+        const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        const core = TestFixtures.getCoreApi(nativeBridge);
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, TestFixtures.getCoreConfiguration());
 
         return backupCampaignManager.loadCampaign(placement).then(loadedCampaign => {
             assert.isDefined(loadedCampaign, 'campaign was not loaded when campaign was stored and cached');
@@ -241,33 +215,12 @@ describe('BackupCampaignManagerTest', () => {
             landscape.setFileId('landscape.jpg');
         }
 
-        const nativeBridge: NativeBridge = <NativeBridge><any>{
-            Storage: {
-                get: sinon.stub().callsFake((type: StorageType, key: string) => {
-                    if (type === StorageType.PRIVATE) {
-                        if (key === 'backupcampaign.placement.' + placement.getId() + '.mediaid') {
-                            return Promise.resolve(testMediaId);
-                        } else if (key === 'backupcampaign.placement.' + placement.getId() + '.adtypes') {
-                            return Promise.resolve(JSON.stringify(placement.getAdTypes()));
-                        } else if (key === 'backupcampaign.campaign.' + testMediaId + '.type') {
-                            return Promise.resolve('performance');
-                        } else if (key === 'backupcampaign.campaign.' + testMediaId + '.data') {
-                            return Promise.resolve(campaign.toJSON());
-                        } else if (key === 'backupcampaign.campaign.' + testMediaId + '.willexpireat') {
-                            return Promise.resolve(Date.now() + 7 * 24 * 3600 * 1000);
-                        }
-                    }
-                    return Promise.reject(StorageError.COULDNT_GET_VALUE);
-                })
-            },
-            Cache: {
-                getFileInfo: sinon.stub().returns(Promise.resolve({
-                    found: false
-                }))
-            }
-        };
+        const platform = Platform.ANDROID;
+        const backend = TestFixtures.getBackend(platform);
+        const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        const core = TestFixtures.getCoreApi(nativeBridge);
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, TestFixtures.getCoreConfiguration());
 
         return backupCampaignManager.loadCampaign(placement).then(loadedCampaign => {
             assert.isUndefined(loadedCampaign, 'campaign was loaded when campaign was stored but cached files were deleted');

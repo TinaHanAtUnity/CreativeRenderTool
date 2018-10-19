@@ -12,22 +12,26 @@ import { PromoEventHandler } from 'Promo/EventHandlers/PromoEventHandler';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
 
 describe('PromoEventHandlersTest', () => {
-    const handleInvocation = sinon.spy();
-    const handleCallback = sinon.spy();
-    const json = JSON.parse(DummyPromo);
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    const json = JSON.parse(DummyPromo);
     let promoAdUnit: PromoAdUnit;
     let sandbox: sinon.SinonSandbox;
     const purchaseTrackingUrls = 'https://events.iap.unity3d.com/events/v1/purchase?co=USA&creid=5a57d399d7482b0945616f35&gid=1019712&pjid=c4b860aa-e0a8-4a58-9f6c-95d419461f1e&plid=placementA&pmid=5a57d3a206a1590006a1d28e&prdid=com.product.2&stky=0&store=google&txid=UX-47c9ac4c-39c5-4e0e-685kl%3Bkl%3Be-66d4619dcc81&uid=567f09ab1ae7f2fc01402d9e&val=4.99';
 
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
-        nativeBridge = new NativeBridge({
-            handleInvocation,
-            handleCallback
-        });
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
         sandbox.stub(PurchasingUtilities, 'onPromoClosed');
         sandbox.stub(PurchasingUtilities, 'onPurchase');
     });

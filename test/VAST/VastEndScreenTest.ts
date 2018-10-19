@@ -8,21 +8,23 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
 
 describe('VastEndScreen', () => {
-    let handleInvocation: sinon.SinonSpy;
-    let handleCallback: sinon.SinonSpy;
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
     let vastEndscreenParameters: IVastEndscreenParameters;
     let gdprManager: GdprManager;
 
     beforeEach(() => {
-        handleInvocation = sinon.spy();
-        handleCallback = sinon.spy();
-        nativeBridge = new NativeBridge({
-            handleInvocation,
-            handleCallback
-        });
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
 
         vastEndscreenParameters = {
             clientInfo: sinon.createStubInstance(ClientInfo),
@@ -35,8 +37,8 @@ describe('VastEndScreen', () => {
     });
 
     it('should render', () => {
-        const privacy = new Privacy(nativeBridge, vastEndscreenParameters.campaign, gdprManager, false, false);
-        const endScreen = new VastEndScreen(nativeBridge, vastEndscreenParameters, privacy);
+        const privacy = new Privacy(platform, vastEndscreenParameters.campaign, gdprManager, false, false);
+        const endScreen = new VastEndScreen(platform, vastEndscreenParameters, privacy);
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, VastEndScreenFixture);
     });

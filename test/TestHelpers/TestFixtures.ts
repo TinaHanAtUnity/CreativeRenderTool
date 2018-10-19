@@ -98,6 +98,8 @@ import { MonetizationListenerApi } from '../../src/ts/Monetization/Native/Moneti
 import { PlacementContentsApi } from '../../src/ts/Monetization/Native/PlacementContents';
 import { IPromoApi } from '../../src/ts/Promo/IPromo';
 import { PurchasingApi } from '../../src/ts/Promo/Native/Purchasing';
+import { IPurchasingApi } from '../../src/ts/Purchasing/IPurchasing';
+import { CustomPurchasingApi } from '../../src/ts/Purchasing/Native/CustomPurchasing';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -640,6 +642,12 @@ export class TestFixtures {
     public static getPromoApi(nativeBridge: NativeBridge): IPromoApi {
         return {
             Purchasing: new PurchasingApi(nativeBridge)
+        };
+    }
+
+    public static getPurchasingApi(nativeBridge: NativeBridge): IPurchasingApi {
+        return {
+            CustomPurchasing: new CustomPurchasingApi(nativeBridge)
         };
     }
 

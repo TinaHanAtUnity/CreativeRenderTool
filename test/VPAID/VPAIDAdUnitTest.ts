@@ -28,15 +28,26 @@ import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
 
 describe('VPAIDAdUnit', () => {
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    let ads: IAdsApi;
     let webPlayerContainer: WebPlayerContainer;
     let parameters: IVPAIDAdUnitParameters;
     let adUnit: VPAIDAdUnit;
 
     beforeEach(() => {
-        nativeBridge = sinon.createStubInstance(NativeBridge);
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(Platform.ANDROID);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        ads = TestFixtures.getAdsApi(nativeBridge);
 
         webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
         (<sinon.SinonStub>webPlayerContainer.setSettings).returns(Promise.resolve());
@@ -44,6 +55,9 @@ describe('VPAIDAdUnit', () => {
         (<any>webPlayerContainer).shouldOverrideUrlLoading = new Observable2<string, string>();
 
         parameters = {
+            platform,
+            core,
+            ads,
             webPlayerContainer,
             campaign: sinon.createStubInstance(VPAIDCampaign),
             closer: sinon.createStubInstance(Closer),
@@ -58,7 +72,7 @@ describe('VPAIDAdUnit', () => {
             container: sinon.createStubInstance(Activity),
             coreConfig: sinon.createStubInstance(CoreConfiguration),
             adsConfig: sinon.createStubInstance(AdsConfiguration),
-            request: sinon.createStubInstance(Request),
+            request: sinon.createStubInstance(RequestManager),
             privacy: sinon.createStubInstance(Privacy),
             forceOrientation: Orientation.NONE,
             options: {},
@@ -83,7 +97,7 @@ describe('VPAIDAdUnit', () => {
         overlayEl.setAttribute('id', 'closer');
         (<sinon.SinonStub>parameters.closer.container).returns(overlayEl);
 
-        adUnit = new VPAIDAdUnit(nativeBridge, parameters);
+        adUnit = new VPAIDAdUnit(parameters);
     });
 
     describe('on show', () => {
@@ -151,7 +165,7 @@ describe('VPAIDAdUnit', () => {
         });
 
         it('should send the finish event', () => {
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendFinishEvent, parameters.placement.getId(), finishState);
+            sinon.assert.calledWith(<sinon.SinonSpy>ads.Listener.sendFinishEvent, parameters.placement.getId(), finishState);
         });
 
         it('should remove the closer from the document', () => {

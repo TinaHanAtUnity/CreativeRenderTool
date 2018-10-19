@@ -31,12 +31,18 @@ import { StoreName, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
-    const handleInvocation = sinon.spy();
-    const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, container: AdUnitContainer, overlay: Overlay, endScreen: XPromoEndScreen;
+    let platform: Platform;
+    let backend: Backend;
+    let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    let ads: IAdsApi;
+    let container: AdUnitContainer, overlay: Overlay, endScreen: XPromoEndScreen;
     let storageBridge: StorageBridge;
     let sessionManager: SessionManager;
     let xPromoAdUnit: XPromoAdUnit;
@@ -56,27 +62,30 @@ describe('XPromoEndScreenEventHandlerTest', () => {
         let resolvedPromise: Promise<INativeResponse>;
 
         beforeEach(() => {
-            nativeBridge = new NativeBridge({
-                handleInvocation,
-                handleCallback
-            }, Platform.ANDROID);
+            platform = Platform.ANDROID;
+            backend = TestFixtures.getBackend(platform);
+            nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+            core = TestFixtures.getCoreApi(nativeBridge);
+            ads = TestFixtures.getAdsApi(nativeBridge);
 
-            storageBridge = new StorageBridge(nativeBridge);
+            storageBridge = new StorageBridge(core);
             campaign = TestFixtures.getXPromoCampaign();
-            focusManager = new FocusManager(nativeBridge);
-            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
-            metaDataManager = new MetaDataManager(nativeBridge);
-            const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-            const request = new RequestManager(nativeBridge, wakeUpManager);
+            container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
+            focusManager = new FocusManager(platform, core);
+            metaDataManager = new MetaDataManager(core);
+            const wakeUpManager = new WakeUpManager(core);
+            const request = new RequestManager(platform, core, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            deviceInfo = TestFixtures.getAndroidDeviceInfo();
-            thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge, request, storageBridge);
+            deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+            thirdPartyEventManager = new ThirdPartyEventManager(core, request);
+            sessionManager = new SessionManager(core.Storage, request, storageBridge);
             const coreConfig = TestFixtures.getCoreConfiguration();
             const adsConfig = TestFixtures.getAdsConfiguration();
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
-                nativeBridge: nativeBridge,
+                platform,
+                core,
+                ads,
                 request: request,
                 metaDataManager: metaDataManager,
                 sessionManager: sessionManager,
@@ -92,13 +101,14 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.spy(operativeEventManager, 'sendClick');
             sinon.stub(operativeEventManager, 'sendHttpKafkaEvent').returns(resolvedPromise);
 
-            sinon.spy(nativeBridge.Intent, 'launch');
+            sinon.spy(core.Android!.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new Privacy(nativeBridge, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+            const privacy = new Privacy(platform, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
-                nativeBridge: nativeBridge,
+                platform,
+                core,
                 language : deviceInfo.getLanguage(),
                 gameId: clientInfo.getGameId(),
                 privacy: privacy,
@@ -107,10 +117,13 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 targetGameName: TestFixtures.getXPromoCampaign().getGameName()
             };
             endScreen = new XPromoEndScreen(endScreenParams, TestFixtures.getXPromoCampaign());
-            overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
+            overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
             placement = TestFixtures.getPlacement();
 
             xPromoAdUnitParameters = {
+                platform,
+                core,
+                ads,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -132,8 +145,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 programmaticTrackingService: programmaticTrackingService
             };
 
-            xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
-            endScreenEventHandler = new XPromoEndScreenEventHandler(nativeBridge, xPromoAdUnit, xPromoAdUnitParameters);
+            xPromoAdUnit = new XPromoAdUnit(xPromoAdUnitParameters);
+            endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters);
         });
 
         it('should send a click to HttpKafka', () => {
@@ -158,28 +171,31 @@ describe('XPromoEndScreenEventHandlerTest', () => {
         let resolvedPromise: Promise<INativeResponse>;
 
         beforeEach(() => {
-            nativeBridge = new NativeBridge({
-                handleInvocation,
-                handleCallback
-            }, Platform.IOS);
+            platform = Platform.IOS;
+            backend = TestFixtures.getBackend(platform);
+            nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+            core = TestFixtures.getCoreApi(nativeBridge);
+            ads = TestFixtures.getAdsApi(nativeBridge);
 
-            storageBridge = new StorageBridge(nativeBridge);
+            storageBridge = new StorageBridge(core);
 
             campaign = TestFixtures.getXPromoCampaign();
             campaign.set('store', StoreName.APPLE);
             campaign.set('appStoreId', '11111');
 
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
-            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
-            const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-            const request = new RequestManager(nativeBridge, wakeUpManager);
-            deviceInfo = TestFixtures.getIosDeviceInfo();
-            thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge, request, storageBridge);
+            container = new ViewController(core, ads, TestFixtures.getIosDeviceInfo(core), focusManager, clientInfo);
+            const wakeUpManager = new WakeUpManager(core);
+            const request = new RequestManager(platform, core, wakeUpManager);
+            deviceInfo = TestFixtures.getIosDeviceInfo(core);
+            thirdPartyEventManager = new ThirdPartyEventManager(core, request);
+            sessionManager = new SessionManager(core.Storage, request, storageBridge);
             const coreConfig = TestFixtures.getCoreConfiguration();
             const adsConfig = TestFixtures.getAdsConfiguration();
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
-                nativeBridge: nativeBridge,
+                platform,
+                core,
+                ads,
                 request: request,
                 metaDataManager: metaDataManager,
                 sessionManager: sessionManager,
@@ -197,9 +213,10 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             const video = new Video('', TestFixtures.getSession());
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new Privacy(nativeBridge, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+            const privacy = new Privacy(platform, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
-                nativeBridge: nativeBridge,
+                platform,
+                core,
                 language : deviceInfo.getLanguage(),
                 gameId: clientInfo.getGameId(),
                 privacy: privacy,
@@ -208,9 +225,12 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 targetGameName: campaign.getGameName()
             };
             endScreen = new XPromoEndScreen(endScreenParams, campaign);
-            overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
+            overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
 
             xPromoAdUnitParameters = {
+                platform,
+                core,
+                ads,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -232,8 +252,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 programmaticTrackingService: programmaticTrackingService
             };
 
-            xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
-            endScreenEventHandler = new XPromoEndScreenEventHandler(nativeBridge, xPromoAdUnit, xPromoAdUnitParameters);
+            xPromoAdUnit = new XPromoAdUnit(xPromoAdUnitParameters);
+            endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters);
         });
 
         it('should send a click to HttpKafka', () => {

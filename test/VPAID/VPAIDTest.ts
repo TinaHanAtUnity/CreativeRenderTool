@@ -9,16 +9,27 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VPAID as VPAIDModel } from 'VPAID/Models/VPAID';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDHandler, VPAID } from 'VPAID/Views/VPAID';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
+import { ICoreApi } from '../../src/ts/Core/ICore';
 
 describe('VPAID View', () => {
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    let ads: IAdsApi;
     let campaign: VPAIDCampaign;
     let eventHandler: IVPAIDHandler;
     let webPlayerContainer: WebPlayerContainer;
     let view: VPAID;
 
     beforeEach(() => {
-        nativeBridge = sinon.createStubInstance(NativeBridge);
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
         campaign = sinon.createStubInstance(VPAIDCampaign);
 
         const deviceInfo = sinon.createStubInstance(DeviceInfoApi);
@@ -35,7 +46,7 @@ describe('VPAID View', () => {
         model.getCreativeParameters.returns('{}');
         (<sinon.SinonStub>campaign.getVPAID).returns(model);
 
-        view = new VPAID(nativeBridge, webPlayerContainer, campaign, TestFixtures.getPlacement());
+        view = new VPAID(platform, core, webPlayerContainer, campaign, TestFixtures.getPlacement());
 
         eventHandler = {
             onVPAIDCompanionClick: sinon.spy(),

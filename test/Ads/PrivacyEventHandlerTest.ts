@@ -26,17 +26,33 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { Privacy } from 'Ads/Views/Privacy';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
+import { TestFixtures } from '../TestHelpers/TestFixtures';
 
 describe('PrivacyEventHandlerTest', () => {
 
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    let ads: IAdsApi;
     let adUnit: PerformanceAdUnit;
     let adUnitParameters: IPerformanceAdUnitParameters;
 
     let privacyEventHandler: PrivacyEventHandler;
 
     beforeEach(() => {
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        ads = TestFixtures.getAdsApi(nativeBridge);
         adUnitParameters = {
+            platform,
+            core,
+            ads,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: sinon.createStubInstance(FocusManager),
             container: sinon.createStubInstance(ViewController),
@@ -60,12 +76,7 @@ describe('PrivacyEventHandlerTest', () => {
 
         adUnit = sinon.createStubInstance(PerformanceAdUnit);
 
-        nativeBridge = sinon.createStubInstance(NativeBridge);
-        (<any>nativeBridge).UrlScheme = sinon.createStubInstance(UrlSchemeApi);
-        (<any>nativeBridge).Intent = sinon.createStubInstance(IntentApi);
-        (<any>nativeBridge).Sdk = sinon.createStubInstance(SdkApi);
-
-        privacyEventHandler = new PrivacyEventHandler(nativeBridge, adUnitParameters);
+        privacyEventHandler = new PrivacyEventHandler(adUnitParameters);
     });
 
     describe('on onPrivacy', () => {
@@ -75,7 +86,7 @@ describe('PrivacyEventHandlerTest', () => {
             (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
             privacyEventHandler.onPrivacy('http://example.com');
 
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'http://example.com');
+            sinon.assert.calledWith(<sinon.SinonSpy>core.iOS!.UrlScheme.open, 'http://example.com');
 
         });
 
@@ -83,7 +94,7 @@ describe('PrivacyEventHandlerTest', () => {
             (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.ANDROID);
             privacyEventHandler.onPrivacy(url);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+            sinon.assert.calledWith(<sinon.SinonSpy>core.Android!.Intent.launch, {
                 'action': 'android.intent.action.VIEW',
                 'uri': url
             });

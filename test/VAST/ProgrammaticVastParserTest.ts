@@ -13,6 +13,9 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { VastParser } from 'VAST/Utilities/VastParser';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
 
 describe('ProgrammaticVastParser', () => {
     const placements = ['TestPlacement'];
@@ -21,13 +24,19 @@ describe('ProgrammaticVastParser', () => {
     const impressionUrl = 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130';
 
     let parser: ProgrammaticVastParser;
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
     let request: RequestManager;
     let session: Session;
 
     beforeEach(() => {
-        nativeBridge = sinon.createStubInstance(NativeBridge);
-        (<any>nativeBridge.Sdk) = sinon.createStubInstance(SdkApi);
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        (<any>core.Sdk) = sinon.createStubInstance(SdkApi);
 
         request = sinon.createStubInstance(Request);
         session = TestFixtures.getSession();
@@ -41,7 +50,7 @@ describe('ProgrammaticVastParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
                     campaign = <VastCampaign>parsedCampaign;
                 });
             };

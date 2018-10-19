@@ -33,11 +33,17 @@ import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScree
 import EventTestVast from 'xml/EventTestVast.xml';
 import { Privacy } from 'Ads/Views/Privacy';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
 
 describe('VastVideoEventHandler tests', () => {
-    const handleInvocation = sinon.spy();
-    const handleCallback = sinon.spy();
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    let ads: IAdsApi;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
     let campaign: VastCampaign;
@@ -67,19 +73,20 @@ describe('VastVideoEventHandler tests', () => {
     });
 
     beforeEach(() => {
-        nativeBridge = new NativeBridge({
-            handleInvocation,
-            handleCallback
-        });
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        ads = TestFixtures.getAdsApi(nativeBridge);
 
-        storageBridge = new StorageBridge(nativeBridge);
-        focusManager = new FocusManager(nativeBridge);
-        metaDataManager = new MetaDataManager(nativeBridge);
+        storageBridge = new StorageBridge(core);
+        focusManager = new FocusManager(platform, core);
+        metaDataManager = new MetaDataManager(core);
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
-        privacy = new Privacy(nativeBridge, campaign, gdprManager, false, false);
-        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
+        container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
+        privacy = new Privacy(platform, campaign, gdprManager, false, false);
+        overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         placement = new Placement({
@@ -93,16 +100,18 @@ describe('VastVideoEventHandler tests', () => {
             muteVideo: false
         });
 
-        deviceInfo = new AndroidDeviceInfo(nativeBridge);
-        wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new RequestManager(nativeBridge, wakeUpManager);
-        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
+        deviceInfo = new AndroidDeviceInfo(core);
+        wakeUpManager = new WakeUpManager(core);
+        request = new RequestManager(platform, core, wakeUpManager);
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request);
+        sessionManager = new SessionManager(core.Storage, request, storageBridge);
 
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
-            nativeBridge: nativeBridge,
+            platform,
+            core,
+            ads,
             request: request,
             metaDataManager: metaDataManager,
             sessionManager: sessionManager,
@@ -117,6 +126,9 @@ describe('VastVideoEventHandler tests', () => {
         gdprManager = sinon.createStubInstance(GdprManager);
 
         vastAdUnitParameters = {
+            platform,
+            core,
+            ads,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
@@ -137,14 +149,16 @@ describe('VastVideoEventHandler tests', () => {
             programmaticTrackingService: programmaticTrackingService
         };
 
-        testAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+        testAdUnit = new VastAdUnit(vastAdUnitParameters);
         sinon.spy(testAdUnit, 'hide');
 
         moat = sinon.createStubInstance(MOAT);
         sandbox.stub(MoatViewabilityService, 'getMoat').returns(moat);
 
         videoEventHandlerParams = {
-            nativeBrige: nativeBridge,
+            platform,
+            core,
+            ads,
             adUnit: testAdUnit,
             campaign: campaign,
             operativeEventManager: operativeEventManager,
@@ -210,7 +224,7 @@ describe('VastVideoEventHandler tests', () => {
             campaignWithTrackers.getVast().set('additionalTrackingEvents', customTracking);
             vastAdUnitParameters.campaign = campaignWithTrackers;
 
-            const adUnitWithTrackers = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+            const adUnitWithTrackers = new VastAdUnit(vastAdUnitParameters);
             videoEventHandlerParams.adUnit = adUnitWithTrackers;
             videoEventHandlerParams.campaign = vastAdUnitParameters.campaign;
             vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
@@ -319,10 +333,10 @@ describe('VastVideoEventHandler tests', () => {
                 seatId: vastAdUnitParameters.campaign.getSeatId(),
                 showPrivacyDuringEndscreen: false
             };
-            vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
+            vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
             sinon.spy(vastEndScreen, 'show');
             vastAdUnitParameters.endScreen = vastEndScreen;
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+            vastAdUnit = new VastAdUnit(vastAdUnitParameters);
             videoEventHandlerParams.adUnit = vastAdUnit;
             vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
         });

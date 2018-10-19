@@ -12,9 +12,17 @@ import { IProduct, ITransactionErrorDetails, ITransactionDetails } from 'Purchas
 import { Observable1 } from 'Core/Utilities/Observable';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { asStub } from 'TestHelpers/Functions';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { IPurchasingApi } from '../../src/ts/Purchasing/IPurchasing';
 
 describe('CustomPurchasingAdapter', () => {
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    let purchasing: IPurchasingApi;
     let analyticsManager: AnalyticsManager;
     let promoEvents: PromoEvents;
     let request: RequestManager;
@@ -23,7 +31,11 @@ describe('CustomPurchasingAdapter', () => {
     let customPurchasing: CustomPurchasingApi;
 
     beforeEach(() => {
-        nativeBridge = sinon.createStubInstance(NativeBridge);
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
         analyticsManager = sinon.createStubInstance(AnalyticsManager);
         promoEvents = sinon.createStubInstance(PromoEvents);
         request = sinon.createStubInstance(Request);
@@ -41,7 +53,7 @@ describe('CustomPurchasingAdapter', () => {
         (<any>nativeBridge).Monetization.CustomPurchasing.onTransactionComplete = new Observable1<ITransactionDetails>();
         (<any>nativeBridge).Monetization.CustomPurchasing.onTransactionError = new Observable1<ITransactionErrorDetails>();
 
-        purchasingAdapter = new CustomPurchasingAdapter(nativeBridge, analyticsManager, promoEvents, request);
+        purchasingAdapter = new CustomPurchasingAdapter(core, purchasing, promoEvents, request, analyticsManager);
         sandbox.stub((<any>purchasingAdapter)._thirdPartyEventManager, 'sendWithGet');
         sandbox.stub((<any>purchasingAdapter)._thirdPartyEventManager, 'sendWithPost');
     });

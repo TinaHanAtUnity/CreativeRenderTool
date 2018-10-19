@@ -13,6 +13,9 @@ import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
 
 describe('PromoCampaignParser', () => {
     const placements = ['TestPlacement'];
@@ -20,13 +23,19 @@ describe('PromoCampaignParser', () => {
     const correlationId = '583dfda0d933a3630a53249c';
 
     let parser: PromoCampaignParser;
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
     let request: RequestManager;
     let session: Session;
 
     beforeEach(() => {
-        nativeBridge = sinon.createStubInstance(NativeBridge);
-        (<any>nativeBridge.Sdk) = sinon.createStubInstance(SdkApi);
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        (<any>core.Sdk) = sinon.createStubInstance(SdkApi);
 
         request = sinon.createStubInstance(Request);
         session = TestFixtures.getSession();
@@ -41,7 +50,7 @@ describe('PromoCampaignParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
             };
@@ -80,7 +89,7 @@ describe('PromoCampaignParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
             };
@@ -113,7 +122,7 @@ describe('PromoCampaignParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
             };
@@ -143,7 +152,7 @@ describe('PromoCampaignParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
             };
@@ -188,7 +197,7 @@ describe('PromoCampaignParser', () => {
 
                     const parse = (data: any) => {
                         const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                        return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                        return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
                             campaign = <PromoCampaign>parsedCampaign;
                             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
                         });
@@ -204,7 +213,7 @@ describe('PromoCampaignParser', () => {
 
                     const parse = (data: any) => {
                         const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                        return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                        return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
                             campaign = <PromoCampaign>parsedCampaign;
                             sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
                         });
@@ -232,7 +241,7 @@ describe('PromoCampaignParser', () => {
                 sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
                 const parse = (data: any) => {
                     const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                    return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                    return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
                         campaign = <PromoCampaign>parsedCampaign;
                         sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
                     });

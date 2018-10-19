@@ -7,6 +7,7 @@ export class Cache extends BackendApi {
     private _internet: boolean = true;
     private _files: { [key: string]: IFileInfo } = {};
     private _currentFile: string;
+    private _freeSpace = 123456789;
 
     public setProgressInterval() {
         return;
@@ -114,6 +115,14 @@ export class Cache extends BackendApi {
             }
         }
         return fileCount;
+    }
+
+    public getFreeSpace(): number {
+        return this._freeSpace;
+    }
+
+    public setFreeSpace(freeSpace: number) {
+        this._freeSpace = freeSpace;
     }
 
 }

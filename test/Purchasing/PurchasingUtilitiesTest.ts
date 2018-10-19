@@ -25,14 +25,21 @@ import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { IPurchasingApi } from '../../src/ts/Purchasing/IPurchasing';
+import { IPromoApi } from '../../src/ts/Promo/IPromo';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
 
 describe('PurchasingUtilitiesTest', () => {
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
-    let purchasing: PurchasingApi;
-
-    let monetizationListenerApi: MonetizationListenerApi;
-    let placementContentsApi: PlacementContentsApi;
-    let customPurchasingApi: CustomPurchasingApi;
+    let core: ICoreApi;
+    let ads: IAdsApi;
+    let promo: IPromoApi;
+    let purchasing: IPurchasingApi;
     let analyticsManager: AnalyticsManager;
     let promoEvents: PromoEvents;
 
@@ -45,31 +52,22 @@ describe('PurchasingUtilitiesTest', () => {
     let request: RequestManager;
 
     beforeEach(() => {
-        nativeBridge = sinon.createStubInstance(NativeBridge);
-        purchasing = sinon.createStubInstance(PurchasingApi);
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        ads = TestFixtures.getAdsApi(nativeBridge);
+        promo = TestFixtures.getPromoApi(nativeBridge);
+        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
-        monetizationListenerApi = sinon.createStubInstance(MonetizationListenerApi);
-        placementContentsApi = sinon.createStubInstance(PlacementContentsApi);
-        customPurchasingApi = sinon.createStubInstance(CustomPurchasingApi);
         campaignManager = sinon.createStubInstance(CampaignManager);
         analyticsManager = sinon.createStubInstance(AnalyticsManager);
         promoEvents = sinon.createStubInstance(PromoEvents);
         request = sinon.createStubInstance(Request);
 
-        monetization = {
-            Listener: monetizationListenerApi,
-            PlacementContents: placementContentsApi,
-            CustomPurchasing: customPurchasingApi
-        };
-
         sdk = sinon.createStubInstance(SdkApi);
         clientInfo = sinon.createStubInstance(ClientInfo);
         sandbox = sinon.createSandbox();
-
-        nativeBridge.Sdk = sdk;
-        nativeBridge.Purchasing = purchasing;
-        nativeBridge.Monetization = monetization;
-        nativeBridge.Monetization.CustomPurchasing = monetization.CustomPurchasing;
 
         promoCatalog = JSON.stringify(JSON.parse(IapPromoCatalog));
         (<any>purchasing).onInitialize = new Observable1<string>();
@@ -80,25 +78,25 @@ describe('PurchasingUtilitiesTest', () => {
         (<any>campaignManager).onAdPlanReceived = new Observable2<number, number>();
         (<any>campaignManager).onCampaign = new Observable2<number, Campaign>();
 
-        (<any>monetization).CustomPurchasing.onProductsRetrieved = new Observable1<IProduct[]>();
-        (<any>monetization).CustomPurchasing.onTransactionComplete = new Observable1<ITransactionDetails>();
-        (<any>monetization).CustomPurchasing.onTransactionError = new Observable2<string, string>();
+        (<any>purchasing).CustomPurchasing.onProductsRetrieved = new Observable1<IProduct[]>();
+        (<any>purchasing).CustomPurchasing.onTransactionComplete = new Observable1<ITransactionDetails>();
+        (<any>purchasing).CustomPurchasing.onTransactionError = new Observable2<string, string>();
 
-        (<sinon.SinonStub>purchasing.getPromoCatalog).returns(Promise.resolve());
-        (<sinon.SinonStub>purchasing.getPromoVersion).returns(Promise.resolve());
-        (<sinon.SinonStub>purchasing.initiatePurchasingCommand).returns(Promise.resolve());
-        (<sinon.SinonStub>purchasing.initializePurchasing).returns(Promise.resolve());
+        (<sinon.SinonStub>promo.Purchasing.getPromoCatalog).returns(Promise.resolve());
+        (<sinon.SinonStub>promo.Purchasing.getPromoVersion).returns(Promise.resolve());
+        (<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand).returns(Promise.resolve());
+        (<sinon.SinonStub>promo.Purchasing.initializePurchasing).returns(Promise.resolve());
         (<sinon.SinonStub>clientInfo.getSdkVersion).returns(3000);
 
         const coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
         const adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-        placementManager = new PlacementManager(nativeBridge, adsConfig);
+        placementManager = new PlacementManager(ads, adsConfig);
 
-        (<sinon.SinonStub>nativeBridge.Monetization.CustomPurchasing.available).returns(Promise.resolve(true));
-        (<sinon.SinonStub>nativeBridge.Monetization.CustomPurchasing.refreshCatalog).returns(Promise.resolve());
-        (<sinon.SinonStub>nativeBridge.Monetization.CustomPurchasing.purchaseItem).returns(Promise.resolve());
+        (<sinon.SinonStub>purchasing.CustomPurchasing.available).returns(Promise.resolve(true));
+        (<sinon.SinonStub>purchasing.CustomPurchasing.refreshCatalog).returns(Promise.resolve());
+        (<sinon.SinonStub>purchasing.CustomPurchasing.purchaseItem).returns(Promise.resolve());
 
-        return PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager, campaignManager, analyticsManager, promoEvents, request);
+        return PurchasingUtilities.initialize(core, promo, purchasing, clientInfo, coreConfig, adsConfig, placementManager, campaignManager, promoEvents, request, analyticsManager);
     });
     afterEach(() => {
         sandbox.restore();
@@ -126,7 +124,7 @@ describe('PurchasingUtilitiesTest', () => {
     describe('onPurchase', () => {
         describe('onSuccess', () => {
             beforeEach(() => {
-                sandbox.stub(nativeBridge.Monetization.CustomPurchasing.onTransactionComplete, 'subscribe').callsFake((resolve) => resolve({
+                sandbox.stub(purchasing.CustomPurchasing.onTransactionComplete, 'subscribe').callsFake((resolve) => resolve({
                     id: 'myPromo',
                     receipt: 'moneymoneymoney',
                     extras: 'schooterdoooter'
@@ -139,21 +137,21 @@ describe('PurchasingUtilitiesTest', () => {
             });
 
             it('should call purchase item for current purchasing adapter', () => {
-                sinon.assert.calledWith(<sinon.SinonStub>nativeBridge.Monetization.CustomPurchasing.purchaseItem, 'myPromo');
+                sinon.assert.calledWith(<sinon.SinonStub>purchasing.CustomPurchasing.purchaseItem, 'myPromo');
             });
         });
 
         describe('onFailure', () => {
             it('should fail when purchase item transaction fails over api', () => {
-                (<sinon.SinonStub>nativeBridge.Monetization.CustomPurchasing.purchaseItem).returns(Promise.reject('fail'));
+                (<sinon.SinonStub>purchasing.CustomPurchasing.purchaseItem).returns(Promise.reject('fail'));
                 PurchasingUtilities.onPurchase('test', TestFixtures.getPromoCampaign(), 'myCoolPlacement').catch((e) => {
                     assert.equal(e.message, undefined);
                 });
             });
 
             it('should fail when purchase item transaction error occurs ', () => {
-                sandbox.stub(nativeBridge.Monetization.CustomPurchasing.onTransactionError, 'subscribe').callsFake((resolve) => resolve('UNKNOWN_ERROR', 'schooty'));
-                (<sinon.SinonStub>nativeBridge.Monetization.CustomPurchasing.purchaseItem).returns(Promise.reject('fail'));
+                sandbox.stub(purchasing.CustomPurchasing.onTransactionError, 'subscribe').callsFake((resolve) => resolve('UNKNOWN_ERROR', 'schooty'));
+                (<sinon.SinonStub>purchasing.CustomPurchasing.purchaseItem).returns(Promise.reject('fail'));
                 PurchasingUtilities.onPurchase('test', TestFixtures.getPromoCampaign(), 'myCoolPlacement').catch((e) => {
                     assert.equal(e.message, `Did not complete transaction due to ${'UNKNOWN_ERROR'}:${'schooty'}`);
                 });
@@ -165,7 +163,7 @@ describe('PurchasingUtilitiesTest', () => {
         describe('onSuccess', () => {
             beforeEach(() => {
                 const promise = PurchasingUtilities.refreshCatalog();
-                nativeBridge.Monetization.CustomPurchasing.onProductsRetrieved.trigger([
+                purchasing.CustomPurchasing.onProductsRetrieved.trigger([
                         {
                             productId: 'myPromo',
                             localizedPriceString: '$0.00',
@@ -203,7 +201,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         describe('onFail', () => {
             it('should fail when get promo catalog fetch over api fails', () => {
-                (<sinon.SinonStub>nativeBridge.Monetization.CustomPurchasing.refreshCatalog).returns(Promise.reject('fail'));
+                (<sinon.SinonStub>purchasing.CustomPurchasing.refreshCatalog).returns(Promise.reject('fail'));
                 PurchasingUtilities.refreshCatalog().catch((e) => {
                     assert.equal((<any>PurchasingUtilities)._refreshPromise, null);
                     assert.equal(e.message, undefined);
@@ -223,7 +221,7 @@ describe('PurchasingUtilitiesTest', () => {
     describe('getProductPrice', () => {
         beforeEach(() => {
             const promise = PurchasingUtilities.refreshCatalog();
-            nativeBridge.Monetization.CustomPurchasing.onProductsRetrieved.trigger([
+            purchasing.CustomPurchasing.onProductsRetrieved.trigger([
                     {
                         productId: 'myPromo',
                         localizedPriceString: '$0.00',
@@ -262,7 +260,7 @@ describe('PurchasingUtilitiesTest', () => {
     describe('getProductName', () => {
         beforeEach(() => {
             const promise = PurchasingUtilities.refreshCatalog();
-            nativeBridge.Monetization.CustomPurchasing.onProductsRetrieved.trigger([
+            purchasing.CustomPurchasing.onProductsRetrieved.trigger([
                     {
                         productId: '100.gold.coins',
                         localizedPriceString: '$0.99',
@@ -290,7 +288,7 @@ describe('PurchasingUtilitiesTest', () => {
     describe('getProductType', () => {
         beforeEach(() => {
             const promise = PurchasingUtilities.refreshCatalog();
-            nativeBridge.Monetization.CustomPurchasing.onProductsRetrieved.trigger([
+            purchasing.CustomPurchasing.onProductsRetrieved.trigger([
                     {
                         productId: '100.gold.coins',
                         localizedPriceString: '$0.99',
@@ -318,7 +316,7 @@ describe('PurchasingUtilitiesTest', () => {
     describe('isProductAvailable', () => {
         beforeEach(() => {
             const promise = PurchasingUtilities.refreshCatalog();
-            nativeBridge.Monetization.CustomPurchasing.onProductsRetrieved.trigger([
+            purchasing.CustomPurchasing.onProductsRetrieved.trigger([
                     {
                         productId: 'myPromo',
                         localizedPriceString: '$0.00',
@@ -351,7 +349,7 @@ describe('PurchasingUtilitiesTest', () => {
         describe('If promo catalog is invalid', () => {
             beforeEach(() => {
                 const promise = PurchasingUtilities.refreshCatalog();
-                nativeBridge.Monetization.CustomPurchasing.onProductsRetrieved.trigger([]);
+                purchasing.CustomPurchasing.onProductsRetrieved.trigger([]);
                 return promise;
             });
             it('should return false if catalog has has size of 0', () => {
@@ -364,7 +362,7 @@ describe('PurchasingUtilitiesTest', () => {
         context('should be false', () => {
             beforeEach(() => {
                 const promise = PurchasingUtilities.refreshCatalog();
-                nativeBridge.Monetization.CustomPurchasing.onProductsRetrieved.trigger([]);
+                purchasing.CustomPurchasing.onProductsRetrieved.trigger([]);
                 return promise;
             });
 
@@ -376,7 +374,7 @@ describe('PurchasingUtilitiesTest', () => {
         context('should be true', () => {
             beforeEach(() => {
                 const promise = PurchasingUtilities.refreshCatalog();
-                nativeBridge.Monetization.CustomPurchasing.onProductsRetrieved.trigger([
+                purchasing.CustomPurchasing.onProductsRetrieved.trigger([
                     {
                         productId: 'test',
                         localizedPriceString: 'tset',

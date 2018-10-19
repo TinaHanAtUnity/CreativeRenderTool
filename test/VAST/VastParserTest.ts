@@ -18,10 +18,15 @@ import VastCompanionAdWithoutImages from 'xml/VastCompanionAdWithoutImages.xml';
 import VastRaw from 'xml/VastRaw.xml';
 import VastWithSpaces from 'xml/VastWithSpaces.xml';
 import WrappedVast from 'xml/WrappedVast.xml';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
 
 describe('VastParser', () => {
     let request: RequestManager;
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
 
     const vastRaw = VastRaw;
 
@@ -104,7 +109,7 @@ describe('VastParser', () => {
         const vastNoAdRaw = '<?xml version="1.0" encoding="UTF-8" standalone="no"?><VAST version="2.0"></VAST>';
 
         try {
-            const vastPromise = TestFixtures.getVastParser().retrieveVast(vastNoAdRaw, nativeBridge, request);
+            const vastPromise = TestFixtures.getVastParser().retrieveVast(vastNoAdRaw, core, request);
             vastPromise.then(() => {
                 assert.fail('Should fail when parsing invalid VAST');
             });
@@ -132,7 +137,7 @@ describe('VastParser', () => {
             response: 'invalid vast'
         }));
 
-        const vastPromise = TestFixtures.getVastParser().retrieveVast(rootVast, nativeBridge, request);
+        const vastPromise = TestFixtures.getVastParser().retrieveVast(rootVast, core, request);
 
         vastPromise.then(() => {
             assert.fail('Should fail when parsing invalid VAST');
@@ -244,39 +249,11 @@ describe('VastParser', () => {
     });
 
     beforeEach(() => {
-        nativeBridge = <NativeBridge><any>{
-            Request: {
-                onComplete: {
-                    subscribe: sinon.spy()
-                },
-                onFailed: {
-                    subscribe: sinon.spy()
-                }
-            },
-            Sdk: {
-                logInfo: sinon.spy(),
-                logDebug: sinon.spy()
-            },
-            Connectivity: {
-                onConnected: new Observable2()
-            },
-            Broadcast: {
-                onBroadcastAction: new Observable4()
-            },
-            Notification: {
-                onNotification: new Observable2()
-            },
-            Lifecycle: {
-                onActivityResumed: new Observable1(),
-                onActivityPaused: new Observable1(),
-                onActivityDestroyed: new Observable1()
-            },
-            getPlatform: () => {
-                return Platform.TEST;
-            }
-        };
-        const focusManager = new FocusManager(nativeBridge);
-        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-        request = new RequestManager(nativeBridge, wakeUpManager);
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        const wakeUpManager = new WakeUpManager(core);
+        request = new RequestManager(platform, core, wakeUpManager);
     });
 });

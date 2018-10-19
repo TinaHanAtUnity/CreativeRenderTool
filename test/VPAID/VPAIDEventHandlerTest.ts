@@ -16,7 +16,6 @@ import { IntentApi } from 'Core/Native/Android/Intent';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 import { SdkApi } from 'Core/Native/Sdk';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -27,16 +26,32 @@ import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
+import { Backend } from '../../src/ts/Backend/Backend';
 
 describe('VPAIDEventHandlerTest', () => {
     let eventHandler: VPAIDEventHandler;
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    let ads: IAdsApi;
     let adUnit: VPAIDAdUnit;
     let parameters: IVPAIDAdUnitParameters;
 
     beforeEach(() => {
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        ads = TestFixtures.getAdsApi(nativeBridge);
+
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         parameters = {
+            platform,
+            core,
+            ads,
             campaign: sinon.createStubInstance(VPAIDCampaign),
             closer: sinon.createStubInstance(Closer),
             vpaid: sinon.createStubInstance(VPAID),
@@ -62,12 +77,7 @@ describe('VPAIDEventHandlerTest', () => {
         (<sinon.SinonStub>parameters.campaign.getVideoClickTrackingURLs).returns(['https://tracking.unityads.unity3d.com']);
         (<sinon.SinonStub>parameters.campaign.getVideoClickThroughURL).returns('https://unityads.unity3d.com');
 
-        nativeBridge = sinon.createStubInstance(NativeBridge);
-        (<any>nativeBridge).UrlScheme = sinon.createStubInstance(UrlSchemeApi);
-        (<any>nativeBridge).Intent = sinon.createStubInstance(IntentApi);
-        (<any>nativeBridge).Sdk = sinon.createStubInstance(SdkApi);
-
-        eventHandler = new VPAIDEventHandler(nativeBridge, adUnit, parameters);
+        eventHandler = new VPAIDEventHandler(adUnit, parameters);
     });
 
     describe('VPAID events', () => {

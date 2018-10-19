@@ -15,12 +15,19 @@ import { Observable2 } from 'Core/Utilities/Observable';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
+import { TestFixtures } from '../TestHelpers/TestFixtures';
 
 describe('GdprManagerTest', () => {
     const testGameId = '12345';
     const testAdvertisingId = '128970986778678';
     const testUnityProjectId = 'game-1';
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let coreConfig: CoreConfiguration;
@@ -44,10 +51,11 @@ describe('GdprManagerTest', () => {
         consentlastsent = false;
         consent = false;
 
-        nativeBridge = sinon.createStubInstance(NativeBridge);
-        nativeBridge.Sdk = sinon.createStubInstance(SdkApi);
-        nativeBridge.Storage = sinon.createStubInstance(StorageApi);
-        (<any>nativeBridge.Storage).onSet = new Observable2<string, object>();
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        (<any>core.Storage).onSet = new Observable2<string, object>();
 
         clientInfo = sinon.createStubInstance(ClientInfo);
         deviceInfo = sinon.createStubInstance(AndroidDeviceInfo);
@@ -55,12 +63,11 @@ describe('GdprManagerTest', () => {
         adsConfig = sinon.createStubInstance(AdsConfiguration);
         request = sinon.createStubInstance(Request);
 
-        onSetStub = sinon.stub(nativeBridge.Storage.onSet, 'subscribe');
-        getStub = <sinon.SinonStub>nativeBridge.Storage.get;
-        setStub = (<sinon.SinonStub>nativeBridge.Storage.set).resolves();
-        writeStub = (<sinon.SinonStub>nativeBridge.Storage.write).resolves();
+        onSetStub = sinon.stub(core.Storage.onSet, 'subscribe');
+        getStub = <sinon.SinonStub>core.Storage.get;
+        setStub = (<sinon.SinonStub>core.Storage.set).resolves();
+        writeStub = (<sinon.SinonStub>core.Storage.write).resolves();
 
-        (<sinon.SinonStub>clientInfo.getPlatform).returns(Platform.TEST);
         (<sinon.SinonStub>clientInfo.getGameId).returns(testGameId);
         (<sinon.SinonStub>deviceInfo.getAdvertisingIdentifier).returns(testAdvertisingId);
         (<sinon.SinonStub>coreConfig.getUnityProjectId).returns(testUnityProjectId);
@@ -79,7 +86,7 @@ describe('GdprManagerTest', () => {
         onSetStub.callsFake((fun) => {
             storageTrigger = fun;
         });
-        gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, coreConfig, adsConfig, request);
+        gdprManager = new GdprManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request);
         sendGDPREventStub = sinon.spy(gdprManager, 'sendGDPREvent');
     });
 
@@ -367,7 +374,7 @@ describe('GdprManagerTest', () => {
             getRequestStub = <sinon.SinonStub>request.get;
             getRequestStub.resolves({response: '{}'});
             diagnosticTriggerStub = sinon.stub(Diagnostics, 'trigger');
-            logErrorStub = <sinon.SinonStub>nativeBridge.Sdk.logError;
+            logErrorStub = <sinon.SinonStub>core.Sdk.logError;
 
             (<sinon.SinonStub>clientInfo.getGameId).returns(gameId);
             (<sinon.SinonStub>deviceInfo.getAdvertisingIdentifier).returns(adId);

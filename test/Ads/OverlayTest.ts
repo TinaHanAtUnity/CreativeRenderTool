@@ -8,25 +8,30 @@ import * as sinon from 'sinon';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Privacy } from 'Ads/Views/Privacy';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Platform } from '../../src/ts/Core/Constants/Platform';
+import { Backend } from '../../src/ts/Backend/Backend';
+import { ICoreApi } from '../../src/ts/Core/ICore';
+import { IAdsApi } from '../../src/ts/Ads/IAds';
 
 describe('OverlayTest', () => {
-    let handleInvocation: sinon.SinonSpy;
-    let handleCallback: sinon.SinonSpy;
+    let platform: Platform;
+    let backend: Backend;
     let nativeBridge: NativeBridge;
+    let core: ICoreApi;
+    let ads: IAdsApi;
     let privacy: AbstractPrivacy;
 
     beforeEach(() => {
-        handleInvocation = sinon.spy();
-        handleCallback = sinon.spy();
-        nativeBridge = new NativeBridge({
-            handleInvocation,
-            handleCallback
-        });
-        privacy = new Privacy(nativeBridge, TestFixtures.getCampaign(), sinon.createStubInstance(GdprManager), false, false);
+        platform = Platform.ANDROID;
+        backend = TestFixtures.getBackend(platform);
+        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        core = TestFixtures.getCoreApi(nativeBridge);
+        ads = TestFixtures.getAdsApi(nativeBridge);
+        privacy = new Privacy(platform, TestFixtures.getCampaign(), sinon.createStubInstance(GdprManager), false, false);
     });
 
     it('should render', () => {
-        const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId', privacy, false);
+        const overlay = new Overlay(platform, ads, TestFixtures.getAndroidDeviceInfo(core), true, 'en', 'testGameId', privacy, false);
         overlay.render();
         assert.isNotNull(overlay.container().innerHTML);
         assert.isNotNull(overlay.container().querySelector('.skip-icon'));
