@@ -40,7 +40,8 @@ export class VastParser {
         }
 
         const xml = (this._domParser).parseFromString(vast, 'text/xml');
-        const ads: VastAd[] = [], errorURLTemplates: string[] = [];
+        const ads: VastAd[] = [];
+        const errorURLTemplates: string[] = [];
 
         if (!xml || !xml.documentElement || xml.documentElement.nodeName !== 'VAST') {
             throw new Error('VAST xml data is missing');

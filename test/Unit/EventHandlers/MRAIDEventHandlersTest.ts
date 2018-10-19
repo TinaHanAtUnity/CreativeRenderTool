@@ -35,7 +35,8 @@ describe('MRAIDEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, container: AdUnitContainer;
+    let nativeBridge: NativeBridge;
+    let container: AdUnitContainer;
     let storageBridge: StorageBridge;
     let mraidAdUnit: MRAIDAdUnit;
     let mraidView: MRAID;

@@ -39,7 +39,8 @@ describe('OverlayEventHandlerTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, performanceAdUnit: PerformanceAdUnit;
+    let nativeBridge: NativeBridge;
+    let performanceAdUnit: PerformanceAdUnit;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
     let sessionManager: SessionManager;

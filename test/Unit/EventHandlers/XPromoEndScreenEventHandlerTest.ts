@@ -36,7 +36,10 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, container: AdUnitContainer, overlay: Overlay, endScreen: XPromoEndScreen;
+    let nativeBridge: NativeBridge;
+    let container: AdUnitContainer;
+    let overlay: Overlay;
+    let endScreen: XPromoEndScreen;
     let storageBridge: StorageBridge;
     let sessionManager: SessionManager;
     let xPromoAdUnit: XPromoAdUnit;
