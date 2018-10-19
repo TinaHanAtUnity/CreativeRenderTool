@@ -134,13 +134,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private onMessageOpen(url: string) {
-        if (!this._callButtonEnabled) {
-            return;
-        }
-        this._handlers.forEach(handler => handler.onMraidClick(url));
-    }
-
     private onLoadedEvent(): void {
         this._domContentLoaded = true;
         this.onLoaded.trigger();
@@ -154,5 +147,12 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._playableStartTimestamp = Date.now();
         this.sendMraidAnalyticsEvent('playable_start');
+    }
+
+    private onMessageOpen(url: string) {
+        if (!this._callButtonEnabled) {
+            return;
+        }
+        this._handlers.forEach(handler => handler.onMraidClick(url));
     }
 }

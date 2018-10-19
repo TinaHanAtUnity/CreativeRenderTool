@@ -100,15 +100,12 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     public render(): void {
         super.render();
 
-        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
         this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen-ar');
 
         this._cameraPermissionPanel = <HTMLElement>this._container.querySelector('.camera-permission-panel');
         this._permissionLearnMorePanel = <HTMLElement>this._container.querySelector('.permissions-learn-more');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
 
         ARUtil.isARSupported(this._nativeBridge).then(arSupported => {
             let container = MRAIDContainer;
@@ -163,14 +160,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }, '*');
         }
 
-        // background time for analytics
-        if(!viewable) {
-            this._backgroundTimestamp = Date.now();
-        } else {
-            if (this._backgroundTimestamp) {
-                this._backgroundTime += Date.now() - this._backgroundTimestamp;
-            }
-        }
+        this.setAnalyticsBackgroundTime(viewable);
     }
 
     public show(): void {
