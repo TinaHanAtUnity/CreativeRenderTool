@@ -128,7 +128,10 @@ class TestRequestApi extends RequestApi {
 describe('RequestTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, requestApi: TestRequestApi, request: Request, wakeUpManager: WakeUpManager;
+    let nativeBridge: NativeBridge;
+    let requestApi: TestRequestApi;
+    let request: Request;
+    let wakeUpManager: WakeUpManager;
     let focusManager: FocusManager;
 
     beforeEach(() => {

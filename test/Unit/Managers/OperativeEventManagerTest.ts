@@ -26,6 +26,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { StorageBridgeHelper } from 'TestHelpers/StorageBridgeHelper';
 
 class TestStorageApi extends StorageApi {
 
@@ -167,18 +168,6 @@ class TestRequestApi extends RequestApi {
     }
 }
 
-class TestHelper {
-    public static waitForStorageBatch(storageBridge: StorageBridge): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const storageObserver = () => {
-                storageBridge.onPrivateStorageWrite.unsubscribe(storageObserver);
-                resolve();
-            };
-            storageBridge.onPrivateStorageWrite.subscribe(storageObserver);
-        });
-    }
-}
-
 describe('OperativeEventManagerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
@@ -272,7 +261,7 @@ describe('OperativeEventManagerTest', () => {
 
         const requestSpy = sinon.spy(request, 'post');
 
-        const storagePromise = TestHelper.waitForStorageBatch(storageBridge);
+        const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
 
         const event = operativeEventManager.sendEvent('test', eventId, sessionId, url, data).then(() => {
             assert.fail('Send failed operative event failed to fail');

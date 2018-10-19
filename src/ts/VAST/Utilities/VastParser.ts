@@ -40,7 +40,8 @@ export class VastParser {
         }
 
         const xml = (this._domParser).parseFromString(vast, 'text/xml');
-        const ads: VastAd[] = [], errorURLTemplates: string[] = [];
+        const ads: VastAd[] = [];
+        const errorURLTemplates: string[] = [];
 
         if (!xml || !xml.documentElement || xml.documentElement.nodeName !== 'VAST') {
             throw new Error('VAST xml data is missing');
@@ -83,9 +84,9 @@ export class VastParser {
         } catch (e) {
             const error = new DiagnosticError(e, { vast: vast, wrapperDepth: depth });
             if (depth > 0) {
-                /* tslint:disable:no-string-literal */
+                // tslint:disable:no-string-literal
                 error.diagnostic['rootWrapperVast'] = this._rootWrapperVast;
-                /* tslint:enable */
+                // tslint:enable
             }
             throw error;
         }
