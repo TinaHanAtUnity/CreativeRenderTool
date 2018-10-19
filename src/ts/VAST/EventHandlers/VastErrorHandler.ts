@@ -93,9 +93,9 @@ export class VastErrorHandler {
     }
 
     private static formatVASTErrorURL(errorUrl: string, errorCode: VastErrorCode, assetUrl?: string): string {
-        const formattedUrl = errorUrl.replace(/[ERRORCODE]/, errorCode.toString());
+        let formattedUrl = errorUrl.replace('[ERRORCODE]', errorCode.toString());
         if (assetUrl) {
-            formattedUrl.replace(/[ASSETURI]/, assetUrl);
+            formattedUrl = formattedUrl.replace('[ASSETURI]', assetUrl);
         }
         return formattedUrl;
     }
