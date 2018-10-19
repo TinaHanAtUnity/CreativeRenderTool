@@ -83,9 +83,9 @@ export class VastParser {
         } catch (e) {
             const error = new DiagnosticError(e, { vast: vast, wrapperDepth: depth });
             if (depth > 0) {
-                /* tslint:disable:no-string-literal */
+                // tslint:disable:no-string-literal
                 error.diagnostic['rootWrapperVast'] = this._rootWrapperVast;
-                /* tslint:enable */
+                // tslint:enable
             }
             throw error;
         }
