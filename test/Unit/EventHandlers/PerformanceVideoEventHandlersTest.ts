@@ -31,7 +31,9 @@ describe('PerformanceVideoEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, overlay: Overlay, endScreen: PerformanceEndScreen;
+    let nativeBridge: NativeBridge;
+    let overlay: Overlay;
+    let endScreen: PerformanceEndScreen;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
     let performanceAdUnit: PerformanceAdUnit;

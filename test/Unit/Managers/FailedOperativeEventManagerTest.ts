@@ -11,18 +11,7 @@ import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
 import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
-
-class TestHelper {
-    public static waitForStorageBatch(storageBridge: StorageBridge): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const storageObserver = () => {
-                storageBridge.onPrivateStorageWrite.unsubscribe(storageObserver);
-                resolve();
-            };
-            storageBridge.onPrivateStorageWrite.subscribe(storageObserver);
-        });
-    }
-}
+import { StorageBridgeHelper } from 'TestHelpers/StorageBridgeHelper';
 
 describe('FailedOperativeEventManagerTest', () => {
     const handleInvocation = sinon.spy();
@@ -67,7 +56,7 @@ describe('FailedOperativeEventManagerTest', () => {
         describe('Resending', () => {
             describe('Performance events', () => {
                 it('Should send single event', () => {
-                    const storagePromise = TestHelper.waitForStorageBatch(storageBridge);
+                    const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
                     const manager = new FailedOperativeEventManager('12345', '12345');
                     return manager.sendFailedEvent(nativeBridge, request, storageBridge).then(() => {
                         return storagePromise;
@@ -83,7 +72,7 @@ describe('FailedOperativeEventManagerTest', () => {
                 });
 
                 it('Should send multiple events', () => {
-                    const storagePromise = TestHelper.waitForStorageBatch(storageBridge);
+                    const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
                     const manager = new FailedOperativeEventManager('12345');
                     return manager.sendFailedEvents(nativeBridge, request, storageBridge).then(() => {
                         return storagePromise;
@@ -117,7 +106,7 @@ describe('FailedOperativeEventManagerTest', () => {
 
                     HttpKafka.setRequest(request);
 
-                    const storagePromise = TestHelper.waitForStorageBatch(storageBridge);
+                    const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
                     const manager = new FailedXpromoOperativeEventManager('12345', '12345');
                     return manager.sendFailedEvent(nativeBridge, request, storageBridge).then(() => {
                         return storagePromise;
@@ -142,7 +131,7 @@ describe('FailedOperativeEventManagerTest', () => {
             });
 
             it('Single event', () => {
-                const storagePromise = TestHelper.waitForStorageBatch(storageBridge);
+                const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
                 const manager = new FailedOperativeEventManager('12345', '12345');
                 return manager.storeFailedEvent(storageBridge, {test1: 'test1', test2: 'test2'}).then(() => {
                     return storagePromise;

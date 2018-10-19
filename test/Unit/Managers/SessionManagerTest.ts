@@ -18,6 +18,7 @@ import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { StorageBridgeHelper } from 'TestHelpers/StorageBridgeHelper';
 
 class TestStorageApi extends StorageApi {
 
@@ -159,18 +160,6 @@ class TestRequestApi extends RequestApi {
     }
 }
 
-class TestHelper {
-    public static waitForStorageBatch(storageBridge: StorageBridge): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const storageObserver = () => {
-                storageBridge.onPrivateStorageWrite.unsubscribe(storageObserver);
-                resolve();
-            };
-            storageBridge.onPrivateStorageWrite.subscribe(storageObserver);
-        });
-    }
-}
-
 describe('SessionManagerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
@@ -262,7 +251,7 @@ describe('SessionManagerTest', () => {
         const sessionId: string = 'new-12345';
         const sessionTsKey: string = 'session.' + sessionId + '.ts';
 
-        const storagePromise = TestHelper.waitForStorageBatch(storageBridge);
+        const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
 
         sessionManager.startNewSession(sessionId);
 
@@ -281,7 +270,7 @@ describe('SessionManagerTest', () => {
 
         storageApi.set(StorageType.PRIVATE, sessionTsKey, threeMonthsAgo);
 
-        const storagePromise = TestHelper.waitForStorageBatch(storageBridge);
+        const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
 
         return sessionManager.sendUnsentSessions().then(() => {
             return storagePromise;
@@ -301,7 +290,7 @@ describe('SessionManagerTest', () => {
 
         storageApi.set(StorageType.PRIVATE, randomKey, 'test');
 
-        const storagePromise = TestHelper.waitForStorageBatch(storageBridge);
+        const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
 
         return sessionManager.sendUnsentSessions().then(() => {
             return storagePromise;

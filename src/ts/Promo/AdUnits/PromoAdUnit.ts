@@ -13,6 +13,8 @@ import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { Promo } from 'Promo/Views/Promo';
+import { PromoEvents } from 'Promo/Utilities/PromoEvents';
+import { Url } from 'Core/Utilities/Url';
 
 export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign> {
     view: Promo;
@@ -128,16 +130,24 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private sendTrackingEvent(eventName: string): void {
-        const sessionId = this._campaign.getSession().getId();
-        if(this._additionalTrackingEvents) {
-            const trackingEventUrls = this._additionalTrackingEvents[eventName];
+        this._nativeBridge.Monetization.CustomPurchasing.available().then((isAvailable) => {
+            const sessionId = this._campaign.getSession().getId();
+            if(this._additionalTrackingEvents) {
+                const trackingEventUrls = this._additionalTrackingEvents[eventName].map((value: string): string => {
+                    // add native flag false to designate promo
+                    if (PromoEvents.purchaseHostnameRegex.test(value)) {
+                        return Url.addParameters(value, {'native': false, 'iap_service': !isAvailable});
+                    }
+                    return value;
+                });
 
-            if(trackingEventUrls) {
-                for (const url of trackingEventUrls) {
-                    this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
+                if(trackingEventUrls) {
+                    for (const url of trackingEventUrls) {
+                        this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
+                    }
                 }
             }
-        }
+        });
     }
 
     private unsetReferences() {

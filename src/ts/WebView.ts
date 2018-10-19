@@ -283,7 +283,7 @@ export class WebView {
                     this._sessionManager.setGameSessionId(gameSessionId);
                 });
             }
-            this._promoEvents = new PromoEvents(this._coreConfig, this._adsConfig, this._nativeBridge, this._clientInfo, this._deviceInfo);
+            this._promoEvents = new PromoEvents(this._coreConfig, this._adsConfig, this._nativeBridge, this._clientInfo, this._deviceInfo, new AnalyticsStorage(this._nativeBridge));
             const gdprConsentPromise = this._gdprManager.getConsentAndUpdateConfiguration().catch((error) => {
                 // do nothing
                 // error happens when consent value is undefined
@@ -293,7 +293,7 @@ export class WebView {
             const defaultPlacement = this._adsConfig.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            this._backupCampaignManager = new BackupCampaignManager(this._nativeBridge, this._coreConfig);
+            this._backupCampaignManager = new BackupCampaignManager(this._nativeBridge, this._storageBridge, this._coreConfig);
             this._assetManager = new AssetManager(this._cache, this._adsConfig.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._programmaticTrackingService, this._nativeBridge, this._backupCampaignManager);
             if(this._sessionManager.getGameSessionId() % 10000 === 0) {
                 this._assetManager.setCacheDiagnostics(true);

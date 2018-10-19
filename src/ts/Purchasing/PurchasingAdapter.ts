@@ -28,7 +28,7 @@ export interface IProduct {
 }
 export interface IPurchasingAdapter {
     initialize(): Promise<void>;
-    purchaseItem(productId: string, campaign: PromoCampaign, placementId: string): Promise<ITransactionDetails>;
+    purchaseItem(productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails>;
     refreshCatalog(): Promise<IProduct[]>;
     onPromoClosed(campaign: PromoCampaign, placementId: string): void;
 
