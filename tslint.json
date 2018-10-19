@@ -39,7 +39,6 @@
     "no-reserved-keywords": false,
     "function-name": false,
     "no-unnecessary-class": false,
-    "one-variable-per-declaration": false,
     "cyclomatic-complexity": false,
     "no-for-in": false,
     "no-function-constructor-with-string-args": false,
