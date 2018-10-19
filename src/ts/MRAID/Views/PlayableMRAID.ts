@@ -82,7 +82,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public show(): void {
         super.show();
-
         this.choosePrivacyShown();
         this._showTimestamp = Date.now();
         this.sendMraidAnalyticsEvent('playable_show');
@@ -109,23 +108,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._mraidBridge.sendViewableEvent(viewable);
             this.setAnalyticsBackgroundTime(viewable);
         }
-    }
-
-    public onPrivacyClose(): void {
-        if(this._privacy) {
-            this._privacy.hide();
-        }
-    }
-
-    public onPrivacyEvent(event: Event): void {
-        event.preventDefault();
-        this._privacy.show();
-    }
-
-    public onGDPRPopupEvent(event: Event) {
-        event.preventDefault();
-        this._gdprPopupClicked = true;
-        this._privacy.show();
     }
 
     private loadIframe(): void {
@@ -213,7 +195,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
-
                 this.sendMraidAnalyticsEvent('playable_start');
                 this._mraidBridge.sendViewableEvent(true);
 

@@ -345,12 +345,12 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             return mraid;
         }
 
-        const src = dom.documentElement!.querySelector('script[src^="mraid.js"]');
+        const src = dom.documentElement.querySelector('script[src^="mraid.js"]');
         if(src && src.parentNode) {
             src.parentNode.removeChild(src);
         }
 
-        return dom.documentElement!.outerHTML;
+        return dom.documentElement.outerHTML;
     }
 
     private fetchMRAID(): Promise<string | undefined> {

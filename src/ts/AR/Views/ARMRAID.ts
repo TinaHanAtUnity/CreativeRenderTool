@@ -230,18 +230,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         super.hide();
     }
 
-    protected choosePrivacyShown(): void {
-        if (this._showGDPRBanner && !this._gdprPopupClicked) {
-            this._gdprBanner.style.visibility = 'visible';
-            this._privacyButton.style.pointerEvents = '1';
-            this._privacyButton.style.visibility = 'hidden';
-        } else {
-            this._privacyButton.style.visibility = 'visible';
-            this._gdprBanner.style.pointerEvents = '1';
-            this._gdprBanner.style.visibility = 'hidden';
-        }
-    }
-
     private showLoadingScreen() {
         this._loadingScreen.style.display = 'block';
         this._loadingScreenTimeout = setTimeout(() => {

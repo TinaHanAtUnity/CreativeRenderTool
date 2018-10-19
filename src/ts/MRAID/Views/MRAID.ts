@@ -59,7 +59,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public show(): void {
         super.show();
-
         this.choosePrivacyShown();
         this._showTimestamp = Date.now();
         this.sendMraidAnalyticsEvent('playable_show');
@@ -88,7 +87,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this.setAnalyticsBackgroundTime(viewable);
     }
 
-    protected sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
+    private sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
         const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
         const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;
