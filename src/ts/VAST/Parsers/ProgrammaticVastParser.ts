@@ -13,7 +13,6 @@ import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { VastErrorHandler, VastErrorCode, VastErrorMessage } from 'VAST/EventHandlers/VastErrorHandler';
 import { Url } from 'Core/Utilities/Url';
-// tslint:disable:no-console
 import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
 
 export class ProgrammaticVastParser extends CampaignParser {
@@ -24,6 +23,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     private static VAST_PARSER_MAX_DEPTH: number;
     private _isMediaExperiment: boolean = false;
+    private _isErrorTrackingExperiment: boolean = false;
 
     protected _vastParser: VastParser = new VastParser();
 
@@ -54,7 +54,7 @@ export class ProgrammaticVastParser extends CampaignParser {
             session: session,
             mediaId: response.getMediaId()
         };
-        console.log('parseVastToCampaign ----- ');
+
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
         if(portraitUrl) {
@@ -72,14 +72,17 @@ export class ProgrammaticVastParser extends CampaignParser {
             mediaVideoUrl = VastMediaSelector.getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
         }
 
-        console.log('parseVastToCampaign ----- mediaVideoUrl ' + mediaVideoUrl);
         if (!mediaVideoUrl) {
-            VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_NOT_FOUND);
+            if (this._isErrorTrackingExperiment) {
+                VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_NOT_FOUND);
+            }
             throw new Error(VastErrorMessage.MEDIA_FILE_NOT_FOUND);
         }
-        console.log('parseVastToCampaign ----- ongoing');
+
         if (nativeBridge.getPlatform() === Platform.IOS && !mediaVideoUrl.match(/^https:\/\//)) {
-            VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_PLAY_ERROR);
+            if (this._isErrorTrackingExperiment) {
+                VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_PLAY_ERROR);
+            }
             const videoUrlError = new DiagnosticError(
                 new Error(VastErrorMessage.MEDIA_FILE_UNSUPPORTED_IOS),
                 { rootWrapperVast: response.getContent() }
@@ -88,7 +91,9 @@ export class ProgrammaticVastParser extends CampaignParser {
         }
 
         if (!Url.isValid(mediaVideoUrl)) {
-            VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_UNSUPPORTED);
+            if (this._isErrorTrackingExperiment) {
+                VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_UNSUPPORTED);
+            }
             throw new Error(VastErrorMessage.MEDIA_FILE_UNSUPPORTED);
         }
 
