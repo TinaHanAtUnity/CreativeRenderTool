@@ -6,7 +6,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { IPromoApi } from '../Promo/Promo';
+import { IPromoApi } from '../Promo/IPromo';
 import { ICoreApi } from '../Core/ICore';
 
 export enum IPromoRequest {

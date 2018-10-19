@@ -11,7 +11,7 @@ import { ProductInfo } from 'Promo/Models/ProductInfo';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { IMonetizationApi } from '../IMonetization';
-import { IPromoApi } from '../../Promo/Promo';
+import { IPromoApi } from '../../Promo/IPromo';
 
 export interface IPlacementContent {
     state: PlacementContentState;

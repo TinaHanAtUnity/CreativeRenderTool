@@ -17,7 +17,7 @@ import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IPurchasingApi } from '../../Purchasing/IPurchasing';
 import { ICoreApi } from '../../Core/ICore';
-import { IPromoApi } from '../Promo';
+import { IPromoApi } from '../IPromo';
 
 export enum IPromoRequest {
     SETIDS = 'setids',

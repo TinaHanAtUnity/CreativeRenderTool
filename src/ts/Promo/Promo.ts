@@ -9,12 +9,9 @@ import { ICore } from '../Core/ICore';
 import { IPurchasing } from '../Purchasing/IPurchasing';
 import { PromoEvents } from './Utilities/PromoEvents';
 import { IAnalytics } from '../Analytics/IAnalytics';
+import { IPromo, IPromoApi } from './IPromo';
 
-export interface IPromoApi extends IModuleApi {
-    Purchasing: PurchasingApi;
-}
-
-export class Promo implements IParserModule, IApiModule {
+export class Promo implements IParserModule, IPromo {
 
     public readonly Api: IPromoApi;
 

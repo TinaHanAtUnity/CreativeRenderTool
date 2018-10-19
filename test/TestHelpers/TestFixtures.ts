@@ -93,6 +93,11 @@ import { ProgrammaticStaticInterstitialParser } from '../../src/ts/Display/Parse
 import { ProductInfo, IProductInfo, ProductInfoType } from 'Promo/Models/ProductInfo';
 import { IAnalyticsApi } from '../../src/ts/Analytics/IAnalytics';
 import { AnalyticsApi } from '../../src/ts/Analytics/Native/Analytics';
+import { IMonetizationApi } from '../../src/ts/Monetization/IMonetization';
+import { MonetizationListenerApi } from '../../src/ts/Monetization/Native/MonetizationListener';
+import { PlacementContentsApi } from '../../src/ts/Monetization/Native/PlacementContents';
+import { IPromoApi } from '../../src/ts/Promo/IPromo';
+import { PurchasingApi } from '../../src/ts/Promo/Native/Purchasing';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -622,6 +627,19 @@ export class TestFixtures {
         return {
             Banner: new BannerApi(nativeBridge),
             Listener: new BannerListenerApi(nativeBridge)
+        };
+    }
+
+    public static getMonetizationApi(nativeBridge: NativeBridge): IMonetizationApi {
+        return {
+            Listener: new MonetizationListenerApi(nativeBridge),
+            PlacementContents: new PlacementContentsApi(nativeBridge)
+        };
+    }
+
+    public static getPromoApi(nativeBridge: NativeBridge): IPromoApi {
+        return {
+            Purchasing: new PurchasingApi(nativeBridge)
         };
     }
 

@@ -7,6 +7,7 @@ import { Template } from 'Core/Utilities/Template';
 import OverlayTemplate from 'html/Overlay.html';
 import { IAdsApi } from 'Ads/IAds';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { DeviceInfo } from '../../Core/Models/DeviceInfo';
 
 export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
@@ -49,7 +50,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _gameId: string;
     private _seatId: number | undefined;
 
-    constructor(platform: Platform, ads: IAdsApi, deviceInfo: AndroidDeviceInfo, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, seatId?: number) {
+    constructor(platform: Platform, ads: IAdsApi, deviceInfo: DeviceInfo, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, seatId?: number) {
         super(platform, 'overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
