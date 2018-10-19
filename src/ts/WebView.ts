@@ -355,22 +355,23 @@ export class WebView {
                 this._nativeBridge.Request.setConcurrentRequestCount(1);
             }
         }).catch(error => {
-            jaegerInitSpan.addAnnotation(error.message);
+            let _error = error;
+            jaegerInitSpan.addAnnotation(_error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
-            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
+            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, _error.message);
             if (this._jaegerManager) {
                 this._jaegerManager.stop(jaegerInitSpan);
             }
 
-            if(error instanceof ConfigError) {
-                error = { 'message': error.message, 'name': error.name };
-                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
-            } else if(error instanceof Error && error.name === 'DisabledGame') {
+            if(_error instanceof ConfigError) {
+                _error = { 'message': _error.message, 'name': _error.name };
+                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], _error.message);
+            } else if(_error instanceof Error && _error.name === 'DisabledGame') {
                 return;
             }
 
-            this._nativeBridge.Sdk.logError(`Init error: ${JSON.stringify(error)}`);
-            Diagnostics.trigger('initialization_error', error);
+            this._nativeBridge.Sdk.logError(`Init error: ${JSON.stringify(_error)}`);
+            Diagnostics.trigger('initialization_error', _error);
         });
     }
 
