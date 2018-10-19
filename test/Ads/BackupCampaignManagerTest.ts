@@ -3,17 +3,14 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Placement } from 'Ads/Models/Placement';
 import { StorageError, StorageType } from 'Core/Native/Storage';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { Platform } from '../../src/ts/Core/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 
 describe('BackupCampaignManagerTest', () => {
     it('should store placement data', () => {
-        const setSpy = sinon.spy();
-
         const platform = Platform.ANDROID;
         const backend = TestFixtures.getBackend(platform);
         const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
@@ -22,6 +19,8 @@ describe('BackupCampaignManagerTest', () => {
         const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, TestFixtures.getCoreConfiguration());
         const placement: Placement = TestFixtures.getPlacement();
         const testMediaId: string = '12345';
+
+        const setSpy = sinon.spy(core.Storage, 'set');
 
         backupCampaignManager.storePlacement(placement, testMediaId);
 
@@ -37,9 +36,6 @@ describe('BackupCampaignManagerTest', () => {
     });
 
     it('should store performance campaign data', () => {
-        const setSpy = sinon.spy();
-        const writeSpy = sinon.spy();
-
         const platform = Platform.ANDROID;
         const backend = TestFixtures.getBackend(platform);
         const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
@@ -49,6 +45,9 @@ describe('BackupCampaignManagerTest', () => {
 
         const campaign: PerformanceCampaign = TestFixtures.getCampaign();
         const testMediaId: string = 'beefcace-abcdefg-deadbeef';
+
+        const setSpy = sinon.spy(core.Storage, 'set');
+        const writeSpy = sinon.spy(core.Storage, 'write');
 
         backupCampaignManager.storeCampaign(campaign);
 
@@ -72,9 +71,6 @@ describe('BackupCampaignManagerTest', () => {
     });
 
     it('should not store placement data when test mode is active', () => {
-        const setSpy = sinon.spy();
-        const writeSpy = sinon.spy();
-
         const platform = Platform.ANDROID;
         const backend = TestFixtures.getBackend(platform);
         const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
@@ -86,6 +82,9 @@ describe('BackupCampaignManagerTest', () => {
         const placement: Placement = TestFixtures.getPlacement();
         const testMediaId: string = '12345';
 
+        const setSpy = sinon.spy(core.Storage, 'set');
+        const writeSpy = sinon.spy(core.Storage, 'write');
+
         backupCampaignManager.storePlacement(placement, testMediaId);
 
         assert.equal(setSpy.callCount, 0, 'placement data was set to storage when test mode is active');
@@ -93,9 +92,6 @@ describe('BackupCampaignManagerTest', () => {
     });
 
     it('should not store campaign data when test mode is active', () => {
-        const setSpy = sinon.spy();
-        const writeSpy = sinon.spy();
-
         const platform = Platform.ANDROID;
         const backend = TestFixtures.getBackend(platform);
         const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
@@ -105,6 +101,9 @@ describe('BackupCampaignManagerTest', () => {
         sinon.stub(configuration, 'getTestMode').returns(true);
         const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, configuration);
         const campaign: PerformanceCampaign = TestFixtures.getCampaign();
+
+        const setSpy = sinon.spy(core.Storage, 'set');
+        const writeSpy = sinon.spy(core.Storage, 'write');
 
         backupCampaignManager.storeCampaign(campaign);
 
@@ -175,6 +174,30 @@ describe('BackupCampaignManagerTest', () => {
         const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         const core = TestFixtures.getCoreApi(nativeBridge);
 
+        sinon.stub(core.Storage, 'get').callsFake((type: StorageType, key: string) => {
+            if (type === StorageType.PRIVATE) {
+                if (key === 'backupcampaign.placement.' + placement.getId() + '.mediaid') {
+                    return Promise.resolve(testMediaId);
+                } else if (key === 'backupcampaign.placement.' + placement.getId() + '.adtypes') {
+                    return Promise.resolve(JSON.stringify(placement.getAdTypes()));
+                } else if (key === 'backupcampaign.campaign.' + testMediaId + '.type') {
+                    return Promise.resolve('performance');
+                } else if (key === 'backupcampaign.campaign.' + testMediaId + '.data') {
+                    return Promise.resolve(campaign.toJSON());
+                } else if (key === 'backupcampaign.campaign.' + testMediaId + '.willexpireat') {
+                    return Promise.resolve(Date.now() + 7 * 24 * 3600 * 1000);
+                }
+            }
+            return Promise.reject(StorageError.COULDNT_GET_VALUE);
+        });
+
+        sinon.stub(core.Cache, 'getFileInfo').returns(Promise.resolve({
+            id: 'test',
+            found: true,
+            size: 12345,
+            mtime: Date.now()
+        }));
+
         const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, TestFixtures.getCoreConfiguration());
 
         return backupCampaignManager.loadCampaign(placement).then(loadedCampaign => {
@@ -219,6 +242,27 @@ describe('BackupCampaignManagerTest', () => {
         const backend = TestFixtures.getBackend(platform);
         const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         const core = TestFixtures.getCoreApi(nativeBridge);
+
+        sinon.stub(core.Storage, 'get').callsFake((type: StorageType, key: string) => {
+            if(type === StorageType.PRIVATE) {
+                if (key === 'backupcampaign.placement.' + placement.getId() + '.mediaid') {
+                    return Promise.resolve(testMediaId);
+                } else if(key === 'backupcampaign.placement.' + placement.getId() + '.adtypes') {
+                    return Promise.resolve(JSON.stringify(placement.getAdTypes()));
+                } else if(key === 'backupcampaign.campaign.' + testMediaId + '.type') {
+                    return Promise.resolve('performance');
+                } else if(key === 'backupcampaign.campaign.' + testMediaId + '.data') {
+                    return Promise.resolve(campaign.toJSON());
+                } else if(key === 'backupcampaign.campaign.' + testMediaId + '.willexpireat') {
+                    return Promise.resolve(Date.now() + 7 * 24 * 3600 * 1000);
+                }
+            }
+            return Promise.reject(StorageError.COULDNT_GET_VALUE);
+        });
+
+        sinon.stub(core.Cache, 'getFileInfo').returns(Promise.resolve({
+            found: false
+        }));
 
         const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, TestFixtures.getCoreConfiguration());
 
