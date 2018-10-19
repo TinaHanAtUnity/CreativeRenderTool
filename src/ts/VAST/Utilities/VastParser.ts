@@ -29,6 +29,11 @@ export class VastParser {
         this._maxWrapperDepth = maxWrapperDepth;
     }
 
+    public parseMediaFileSize(duration: number, kbitrate: number): number {
+        // returning file size in byte from bit
+        return (duration * kbitrate * 1000) / 8;
+    }
+
     public parseVast(vast: string | null): Vast {
         if (!vast) {
             throw new Error('VAST data is missing');
@@ -221,6 +226,7 @@ export class VastParser {
             return null;
         }
 
+        const mediaDuration = creative.getDuration();
         const skipOffset = creativeElement.getAttribute('skipoffset');
         if (skipOffset == null) {
             creative.setSkipDelay(null);
@@ -270,7 +276,8 @@ export class VastParser {
                     parseInt(mediaFileElement.getAttribute('maxBitrate') || 0, 10),
                     parseInt(mediaFileElement.getAttribute('width') || 0, 10),
                     parseInt(mediaFileElement.getAttribute('height') || 0, 10),
-                    mediaFileElement.getAttribute('apiFramework'));
+                    mediaFileElement.getAttribute('apiFramework'),
+                    this.parseMediaFileSize(mediaDuration, parseInt(mediaFileElement.getAttribute('bitrate') || 0, 10)));
                 creative.addMediaFile(mediaFile);
             }
         }

@@ -1,10 +1,10 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
+
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
@@ -12,18 +12,18 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
     private _spinnerEnabled: boolean = false;
 
-    private _skipEnabled: boolean;
+    protected _skipEnabled: boolean;
 
     private _videoDurationEnabled: boolean = false;
-    private _videoProgress: number;
+    protected _videoProgress: number;
 
     private _muteEnabled: boolean = false;
 
     private _debugMessageVisible: boolean = false;
     private _callButtonVisible: boolean = false;
-    private _callButtonEnabled: boolean = true;
+    protected _callButtonEnabled: boolean = true;
 
-    private _skipButtonElement: HTMLElement;
+    protected _skipButtonElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
@@ -31,7 +31,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _timerElement: HTMLElement;
 
     private _fadeTimer: any;
-    private _areControlsVisible: boolean = false;
+    protected _areControlsVisible: boolean = false;
     private _privacy: AbstractPrivacy;
     private _gdprPopupClicked: boolean = false;
     private _showGDPRBanner: boolean = false;
@@ -292,7 +292,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._handlers.forEach(handler => handler.onOverlayMute(this._muted));
     }
 
-    private onCallButtonEvent(event: Event): void {
+    protected onCallButtonEvent(event: Event): void {
         if (!this._callButtonEnabled) {
             return;
         }
@@ -328,7 +328,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._timerElement = <HTMLElement>this._container.querySelector('.timer');
     }
 
-    private showSkipButton() {
+    protected showSkipButton() {
         if (this._skipEnabled) {
             this._skipButtonElement.classList.add('show-skip-button');
         }
@@ -341,7 +341,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         }
     }
 
-    private showCallButton() {
+    protected showCallButton() {
         if (!this._areControlsVisible) {
             return;
         }
@@ -349,7 +349,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._callButtonElement.classList.add('show-go-text');
     }
 
-    private fadeIn() {
+    protected fadeIn() {
         this._container.classList.add('fade-in');
         this._areControlsVisible = true;
         setTimeout(() => {
