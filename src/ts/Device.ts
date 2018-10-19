@@ -26,7 +26,7 @@ let runningResizeEvent = false;
 
 const changeOrientation = () => {
 
-    /* Calculate orientation based on width and height by default */
+    // Calculate orientation based on width and height by default
     let orientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
 
     if (typeof window.orientation !== 'undefined' && platform === 'ios' && !isIOS7) {
