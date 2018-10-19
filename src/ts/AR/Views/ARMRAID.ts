@@ -186,8 +186,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     public hide() {
-        this.setViewableState(false);
-
         if (this._arFrameUpdatedObserver) {
             this._nativeBridge.AR.onFrameUpdated.unsubscribe(this._arFrameUpdatedObserver);
             this._nativeBridge.AR.onPlanesAdded.unsubscribe(this._arPlanesAddedObserver);
@@ -223,10 +221,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._prepareTimeout = undefined;
         }
 
-        if(this._updateInterval) {
-            clearInterval(this._updateInterval);
-            this._updateInterval = undefined;
-        }
         super.hide();
     }
 
