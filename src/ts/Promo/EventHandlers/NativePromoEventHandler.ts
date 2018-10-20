@@ -5,6 +5,8 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { Observable0 } from 'Core/Utilities/Observable';
+import { PromoEvents } from 'Promo/Utilities/PromoEvents';
+import { Url } from 'Core/Utilities/Url';
 
 export class NativePromoEventHandler {
 
@@ -24,42 +26,49 @@ export class NativePromoEventHandler {
         // TODO: Ignore event
     }
 
-    public onImpression(campaign: PromoCampaign, placementId: string) {
+    public onImpression(campaign: PromoCampaign, placementId: string): Promise<void> {
         this._thirdPartyEventManager.setTemplateValue('%ZONE%', placementId);
         return this.sendTrackingEvent('impression', campaign);
     }
 
-    public onPromoClosed(campaign: PromoCampaign) {
+    public onPromoClosed(campaign: PromoCampaign): Promise<void> {
         this._nativeBridge.Sdk.logInfo('Closing Unity Native Promo ad unit');
         this.onClose.trigger();
-        this.sendTrackingEvent('complete', campaign);
+        return this.sendTrackingEvent('complete', campaign);
     }
 
-    public onClick(productId: string, campaign: PromoCampaign, placementId: string) {
+    public onClick(productId: string, campaign: PromoCampaign, placementId: string): Promise<void> {
         return this.sendClick(productId, placementId, campaign);
     }
 
-    private sendClick(productId: string, placementId: string, campaign: PromoCampaign) {
+    private sendClick(productId: string, placementId: string, campaign: PromoCampaign): Promise<void> {
         this._nativeBridge.Listener.sendClickEvent(placementId);
         this._thirdPartyEventManager.setTemplateValue('%ZONE%', placementId);
-        this.sendTrackingEvent('click', campaign);
-
-        PurchasingUtilities.onPurchase(productId, campaign, placementId);
+        PurchasingUtilities.onPurchase(productId, campaign, placementId, true);
+        return this.sendTrackingEvent('click', campaign);
     }
 
-    private sendTrackingEvent(eventName: string, campaign: PromoCampaign) {
-        const sessionId = campaign.getSession().getId();
-        let trackingEvents;
-        if (campaign instanceof PromoCampaign) {
-            trackingEvents = campaign.getTrackingEventUrls();
-        }
-        if (trackingEvents) {
-            const trackingEventUrls = trackingEvents[eventName];
-            if (trackingEventUrls) {
-                for (const url of trackingEventUrls) {
-                    this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
+    private sendTrackingEvent(eventName: string, campaign: PromoCampaign): Promise<void> {
+        return this._nativeBridge.Monetization.CustomPurchasing.available().then((isAvailable) => {
+            const sessionId = campaign.getSession().getId();
+            let trackingEvents;
+            if (campaign instanceof PromoCampaign) {
+                trackingEvents = campaign.getTrackingEventUrls();
+            }
+            if (trackingEvents) {
+                const trackingEventUrls = trackingEvents[eventName].map((value: string): string => {
+                    // add native flag true to designate native promo
+                    if (PromoEvents.purchaseHostnameRegex.test(value)) {
+                        return Url.addParameters(value, {'native': true, 'iap_service': !isAvailable});
+                    }
+                    return value;
+                });
+                if (trackingEventUrls) {
+                    for (const url of trackingEventUrls) {
+                        this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
+                    }
                 }
             }
-        }
+        });
     }
 }
