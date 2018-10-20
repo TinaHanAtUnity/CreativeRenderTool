@@ -63,7 +63,7 @@ export class VastErrorHandler {
         if (errorTrackingUrl) {
             return VastErrorHandler.sendErrorEventWithThirdParty(thirdPartyEventManager, sessionId, errorTrackingUrl, errorCode, assetUrl);
         }
-        return Promise.reject();
+        return Promise.reject(new Error('sendVastErrorEventWithThirdParty errorTrackingUrl was undefined'));
     }
 
     public static sendVastErrorEventWithRequest(vast: Vast, request: Request, errorCode?: VastErrorCode, assetUrl?: string): Promise<INativeResponse> {
@@ -71,7 +71,7 @@ export class VastErrorHandler {
         if (errorTrackingUrl) {
             return VastErrorHandler.sendErrorEventWithRequest(request, errorTrackingUrl, errorCode, assetUrl);
         }
-        return Promise.reject();
+        return Promise.reject(new Error('sendVastErrorEventWithThirdParty errorTrackingUrl was undefined'));
     }
 
     private static sendErrorEventWithThirdParty(thirdPartyEventManager: ThirdPartyEventManager, sessionId: string, errorUrl: string, errorCode?: VastErrorCode, assetUrl?: string): Promise<INativeResponse> {
