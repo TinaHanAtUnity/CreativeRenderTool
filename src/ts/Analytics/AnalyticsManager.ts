@@ -58,7 +58,7 @@ export class AnalyticsManager {
         }
     }
 
-    constructor(platform: Platform, core: ICoreApi, analytics: IAnalyticsApi, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, focusManager: FocusManager) {
+    constructor(platform: Platform, core: ICoreApi, analytics: IAnalyticsApi, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, focusManager: FocusManager, analyticsStorage: AnalyticsStorage) {
         this._platform = platform;
         this._core = core;
         this._analytics = analytics;
@@ -67,7 +67,7 @@ export class AnalyticsManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._configuration = configuration;
-        this._storage = new AnalyticsStorage(core);
+        this._storage = analyticsStorage;
 
         this._endpoint = 'https://prd-lender.cdp.internal.unity3d.com/v1/events';
         this._cdpEndpoint = 'https://cdp.cloud.unity3d.com/v1/events';

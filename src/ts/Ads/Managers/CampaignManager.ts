@@ -96,6 +96,7 @@ export class CampaignManager {
     private _backupCampaignManager: BackupCampaignManager;
     private _request: RequestManager;
     private _deviceInfo: DeviceInfo;
+    private _deviceConnectionType: string | undefined;
     private _previousPlacementId: string | undefined;
     private _realtimeUrl: string | undefined;
     private _realtimeBody: any = {};
@@ -547,7 +548,7 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        return parser.parse(this._platform, this._core, this._request, response, session, this._deviceInfo.getOsVersion(), this._clientInfo.getGameId()).then((campaign) => {
+        return parser.parse(this._platform, this._core, this._request, response, session, this._deviceInfo.getOsVersion(), this._clientInfo.getGameId(), this._deviceConnectionType).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
                 SdkStats.setParseDuration(placement, parseDuration);
@@ -729,6 +730,7 @@ export class CampaignManager {
                 connectionType: connectionType,
                 networkType: networkType
             });
+            this._deviceConnectionType = connectionType;
             this._realtimeUrl = url;
             return url;
         });

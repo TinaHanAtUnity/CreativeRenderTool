@@ -6,9 +6,9 @@ import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser
 
 export class PerformanceOverlayEventHandler extends OverlayEventHandler<PerformanceCampaign> {
 
-    private _performanceAdUnit: PerformanceAdUnit;
     private _trackingUrls: {[key: string]: string[]};
-    private _thirdPartyEventManager: ThirdPartyEventManager;
+    protected _performanceAdUnit: PerformanceAdUnit;
+    protected _thirdPartyEventManager: ThirdPartyEventManager;
 
     constructor(adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters) {
         super(adUnit, parameters, parameters.adUnitStyle);

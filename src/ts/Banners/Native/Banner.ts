@@ -100,11 +100,11 @@ export class BannerApi extends NativeApi {
     }
 
     private handleBannerResized(parameters: any[]) {
-        const x = parameters[0],
-            y = parameters[1],
-            width = parameters[2],
-            height = parameters[3],
-            alpha = parameters[4];
+        const x = parameters[0];
+        const y = parameters[1];
+        const width = parameters[2];
+        const height = parameters[3];
+        const alpha = parameters[4];
         this.onBannerResized.trigger({x, y, width, height, alpha});
     }
 

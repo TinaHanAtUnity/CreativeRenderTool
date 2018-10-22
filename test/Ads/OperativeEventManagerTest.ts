@@ -29,18 +29,7 @@ import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { Backend } from '../../src/ts/Backend/Backend';
 import { ICoreApi } from '../../src/ts/Core/ICore';
 import { IAdsApi } from '../../src/ts/Ads/IAds';
-
-class TestHelper {
-    public static waitForStorageBatch(storageBridge: StorageBridge): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const storageObserver = () => {
-                storageBridge.onPrivateStorageWrite.unsubscribe(storageObserver);
-                resolve();
-            };
-            storageBridge.onPrivateStorageWrite.subscribe(storageObserver);
-        });
-    }
-}
+import { StorageBridgeHelper } from 'TestHelpers/StorageBridgeHelper';
 
 describe('OperativeEventManagerTest', () => {
     let platform: Platform;
@@ -135,7 +124,7 @@ describe('OperativeEventManagerTest', () => {
 
         const requestSpy = sinon.spy(request, 'post');
 
-        const storagePromise = TestHelper.waitForStorageBatch(storageBridge);
+        const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
 
         const event = operativeEventManager.sendEvent('test', eventId, sessionId, url, data).then(() => {
             assert.fail('Send failed operative event failed to fail');

@@ -31,7 +31,7 @@ export class Promo implements IParserModule, IPromo {
             Purchasing: new PurchasingApi(this._core.NativeBridge)
         };
 
-        this.PromoEvents = new PromoEvents(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ClientInfo, core.DeviceInfo);
+        this.PromoEvents = new PromoEvents(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ClientInfo, core.DeviceInfo, analytics.AnalyticsStorage);
         PurchasingUtilities.initialize(this._core.Api, this.Api, purchasing.Api, this._core.ClientInfo, this._core.Config, this._ads.Config, this._ads.PlacementManager, this._ads.CampaignManager, this.PromoEvents, core.RequestManager, analytics.AnalyticsManager);
     }
 

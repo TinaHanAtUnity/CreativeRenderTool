@@ -17,6 +17,7 @@ export interface IPurchaseCommon {
     storeSpecificId: string;
     amount: number | undefined;
     currency: string | undefined;
+    native: boolean;
 }
 
 // internal fields
@@ -26,6 +27,7 @@ interface IPurchase extends IPurchaseCommon {
     platformid: number;
     gameId: string;
     sdk_ver: string;
+    ads_sdk_ver: string;
     gamerToken: string;
     game_ver: string;
     osv: string;
@@ -82,6 +84,9 @@ Events for iap should be sent to :
 */
 export class PromoEvents {
 
+    public static purchasePathRegex = new RegExp('events\/v1\/purchase');
+    public static purchaseHostnameRegex = new RegExp('events\.iap\.unity3d\.com');
+
     private _platform: Platform;
     private _core: ICoreApi;
     private _coreConfiguration: CoreConfiguration;
@@ -90,17 +95,32 @@ export class PromoEvents {
     private _deviceInfo: DeviceInfo;
     private _analyticsStorage: AnalyticsStorage;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfiguration: CoreConfiguration, adsConfiguration: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
+    constructor(platform: Platform, core: ICoreApi, coreConfiguration: CoreConfiguration, adsConfiguration: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, analyticsStorage: AnalyticsStorage) {
         this._platform = platform;
         this._core = core;
         this._coreConfiguration = coreConfiguration;
         this._adsConfiguration = adsConfiguration;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
-        this._analyticsStorage = new AnalyticsStorage(core);
+        this._analyticsStorage = analyticsStorage;
     }
 
-    public onPurchaseFailed(url: string, body: IPurchaseCommon, failureJson: IFailureJson): Promise<IPromoPurchaseFailed> {
+    public getAppStoreFromReceipt(receipt: string | undefined): string {
+        if (receipt) {
+            try {
+                const data = JSON.parse(receipt);
+                if (data && data.Store) {
+                    return data.Store;
+                }
+            } catch(error) {
+                // log the error
+                this._core.Sdk.logError('PromoEvents.getAppStoreFromReceipt failed to parse json');
+            }
+        }
+        return 'unknown';
+    }
+
+    public onPurchaseFailed(body: IPurchaseCommon, failureJson: IFailureJson): Promise<IPromoPurchaseFailed> {
         return Promise.all([
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight(),
@@ -113,7 +133,8 @@ export class PromoEvents {
                 platform: this._platform === Platform.IOS ? 'Ios' : 'Android',
                 platformid: this._platform === Platform.IOS ? 8 : 11,
                 gameId: this._clientInfo.getGameId(),
-                sdk_ver: this._clientInfo.getSdkVersionName(),
+                sdk_ver: '', // leaving this blank as there is no way to get the unity version
+                ads_sdk_ver: this._clientInfo.getSdkVersionName(),
                 gamerToken: this._coreConfiguration.getToken(),
                 game_ver: this._clientInfo.getApplicationVersion(),
                 osv: AnalyticsProtocol.getOsVersion(this._platform, this._deviceInfo),
@@ -124,7 +145,7 @@ export class PromoEvents {
                 sessionid: sessionId,
                 userid: userId,
                 trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
-                ppi: this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getScreenDensity() : undefined,
+                ppi: this.getPPI(),
                 deviceid: this.getDeviceId(),
                 request: 'purchase',
                 iap_service: false,
@@ -136,7 +157,7 @@ export class PromoEvents {
         });
     }
 
-    public onPurchaseSuccess(url: string, body: IPurchaseCommon, productType: string | undefined, receipt: string): Promise<IPromoPurchaseSucceeded> {
+    public onPurchaseSuccess(body: IPurchaseCommon, productType: string | undefined, receipt: string): Promise<IPromoPurchaseSucceeded> {
         return Promise.all([
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight(),
@@ -149,7 +170,8 @@ export class PromoEvents {
                 platform: this._platform === Platform.IOS ? 'Ios' : 'Android',
                 platformid: this._platform === Platform.IOS ? 8 : 11,
                 gameId: this._clientInfo.getGameId(),
-                sdk_ver: this._clientInfo.getSdkVersionName(),
+                sdk_ver: '', // leaving this blank as there is no way to get the unity version
+                ads_sdk_ver: this._clientInfo.getSdkVersionName(),
                 gamerToken: this._coreConfiguration.getToken(),
                 game_ver: this._clientInfo.getApplicationVersion(),
                 osv: AnalyticsProtocol.getOsVersion(this._platform, this._deviceInfo),
@@ -160,7 +182,7 @@ export class PromoEvents {
                 sessionid: sessionId,
                 userid: userId,
                 trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
-                ppi: this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getScreenDensity() : undefined,
+                ppi: this.getPPI(),
                 deviceid: this.getDeviceId(),
                 request: 'purchase',
                 iap_service: false,
@@ -188,7 +210,8 @@ export class PromoEvents {
                 platform: this._platform === Platform.IOS ? 'Ios' : 'Android',
                 platformid: this._platform === Platform.IOS ? 8 : 11,
                 gameId: this._clientInfo.getGameId(),
-                sdk_ver: this._clientInfo.getSdkVersionName(),
+                sdk_ver: '', // leaving this blank as there is no way to get the unity version
+                ads_sdk_ver: this._clientInfo.getSdkVersionName(),
                 gamerToken: this._coreConfiguration.getToken(),
                 game_ver: this._clientInfo.getApplicationVersion(),
                 osv: AnalyticsProtocol.getOsVersion(this._platform, this._deviceInfo),
@@ -199,7 +222,7 @@ export class PromoEvents {
                 sessionid: sessionId,
                 userid: userId,
                 trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
-                ppi: this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getScreenDensity() : undefined,
+                ppi: this.getPPI(),
                 deviceid: this.getDeviceId(),
                 iap_service: false,
                 iapPromo: false,
@@ -223,7 +246,8 @@ export class PromoEvents {
                 platform: this._platform === Platform.IOS ? 'Ios' : 'Android',
                 platformid: this._platform === Platform.IOS ? 8 : 11,
                 gameId: this._clientInfo.getGameId(),
-                sdk_ver: this._clientInfo.getSdkVersionName(),
+                sdk_ver: '', // leaving this blank as there is no way to get the unity version
+                ads_sdk_ver: this._clientInfo.getSdkVersionName(),
                 gamerToken: this._coreConfiguration.getToken(),
                 game_ver: this._clientInfo.getApplicationVersion(),
                 osv: AnalyticsProtocol.getOsVersion(this._platform, this._deviceInfo),
@@ -234,7 +258,7 @@ export class PromoEvents {
                 sessionid: sessionId,
                 userid: userId,
                 trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
-                ppi: this._deviceInfo instanceof AndroidDeviceInfo ? this._deviceInfo.getScreenDensity() : undefined,
+                ppi: this.getPPI(),
                 deviceid: this.getDeviceId(),
                 iap_service: false,
                 iapPromo: false,
@@ -255,6 +279,10 @@ export class PromoEvents {
             reason: PurchasingFailureReason[reason],
             productId: productId
         };
+    }
+
+    private getPPI(): number {
+        return this._platform === Platform.ANDROID ? (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity() : (<IosDeviceInfo>this._deviceInfo).getScreenScale();
     }
 
     private getOrientation(width: number, height: number): string {

@@ -20,6 +20,7 @@ import { ICoreApi } from '../../src/ts/Core/ICore';
 import { IAdsApi } from '../../src/ts/Ads/IAds';
 import { Campaign, ICampaign } from '../../src/ts/Ads/Models/Campaign';
 import { Asset } from '../../src/ts/Ads/Models/Assets/Asset';
+import { StorageBridge } from '../../src/ts/Core/Utilities/StorageBridge';
 
 class TestCampaign extends Campaign {
 
@@ -59,6 +60,7 @@ describe('AssetManagerTest', () => {
     let cacheBookkeeping: CacheBookkeepingManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
     let backupCampaignManager: BackupCampaignManager;
+    let storageBridge: StorageBridge;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -72,7 +74,8 @@ describe('AssetManagerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         cacheBookkeeping = new CacheBookkeepingManager(core);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-        backupCampaignManager = new BackupCampaignManager(core, TestFixtures.getCoreConfiguration());
+        storageBridge = new StorageBridge(core);
+        backupCampaignManager = new BackupCampaignManager(core, storageBridge, TestFixtures.getCoreConfiguration());
     });
 
     it('should not cache anything when cache mode is disabled', () => {

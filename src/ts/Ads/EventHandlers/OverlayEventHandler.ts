@@ -16,10 +16,10 @@ import { KeyCode } from 'Core/Constants/Android/KeyCode';
 export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler implements IOverlayHandler {
     protected _placement: Placement;
     protected _campaign: T;
-
+    protected _operativeEventManager: OperativeEventManager;
+    protected _adUnit: VideoAdUnit<T>;
     protected _ads: IAdsApi;
-    private _adUnit: VideoAdUnit<T>;
-    private _operativeEventManager: OperativeEventManager;
+
     private _adUnitStyle?: AdUnitStyle;
 
     constructor(adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
@@ -91,7 +91,7 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
         return position >= allowSkipInMs;
     }
 
-    private getVideoOrientation(): string | undefined {
+    protected getVideoOrientation(): string | undefined {
         if(this._adUnit instanceof PerformanceAdUnit) {
             return (<PerformanceAdUnit>this._adUnit).getVideoOrientation();
         }

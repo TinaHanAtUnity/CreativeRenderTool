@@ -6,6 +6,9 @@ import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { IAdsApi } from '../../Ads/IAds';
 import { ICoreApi } from '../../Core/ICore';
+import { PromoEvents } from 'Promo/Utilities/PromoEvents';
+import { Url } from 'Core/Utilities/Url';
+import { IPurchasingApi } from '../../Purchasing/IPurchasing';
 
 export class NativePromoEventHandler {
 
@@ -14,10 +17,12 @@ export class NativePromoEventHandler {
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _core: ICoreApi;
     private _ads: IAdsApi;
+    private _purchasing: IPurchasingApi;
 
-    constructor(core: ICoreApi, ads: IAdsApi, clientInfo: ClientInfo, request: RequestManager) {
+    constructor(core: ICoreApi, ads: IAdsApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, request: RequestManager) {
         this._core = core;
         this._ads = ads;
+        this._purchasing = purchasing;
         this._thirdPartyEventManager = new ThirdPartyEventManager(core, request, {
             '%SDK_VERSION%': clientInfo.getSdkVersion().toString()
         });
@@ -27,7 +32,7 @@ export class NativePromoEventHandler {
         // TODO: Ignore event
     }
 
-    public onImpression(campaign: PromoCampaign, placementId: string) {
+    public onImpression(campaign: PromoCampaign, placementId: string): Promise<void> {
         this._thirdPartyEventManager.setTemplateValue('%ZONE%', placementId);
         return this.sendTrackingEvent('impression', campaign);
     }
@@ -35,34 +40,41 @@ export class NativePromoEventHandler {
     public onPromoClosed(campaign: PromoCampaign) {
         this._core.Sdk.logInfo('Closing Unity Native Promo ad unit');
         this.onClose.trigger();
-        this.sendTrackingEvent('complete', campaign);
+        return this.sendTrackingEvent('complete', campaign);
     }
 
-    public onClick(productId: string, campaign: PromoCampaign, placementId: string) {
+    public onClick(productId: string, campaign: PromoCampaign, placementId: string): Promise<void> {
         return this.sendClick(productId, placementId, campaign);
     }
 
     private sendClick(productId: string, placementId: string, campaign: PromoCampaign) {
         this._ads.Listener.sendClickEvent(placementId);
         this._thirdPartyEventManager.setTemplateValue('%ZONE%', placementId);
-        this.sendTrackingEvent('click', campaign);
-
-        PurchasingUtilities.onPurchase(productId, campaign, placementId);
+        PurchasingUtilities.onPurchase(productId, campaign, placementId, true);
+        return this.sendTrackingEvent('click', campaign);
     }
 
-    private sendTrackingEvent(eventName: string, campaign: PromoCampaign) {
-        const sessionId = campaign.getSession().getId();
-        let trackingEvents;
-        if (campaign instanceof PromoCampaign) {
-            trackingEvents = campaign.getTrackingEventUrls();
-        }
-        if (trackingEvents) {
-            const trackingEventUrls = trackingEvents[eventName];
-            if (trackingEventUrls) {
-                for (const url of trackingEventUrls) {
-                    this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
+    private sendTrackingEvent(eventName: string, campaign: PromoCampaign): Promise<void> {
+        return this._purchasing.CustomPurchasing.available().then((isAvailable) => {
+            const sessionId = campaign.getSession().getId();
+            let trackingEvents;
+            if (campaign instanceof PromoCampaign) {
+                trackingEvents = campaign.getTrackingEventUrls();
+            }
+            if (trackingEvents) {
+                const trackingEventUrls = trackingEvents[eventName].map((value: string): string => {
+                    // add native flag true to designate native promo
+                    if (PromoEvents.purchaseHostnameRegex.test(value)) {
+                        return Url.addParameters(value, {'native': true, 'iap_service': !isAvailable});
+                    }
+                    return value;
+                });
+                if (trackingEventUrls) {
+                    for (const url of trackingEventUrls) {
+                        this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
+                    }
                 }
             }
-        }
+        });
     }
 }

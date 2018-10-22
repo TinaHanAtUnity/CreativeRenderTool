@@ -42,7 +42,9 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let container: AdUnitContainer, overlay: Overlay, endScreen: XPromoEndScreen;
+    let container: AdUnitContainer;
+    let overlay: Overlay;
+    let endScreen: XPromoEndScreen;
     let storageBridge: StorageBridge;
     let sessionManager: SessionManager;
     let xPromoAdUnit: XPromoAdUnit;

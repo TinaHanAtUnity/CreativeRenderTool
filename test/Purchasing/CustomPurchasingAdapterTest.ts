@@ -120,7 +120,7 @@ describe('CustomPurchasingAdapter', () => {
             const transactionDetails: ITransactionDetails = {
                 productId: 'productId',
                 transactionId: 'asdf',
-                receipt: 'asdf',
+                receipt: '{\"Store\":\"GooglePlay\",\"TransactionID\":\"GPA.3375-3039-6434-59087\",\"Payload\":\"{\\\"skuDetails\\\":\\\"{\\\\\\\"productId\\\\\\\":\\\\\\\"100.gold.coins\\\\\\\",\\\\\\\"type\\\\\\\":\\\\\\\"inapp\\\\\\\",\\\\\\\"price\\\\\\\":\\\\\\\"$0.99\\\\\\\",\\\\\\\"price_amount_micros\\\\\\\":990000,\\\\\\\"price_currency_code\\\\\\\":\\\\\\\"USD\\\\\\\",\\\\\\\"title\\\\\\\":\\\\\\\"100 Gold Coins Title (MyFunGame)\\\\\\\",\\\\\\\"description\\\\\\\":\\\\\\\"100 Gold Coins\\\\\\\"}\\\",\\\"json\\\":\\\"{\\\\\\\"orderId\\\\\\\":\\\\\\\"GPA.3375-3039-6434-59087\\\\\\\",\\\\\\\"packageName\\\\\\\":\\\\\\\"me.hurricanerix.test.myfungame\\\\\\\",\\\\\\\"productId\\\\\\\":\\\\\\\"100.gold.coins\\\\\\\",\\\\\\\"purchaseTime\\\\\\\":1537918892707,\\\\\\\"purchaseState\\\\\\\":0,\\\\\\\"developerPayload\\\\\\\":\\\\\\\"{\\\\\\\\\\\\\\\"is_updated\\\\\\\\\\\\\\\":false,\\\\\\\\\\\\\\\"has_introductory_price_trial\\\\\\\\\\\\\\\":false,\\\\\\\\\\\\\\\"is_free_trial\\\\\\\\\\\\\\\":false,\\\\\\\\\\\\\\\"developerPayload\\\\\\\\\\\\\\\":\\\\\\\\\\\\\\\"\\\\\\\\\\\\\\\"}\\\\\\\",\\\\\\\"purchaseToken\\\\\\\":\\\\\\\"jpdlckmodjjjfhnoapgegbmk.AO-J1OzZfbxaMZfZfvBysOlWJ06khJ9J8qeGJQ0dOOgcVAV11O_1cutYD1qUXnHzAITFoKXBhgf6pxO-Kr1LX19-Fp_ecHQjzoLlKHz-hKxcpJosMbiJ_0-bIBgYlcgjTXGPPYdrudpy\\\\\\\"}\\\",\\\"isPurchaseHistorySupported\\\":true,\\\"signature\\\":\\\"Kd18224WtNwtZCvGf\\\\/foEj\\\\/GU7suTNelMbU4fFW\\\\/SEZ6odkSCwUtC6ouuh19g4u7ehkejexXUkvOpFlatsX0Y\\\\/nv1H7qlXLUNcwTcoCy7GxKLsE4wCirzTOQlI0c4\\\\/t4TXw1+Y1rcEtR2HNIPJYg1wP86JAaSnKEbUoNSiRBxxwWDr9BSUhk8J0RPS1MQ7Fj43Y1YBZ+6ikJa+5dIbRPoqpcZ+8o8xgl\\\\/fsqbqQxMe+OIYuDK1SHcAqaQAG855HMrL8TlZiWWGVK0KEvbnuD0x7\\\\/wlfMMfgMJO23zC51Uy0q5gMhdKXOzU6D7nHGT31EWzUHLIiOlBZUfgJIB5akoA==\\\"}\"}',
                 price: 1,
                 currency: 'asdfa',
                 extras: 'extra'
@@ -136,7 +136,7 @@ describe('CustomPurchasingAdapter', () => {
             }];
 
             it('should send iap transaction analytics event if analytics is enabled', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId');
+                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
 
                 return triggerTransactionComplete(transactionDetails)
                     .then(() => {
@@ -148,7 +148,7 @@ describe('CustomPurchasingAdapter', () => {
             });
 
             it('should not send the purchase success event if given productId is not in the catalog', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId');
+                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
 
                 return triggerTransactionComplete(transactionDetails)
                     .then(() => {
@@ -160,7 +160,7 @@ describe('CustomPurchasingAdapter', () => {
             });
 
             it('should send the purchase success event and thirdpartyEvent post for purchase path url', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId');
+                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
                 const refreshCatalogPromise = purchasingAdapter.refreshCatalog();
 
                 asStub(promoEvents.onPurchaseSuccess).returns(Promise.resolve());
@@ -181,7 +181,7 @@ describe('CustomPurchasingAdapter', () => {
             });
 
             it('should send the thirdParty get of non purhcase path or hostname url', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId');
+                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
                 const refreshCatalogPromise = purchasingAdapter.refreshCatalog();
 
                 asStub(promoEvents.onPurchaseSuccess).returns(Promise.resolve());
@@ -222,7 +222,7 @@ describe('CustomPurchasingAdapter', () => {
             }];
 
             it('should reject with error and not send iap purchase failed event product doesnt exist', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId');
+                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
 
                 return triggerTransactionError(transactionErrorDetails)
                     .then(() => {
@@ -236,7 +236,7 @@ describe('CustomPurchasingAdapter', () => {
             });
 
             it('should reject with error and send iap purchase failed event if analytics is enabled and product does exist', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId');
+                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
                 const refreshCatalogPromise = purchasingAdapter.refreshCatalog();
 
                 asStub(promoEvents.onPurchaseFailed).returns(Promise.resolve());
@@ -258,7 +258,7 @@ describe('CustomPurchasingAdapter', () => {
             });
 
             it('should send the purchase failed event and thirdpartyEvent post for purchase path url', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId');
+                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
                 const refreshCatalogPromise = purchasingAdapter.refreshCatalog();
 
                 asStub(promoEvents.onPurchaseFailed).returns(Promise.resolve());
@@ -281,7 +281,7 @@ describe('CustomPurchasingAdapter', () => {
             });
 
             it('should send the thirdParty get of non purhcase path or hostname url', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId');
+                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
                 const refreshCatalogPromise = purchasingAdapter.refreshCatalog();
 
                 asStub(promoEvents.onPurchaseFailed).returns(Promise.resolve());

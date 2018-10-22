@@ -29,13 +29,19 @@ export class VastParser {
         this._maxWrapperDepth = maxWrapperDepth;
     }
 
+    public parseMediaFileSize(duration: number, kbitrate: number): number {
+        // returning file size in byte from bit
+        return (duration * kbitrate * 1000) / 8;
+    }
+
     public parseVast(vast: string | null): Vast {
         if (!vast) {
             throw new Error('VAST data is missing');
         }
 
         const xml = (this._domParser).parseFromString(vast, 'text/xml');
-        const ads: VastAd[] = [], errorURLTemplates: string[] = [];
+        const ads: VastAd[] = [];
+        const errorURLTemplates: string[] = [];
 
         if (!xml || !xml.documentElement || xml.documentElement.nodeName !== 'VAST') {
             throw new Error('VAST xml data is missing');
@@ -78,9 +84,9 @@ export class VastParser {
         } catch (e) {
             const error = new DiagnosticError(e, { vast: vast, wrapperDepth: depth });
             if (depth > 0) {
-                /* tslint:disable:no-string-literal */
+                // tslint:disable:no-string-literal
                 error.diagnostic['rootWrapperVast'] = this._rootWrapperVast;
-                /* tslint:enable */
+                // tslint:enable
             }
             throw error;
         }
@@ -221,6 +227,7 @@ export class VastParser {
             return null;
         }
 
+        const mediaDuration = creative.getDuration();
         const skipOffset = creativeElement.getAttribute('skipoffset');
         if (skipOffset == null) {
             creative.setSkipDelay(null);
@@ -270,7 +277,8 @@ export class VastParser {
                     parseInt(mediaFileElement.getAttribute('maxBitrate') || 0, 10),
                     parseInt(mediaFileElement.getAttribute('width') || 0, 10),
                     parseInt(mediaFileElement.getAttribute('height') || 0, 10),
-                    mediaFileElement.getAttribute('apiFramework'));
+                    mediaFileElement.getAttribute('apiFramework'),
+                    this.parseMediaFileSize(mediaDuration, parseInt(mediaFileElement.getAttribute('bitrate') || 0, 10)));
                 creative.addMediaFile(mediaFile);
             }
         }

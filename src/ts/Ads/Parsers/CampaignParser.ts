@@ -8,8 +8,9 @@ import { Url } from 'Core/Utilities/Url';
 import { ICoreApi } from 'Core/ICore';
 
 export abstract class CampaignParser {
+
     public abstract getContentTypes(): string[];
-    public abstract parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign>;
+    public abstract parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign>;
 
     protected getProgrammaticCampaignId(platform: Platform): string {
         switch (platform) {

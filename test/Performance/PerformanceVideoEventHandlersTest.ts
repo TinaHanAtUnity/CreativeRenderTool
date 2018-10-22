@@ -32,14 +32,13 @@ import { IAdsApi } from '../../src/ts/Ads/IAds';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
-    const handleInvocation = sinon.spy();
-    const handleCallback = sinon.spy();
     let platform: Platform;
     let backend: Backend;
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let overlay: Overlay, endScreen: PerformanceEndScreen;
+    let overlay: Overlay;
+    let endScreen: PerformanceEndScreen;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
     let performanceAdUnit: PerformanceAdUnit;

@@ -143,7 +143,7 @@ export class Ads implements IAds {
         }
         this.SessionManager = new SessionManager(this._core.Api.Storage, this._core.RequestManager, this._core.StorageBridge);
         this.MissedImpressionManager = new MissedImpressionManager(this._core.Api.Storage);
-        this.BackupCampaignManager = new BackupCampaignManager(this._core.Api, this._core.Config);
+        this.BackupCampaignManager = new BackupCampaignManager(this._core.Api, this._core.StorageBridge, this._core.Config);
         this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this._core.NativeBridge.getPlatform(), this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo);
         this.CampaignParserManager = new CampaignParserManager();
     }

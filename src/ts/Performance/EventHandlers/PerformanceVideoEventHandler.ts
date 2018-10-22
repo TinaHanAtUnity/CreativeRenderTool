@@ -3,6 +3,7 @@ import { VideoEventHandler } from 'Ads/EventHandlers/VideoEventHandler';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
+import { PerformanceVideoOverlayWithCTAButton } from 'Ads/Views/PerformanceVideoOverlayWithCTAButton';
 
 export class PerformanceVideoEventHandler extends VideoEventHandler {
 
@@ -28,6 +29,10 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
         super.onPrepared(url, duration, width, height);
 
         const overlay = this._adUnit.getOverlay();
+        if (overlay instanceof PerformanceVideoOverlayWithCTAButton) {
+            overlay.setCallButtonVisible(true);
+        }
+
         if(TestEnvironment.get('debugOverlayEnabled') && overlay) {
             overlay.setDebugMessage('Performance Ad');
         }

@@ -20,6 +20,7 @@ import { IAdsApi } from 'Ads/IAds';
 import { ICoreApi } from 'Core/ICore';
 import { Platform } from 'Core/Constants/Platform';
 import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from '../../Purchasing/IPurchasing';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -34,7 +35,8 @@ export interface IAdUnitParameters<T extends Campaign> {
     platform: Platform;
     core: ICoreApi;
     ads: IAdsApi;
-    ar?: IARApi;
+    ar?: IARApi; // todo: fix optional
+    purchasing?: IPurchasingApi; // todo: fix optional
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
     request: RequestManager;

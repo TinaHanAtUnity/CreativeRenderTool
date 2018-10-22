@@ -39,14 +39,14 @@ import { AndroidDeviceInfo } from '../../src/ts/Core/Models/AndroidDeviceInfo';
 
 describe('EndScreenEventHandlerTest', () => {
 
-    const handleInvocation = sinon.spy();
-    const handleCallback = sinon.spy();
     let platform: Platform;
     let backend: Backend;
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let container: AdUnitContainer, overlay: Overlay, endScreen: PerformanceEndScreen;
+    let container: AdUnitContainer;
+    let overlay: Overlay;
+    let endScreen: PerformanceEndScreen;
     let storageBridge: StorageBridge;
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;

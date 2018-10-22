@@ -37,11 +37,10 @@ import { AndroidDeviceInfo } from '../../src/ts/Core/Models/AndroidDeviceInfo';
 
 describe('MRAIDEventHandlersTest', () => {
 
-    const handleInvocation = sinon.spy();
-    const handleCallback = sinon.spy();
     let platform: Platform;
     let backend: Backend;
-    let nativeBridge: NativeBridge, container: AdUnitContainer;
+    let nativeBridge: NativeBridge;
+    let container: AdUnitContainer;
     let core: ICoreApi;
     let ads: IAdsApi;
     let storageBridge: StorageBridge;

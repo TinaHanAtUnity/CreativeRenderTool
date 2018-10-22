@@ -19,6 +19,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { Backend } from '../../src/ts/Backend/Backend';
 import { ICoreApi } from '../../src/ts/Core/ICore';
 import { IAnalyticsApi } from '../../src/ts/Analytics/IAnalytics';
+import { AnalyticsStorage } from '../../src/ts/Analytics/AnalyticsStorage';
 
 class TestHelper {
     public static getEventType(data: string) {
@@ -39,6 +40,7 @@ class TestHelper {
         let deviceInfo: DeviceInfo;
         let configuration: CoreConfiguration;
         let analyticsManager: AnalyticsManager;
+        let analyticsStorage: AnalyticsStorage;
         let focusManager: FocusManager;
 
         beforeEach(() => {
@@ -55,7 +57,8 @@ class TestHelper {
             sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('6c7fa2c0-4333-47be-8de2-2f24e33e710c'));
             (<sinon.SinonStub>request.post).returns(Promise.resolve());
 
-            analyticsManager = new AnalyticsManager(platform, core, analytics, request, clientInfo, deviceInfo, configuration, focusManager);
+            analyticsStorage = new AnalyticsStorage(core);
+            analyticsManager = new AnalyticsManager(platform, core, analytics, request, clientInfo, deviceInfo, configuration, focusManager, analyticsStorage);
         });
 
         it('should send session start event', () => {

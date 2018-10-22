@@ -25,7 +25,7 @@ export class BannerCampaignParser extends CampaignParser {
         ];
     }
 
-    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const markup = this._wrapJS ? this.getJSContent(response) : this.getHTMLContent(response);
         const campaign = <IBannerCampaign>{
             id: this.getProgrammaticCampaignId(platform),

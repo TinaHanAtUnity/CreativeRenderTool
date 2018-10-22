@@ -12,8 +12,12 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { Promo } from 'Promo/Views/Promo';
+import { PromoEvents } from 'Promo/Utilities/PromoEvents';
+import { Url } from 'Core/Utilities/Url';
+import { IPurchasingApi } from '../../Purchasing/IPurchasing';
 
 export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign> {
+    purchasing: IPurchasingApi;
     view: Promo;
     privacy: AbstractPrivacy;
 }
@@ -25,6 +29,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _placement: Placement;
     private _campaign: PromoCampaign;
     private _privacy: AbstractPrivacy;
+    private _purchasing: IPurchasingApi;
 
     private _keyDownListener: (kc: number) => void;
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
@@ -40,6 +45,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._campaign = parameters.campaign;
         this._keyDownListener = (kc: number) => this.onKeyDown(kc);
         this._privacy = parameters.privacy;
+        this._purchasing = parameters.purchasing;
     }
 
     public show(): Promise<void> {
@@ -127,16 +133,24 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private sendTrackingEvent(eventName: string): void {
-        const sessionId = this._campaign.getSession().getId();
-        if(this._additionalTrackingEvents) {
-            const trackingEventUrls = this._additionalTrackingEvents[eventName];
+        this._purchasing.CustomPurchasing.available().then((isAvailable) => {
+            const sessionId = this._campaign.getSession().getId();
+            if(this._additionalTrackingEvents) {
+                const trackingEventUrls = this._additionalTrackingEvents[eventName].map((value: string): string => {
+                    // add native flag false to designate promo
+                    if (PromoEvents.purchaseHostnameRegex.test(value)) {
+                        return Url.addParameters(value, {'native': false, 'iap_service': !isAvailable});
+                    }
+                    return value;
+                });
 
-            if(trackingEventUrls) {
-                for (const url of trackingEventUrls) {
-                    this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
+                if(trackingEventUrls) {
+                    for (const url of trackingEventUrls) {
+                        this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
+                    }
                 }
             }
-        }
+        });
     }
 
     private unsetReferences() {

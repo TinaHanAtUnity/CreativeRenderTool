@@ -26,7 +26,7 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
             limitedTimeOffer: ['object', 'undefined'],
             payouts: ['array'],
             costs: ['array'],
-            premiumProduct: ['object']
+            premiumProduct: ['object', 'undefined']
         }, campaign);
     }
 
@@ -49,7 +49,15 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
                     result[key] = [];
                     const trackingURLs = additionalTrackingEvents[key];
                     for(const trackingURL of trackingURLs) {
-                        result[key].push(trackingURL + '&productType=' + productType);
+                        if(trackingURL) {
+                            const isStagingURL = trackingURL.indexOf('events-iap.staging.unityads.unity3d.com') !== -1;
+                            const isProductionURL = trackingURL.indexOf('events.iap.unity3d.com') !== -1;
+                            if(isStagingURL || isProductionURL) {
+                                result[key].push(trackingURL + '&productType=' + productType);
+                            } else {
+                                result[key].push(trackingURL);
+                            }
+                        }
                     }
                 }
             }

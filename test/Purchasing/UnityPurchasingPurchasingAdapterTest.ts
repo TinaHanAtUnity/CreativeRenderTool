@@ -382,7 +382,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         it('should send the promo payload with Purchase request value', () => {
 
             const callPurchase = () => {
-                return purchasingAdapter.purchaseItem('com.example.iap.product1', TestFixtures.getPromoCampaign(), 'testId')
+                return purchasingAdapter.purchaseItem('com.example.iap.product1', TestFixtures.getPromoCampaign(), 'testId', false)
                 .then(() => triggerPurchasingCommand(true))
                 .then(() => {
                     sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
@@ -390,7 +390,8 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                         productId: TestFixtures.getPromoCampaign().getIapProductId(),
                         iapPromo: true,
                         request: 'purchase',
-                        purchaseTrackingUrls: ['https://events.iap.unity3d.com/events/v1/purchase','http://test.purchase.com/purchase']
+                        purchaseTrackingUrls: ['https://events.iap.unity3d.com/events/v1/purchase?native=false&iap_service=true','http://test.purchase.com/purchase'],
+                        native: false
                     }));
                 });
             };

@@ -145,7 +145,7 @@ describe('CampaignManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
         placementManager = sinon.createStubInstance(PlacementManager);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-        backupCampaignManager = new BackupCampaignManager(core, coreConfig);
+        backupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig);
         campaignParserManager = new CampaignParserManager();
     });
 

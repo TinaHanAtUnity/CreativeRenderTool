@@ -63,8 +63,9 @@ describe('ProgrammaticVastParser', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
                 assert.isTrue(campaign instanceof VastCampaign, 'Campaign was not an VastCampaign');
 
+                const vastParser = new VastParser();
                 const json = JSON.parse(ProgrammaticVastCampaignFlat);
-                const vast = new VastParser().parseVast(decodeURIComponent(json.content));
+                const vast = vastParser.parseVast(decodeURIComponent(json.content));
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');

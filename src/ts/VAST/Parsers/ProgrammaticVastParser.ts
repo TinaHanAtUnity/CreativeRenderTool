@@ -11,6 +11,7 @@ import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { ICoreApi } from 'Core/ICore';
+import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
 
 export class ProgrammaticVastParser extends CampaignParser {
 
@@ -21,6 +22,7 @@ export class ProgrammaticVastParser extends CampaignParser {
     }
 
     private static VAST_PARSER_MAX_DEPTH: number;
+    private _isMediaExperiment: boolean = false;
 
     protected _vastParser: VastParser = new VastParser();
 
@@ -28,7 +30,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         return [ProgrammaticVastParser.ContentType];
     }
 
-    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
 
         if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
@@ -37,11 +39,11 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         return this._vastParser.retrieveVast(decodedVast, core, request).then((vast): Promise<Campaign> => {
             const campaignId = this.getProgrammaticCampaignId(platform);
-            return this.parseVastToCampaign(vast, platform, campaignId, session, response);
+            return this.parseVastToCampaign(vast, platform, campaignId, session, response, connectionType);
         });
     }
 
-    protected parseVastToCampaign(vast: Vast, platform: Platform, campaignId: string, session: Session, response: AuctionResponse): Promise<Campaign> {
+    protected parseVastToCampaign(vast: Vast, platform: Platform, campaignId: string, session: Session, response: AuctionResponse, connectionType?: string): Promise<Campaign> {
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
@@ -69,10 +71,20 @@ export class ProgrammaticVastParser extends CampaignParser {
             landscapeAsset = new Image(this.validateAndEncodeUrl(landscapeUrl, session), session);
         }
 
+        let videoUrl;
+        if (this._isMediaExperiment && connectionType) {    // TODO: ab test with auction feature flag
+            videoUrl = VastMediaSelector.getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
+            if (!videoUrl) {
+                throw new Error('No video URL found for VAST');
+            }
+        } else {
+            videoUrl = vast.getVideoUrl();
+        }
+
         const vastCampaignParms: IVastCampaign = {
             ... baseCampaignParams,
             vast: vast,
-            video: new Video(this.validateAndEncodeUrl(vast.getVideoUrl(), session), session),
+            video: new Video(this.validateAndEncodeUrl(videoUrl, session), session),
             hasEndscreen: !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(),
             portrait: portraitAsset,
             landscape: landscapeAsset,
@@ -89,6 +101,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         };
 
         const campaign = new VastCampaign(vastCampaignParms);
+
         if(campaign.getImpressionUrls().length === 0) {
             throw new Error('Campaign does not have an impression url');
         }

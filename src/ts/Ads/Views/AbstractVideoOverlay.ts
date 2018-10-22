@@ -1,3 +1,5 @@
+
+import { IVideoOverlayDownloadParameters } from 'Performance/EventHandlers/PerformanceOverlayWithCTAButtonEventHandler';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { View } from 'Core/Views/View';
 import { Platform } from 'Core/Constants/Platform';
@@ -8,6 +10,7 @@ export interface IOverlayHandler extends IGDPREventHandler {
     onOverlayPauseForTesting(paused: boolean): void;
     onOverlayCallButton(): void;
     onOverlayClose(): void;
+    onOverlayDownload?(parameters: IVideoOverlayDownloadParameters): void;
 }
 
 export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
