@@ -2,7 +2,7 @@ import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 
 export class CampaignParserManager {
 
-    private _parsers: { [key: string]: CampaignParser };
+    private _parsers: { [key: string]: CampaignParser } = {};
 
     public addParsers(parsers: CampaignParser[]) {
         parsers.forEach(parser => this.addParser(parser));
@@ -13,8 +13,9 @@ export class CampaignParserManager {
         contentTypes.forEach(contentType => {
             if(!(contentType in this._parsers)) {
                 this._parsers[contentType] = parser;
+            } else {
+                throw new Error('Parser already defined for: ' + contentType);
             }
-            throw new Error('Parser already defined for: ' + contentType);
         });
     }
 
