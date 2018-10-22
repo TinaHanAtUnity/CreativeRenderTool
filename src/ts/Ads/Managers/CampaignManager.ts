@@ -98,7 +98,6 @@ export class CampaignManager {
     private _previousPlacementId: string | undefined;
     private _realtimeUrl: string | undefined;
     private _realtimeBody: any = {};
-    private _ignoreEvents: boolean;
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
 
@@ -115,15 +114,8 @@ export class CampaignManager {
         this._adMobSignalFactory = adMobSignalFactory;
         this._cacheBookkeeping = cacheBookkeeping;
         this._requesting = false;
-        this._ignoreEvents = false;
         this._jaegerManager = jaegerManager;
         this._backupCampaignManager = backupCampaignManager;
-    }
-
-    public cleanCachedUrl(url: string): string {
-        url = Url.removeQueryParameter(url, 'connectionType');
-        url = Url.removeQueryParameter(url, 'networkType');
-        return url;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -271,17 +263,17 @@ export class CampaignManager {
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
-            if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
+            if(CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
                 json.placements = MixedPlacementUtility.insertMediaIdsIntoJSON(this._adsConfig, json.placements);
             }
 
             const placements = this._adsConfig.getPlacements();
-            for (const placement in placements) {
-                if (placements.hasOwnProperty(placement)) {
+            for(const placement in placements) {
+                if(placements.hasOwnProperty(placement)) {
                     const mediaId: string = json.placements[placement];
 
-                    if (mediaId) {
-                        if (fill[mediaId]) {
+                    if(mediaId) {
+                        if(fill[mediaId]) {
                             fill[mediaId].push(placement);
                         } else {
                             fill[mediaId] = [placement];
@@ -292,7 +284,7 @@ export class CampaignManager {
                         noFill.push(placement);
                     }
 
-                    if (json.realtimeData && json.realtimeData[placement]) {
+                    if(json.realtimeData && json.realtimeData[placement]) {
                         this._adsConfig.getPlacement(placement).setRealtimeData(json.realtimeData[placement]);
                     }
                 }
@@ -301,28 +293,27 @@ export class CampaignManager {
             let refreshDelay: number = 0;
             const promises: Array<Promise<void>> = [];
 
-            for (const placement of noFill) {
+            for(const placement of noFill) {
                 promises.push(this.handleNoFill(placement));
                 refreshDelay = RefreshManager.NoFillDelay;
             }
 
             let campaigns: number = 0;
-            for (const mediaId in fill) {
-                if (fill.hasOwnProperty(mediaId)) {
+            for(const mediaId in fill) {
+                if(fill.hasOwnProperty(mediaId)) {
                     campaigns++;
 
                     const contentType = json.media[mediaId].contentType;
                     const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
-                    if (contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
+                    if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
                         refreshDelay = cacheTTL;
                     }
                 }
             }
 
-            if(!this._ignoreEvents) {
-                this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
-                this.onAdPlanReceived.trigger(refreshDelay, campaigns);
-            }
+            this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
+            this.onAdPlanReceived.trigger(refreshDelay, campaigns);
+
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     let auctionResponse: AuctionResponse;
@@ -460,18 +451,13 @@ export class CampaignManager {
 
     private handleNoFill(placement: string): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC no fill for placement ' + placement);
-        if (!this._ignoreEvents) {
-            this.onNoFill.trigger(placement);
-        }
+        this.onNoFill.trigger(placement);
         return Promise.resolve();
     }
 
     private handleError(error: any, placementIds: string[], diagnosticsType: string, session?: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        if (!this._ignoreEvents) {
-            this.onError.trigger(error, placementIds, diagnosticsType, session);
-        }
-
+        this.onError.trigger(error, placementIds, diagnosticsType, session);
         return Promise.resolve();
     }
 
