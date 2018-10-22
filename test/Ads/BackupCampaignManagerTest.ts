@@ -198,8 +198,15 @@ describe('BackupCampaignManagerTest', () => {
                 } else if (key === 'backupcampaign.campaign.' + testMediaId + '.willexpireat') {
                     return Promise.resolve(Date.now() + 7 * 24 * 3600 * 1000);
                 }
+                return Promise.reject(StorageError.COULDNT_GET_VALUE);
             }
         });
+        sinon.stub(core.Cache, 'getFileInfo').returns(Promise.resolve({
+            id: 'test',
+            found: true,
+            size: 12345,
+            mtime: Date.now()
+        }));
 
         const storageBridge: StorageBridge = new StorageBridge(core, 1);
         const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, TestFixtures.getCoreConfiguration());
