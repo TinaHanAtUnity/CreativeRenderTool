@@ -128,7 +128,7 @@ export class Backend implements IWebViewBridge {
     private executeInvocation(invocation: IInvocation): IResult {
         const api = (() => {
             for(const apiKey in this.Api) {
-                if(this.Api.hasOwnProperty(apiKey) && invocation.className.match('.*' + apiKey)) {
+                if(this.Api.hasOwnProperty(apiKey) && invocation.className.match('.*' + apiKey + '$')) {
                     return this.Api[apiKey];
                 }
             }

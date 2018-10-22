@@ -49,12 +49,10 @@ import { IAdsApi } from '../../src/ts/Ads/IAds';
             monetization = TestFixtures.getMonetizationApi(nativeBridge);
             promo = TestFixtures.getPromoApi(nativeBridge);
 
-            (<any>nativeBridge).Purchasing = sinon.createStubInstance(PurchasingApi);
-
-            asStub(monetization.PlacementContents.createPlacementContent).resolves();
-            asStub(monetization.PlacementContents.setPlacementContentState).resolves();
-            asStub(monetization.Listener.sendPlacementContentReady).resolves();
-            asStub(monetization.Listener.sendPlacementContentStateChanged).resolves();
+            sinon.stub(monetization.PlacementContents, 'createPlacementContent').resolves();
+            sinon.stub(monetization.PlacementContents, 'setPlacementContentState').resolves();
+            sinon.stub(monetization.Listener, 'sendPlacementContentReady').resolves();
+            sinon.stub(monetization.Listener, 'sendPlacementContentStateChanged').resolves();
             campaignManager = sinon.createStubInstance(CampaignManager);
             (<any>campaignManager).onCampaign = new Observable2<string, Campaign>();
             (<any>campaignManager).onNoFill = new Observable1<string>();
