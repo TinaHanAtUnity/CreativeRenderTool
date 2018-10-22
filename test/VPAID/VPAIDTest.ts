@@ -33,7 +33,7 @@ describe('VPAID View', () => {
         const deviceInfo = sinon.createStubInstance(DeviceInfoApi);
         deviceInfo.getScreenWidth.returns(Promise.resolve(320));
         deviceInfo.getScreenHeight.returns(Promise.resolve(480));
-        (<any>nativeBridge).DeviceInfo = deviceInfo;
+        (<any>core).DeviceInfo = deviceInfo;
 
         webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
         (<any>webPlayerContainer).onWebPlayerEvent = new Observable1<string>();

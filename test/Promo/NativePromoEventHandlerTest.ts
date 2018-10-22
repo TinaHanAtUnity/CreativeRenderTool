@@ -34,7 +34,7 @@ describe('NativePromoEventHandlerTest', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
         purchasing = TestFixtures.getPurchasingApi(nativeBridge);
-        (<sinon.SinonStub>purchasing.CustomPurchasing.available).resolves(false);
+        sinon.stub(purchasing.CustomPurchasing, 'available').resolves(false);
         clientInfo = sinon.createStubInstance(ClientInfo);
         wakeUpManager = new WakeUpManager(core);
         request = new RequestManager(platform, core, wakeUpManager);

@@ -173,7 +173,7 @@ describe('VPAIDEventHandlerTest', () => {
 
             describe('on android', () => {
                 beforeEach(() => {
-                    (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.ANDROID);
+                    sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
                 });
 
                 describe('when url is passed', () => {
@@ -198,7 +198,7 @@ describe('VPAIDEventHandlerTest', () => {
 
             describe('on ios', () => {
                 beforeEach(() => {
-                    (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
+                    sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
                 });
 
                 describe('when url is passed', () => {

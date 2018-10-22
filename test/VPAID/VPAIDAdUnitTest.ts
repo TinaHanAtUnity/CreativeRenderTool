@@ -31,6 +31,7 @@ import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from '../../src/ts/Backend/Backend';
 import { ICoreApi } from '../../src/ts/Core/ICore';
 import { IAdsApi } from '../../src/ts/Ads/IAds';
+import { AndroidDeviceInfo } from '../../src/ts/Core/Models/AndroidDeviceInfo';
 
 describe('VPAIDAdUnit', () => {
     let platform: Platform;
@@ -64,7 +65,7 @@ describe('VPAIDAdUnit', () => {
             vpaid: sinon.createStubInstance(VPAID),
             endScreen: sinon.createStubInstance(VPAIDEndScreen),
             focusManager: sinon.createStubInstance(FocusManager),
-            deviceInfo: sinon.createStubInstance(DeviceInfo),
+            deviceInfo: sinon.createStubInstance(AndroidDeviceInfo),
             clientInfo: sinon.createStubInstance(ClientInfo),
             thirdPartyEventManager: sinon.createStubInstance(ThirdPartyEventManager),
             operativeEventManager: sinon.createStubInstance(ProgrammaticOperativeEventManager),
@@ -131,14 +132,14 @@ describe('VPAIDAdUnit', () => {
 
         describe('on android', () => {
             beforeEach(() => {
-                (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.ANDROID);
+                sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
             });
             onShowTests();
         });
 
         xdescribe('on ios', () => {
             beforeEach(() => {
-                (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
+                sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
             });
             onShowTests();
         });
@@ -147,6 +148,7 @@ describe('VPAIDAdUnit', () => {
     describe('on hide', () => {
         const finishState = FinishState.COMPLETED;
         let onCloseObserver: IObserver0;
+        let finishSpy: sinon.SinonSpy;
 
         beforeEach(() => {
             onCloseObserver = sinon.spy();
@@ -157,6 +159,7 @@ describe('VPAIDAdUnit', () => {
             for (let i = 0; i < elements.length; i++) {
                 elements[i].parentNode!.removeChild(elements[i]);
             }
+            finishSpy = sinon.spy(ads.Listener, 'sendFinishEvent');
             return adUnit.show().then(() => adUnit.hide());
         });
 
@@ -165,7 +168,7 @@ describe('VPAIDAdUnit', () => {
         });
 
         it('should send the finish event', () => {
-            sinon.assert.calledWith(<sinon.SinonSpy>ads.Listener.sendFinishEvent, parameters.placement.getId(), finishState);
+            sinon.assert.calledWith(finishSpy, parameters.placement.getId(), finishState);
         });
 
         it('should remove the closer from the document', () => {
