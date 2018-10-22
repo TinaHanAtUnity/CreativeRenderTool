@@ -14,7 +14,7 @@ export interface IFileBookkeepingInfo {
 }
 
 enum CacheKey {
-    CAMPAIGN = 'campaign',
+    CAMPAIGN = 'campaign', // todo: key for legacy backup campaigns, remove in early 2019
     FILES = 'files',
     CAMPAIGNS = 'campaigns'
 }
