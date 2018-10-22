@@ -96,7 +96,7 @@ describe('MraidIframeEventBridge', () => {
             const sendEvent = (e: string, data?: any) => {
                 return () => {
                     return new Promise((res) => {
-                        window.postMessage({
+                        window!.postMessage({
                             type: e,
                             url: data
                         }, '*');
@@ -112,7 +112,7 @@ describe('MraidIframeEventBridge', () => {
             const sendEvent = (e: string, data?: any) => {
                 return () => {
                     return new Promise((res) => {
-                        window.postMessage({
+                        window!.postMessage({
                             type: e
                         }, '*');
                         setTimeout(res);
@@ -127,7 +127,7 @@ describe('MraidIframeEventBridge', () => {
             const sendEvent = (e: string, data?: any) => {
                 return () => {
                     return new Promise((res) => {
-                        window.postMessage({
+                        window!.postMessage({
                             type: e,
                             properties: data
                         }, '*');
@@ -143,7 +143,7 @@ describe('MraidIframeEventBridge', () => {
             const sendEvent = (e: string, data?: any) => {
                 return () => {
                     return new Promise((res) => {
-                        window.postMessage({
+                        window!.postMessage({
                             type: e,
                             properties: data
                         }, '*');
@@ -159,7 +159,7 @@ describe('MraidIframeEventBridge', () => {
             const sendEvent = (e: string, data?: any) => {
                 return () => {
                     return new Promise((res) => {
-                        window.postMessage({
+                        window!.postMessage({
                             type: e
                         }, '*');
                         setTimeout(res);
@@ -174,7 +174,7 @@ describe('MraidIframeEventBridge', () => {
             const sendEvent = (e: string, event: any, eventData: any) => {
                 return () => {
                     return new Promise((res) => {
-                        window.postMessage({
+                        window!.postMessage({
                             type: e,
                             event: event,
                             eventData: eventData
@@ -191,7 +191,7 @@ describe('MraidIframeEventBridge', () => {
             const sendEvent = (e: string, data?: any) => {
                 return () => {
                     return new Promise((res) => {
-                        window.postMessage({
+                        window!.postMessage({
                             type: e,
                             state: data
                         }, '*');
@@ -207,7 +207,7 @@ describe('MraidIframeEventBridge', () => {
             const sendEvent = (e: string, totalTime: any, playTime: any, frameCount: any) => {
                 return () => {
                     return new Promise((res) => {
-                        window.postMessage({
+                        window!.postMessage({
                             type: e,
                             totalTime: totalTime,
                             playTime: playTime,
