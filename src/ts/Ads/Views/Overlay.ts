@@ -6,14 +6,14 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import OverlayTemplate from 'html/Overlay.html';
 import { IAdsApi } from 'Ads/IAds';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from '../../Core/Models/DeviceInfo';
+import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
 
 export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
     protected _template: Template;
     private _ads: IAdsApi;
-    private _deviceInfo: AndroidDeviceInfo;
+    private _deviceInfo: DeviceInfo;
     private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
@@ -53,6 +53,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     constructor(platform: Platform, ads: IAdsApi, deviceInfo: DeviceInfo, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, seatId?: number) {
         super(platform, 'overlay', muted);
 
+        this._deviceInfo = deviceInfo;
         this._localization = new Localization(language, 'overlay');
         this._showGDPRBanner = showGDPRBanner;
         this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
@@ -344,7 +345,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
-        if(this._platform === Platform.ANDROID && this._deviceInfo.getApiLevel() < 15) {
+        if(this._platform === Platform.ANDROID && (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
             this._container.style.display = 'none';
             /* tslint:disable:no-unused-expression */
