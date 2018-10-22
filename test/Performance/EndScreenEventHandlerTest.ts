@@ -213,7 +213,7 @@ describe('EndScreenEventHandlerTest', () => {
 
             it('with appDownloadUrl and API is greater than or equal to 21, it should launch web search intent', () => {
                 sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').resolves();
-                sinon.stub(core.DeviceInfo.Android!, 'getApiLevel').returns(21);
+                sinon.stub(<AndroidDeviceInfo>deviceInfo, 'getApiLevel').returns(21);
 
                 endScreenEventHandler.onEndScreenDownload(downloadParameters);
 
@@ -264,7 +264,7 @@ describe('EndScreenEventHandlerTest', () => {
                     responseCode: 200
                 }));
 
-                sinon.stub(core.DeviceInfo.Android!, 'getApiLevel').returns(21);
+                sinon.stub(<AndroidDeviceInfo>deviceInfo, 'getApiLevel').returns(21);
 
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
@@ -292,7 +292,7 @@ describe('EndScreenEventHandlerTest', () => {
                     responseCode: 200
                 }));
 
-                sinon.stub(core.DeviceInfo.Android!, 'getApiLevel').returns(20);
+                sinon.stub(<AndroidDeviceInfo>deviceInfo, 'getApiLevel').returns(20);
 
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
@@ -379,12 +379,12 @@ describe('EndScreenEventHandlerTest', () => {
             storageBridge = new StorageBridge(core);
             campaign = TestFixtures.getCampaign();
             focusManager = new FocusManager(platform, core);
-            container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
+            container = new ViewController(core, ads, TestFixtures.getIosDeviceInfo(core), focusManager, clientInfo);
             metaDataManager = new MetaDataManager(core);
             const wakeUpManager = new WakeUpManager(core);
             const request = new RequestManager(platform, core, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
-            deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+            deviceInfo = TestFixtures.getIosDeviceInfo(core);
             thirdPartyEventManager = new ThirdPartyEventManager(core, request);
             sessionManager = new SessionManager(core.Storage, request, storageBridge);
 
@@ -521,7 +521,7 @@ describe('EndScreenEventHandlerTest', () => {
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
                     store: performanceAdUnitParameters.campaign.getStore(),
-                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                    clickAttributionUrlFollowsRedirects: true,
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
                 });
 
