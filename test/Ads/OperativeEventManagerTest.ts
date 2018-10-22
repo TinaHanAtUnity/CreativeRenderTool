@@ -91,7 +91,7 @@ describe('OperativeEventManagerTest', () => {
         const url: string = 'https://www.example.net/operative_event';
         const data: string = 'Test data';
 
-        const requestSpy = sinon.spy(request, 'post');
+        const requestSpy = sinon.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
 
         return operativeEventManager.sendEvent('test', eventId, sessionId, url, data).then(() => {
             assert(requestSpy.calledOnce, 'Operative event did not send POST request');
