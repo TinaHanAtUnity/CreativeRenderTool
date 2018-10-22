@@ -126,7 +126,6 @@ export class WebView {
     private _requestDelay: number;
     private _wasRealtimePlacement: boolean = false;
 
-    private _cachedCampaignResponse: INativeResponse | undefined;
     private _bannerAdContext: BannerAdContext;
 
     constructor(nativeBridge: NativeBridge) {
@@ -154,8 +153,6 @@ export class WebView {
             } else if(this._clientInfo.getPlatform() === Platform.IOS) {
                 this._deviceInfo = new IosDeviceInfo(this._nativeBridge);
             }
-
-            this._cachedCampaignResponse = undefined;
 
             this._storageBridge = new StorageBridge(this._nativeBridge);
             this._focusManager = new FocusManager(this._nativeBridge);
@@ -250,16 +247,14 @@ export class WebView {
                 Diagnostics.trigger('cleaning_cache_failed', error);
             });
 
-            const cachedCampaignResponsePromise = this._cacheBookkeeping.getCachedCampaignResponse();
             const monetizationEnabledPromise = this._nativeBridge.Monetization.Listener.isMonetizationEnabled();
 
-            return Promise.all([configPromise, cachedCampaignResponsePromise, monetizationEnabledPromise, cachePromise]);
-        }).then(([[coreConfig, adsConfig], cachedCampaignResponse, monetizationEnabled]) => {
+            return Promise.all([configPromise, monetizationEnabledPromise, cachePromise]);
+        }).then(([[coreConfig, adsConfig], monetizationEnabled]) => {
             this._coreConfig = coreConfig;
             this._adsConfig = adsConfig;
             this._clientInfo.setMonetizationInUse(monetizationEnabled);
             this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, this._coreConfig, this._adsConfig, this._request);
-            this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._coreConfig);
             this._jaegerManager.setJaegerTracingEnabled(this._coreConfig.isJaegerTracingEnabled());
 
@@ -323,15 +318,7 @@ export class WebView {
 
             const refreshSpan = this._jaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
-            let refreshPromise;
-            if(BackupCampaignTest.isValid(this._coreConfig.getAbGroup())) {
-                refreshPromise = this._refreshManager.refreshWithBackupCampaigns(this._backupCampaignManager);
-            } else if(this._cachedCampaignResponse !== undefined) {
-                refreshPromise = this._refreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
-            } else {
-                refreshPromise = this._refreshManager.refresh();
-            }
-            return refreshPromise.then((resp) => {
+            return this._refreshManager.refreshWithBackupCampaigns(this._backupCampaignManager).then((resp) => {
                 this._jaegerManager.stop(refreshSpan);
                 return resp;
             }).catch((error) => {
@@ -413,8 +400,6 @@ export class WebView {
             SessionDiagnostics.trigger('campaign_expired', error, campaign.getSession());
             return;
         }
-
-        this._cacheBookkeeping.deleteCachedCampaignResponse();
 
         if (placement.getRealtimeData()) {
             this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
