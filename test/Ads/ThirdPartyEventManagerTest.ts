@@ -2,7 +2,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { assert } from 'chai';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import { RequestManager } from 'Core/Managers/RequestManager';
@@ -34,8 +33,7 @@ describe('ThirdPartyEventManagerTest', () => {
 
         metaDataManager = new MetaDataManager(core);
         focusManager = new FocusManager(platform, core);
-        const wakeUpManager = new WakeUpManager(core);
-        request = sinon.createStubInstance(Request);
+        request = sinon.createStubInstance(RequestManager);
         (<sinon.SinonStub>request.get).returns(Promise.resolve({}));
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
     });
