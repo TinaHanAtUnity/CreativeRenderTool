@@ -1,6 +1,5 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
@@ -97,26 +96,6 @@ describe('configurationParserTest', () => {
             it('should return placement by id', () => {
                 assert.equal(adsConfig.getPlacement('premium').getName(), 'Premium placement');
             });
-        });
-    });
-
-    xdescribe('Parsing mixed placement json to configuration', () => {
-
-        const sandbox = sinon.createSandbox();
-
-        beforeEach(() => {
-            sandbox.stub(MixedPlacementUtility, 'createMixedPlacements');
-        });
-
-        afterEach(() => {
-            MixedPlacementUtility.originalPlacements = {};
-            sandbox.restore();
-        });
-
-        it('should only call createMixedPlacements if created placement is mixed and gameid is in mixed placement experiment', () => {
-            const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
-            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements), clientInfoPromoGame);
-            sandbox.assert.called(<sinon.SinonStub>MixedPlacementUtility.createMixedPlacements);
         });
     });
 });
