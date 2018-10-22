@@ -82,19 +82,19 @@ describe('PurchasingUtilitiesTest', () => {
         (<any>purchasing).CustomPurchasing.onTransactionComplete = new Observable1<ITransactionDetails>();
         (<any>purchasing).CustomPurchasing.onTransactionError = new Observable2<string, string>();
 
-        (<sinon.SinonStub>promo.Purchasing.getPromoCatalog).returns(Promise.resolve());
-        (<sinon.SinonStub>promo.Purchasing.getPromoVersion).returns(Promise.resolve());
-        (<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand).returns(Promise.resolve());
-        (<sinon.SinonStub>promo.Purchasing.initializePurchasing).returns(Promise.resolve());
+        sinon.stub(promo.Purchasing, 'getPromoCatalog').returns(Promise.resolve());
+        sinon.stub(promo.Purchasing, 'getPromoVersion').returns(Promise.resolve());
+        sinon.stub(promo.Purchasing, 'initiatePurchasingCommand').returns(Promise.resolve());
+        sinon.stub(promo.Purchasing, 'initializePurchasing').returns(Promise.resolve());
         (<sinon.SinonStub>clientInfo.getSdkVersion).returns(3000);
 
         const coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
         const adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
         placementManager = new PlacementManager(ads, adsConfig);
 
-        (<sinon.SinonStub>purchasing.CustomPurchasing.available).returns(Promise.resolve(true));
-        (<sinon.SinonStub>purchasing.CustomPurchasing.refreshCatalog).returns(Promise.resolve());
-        (<sinon.SinonStub>purchasing.CustomPurchasing.purchaseItem).returns(Promise.resolve());
+        sinon.stub(purchasing.CustomPurchasing, 'available').returns(Promise.resolve(true));
+        sinon.stub(purchasing.CustomPurchasing, 'refreshCatalog').returns(Promise.resolve());
+        sinon.stub(purchasing.CustomPurchasing, 'purchaseItem').returns(Promise.resolve());
 
         return PurchasingUtilities.initialize(core, promo, purchasing, clientInfo, coreConfig, adsConfig, placementManager, campaignManager, promoEvents, request, analyticsManager);
     });

@@ -7,9 +7,7 @@ import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { CustomPurchasingApi } from 'Purchasing/Native/CustomPurchasing';
 import { IProduct, ITransactionErrorDetails, ITransactionDetails } from 'Purchasing/PurchasingAdapter';
-import { Observable1 } from 'Core/Utilities/Observable';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { asStub } from 'TestHelpers/Functions';
 import { Platform } from '../../src/ts/Core/Constants/Platform';
@@ -28,7 +26,6 @@ describe('CustomPurchasingAdapter', () => {
     let request: RequestManager;
     let sandbox: sinon.SinonSandbox;
     let purchasingAdapter: CustomPurchasingAdapter;
-    let customPurchasing: CustomPurchasingApi;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -40,18 +37,9 @@ describe('CustomPurchasingAdapter', () => {
         promoEvents = sinon.createStubInstance(PromoEvents);
         request = sinon.createStubInstance(Request);
         sandbox = sinon.createSandbox();
-        customPurchasing = sinon.createStubInstance(CustomPurchasingApi);
 
-        (<any>nativeBridge).Monetization = {
-            CustomPurchasing: customPurchasing
-        };
-
-        (<sinon.SinonStub>customPurchasing.refreshCatalog).returns(Promise.resolve());
-        (<sinon.SinonStub>customPurchasing.purchaseItem).returns(Promise.resolve());
-
-        (<any>nativeBridge).Monetization.CustomPurchasing.onProductsRetrieved = new Observable1<IProduct[]>();
-        (<any>nativeBridge).Monetization.CustomPurchasing.onTransactionComplete = new Observable1<ITransactionDetails>();
-        (<any>nativeBridge).Monetization.CustomPurchasing.onTransactionError = new Observable1<ITransactionErrorDetails>();
+        sinon.stub(purchasing.CustomPurchasing, 'refreshCatalog').returns(Promise.resolve());
+        sinon.stub(purchasing.CustomPurchasing, 'purchaseItem').returns(Promise.resolve());
 
         purchasingAdapter = new CustomPurchasingAdapter(core, purchasing, promoEvents, request, analyticsManager);
         sandbox.stub((<any>purchasingAdapter)._thirdPartyEventManager, 'sendWithGet');
@@ -60,21 +48,21 @@ describe('CustomPurchasingAdapter', () => {
 
     const triggerRefreshCatalog = (value: IProduct[]) => {
         return new Promise((resolve) => {
-            (<any>nativeBridge).Monetization.CustomPurchasing.onProductsRetrieved.trigger(value);
+            purchasing.CustomPurchasing.onProductsRetrieved.trigger(value);
             setTimeout(resolve);
         });
     };
 
     const triggerTransactionComplete = (value: ITransactionDetails) => {
         return new Promise((resolve) => {
-            (<any>nativeBridge).Monetization.CustomPurchasing.onTransactionComplete.trigger(value);
+            purchasing.CustomPurchasing.onTransactionComplete.trigger(value);
             setTimeout(resolve);
         });
     };
 
     const triggerTransactionError = (value: ITransactionErrorDetails) => {
         return new Promise((resolve) => {
-            (<any>nativeBridge).Monetization.CustomPurchasing.onTransactionError.trigger(value);
+            purchasing.CustomPurchasing.onTransactionError.trigger(value);
             setTimeout(resolve);
         });
     };
@@ -106,7 +94,8 @@ describe('CustomPurchasingAdapter', () => {
         });
 
         it('should fail when onProductsRetrieved rejects', () => {
-            (<sinon.SinonStub>customPurchasing.refreshCatalog).rejects();
+            (<sinon.SinonStub>purchasing.CustomPurchasing.refreshCatalog).restore();
+            sinon.stub(purchasing.CustomPurchasing, 'refreshCatalog').rejects();
 
             return purchasingAdapter.refreshCatalog().catch((e: any) => {
                 assert.equal(e.message, 'Error');
