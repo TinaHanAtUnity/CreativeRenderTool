@@ -1,12 +1,13 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { EventCategory } from '../../Constants/EventCategory';
 
 export abstract class EventedNativeApi<T extends object> extends NativeApi {
 
     protected _handlers: T[] = [];
 
-    protected constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage) {
-        super(nativeBridge, apiClass, apiPackage);
+    protected constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage, eventCategory?: EventCategory) {
+        super(nativeBridge, apiClass, apiPackage, eventCategory);
     }
 
     public addEventHandler(handler: T): T {

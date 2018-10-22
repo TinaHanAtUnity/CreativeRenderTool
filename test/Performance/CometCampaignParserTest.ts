@@ -40,7 +40,7 @@ describe('CometCampaignParser', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         (<any>core.Sdk) = sinon.createStubInstance(SdkApi);
 
-        request = sinon.createStubInstance(Request);
+        request = sinon.createStubInstance(RequestManager);
         (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve('http://s3-us-west-1.amazonaws.com/ads-load-testing/AssetPack1/b30-400.mp4'));
 
         session = TestFixtures.getSession();

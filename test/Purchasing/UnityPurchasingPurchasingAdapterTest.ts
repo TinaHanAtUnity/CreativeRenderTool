@@ -87,10 +87,10 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         sdk = sinon.createStubInstance(SdkApi);
         sandbox = sinon.createSandbox();
 
-        (<sinon.SinonStub>promo.Purchasing.getPromoCatalog).returns(Promise.resolve());
-        (<sinon.SinonStub>promo.Purchasing.getPromoVersion).returns(Promise.resolve());
-        (<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand).returns(Promise.resolve());
-        (<sinon.SinonStub>promo.Purchasing.initializePurchasing).returns(Promise.resolve());
+        sinon.stub(promo.Purchasing, 'getPromoCatalog').returns(Promise.resolve());
+        sinon.stub(promo.Purchasing, 'getPromoVersion').returns(Promise.resolve());
+        sinon.stub(promo.Purchasing, 'initiatePurchasingCommand').returns(Promise.resolve());
+        sinon.stub(promo.Purchasing, 'initializePurchasing').returns(Promise.resolve());
         (<any>promo.Purchasing).onInitialize = new Observable1<string>();
         (<any>promo.Purchasing).onGetPromoVersion = new Observable1<string>();
         (<any>promo.Purchasing).onCommandResult = new Observable1<string>();

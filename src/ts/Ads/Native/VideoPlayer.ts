@@ -5,6 +5,7 @@ import { ApiPackage } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
 import { EventedNativeApi } from 'Core/Native/Bridge/EventedNativeApi';
+import { EventCategory } from '../../Core/Constants/EventCategory';
 
 enum VideoPlayerEvent {
     PROGRESS,
@@ -34,7 +35,7 @@ export class VideoPlayerApi extends EventedNativeApi<IVideoEventHandler> {
     public readonly Android?: AndroidVideoPlayerApi;
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS);
+        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS, EventCategory.VIDEOPLAYER);
         if(nativeBridge.getPlatform() === Platform.IOS) {
             this.iOS = new IosVideoPlayerApi(nativeBridge);
         } else if(nativeBridge.getPlatform() === Platform.ANDROID) {

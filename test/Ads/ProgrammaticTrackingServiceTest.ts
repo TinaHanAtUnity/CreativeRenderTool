@@ -10,21 +10,20 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import 'mocha';
 import * as sinon from 'sinon';
+import { RequestManager } from '../../src/ts/Core/Managers/RequestManager';
 
 describe('Ads/Utilities', () => {
 
     let programmaticTrackingService: ProgrammaticTrackingService;
-    let platformStub: sinon.SinonStub;
     let osVersionStub: sinon.SinonStub;
     let sdkVersionStub: sinon.SinonStub;
     let postStub: sinon.SinonStub;
 
     beforeEach(() => {
-        const request = sinon.createStubInstance(Request);
+        const request = sinon.createStubInstance(RequestManager);
         const clientInfo = sinon.createStubInstance(ClientInfo);
         const deviceInfo = sinon.createStubInstance(DeviceInfo);
         programmaticTrackingService = new ProgrammaticTrackingService(Platform.ANDROID, request, clientInfo, deviceInfo);
-        platformStub = clientInfo.getPlatform;
         osVersionStub = deviceInfo.getOsVersion;
         sdkVersionStub = clientInfo.getSdkVersionName;
         postStub = request.post;
@@ -38,16 +37,14 @@ describe('Ads/Utilities', () => {
 
     describe('buildErrorData', () => {
         it('should send correct data for too_large_file', () => {
-            platformStub.returns(Platform.TEST);
             osVersionStub.returns('11.2.1');
             sdkVersionStub.returns('2.3.0');
             const errorData = programmaticTrackingService.buildErrorData(ProgrammaticTrackingError.TooLargeFile, 'test', 1234);
-            sinon.assert.calledOnce(platformStub);
             sinon.assert.calledOnce(osVersionStub);
             sinon.assert.calledOnce(sdkVersionStub);
             assert.deepEqual(errorData, {
                 event: ProgrammaticTrackingError.TooLargeFile,
-                platform: 'TEST',
+                platform: 'ANDROID',
                 osVersion: '11.2.1',
                 sdkVersion: '2.3.0',
                 adType: 'test',
@@ -58,7 +55,6 @@ describe('Ads/Utilities', () => {
 
     describe('reportError', () => {
         it('should send correct data using request api', () => {
-            platformStub.returns(Platform.TEST);
             osVersionStub.returns('11.2.1');
             sdkVersionStub.returns('2.3.0');
             const errorData = programmaticTrackingService.buildErrorData(ProgrammaticTrackingError.TooLargeFile, 'test', 1234);
