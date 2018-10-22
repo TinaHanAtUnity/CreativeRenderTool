@@ -189,7 +189,7 @@ export class CacheBookkeeping {
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
     }
 
-    // todo: This is method exists for legacy backup campaign implementation that was live from April 2018 to October 2018. It should be removed in early 2019.
+    // todo: This method exists for legacy backup campaign implementation that was live from April 2018 to October 2018. It should be removed in early 2019.
     public deleteCachedCampaignResponse(): Promise<any> {
         const cacheCampaignUrlPromise = this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'));
         const cachedCampaignResponsePromise = this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'));
