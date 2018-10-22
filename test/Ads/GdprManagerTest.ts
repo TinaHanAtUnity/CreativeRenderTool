@@ -61,12 +61,12 @@ describe('GdprManagerTest', () => {
         deviceInfo = sinon.createStubInstance(AndroidDeviceInfo);
         coreConfig = sinon.createStubInstance(CoreConfiguration);
         adsConfig = sinon.createStubInstance(AdsConfiguration);
-        request = sinon.createStubInstance(Request);
+        request = sinon.createStubInstance(RequestManager);
 
         onSetStub = sinon.stub(core.Storage.onSet, 'subscribe');
-        getStub = <sinon.SinonStub>core.Storage.get;
-        setStub = (<sinon.SinonStub>core.Storage.set).resolves();
-        writeStub = (<sinon.SinonStub>core.Storage.write).resolves();
+        getStub = sinon.stub(core.Storage, 'get');
+        setStub = sinon.stub(core.Storage, 'set').resolves();
+        writeStub = sinon.stub(core.Storage, 'write').resolves();
 
         (<sinon.SinonStub>clientInfo.getGameId).returns(testGameId);
         (<sinon.SinonStub>deviceInfo.getAdvertisingIdentifier).returns(testAdvertisingId);
@@ -374,7 +374,7 @@ describe('GdprManagerTest', () => {
             getRequestStub = <sinon.SinonStub>request.get;
             getRequestStub.resolves({response: '{}'});
             diagnosticTriggerStub = sinon.stub(Diagnostics, 'trigger');
-            logErrorStub = <sinon.SinonStub>core.Sdk.logError;
+            logErrorStub = sinon.stub(core.Sdk, 'logError');
 
             (<sinon.SinonStub>clientInfo.getGameId).returns(gameId);
             (<sinon.SinonStub>deviceInfo.getAdvertisingIdentifier).returns(adId);
@@ -436,7 +436,7 @@ describe('GdprManagerTest', () => {
                 'adid': testAdvertisingId,
                 'action': 'skip',
                 'projectId': testUnityProjectId,
-                'platform': 'test',
+                'platform': 'android',
                 'gameId': testGameId
             }
         }, {
@@ -446,7 +446,7 @@ describe('GdprManagerTest', () => {
                 'adid': testAdvertisingId,
                 'action': 'consent',
                 'projectId': testUnityProjectId,
-                'platform': 'test',
+                'platform': 'android',
                 'gameId': testGameId
             }
         }, {
@@ -456,7 +456,7 @@ describe('GdprManagerTest', () => {
                 'adid': testAdvertisingId,
                 'action': 'optout',
                 'projectId': testUnityProjectId,
-                'platform': 'test',
+                'platform': 'android',
                 'gameId': testGameId
             }
         }, {
@@ -466,7 +466,7 @@ describe('GdprManagerTest', () => {
                 'adid': testAdvertisingId,
                 'action': 'optout',
                 'projectId': testUnityProjectId,
-                'platform': 'test',
+                'platform': 'android',
                 'gameId': testGameId,
                 'source': 'metadata'
             }
@@ -477,7 +477,7 @@ describe('GdprManagerTest', () => {
                 'adid': testAdvertisingId,
                 'action': 'optout',
                 'projectId': testUnityProjectId,
-                'platform': 'test',
+                'platform': 'android',
                 'gameId': testGameId,
                 'source': 'user'
             }
@@ -488,7 +488,7 @@ describe('GdprManagerTest', () => {
                 'adid': testAdvertisingId,
                 'action': 'optin',
                 'projectId': testUnityProjectId,
-                'platform': 'test',
+                'platform': 'android',
                 'gameId': testGameId
             }
         }];
