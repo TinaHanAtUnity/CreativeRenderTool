@@ -17,7 +17,7 @@ export class XPromoEndScreen extends EndScreen {
             'endScreenPortrait': campaign.getLandscape().getUrl(),
             'rating': adjustedRating.toString(),
             'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
-            'endscreenAlt': this.getEndscreenAlt(campaign)
+            'endscreenAlt': this.getEndscreenAlt()
         };
 
         this._campaign = campaign;

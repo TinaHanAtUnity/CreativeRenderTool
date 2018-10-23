@@ -1,5 +1,9 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { Campaign } from 'Ads/Models/Campaign';
+import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
+
+const SQUARE_END_SCREEN = 'square-end-screen';
 
 export class PerformanceEndScreen extends EndScreen {
     private _campaign: PerformanceCampaign;
@@ -33,5 +37,20 @@ export class PerformanceEndScreen extends EndScreen {
             appDownloadUrl: this._campaign.getAppDownloadUrl(),
             adUnitStyle: this._adUnitStyle
         }));
+    }
+
+    protected getEndscreenAlt(campaign?: Campaign): string | undefined {
+        if (this._campaign.getSquare()) {
+            return SQUARE_END_SCREEN;
+        }
+        return undefined;
+    }
+
+    protected getTemplate() {
+        if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
+            return SquareEndScreenTemplate;
+
+        }
+        return super.getTemplate();
     }
 }

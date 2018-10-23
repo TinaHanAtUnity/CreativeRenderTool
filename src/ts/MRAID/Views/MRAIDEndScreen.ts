@@ -10,7 +10,7 @@ export class MRAIDEndScreen extends EndScreen {
 
         this._templateData = {
             'gameName': campaign.getGameName(),
-            'endscreenAlt': this.getEndscreenAlt(campaign)
+            'endscreenAlt': this.getEndscreenAlt()
         };
         const gameIcon = campaign.getGameIcon();
         if(gameIcon) {
