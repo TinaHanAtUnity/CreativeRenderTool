@@ -78,7 +78,6 @@ import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHan
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 export class WebView {
 
@@ -398,11 +397,6 @@ export class WebView {
 
         if(!campaign) {
             this.showError(true, placementId, 'Campaign not found');
-            return;
-        }
-
-        if (campaign instanceof PromoCampaign && campaign.getRequiredAssets().length === 0) {
-            this.showError(true, placementId, 'No creatives found for campaign');
             return;
         }
 
