@@ -1,4 +1,4 @@
-# Tue Oct 23 18:39:31 UTC 2018
+# Pending
 
 * Enable x icon skip for Cheetah [#6781](https://github.com/Applifier/unity-ads-webview/pull/6781)
 * AR logo cropping fix [#6783](https://github.com/Applifier/unity-ads-webview/pull/6783)
