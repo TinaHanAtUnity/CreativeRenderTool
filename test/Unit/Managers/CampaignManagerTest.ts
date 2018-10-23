@@ -10,7 +10,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { IPlacementRequestMap, MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -1461,54 +1460,6 @@ describe('CampaignManager', () => {
             return campaignManager.request().then(() => {
                 const requestBody = JSON.parse(requestData);
                 assert.isUndefined(requestBody.organizationId, 'organizationId should NOT be in ad request body when it was NOT defined in the config response');
-            });
-        });
-    });
-
-    xdescribe('on mixed placement request', () => {
-        let requestData: string = '{}';
-        let assetManager: AssetManager;
-        let campaignManager: CampaignManager;
-
-        const placements = MixedPlacementUtility.originalPlacements;
-        const placementRequestMap: { [id: string]: IPlacementRequestMap } = {};
-
-        beforeEach(() => {
-            sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: Array<[string, string]> = [], options?: any) => {
-                requestData = data;
-                return Promise.resolve();
-            });
-
-            const clientInfoMixedExperiment = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
-            coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements), clientInfoMixedExperiment);
-            assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, nativeBridge, backupCampaignManager);
-            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfoMixedExperiment, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
-        });
-
-        afterEach(() => {
-            MixedPlacementUtility.originalPlacements = {};
-        });
-
-        it('should strip mixedPlacements from the placement request map in request body sent to auction when mixedplacment experiment is enabled', () => {
-            for (const placementid in placements) {
-                if(placements.hasOwnProperty(placementid)) {
-                    placementRequestMap[placementid] = {
-                        adTypes: placements[placementid].getAdTypes(),
-                        allowSkip: placements[placementid].allowSkip()
-                    };
-
-                    if (placementRequestMap[placementid].adTypes === undefined) {
-                        delete placementRequestMap[placementid].adTypes;
-                    }
-                }
-            }
-
-            return campaignManager.request().then(() => {
-                const requestBody = JSON.parse(requestData);
-                assert.notEqual(MixedPlacementUtility.originalPlacements, adsConfig.getPlacements());
-                assert.notEqual(requestBody.placements, {});
-                assert.deepEqual(requestBody.placements, placementRequestMap);
             });
         });
     });
