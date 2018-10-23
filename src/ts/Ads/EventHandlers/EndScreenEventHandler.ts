@@ -187,7 +187,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private handleAppDownloadUrl(appDownloadUrl: string) {
-        const _appDownloadUrl = decodeURIComponent(appDownloadUrl);
+        const modifiedAppDownloadUrl = decodeURIComponent(appDownloadUrl);
 
         if (this._nativeBridge.getApiLevel() >= 21) {
             // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
@@ -196,14 +196,14 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 'extras': [
                     {
                         'key': 'query',
-                        'value': _appDownloadUrl
+                        'value': modifiedAppDownloadUrl
                     }
                 ]
             });
         } else {
             this._nativeBridge.Intent.launch({
                 'action': 'android.intent.action.VIEW',
-                'uri': _appDownloadUrl
+                'uri': modifiedAppDownloadUrl
             });
         }
     }

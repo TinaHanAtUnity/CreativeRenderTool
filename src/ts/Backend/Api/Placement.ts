@@ -16,7 +16,7 @@ export class Placement {
         if (placement) {
             return Placement._placements[placement];
         } else if(Placement._defaultPlacement) {
-            return Placement._defaultPlacement;
+            return Placement._placements[Placement._defaultPlacement];
         } else {
             return 'NOT_AVAILABLE';
         }

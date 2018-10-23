@@ -96,14 +96,14 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
     }
 
     public update(progress: number, total: number) {
-        let _total = total;
-        if (progress >= (_total * 0.75)) {
+        let modifiedTotal = total;
+        if (progress >= (modifiedTotal * 0.75)) {
             this._canReward = true;
         }
 
-        _total = this._placement.allowSkip() ? this._placement.allowSkipInSeconds() : _total;
-        const secondsLeft = this.clampLower(Math.floor(_total - progress), 0);
-        let progressFraction = progress / _total;
+        modifiedTotal = this._placement.allowSkip() ? this._placement.allowSkipInSeconds() : modifiedTotal;
+        const secondsLeft = this.clampLower(Math.floor(modifiedTotal - progress), 0);
+        let progressFraction = progress / modifiedTotal;
         if (secondsLeft <= 0) {
             this._allowClose = true;
         }

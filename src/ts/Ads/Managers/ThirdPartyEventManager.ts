@@ -65,16 +65,16 @@ export class ThirdPartyEventManager {
     }
 
     private sendEvent(method: ThirdPartyEventMethod, event: string, sessionId: string, url: string, body?: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
-        const _headers = headers || [];
-        if (!Request.getHeader(_headers, 'User-Agent')) {
+        const modifiedHeaders = headers || [];
+        if (!Request.getHeader(modifiedHeaders, 'User-Agent')) {
             if (typeof navigator !== 'undefined' && navigator.userAgent && useWebViewUserAgentForTracking === true) {
-                _headers.push(['User-Agent', navigator.userAgent]);
+                modifiedHeaders.push(['User-Agent', navigator.userAgent]);
             }
         }
 
-        const _url = this.getUrl(url);
+        const urlInternal = this.getUrl(url);
 
-        this._nativeBridge.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + _url + ' with headers ' + _headers + ' (session ' + sessionId + ')');
+        this._nativeBridge.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + urlInternal + ' with headers ' + modifiedHeaders + ' (session ' + sessionId + ')');
         const options = {
             retries: 0,
             retryDelay: 0,
@@ -84,27 +84,27 @@ export class ThirdPartyEventManager {
         let request: Promise<INativeResponse>;
         switch(method) {
             case ThirdPartyEventMethod.POST:
-                request = this._request.post(_url, body, _headers, options);
+                request = this._request.post(urlInternal, body, modifiedHeaders, options);
                 break;
             case ThirdPartyEventMethod.GET:
             default:
-                request = this._request.get(_url, _headers, options);
+                request = this._request.get(urlInternal, modifiedHeaders, options);
         }
         return request.catch(error => {
-            let _error = error;
-            const urlParts = Url.parse(_url);
+            let errorInternal = error;
+            const urlParts = Url.parse(urlInternal);
             if(error instanceof RequestError) {
-                _error = new DiagnosticError(new Error(error.message), {
+                errorInternal = new DiagnosticError(new Error(error.message), {
                     request: error.nativeRequest,
                     event: event,
                     sessionId: sessionId,
-                    url: _url,
+                    url: urlInternal,
                     response: error.nativeResponse,
                     host: urlParts.host,
                     protocol: urlParts.protocol
                 });
             }
-            return Analytics.trigger('third_party_event_failed', _error);
+            return Analytics.trigger('third_party_event_failed', errorInternal);
         });
     }
 
@@ -138,15 +138,15 @@ export class ThirdPartyEventManager {
     }
 
     private getUrl(url: string): string {
-        let _url = url;
-        if(_url) {
+        let modifiedUrl = url;
+        if(modifiedUrl) {
             for(const key in this._templateValues) {
                 if(this._templateValues.hasOwnProperty(key)) {
-                    _url = _url.replace(key, this._templateValues[key]);
+                    modifiedUrl = modifiedUrl.replace(key, this._templateValues[key]);
                 }
             }
         }
 
-        return _url;
+        return modifiedUrl;
     }
 }

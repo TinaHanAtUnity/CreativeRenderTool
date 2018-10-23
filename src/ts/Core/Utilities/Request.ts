@@ -182,16 +182,16 @@ export class Request {
         let redirectCount = 0;
         return new Promise((resolve, reject) => {
             const makeRequest = (requestUrl: string) => {
-                let _requestUrl = requestUrl;
+                let modifiedRequestUrl = requestUrl;
                 redirectCount++;
-                _requestUrl = _requestUrl.trim();
+                modifiedRequestUrl = modifiedRequestUrl.trim();
                 if (redirectCount >= Request._redirectLimit) {
                     reject(new Error('redirect limit reached'));
-                } else if (_requestUrl.indexOf('http') === -1) {
+                } else if (modifiedRequestUrl.indexOf('http') === -1) {
                     // market:// or itunes:// urls can be opened directly
-                    resolve(_requestUrl);
+                    resolve(modifiedRequestUrl);
                 } else {
-                    this.head(_requestUrl).then((response: INativeResponse) => {
+                    this.head(modifiedRequestUrl).then((response: INativeResponse) => {
                         if (Request.is3xxRedirect(response.responseCode)) {
                             const location = Request.getHeader(response.headers, 'location');
                             if (location) {
@@ -200,12 +200,12 @@ export class Request {
                                 reject(new Error(`${response.responseCode} response did not have a "Location" header`));
                             }
                         } else if (Request.is2xxSuccessful(response.responseCode)) {
-                            resolve(_requestUrl);
+                            resolve(modifiedRequestUrl);
                         } else {
                             if (resolveOnHttpError) {
-                                resolve(_requestUrl);
+                                resolve(modifiedRequestUrl);
                             } else {
-                                reject(new Error(`Request to ${_requestUrl} failed with status ${response.responseCode}`));
+                                reject(new Error(`Request to ${modifiedRequestUrl} failed with status ${response.responseCode}`));
                             }
                         }
                     }).catch(reject);

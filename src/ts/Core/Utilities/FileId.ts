@@ -2,18 +2,18 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export class FileId {
     public static getFileId(url: string, nativeBridge: NativeBridge): Promise<string> {
-        let _url = url;
-        if(_url in this._fileIds) {
-            return Promise.resolve(this._fileIds[_url]);
+        let modifiedUrl = url;
+        if(modifiedUrl in this._fileIds) {
+            return Promise.resolve(this._fileIds[modifiedUrl]);
         }
 
-        if(_url.indexOf('?') !== -1) {
-            _url = _url.split('?')[0];
+        if(modifiedUrl.indexOf('?') !== -1) {
+            modifiedUrl = modifiedUrl.split('?')[0];
         }
 
         let extension: string;
-        let urlFilename: string = _url;
-        const urlPaths = _url.split('/');
+        let urlFilename: string = modifiedUrl;
+        const urlPaths = modifiedUrl.split('/');
         if(urlPaths.length > 1) {
             urlFilename = urlPaths[urlPaths.length - 1];
         }
@@ -22,12 +22,12 @@ export class FileId {
             extension = fileExtensions[fileExtensions.length - 1];
         }
 
-        return nativeBridge.Cache.getHash(_url).then(hash => {
+        return nativeBridge.Cache.getHash(modifiedUrl).then(hash => {
             let fileId: string;
             if(extension) {
-                fileId = this._fileIds[_url] = hash + '.' + extension;
+                fileId = this._fileIds[modifiedUrl] = hash + '.' + extension;
             } else {
-                fileId = this._fileIds[_url] = hash;
+                fileId = this._fileIds[modifiedUrl] = hash;
             }
             return fileId;
         });

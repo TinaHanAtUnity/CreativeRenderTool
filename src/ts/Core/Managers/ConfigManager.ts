@@ -55,18 +55,18 @@ export class ConfigManager {
                     throw new Error(error);
                 }
             }).catch(error => {
-                let _error = error;
-                if (_error instanceof RequestError) {
-                    const requestError = _error;
+                let modifiedError = error;
+                if (modifiedError instanceof RequestError) {
+                    const requestError = modifiedError;
                     if (requestError.nativeResponse && requestError.nativeResponse.responseCode) {
                         jaegerSpan.addTag(JaegerTags.StatusCode, requestError.nativeResponse.responseCode.toString());
                     }
                     if (requestError.nativeResponse && requestError.nativeResponse.response) {
                         const responseObj = JsonParser.parse(requestError.nativeResponse.response);
-                        _error = new ConfigError((new Error(responseObj.error)));
+                        modifiedError = new ConfigError((new Error(responseObj.error)));
                     }
                 }
-                throw _error;
+                throw modifiedError;
             });
         });
     }

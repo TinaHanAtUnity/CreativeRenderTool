@@ -332,12 +332,12 @@ describe('RequestTest', () => {
                 return request.get(failureUrl).then((response) => {
                     assert.fail('Should not resolve');
                 }).catch(error => {
-                    let _error = error;
-                    assert.instanceOf(_error, RequestError);
-                    _error = <RequestError>_error;
-                    assert.equal(_error.message, reason);
-                    assert.equal(_error.nativeResponse.responseCode, i);
-                    assert.equal(_error.nativeResponse.response, failureResponse);
+                    let modifiedError = error;
+                    assert.instanceOf(modifiedError, RequestError);
+                    modifiedError = <RequestError>modifiedError;
+                    assert.equal(modifiedError.message, reason);
+                    assert.equal(modifiedError.nativeResponse.responseCode, i);
+                    assert.equal(modifiedError.nativeResponse.response, failureResponse);
                 });
             });
         }
@@ -352,12 +352,12 @@ describe('RequestTest', () => {
             return request.get(failureUrl).then((response) => {
                 assert.fail('Should not resolve');
             }).catch(error => {
-                let _error = error;
-                assert.instanceOf(_error, RequestError);
-                _error = <RequestError>_error;
-                assert.equal(_error.message, reason);
-                assert.equal(_error.nativeResponse.responseCode, 600);
-                assert.equal(_error.nativeResponse.response, failureResponse);
+                let modifiedError = error;
+                assert.instanceOf(modifiedError, RequestError);
+                modifiedError = <RequestError>modifiedError;
+                assert.equal(modifiedError.message, reason);
+                assert.equal(modifiedError.nativeResponse.responseCode, 600);
+                assert.equal(modifiedError.nativeResponse.response, failureResponse);
             });
         });
     });
