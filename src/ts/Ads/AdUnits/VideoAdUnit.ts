@@ -270,12 +270,15 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         if(overlay) {
             overlay.render();
             document.body.appendChild(overlay.container());
+            this._nativeBridge.Sdk.logError(JSON.stringify(this._placement));
+            if(!this._placement.allowSkip()) {
+                if (CustomFeatures.allowSkipInRewardedVideos(this._abGroup, this._campaign)) {
+                    overlay.setSkipEnabled(true);
+                    //TODO: Change to actual time, 15s?
+                    overlay.setSkipDuration(5);
+                    return;
+                }
 
-            if (CustomFeatures.allowSkipInRewardedVideos(this._abGroup, this._campaign)) {
-                overlay.setSkipEnabled(true);
-                //TODO: Change to actual time, 15s?
-                overlay.setSkipDuration(5);
-            } else if(!this._placement.allowSkip()) {
                 overlay.setSkipEnabled(false);
             } else {
                 overlay.setSkipEnabled(true);

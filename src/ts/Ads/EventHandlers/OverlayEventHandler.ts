@@ -33,10 +33,8 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
 
     public onOverlaySkip(position: number): void {
         this._nativeBridge.VideoPlayer.pause();
-
         this._adUnit.setVideoState(VideoState.SKIPPED);
         this._adUnit.setFinishState(FinishState.SKIPPED);
-
         this._operativeEventManager.sendSkip(this.getOperativeSkipEventParams());
 
         this._adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
