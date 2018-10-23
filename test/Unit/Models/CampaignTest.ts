@@ -21,8 +21,8 @@ describe('PerformanceCampaign', () => {
             const campaign = new PerformanceCampaign(params);
 
             assert.equal(campaign.getAppStoreId(), campaignObject.appStoreId);
-            assert.equal(campaign.getLandscape().getUrl(), campaignObject.endScreenLandscape);
-            assert.equal(campaign.getPortrait().getUrl(), campaignObject.endScreenPortrait);
+            assert.equal(campaign.getLandscape()!.getUrl(), campaignObject.endScreenLandscape);
+            assert.equal(campaign.getPortrait()!.getUrl(), campaignObject.endScreenPortrait);
             assert.equal(campaign.getGameIcon().getUrl(), campaignObject.gameIcon);
             assert.equal(campaign.getGameId(), campaignObject.gameId);
             assert.equal(campaign.getGameName(), campaignObject.gameName);
