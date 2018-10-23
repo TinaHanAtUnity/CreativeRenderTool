@@ -2,6 +2,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
+import { Asset } from 'Ads/Models/Assets/Asset';
 
 export enum StoreName {
     APPLE,
@@ -20,6 +21,7 @@ export interface IPerformanceCampaign extends ICampaign {
     ratingCount: number;
     landscapeImage: Image;
     portraitImage: Image;
+    squareImage?: Image;
     video?: Video;
     streamingVideo?: Video;
     videoPortrait?: Video;
@@ -47,6 +49,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             ratingCount: ['number'],
             landscapeImage: ['object'],
             portraitImage: ['object'],
+            squareImage: ['object', 'undefined'],
             video: ['object', 'undefined'],
             streamingVideo: ['object', 'undefined'],
             videoPortrait: ['object', 'undefined'],
@@ -99,6 +102,10 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('landscapeImage');
     }
 
+    public getSquare(): Image | undefined {
+        return this.get('squareImage');
+    }
+
     public getVideo(): Video | undefined {
         return this.get('video');
     }
@@ -148,11 +155,26 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     }
 
     public getOptionalAssets() {
-        return [
-            this.getGameIcon(),
-            this.getPortrait(),
-            this.getLandscape()
-        ];
+        const assets: Asset[] = [];
+
+        assets.push(this.getGameIcon());
+
+        const landscape = this.getLandscape();
+        if(landscape) {
+            assets.push(landscape);
+        }
+
+        const portrait = this.getPortrait();
+        if(portrait) {
+            assets.push(portrait);
+        }
+
+        const square = this.getSquare();
+        if(square) {
+            assets.push(square);
+        }
+
+        return assets;
     }
 
     public getAppDownloadUrl() {

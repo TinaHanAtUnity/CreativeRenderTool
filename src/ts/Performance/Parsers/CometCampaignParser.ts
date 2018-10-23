@@ -122,6 +122,7 @@ export class CometCampaignParser extends CampaignParser {
                 ratingCount: json.ratingCount,
                 landscapeImage: new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session),
                 portraitImage: new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session),
+                squareImage: json.squareImage ? new Image(this.validateAndEncodeUrl(json.squareImage, session), session) : undefined,
                 clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl, session) : undefined,
                 clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
                 clickUrl: this.validateAndEncodeUrl(json.clickUrl, session),
