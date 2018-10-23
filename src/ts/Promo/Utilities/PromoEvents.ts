@@ -14,8 +14,8 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 // external fields
 export interface IPurchaseCommon {
     store: string;
-    productId: string;
-    storeSpecificId: string;
+    productId: string | undefined;
+    storeSpecificId: string | undefined;
     amount: number | undefined;
     currency: string | undefined;
     native: boolean;
@@ -59,7 +59,7 @@ interface IPurhcaseFailed {
 interface IPurchaseSuccess {
     productType: string | undefined;
     receipt: {
-        data: string;
+        data: string | undefined;
     };
 }
 
@@ -232,7 +232,7 @@ export class PromoEvents {
         });
     }
 
-    public onOrganicPurchaseSuccess(body: IPurchaseCommon, productType: string | undefined, receipt: string): Promise<IOrganicPurchaseSuccess> {
+    public onOrganicPurchaseSuccess(body: IPurchaseCommon, productType: string | undefined, receipt: string | undefined): Promise<IOrganicPurchaseSuccess> {
         return Promise.all([
             this.deviceInfo.getScreenWidth(),
             this.deviceInfo.getScreenHeight(),

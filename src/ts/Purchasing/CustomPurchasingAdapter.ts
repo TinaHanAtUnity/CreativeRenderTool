@@ -18,6 +18,7 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
     private _products: {[productId: string]: IProduct};
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _organicPurchase: OrganicPurchase;
+    private _request: Request;
     
     private static InAppPurchaseStorageKey = 'iap.purchases';
 
@@ -26,23 +27,73 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
         this._analyticsManager = analyticsManager;
         this._promoEvents = promoEvents;
         this._products = {};
+        this._request = request;
 
         this._thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request, {});
+
+        this.getOrganicPurchase();
+        this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
+       
     }
 
     public initialize() {
         return Promise.resolve();
     }
+    
+    private onStorageSet(eventType: string, data: any){
+        this._nativeBridge.Sdk.logDebug('IAP::eventType ' + eventType);
+        this._nativeBridge.Sdk.logDebug('IAP::data ' + JSON.stringify(data));
+        // if(eventType === CustomPurchasingAdapter.InAppPurchaseStorageKey){
+        //     if(data && data.length && data.length > 0){
+        //         for(const event of data){
+        //             const organicPurchaseEvent = new OrganicPurchase(this._nativeBridge, event);
+        //             this.postOrganicPurchaseEvents(organicPurchaseEvent);
+        //         }
+        //         this.resetIAPPurchaseMetaData();
+        //     }   
+        // }
+        this.getOrganicPurchase();
+    }
 
     private getOrganicPurchase(): Promise<void> {    
         return this._nativeBridge.Storage.get(StorageType.PUBLIC, CustomPurchasingAdapter.InAppPurchaseStorageKey).then((data: any) => {
-            this._organicPurchase = new OrganicPurchase(this._nativeBridge, data[0]);
-            return Promise.resolve();
+            if(data && data.length && data.length > 0){
+                for(const event of data){
+                    const organicPurchaseEvent = new OrganicPurchase(this._nativeBridge, event);
+                    this.postOrganicPurchaseEvents(organicPurchaseEvent);
+                }
+                this.resetIAPPurchaseMetaData();
+            }
         });
     }
 
-    private resetMetaData(): Promise<void> {
-        return this._nativeBridge.Storage.delete(StorageType.PUBLIC, CustomPurchasingAdapter.InAppPurchaseStorageKey);
+    private resetIAPPurchaseMetaData(): Promise<void> {
+        return this._nativeBridge.Storage.set(StorageType.PUBLIC, CustomPurchasingAdapter.InAppPurchaseStorageKey, []).then(() => {
+            this._nativeBridge.Storage.write(StorageType.PUBLIC);
+        });
+    }
+
+    private postOrganicPurchaseEvents(organicPurchaseEvent: OrganicPurchase) {
+        const productId = organicPurchaseEvent.getId();
+        let productType: string | undefined;
+        if (productId) {
+            const product = this._products[productId];
+            if (product) {
+                productType = product.productType;
+            }
+        }
+      
+        this._promoEvents.onOrganicPurchaseSuccess({ 
+            store: this._promoEvents.getAppStoreFromReceipt(organicPurchaseEvent.getReceipt()),
+            productId: organicPurchaseEvent.getId(),
+            storeSpecificId: organicPurchaseEvent.getId(),
+            amount: organicPurchaseEvent.getPrice(),
+            currency: organicPurchaseEvent.getCurrency(),
+            native: false}, productType, organicPurchaseEvent.getReceipt()).then((body) => {
+
+                this._request.post( Url.addParameters('https://events.iap.unity3d.com/events/v1/organic_purchase', {'native': false, 'iap_service': false}), JSON.stringify(body));             
+            }                    
+            );
     }
     
     public refreshCatalog(): Promise<IProduct[]> {
@@ -65,22 +116,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
             let onError: IObserver1<ITransactionErrorDetails>;
             let onSuccess: IObserver1<ITransactionDetails>;
             let onOrganicSuccess: IObserver1<ITransactionDetails>;
-
-            // onOrganicSuccess = this._nativeBridge.Monetization.CustomPurchasing.onTransactionComplete.subscribe((details) => {
-            //     this._nativeBridge.Monetization.CustomPurchasing.onTransactionError.unsubscribe(onError);
-            //     this._nativeBridge.Monetization.CustomPurchasing.onTransactionComplete.unsubscribe(onSuccess);
-            //     this._promoEvents.onOrganicPurchaseSuccess({
-            //                 store: this._promoEvents.getAppStoreFromReceipt(details.receipt),
-            //                 productId: details.productId,
-            //                 storeSpecificId: details.productId,
-            //                 amount: details.price,
-            //                 currency: details.currency,
-            //                 native: isNative
-            //             }, product.productType, details.receipt))
-            //             .then((body)=>{
-            //                 this._thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, Url.addParameters(url, {'native': isNative, 'iap_service': false}), JSON.stringify(body));
-            //             }) ;          
-            //     }
 
             onSuccess = this._nativeBridge.Monetization.CustomPurchasing.onTransactionComplete.subscribe((details) => {
                 this._nativeBridge.Monetization.CustomPurchasing.onTransactionError.unsubscribe(onError);
