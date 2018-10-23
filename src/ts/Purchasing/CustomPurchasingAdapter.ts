@@ -1,4 +1,4 @@
-import { IPurchasingAdapter, ITransactionDetails, IProduct, ITransactionErrorDetails } from 'Purchasing/PurchasingAdapter';
+import { IPurchasingAdapter, ITransactionDetails, IProduct, ITransactionErrorDetails, OrganicPurchase, IOrganicPurchase } from 'Purchasing/PurchasingAdapter';
 import { Observable1 } from 'Core/Utilities/Observable';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
@@ -8,6 +8,7 @@ import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Url } from 'Core/Utilities/Url';
 import { Request } from 'Core/Utilities/Request';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { StorageType } from 'Core/Native/Storage';
 
 export class CustomPurchasingAdapter implements IPurchasingAdapter {
     public readonly onCatalogRefreshed = new Observable1<IProduct[]>();
@@ -16,6 +17,9 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
     private _promoEvents: PromoEvents;
     private _products: {[productId: string]: IProduct};
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _organicPurchase: OrganicPurchase;
+    
+    private static InAppPurchaseStorageKey = 'iap.purchases';
 
     constructor(nativeBridge: NativeBridge, analyticsManager: AnalyticsManager | undefined, promoEvents: PromoEvents, request: Request) {
         this._nativeBridge = nativeBridge;
@@ -30,6 +34,17 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
         return Promise.resolve();
     }
 
+    private getOrganicPurchase(): Promise<void> {    
+        return this._nativeBridge.Storage.get(StorageType.PUBLIC, CustomPurchasingAdapter.InAppPurchaseStorageKey).then((data: any) => {
+            this._organicPurchase = new OrganicPurchase(this._nativeBridge, data[0]);
+            return Promise.resolve();
+        });
+    }
+
+    private resetMetaData(): Promise<void> {
+        return this._nativeBridge.Storage.delete(StorageType.PUBLIC, CustomPurchasingAdapter.InAppPurchaseStorageKey);
+    }
+    
     public refreshCatalog(): Promise<IProduct[]> {
         return new Promise<IProduct[]>((resolve, reject) => {
             const observer = this._nativeBridge.Monetization.CustomPurchasing.onProductsRetrieved.subscribe((products) => {
@@ -49,6 +64,24 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
         return new Promise<ITransactionDetails>((resolve, reject) => {
             let onError: IObserver1<ITransactionErrorDetails>;
             let onSuccess: IObserver1<ITransactionDetails>;
+            let onOrganicSuccess: IObserver1<ITransactionDetails>;
+
+            // onOrganicSuccess = this._nativeBridge.Monetization.CustomPurchasing.onTransactionComplete.subscribe((details) => {
+            //     this._nativeBridge.Monetization.CustomPurchasing.onTransactionError.unsubscribe(onError);
+            //     this._nativeBridge.Monetization.CustomPurchasing.onTransactionComplete.unsubscribe(onSuccess);
+            //     this._promoEvents.onOrganicPurchaseSuccess({
+            //                 store: this._promoEvents.getAppStoreFromReceipt(details.receipt),
+            //                 productId: details.productId,
+            //                 storeSpecificId: details.productId,
+            //                 amount: details.price,
+            //                 currency: details.currency,
+            //                 native: isNative
+            //             }, product.productType, details.receipt))
+            //             .then((body)=>{
+            //                 this._thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, Url.addParameters(url, {'native': isNative, 'iap_service': false}), JSON.stringify(body));
+            //             }) ;          
+            //     }
+
             onSuccess = this._nativeBridge.Monetization.CustomPurchasing.onTransactionComplete.subscribe((details) => {
                 this._nativeBridge.Monetization.CustomPurchasing.onTransactionError.unsubscribe(onError);
                 this._nativeBridge.Monetization.CustomPurchasing.onTransactionComplete.unsubscribe(onSuccess);
@@ -86,6 +119,7 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                         }
                     }
                 }
+            
                 resolve(details);
             });
             onError = this._nativeBridge.Monetization.CustomPurchasing.onTransactionError.subscribe((details) => {
@@ -130,7 +164,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
             this._nativeBridge.Monetization.CustomPurchasing.purchaseItem(productId, {}).catch(reject);
         });
     }
-
     public onPromoClosed(campaign: PromoCampaign) {
         // does nothing
     }
