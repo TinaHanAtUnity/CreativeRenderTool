@@ -19,8 +19,8 @@ export interface IPerformanceCampaign extends ICampaign {
     gameIcon: Image;
     rating: number;
     ratingCount: number;
-    landscapeImage: Image;
-    portraitImage: Image;
+    landscapeImage?: Image;
+    portraitImage?: Image;
     squareImage?: Image;
     video?: Video;
     streamingVideo?: Video;
@@ -47,8 +47,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             gameIcon: ['object'],
             rating: ['number'],
             ratingCount: ['number'],
-            landscapeImage: ['object'],
-            portraitImage: ['object'],
+            landscapeImage: ['object', 'undefined'],
+            portraitImage: ['object', 'undefined'],
             squareImage: ['object', 'undefined'],
             video: ['object', 'undefined'],
             streamingVideo: ['object', 'undefined'],
@@ -94,11 +94,11 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('ratingCount');
     }
 
-    public getPortrait(): Image {
+    public getPortrait(): Image | undefined {
         return this.get('portraitImage');
     }
 
-    public getLandscape(): Image {
+    public getLandscape(): Image | undefined {
         return this.get('landscapeImage');
     }
 

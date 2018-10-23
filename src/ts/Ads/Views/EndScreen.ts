@@ -2,13 +2,11 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHandler';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
-import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { ABGroup, ImprovedEndScreenStylesTest } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
-import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
 import EndScreenWithImprovedStylesTemplate from 'html/EndScreenWithImprovedStyles.html';
@@ -24,7 +22,6 @@ export interface IEndScreenParameters {
     adUnitStyle?: AdUnitStyle;
     campaignId?: string;
     osVersion?: string;
-    campaign?: Campaign;
 }
 
 export interface IEndScreenHandler extends IGDPREventHandler {
@@ -56,8 +53,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._showGDPRBanner = parameters.showGDPRBanner;
         this._campaignId = parameters.campaignId;
         this._osVersion = parameters.osVersion;
-
-        this._template = new Template(this.getTemplate(), this._localization);
 
         this._bindings = [
             {

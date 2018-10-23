@@ -1,5 +1,6 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { Template } from "../../Core/Utilities/Template";
 
 export class XPromoEndScreen extends EndScreen {
     private _campaign: XPromoCampaign;
@@ -7,6 +8,8 @@ export class XPromoEndScreen extends EndScreen {
     constructor(parameters: IEndScreenParameters, campaign: XPromoCampaign) {
         parameters.targetGameName = campaign.getGameName();
         super(parameters);
+
+        this._template = new Template(this.getTemplate(), this._localization);
 
         const adjustedRating: number = campaign.getRating() * 20;
         this._templateData = {

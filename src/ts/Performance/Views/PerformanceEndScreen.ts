@@ -1,7 +1,7 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { Campaign } from 'Ads/Models/Campaign';
 import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
+import { Template } from 'Core/Utilities/Template';
 
 const SQUARE_END_SCREEN = 'square-end-screen';
 
@@ -11,19 +11,25 @@ export class PerformanceEndScreen extends EndScreen {
     constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign) {
         super(parameters);
 
+        this._campaign = campaign;
+
+        this._template = new Template(this.getTemplate(), this._localization);
+
+        const portraitImage = campaign.getPortrait();
+        const landscapeImage = campaign.getLandscape();
+        const squareImage = campaign.getSquare();
         const adjustedRating: number = campaign.getRating() * 20;
         this._templateData = {
             'gameName': campaign.getGameName(),
             'gameIcon': campaign.getGameIcon().getUrl(),
             // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
-            'endScreenLandscape': campaign.getPortrait().getUrl(),
-            'endScreenPortrait': campaign.getLandscape().getUrl(),
+            'endScreenLandscape': portraitImage ? portraitImage.getUrl() : undefined,
+            'endScreenPortrait': landscapeImage ? landscapeImage.getUrl() : undefined,
+            'endScreenSquare': squareImage ? squareImage.getUrl() : undefined,
             'rating': adjustedRating.toString(),
             'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
-            'endscreenAlt': this.getEndscreenAlt(campaign)
+            'endscreenAlt': this.getEndscreenAlt()
         };
-
-        this._campaign = campaign;
     }
 
     protected onDownloadEvent(event: Event): void {
@@ -39,7 +45,7 @@ export class PerformanceEndScreen extends EndScreen {
         }));
     }
 
-    protected getEndscreenAlt(campaign?: Campaign): string | undefined {
+    protected getEndscreenAlt(): string | undefined {
         if (this._campaign.getSquare()) {
             return SQUARE_END_SCREEN;
         }

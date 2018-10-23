@@ -194,7 +194,6 @@ export class AdUnitFactory {
             adUnitStyle: undefined,
             campaignId: undefined,
             osVersion: undefined,
-            campaign: parameters.campaign
         };
     }
 
