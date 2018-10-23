@@ -290,7 +290,7 @@ export class PromoEvents {
 
     private getDeviceId(): string {
         const gdprEnabled: boolean = this.adsConfiguration.isOptOutEnabled() && this.adsConfiguration.isGDPREnabled();
-        if (gdprEnabled) {
+        if (!gdprEnabled) {
             if (this.deviceInfo instanceof AndroidDeviceInfo) {
                 return this.deviceInfo.getDevice();
             } else if (this.deviceInfo instanceof IosDeviceInfo) {

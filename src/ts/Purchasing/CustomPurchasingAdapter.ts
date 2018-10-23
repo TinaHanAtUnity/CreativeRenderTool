@@ -32,27 +32,12 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
         this._thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request, {});
 
         this.getOrganicPurchase();
-        this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
+        this._nativeBridge.Storage.onSet.subscribe(() => this.getOrganicPurchase());
        
     }
 
     public initialize() {
         return Promise.resolve();
-    }
-    
-    private onStorageSet(eventType: string, data: any){
-        this._nativeBridge.Sdk.logDebug('IAP::eventType ' + eventType);
-        this._nativeBridge.Sdk.logDebug('IAP::data ' + JSON.stringify(data));
-        // if(eventType === CustomPurchasingAdapter.InAppPurchaseStorageKey){
-        //     if(data && data.length && data.length > 0){
-        //         for(const event of data){
-        //             const organicPurchaseEvent = new OrganicPurchase(this._nativeBridge, event);
-        //             this.postOrganicPurchaseEvents(organicPurchaseEvent);
-        //         }
-        //         this.resetIAPPurchaseMetaData();
-        //     }   
-        // }
-        this.getOrganicPurchase();
     }
 
     private getOrganicPurchase(): Promise<void> {    
