@@ -41,7 +41,8 @@ export class CustomFeatures {
             || gameId === '2808037'
             || gameId === '2755670'
             || gameId === '2625701'
-            || gameId === '2625703';
+            || gameId === '2625703'
+            || gameId === '2845426';
     }
 
     public static isAlwaysAutobatching(gameId: string): boolean {
