@@ -7,28 +7,25 @@ import { WebView } from 'WebView';
 export class UnityAds {
 
     public static initialize(platform: Platform, gameId: string, listener: IUnityAdsListener, testMode: boolean = false) {
-        let backend: Backend;
         let nativeBridge: NativeBridge;
         switch(platform) {
             case Platform.ANDROID:
                 // todo: setting auto batching on causes some very weird behaviour with Node, should be investigated
-                backend = new Backend(Platform.ANDROID);
-                nativeBridge = new NativeBridge(backend, Platform.ANDROID, false);
-                backend.setNativeBridge(nativeBridge);
+                nativeBridge = new NativeBridge(UnityAds._backend, Platform.ANDROID, false);
+                UnityAds._backend.setNativeBridge(nativeBridge);
                 break;
 
             case Platform.IOS:
-                backend = new Backend(Platform.IOS);
-                nativeBridge = new NativeBridge(backend, Platform.IOS, false);
-                backend.setNativeBridge(nativeBridge);
+                nativeBridge = new NativeBridge(UnityAds._backend, Platform.IOS, false);
+                UnityAds._backend.setNativeBridge(nativeBridge);
                 break;
 
             default:
                 throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
         }
 
-        backend.Api.Sdk.setGameId(gameId);
-        backend.Api.Sdk.setTestMode(testMode);
+        UnityAds._backend.Api.Sdk.setGameId(gameId);
+        UnityAds._backend.Api.Sdk.setTestMode(testMode);
 
         UnityAds._listener = listener;
 
@@ -46,6 +43,15 @@ export class UnityAds {
         return UnityAds._listener;
     }
 
+    public static setBackend(backend: Backend) {
+        UnityAds._backend = backend;
+    }
+
+    public static getBackend() {
+        return UnityAds._backend;
+    }
+
+    private static _backend: Backend;
     private static _listener: IUnityAdsListener | undefined;
     private static _webView: WebView;
 
