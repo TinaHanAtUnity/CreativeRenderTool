@@ -189,23 +189,10 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private handleAppDownloadUrl(appDownloadUrl: string) {
         appDownloadUrl = decodeURIComponent(appDownloadUrl);
 
-        if (this._nativeBridge.getApiLevel() >= 21) {
-            // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
-            this._nativeBridge.Intent.launch({
-                'action': 'android.intent.action.WEB_SEARCH',
-                'extras': [
-                    {
-                        'key': 'query',
-                        'value': appDownloadUrl
-                    }
-                ]
-            });
-        } else {
-            this._nativeBridge.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': appDownloadUrl
-            });
-        }
+        this._nativeBridge.Intent.launch({
+            'action': 'android.intent.action.VIEW',
+            'uri': appDownloadUrl
+        });
     }
 
     private triggerDiagnosticsError(error: any, clickAttributionUrl: string) {
