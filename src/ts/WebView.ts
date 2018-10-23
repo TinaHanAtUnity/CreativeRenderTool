@@ -410,6 +410,11 @@ export class WebView {
             return;
         }
 
+        if (campaign instanceof PromoCampaign && campaign.getRequiredAssets().length === 0) {
+            this._nativeBridge.Sdk.logError('Show invocation failed: No creatives found for promo campaign');
+            return;
+        }
+
         SdkStats.sendShowEvent(placementId);
 
         if(campaign.isExpired()) {
