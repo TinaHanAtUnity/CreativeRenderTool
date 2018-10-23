@@ -67,9 +67,11 @@ $camera-permission-panel-height = 100vw;
     $iframe-default();
   }
 
+  // @stylint off
   .mraid-iframe-camera-permission-dialog {
     height: $camera-permission-panel-height !important;
   }
+  // @stylint on
 
   .close-region {
     $iframe-close-region-default();
@@ -339,10 +341,13 @@ $camera-permission-panel-height = 100vw;
 
 .landscape {
   #playable-mraid {
+
+    // @stylint off
     .mraid-iframe-camera-permission-dialog {
-      width: 100vh !important;
-      height: 100vh !important; 
+      width: 100vh !important; @stylint off
+      height: 100vh !important; @stylint off
     }
+    // @stylint on
 
     .camera-permission-panel {
       position: absolute;
