@@ -6,8 +6,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
@@ -212,11 +210,8 @@ export class OldCampaignRefreshManager extends RefreshManager {
         PurchasingUtilities.addCampaignPlacementIds(placementId, campaign);
         this._parsingErrorCount = 0;
         const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
-        const isMixedPlacementExperiment = CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId());
-        const shouldFillMixedPlacement = MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign);
-        const shouldNoFillMixedPlacement = isMixedPlacementExperiment && !shouldFillMixedPlacement;
 
-        if (shouldNoFillMixedPlacement || isPromoWithoutProduct) {
+        if (isPromoWithoutProduct) {
             this.onNoFill(placementId);
         } else {
             this.setPlacementReady(placementId, campaign);

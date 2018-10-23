@@ -11,7 +11,6 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
-import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
@@ -263,9 +262,6 @@ export class CampaignManager {
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
-            if(CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-                json.placements = MixedPlacementUtility.insertMediaIdsIntoJSON(this._adsConfig, json.placements);
-            }
 
             const placements = this._adsConfig.getPlacements();
             for(const placement in placements) {
@@ -672,13 +668,7 @@ export class CampaignManager {
                     body.frameworkVersion = framework.getVersion();
                 }
 
-                let placements: { [id: string]: Placement } = {};
-
-                if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-                    placements = MixedPlacementUtility.originalPlacements;
-                } else {
-                    placements = this._adsConfig.getPlacements();
-                }
+                const placements = this._adsConfig.getPlacements();
 
                 Object.keys(placements).forEach((placementId) => {
                     const placement = placements[placementId];
