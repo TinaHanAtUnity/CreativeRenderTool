@@ -1,5 +1,6 @@
 import { CacheError, CacheEvent, IFileInfo } from 'Core/Native/Cache';
 import { BackendApi } from '../BackendApi';
+import { VideoMetadata } from '../../Core/Constants/Android/VideoMetadata';
 
 export class Cache extends BackendApi {
 
@@ -22,7 +23,7 @@ export class Cache extends BackendApi {
             return Promise.reject(CacheError[CacheError.FILE_ALREADY_CACHING]);
         }
 
-        this.addFile(fileId, 123, 123);
+        this.addFile(fileId, 123, 1445875);
 
         if(this._internet) {
             this._currentFile = url;
@@ -104,7 +105,7 @@ export class Cache extends BackendApi {
     }
 
     public addPreviouslyDownloadedFile(url: string) {
-        this.addFile(this.getHashDirect(url) + '.' + this.getExtension(url), 123, 123);
+        this.addFile(this.getHashDirect(url) + '.' + this.getExtension(url), 123, 1445875);
     }
 
     public getDownloadedFilesCount(): number {
@@ -123,6 +124,35 @@ export class Cache extends BackendApi {
 
     public setFreeSpace(freeSpace: number) {
         this._freeSpace = freeSpace;
+    }
+
+    public getVideoInfo(fileId: string) {
+        return [640, 360, 10000];
+    }
+
+    public getMetaData(fileId: string, metadatas: number[]) {
+        const retValue = [];
+
+        for(const metadata of metadatas) {
+            switch(metadata) {
+                case VideoMetadata.METADATA_KEY_VIDEO_WIDTH:
+                    retValue.push([VideoMetadata.METADATA_KEY_VIDEO_WIDTH, 640]);
+                    break;
+
+                case VideoMetadata.METADATA_KEY_VIDEO_HEIGHT:
+                    retValue.push([VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, 360]);
+                    break;
+
+                case VideoMetadata.METADATA_KEY_DURATION:
+                    retValue.push([VideoMetadata.METADATA_KEY_DURATION, 10000]);
+                    break;
+
+                default:
+                // error handling not implemented
+            }
+        }
+
+        return retValue;
     }
 
 }

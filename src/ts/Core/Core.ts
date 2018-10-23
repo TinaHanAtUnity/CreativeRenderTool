@@ -43,6 +43,8 @@ import { AndroidPreferencesApi } from 'Core/Native/Android/Preferences';
 import { IosPreferencesApi } from 'Core/Native/iOS/Preferences';
 import { StorageBridge } from './Utilities/StorageBridge';
 import { ICore, ICoreApi } from './ICore';
+import { Analytics } from '../Analytics/Analytics';
+import { Ads } from '../Ads/Ads';
 
 export class Core implements ICore {
 
@@ -64,6 +66,9 @@ export class Core implements ICore {
     public ClientInfo: ClientInfo;
     public DeviceInfo: DeviceInfo;
     public Config: CoreConfiguration;
+
+    public Analytics: Analytics;
+    public Ads: Ads;
 
     private _initialized = false;
     private _initializedAt: number;
@@ -161,13 +166,13 @@ export class Core implements ICore {
                 this.JaegerManager.stop(configSpan);
             });
 
-            configPromise = configPromise.then((configJson: any): [CoreConfiguration] => {
+            configPromise = configPromise.then((configJson: any): [any, CoreConfiguration] => {
                 const coreConfig = CoreConfigurationParser.parse(configJson);
                 this.Api.Sdk.logInfo('Received configuration token ' + coreConfig.getToken() + ' (A/B group ' + coreConfig.getAbGroup() + ')');
                 if(this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo.getLimitAdTracking()) {
                     this.ConfigManager.storeGamerToken(configJson.token);
                 }
-                return [coreConfig];
+                return [configJson, coreConfig];
             }).catch((error: any) => {
                 configSpan.addTag(JaegerTags.Error, 'true');
                 configSpan.addTag(JaegerTags.ErrorMessage, error.message);
@@ -182,7 +187,7 @@ export class Core implements ICore {
             });
 
             return Promise.all([configPromise, cachePromise]);
-        }).then(([[coreConfig, adsConfig]]) => {
+        }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
 
             HttpKafka.setConfiguration(this.Config);
@@ -193,6 +198,10 @@ export class Core implements ICore {
                 error.name = 'DisabledGame';
                 throw error;
             }
+
+            this.Analytics = new Analytics(this);
+            this.Ads = new Ads(configJson, this, this.Analytics);
+            return this.Ads.initialize(jaegerInitSpan);
         }).then(() => {
             this._initialized = true;
             this._initializedAt = Date.now();

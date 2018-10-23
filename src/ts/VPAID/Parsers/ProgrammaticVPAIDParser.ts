@@ -12,6 +12,8 @@ import { ICoreApi } from 'Core/ICore';
 
 export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
 
+    public static ContentType = 'programmatic/vast-vpaid';
+
     private _vpaidParser: VPAIDParser = new VPAIDParser();
 
     public getContentTypes() {

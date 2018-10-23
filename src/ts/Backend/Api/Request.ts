@@ -4,6 +4,7 @@ export class Request extends BackendApi {
 
     private _retryCount: number = 0;
     private _toggleUrl: boolean = false;
+    private _passthrough = false;
 
     public getLog() {
         return this._requestLog;
@@ -14,6 +15,17 @@ export class Request extends BackendApi {
     }
 
     public get(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
+        if(this._passthrough) {
+            this._requestLog.push(url);
+            const xhr = new XMLHttpRequest();
+            xhr.onload = (event: Event) => {
+                this._backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
+            };
+            xhr.open('GET', url);
+            xhr.send();
+            return;
+        }
+
         if(url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
         } else if(url.indexOf('/fail') !== -1) {
@@ -60,6 +72,17 @@ export class Request extends BackendApi {
     }
 
     public head(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
+        if(this._passthrough) {
+            this._requestLog.push(url);
+            const xhr = new XMLHttpRequest();
+            xhr.onload = (event: Event) => {
+                this._backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
+            };
+            xhr.open('HEAD', url);
+            xhr.send();
+            return;
+        }
+
         if (url.indexOf('/responsecode') !== -1) {
             const responseCodes = url.match(/3[0-9]{2}/);
             if (responseCodes && responseCodes.length > 0) {
@@ -74,6 +97,17 @@ export class Request extends BackendApi {
     }
 
     public post(id: string, url: string, body: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
+        if(this._passthrough) {
+            this._requestLog.push(url);
+            const xhr = new XMLHttpRequest();
+            xhr.onload = (event: Event) => {
+                this._backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
+            };
+            xhr.open('POST', url);
+            xhr.send(body);
+            return;
+        }
+
         if(url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
         } else if(url.indexOf('/fail') !== -1) {
@@ -109,6 +143,10 @@ export class Request extends BackendApi {
 
     public setKeepAliveTime(keepAliveTime: number) {
         return;
+    }
+
+    public setPassthrough(value: boolean) {
+        this._passthrough = value;
     }
 
     private _requestLog: string[] = [];

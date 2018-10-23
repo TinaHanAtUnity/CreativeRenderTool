@@ -12,19 +12,11 @@ export class VideoPlayer extends BackendApi {
         }
 
         if('exec' in window) {
-            // tslint:disable:no-string-literal
-            const exec = (<any>window)['exec'];
-            exec('curl -s "' + url + '" | exiftool -j -').then((result: any) => {
-                const stdout: string = result.stdout;
-                const stream = JSON.parse(stdout)[0];
-                const duration = this._duration = Math.round(parseFloat(stream.Duration) * 1000);
-                const splitImageSize = stream.ImageSize.split('x');
-                const width = this._width = splitImageSize[0];
-                const height = this._height = splitImageSize[1];
-                this._url = url;
-                this._backend.sendEvent('VIDEOPLAYER', 'PREPARED', url, duration, width, height);
-            });
-            // tslint:enable:no-string-literal
+            this._duration = 30000;
+            this._width = 480;
+            this._height = 360;
+            this._url = url;
+            this._backend.sendEvent('VIDEOPLAYER', 'PREPARED', url, this._duration, this._width, this._height);
         } else {
             let videoView = this._videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
             if(!videoView) {

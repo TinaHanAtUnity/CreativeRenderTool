@@ -7,6 +7,11 @@ export class VAST implements IParserModule {
     private readonly _parser: ProgrammaticVastParser;
     private readonly _adUnitFactory: VastAdUnitFactory;
 
+    constructor() {
+        this._parser = new ProgrammaticVastParser();
+        this._adUnitFactory = new VastAdUnitFactory();
+    }
+
     public canParse(contentType: string) {
         return contentType === ProgrammaticVastParser.ContentType;
     }

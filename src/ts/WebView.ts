@@ -1,14 +1,10 @@
 import { INativeCallback, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Core } from 'Core/Core';
-import { Analytics } from 'Analytics/Analytics';
-import { Ads } from 'Ads/Ads';
 
 export class WebView {
 
     private readonly _core: Core;
-    private readonly _analytics: Analytics;
-    private readonly _ads: Ads;
 
     constructor(nativeBridge: NativeBridge) {
         if(window && window.addEventListener) {
@@ -16,8 +12,6 @@ export class WebView {
         }
 
         this._core = new Core(nativeBridge);
-        this._analytics = new Analytics(this._core);
-        this._ads = new Ads(this._core, this._analytics);
     }
 
     public initialize() {
@@ -25,15 +19,15 @@ export class WebView {
     }
 
     public show(placementId: string, options: any, callback: INativeCallback): void {
-        this._ads.show(placementId, options, callback);
+        this._core.Ads.show(placementId, options, callback);
     }
 
     public showBanner(placementId: string, callback: INativeCallback) {
-        this._ads.showBanner(placementId, callback);
+        this._core.Ads.showBanner(placementId, callback);
     }
 
     public hideBanner(callback: INativeCallback) {
-        this._ads.hideBanner(callback);
+        this._core.Ads.hideBanner(callback);
     }
 
     private onError(event: ErrorEvent): boolean {

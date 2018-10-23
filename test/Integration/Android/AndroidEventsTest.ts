@@ -116,6 +116,7 @@ describe('AndroidEventsTest', () => {
 
         UnityAds.setBackend(new Backend(Platform.ANDROID));
 
+        UnityAds.getBackend().Api.Request.setPassthrough(true);
         UnityAds.getBackend().Api.Request.setLog([]);
 
         UnityAds.getBackend().Api.DeviceInfo.setAdvertisingTrackingId('78db88cb-2026-4423-bfe0-07e9ed2701c3');

@@ -5,6 +5,7 @@ import { SystemUiVisibility } from 'Core/Constants/Android/SystemUiVisibility';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1, Observable2, Observable5 } from 'Core/Utilities/Observable';
+import { EventCategory } from '../../../Core/Constants/EventCategory';
 
 enum AdUnitEvent {
     ON_START,
@@ -58,7 +59,7 @@ export class AndroidAdUnitApi extends NativeApi {
     public readonly onFocusLost = new Observable1<number>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AdUnit', ApiPackage.ADS);
+        super(nativeBridge, 'AdUnit', ApiPackage.ADS, EventCategory.ADUNIT);
     }
 
     public open(activityId: number, views: string[], orientation: ScreenOrientation, keyEvents: number[] = [], systemUiVisibility: SystemUiVisibility = 0, hardwareAccel: boolean = true, isTransparent: boolean = false): Promise<void> {

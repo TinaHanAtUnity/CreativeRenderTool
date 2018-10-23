@@ -37,7 +37,8 @@ describe('IosIntegrationTest', () => {
             }
         };
 
-        UnityAds.setBackend(new Backend(Platform.ANDROID));
+        UnityAds.setBackend(new Backend(Platform.IOS));
+        UnityAds.getBackend().Api.Request.setPassthrough(true);
 
         UnityAds.getBackend().Api.DeviceInfo.setAdvertisingTrackingId('DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21');
         UnityAds.getBackend().Api.DeviceInfo.setManufacturer('Apple');

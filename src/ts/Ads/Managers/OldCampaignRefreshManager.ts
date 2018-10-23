@@ -234,7 +234,9 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     private onCampaign(placementId: string, campaign: Campaign) {
-        PurchasingUtilities.addCampaignPlacementIds(placementId, campaign);
+        if(PurchasingUtilities.isInitialized()) {
+            PurchasingUtilities.addCampaignPlacementIds(placementId, campaign);
+        }
         this._parsingErrorCount = 0;
         const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
         const isMixedPlacementExperiment = CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId());

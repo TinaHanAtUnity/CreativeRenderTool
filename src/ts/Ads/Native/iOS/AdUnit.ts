@@ -3,6 +3,7 @@ import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
 import { Observable0 } from 'Core/Utilities/Observable';
+import { EventCategory } from '../../../Core/Constants/EventCategory';
 
 enum AdUnitEvent {
     VIEW_CONTROLLER_INIT,
@@ -29,7 +30,7 @@ export class IosAdUnitApi extends NativeApi {
     public readonly onViewControllerDidReceiveMemoryWarning = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AdUnit', ApiPackage.ADS);
+        super(nativeBridge, 'AdUnit', ApiPackage.ADS, EventCategory.ADUNIT);
     }
 
     public open(view: string[], supportedOrientations: UIInterfaceOrientationMask, statusBarHidden: boolean, shouldAutorotate: boolean, isTransparent: boolean, withAnimation: boolean): Promise<void> {

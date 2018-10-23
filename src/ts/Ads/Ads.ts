@@ -70,6 +70,7 @@ import { VPAID } from '../VPAID/VPAID';
 import { XPromo } from '../XPromo/XPromo';
 import { IAds, IAdsApi } from './IAds';
 import { IAnalytics } from '../Analytics/IAnalytics';
+import { AdsConfigurationParser } from './Parsers/AdsConfigurationParser';
 
 export class Ads implements IAds {
 
@@ -105,7 +106,8 @@ export class Ads implements IAds {
     private _core: ICore;
     private _analytics: IAnalytics;
 
-    constructor(core: ICore, analytics: IAnalytics) {
+    constructor(config: any, core: ICore, analytics: IAnalytics) {
+        this.Config = AdsConfigurationParser.parse(config, core.ClientInfo);
         this._core = core;
         this._analytics = analytics;
 

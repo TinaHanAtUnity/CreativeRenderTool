@@ -31,6 +31,8 @@ import { JaegerManager } from './Managers/JaegerManager';
 import { ClientInfo } from './Models/ClientInfo';
 import { DeviceInfo } from './Models/DeviceInfo';
 import { CoreConfiguration } from './Models/CoreConfiguration';
+import { IAds } from '../Ads/IAds';
+import { IAnalytics } from '../Analytics/IAnalytics';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -73,4 +75,6 @@ export interface ICore extends IApiModule {
     ClientInfo: ClientInfo;
     DeviceInfo: DeviceInfo;
     Config: CoreConfiguration;
+    Ads: IAds;
+    Analytics: IAnalytics;
 }

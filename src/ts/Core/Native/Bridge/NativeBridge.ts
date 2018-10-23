@@ -133,7 +133,7 @@ export class NativeBridge implements INativeBridge {
     }
 
     public setAutoBatchEnabled(enabled: boolean) {
-        this._autoBatchEnabled = enabled;
+        this._autoBatchEnabled = false;
     }
 
     private invokeBatch(batch: BatchInvocation): void {

@@ -84,7 +84,7 @@ export class ConfigManager {
                             configUrl: url,
                             configResponse: response.response
                         });
-                        this._core.Sdk.logError('Config request failed ' + error);
+                        this._core.Sdk.logError('Config request failed ' + JSON.stringify(error));
                         throw new Error(error);
                     }
                 }).catch(error => {

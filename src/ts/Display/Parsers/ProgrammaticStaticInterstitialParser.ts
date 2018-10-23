@@ -20,10 +20,10 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     }
 
     public getContentTypes() {
-        return [
-            ProgrammaticStaticInterstitialParser.ContentTypeHtml,
-            ProgrammaticStaticInterstitialParser.ContentTypeJs
-        ];
+        if(this._wrapWithScriptTag) {
+            return [ProgrammaticStaticInterstitialParser.ContentTypeJs];
+        }
+        return [ProgrammaticStaticInterstitialParser.ContentTypeHtml];
     }
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
