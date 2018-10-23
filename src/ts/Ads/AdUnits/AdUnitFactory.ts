@@ -193,7 +193,8 @@ export class AdUnitFactory {
             showGDPRBanner: showGDPRBanner,
             adUnitStyle: undefined,
             campaignId: undefined,
-            osVersion: undefined
+            osVersion: undefined,
+            campaign: parameters.campaign
         };
     }
 
