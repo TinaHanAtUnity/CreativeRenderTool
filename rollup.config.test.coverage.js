@@ -16,7 +16,7 @@ export default {
     plugins: plugins.concat([
         istanbul({
             include: [
-                'build/src/ts/Core/**/*.js'
+                'build/src/ts/**/*.js'
             ]
         })
     ]),
