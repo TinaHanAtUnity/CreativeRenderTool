@@ -60,8 +60,8 @@ export class PurchasingUtilities {
         return this._isInitialized;
     }
 
-    public static onPurchase(productId: string, campaign: PromoCampaign, placementId: string) {
-        return this._purchasingAdapter.purchaseItem(productId, campaign, placementId);
+    public static onPurchase(productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean = false) {
+        return this._purchasingAdapter.purchaseItem(productId, campaign, placementId, isNative);
     }
     public static onPromoClosed(campaign: PromoCampaign, placementId: string): void {
         this._purchasingAdapter.onPromoClosed(campaign, placementId);

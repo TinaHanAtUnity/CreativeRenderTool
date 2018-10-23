@@ -7,10 +7,6 @@ export class CustomFeatures {
         return gameId === '1300023' || gameId === '1300024';
     }
 
-    public static isMixedPlacementExperiment(gameId: string): boolean {
-        return false;
-    }
-
     public static isSonicPlayable(creativeId: string | undefined) {
         return  creativeId === '109455881' ||
                 creativeId === '109455877' ||

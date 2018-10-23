@@ -2,7 +2,7 @@ import { IPurchasingAdapter, ITransactionDetails, IProduct, ITransactionErrorDet
 import { Observable1 } from 'Core/Utilities/Observable';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { IObserver2, IObserver1 } from 'Core/Utilities/IObserver';
+import { IObserver1 } from 'Core/Utilities/IObserver';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Url } from 'Core/Utilities/Url';
@@ -16,9 +16,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
     private _promoEvents: PromoEvents;
     private _products: {[productId: string]: IProduct};
     private _thirdPartyEventManager: ThirdPartyEventManager;
-
-    private static purchasePathRegex = new RegExp('events\/v1\/purchase');
-    private static purchaseHostnameRegex = new RegExp('events\.iap\.unity3d\.com');
 
     constructor(nativeBridge: NativeBridge, analyticsManager: AnalyticsManager | undefined, promoEvents: PromoEvents, request: Request) {
         this._nativeBridge = nativeBridge;
@@ -48,7 +45,7 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
         });
     }
 
-    public purchaseItem(productId: string, campaign: PromoCampaign, placementId: string): Promise<ITransactionDetails> {
+    public purchaseItem(productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails> {
         return new Promise<ITransactionDetails>((resolve, reject) => {
             let onError: IObserver1<ITransactionErrorDetails>;
             let onSuccess: IObserver1<ITransactionDetails>;
@@ -71,16 +68,17 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                         for (const url of purchaseEventUrls) {
                             const urlData = Url.parse(url);
                             const sessionId = campaign.getSession().getId();
-                            if (CustomPurchasingAdapter.purchaseHostnameRegex.test(urlData.hostname) && CustomPurchasingAdapter.purchasePathRegex.test(urlData.pathname)) {
-                                this._promoEvents.onPurchaseSuccess(url, {
-                                    store: '', // TODO // fill from details.receipt
+                            if (PromoEvents.purchaseHostnameRegex.test(urlData.hostname) && PromoEvents.purchasePathRegex.test(urlData.pathname)) {
+                                this._promoEvents.onPurchaseSuccess({
+                                    store: this._promoEvents.getAppStoreFromReceipt(details.receipt),
                                     productId: details.productId,
                                     storeSpecificId: details.productId,
                                     amount: details.price,
-                                    currency: details.currency
+                                    currency: details.currency,
+                                    native: isNative
                                 }, product.productType, details.receipt)
                                 .then((body) => {
-                                    this._thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, url, JSON.stringify(body));
+                                    this._thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, Url.addParameters(url, {'native': isNative, 'iap_service': false}), JSON.stringify(body));
                                 });
                             } else {
                                 this._thirdPartyEventManager.sendWithGet(purchaseKey, sessionId, url);
@@ -109,16 +107,17 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                         for (const url of purchaseEventUrls) {
                             const urlData = Url.parse(url);
                             const sessionId = campaign.getSession().getId();
-                            if (CustomPurchasingAdapter.purchaseHostnameRegex.test(urlData.hostname) && CustomPurchasingAdapter.purchasePathRegex.test(urlData.pathname)) {
-                                this._promoEvents.onPurchaseFailed(url, {
+                            if (PromoEvents.purchaseHostnameRegex.test(urlData.hostname) && PromoEvents.purchasePathRegex.test(urlData.pathname)) {
+                                this._promoEvents.onPurchaseFailed({
                                     store: details.store,
                                     productId: productId,
                                     storeSpecificId: productId,
                                     amount: product.localizedPrice,
-                                    currency: product.isoCurrencyCode
+                                    currency: product.isoCurrencyCode,
+                                    native: isNative
                                 }, this._promoEvents.failureJson(details.storeSpecificErrorCode, details.exceptionMessage, AnalyticsManager.getPurchasingFailureReason(details.transactionError), productId))
                                 .then((body) => {
-                                    this._thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, url, JSON.stringify(body));
+                                    this._thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, Url.addParameters(url, {'native': isNative, 'iap_service': false}), JSON.stringify(body));
                                 });
                             } else {
                                 this._thirdPartyEventManager.sendWithGet(purchaseKey, sessionId, url);

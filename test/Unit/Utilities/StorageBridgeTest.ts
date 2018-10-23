@@ -1,33 +1,11 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { StorageType } from 'Core/Native/Storage';
 import { StorageOperation } from 'Core/Utilities/StorageOperation';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-
-class TestHelper {
-    public static waitForPublicStorageBatch(storageBridge: StorageBridge): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const storageObserver = () => {
-                storageBridge.onPublicStorageWrite.unsubscribe(storageObserver);
-                resolve();
-            };
-            storageBridge.onPublicStorageWrite.subscribe(storageObserver);
-        });
-    }
-
-    public static waitForPrivateStorageBatch(storageBridge: StorageBridge): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const storageObserver = () => {
-                storageBridge.onPrivateStorageWrite.unsubscribe(storageObserver);
-                resolve();
-            };
-            storageBridge.onPrivateStorageWrite.subscribe(storageObserver);
-        });
-    }
-}
+import { StorageBridgeHelper } from 'TestHelpers/StorageBridgeHelper';
 
 describe('StorageBridgeTest', () => {
     let nativeBridge: NativeBridge;
@@ -67,7 +45,7 @@ describe('StorageBridgeTest', () => {
         const testKey: string = 'testKey';
         const testValue: string = 'testValue';
 
-        const storagePromise = TestHelper.waitForPublicStorageBatch(storageBridge);
+        const storagePromise = StorageBridgeHelper.waitForPublicStorageBatch(storageBridge);
 
         const operation = new StorageOperation(StorageType.PUBLIC);
         operation.set(testKey, testValue);
@@ -82,7 +60,7 @@ describe('StorageBridgeTest', () => {
     it('should execute one delete to public storage', () => {
         const testKey: string = 'testKey';
 
-        const storagePromise = TestHelper.waitForPublicStorageBatch(storageBridge);
+        const storagePromise = StorageBridgeHelper.waitForPublicStorageBatch(storageBridge);
 
         const operation = new StorageOperation(StorageType.PUBLIC);
         operation.delete(testKey);
@@ -98,7 +76,7 @@ describe('StorageBridgeTest', () => {
         const testKey: string = 'testKey';
         const testValue: string = 'testValue';
 
-        const storagePromise = TestHelper.waitForPrivateStorageBatch(storageBridge);
+        const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
 
         const operation = new StorageOperation(StorageType.PRIVATE);
         operation.set(testKey, testValue);
@@ -113,7 +91,7 @@ describe('StorageBridgeTest', () => {
     it('should execute one delete to private storage', () => {
         const testKey: string = 'testKey';
 
-        const storagePromise = TestHelper.waitForPrivateStorageBatch(storageBridge);
+        const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
 
         const operation = new StorageOperation(StorageType.PRIVATE);
         operation.delete(testKey);
@@ -132,7 +110,7 @@ describe('StorageBridgeTest', () => {
         const setValueTwo: string = 'setValueTwo';
         const deleteKey: string = 'deleteKey';
 
-        const storagePromise = TestHelper.waitForPublicStorageBatch(storageBridge);
+        const storagePromise = StorageBridgeHelper.waitForPublicStorageBatch(storageBridge);
 
         const setOperation = new StorageOperation(StorageType.PUBLIC);
         setOperation.set(setKeyOne, setValueOne);
@@ -158,7 +136,7 @@ describe('StorageBridgeTest', () => {
         const setValueTwo: string = 'setValueTwo';
         const deleteKey: string = 'deleteKey';
 
-        const storagePromise = TestHelper.waitForPrivateStorageBatch(storageBridge);
+        const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
 
         const setOperation = new StorageOperation(StorageType.PRIVATE);
         setOperation.set(setKeyOne, setValueOne);
@@ -182,8 +160,8 @@ describe('StorageBridgeTest', () => {
         const setValue: string = 'setValue';
         const deleteKey: string = 'deleteKey';
 
-        const publicStoragePromise = TestHelper.waitForPublicStorageBatch(storageBridge);
-        const privateStoragePromise = TestHelper.waitForPrivateStorageBatch(storageBridge);
+        const publicStoragePromise = StorageBridgeHelper.waitForPublicStorageBatch(storageBridge);
+        const privateStoragePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
 
         const privateOperation = new StorageOperation(StorageType.PRIVATE);
         privateOperation.set(setKey, setValue);

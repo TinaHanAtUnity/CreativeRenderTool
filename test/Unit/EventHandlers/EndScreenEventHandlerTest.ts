@@ -37,7 +37,10 @@ describe('EndScreenEventHandlerTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, container: AdUnitContainer, overlay: Overlay, endScreen: PerformanceEndScreen;
+    let nativeBridge: NativeBridge;
+    let container: AdUnitContainer;
+    let overlay: Overlay;
+    let endScreen: PerformanceEndScreen;
     let storageBridge: StorageBridge;
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;
