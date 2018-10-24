@@ -10,6 +10,7 @@ import { Localization } from 'Core/Utilities/Localization';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
 import EndScreenWithImprovedStylesTemplate from 'html/EndScreenWithImprovedStyles.html';
+import { Platform } from 'Core/Constants/Platform';
 
 export interface IEndScreenParameters {
     nativeBridge: NativeBridge;
@@ -112,6 +113,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         if (ImprovedEndScreenStylesTest.isValid(this._abGroup)) {
             this._container.classList.add('improved-endscreen-styles-test');
+        }
+
+        // Android <= 4.4.4
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() <= 19) {
+            this._container.classList.add('old-androids');
         }
     }
 
