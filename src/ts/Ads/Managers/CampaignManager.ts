@@ -42,6 +42,8 @@ import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
+import { CampaignError } from 'Ads/Errors/CampaignError';
 
 export class CampaignManager {
 
@@ -421,7 +423,7 @@ export class CampaignManager {
                                 return this.handleError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), fill[mediaId], 'campaign_caching_get_file_path_failed', session);
                             }
 
-                            return this.handleError(error, fill[mediaId], 'handle_campaign_error', session);
+                            return this.handleCampaignError(auctionResponse.getContentType(), error, fill[mediaId], session);
                         }));
                     } catch(error) {
                         fill[mediaId].forEach(placement => {
@@ -620,6 +622,19 @@ export class CampaignManager {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
         if (!this._ignoreEvents) {
             this.onError.trigger(error, placementIds, diagnosticsType, session);
+        }
+
+        return Promise.resolve();
+    }
+
+    private handleCampaignError(contentType: string, campaignError: CampaignError, placementIds: string[], session?: Session): Promise<void> {
+        this._nativeBridge.Sdk.logDebug(`Handle Campaign error - contentType: ${contentType}`);
+        if (!this._ignoreEvents) {
+            this.onError.trigger(campaignError, placementIds, `handle_campaign_error_${contentType.replace('/', '_')}`, session);
+        }
+        const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._nativeBridge, this._request);
+        if (campaignErrorHandler) {
+            campaignErrorHandler.sendErrorEventWithRequest(campaignError);
         }
 
         return Promise.resolve();

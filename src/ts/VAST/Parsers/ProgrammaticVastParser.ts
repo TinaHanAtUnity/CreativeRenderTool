@@ -14,6 +14,8 @@ import { VastParser } from 'VAST/Utilities/VastParser';
 import { VastErrorHandler, VastErrorCode, VastErrorMessage } from 'VAST/EventHandlers/VastErrorHandler';
 import { Url } from 'Core/Utilities/Url';
 import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
+import { CampaignError } from 'Ads/Errors/CampaignError';
+import { VastErrorInfo } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 
 export class ProgrammaticVastParser extends CampaignParser {
     public static ContentType = 'programmatic/vast';
@@ -72,11 +74,13 @@ export class ProgrammaticVastParser extends CampaignParser {
             mediaVideoUrl = VastMediaSelector.getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
         }
 
+        let errorTrackingUrl;
+        if (vast.getErrorURLTemplate()) {
+            errorTrackingUrl = vast.getErrorURLTemplate()!;
+        }
+
         if (!mediaVideoUrl) {
-            if (this._isErrorTrackingExperiment) {
-                VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_NOT_FOUND);
-            }
-            throw new Error(VastErrorMessage.MEDIA_FILE_NOT_FOUND);
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.XML_PARSER_ERROR], ProgrammaticVastParser.ContentType, errorTrackingUrl, VastErrorCode.XML_PARSER_ERROR);
         }
 
         if (nativeBridge.getPlatform() === Platform.IOS && !mediaVideoUrl.match(/^https:\/\//)) {

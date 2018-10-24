@@ -27,7 +27,8 @@ export enum VastErrorCode {
     COMPANION_UNABLE_TO_FETCH = 603,
     COMPANION_RESOURCE_NOT_FOUND = 604,
     UNDEFINED_ERROR = 900,
-    GENERAL_VPAID_ERROR = 901
+    GENERAL_VPAID_ERROR = 901,
+    UNKNOWN_ERROR = 9999
 }
 
 export enum VastErrorMessage {
