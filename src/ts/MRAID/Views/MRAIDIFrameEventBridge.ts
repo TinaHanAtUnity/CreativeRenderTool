@@ -117,9 +117,9 @@ export class MraidIFrameEventBridge {
     }
 
     private postMessage(event: string, data?: any) {
-        this._iframe.contentWindow!.postMessage({
-            type: event,
-            value: data
-        }, '*');
+        // this._iframe.contentWindow!.postMessage({
+        //     type: event,
+        //     value: data
+        // }, '*');
     }
 }
