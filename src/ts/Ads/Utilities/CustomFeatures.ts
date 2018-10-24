@@ -7,10 +7,6 @@ export class CustomFeatures {
         return gameId === '1300023' || gameId === '1300024';
     }
 
-    public static isMixedPlacementExperiment(gameId: string): boolean {
-        return false;
-    }
-
     public static isSonicPlayable(creativeId: string | undefined) {
         return  creativeId === '109455881' ||
                 creativeId === '109455877' ||
@@ -45,7 +41,8 @@ export class CustomFeatures {
             || gameId === '2808037'
             || gameId === '2755670'
             || gameId === '2625701'
-            || gameId === '2625703';
+            || gameId === '2625703'
+            || gameId === '2845426';
     }
 
     public static isAlwaysAutobatching(gameId: string): boolean {
