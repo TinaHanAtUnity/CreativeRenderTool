@@ -54,7 +54,6 @@ export class PerformanceOverlayEventHandlerWithAllowSkip extends PerformanceOver
 
     // This is used by the Android backbutton when skipping the video
     protected canSkipVideo(): boolean {
-        // TODO: Is there a lot of non-rewarded videos that have no skip rule and does it matter if we override it?
         if (!this._adUnit.isShowing() || !this._adUnit.canPlayVideo()) {
             return false;
         }
