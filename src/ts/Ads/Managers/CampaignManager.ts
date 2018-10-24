@@ -9,7 +9,6 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
@@ -419,7 +418,7 @@ export class CampaignManager {
                                 return this.handleError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), fill[mediaId], 'campaign_caching_get_file_path_failed', session);
                             }
 
-                            return this.handleCampaignError(auctionResponse.getContentType(), error, fill[mediaId], session);
+                            return this.handleParseCampaignError(auctionResponse.getContentType(), error, fill[mediaId], session);
                         }));
                     } catch(error) {
                         fill[mediaId].forEach(placement => {
@@ -623,11 +622,9 @@ export class CampaignManager {
         return Promise.resolve();
     }
 
-    private handleCampaignError(contentType: string, campaignError: CampaignError, placementIds: string[], session?: Session): Promise<void> {
-        this._nativeBridge.Sdk.logDebug(`Handle Campaign error - contentType: ${contentType}`);
-        if (!this._ignoreEvents) {
-            this.onError.trigger(campaignError, placementIds, `handle_campaign_error_${contentType.replace('/', '_')}`, session);
-        }
+    private handleParseCampaignError(contentType: string, campaignError: CampaignError, placementIds: string[], session?: Session): Promise<void> {
+        this.handleError(campaignError, placementIds, `parse_campaign_${contentType.replace('/', '_')}_error`, session);
+
         const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._nativeBridge, this._request);
         if (campaignErrorHandler) {
             campaignErrorHandler.sendErrorEventWithRequest(campaignError);

@@ -16,9 +16,10 @@ import { Url } from 'Core/Utilities/Url';
 import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
 import { CampaignError } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo } from 'VAST/EventHandlers/VastCampaignErrorHandler';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class ProgrammaticVastParser extends CampaignParser {
-    public static ContentType = 'programmatic/vast';
+    public static ContentType = CampaignContentType.ProgrammaticVast;
     public static setVastParserMaxDepth(depth: number): void {
         ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH = depth;
     }
@@ -57,16 +58,27 @@ export class ProgrammaticVastParser extends CampaignParser {
             mediaId: response.getMediaId()
         };
 
+        let errorTrackingUrl;
+        if (vast.getErrorURLTemplate()) {
+            errorTrackingUrl = vast.getErrorURLTemplate()!;
+        }
+
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
         if(portraitUrl) {
-            portraitAsset = new Image(this.validateAndEncodeUrl(portraitUrl, session), session);
+            if (!Url.isValid(portraitUrl)) {
+                throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentType.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED, portraitUrl);
+            }
+            portraitAsset = new Image(Url.encode(portraitUrl), session);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
         let landscapeAsset;
         if(landscapeUrl) {
-            landscapeAsset = new Image(this.validateAndEncodeUrl(landscapeUrl, session), session);
+            if (!Url.isValid(landscapeUrl)) {
+                throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentType.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED, landscapeUrl);
+            }
+            landscapeAsset = new Image(Url.encode(landscapeUrl), session);
         }
 
         let mediaVideoUrl = vast.getMediaVideoUrl();
@@ -74,31 +86,16 @@ export class ProgrammaticVastParser extends CampaignParser {
             mediaVideoUrl = VastMediaSelector.getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
         }
 
-        let errorTrackingUrl;
-        if (vast.getErrorURLTemplate()) {
-            errorTrackingUrl = vast.getErrorURLTemplate()!;
-        }
-
         if (!mediaVideoUrl) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.XML_PARSER_ERROR], ProgrammaticVastParser.ContentType, errorTrackingUrl, VastErrorCode.XML_PARSER_ERROR);
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_NOT_FOUND], CampaignContentType.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_NOT_FOUND);
         }
 
         if (nativeBridge.getPlatform() === Platform.IOS && !mediaVideoUrl.match(/^https:\/\//)) {
-            if (this._isErrorTrackingExperiment) {
-                VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS);
-            }
-            const videoUrlError = new DiagnosticError(
-                new Error(VastErrorMessage.MEDIA_FILE_UNSUPPORTED_IOS),
-                { rootWrapperVast: response.getContent() }
-            );
-            throw videoUrlError;
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS], CampaignContentType.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS, mediaVideoUrl);
         }
 
         if (!Url.isValid(mediaVideoUrl)) {
-            if (this._isErrorTrackingExperiment) {
-                VastErrorHandler.sendVastErrorEventWithRequest(vast, request, VastErrorCode.MEDIA_FILE_UNSUPPORTED);
-            }
-            throw new Error(VastErrorMessage.MEDIA_FILE_UNSUPPORTED);
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentType.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED, mediaVideoUrl);
         }
 
         mediaVideoUrl = Url.encode(mediaVideoUrl);
@@ -107,7 +104,7 @@ export class ProgrammaticVastParser extends CampaignParser {
             ... baseCampaignParams,
             vast: vast,
             video: new Video(mediaVideoUrl, session),
-            hasEndscreen: !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(),
+            hasEndscreen: !!portraitAsset || !!landscapeAsset,
             portrait: portraitAsset,
             landscape: landscapeAsset,
             trackingUrls: response.getTrackingUrls(),
