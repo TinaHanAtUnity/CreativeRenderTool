@@ -274,7 +274,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             if(!this._placement.allowSkip()) {
                 if (CustomFeatures.allowSkipInRewardedVideos(this._abGroup, this._campaign)) {
                     overlay.setSkipEnabled(true);
-                    //TODO: Change to actual time, 15s?
+                    // Use the same value as in the PerformanceOverlayEventHandlerWithAllowSkip canSkipVideo()
                     overlay.setSkipDuration(5);
                     return;
                 }

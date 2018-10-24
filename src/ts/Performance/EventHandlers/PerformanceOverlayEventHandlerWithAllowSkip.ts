@@ -72,6 +72,8 @@ export class PerformanceOverlayEventHandlerWithAllowSkip extends PerformanceOver
 
         const params = this.getOperativeEventParams();
         this._operativeEventManager.sendThirdQuartile(params);
+
+        // Needed for the view attribution
         this._operativeEventManager.sendView(params);
 
         this._adUnit.setVideoState(VideoState.COMPLETED);
