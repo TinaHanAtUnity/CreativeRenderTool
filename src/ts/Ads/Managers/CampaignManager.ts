@@ -120,9 +120,9 @@ export class CampaignManager {
     }
 
     public cleanCachedUrl(url: string): string {
-        url = Url.removeQueryParameter(url, 'connectionType');
-        url = Url.removeQueryParameter(url, 'networkType');
-        return url;
+        let cleanUrl = Url.removeQueryParameter(url, 'connectionType');
+        cleanUrl = Url.removeQueryParameter(cleanUrl, 'networkType');
+        return cleanUrl;
     }
 
     public requestFromCache(cachedResponse: INativeResponse): Promise<void[] | void> {
@@ -137,10 +137,10 @@ export class CampaignManager {
             let cachedUrl = cachedResponse.url;
 
             cachedUrl = this.cleanCachedUrl(cachedUrl);
-            currentUrl = this.cleanCachedUrl(currentUrl);
+            const cleanUrl = this.cleanCachedUrl(currentUrl);
 
-            if (cachedUrl !== currentUrl) {
-                this._nativeBridge.Sdk.logInfo('Failed to use cached campaign response due to URL mismatch ' + cachedUrl + ' (cached) and ' + currentUrl + ' (current)');
+            if (cachedUrl !== cleanUrl) {
+                this._nativeBridge.Sdk.logInfo('Failed to use cached campaign response due to URL mismatch ' + cachedUrl + ' (cached) and ' + cleanUrl + ' (current)');
                 return Promise.reject(new Error('invalidate cache'));
             }
 
