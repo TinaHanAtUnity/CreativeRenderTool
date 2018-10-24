@@ -3,7 +3,6 @@
 * Enable x icon skip for Cheetah [#6781](https://github.com/Applifier/unity-ads-webview/pull/6781)
 * AR logo cropping fix [#6783](https://github.com/Applifier/unity-ads-webview/pull/6783)
 * Remove mixed placement experiment dead code [#6779](https://github.com/Applifier/unity-ads-webview/pull/6779)
-* Square image test for performance endcards [#5322](https://github.com/Applifier/unity-ads-webview/pull/5322/files)
 * Use StorageBridge with BackupCampaignManager [#6769](https://github.com/Applifier/unity-ads-webview/pull/6769)
 * Native flag added to promo events [#6705](https://github.com/Applifier/unity-ads-webview/pull/6705)
 * TSLint: one-variable-per-declaration [#6772](https://github.com/Applifier/unity-ads-webview/pull/6772)
