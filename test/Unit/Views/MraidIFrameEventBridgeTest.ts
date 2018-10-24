@@ -6,12 +6,11 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 
 describe('MraidIframeEventBridge', () => {
-    let handler: IMRAIDHandler;
-    let mraidBridge: MraidIFrameEventBridge;
-    let iframe: HTMLIFrameElement;
-    let nativeBridge: NativeBridge;
-
-    xdescribe('receiving MRAID events', () => {
+    describe('receiving MRAID events', () => {
+        let handler: IMRAIDHandler;
+        let mraidBridge: MraidIFrameEventBridge;
+        let iframe: HTMLIFrameElement;
+        let nativeBridge: NativeBridge;
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge();
             handler = {
@@ -93,7 +92,7 @@ describe('MraidIframeEventBridge', () => {
         }];
 
         describe(`${tests[0].msg.type} MRAID event`, () => {
-            const sendEvent = (e: string, data?: any) => {
+            const sendEvent0 = (e: string, data?: any) => {
                 return () => {
                     return new Promise((res) => {
                         window.postMessage({
@@ -104,67 +103,12 @@ describe('MraidIframeEventBridge', () => {
                     });
                 };
             };
-            if (window && window.postMessage) {
-                beforeEach(sendEvent(tests[0].msg.type, tests[0].msg.url));
-                it(`should handle the ${tests[0].msg.type} event`, () => tests[0].verify(tests[0].msg));
-            }
-        });
-
-        describe(`${tests[1].msg.type} MRAID event`, () => {
-            const sendEvent = (e: string, data?: any) => {
-                return () => {
-                    return new Promise((res) => {
-                        window.postMessage({
-                            type: e
-                        }, '*');
-                        setTimeout(res);
-                    });
-                };
-            };
-            if (window && window.postMessage) {
-                beforeEach(sendEvent(tests[1].msg.type));
-                it(`should handle the ${tests[1].msg.type} event`, () => tests[1].verify(tests[1].msg));
-            }
-        });
-
-        describe(`${tests[2].msg.type} MRAID event`, () => {
-            const sendEvent = (e: string, data?: any) => {
-                return () => {
-                    return new Promise((res) => {
-                        window.postMessage({
-                            type: e,
-                            properties: data
-                        }, '*');
-                        setTimeout(res);
-                    });
-                };
-            };
-            if (window && window.postMessage) {
-                beforeEach(sendEvent(tests[2].msg.type, tests[2].msg.properties));
-                it(`should handle the ${tests[2].msg.type} event`, () => tests[2].verify(tests[2].msg));
-            }
-        });
-
-        describe(`${tests[3].msg.type} MRAID event`, () => {
-            const sendEvent = (e: string, data?: any) => {
-                return () => {
-                    return new Promise((res) => {
-                        window.postMessage({
-                            type: e,
-                            properties: data
-                        }, '*');
-                        setTimeout(res);
-                    });
-                };
-            };
-            if (window && window.postMessage) {
-                beforeEach(sendEvent(tests[3].msg.type, tests[3].msg.properties));
-                it(`should handle the ${tests[3].msg.type} event`, () => tests[3].verify(tests[3].msg));
-            }
+            beforeEach(sendEvent0(tests[0].msg.type, tests[0].msg.url));
+            it(`should handle the ${tests[0].msg.type} event`, () => tests[0].verify(tests[0].msg));
         });
 
         describe(`${tests[4].msg.type} MRAID event`, () => {
-            const sendEvent = (e: string, data?: any) => {
+            const sendEvent4 = (e: string, data?: any) => {
                 return () => {
                     return new Promise((res) => {
                         window.postMessage({
@@ -174,14 +118,12 @@ describe('MraidIframeEventBridge', () => {
                     });
                 };
             };
-            if (window && window.postMessage) {
-                beforeEach(sendEvent(tests[4].msg.type));
-                it(`should handle the ${tests[4].msg.type} event`, () => tests[4].verify(tests[4].msg));
-            }
+            beforeEach(sendEvent4(tests[4].msg.type));
+            it(`should handle the ${tests[4].msg.type} event`, () => tests[4].verify(tests[4].msg));
         });
 
         describe(`${tests[5].msg.type} MRAID event`, () => {
-            const sendEvent = (e: string, event: any, eventData: any) => {
+            const sendEvent5 = (e: string, event: any, eventData: any) => {
                 return () => {
                     return new Promise((res) => {
                         window.postMessage({
@@ -193,14 +135,12 @@ describe('MraidIframeEventBridge', () => {
                     });
                 };
             };
-            if (window && window.postMessage) {
-                beforeEach(sendEvent(tests[5].msg.type, tests[5].msg.event, tests[5].msg.eventData));
-                it(`should handle the ${tests[5].msg.type} event`, () => tests[5].verify(tests[5].msg));
-            }
+            beforeEach(sendEvent5(tests[5].msg.type, tests[5].msg.event, tests[5].msg.eventData));
+            it(`should handle the ${tests[5].msg.type} event`, () => tests[5].verify(tests[5].msg));
         });
 
         describe(`${tests[6].msg.type} MRAID event`, () => {
-            const sendEvent = (e: string, data?: any) => {
+            const sendEvent6 = (e: string, data?: any) => {
                 return () => {
                     return new Promise((res) => {
                         window.postMessage({
@@ -211,14 +151,12 @@ describe('MraidIframeEventBridge', () => {
                     });
                 };
             };
-            if (window && window.postMessage) {
-                beforeEach(sendEvent(tests[6].msg.type, tests[6].msg.state));
-                it(`should handle the ${tests[6].msg.type} event`, () => tests[6].verify(tests[6].msg));
-            }
+            beforeEach(sendEvent6(tests[6].msg.type, tests[6].msg.state));
+            it(`should handle the ${tests[6].msg.type} event`, () => tests[6].verify(tests[6].msg));
         });
 
         describe(`${tests[7].msg.type} MRAID event`, () => {
-            const sendEvent = (e: string, totalTime: any, playTime: any, frameCount: any) => {
+            const sendEvent7 = (e: string, totalTime: any, playTime: any, frameCount: any) => {
                 return () => {
                     return new Promise((res) => {
                         window.postMessage({
@@ -231,10 +169,55 @@ describe('MraidIframeEventBridge', () => {
                     });
                 };
             };
-            if (window && window.postMessage) {
-                beforeEach(sendEvent(tests[7].msg.type, tests[7].msg.totalTime, tests[7].msg.playTime, tests[7].msg.frameCount));
-                it(`should handle the ${tests[7].msg.type} event`, () => tests[7].verify(tests[7].msg));
-            }
+            beforeEach(sendEvent7(tests[7].msg.type, tests[7].msg.totalTime, tests[7].msg.playTime, tests[7].msg.frameCount));
+            it(`should handle the ${tests[7].msg.type} event`, () => tests[7].verify(tests[7].msg));
+        });
+
+        xdescribe(`${tests[2].msg.type} MRAID event`, () => {
+            const sendEvent2 = (e: string, data?: any) => {
+                return () => {
+                    return new Promise((res) => {
+                        window.parent.postMessage({
+                            type: e,
+                            properties: data
+                        }, '*');
+                        setTimeout(res);
+                    });
+                };
+            };
+            beforeEach(sendEvent2(tests[2].msg.type, tests[2].msg.properties));
+            it(`should handle the ${tests[2].msg.type} event`, () => tests[2].verify(tests[2].msg));
+        });
+
+        xdescribe(`${tests[3].msg.type} MRAID event`, () => {
+            const sendEvent3 = (e: string, data?: any) => {
+                return () => {
+                    return new Promise((res) => {
+                        window.parent.postMessage({
+                            type: e,
+                            properties: data
+                        }, '*');
+                        setTimeout(res);
+                    });
+                };
+            };
+            beforeEach(sendEvent3(tests[3].msg.type, tests[3].msg.properties));
+            it(`should handle the ${tests[3].msg.type} event`, () => tests[3].verify(tests[3].msg));
+        });
+
+        xdescribe(`${tests[1].msg.type} MRAID event`, () => {
+            const sendEvent1 = (e: string, data?: any) => {
+                return () => {
+                    return new Promise((res) => {
+                        window.parent.postMessage({
+                            type: e
+                        }, '*');
+                        setTimeout(res);
+                    });
+                };
+            };
+            beforeEach(sendEvent1(tests[1].msg.type));
+            it(`should handle the ${tests[1].msg.type} event`, () => tests[1].verify(tests[1].msg));
         });
     });
 });
