@@ -1,6 +1,9 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { Template } from 'Core/Utilities/Template';
+import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
+
+const SQUARE_END_SCREEN = 'square-end-screen';
 
 export class XPromoEndScreen extends EndScreen {
     private _campaign: XPromoCampaign;
@@ -9,21 +12,24 @@ export class XPromoEndScreen extends EndScreen {
         parameters.targetGameName = campaign.getGameName();
         super(parameters);
 
+        this._campaign = campaign;
         this._template = new Template(this.getTemplate(), this._localization);
 
+        const portraitImage = campaign.getPortrait();
+        const landscapeImage = campaign.getLandscape();
+        const squareImage = campaign.getSquare();
         const adjustedRating: number = campaign.getRating() * 20;
         this._templateData = {
             'gameName': campaign.getGameName(),
             'gameIcon': campaign.getGameIcon().getUrl(),
             // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
-            'endScreenLandscape': campaign.getPortrait().getUrl(),
-            'endScreenPortrait': campaign.getLandscape().getUrl(),
+            'endScreenLandscape': portraitImage ? portraitImage.getUrl() : undefined,
+            'endScreenPortrait': landscapeImage ? landscapeImage.getUrl() : undefined,
+            'endScreenSquare': squareImage ? squareImage.getUrl() : undefined,
             'rating': adjustedRating.toString(),
             'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
             'endscreenAlt': this.getEndscreenAlt()
         };
-
-        this._campaign = campaign;
     }
 
     protected onDownloadEvent(event: Event): void {
@@ -36,4 +42,19 @@ export class XPromoEndScreen extends EndScreen {
             store: this._campaign.getStore()
         }));
     }
+    protected getEndscreenAlt(): string | undefined {
+        if (this._campaign.getSquare()) {
+            return SQUARE_END_SCREEN;
+        }
+        return undefined;
+    }
+
+    protected getTemplate() {
+        if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
+            return SquareEndScreenTemplate;
+
+        }
+        return super.getTemplate();
+    }
+
 }
