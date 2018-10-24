@@ -17,9 +17,9 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
     protected _placement: Placement;
     protected _nativeBridge: NativeBridge;
     protected _campaign: T;
+    protected _operativeEventManager: OperativeEventManager;
+    protected _adUnit: VideoAdUnit<T>;
 
-    private _adUnit: VideoAdUnit<T>;
-    private _operativeEventManager: OperativeEventManager;
     private _adUnitStyle?: AdUnitStyle;
 
     constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
@@ -73,7 +73,11 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
 
     public onKeyEvent(keyCode: number): void {
         if(keyCode === KeyCode.BACK && this.canSkipVideo()) {
-            this.onOverlaySkip(this._adUnit.getVideo().getPosition());
+            if(!this._placement.skipEndCardOnClose()) {
+                this.onOverlaySkip(this._adUnit.getVideo().getPosition());
+            } else {
+                this.onOverlayClose();
+            }
         }
     }
 
@@ -87,7 +91,7 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
         return position >= allowSkipInMs;
     }
 
-    private getVideoOrientation(): string | undefined {
+    protected getVideoOrientation(): string | undefined {
         if(this._adUnit instanceof PerformanceAdUnit) {
             return (<PerformanceAdUnit>this._adUnit).getVideoOrientation();
         }

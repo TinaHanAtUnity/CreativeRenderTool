@@ -53,7 +53,7 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
         this.set('cachedUrl', url);
     }
 
-    public setFileId(fileId: string) {
+    public setFileId(fileId: string | undefined) {
         this.set('fileId', fileId);
     }
 

@@ -12,15 +12,20 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { IFileInfo } from 'Core/Native/Cache';
 import { MraidLoader } from 'MRAID/Parsers/MraidLoader';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { StorageOperation } from 'Core/Utilities/StorageOperation';
 
 export class BackupCampaignManager {
     private static _maxExpiryDelay: number = 7 * 24 * 3600 * 1000; // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
 
     private _nativeBridge: NativeBridge;
+    private _storageBridge: StorageBridge;
     private _coreConfiguration: CoreConfiguration;
 
-    constructor(nativeBridge: NativeBridge, coreConfiguration: CoreConfiguration) {
+    constructor(nativeBridge: NativeBridge, storageBridge: StorageBridge, coreConfiguration: CoreConfiguration) {
         this._nativeBridge = nativeBridge;
+        this._storageBridge = storageBridge;
         this._coreConfiguration = coreConfiguration;
     }
 
@@ -32,11 +37,10 @@ export class BackupCampaignManager {
 
         const rootKey: string = 'backupcampaign.placement.' + placement.getId();
 
-        this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.mediaid', mediaId);
-        this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.adtypes', JSON.stringify(placement.getAdTypes()));
-        // note: Storage.write is intentionally omitted as an optimization hack
-        // it is enough to have Storage.write after campaigns are stored
-        // if placements are not written because of this, it won't matter since campaigns would not be written either
+        const operation = new StorageOperation(StorageType.PRIVATE);
+        operation.set(rootKey + '.mediaid', mediaId);
+        operation.set(rootKey + '.adtypes', JSON.stringify(placement.getAdTypes()));
+        this._storageBridge.queue(operation);
     }
 
     public storeCampaign(campaign: Campaign) {
@@ -55,10 +59,11 @@ export class BackupCampaignManager {
                 willExpireAt = Date.now() + BackupCampaignManager._maxExpiryDelay;
             }
 
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.type', campaignType);
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.data', campaign.toJSON());
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.willexpireat', willExpireAt);
-            this._nativeBridge.Storage.write(StorageType.PRIVATE);
+            const operation = new StorageOperation(StorageType.PRIVATE);
+            operation.set(rootKey + '.type', campaignType);
+            operation.set(rootKey + '.data', campaign.toJSON());
+            operation.set(rootKey + '.willexpireat', willExpireAt);
+            this._storageBridge.queue(operation);
         }
     }
 
@@ -80,18 +85,18 @@ export class BackupCampaignManager {
                             const campaign = loader.load(data);
 
                             if(campaign) {
-                                return this.verifyCachedFiles(campaign).then(cached => {
-                                    if(cached) {
-                                        return campaign;
-                                    } else {
-                                        return undefined;
-                                    }
+                                return this.verifyCachedFiles(campaign);
+                            } else {
+                                Diagnostics.trigger('backup_campaign_loading_failed', {
+                                    type: type,
+                                    data: data,
+                                    willExpireAt: willexpireat
                                 });
                             }
                         }
                     }
 
-                    return undefined;
+                    return Promise.resolve(undefined);
                 });
             } else {
                 return undefined;
@@ -102,8 +107,9 @@ export class BackupCampaignManager {
     }
 
     public deleteBackupCampaigns() {
-        this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'backupcampaign');
-        this._nativeBridge.Storage.write(StorageType.PRIVATE);
+        const operation = new StorageOperation(StorageType.PRIVATE);
+        operation.delete('backupcampaign');
+        this._storageBridge.queue(operation);
     }
 
     private getCampaignType(campaign: Campaign): string | undefined {
@@ -138,12 +144,12 @@ export class BackupCampaignManager {
         return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, key);
     }
 
-    private verifyCachedFiles(campaign: Campaign): Promise<boolean> {
+    private verifyCachedFiles(campaign: Campaign): Promise<Campaign> {
         const requiredAssets = campaign.getRequiredAssets();
         const optionalAssets = campaign.getOptionalAssets();
 
         if(requiredAssets.length === 0 && optionalAssets.length === 0) {
-            return Promise.resolve(true);
+            return Promise.resolve(campaign);
         }
 
         const promises = [];
@@ -155,10 +161,10 @@ export class BackupCampaignManager {
             const portraitVideo = campaign.getPortraitVideo();
             if(video && video.isCached()) {
                 promises.push(this.verifyCachedAsset(video));
-            } else if(portraitVideo && portraitVideo.isCached()) {
+            }
+
+            if(portraitVideo && portraitVideo.isCached()) {
                 promises.push(this.verifyCachedAsset(portraitVideo));
-            } else {
-                return Promise.resolve(false);
             }
         }
 
@@ -170,24 +176,26 @@ export class BackupCampaignManager {
             promises.push(this.verifyCachedAsset(optionalAsset));
         }
 
-        return Promise.all(promises).then((values: boolean[]) => {
-            return values.every(value => value);
+        return Promise.all(promises).then(() => {
+            return campaign;
         });
     }
 
-    private verifyCachedAsset(asset: Asset): Promise<boolean> {
+    private verifyCachedAsset(asset: Asset): Promise<void> {
         const fileId = asset.getFileId();
 
         if(asset.isCached() && fileId) {
             return this._nativeBridge.Cache.getFileInfo(fileId).then((fileInfo: IFileInfo) => {
                 if(fileInfo.found && fileInfo.size > 0) {
-                    return true;
+                    return;
+                } else {
+                    asset.setCachedUrl(undefined);
+                    asset.setFileId(undefined);
+                    return;
                 }
-
-                return false;
             });
         } else {
-            return Promise.resolve(false);
+            return Promise.resolve();
         }
     }
 }

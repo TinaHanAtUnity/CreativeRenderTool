@@ -11,7 +11,6 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
-import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
@@ -41,7 +40,6 @@ import { Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable
 import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export class CampaignManager {
@@ -95,6 +93,7 @@ export class CampaignManager {
     private _backupCampaignManager: BackupCampaignManager;
     private _request: Request;
     private _deviceInfo: DeviceInfo;
+    private _deviceConnectionType: string | undefined;
     private _previousPlacementId: string | undefined;
     private _realtimeUrl: string | undefined;
     private _realtimeBody: any = {};
@@ -211,7 +210,6 @@ export class CampaignManager {
 
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
-        this._backupCampaignManager.deleteBackupCampaigns();
 
         this._requesting = true;
 
@@ -343,13 +341,12 @@ export class CampaignManager {
         const session: Session = this._sessionManager.create(json.auctionId);
         session.setAdPlan(response.response);
 
+        this._backupCampaignManager.deleteBackupCampaigns();
+
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
             const failedToCachePlacement: string[] = [];
-            if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-                json.placements = MixedPlacementUtility.insertMediaIdsIntoJSON(this._adsConfig, json.placements);
-            }
 
             const placements = this._adsConfig.getPlacements();
             for(const placement in placements) {
@@ -399,7 +396,6 @@ export class CampaignManager {
                 this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
                 this.onAdPlanReceived.trigger(refreshDelay, campaigns);
             }
-            PurchasingUtilities.placementManager.clear();
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     let auctionResponse: AuctionResponse;
@@ -544,10 +540,9 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        return parser.parse(this._nativeBridge, this._request, response, session, this._deviceInfo.getOsVersion(), this._clientInfo.getGameId()).then((campaign) => {
+        return parser.parse(this._nativeBridge, this._request, response, session, this._deviceInfo.getOsVersion(), this._clientInfo.getGameId(), this._deviceConnectionType).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
-                PurchasingUtilities.placementManager.addCampaignPlacementIds(placement, campaign);
                 SdkStats.setParseDuration(placement, parseDuration);
             }
 
@@ -727,6 +722,7 @@ export class CampaignManager {
                 connectionType: connectionType,
                 networkType: networkType
             });
+            this._deviceConnectionType = connectionType;
             this._realtimeUrl = url;
             return url;
         });
@@ -836,13 +832,7 @@ export class CampaignManager {
                     body.frameworkVersion = framework.getVersion();
                 }
 
-                let placements: { [id: string]: Placement } = {};
-
-                if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-                    placements = MixedPlacementUtility.originalPlacements;
-                } else {
-                    placements = this._adsConfig.getPlacements();
-                }
+                const placements = this._adsConfig.getPlacements();
 
                 Object.keys(placements).forEach((placementId) => {
                     const placement = placements[placementId];

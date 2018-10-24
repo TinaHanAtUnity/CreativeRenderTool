@@ -51,15 +51,15 @@ export class BannerApi extends NativeApi {
     }
 
     public load(views: BannerViewType[], style: string, width: number, height: number): Promise<void> {
-        return this._nativeBridge.invoke(this._apiClass, 'load', [views, style, width, height]);
+        return this._nativeBridge.invoke(this._fullApiClassName, 'load', [views, style, width, height]);
     }
 
     public destroy(): Promise<void> {
-        return this._nativeBridge.invoke(this._apiClass, 'destroy');
+        return this._nativeBridge.invoke(this._fullApiClassName, 'destroy');
     }
 
     public setViewFrame(view: BannerViewType, x: number, y: number, width: number, height: number) {
-        return this._nativeBridge.invoke(this._apiClass, 'setViewFrame', [view, x, y, width, height]);
+        return this._nativeBridge.invoke(this._fullApiClassName, 'setViewFrame', [view, x, y, width, height]);
     }
 
     public setBannerFrame(style: string, width: number, height: number) {
@@ -67,7 +67,7 @@ export class BannerApi extends NativeApi {
     }
 
     public setViews(views: BannerViewType[]) {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setViews', [views]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setViews', [views]);
     }
 
     public handleEvent(event: string, parameters: any[]) {
@@ -99,11 +99,11 @@ export class BannerApi extends NativeApi {
     }
 
     private handleBannerResized(parameters: any[]) {
-        const x = parameters[0],
-            y = parameters[1],
-            width = parameters[2],
-            height = parameters[3],
-            alpha = parameters[4];
+        const x = parameters[0];
+        const y = parameters[1];
+        const width = parameters[2];
+        const height = parameters[3];
+        const alpha = parameters[4];
         this.onBannerResized.trigger({x, y, width, height, alpha});
     }
 

@@ -149,7 +149,7 @@ export class BannerCampaignManager {
 
         const parser: CampaignParser = this.getCampaignParser(response.getContentType());
 
-        return parser.parse(this._nativeBridge, this._request, response, session, this._deviceInfo.getOsVersion()).then((campaign) => {
+        return parser.parse(this._nativeBridge, this._request, response, session).then((campaign) => {
             campaign.setMediaId(response.getMediaId());
             return campaign;
         });

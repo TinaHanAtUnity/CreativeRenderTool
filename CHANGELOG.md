@@ -1,4 +1,38 @@
-# Pending
+# Wed Oct 24 17:13:55 UTC 2018
+
+* Enable x icon skip for Cheetah [#6781](https://github.com/Applifier/unity-ads-webview/pull/6781)
+* AR logo cropping fix [#6783](https://github.com/Applifier/unity-ads-webview/pull/6783)
+* Remove mixed placement experiment dead code [#6779](https://github.com/Applifier/unity-ads-webview/pull/6779)
+* Use StorageBridge with BackupCampaignManager [#6769](https://github.com/Applifier/unity-ads-webview/pull/6769)
+* Native flag added to promo events [#6705](https://github.com/Applifier/unity-ads-webview/pull/6705)
+* TSLint: one-variable-per-declaration [#6772](https://github.com/Applifier/unity-ads-webview/pull/6772)
+* TSLint: no-single-line-black-comment [#6770](https://github.com/Applifier/unity-ads-webview/pull/6770)
+* Fix product type to only be appended to iap tracking events [#6706](https://github.com/Applifier/unity-ads-webview/pull/6706)
+* Minor adjustments to Reported Ads [#6771](https://github.com/Applifier/unity-ads-webview/pull/6771)
+
+# Thu Oct 18 17:01:37 UTC 2018
+
+* Test CTA button in video overlay [#6403](https://github.com/Applifier/unity-ads-webview/pull/6403)
+
+# Thu Oct 18 10:52:21 UTC 2018
+
+* MediaFile selection based on file size for VAST, ready for auction abTest [#6547](https://github.com/Applifier/unity-ads-webview/pull/6547)
+* Remove CachedAdmobCampaign [#6681](https://github.com/Applifier/unity-ads-webview/pull/6681)
+* Switch AB groups for the Improved endscreen styles test [#6728](https://github.com/Applifier/unity-ads-webview/pull/6726)
+* Move Promo models to Promo Module [#6728](https://github.com/Applifier/unity-ads-webview/pull/6728)
+* Allow streaming of backup campaigns [#6727](https://github.com/Applifier/unity-ads-webview/pull/6727)
+* Update promo parse to use IAP Product ID as a fallback [#6730](https://github.com/Applifier/unity-ads-webview/pull/6730)
+
+# Wed Oct 17 18:20:47 UTC 2018
+
+* Add support for all SDK 3.0.0 Webview Functionality: [List of PRs](https://github.com/Applifier/unity-ads-webview/pulls?q=is%3Apr+is%3Aclosed+label%3A3.0)
+
+# Tue Oct 16 12:43:43 UTC 2018
+
+* Minor optimizations to backup campaign implementation [#6676](https://github.com/Applifier/unity-ads-webview/pull/6676)
+* Enable Android back button on Closable video overlay for Cheetah [#6679](https://github.com/Applifier/unity-ads-webview/pull/6679)
+
+# Mon Oct 15 20:37:20 UTC 2018
 
 * AB Test various improvements to the endscreen layout v2 [#6674](https://github.com/Applifier/unity-ads-webview/pull/6674)
 * Remove smart close button test [#6673](https://github.com/Applifier/unity-ads-webview/pull/6673)
@@ -11,7 +45,6 @@
 * Show target information in Non-GDPR Privacy Dialog [#6646](https://github.com/Applifier/unity-ads-webview/pull/6646)
 * Add error throwing when API is missing in browser build [#6604](https://github.com/Applifier/unity-ads-webview/pull/6604)
 * Add isCached checking support for Admob Campaigns [#6652](https://github.com/Applifier/unity-ads-webview/pull/6652)
-
 
 # Wed Oct 10 17:36:31 UTC 2018
 
