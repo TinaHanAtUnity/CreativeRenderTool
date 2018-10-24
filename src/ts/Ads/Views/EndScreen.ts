@@ -5,13 +5,13 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { ABGroup, ImprovedEndScreenStylesTest } from 'Core/Models/ABGroup';
+import { ABGroup } from 'Core/Models/ABGroup';
+
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
-import EndScreenWithImprovedStylesTemplate from 'html/EndScreenWithImprovedStyles.html';
 
 export interface IEndScreenParameters {
     nativeBridge: NativeBridge;
@@ -112,10 +112,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         if (this._showGDPRBanner) {
             this._container.classList.add('show-gdpr-banner');
         }
-
-        if (ImprovedEndScreenStylesTest.isValid(this._abGroup)) {
-            this._container.classList.add('improved-endscreen-styles-test');
-        }
     }
 
     public show(): void {
@@ -188,10 +184,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     private getTemplate() {
-        if (ImprovedEndScreenStylesTest.isValid(this._abGroup)) {
-            return EndScreenWithImprovedStylesTemplate;
-        }
-
         return EndScreenTemplate;
     }
 }
