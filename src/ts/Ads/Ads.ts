@@ -73,6 +73,7 @@ import { IAnalytics } from '../Analytics/IAnalytics';
 import { AdsConfigurationParser } from './Parsers/AdsConfigurationParser';
 import { Promo } from 'Promo/Promo';
 import { Banners } from 'Banners/Banners';
+import { Monetization } from 'Monetization/Monetization';
 
 export class Ads implements IAds {
 
@@ -107,6 +108,7 @@ export class Ads implements IAds {
     private _core: ICore;
 
     public Banners: Banners;
+    public Monetization: Monetization;
 
     constructor(config: any, core: ICore) {
         this.Config = AdsConfigurationParser.parse(config, core.ClientInfo);
@@ -199,12 +201,18 @@ export class Ads implements IAds {
             });
 
             this.Banners = new Banners(this._core, this, this._core.Analytics);
+            this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
 
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.CampaignParserManager, this._core.JaegerManager, this.BackupCampaignManager);
             this.RefreshManager = new OldCampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
 
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
             promo.initialize();
+            this.Monetization.Api.Listener.isMonetizationEnabled().then((enabled) => {
+                if(enabled) {
+                    this.Monetization.initialize();
+                }
+            });
 
             const refreshSpan = this._core.JaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._core.NativeBridge.getPlatform()]);
@@ -387,6 +395,9 @@ export class Ads implements IAds {
                 gameSessionId: this.SessionManager.getGameSessionId()
             });
             this.RefreshManager.setCurrentAdUnit(this._currentAdUnit);
+            if (this.Monetization.isInitialized()) {
+                this.Monetization.PlacementContentManager.setCurrentAdUnit(placement.getId(), this._currentAdUnit);
+            }
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
             if(this._core.NativeBridge.getPlatform() === Platform.IOS && (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign)) {
