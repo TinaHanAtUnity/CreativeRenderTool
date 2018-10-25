@@ -1,4 +1,4 @@
-# Pending
+# Thu Oct 25 21:49:17 UTC 2018
 
 * Remove old backup campaign implementation, use new as default [#6778](https://github.com/Applifier/unity-ads-webview/pull/6778)
 * A/B test CTA Button on Video Overlay v2 [#6807](https://github.com/Applifier/unity-ads-webview/pull/6807)
