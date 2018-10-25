@@ -187,7 +187,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private handleAppDownloadUrl(appDownloadUrl: string) {
-        appDownloadUrl = decodeURIComponent(appDownloadUrl);
+        const modifiedAppDownloadUrl = decodeURIComponent(appDownloadUrl);
 
         if (this._nativeBridge.getApiLevel() >= 21) {
             // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
@@ -196,30 +196,31 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 'extras': [
                     {
                         'key': 'query',
-                        'value': appDownloadUrl
+                        'value': modifiedAppDownloadUrl
                     }
                 ]
             });
         } else {
             this._nativeBridge.Intent.launch({
                 'action': 'android.intent.action.VIEW',
-                'uri': appDownloadUrl
+                'uri': modifiedAppDownloadUrl
             });
         }
     }
 
     private triggerDiagnosticsError(error: any, clickAttributionUrl: string) {
         const currentSession = this._campaign.getSession();
+        let diagnosticError = error;
 
         if (error instanceof RequestError) {
-            error = new DiagnosticError(new Error(error.message), {
+            diagnosticError = new DiagnosticError(new Error(error.message), {
                 request: error.nativeRequest,
                 auctionId: currentSession.getId(),
                 url: clickAttributionUrl,
                 response: error.nativeResponse
             });
         }
-        SessionDiagnostics.trigger('click_attribution_failed', error, currentSession);
+        SessionDiagnostics.trigger('click_attribution_failed', diagnosticError, currentSession);
     }
 
     private openAppStore(parameters: IEndScreenDownloadParameters, isAppSheetBroken?: boolean) {
