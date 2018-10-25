@@ -1,9 +1,24 @@
 @import "vars.styl";
 @import "new-video-overlay.styl";
 
+/* This is mostly needed for iPhone XS Max but I had issue with the media query so applying this to all devices in landscape */
+@media only screen and (orientation: landscape) {
+    #new-video-overlay {
+      &.cta-button-test {
+        .call-button {
+          transform: translateX(120%);
+          transition: transform .3s ease-in;
+        }
+
+        .show-call-button {
+          transform: translateX(0%);
+        }
+      }
+    }
+}
+
 #new-video-overlay {
   &.cta-button-test {
-
     .top-container {
       .left-corner,
       .right-corner {
