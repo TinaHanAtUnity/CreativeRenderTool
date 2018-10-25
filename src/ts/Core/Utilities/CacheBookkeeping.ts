@@ -14,7 +14,7 @@ export interface IFileBookkeepingInfo {
 }
 
 enum CacheKey {
-    CAMPAIGN = 'campaign',
+    CAMPAIGN = 'campaign', // todo: key for legacy backup campaigns, remove in early 2019
     FILES = 'files',
     CAMPAIGNS = 'campaigns'
 }
@@ -189,31 +189,7 @@ export class CacheBookkeeping {
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
     }
 
-    public getCachedCampaignResponse(): Promise<INativeResponse | undefined> {
-        const cacheCampaignUrlPromise = this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'));
-        const cachedCampaignResponsePromise = this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'));
-
-        return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).then(([requestUrl, cachedResponse]) =>
-            (<INativeResponse>{
-                url: requestUrl,
-                response: cachedResponse,
-                responseCode: 200,
-                headers: []
-            })
-        ).catch(() => {
-            return undefined;
-        });
-    }
-
-    public setCachedCampaignResponse(response: INativeResponse): Promise<any> {
-        const cacheCampaignUrlPromise = this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'), response.url);
-        const cachedCampaignResponsePromise = this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'), response.response);
-
-        return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).then(() => this._nativeBridge.Storage.write(StorageType.PRIVATE)).catch(() => {
-            // ignore error
-        });
-    }
-
+    // todo: This method exists for legacy backup campaign implementation that was live from April 2018 to October 2018. It should be removed in early 2019.
     public deleteCachedCampaignResponse(): Promise<any> {
         const cacheCampaignUrlPromise = this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'));
         const cachedCampaignResponsePromise = this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'));

@@ -1,36 +1,94 @@
 @import "vars.styl";
 @import "new-video-overlay.styl";
 
+/* This is mostly needed for iPhone XS Max but I had issue with the media query so applying this to all devices in landscape */
+@media only screen and (orientation: landscape) {
+    #new-video-overlay {
+      &.cta-button-test {
+        .call-button {
+          transform: translateX(120%);
+          transition: transform .3s ease-in;
+        }
+
+        .show-call-button {
+          transform: translateX(0%);
+        }
+      }
+    }
+}
+
 #new-video-overlay {
-  .call-button {
-    .download-wrapper {
-      $new-video-overlay-styles-download-element-height = $new-video-overlay-styles.base-size * 1;
-      $new-video-overlay-styles-download-element-margin = $new-video-overlay-styles.base-size * .26;
-      $new-video-overlay-styles-download-element-border-radius = $new-video-overlay-styles.base-size * .2;
+  &.cta-button-test {
+    .top-container {
+      .left-corner,
+      .right-corner {
+        top: .3 * $new-video-overlay-styles.base-size;
+      }
+    }
 
-      position: relative;
+    .bottom-container {
+      display: block;
+      height: 3 * $new-video-overlay-styles.base-size;
 
-      .game-icon {
-        $set-image($new-video-overlay-styles-download-element-height, $new-video-overlay-styles-download-element-height, $new-video-overlay-styles-download-element-border-radius);
-        margin: $new-video-overlay-styles-download-element-margin;
+      .left-corner,
+      .center {
+        display: none;
       }
 
-      .download-container {
-        position: absolute;
-        top: 0;
-        left: $new-video-overlay-styles-download-element-height + 2 * $new-video-overlay-styles-download-element-margin;
-        width: $new-video-overlay-styles.base-size * 4;
-        height: $new-video-overlay-styles-download-element-height;
-        border-radius: $new-video-overlay-styles-download-element-border-radius;
-        background: $blue;
-        color: $white;
-        text-align: center;
-        line-height: $new-video-overlay-styles.base-size * .75;
+      .left-corner,
+      .right-corner {
+        top: auto;
+        bottom: .3 * $new-video-overlay-styles.base-size;
+      }
+    }
+
+    .call-button {
+      width: 7.5 * $new-video-overlay-styles.base-size;
+      height: 3 * $new-video-overlay-styles.base-size;
+
+      .tab {
+        width: 7.5 * $new-video-overlay-styles.base-size;
+        height: 2.3 * $new-video-overlay-styles.base-size;
       }
 
-      .download-text {
-        text-shadow: none;
-        font-size: $new-video-overlay-styles.base-size * .5;
+      .download-wrapper {
+        $new-video-overlay-styles-download-element-height = $new-video-overlay-styles.base-size * 1.7;
+        $new-video-overlay-styles-download-element-margin = $new-video-overlay-styles.base-size * .3;
+        $new-video-overlay-styles-download-element-border-radius = $new-video-overlay-styles.base-size * .25;
+
+        position: relative;
+
+        .game-icon {
+          $set-image($new-video-overlay-styles-download-element-height, $new-video-overlay-styles-download-element-height, $new-video-overlay-styles-download-element-border-radius);
+          margin: $new-video-overlay-styles-download-element-margin;
+        }
+
+        .download-container {
+          position: absolute;
+          top: 0;
+          left: $new-video-overlay-styles-download-element-height + 2 * $new-video-overlay-styles-download-element-margin;
+          width: $new-video-overlay-styles.base-size * 4.5;
+          height: $new-video-overlay-styles-download-element-height;
+          border-radius: $new-video-overlay-styles-download-element-border-radius;
+          background: $blue;
+          color: $white;
+          text-align: center;
+          line-height: $new-video-overlay-styles.base-size * 1.5;
+        }
+
+        .download-text {
+          text-shadow: none;
+          font-size: $new-video-overlay-styles.base-size * .65;
+        }
+      }
+    }
+
+    &.fade-in {
+      .bottom-container {
+        .left-corner,
+        .center {
+          display: block;
+        }
       }
     }
   }
