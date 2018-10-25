@@ -33,6 +33,7 @@ import { DeviceInfo } from './Models/DeviceInfo';
 import { CoreConfiguration } from './Models/CoreConfiguration';
 import { IAds } from '../Ads/IAds';
 import { IAnalytics } from '../Analytics/IAnalytics';
+import { IPurchasing } from 'Purchasing/IPurchasing';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -77,4 +78,5 @@ export interface ICore extends IApiModule {
     Config: CoreConfiguration;
     Ads: IAds;
     Analytics: IAnalytics;
+    Purchasing: IPurchasing;
 }

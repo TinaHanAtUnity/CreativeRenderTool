@@ -19,6 +19,8 @@ export class Promo implements IParserModule, IPromo {
 
     private readonly _core: ICore;
     private readonly _ads: IAds;
+    private readonly _purchasing: IPurchasing;
+    private readonly _analytics: IAnalytics;
 
     private readonly _parser: PromoCampaignParser;
     private readonly _adUnitFactory: PromoAdUnitFactory;
@@ -26,13 +28,21 @@ export class Promo implements IParserModule, IPromo {
     constructor(core: ICore, ads: IAds, purchasing: IPurchasing, analytics: IAnalytics) {
         this._core = core;
         this._ads = ads;
+        this._purchasing = purchasing;
+        this._analytics = analytics;
 
         this.Api = {
             Purchasing: new PurchasingApi(this._core.NativeBridge)
         };
 
+        this._parser = new PromoCampaignParser();
+        this._adUnitFactory = new PromoAdUnitFactory();
+
         this.PromoEvents = new PromoEvents(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ClientInfo, core.DeviceInfo, analytics.AnalyticsStorage);
-        PurchasingUtilities.initialize(this._core.Api, this.Api, purchasing.Api, this._core.ClientInfo, this._core.Config, this._ads.Config, this._ads.PlacementManager, this._ads.CampaignManager, this.PromoEvents, core.RequestManager, analytics.AnalyticsManager);
+    }
+
+    public initialize() {
+        PurchasingUtilities.initialize(this._core.Api, this.Api, this._purchasing.Api, this._core.ClientInfo, this._core.Config, this._ads.Config, this._ads.PlacementManager, this._ads.CampaignManager, this.PromoEvents, this._core.RequestManager, this._analytics.AnalyticsManager);
     }
 
     public canParse(contentType: string) {

@@ -45,6 +45,7 @@ import { StorageBridge } from './Utilities/StorageBridge';
 import { ICore, ICoreApi } from './ICore';
 import { Analytics } from '../Analytics/Analytics';
 import { Ads } from '../Ads/Ads';
+import { Purchasing } from 'Purchasing/Purchasing';
 
 export class Core implements ICore {
 
@@ -69,6 +70,7 @@ export class Core implements ICore {
 
     public Analytics: Analytics;
     public Ads: Ads;
+    public Purchasing: Purchasing;
 
     private _initialized = false;
     private _initializedAt: number;
@@ -200,7 +202,8 @@ export class Core implements ICore {
             }
 
             this.Analytics = new Analytics(this);
-            this.Ads = new Ads(configJson, this, this.Analytics);
+            this.Ads = new Ads(configJson, this);
+            this.Purchasing = new Purchasing(this);
             return this.Ads.initialize(jaegerInitSpan);
         }).then(() => {
             this._initialized = true;

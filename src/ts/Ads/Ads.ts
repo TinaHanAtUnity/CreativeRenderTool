@@ -71,6 +71,8 @@ import { XPromo } from '../XPromo/XPromo';
 import { IAds, IAdsApi } from './IAds';
 import { IAnalytics } from '../Analytics/IAnalytics';
 import { AdsConfigurationParser } from './Parsers/AdsConfigurationParser';
+import { Promo } from 'Promo/Promo';
+import { Banners } from 'Banners/Banners';
 
 export class Ads implements IAds {
 
@@ -99,17 +101,16 @@ export class Ads implements IAds {
     private _creativeUrl?: string;
     private _requestDelay: number;
     private _wasRealtimePlacement: boolean = false;
-    private _bannerAdContext: BannerAdContext;
 
     private _adUnitFactories: { [key: string]: AbstractAdUnitFactory } = {};
 
     private _core: ICore;
-    private _analytics: IAnalytics;
 
-    constructor(config: any, core: ICore, analytics: IAnalytics) {
+    public Banners: Banners;
+
+    constructor(config: any, core: ICore) {
         this.Config = AdsConfigurationParser.parse(config, core.ClientInfo);
         this._core = core;
-        this._analytics = analytics;
 
         const platform = core.NativeBridge.getPlatform();
         this.Api = {
@@ -176,8 +177,8 @@ export class Ads implements IAds {
                 this.AssetManager.setCacheDiagnostics(true);
             }
 
-            const modules = [AdMob, Display, MRAID, Performance, VAST, VPAID, XPromo];
-            modules.forEach(moduleConstructor => {
+            const parserModules = [AdMob, Display, MRAID, Performance, VAST, VPAID, XPromo];
+            parserModules.forEach(moduleConstructor => {
                 const module = new moduleConstructor();
                 const parsers = module.getParsers();
                 this.CampaignParserManager.addParsers(parsers);
@@ -188,10 +189,22 @@ export class Ads implements IAds {
                 });
             });
 
+            const promo = new Promo(this._core, this, this._core.Purchasing, this._core.Analytics);
+            const promoParsers = promo.getParsers();
+            this.CampaignParserManager.addParsers(promoParsers);
+            promoParsers.forEach(parser => {
+                parser.getContentTypes().forEach(contentType => {
+                    this._adUnitFactories[contentType] = promo.getAdUnitFactory();
+                });
+            });
+
+            this.Banners = new Banners(this._core, this, this._core.Analytics);
+
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.CampaignParserManager, this._core.JaegerManager, this.BackupCampaignManager);
             this.RefreshManager = new OldCampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
 
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
+            promo.initialize();
 
             const refreshSpan = this._core.JaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._core.NativeBridge.getPlatform()]);
@@ -294,7 +307,7 @@ export class Ads implements IAds {
     public showBanner(placementId: string, callback: INativeCallback) {
         callback(CallbackStatus.OK);
 
-        const context = this._bannerAdContext;
+        const context = this.Banners.BannerAdContext;
         context.load(placementId).catch((e) => {
             this._core.Api.Sdk.logWarning(`Could not show banner due to ${e.message}`);
         });
@@ -303,7 +316,7 @@ export class Ads implements IAds {
     public hideBanner(callback: INativeCallback) {
         callback(CallbackStatus.OK);
 
-        const context = this._bannerAdContext;
+        const context = this.Banners.BannerAdContext;
         context.hide();
     }
 
