@@ -141,41 +141,40 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this.sendMraidAnalyticsEvent('playable_start');
     }
 
-    private onMessageOpen(url: string) {
-        if (!this._callButtonEnabled) {
-            return;
-        }
-        this._handlers.forEach(handler => handler.onMraidClick(url));
-    }
-
     private onMessage(event: MessageEvent) {
         switch(event.data.type) {
             case 'loaded':
                 this.onLoadedEvent();
                 break;
-             case 'open':
+
+            case 'open':
                 this.onMessageOpen(event.data.url);
                 break;
-             case 'sendStats':
+
+            case 'sendStats':
                 this.updateStats({
                     totalTime: event.data.totalTime,
                     playTime: event.data.playTime,
                     frameCount: event.data.frameCount
                 });
                 break;
-             case 'close':
+
+            case 'close':
                 this._handlers.forEach(handler => handler.onMraidClose());
                 break;
-             case 'orientation':
+
+            case 'orientation':
                 let forceOrientation = Orientation.NONE;
                 switch(event.data.properties.forceOrientation) {
                     case 'portrait':
                         forceOrientation = Orientation.PORTRAIT;
                         break;
-                     case 'landscape':
+
+                    case 'landscape':
                         forceOrientation = Orientation.LANDSCAPE;
                         break;
-                     default:
+
+                    default:
                 }
                 this._handlers.forEach(handler => handler.onMraidOrientationProperties({
                     allowOrientationChange: event.data.properties.allowOrientationChange,
@@ -185,14 +184,23 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             case 'analyticsEvent':
                 this.sendMraidAnalyticsEvent(event.data.event, event.data.eventData);
                 break;
-             case 'customMraidState':
+
+            case 'customMraidState':
                 if(event.data.state === 'completed') {
                     if(!this._placement.allowSkip() && this._closeRemaining > 5) {
                         this._closeRemaining = 5;
                     }
                 }
                 break;
-             default:
+
+            default:
         }
+    }
+
+    private onMessageOpen(url: string) {
+        if (!this._callButtonEnabled) {
+            return;
+        }
+        this._handlers.forEach(handler => handler.onMraidClick(url));
     }
 }

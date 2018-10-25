@@ -247,10 +247,12 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                     case 'portrait':
                         forceOrientation = Orientation.PORTRAIT;
                         break;
-                     case 'landscape':
+
+                    case 'landscape':
                         forceOrientation = Orientation.LANDSCAPE;
                         break;
-                     default:
+
+                    default:
                 }
                 this._handlers.forEach(handler => handler.onMraidOrientationProperties({
                     allowOrientationChange: event.data.properties.allowOrientationChange,
