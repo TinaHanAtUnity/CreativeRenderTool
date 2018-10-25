@@ -1,12 +1,13 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1 } from 'Core/Utilities/Observable';
+import {EventCategory} from '../../../Core/Constants/EventCategory';
 
 export class AndroidARApi extends NativeApi {
     public readonly onAndroidEnumsReceived = new Observable1<any>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AR', ApiPackage.AR);
+        super(nativeBridge, 'AR', ApiPackage.AR, EventCategory.AR);
     }
 
     public isARSupported(): Promise<[boolean, boolean]> {

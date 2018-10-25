@@ -1,6 +1,7 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1, Observable3 } from 'Core/Utilities/Observable';
+import {EventCategory} from '../../Constants/EventCategory';
 
 export enum AndroidPermission {
     CAMERA = 'android.permission.CAMERA',
@@ -12,7 +13,7 @@ export class AndroidPermissionsApi extends NativeApi {
     public readonly onPermissionsError = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Permissions', ApiPackage.CORE);
+        super(nativeBridge, 'Permissions', ApiPackage.CORE, EventCategory.PERMISSIONS);
     }
 
     public getPermissions(): Promise<string[]> {

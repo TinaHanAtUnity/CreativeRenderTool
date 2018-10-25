@@ -5,6 +5,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IosPermissionsApi } from 'Core/Native/iOS/Permissions';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { PermissionsUtil } from 'Core/Utilities/Permissions';
+import {EventCategory} from '../Constants/EventCategory';
 
 enum PermissionsEvent {
     PERMISSIONS_RESULT,
@@ -20,7 +21,7 @@ export class PermissionsApi extends NativeApi {
     private readonly _currentPlatform: Platform;
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Permissions', ApiPackage.CORE);
+        super(nativeBridge, 'Permissions', ApiPackage.CORE, EventCategory.PERMISSIONS);
         const currentPlatform = nativeBridge.getPlatform();
         if (currentPlatform === Platform.ANDROID) {
             this.Android = new AndroidPermissionsApi(nativeBridge);

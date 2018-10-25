@@ -1,6 +1,7 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable2 } from 'Core/Utilities/Observable';
+import {EventCategory} from '../../Constants/EventCategory';
 
 export enum IosPermission {
     AVMediaTypeVideo = 'vide',
@@ -16,7 +17,7 @@ export class IosPermissionsApi extends NativeApi {
     public readonly onPermissionsResult = new Observable2<string, boolean>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Permissions', ApiPackage.CORE);
+        super(nativeBridge, 'Permissions', ApiPackage.CORE, EventCategory.PERMISSIONS);
     }
 
     public checkPermission(permission: IosPermission | string): Promise<number> {

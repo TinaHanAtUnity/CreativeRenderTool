@@ -1,6 +1,7 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1 } from 'Core/Utilities/Observable';
+import {EventCategory} from '../../Core/Constants/EventCategory';
 
 export enum PurchasingEvent {
     COMMAND,
@@ -19,7 +20,7 @@ export class PurchasingApi extends NativeApi {
     public readonly onIAPSendEvent = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Purchasing', ApiPackage.ADS);
+        super(nativeBridge, 'Purchasing', ApiPackage.ADS, EventCategory.PURCHASING);
     }
 
     public initializePurchasing(): Promise<void> {

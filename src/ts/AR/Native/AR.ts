@@ -6,6 +6,7 @@ import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
 import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable';
+import {EventCategory} from '../../Core/Constants/EventCategory';
 
 enum AREvent {
     AR_PLANES_ADDED,
@@ -57,7 +58,7 @@ export class ARApi extends NativeApi {
     public readonly onSessionInterruptionEnded = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AR', ApiPackage.AR);
+        super(nativeBridge, 'AR', ApiPackage.AR, EventCategory.AR);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             this.Android = new AndroidARApi(nativeBridge);

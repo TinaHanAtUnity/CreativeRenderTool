@@ -3,6 +3,7 @@ import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
 import { FinishState } from 'Core/Constants/FinishState';
+import {EventCategory} from '../../Core/Constants/EventCategory';
 
 export enum IPlacementContentType {
     SHOW_AD,
@@ -24,7 +25,7 @@ export class PlacementContentsApi extends NativeApi {
     public readonly onPlacementContentCustomEvent = new Observable2<string, any>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'PlacementContents', ApiPackage.MONETIZATION_CORE);
+        super(nativeBridge, 'PlacementContents', ApiPackage.MONETIZATION_CORE, EventCategory.PLACEMENT_CONTENT);
     }
 
     public createPlacementContent(placementId: string, params: IPlacementContentParams): Promise<void> {

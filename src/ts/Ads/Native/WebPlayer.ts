@@ -1,6 +1,7 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable2, Observable3 } from 'Core/Utilities/Observable';
+import {EventCategory} from '../../Core/Constants/EventCategory';
 
 // Platform specific, first three are available on both Android & iOS. The rest are Android only.
 export enum WebplayerEvent {
@@ -177,7 +178,7 @@ export class WebPlayerApi extends NativeApi {
     public readonly onCreateWebView = new Observable2<string, string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'WebPlayer', ApiPackage.ADS);
+        super(nativeBridge, 'WebPlayer', ApiPackage.ADS, EventCategory.WEBPLAYER);
     }
 
     public setUrl(url: string, viewId: string): Promise<void> {

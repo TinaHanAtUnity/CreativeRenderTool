@@ -1,6 +1,7 @@
 import { ApiPackage } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { EventedNativeApi } from 'Core/Native/Bridge/EventedNativeApi';
+import {EventCategory} from '../../../Core/Constants/EventCategory';
 
 enum AndroidVideoPlayerEvent {
     INFO
@@ -28,7 +29,7 @@ export interface IAndroidVideoEventHandler {
 export class AndroidVideoPlayerApi extends EventedNativeApi<IAndroidVideoEventHandler> {
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS);
+        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS, EventCategory.VIDEOPLAYER);
     }
 
     public setInfoListenerEnabled(enabled: boolean): Promise<void> {

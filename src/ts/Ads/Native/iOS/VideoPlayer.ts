@@ -1,6 +1,7 @@
 import { ApiPackage } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { EventedNativeApi } from 'Core/Native/Bridge/EventedNativeApi';
+import {EventCategory} from '../../../Core/Constants/EventCategory';
 
 export enum IosVideoPlayerEvent {
     LIKELY_TO_KEEP_UP,
@@ -20,7 +21,7 @@ export interface IIosVideoEventHandler {
 export class IosVideoPlayerApi extends EventedNativeApi<IIosVideoEventHandler> {
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS);
+        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS, EventCategory.VIDEOPLAYER);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

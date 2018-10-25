@@ -1,6 +1,7 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable4 } from 'Core/Utilities/Observable';
+import {EventCategory} from '../../Constants/EventCategory';
 
 enum BroadcastEvent {
     ACTION
@@ -11,7 +12,7 @@ export class BroadcastApi extends NativeApi {
     public readonly onBroadcastAction = new Observable4<string, string, string, any>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Broadcast', ApiPackage.CORE);
+        super(nativeBridge, 'Broadcast', ApiPackage.CORE, EventCategory.BROADCAST);
     }
 
     public addBroadcastListener(listenerName: string, actions: string[]): Promise<void> {

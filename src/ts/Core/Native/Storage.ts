@@ -1,6 +1,7 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable2 } from 'Core/Utilities/Observable';
+import {EventCategory} from '../Constants/EventCategory';
 
 export enum StorageType {
     PRIVATE,
@@ -24,7 +25,7 @@ export class StorageApi extends NativeApi {
     public onSet: Observable2<string, object> = new Observable2();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Storage', ApiPackage.CORE);
+        super(nativeBridge, 'Storage', ApiPackage.CORE, EventCategory.STORAGE);
     }
 
     public read(type: StorageType): Promise<void> {

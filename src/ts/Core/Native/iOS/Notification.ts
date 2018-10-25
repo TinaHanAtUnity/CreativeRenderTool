@@ -1,6 +1,7 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable2 } from 'Core/Utilities/Observable';
+import {EventCategory} from '../../Constants/EventCategory';
 
 enum NotificationEvent {
     ACTION
@@ -11,7 +12,7 @@ export class NotificationApi extends NativeApi {
     public readonly onNotification = new Observable2<string, any>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Notification', ApiPackage.CORE);
+        super(nativeBridge, 'Notification', ApiPackage.CORE, EventCategory.NOTIFICATION);
     }
 
     public addNotificationObserver(name: string, keys: string[]): Promise<void> {
