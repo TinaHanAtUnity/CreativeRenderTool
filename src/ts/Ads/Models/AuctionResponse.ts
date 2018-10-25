@@ -1,8 +1,9 @@
 import { Model } from 'Core/Models/Model';
 import { JsonParser } from 'Core/Utilities/JsonParser';
+import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 
 export interface IAuctionResponse {
-    placements: string[];
+    placements: Array<AuctionPlacement>;
     contentType: string;
     content: string;
     cacheTTL: number | undefined;
@@ -25,9 +26,9 @@ export interface IAuctionResponse {
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
-    constructor(placements: string[], data: any, mediaId: string, correlationId: string) {
+    constructor(placements: Array<AuctionPlacement>, data: any, mediaId: string, correlationId: string) {
         super('AuctionResponse', {
-            placements: ['array'],
+            placements: ['object'],
             contentType: ['string'],
             content: ['string'],
             cacheTTL: ['integer', 'undefined'],
@@ -71,7 +72,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('isMoatEnabled', data.isMoatEnabled);
     }
 
-    public getPlacements(): string[] {
+    public getPlacements(): Array<AuctionPlacement> {
         return this.get('placements');
     }
 

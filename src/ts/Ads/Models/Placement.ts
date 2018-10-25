@@ -31,6 +31,7 @@ interface IPlacement {
     previousState: PlacementState;
     placementStateChanged: boolean;
     currentCampaign: Campaign | undefined;
+    currentTrackingUrls: { [eventName: string]: string[] } | undefined;
     refreshDelay: number | undefined;
     position: string | undefined;
 }
@@ -54,6 +55,7 @@ export class Placement extends Model<IPlacement> {
             previousState: ['number'],
             placementStateChanged: ['boolean'],
             currentCampaign: ['object', 'undefined'],
+            currentTrackingUrls: ['object', 'undefined'],
             refreshDelay: ['number', 'undefined'],
             position: ['string', 'undefined']
         });
@@ -154,6 +156,14 @@ export class Placement extends Model<IPlacement> {
 
     public setCurrentCampaign(campaign: Campaign | undefined): void {
         this.set('currentCampaign', campaign);
+    }
+
+    public getCurrentTrackingUrls(): { [eventName: string]: string[] } | undefined {
+        return this.get('currentTrackingUrls');
+    }
+
+    public setCurrentTrackingUrls(trackingUrls: { [eventName: string]: string[] } | undefined) {
+        this.set('currentTrackingUrls', trackingUrls);
     }
 
     public getRealtimeData(): string | undefined {

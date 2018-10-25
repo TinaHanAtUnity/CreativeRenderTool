@@ -20,7 +20,7 @@ import { WebViewError } from 'Core/Errors/WebViewError';
 import { JaegerManager } from 'Core/Jaeger/JaegerManager';
 import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { ABGroup } from 'Core/Models/ABGroup';
+import { ABGroup, AuctionV5Test } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -36,11 +36,12 @@ import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
+import { Observable1, Observable2, Observable3, Observable4 } from 'Core/Utilities/Observable';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 
 export class CampaignManager {
 
@@ -69,12 +70,13 @@ export class CampaignManager {
     protected static AbGroup: ABGroup | undefined;
 
     private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
+    private static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
 
     private static CampaignId: string | undefined;
     private static SessionId: string | undefined;
     private static Country: string | undefined;
 
-    public readonly onCampaign = new Observable2<string, Campaign>();
+    public readonly onCampaign = new Observable3<string, Campaign, { [eventName: string]: string[] } | undefined>();
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable4<WebViewError, string[], string, Session | undefined>();
     public readonly onConnectivityError = new Observable1<string[]>();
@@ -339,6 +341,109 @@ export class CampaignManager {
         }
     }
 
+    private parseAuctionV5Campaigns(response: INativeResponse): Promise<void[]> {
+        let json;
+        try {
+            json = JsonParser.parse(response.response);
+        } catch (e) {
+            Diagnostics.trigger('auction_invalid_v5_json', {
+                response: response.response
+            });
+            return Promise.reject(new Error('Could not parse campaign JSON: ' + e.message));
+        }
+
+        if(!json.auctionId) {
+            throw new Error('No auction ID found');
+        } else {
+            this._lastAuctionId = json.auctionId;
+        }
+
+        const session: Session = this._sessionManager.create(json.auctionId);
+        session.setAdPlan(response.response);
+
+        this._backupCampaignManager.deleteBackupCampaigns();
+        this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
+
+        if(!('placements' in json)) {
+            throw new Error('No placements found');
+        }
+
+        const campaigns: { [mediaId: string]: Array<AuctionPlacement> } = {};
+        const noFill: string[] = [];
+
+        const placements = this._adsConfig.getPlacements();
+        for(const placement in placements) {
+            if(placements.hasOwnProperty(placement)) {
+                const mediaId = json.placements[placement].mediaId;
+
+                if(mediaId) {
+                    const auctionPlacement: AuctionPlacement = new AuctionPlacement(placement, mediaId, json.placements[placement].trackingId);
+
+                    if(campaigns[mediaId]) {
+                        campaigns[mediaId].push(auctionPlacement);
+                    } else {
+                        campaigns[mediaId] = [auctionPlacement];
+                    }
+                } else {
+                    noFill.push(placement);
+                }
+
+                if(json.realtimeData && json.realtimeData[placement]) {
+                    this._adsConfig.getPlacement(placement).setRealtimeData(json.realtimeData[placement]);
+                }
+            }
+        }
+
+        let refreshDelay: number = 0;
+        const promises: Array<Promise<void>> = [];
+
+        for(const placement of noFill) {
+            promises.push(this.handleNoFill(placement));
+            refreshDelay = RefreshManager.NoFillDelay;
+        }
+
+        let campaignCount: number = 0;
+        for(const mediaId in campaigns) {
+            if(campaigns.hasOwnProperty(mediaId)) {
+                campaignCount++;
+
+                const contentType = json.media[mediaId].contentType;
+                const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
+                if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
+                    refreshDelay = cacheTTL;
+                }
+            }
+        }
+
+        this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
+        this.onAdPlanReceived.trigger(refreshDelay, campaignCount);
+
+        for(const mediaId in campaigns) {
+            if(campaigns.hasOwnProperty(mediaId)) {
+                let auctionResponse: AuctionResponse;
+                try {
+                    auctionResponse = new AuctionResponse(campaigns[mediaId], json.media[mediaId], mediaId, json.correlationId);
+                    promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
+                        if(error === CacheStatus.STOPPED) {
+                            return Promise.resolve();
+                        } else if(error === CacheStatus.FAILED) {
+                            return this.handleError(new WebViewError('Caching failed', 'CacheStatusFailed'), campaigns[mediaId], 'campaign_caching_failed', session);
+                        } else if(error === CacheError[CacheError.FILE_NOT_FOUND]) {
+                            // handle native API Cache.getFilePath failure (related to Android cache directory problems?)
+                            return this.handleError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), campaigns[mediaId], 'campaign_caching_get_file_path_failed', session);
+                        }
+
+                        return this.handleError(error, fill[mediaId], 'handle_campaign_error', session);
+                    }));
+                } catch(error) {
+                    this.handleError(error, fill[mediaId], 'error_creating_handle_campaign_chain', session);
+                }
+            }
+        }
+
+        return Promise.all(promises);
+    }
+
     private parseRealtimeCampaign(response: INativeResponse, session: Session, placement: Placement): Promise<Campaign | void> {
         const json = JsonParser.parse(response.response);
 
@@ -393,7 +498,7 @@ export class CampaignManager {
         });
     }
 
-    private setupCampaignAssets(placements: string[], campaign: Campaign, contentType: string, session: Session): Promise<void> {
+    private setupCampaignAssets(placements: Array<AuctionPlacement>, campaign: Campaign, contentType: string, session: Session): Promise<void> {
         const cachingTimestamp = Date.now();
         return this._assetManager.setup(campaign).then(() => {
             if(this._sessionManager.getGameSessionId() % 1000 === 99) {
@@ -458,11 +563,19 @@ export class CampaignManager {
     }
 
     private getBaseUrl(): string {
-        return [
-            CampaignManager.BaseUrl,
-            this._clientInfo.getGameId(),
-            'requests'
-        ].join('/');
+        if(AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
+            return [
+                CampaignManager.AuctionV5BaseUrl,
+                this._clientInfo.getGameId(),
+                'requests'
+            ].join('/');
+        } else {
+            return [
+                CampaignManager.BaseUrl,
+                this._clientInfo.getGameId(),
+                'requests'
+            ].join('/');
+        }
     }
 
     private createRequestUrl(realtime: boolean, nofillRetry?: boolean, session?: Session): Promise<string> {
