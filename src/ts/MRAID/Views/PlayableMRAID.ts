@@ -1,4 +1,3 @@
-import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
@@ -13,7 +12,7 @@ import MRAIDContainer from 'html/mraid/container.html';
 import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { MraidIFrameEventBridge } from './MRAIDIFrameEventBridge';
+import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -27,25 +26,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _configuration: any;
 
     protected _campaign: PerformanceMRAIDCampaign;
-    private _mraidBridge: MraidIFrameEventBridge;
+    private _messageListener: any;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: PerformanceMRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
         super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
-
-        this._mraidBridge = new MraidIFrameEventBridge(nativeBridge, {
-            onSetOrientationProperties: (allowOrientationChange: boolean, forceOrientation: Orientation) => this.onSetOrientationProperties(allowOrientationChange, forceOrientation),
-            onOpen: (url: string) => this.onOpen(url),
-            onLoaded: () => this.onLoadedEvent(),
-            onAnalyticsEvent: (event: string, eventData: string) => this.sendMraidAnalyticsEvent(event, eventData),
-            onClose: () => this.onClose(),
-            onStateChange: (customState: string) => this.onCustomState(customState),
-            onResizeWebview: () => this.onResizeWebview(),
-            onSendStats: (totalTime: number, playTime: number, frameCount: number) => this.updateStats({
-                totalTime: totalTime,
-                playTime: playTime,
-                frameCount: frameCount
-            })
-        });
 
         this._placement = placement;
         this._campaign = campaign;
@@ -77,6 +61,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         super.render();
 
         this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
+        this._messageListener = (event: MessageEvent) => this.onMessage(event);
+        window.addEventListener('message', this._messageListener, false);
         this.loadIframe();
     }
 
@@ -99,20 +85,26 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._prepareTimeout = undefined;
         }
 
-        this._mraidBridge.disconnect();
         super.hide();
+
+        if(this._messageListener) {
+            window.removeEventListener('message', this._messageListener, false);
+            this._messageListener = undefined;
+        }
     }
 
     public setViewableState(viewable: boolean) {
         if(this._isLoaded && !this._loadingScreenTimeout) {
-            this._mraidBridge.sendViewableEvent(viewable);
+            this._iframe.contentWindow!.postMessage({
+                type: 'viewable',
+                value: viewable
+            }, '*');
         }
         this.setAnalyticsBackgroundTime(viewable);
     }
 
     private loadIframe(): void {
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-        this._mraidBridge.connect(iframe);
 
         const container = this.setUpMraidContainer();
         this.createMRAID(container).then(mraid => {
@@ -196,7 +188,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
                 this._playableStartTimestamp = Date.now();
                 this.sendMraidAnalyticsEvent('playable_start');
-                this._mraidBridge.sendViewableEvent(true);
+                this._iframe.contentWindow!.postMessage({
+                    type: 'viewable',
+                    value: true
+                }, '*');
 
                 this._loadingScreen.style.display = 'none';
             }, false);
@@ -231,7 +226,53 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private onLoadedEvent(): void {
-        // do nothing
+    private onMessage(event: MessageEvent) {
+        switch(event.data.type) {
+            case 'open':
+                this._handlers.forEach(handler => handler.onMraidClick(encodeURI(event.data.url)));
+                break;
+            case 'close':
+                this._handlers.forEach(handler => handler.onMraidClose());
+                break;
+            case 'sendStats':
+                this.updateStats({
+                    totalTime: event.data.totalTime,
+                    playTime: event.data.playTime,
+                    frameCount: event.data.frameCount
+                });
+                break;
+            case 'orientation':
+                let forceOrientation = Orientation.NONE;
+                switch(event.data.properties.forceOrientation) {
+                    case 'portrait':
+                        forceOrientation = Orientation.PORTRAIT;
+                        break;
+                     case 'landscape':
+                        forceOrientation = Orientation.LANDSCAPE;
+                        break;
+                     default:
+                }
+                this._handlers.forEach(handler => handler.onMraidOrientationProperties({
+                    allowOrientationChange: event.data.properties.allowOrientationChange,
+                    forceOrientation: forceOrientation
+                }));
+                break;
+            case 'analyticsEvent':
+                this.sendMraidAnalyticsEvent(event.data.event, event.data.eventData);
+                break;
+            case 'customMraidState':
+                switch(event.data.state) {
+                    case 'completed':
+                        if(!this._placement.allowSkip() && this._closeRemaining > 5) {
+                            this._closeRemaining = 5;
+                        }
+                        break;
+                    case 'showEndScreen':
+                        break;
+                    default:
+                }
+                break;
+            default:
+        }
     }
 }

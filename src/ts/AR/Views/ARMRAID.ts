@@ -196,11 +196,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }
         }
 
-        if(this._messageListener) {
-            window.removeEventListener('message', this._messageListener, false);
-            this._messageListener = undefined;
-        }
-
         if(this._loadingScreenTimeout) {
             clearTimeout(this._loadingScreenTimeout);
             this._loadingScreenTimeout = undefined;
@@ -212,6 +207,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
 
         super.hide();
+
+        if(this._messageListener) {
+            window.removeEventListener('message', this._messageListener, false);
+            this._messageListener = undefined;
+        }
     }
 
     private showLoadingScreen() {
