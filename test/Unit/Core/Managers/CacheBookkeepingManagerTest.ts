@@ -41,7 +41,7 @@ class TestHelper {
         let helper: TestHelper;
 
         beforeEach(() => {
-            backend = new Backend(Platform.ANDROID);
+            backend = new Backend(platform);
             nativeBridge = new NativeBridge(backend, platform, false);
             backend.setNativeBridge(nativeBridge);
             core = TestFixtures.getCoreApi(nativeBridge);
