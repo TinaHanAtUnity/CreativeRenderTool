@@ -23,6 +23,7 @@ import { Double } from 'Core/Utilities/Double';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { ABGroup } from 'Core/Models/ABGroup';
+import { AllowRewardedAdSkipInSeconds } from 'Constants/ExperimentConstants';
 
 export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParameters<T> {
     video: Video;
@@ -275,7 +276,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                 if (CustomFeatures.allowSkipInRewardedVideos(this._abGroup, this._campaign)) {
                     overlay.setSkipEnabled(true);
                     // Use the same value as in the PerformanceOverlayEventHandlerWithAllowSkip canSkipVideo()
-                    overlay.setSkipDuration(5);
+                    overlay.setSkipDuration(AllowRewardedAdSkipInSeconds);
                     return;
                 }
 

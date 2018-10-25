@@ -1,21 +1,14 @@
-import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
-import { ABGroup } from 'Core/Models/ABGroup';
 import { Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IOperativeEventParams } from 'Ads/Managers/OperativeEventManager';
-import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
-import { Campaign } from 'Ads/Models/Campaign';
 import { Video } from 'Ads/Models/Assets/Video';
-import { WebViewError } from 'Core/Errors/WebViewError';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { FinishState } from 'Core/Constants/FinishState';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
+import { AllowRewardedAdSkipInSeconds } from 'Constants/ExperimentConstants';
 
 export class PerformanceOverlayEventHandlerWithAllowSkip extends PerformanceOverlayEventHandler {
 
@@ -61,7 +54,7 @@ export class PerformanceOverlayEventHandlerWithAllowSkip extends PerformanceOver
         const position = this._video.getPosition();
 
         // Use the same value as in the VideoAdUnit.ts prepareOverlay()
-        const allowSkipInMs = 5000;
+        const allowSkipInMs = AllowRewardedAdSkipInSeconds * 1000;
         return position >= allowSkipInMs;
     }
 
