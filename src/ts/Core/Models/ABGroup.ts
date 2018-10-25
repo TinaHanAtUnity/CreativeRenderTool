@@ -104,5 +104,4 @@ class ABTest {
 
 export const FPSCollectionTest = new ABTest(GroupSixteen);
 export const ClickDelayTrackingTest = new ABTest(GroupFourteen, GroupFifteen);
-export const BackupCampaignTest = new ABTest(GroupSix, GroupSeven);
 export const PerformanceVideoOverlayCTAButtonTest = new ABTest(GroupEighteen, GroupNineteen);

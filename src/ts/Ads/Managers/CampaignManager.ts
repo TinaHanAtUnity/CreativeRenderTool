@@ -97,7 +97,6 @@ export class CampaignManager {
     private _previousPlacementId: string | undefined;
     private _realtimeUrl: string | undefined;
     private _realtimeBody: any = {};
-    private _ignoreEvents: boolean;
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
 
@@ -114,90 +113,8 @@ export class CampaignManager {
         this._adMobSignalFactory = adMobSignalFactory;
         this._cacheBookkeeping = cacheBookkeeping;
         this._requesting = false;
-        this._ignoreEvents = false;
         this._jaegerManager = jaegerManager;
         this._backupCampaignManager = backupCampaignManager;
-    }
-
-    public cleanCachedUrl(url: string): string {
-        let cleanUrl = Url.removeQueryParameter(url, 'connectionType');
-        cleanUrl = Url.removeQueryParameter(cleanUrl, 'networkType');
-        return cleanUrl;
-    }
-
-    public requestFromCache(cachedResponse: INativeResponse): Promise<void[] | void> {
-        if(this._requesting) {
-            return Promise.resolve();
-        }
-
-        this._ignoreEvents = true;
-        this._requesting = true;
-
-        return this.createRequestUrl(false).then((currentUrl: string) => {
-            let cachedUrl = cachedResponse.url;
-
-            cachedUrl = this.cleanCachedUrl(cachedUrl);
-            const cleanUrl = this.cleanCachedUrl(currentUrl);
-
-            if (cachedUrl !== cleanUrl) {
-                this._nativeBridge.Sdk.logInfo('Failed to use cached campaign response due to URL mismatch ' + cachedUrl + ' (cached) and ' + cleanUrl + ' (current)');
-                return Promise.reject(new Error('invalidate cache'));
-            }
-
-            return Promise.resolve();
-        }).then(() => {
-            this._assetManager.enableCaching();
-            this._assetManager.checkFreeSpace();
-
-            this.resetRealtimeDataForPlacements();
-
-            this._nativeBridge.Sdk.logInfo('Requesting ad plan from cache ' + cachedResponse.url);
-
-            SdkStats.setAdRequestTimestamp();
-        }).then(() => {
-            let cachedJson: any;
-            try {
-                cachedJson = JsonParser.parse(cachedResponse.response);
-            } catch (e) {
-                return Promise.reject('failed to parse cached response, invalidate cache');
-            }
-
-            const expiredPlacements = [];
-
-            const now = new Date(Date.now());
-            const utcTimestamp = Math.floor(new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate(),
-                now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds()).getTime() / 1000);
-
-            for(const placement in cachedJson.placements) {
-                if(!cachedJson.placements.hasOwnProperty(placement)) {
-                    continue;
-                }
-                const mediaId: string = cachedJson.placements[placement];
-                const absoluteCacheTTL = cachedJson.media[mediaId].absoluteCacheTTL;
-
-                if (absoluteCacheTTL && utcTimestamp > absoluteCacheTTL) {
-                    expiredPlacements.push(placement);
-                }
-            }
-
-            for(const placement of expiredPlacements) {
-                delete cachedJson.placements[placement];
-            }
-
-            if (Object.keys(cachedJson.placements).length === 0) {
-                return Promise.reject('all placements expired, invalidate cache');
-            }
-
-            cachedResponse.response = JSON.stringify(cachedJson);
-
-            return this.parseCampaigns(cachedResponse, true);
-        }).then(() => {
-            this._ignoreEvents = false;
-            this._requesting = false;
-        }).catch((error) => {
-            this._ignoreEvents = false;
-            this._requesting = false;
-        });
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -222,9 +139,7 @@ export class CampaignManager {
 
             SdkStats.setAdRequestTimestamp();
             const requestTimestamp: number = Date.now();
-            return Promise.resolve().then(() => {
-                return this._cacheBookkeeping.deleteCachedCampaignResponse();
-            }).then((): Promise<INativeResponse> => {
+            return Promise.resolve().then((): Promise<INativeResponse> => {
                 if(CampaignManager.CampaignResponse) {
                     return Promise.resolve({
                         url: requestUrl,
@@ -250,7 +165,7 @@ export class CampaignManager {
                 if(response) {
                     this.setSDKSignalValues(requestTimestamp);
 
-                    return this.parseCampaigns(response, false).catch((e) => {
+                    return this.parseCampaigns(response).catch((e) => {
                         this.handleError(e, this._adsConfig.getPlacementIds(), 'parse_campaigns_error');
                     });
                 }
@@ -321,7 +236,7 @@ export class CampaignManager {
         });
     }
 
-    private parseCampaigns(response: INativeResponse, backupResponse: boolean): Promise<void[]> {
+    private parseCampaigns(response: INativeResponse): Promise<void[]> {
         let json;
         try {
             json = JsonParser.parse(response.response);
@@ -342,11 +257,11 @@ export class CampaignManager {
         session.setAdPlan(response.response);
 
         this._backupCampaignManager.deleteBackupCampaigns();
+        this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
 
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
-            const failedToCachePlacement: string[] = [];
 
             const placements = this._adsConfig.getPlacements();
             for(const placement in placements) {
@@ -392,22 +307,15 @@ export class CampaignManager {
                 }
             }
 
-            if (!this._ignoreEvents) {
-                this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
-                this.onAdPlanReceived.trigger(refreshDelay, campaigns);
-            }
+            this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
+            this.onAdPlanReceived.trigger(refreshDelay, campaigns);
+
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     let auctionResponse: AuctionResponse;
                     try {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], mediaId, json.correlationId);
-                        promises.push(this.handleCampaign(auctionResponse, session, backupResponse).catch(error => {
-                            fill[mediaId].forEach(placement => {
-                                if(failedToCachePlacement.indexOf(placement) === -1) {
-                                    failedToCachePlacement.push(placement);
-                                }
-                            });
-
+                        promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
                             } else if(error === CacheStatus.FAILED) {
@@ -420,79 +328,12 @@ export class CampaignManager {
                             return this.handleError(error, fill[mediaId], 'handle_campaign_error', session);
                         }));
                     } catch(error) {
-                        fill[mediaId].forEach(placement => {
-                            if(failedToCachePlacement.indexOf(placement) === -1) {
-                                failedToCachePlacement.push(placement);
-                            }
-                        });
                         this.handleError(error, fill[mediaId], 'error_creating_handle_campaign_chain', session);
                     }
                 }
             }
 
-            return Promise.all(promises).then(x => {
-                if (backupResponse) {
-                    return Promise.resolve();
-                }
-
-                let cachedJson: any;
-                try {
-                    cachedJson = JsonParser.parse(response.response);
-                } catch (e) {
-                    return Promise.resolve();
-                }
-
-                for(const mediaId in fill) {
-                    if(!fill.hasOwnProperty(mediaId)) {
-                        continue;
-                    }
-                    const contentType = cachedJson.media[mediaId].contentType;
-
-                    if (contentType && contentType === 'programmatic/vast') {
-                        fill[mediaId].forEach(p => {
-                            delete cachedJson.placements[p];
-                        });
-                    }
-                }
-
-                for(const placement of failedToCachePlacement) {
-                    delete cachedJson.placements[placement];
-                }
-
-                for(const placement of noFill) {
-                    delete cachedJson.placements[placement];
-                }
-
-                if (Object.keys(cachedJson.placements).length === 0) {
-                    return Promise.resolve();
-                }
-
-                const now = new Date(Date.now());
-                const utcTimestamp = Math.floor(new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate(),
-                    now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds()).getTime() / 1000);
-
-                for(const mediaId in fill) {
-                    if(!fill.hasOwnProperty(mediaId)) {
-                        continue;
-                    }
-
-                    const contentType = cachedJson.media[mediaId].contentType;
-                    let cacheTTL = cachedJson.media[mediaId].cacheTTL ? cachedJson.media[mediaId].cacheTTL : 3600;
-
-                    if(!cachedJson.media[mediaId].cacheTTL && contentType && contentType === 'comet/campaign') {
-                        cacheTTL = 7 * 24 * 3600;
-                    }
-
-                    cachedJson.media[mediaId].absoluteCacheTTL = utcTimestamp + cacheTTL;
-                }
-
-                return this._cacheBookkeeping.setCachedCampaignResponse({
-                    url: response.url,
-                    response: JSON.stringify(cachedJson),
-                    responseCode: response.responseCode,
-                    headers: response.headers
-                });
-            });
+            return Promise.all(promises);
         } else {
             throw new Error('No placements found');
         }
@@ -523,11 +364,11 @@ export class CampaignManager {
         }
     }
 
-    private handleCampaign(response: AuctionResponse, session: Session, backupCampaign: boolean): Promise<void> {
+    private handleCampaign(response: AuctionResponse, session: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
         let parser: CampaignParser;
 
-        if((this._sessionManager.getGameSessionId() % 1000 === 99) && backupCampaign === false) {
+        if(this._sessionManager.getGameSessionId() % 1000 === 99) {
             SessionDiagnostics.trigger('ad_received', {
                 contentType: response.getContentType()
             }, session);
@@ -548,14 +389,14 @@ export class CampaignManager {
 
             campaign.setMediaId(response.getMediaId());
 
-            return this.setupCampaignAssets(response.getPlacements(), campaign, backupCampaign, response.getContentType(), session);
+            return this.setupCampaignAssets(response.getPlacements(), campaign, response.getContentType(), session);
         });
     }
 
-    private setupCampaignAssets(placements: string[], campaign: Campaign, backupCampaign: boolean, contentType: string, session: Session): Promise<void> {
+    private setupCampaignAssets(placements: string[], campaign: Campaign, contentType: string, session: Session): Promise<void> {
         const cachingTimestamp = Date.now();
         return this._assetManager.setup(campaign).then(() => {
-            if((this._sessionManager.getGameSessionId() % 1000 === 99) && backupCampaign === false) {
+            if(this._sessionManager.getGameSessionId() % 1000 === 99) {
                 SessionDiagnostics.trigger('ad_ready', {
                     contentType: contentType
                 }, session);
@@ -606,18 +447,13 @@ export class CampaignManager {
 
     private handleNoFill(placement: string): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC no fill for placement ' + placement);
-        if (!this._ignoreEvents) {
-            this.onNoFill.trigger(placement);
-        }
+        this.onNoFill.trigger(placement);
         return Promise.resolve();
     }
 
     private handleError(error: any, placementIds: string[], diagnosticsType: string, session?: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        if (!this._ignoreEvents) {
-            this.onError.trigger(error, placementIds, diagnosticsType, session);
-        }
-
+        this.onError.trigger(error, placementIds, diagnosticsType, session);
         return Promise.resolve();
     }
 
