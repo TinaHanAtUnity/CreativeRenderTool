@@ -17,7 +17,7 @@ export class IosPermissionsApi extends NativeApi {
     public readonly onPermissionsResult = new Observable2<string, boolean>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Permissions', ApiPackage.CORE, EventCategory.PERMISSIONS);
+        super(nativeBridge, 'Permissions', ApiPackage.CORE);
     }
 
     public checkPermission(permission: IosPermission | string): Promise<number> {

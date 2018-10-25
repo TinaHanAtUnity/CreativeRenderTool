@@ -13,7 +13,7 @@ export class AndroidPermissionsApi extends NativeApi {
     public readonly onPermissionsError = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Permissions', ApiPackage.CORE, EventCategory.PERMISSIONS);
+        super(nativeBridge, 'Permissions', ApiPackage.CORE);
     }
 
     public getPermissions(): Promise<string[]> {

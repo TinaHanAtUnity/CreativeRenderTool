@@ -29,7 +29,7 @@ export interface IAndroidVideoEventHandler {
 export class AndroidVideoPlayerApi extends EventedNativeApi<IAndroidVideoEventHandler> {
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS, EventCategory.VIDEOPLAYER);
+        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS);
     }
 
     public setInfoListenerEnabled(enabled: boolean): Promise<void> {

@@ -7,7 +7,7 @@ export class AndroidARApi extends NativeApi {
     public readonly onAndroidEnumsReceived = new Observable1<any>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AR', ApiPackage.AR, EventCategory.AR);
+        super(nativeBridge, 'AR', ApiPackage.AR);
     }
 
     public isARSupported(): Promise<[boolean, boolean]> {
