@@ -12,14 +12,14 @@ export class Placement {
         Placement._placements[placement] = state;
     }
 
-    public static getPlacementState(placement?: string) {
-        if(!placement) {
-            placement = Placement._defaultPlacement;
-        }
-        if(placement) {
+    public static getPlacementState(placement?: string): string {
+        if (placement) {
             return Placement._placements[placement];
+        } else if(Placement._defaultPlacement) {
+            return Placement._placements[Placement._defaultPlacement];
+        } else {
+            return 'NOT_AVAILABLE';
         }
-        return 'NOT_AVAILABLE';
     }
 
     private static _defaultPlacement: string | undefined;
