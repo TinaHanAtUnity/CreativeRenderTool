@@ -5,17 +5,15 @@ import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { Platform } from 'Core/Constants/Platform';
-import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
-import { VastErrorHandler, VastErrorCode, VastErrorMessage } from 'VAST/EventHandlers/VastErrorHandler';
 import { Url } from 'Core/Utilities/Url';
 import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
 import { CampaignError } from 'Ads/Errors/CampaignError';
-import { VastErrorInfo } from 'VAST/EventHandlers/VastCampaignErrorHandler';
+import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 export class ProgrammaticVastParser extends CampaignParser {
@@ -87,7 +85,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         }
 
         if (!mediaVideoUrl) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_NOT_FOUND], CampaignContentType.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_NOT_FOUND);
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentType.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND);
         }
 
         if (nativeBridge.getPlatform() === Platform.IOS && !mediaVideoUrl.match(/^https:\/\//)) {

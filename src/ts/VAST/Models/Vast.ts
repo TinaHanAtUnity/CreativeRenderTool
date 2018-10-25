@@ -1,8 +1,10 @@
 import { Model } from 'Core/Models/Model';
 import { VastAd } from 'VAST/Models/VastAd';
 import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
-import { VastErrorMessage } from 'VAST/EventHandlers/VastErrorHandler';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
+import { CampaignError } from 'Ads/Errors/CampaignError';
+import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
+import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
 
 interface IVast {
     ads: VastAd[];
@@ -71,7 +73,7 @@ export class Vast extends Model<IVast> {
             }
         }
 
-        throw new Error(VastErrorMessage.MEDIA_FILE_NOT_FOUND);
+        throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentType.ProgrammaticVast);
     }
 
     public getMediaVideoUrl(): string | null {
