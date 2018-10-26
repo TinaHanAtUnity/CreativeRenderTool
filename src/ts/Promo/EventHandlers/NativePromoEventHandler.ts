@@ -3,7 +3,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
-import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';

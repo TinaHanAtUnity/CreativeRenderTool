@@ -7,9 +7,10 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 
 export class ProgrammaticMraidUrlParser extends CampaignParser {
-    public static ContentType = 'programmatic/mraid-url';
+    public static ContentType = CampaignContentTypes.ProgrammaticMraidUrl;
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraidUrl = response.getJsonContent();
 

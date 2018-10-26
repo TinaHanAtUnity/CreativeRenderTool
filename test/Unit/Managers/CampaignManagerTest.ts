@@ -82,6 +82,7 @@ import WrappedVast3 from 'xml/WrappedVast3.xml';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -472,7 +473,7 @@ describe('CampaignManager', () => {
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             campaignManager.onError.subscribe((err: WebViewError) => {
-                assert.equal(err.message, 'VAST wrapper depth exceeded');
+                assert.equal(err.message, VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
                 done();
             });
 
@@ -540,7 +541,7 @@ describe('CampaignManager', () => {
                 const response = {
                     response: OnProgrammaticVastPlcCampaignNoVideo
                 };
-                return verifyErrorForResponse(response, 'No video URL found for VAST');
+                return verifyErrorForResponse(response, VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND]);
             });
 
             it('should trigger onError after requesting a wrapped vast placement without a video url', (done) => {
@@ -551,7 +552,7 @@ describe('CampaignManager', () => {
                 const wrappedResponse = Promise.resolve({
                     response: NoVideoWrappedVast
                 });
-                return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'No video URL found for VAST', done);
+                return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], done);
             });
 
             it('should trigger onError after requesting a vast placement with incorrect document element node name', () => {
@@ -577,7 +578,7 @@ describe('CampaignManager', () => {
                 const response = {
                     response: OnProgrammaticVastPlcCampaignNoData
                 };
-                return verifyErrorForResponse(response, 'VAST xml data is missing');
+                return verifyErrorForResponse(response, VastErrorInfo.errorMap[VastErrorCode.XML_PARSER_ERROR]);
             });
 
             it('should trigger onError after requesting a wrapped vast placement when a failure occurred requesting the wrapped VAST', () => {
@@ -585,9 +586,9 @@ describe('CampaignManager', () => {
                     response: OnProgrammaticVastPlcCampaignFailing
                 };
                 const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
-                const wrappedResponse = Promise.reject('Some kind of request error happened');
+                const wrappedResponse = Promise.reject(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_GENERAL_ERROR]);
 
-                return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'Some kind of request error happened');
+                return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, VastErrorInfo.errorMap[VastErrorCode.WRAPPER_GENERAL_ERROR]);
             });
 
             it('should trigger onError after requesting a vast placement with null vast data', () => {
@@ -617,13 +618,6 @@ describe('CampaignManager', () => {
                 });
             });
 
-            it('should trigger onError after requesting a vast placement without an impression url', () => {
-                const response = {
-                    response: OnProgrammaticVastPlcCampaignNoImpression
-                };
-                return verifyErrorForResponse(response, 'Campaign does not have an impression url');
-            });
-
             it('should bail out when max wrapper depth is reached for a wrapped VAST', () => {
 
                 // given a valid VAST response containing a wrapper
@@ -636,7 +630,7 @@ describe('CampaignManager', () => {
 
                 // then we should get an error because there was no video URL,
                 // because the video url would have been in the wrapped xml
-                return verifyErrorForResponse(response, 'VAST wrapper depth exceeded');
+                return verifyErrorForResponse(response, VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
             });
         });
 
