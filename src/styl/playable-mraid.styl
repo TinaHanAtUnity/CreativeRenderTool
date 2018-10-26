@@ -266,19 +266,18 @@ $camera-permission-panel-height = 100vw;
     background: $camera-permission-panel-color;
 
     .container {
-      max-width: $permissions-max-width;
       width: 80%;
-      justify-content: flex-start;
+      justify-content: center;
     }
 
     .permission-text {
       margin: 0 0 8px;
       text-align: center;
-      font-size:4vw;
+      font-size: $default-font-size * 0.85;
     }
 
     .arads-logo {
-      margin: 20px auto 15px;
+      margin: 0 auto 15px;
       width: 166.5px;
       height: 30px;
       background-image: url("../img/adsar.png");
@@ -290,7 +289,7 @@ $camera-permission-panel-height = 100vw;
       display: flex;
 
       margin: 0 auto;
-      max-width: $permissions-max-width;
+      max-width: 90%;
       width: 90%;
 
       -webkit-box-orient: horizontal;
@@ -304,16 +303,16 @@ $camera-permission-panel-height = 100vw;
     }
 
     .permission-accept-button {
-      $download-container-default($default-scale-size * .85, true);
+      $download-container-default($default-scale-size * .5, true);
       flex: 1;
-      margin: 0 auto 8px 8px;
+      //margin: 0 auto 8px 8px;
       padding: .6375rem .35rem;
     }
 
     .permission-decline-button {
-      $download-container-default($default-scale-size * .85, true);
+      $download-container-default($default-scale-size * .5, true);
       flex: 1;
-      margin: 0 0 8px;
+      margin: 0 8px 0 0;
       padding: .6375rem .35rem;
       background: $permissions-gray;
       color: $white;
@@ -359,7 +358,7 @@ $camera-permission-panel-height = 100vw;
       height: inherit;
 
       .container {
-        width: 100%;
+        width: 80%;
         justify-content: center;
       }
 
@@ -369,7 +368,7 @@ $camera-permission-panel-height = 100vw;
 
       .permission-text {
         padding: 0 8px;
-        font-size: 2vw;
+        font-size: $default-font-size * 0.85;
       }
 
       .permission-choice-buttons {
@@ -381,6 +380,10 @@ $camera-permission-panel-height = 100vw;
         flex-direction: column-reverse;
         align-items: center;
         justify-content: space-around;
+      }
+
+      .permission-decline-button {
+        margin: 0;
       }
 
       .gdpr-link {
@@ -479,12 +482,12 @@ $camera-permission-panel-height = 100vw;
   #playable-mraid {
     // @stylint off
     .mraid-iframe-camera-permission-dialog {
-      height: 130vw !important;
+      height: 120vw !important;
     }
     // @stylint on
 
     .camera-permission-panel {
-      top: 130vw;
+      top: 120vw;
     }
   }
 }
@@ -582,7 +585,7 @@ $camera-permission-panel-height = 100vw;
     }
   }
 }
-*/
+
 // iPad
 @media screen and (min-height: 768px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 768px) {
   .loading-screen {
