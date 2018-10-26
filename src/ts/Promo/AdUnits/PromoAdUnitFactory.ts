@@ -1,11 +1,11 @@
-import { AbstractAdUnitFactory } from '../../Ads/AdUnits/AbstractAdUnitFactory';
-import { NativeBridge } from '../../Core/Native/Bridge/NativeBridge';
-import { IAdUnitParameters } from '../../Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { PromoCampaign } from '../Models/PromoCampaign';
 import { PromoAdUnit } from './PromoAdUnit';
 import { Promo } from '../Views/Promo';
 import { PromoEventHandler } from '../EventHandlers/PromoEventHandler';
-import { Privacy } from '../../Ads/Views/Privacy';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export class PromoAdUnitFactory extends AbstractAdUnitFactory {
 

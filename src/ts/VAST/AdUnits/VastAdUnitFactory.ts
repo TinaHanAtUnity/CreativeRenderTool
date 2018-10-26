@@ -1,19 +1,19 @@
-import { AbstractAdUnitFactory } from '../../Ads/AdUnits/AbstractAdUnitFactory';
-import { NativeBridge } from '../../Core/Native/Bridge/NativeBridge';
-import { IAdUnitParameters } from '../../Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastCampaign } from '../Models/VastCampaign';
 import { IVastAdUnitParameters, VastAdUnit } from './VastAdUnit';
 import { IVastEndscreenParameters, VastEndScreen } from '../Views/VastEndScreen';
-import { MoatViewabilityService } from '../../Ads/Utilities/MoatViewabilityService';
+import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { VastOverlayEventHandler } from '../EventHandlers/VastOverlayEventHandler';
 import { VastEndScreenEventHandler } from '../EventHandlers/VastEndScreenEventHandler';
-import { Platform } from '../../Core/Constants/Platform';
-import { CustomFeatures } from '../../Ads/Utilities/CustomFeatures';
+import { Platform } from 'Core/Constants/Platform';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { VastVideoEventHandler } from '../EventHandlers/VastVideoEventHandler';
-import { IVideoEventHandlerParams } from '../../Ads/EventHandlers/BaseVideoEventHandler';
-import { IObserver2, IObserver3 } from '../../Core/Utilities/IObserver';
-import { StreamType } from '../../Core/Constants/Android/StreamType';
-import { Privacy } from '../../Ads/Views/Privacy';
+import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
+import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
+import { StreamType } from 'Core/Constants/Android/StreamType';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export class VastAdUnitFactory extends AbstractAdUnitFactory {
 

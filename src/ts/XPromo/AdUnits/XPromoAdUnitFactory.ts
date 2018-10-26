@@ -1,17 +1,17 @@
-import { AbstractAdUnitFactory } from '../../Ads/AdUnits/AbstractAdUnitFactory';
-import { NativeBridge } from '../../Core/Native/Bridge/NativeBridge';
-import { IAdUnitParameters } from '../../Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { XPromoCampaign } from '../Models/XPromoCampaign';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from './XPromoAdUnit';
 import { XPromoEndScreen } from '../Views/XPromoEndScreen';
 import { XPromoOverlayEventHandler } from '../EventHandlers/XPromoOverlayEventHandler';
 import { XPromoEndScreenEventHandler } from '../EventHandlers/XPromoEndScreenEventHandler';
 import { XPromoVideoEventHandler } from '../EventHandlers/XPromoVideoEventHandler';
-import { IVideoEventHandlerParams } from '../../Ads/EventHandlers/BaseVideoEventHandler';
+import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { XPromoOperativeEventManager } from '../Managers/XPromoOperativeEventManager';
-import { Platform } from '../../Core/Constants/Platform';
-import { CustomFeatures } from '../../Ads/Utilities/CustomFeatures';
-import { Privacy } from '../../Ads/Views/Privacy';
+import { Platform } from 'Core/Constants/Platform';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
 

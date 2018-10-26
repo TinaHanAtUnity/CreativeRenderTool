@@ -1,20 +1,20 @@
-import { AbstractAdUnitFactory } from '../../Ads/AdUnits/AbstractAdUnitFactory';
-import { NativeBridge } from '../../Core/Native/Bridge/NativeBridge';
-import { IAdUnitParameters } from '../../Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from '../Models/PerformanceCampaign';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from './PerformanceAdUnit';
-import { AdUnitStyle } from '../../Ads/Models/AdUnitStyle';
-import { IEndScreenParameters } from '../../Ads/Views/EndScreen';
+import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceEndScreen } from '../Views/PerformanceEndScreen';
 import { PerformanceOverlayEventHandler } from '../EventHandlers/PerformanceOverlayEventHandler';
-import { PerformanceVideoOverlayWithCTAButton } from '../../Ads/Views/PerformanceVideoOverlayWithCTAButton';
+import { PerformanceVideoOverlayWithCTAButton } from 'Ads/Views/PerformanceVideoOverlayWithCTAButton';
 import { PerformanceOverlayWithCTAButtonEventHandler } from '../EventHandlers/PerformanceOverlayWithCTAButtonEventHandler';
 import { PerformanceEndScreenEventHandler } from '../EventHandlers/PerformanceEndScreenEventHandler';
 import { PerformanceVideoEventHandler } from '../EventHandlers/PerformanceVideoEventHandler';
-import { IVideoEventHandlerParams } from '../../Ads/EventHandlers/BaseVideoEventHandler';
-import { Platform } from '../../Core/Constants/Platform';
-import { CustomFeatures } from '../../Ads/Utilities/CustomFeatures';
-import { Privacy } from '../../Ads/Views/Privacy';
+import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
+import { Platform } from 'Core/Constants/Platform';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
