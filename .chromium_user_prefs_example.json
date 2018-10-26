@@ -1,0 +1,11 @@
+{
+  "userPrefs": {
+    "devtools": {
+      "preferences": {
+        "InspectorView.splitViewState": "{\"vertical\":{\"size\":9999}}",
+        "sourcesPanelSplitViewState": "{\"vertical\":{\"size\":450,\"showMode\":\"Both\"}}",
+        "uiTheme": "\"dark\""
+      }
+    }
+  }
+}
