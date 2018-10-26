@@ -115,6 +115,30 @@ $iphone-x-styles() {
       left: env(safe-area-inset-left);
       width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
     }
+
+    .camera-permission-panel {
+        .gdpr-link {
+          bottom: calc(0.5rem + constant(safe-area-inset-bottom));
+
+          bottom: calc(0.5rem + env(safe-area-inset-bottom));
+        }
+        .show-learn-more-button {
+          bottom: calc(-0.5rem + constant(safe-area-inset-bottom));
+
+          bottom: calc(-0.5rem + env(safe-area-inset-bottom));
+        }
+    }
+  }
+
+  .landscape {
+    #playable-mraid {
+      .camera-permission-panel {
+        .show-learn-more-button {
+          right: constant(safe-area-inset-right);
+          right: env(safe-area-inset-right);
+        }
+      }
+    }
   }
 
   #end-screen,
