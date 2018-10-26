@@ -1,4 +1,4 @@
-import { ABGroup } from 'Core/Models/ABGroup';
+import { ABGroup, ABGroupBuilder } from 'Core/Models/ABGroup';
 import { ISchema, Model } from 'Core/Models/Model';
 
 export enum CacheMode {
@@ -62,7 +62,8 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
     }
 
     public getAbGroup(): ABGroup {
-        return this.get('abGroup');
+        // return this.get('abGroup');
+        return ABGroupBuilder.getAbGroup(99);
     }
 
     public getProperties(): string {

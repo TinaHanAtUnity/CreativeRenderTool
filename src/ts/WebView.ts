@@ -78,6 +78,7 @@ import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHan
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
 
 export class WebView {
 
@@ -400,6 +401,13 @@ export class WebView {
             });
             SessionDiagnostics.trigger('campaign_expired', error, campaign.getSession());
             return;
+        }
+
+        if(campaign instanceof ProgrammaticCampaign) {
+            const trackingUrls = placement.getCurrentTrackingUrls();
+            if(trackingUrls) {
+                campaign.setTrackingUrls(trackingUrls);
+            }
         }
 
         if (placement.getRealtimeData()) {

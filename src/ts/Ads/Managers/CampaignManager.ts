@@ -167,9 +167,15 @@ export class CampaignManager {
                 if(response) {
                     this.setSDKSignalValues(requestTimestamp);
 
-                    return this.parseCampaigns(response).catch((e) => {
-                        this.handleError(e, this._adsConfig.getPlacementIds(), 'parse_campaigns_error');
-                    });
+                    if(AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
+                        return this.parseAuctionV5Campaigns(response).catch((e) => {
+                            this.handleError(e, this._adsConfig.getPlacementIds(), 'parse_campaigns_error');
+                        });
+                    } else {
+                        return this.parseCampaigns(response).catch((e) => {
+                            this.handleError(e, this._adsConfig.getPlacementIds(), 'parse_campaigns_error');
+                        });
+                    }
                 }
                 throw new WebViewError('Empty campaign response', 'CampaignRequestError');
             }).then(() => {
