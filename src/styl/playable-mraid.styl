@@ -344,7 +344,7 @@ $camera-permission-panel-height = 100vw;
 
     // @stylint off
     .mraid-iframe-camera-permission-dialog {
-      width: 100vh !important;
+      width: 50vw !important;
       height: 100vh !important;
     }
     // @stylint on
@@ -354,7 +354,7 @@ $camera-permission-panel-height = 100vw;
       top: 0;
       right: 0;
       bottom: 0;
-      left: 100vh;
+      left: 50vw;
       width: inherit;
       height: inherit;
 
@@ -475,6 +475,87 @@ $camera-permission-panel-height = 100vw;
   }
 }
 
+@media screen and (min-aspect-ratio: 8/19) {
+  #playable-mraid {
+    // @stylint off
+    .mraid-iframe-camera-permission-dialog {
+      height: 130vw !important;
+    }
+    // @stylint on
+
+    .camera-permission-panel {
+      top: 130vw;
+    }
+  }
+}
+
+@media screen and (min-aspect-ratio: 9/16) {
+  #playable-mraid {
+    // @stylint off
+    .mraid-iframe-camera-permission-dialog {
+      height: 100vw !important;
+    }
+    // @stylint on
+
+    .camera-permission-panel {
+      top: 100vw;
+    }
+  }
+}
+
+@media screen and (min-aspect-ratio: 3/4) {
+  #playable-mraid {
+    // @stylint off
+    .mraid-iframe-camera-permission-dialog {
+      height: 70vw !important;
+    }
+    // @stylint on
+
+    .camera-permission-panel {
+      top: 70vw;
+    }
+  }
+}
+
+@media screen and (min-aspect-ratio: 1/2) {
+  #playable-mraid {
+    // @stylint off
+    .mraid-iframe-camera-permission-dialog {
+      height: 100vw !important;
+    }
+    // @stylint on
+
+    .camera-permission-panel {
+      top: 100vw;
+    }
+  }
+}
+
+@media screen and (min-aspect-ratio: 2/3) {
+  #playable-mraid {
+    // @stylint off
+    .mraid-iframe-camera-permission-dialog {
+      height: 80vw !important;
+    }
+    // @stylint on
+
+    .camera-permission-panel {
+      top: 80vw;
+    }
+  }
+}
+
+
+@media screen and (min-aspect-ratio: 1/1) {
+  .mraid {
+    height: 50vw;
+  }
+
+  .panel {
+    top: 50vw;
+  }
+}
+
 @media screen and (min-height: 568px) {
   .loading-screen .game-icon {
     width: 96px;
@@ -501,7 +582,7 @@ $camera-permission-panel-height = 100vw;
     }
   }
 }
-
+*/
 // iPad
 @media screen and (min-height: 768px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 768px) {
   .loading-screen {
