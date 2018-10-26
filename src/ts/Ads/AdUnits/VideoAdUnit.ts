@@ -58,7 +58,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     private _finalVideoUrl: string;
     private _videoState: VideoState = VideoState.NOT_READY;
     private _clientInfo: ClientInfo;
-    private _abGroup: ABGroup;
+    private _parameters: IVideoAdUnitParameters<T>;
 
     constructor(nativeBridge: NativeBridge, parameters: IVideoAdUnitParameters<T>) {
         super(nativeBridge, parameters);
@@ -74,7 +74,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
         this._clientInfo = parameters.clientInfo;
-        this._abGroup = parameters.coreConfig.getAbGroup();
+        this._parameters = parameters;
 
         this.prepareOverlay();
     }
@@ -273,7 +273,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             document.body.appendChild(overlay.container());
 
             if(!this._placement.allowSkip()) {
-                if (CustomFeatures.allowSkipInRewardedVideos(this._abGroup, this._campaign)) {
+                if (CustomFeatures.allowSkipInRewardedVideos(this._parameters)) {
                     overlay.setSkipEnabled(true);
                     // Use the same value as in the PerformanceOverlayEventHandlerWithAllowSkip canSkipVideo()
                     overlay.setSkipDuration(AllowRewardedAdSkipInSeconds);

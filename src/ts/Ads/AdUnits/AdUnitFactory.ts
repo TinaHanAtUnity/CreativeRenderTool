@@ -153,7 +153,7 @@ export class AdUnitFactory {
 
         if (overlay instanceof PerformanceVideoOverlayWithCTAButton) {
             performanceOverlayEventHandler = new PerformanceOverlayWithCTAButtonEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
-        } else if (!skipAllowed && CustomFeatures.allowSkipInRewardedVideos(parameters.coreConfig.getAbGroup(), parameters.campaign)) {
+        } else if (!skipAllowed && CustomFeatures.allowSkipInRewardedVideos(parameters)) {
             performanceOverlayEventHandler = new PerformanceOverlayEventHandlerWithAllowSkip(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         } else {
             performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
