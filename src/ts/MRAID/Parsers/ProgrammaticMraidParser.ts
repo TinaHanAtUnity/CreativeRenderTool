@@ -6,10 +6,10 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { CampaignContentType } from 'Ads/Utilities/CampaignContentType';
+import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 
 export class ProgrammaticMraidParser extends CampaignParser {
-    public static ContentType = CampaignContentType.ProgrammaticMraid;
+    public static ContentType = CampaignContentTypes.ProgrammaticMraid;
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraid = response.getJsonContent();
 
