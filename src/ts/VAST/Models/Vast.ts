@@ -292,7 +292,6 @@ export class Vast extends Model<IVast> {
 
     private isSupportedMIMEType(MIMEType: string): boolean {
         const playableMIMEType = 'video/mp4';
-        MIMEType = MIMEType.toLowerCase();
-        return MIMEType === playableMIMEType;
+        return MIMEType.toLowerCase() === playableMIMEType;
     }
 }
