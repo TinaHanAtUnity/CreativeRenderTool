@@ -10,6 +10,8 @@ import { Url } from 'Core/Utilities/Url';
 
 import OnCometMraidPlcCampaign from 'json/campaigns/performance/CometMraidUrlCampaign.json';
 import OnCometVideoPlcCampaign from 'json/campaigns/performance/CometVideoCampaign.json';
+import OnCometVideoPlcCampaignSquareEndScreenAsset from 'json/campaigns/performance/CometVideoCampaignWithSquareEndScreenAsset.json';
+
 import 'mocha';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
@@ -84,8 +86,6 @@ describe('CometCampaignParser', () => {
             assert.equal(campaign.getGameName(), content.gameName, 'Game Name is equal');
             assert.equal(campaign.getGameIcon().getUrl(), Url.encode(content.gameIcon), 'Game Icon is not equal');
             assert.equal(campaign.getRating(), content.rating, 'Rating is not the same');
-            assert.equal(campaign.getLandscape()!.getOriginalUrl(), Url.encode(content.endScreenLandscape), 'Landscape URL is not equal');
-            assert.equal(campaign.getPortrait()!.getOriginalUrl(), Url.encode(content.endScreenPortrait), 'Portrait URL is not equal');
             assert.equal(campaign.getBypassAppSheet(), content.bypassAppSheet, 'Bypass App Sheet is not equal');
             assert.equal(campaign.getStore(), getStore(content.store), 'Store is not equal');
             assert.equal(campaign.getAppStoreId(), content.appStoreId, 'App Store ID is not equal');
@@ -127,6 +127,9 @@ describe('CometCampaignParser', () => {
                 assertBaseCampaign(content);
                 assert.equal(perfCampaign.getVideo()!.getUrl(), Url.encode(content.trailerDownloadable), 'Downloadable Trailer URL is not equal');
                 assert.equal(perfCampaign.getStreamingVideo()!.getUrl(), Url.encode(content.trailerStreaming), 'Downloadable Trailer URL is not equal');
+                assert.equal(perfCampaign.getLandscape()!.getOriginalUrl(), Url.encode(content.endScreenLandscape), 'Landscape URL is not equal');
+                assert.equal(perfCampaign.getPortrait()!.getOriginalUrl(), Url.encode(content.endScreenPortrait), 'Portrait URL is not equal');
+
             });
 
             it('should have a AdUnitStyle object with ctaButtonColor-property', () => {
@@ -233,6 +236,27 @@ describe('CometCampaignParser', () => {
                         sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
                     });
                 });
+            });
+        });
+
+        describe('when it is a performance campaign with square end screen asset', () => {
+            beforeEach(() => {
+                return parse(JSON.parse(OnCometVideoPlcCampaignSquareEndScreenAsset));
+            });
+
+            it('should parse and return a performance campaign with square end screen asset', () => {
+                assert.isNotNull(campaign, 'Campaign is null');
+                assert.isTrue(campaign instanceof PerformanceCampaign, 'Campaign was not an MRAIDCampaign');
+
+                const perfCampaign = <PerformanceCampaign>campaign;
+                const json = JSON.parse(OnCometVideoPlcCampaignSquareEndScreenAsset);
+                const content = JSON.parse(json.content);
+
+                assertBaseCampaign(content);
+                assert.equal(perfCampaign.getVideo()!.getUrl(), Url.encode(content.trailerDownloadable), 'Downloadable Trailer URL is not equal');
+                assert.equal(perfCampaign.getStreamingVideo()!.getUrl(), Url.encode(content.trailerStreaming), 'Downloadable Trailer URL is not equal');
+                assert.equal(perfCampaign.getSquare()!.getOriginalUrl(), Url.encode(content.endScreen), 'Square URL is not equal');
+
             });
         });
     });
