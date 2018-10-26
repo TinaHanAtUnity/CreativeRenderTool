@@ -1,4 +1,12 @@
-# Pending
+# Thu Oct 25 21:49:17 UTC 2018
+
+* Remove old backup campaign implementation, use new as default [#6778](https://github.com/Applifier/unity-ads-webview/pull/6778)
+* A/B test CTA Button on Video Overlay v2 [#6807](https://github.com/Applifier/unity-ads-webview/pull/6807)
+* Remove endscreen layout A/B test [#6805](https://github.com/Applifier/unity-ads-webview/pull/6805)
+* TSLint no-parameter-reassignment [#6777](https://github.com/Applifier/unity-ads-webview/pull/6777) 
+* Remove web search intent for opening appDownloadUrl [#6810](https://github.com/Applifier/unity-ads-webview/pull/6810)
+
+# Wed Oct 24 17:13:55 UTC 2018
 
 * Enable x icon skip for Cheetah [#6781](https://github.com/Applifier/unity-ads-webview/pull/6781)
 * AR logo cropping fix [#6783](https://github.com/Applifier/unity-ads-webview/pull/6783)

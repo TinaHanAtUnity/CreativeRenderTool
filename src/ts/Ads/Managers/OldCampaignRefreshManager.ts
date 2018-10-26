@@ -232,22 +232,23 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     private onError(error: WebViewError | Error, placementIds: string[], diagnosticsType: string, session?: Session) {
+        let errorInternal = error;
         this.invalidateCampaigns(this._needsRefill, placementIds);
 
         if(error instanceof Error) {
-            error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
+            errorInternal = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
 
         if(session) {
             SessionDiagnostics.trigger(diagnosticsType, {
-                error: error
+                error: errorInternal
             }, session);
         } else {
             Diagnostics.trigger(diagnosticsType, {
-                error: error
+                error: errorInternal
             });
         }
-        this._nativeBridge.Sdk.logError(JSON.stringify(error));
+        this._nativeBridge.Sdk.logError(JSON.stringify(errorInternal));
 
         const minimumRefreshTimestamp = Date.now() + RefreshManager.ErrorRefillDelay * 1000;
         if(this._refillTimestamp === 0 || this._refillTimestamp > minimumRefreshTimestamp) {
