@@ -7,7 +7,7 @@ import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { XPromoCampaignParser } from 'XPromo/Parsers/XPromoCampaignParser';
-import { AbstractAdUnitFactory } from './AbstractAdUnitFactory';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { XPromoAdUnitFactory } from 'XPromo/AdUnits/XPromoAdUnitFactory';
 import { VastAdUnitFactory } from 'VAST/AdUnits/VastAdUnitFactory';

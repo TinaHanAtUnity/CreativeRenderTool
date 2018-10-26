@@ -1,17 +1,17 @@
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { MRAIDCampaign } from '../Models/MRAIDCampaign';
-import { IMRAIDAdUnitParameters, MRAIDAdUnit } from './MRAIDAdUnit';
-import { IMRAIDViewHandler, MRAIDView } from '../Views/MRAIDView';
-import { PlayableMRAID } from '../Views/PlayableMRAID';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
+import { IMRAIDViewHandler, MRAIDView } from 'MRAID//Views/MRAIDView';
+import { PlayableMRAID } from 'MRAID//Views/PlayableMRAID';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
-import { MRAID } from '../Views/MRAID';
+import { MRAID } from 'MRAID//Views/MRAID';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { PlayableEventHandler } from '../EventHandlers/PlayableEventHandler';
-import { MRAIDEventHandler } from '../EventHandlers/MRAIDEventHandler';
+import { PlayableEventHandler } from 'MRAID/EventHandlers/PlayableEventHandler';
+import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
 import { Privacy } from 'Ads/Views/Privacy';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {

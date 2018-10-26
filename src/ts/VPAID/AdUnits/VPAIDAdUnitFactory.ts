@@ -1,14 +1,14 @@
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { VPAIDCampaign } from '../Models/VPAIDCampaign';
-import { IVPAIDAdUnitParameters, VPAIDAdUnit } from './VPAIDAdUnit';
-import { VPAIDEndScreen } from '../Views/VPAIDEndScreen';
-import { VPAIDOverlayEventHandler } from '../EventHandlers/VPAIDOverlayEventHandler';
-import { VPAIDEventHandler } from '../EventHandlers/VPAIDEventHandler';
-import { VPAIDEndScreenEventHandler } from '../EventHandlers/VPAIDEndScreenEventHandler';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
+import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
+import { VPAIDOverlayEventHandler } from 'VPAID/EventHandlers/VPAIDOverlayEventHandler';
+import { VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
+import { VPAIDEndScreenEventHandler } from 'VPAID/EventHandlers/VPAIDEndScreenEventHandler';
 import { Closer } from 'Ads/Views/Closer';
-import { VPAID } from '../Views/VPAID';
+import { VPAID } from 'VPAID/Views/VPAID';
 import { Privacy } from 'Ads/Views/Privacy';
 
 export class VPAIDAdUnitFactory extends AbstractAdUnitFactory {

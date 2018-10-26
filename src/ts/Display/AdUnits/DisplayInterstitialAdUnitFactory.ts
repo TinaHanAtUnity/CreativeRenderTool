@@ -1,10 +1,10 @@
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { DisplayInterstitialCampaign } from '../Models/DisplayInterstitialCampaign';
-import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from './DisplayInterstitialAdUnit';
-import { DisplayInterstitial } from '../Views/DisplayInterstitial';
-import { DisplayInterstitialEventHandler } from '../EventHandlers/DisplayInterstitialEventHandler';
+import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'Display/AdUnits/DisplayInterstitialAdUnit';
+import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
+import { DisplayInterstitialEventHandler } from 'Display/EventHandlers/DisplayInterstitialEventHandler';
 import { Privacy } from 'Ads/Views/Privacy';
 
 export class DisplayInterstitialAdUnitFactory extends AbstractAdUnitFactory {
