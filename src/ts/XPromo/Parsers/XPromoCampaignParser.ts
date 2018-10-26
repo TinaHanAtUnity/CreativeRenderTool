@@ -55,7 +55,7 @@ export class XPromoCampaignParser extends CampaignParser {
             ratingCount: json.ratingCount,
             landscapeImage: json.endScreenLandscape ? new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session) : undefined,
             portraitImage: json.endScreenPortrait ? new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session) : undefined,
-            squareImage: json.endScreenSquare ? new Image(this.validateAndEncodeUrl(json.endScreenSquare, session), session) : undefined,
+            squareImage: json.endScreen ? new Image(this.validateAndEncodeUrl(json.endScreen, session), session) : undefined,
             clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl, session) : undefined,
             clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
             bypassAppSheet: json.bypassAppSheet,
