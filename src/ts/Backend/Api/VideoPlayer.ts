@@ -6,9 +6,10 @@ export class VideoPlayer extends BackendApi {
         return;
     }
 
-    public prepare(url: string) {
+    public prepare(rawUrl: string) {
+        let url = rawUrl;
         if(url.indexOf('file://http') !== -1) {
-            url = url.replace('file://', '');
+            url = rawUrl.replace('file://', '');
         }
 
         if('exec' in window) {
