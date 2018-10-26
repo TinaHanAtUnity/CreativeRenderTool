@@ -4,12 +4,11 @@ import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { ABGroup, ImprovedEndScreenStylesTest } from 'Core/Models/ABGroup';
+import { ABGroup } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
-import EndScreenWithImprovedStylesTemplate from 'html/EndScreenWithImprovedStyles.html';
 import { Platform } from 'Core/Constants/Platform';
 
 export interface IEndScreenParameters {
@@ -111,10 +110,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             this._container.classList.add('show-gdpr-banner');
         }
 
-        if (ImprovedEndScreenStylesTest.isValid(this._abGroup)) {
-            this._container.classList.add('improved-endscreen-styles-test');
-        }
-
         // Android <= 4.4.4
         if (this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() <= 19) {
             this._container.classList.add('old-androids');
@@ -173,9 +168,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getTemplate() {
-        if (ImprovedEndScreenStylesTest.isValid(this._abGroup)) {
-            return EndScreenWithImprovedStylesTemplate;
-        }
         return EndScreenTemplate;
     }
 
