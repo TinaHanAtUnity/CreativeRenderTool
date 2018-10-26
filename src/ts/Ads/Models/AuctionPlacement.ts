@@ -3,20 +3,20 @@ import { Model } from 'Core/Models/Model';
 export interface IAuctionPlacement {
     placementId: string;
     mediaId: string;
-    trackingId: string | undefined;
+    trackingUrls: { [eventName: string]: string[] } | undefined;
 }
 
 export class AuctionPlacement extends Model<IAuctionPlacement> {
-    constructor(placementId: string, mediaId: string, trackingId?: string) {
+    constructor(placementId: string, mediaId: string, trackingUrls?: { [eventName: string]: string[] }) {
         super('AuctionPlacement', {
             placementId: ['string'],
             mediaId: ['string'],
-            trackingId: ['string', 'undefined']
+            trackingUrls: ['object', 'undefined']
         });
 
         this.set('placementId', placementId);
         this.set('mediaId', mediaId);
-        this.set('trackingId', trackingId);
+        this.set('trackingUrls', trackingUrls);
     }
 
     public getPlacementId(): string {
@@ -27,15 +27,15 @@ export class AuctionPlacement extends Model<IAuctionPlacement> {
         return this.get('mediaId');
     }
 
-    public getTrackingId(): string | undefined {
-        return this.get('trackingId');
+    public getTrackingUrls(): { [eventName: string]: string[] } | undefined {
+        return this.get('trackingUrls');
     }
 
     public getDTO(): { [key: string]: any } {
         return {
             placementId: this.getPlacementId(),
             mediaId: this.getMediaId(),
-            trackingId: this.getTrackingId()
+            trackingUrls: this.getTrackingUrls()
         };
     }
 }

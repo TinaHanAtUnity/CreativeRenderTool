@@ -28,7 +28,7 @@ export interface IAuctionResponse {
 export class AuctionResponse extends Model<IAuctionResponse> {
     constructor(placements: Array<AuctionPlacement>, data: any, mediaId: string, correlationId: string) {
         super('AuctionResponse', {
-            placements: ['object'],
+            placements: ['array'],
             contentType: ['string'],
             content: ['string'],
             cacheTTL: ['integer', 'undefined'],

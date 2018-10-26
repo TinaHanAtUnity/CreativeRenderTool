@@ -262,7 +262,7 @@ export class CampaignManager {
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
 
         if('placements' in json) {
-            const fill: { [mediaId: string]: string[] } = {};
+            const fill: { [mediaId: string]: Array<AuctionPlacement> } = {};
             const noFill: string[] = [];
 
             const placements = this._adsConfig.getPlacements();
@@ -271,10 +271,11 @@ export class CampaignManager {
                     const mediaId: string = json.placements[placement];
 
                     if(mediaId) {
+                        const auctionPlacement: AuctionPlacement = new AuctionPlacement(placement, mediaId);
                         if(fill[mediaId]) {
-                            fill[mediaId].push(placement);
+                            fill[mediaId].push(auctionPlacement);
                         } else {
-                            fill[mediaId] = [placement];
+                            fill[mediaId] = [auctionPlacement];
                         }
 
                         this._backupCampaignManager.storePlacement(this._adsConfig.getPlacement(placement), mediaId);
@@ -321,16 +322,16 @@ export class CampaignManager {
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
                             } else if(error === CacheStatus.FAILED) {
-                                return this.handleError(new WebViewError('Caching failed', 'CacheStatusFailed'), fill[mediaId], 'campaign_caching_failed', session);
+                                return this.handleErrorWrapper(new WebViewError('Caching failed', 'CacheStatusFailed'), fill[mediaId], 'campaign_caching_failed', session);
                             } else if(error === CacheError[CacheError.FILE_NOT_FOUND]) {
                                 // handle native API Cache.getFilePath failure (related to Android cache directory problems?)
-                                return this.handleError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), fill[mediaId], 'campaign_caching_get_file_path_failed', session);
+                                return this.handleErrorWrapper(new WebViewError('Getting file path failed', 'GetFilePathFailed'), fill[mediaId], 'campaign_caching_get_file_path_failed', session);
                             }
 
-                            return this.handleError(error, fill[mediaId], 'handle_campaign_error', session);
+                            return this.handleErrorWrapper(error, fill[mediaId], 'handle_campaign_error', session);
                         }));
                     } catch(error) {
-                        this.handleError(error, fill[mediaId], 'error_creating_handle_campaign_chain', session);
+                        this.handleErrorWrapper(error, fill[mediaId], 'error_creating_handle_campaign_chain', session);
                     }
                 }
             }
@@ -377,7 +378,22 @@ export class CampaignManager {
                 const mediaId = json.placements[placement].mediaId;
 
                 if(mediaId) {
-                    const auctionPlacement: AuctionPlacement = new AuctionPlacement(placement, mediaId, json.placements[placement].trackingId);
+                    const trackingId: string = json.placements[placement].trackingId;
+                    let trackingUrls: { [eventName: string]: string[] } | undefined = undefined;
+                    if(trackingId) {
+                        if(json.tracking[trackingId]) {
+                            trackingUrls = json.tracking[trackingId];
+                            // todo: validate tracking URLs with Core/Utilities/Url.isValid
+                        } else {
+                            SessionDiagnostics.trigger('invalid_auction_tracking_id', {
+                                mediaId: mediaId,
+                                trackingId: trackingId
+                            }, session);
+                            throw new Error('Invalid tracking ID ' + trackingId);
+                        }
+                    }
+
+                    const auctionPlacement: AuctionPlacement = new AuctionPlacement(placement, mediaId, trackingUrls);
 
                     if(campaigns[mediaId]) {
                         campaigns[mediaId].push(auctionPlacement);
@@ -427,16 +443,16 @@ export class CampaignManager {
                         if(error === CacheStatus.STOPPED) {
                             return Promise.resolve();
                         } else if(error === CacheStatus.FAILED) {
-                            return this.handleError(new WebViewError('Caching failed', 'CacheStatusFailed'), campaigns[mediaId], 'campaign_caching_failed', session);
+                            return this.handleErrorWrapper(new WebViewError('Caching failed', 'CacheStatusFailed'), campaigns[mediaId], 'campaign_caching_failed', session);
                         } else if(error === CacheError[CacheError.FILE_NOT_FOUND]) {
                             // handle native API Cache.getFilePath failure (related to Android cache directory problems?)
-                            return this.handleError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), campaigns[mediaId], 'campaign_caching_get_file_path_failed', session);
+                            return this.handleErrorWrapper(new WebViewError('Getting file path failed', 'GetFilePathFailed'), campaigns[mediaId], 'campaign_caching_get_file_path_failed', session);
                         }
 
-                        return this.handleError(error, fill[mediaId], 'handle_campaign_error', session);
+                        return this.handleErrorWrapper(error, campaigns[mediaId], 'handle_campaign_error', session);
                     }));
                 } catch(error) {
-                    this.handleError(error, fill[mediaId], 'error_creating_handle_campaign_chain', session);
+                    this.handleErrorWrapper(error, campaigns[mediaId], 'error_creating_handle_campaign_chain', session);
                 }
             }
         }
@@ -457,7 +473,8 @@ export class CampaignManager {
                     return Promise.resolve(oldCampaign);
                 }
 
-                const auctionResponse = new AuctionResponse([placement.getId()], json.media[mediaId], mediaId, json.correlationId);
+                const auctionPlacement: AuctionPlacement = new AuctionPlacement(placement.getId(), mediaId);
+                const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId);
 
                 return this.handleRealtimeCampaign(auctionResponse, session);
             } else {
@@ -489,7 +506,7 @@ export class CampaignManager {
         return parser.parse(this._nativeBridge, this._request, response, session, this._deviceInfo.getOsVersion(), this._clientInfo.getGameId(), this._deviceConnectionType).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
-                SdkStats.setParseDuration(placement, parseDuration);
+                SdkStats.setParseDuration(placement.getPlacementId(), parseDuration);
             }
 
             campaign.setMediaId(response.getMediaId());
@@ -529,7 +546,7 @@ export class CampaignManager {
             }
 
             for(const placement of placements) {
-                this.onCampaign.trigger(placement, campaign);
+                this.onCampaign.trigger(placement.getPlacementId(), campaign, placement.getTrackingUrls());
             }
         });
     }
@@ -560,6 +577,16 @@ export class CampaignManager {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
         this.onError.trigger(error, placementIds, diagnosticsType, session);
         return Promise.resolve();
+    }
+
+    // todo: figure out better way to handler error without silly wrappers like this
+    private handleErrorWrapper(error: any, placements: Array<AuctionPlacement>, diagnosticsType: string, session?: Session): Promise<void> {
+        const placementIds: string[] = [];
+        for(const placement of placements) {
+            placementIds.push(placement.getPlacementId());
+        }
+
+        return this.handleError(error, placementIds, diagnosticsType, session);
     }
 
     private getBaseUrl(): string {
