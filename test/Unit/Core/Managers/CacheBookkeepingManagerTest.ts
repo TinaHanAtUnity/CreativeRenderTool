@@ -1,19 +1,19 @@
+import { Cache } from 'Backend/Api/Cache';
+import { Storage } from 'Backend/Api/Storage';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
+import { CacheManager } from 'Core/Managers/CacheManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import { StorageType } from 'Core/Native/Storage';
-import { CacheManager } from 'Core/Managers/CacheManager';
-import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Backend } from 'Backend/Backend';
-import { Cache } from 'Backend/Api/Cache';
-import { Storage } from 'Backend/Api/Storage';
-import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
 
 class TestHelper {
     private _cache: Cache;

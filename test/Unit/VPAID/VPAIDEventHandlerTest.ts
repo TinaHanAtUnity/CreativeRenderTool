@@ -1,21 +1,22 @@
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { IAdsApi } from 'Ads/IAds';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Closer } from 'Ads/Views/Closer';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Backend } from 'Backend/Backend';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { IntentApi } from 'Core/Native/Android/Intent';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
-import { SdkApi } from 'Core/Native/Sdk';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -25,10 +26,6 @@ import { VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
-import { Privacy } from 'Ads/Views/Privacy';
-import { ICoreApi } from 'Core/ICore';
-import { IAdsApi } from 'Ads/IAds';
-import { Backend } from 'Backend/Backend';
 
 describe('VPAIDEventHandlerTest', () => {
     let eventHandler: VPAIDEventHandler;

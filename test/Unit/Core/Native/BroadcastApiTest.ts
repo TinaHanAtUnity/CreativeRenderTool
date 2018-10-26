@@ -1,12 +1,12 @@
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 
 describe('BroadcastApi', () => {
     let backend: Backend;

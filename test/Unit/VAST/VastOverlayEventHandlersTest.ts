@@ -1,5 +1,7 @@
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
+import { IAdsApi } from 'Ads/IAds';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
@@ -9,15 +11,21 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { MOAT } from 'Ads/Views/MOAT';
 import { Overlay } from 'Ads/Views/Overlay';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -25,14 +33,6 @@ import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
-import { Privacy } from 'Ads/Views/Privacy';
-import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { IAdsApi } from 'Ads/IAds';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
-import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastOverlayEventHandlersTest', () => {

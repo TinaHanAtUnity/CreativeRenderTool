@@ -1,3 +1,4 @@
+import { IAdsApi } from 'Ads/IAds';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
@@ -5,7 +6,9 @@ import { PlacementState } from 'Ads/Models/Placement';
 import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
+import { Backend } from 'Backend/Backend';
 import { assert, expect } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -16,9 +19,6 @@ import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { IAdsApi } from 'Ads/IAds';
 
 describe('PlacementManagerTest', () => {
     let platform: Platform;

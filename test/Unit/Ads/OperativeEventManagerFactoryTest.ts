@@ -1,26 +1,26 @@
+import { IAdsApi } from 'Ads/IAds';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import 'mocha';
 import { MRAIDOperativeEventManager } from 'MRAID/Managers/MRAIDOperativeEventManager';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
-import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { IAdsApi } from 'Ads/IAds';
 
 describe('OperativeEventManagerFactoryTest', () => {
 

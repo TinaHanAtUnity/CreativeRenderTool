@@ -1,15 +1,15 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { PermissionsApi } from 'Core/Native/Permissions';
-import { IosPermission } from 'Core/Native/iOS/Permissions';
-import { AndroidPermission } from 'Core/Native/Android/Permissions';
-import { PermissionTypes } from 'Core/Utilities/Permissions';
-import { IObserver2 } from 'Core/Utilities/IObserver';
-import { Backend } from 'Backend/Backend';
 import { ICoreApi } from 'Core/ICore';
+import { AndroidPermission } from 'Core/Native/Android/Permissions';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IosPermission } from 'Core/Native/iOS/Permissions';
+import { PermissionsApi } from 'Core/Native/Permissions';
+import { IObserver2 } from 'Core/Utilities/IObserver';
+import { PermissionTypes } from 'Core/Utilities/Permissions';
+import 'mocha';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('PermissionsApi Test', () => {

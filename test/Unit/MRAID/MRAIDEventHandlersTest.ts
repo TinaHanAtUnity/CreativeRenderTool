@@ -1,5 +1,6 @@
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { IAdsApi } from 'Ads/IAds';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
@@ -9,17 +10,22 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import 'mocha';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
@@ -28,12 +34,6 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Privacy } from 'Ads/Views/Privacy';
-import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { IAdsApi } from 'Ads/IAds';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 describe('MRAIDEventHandlersTest', () => {
 

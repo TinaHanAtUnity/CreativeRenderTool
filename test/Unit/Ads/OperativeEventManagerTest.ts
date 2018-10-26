@@ -1,3 +1,4 @@
+import { IAdsApi } from 'Ads/IAds';
 import { IOperativeEventManagerParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
@@ -5,31 +6,29 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
-import { RequestApi } from 'Core/Native/Request';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
+import { StorageType } from 'Core/Native/Storage';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
-
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import 'mocha';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import * as sinon from 'sinon';
+import { StorageBridgeHelper } from 'TestHelpers/StorageBridgeHelper';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
-import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { IAdsApi } from 'Ads/IAds';
-import { StorageBridgeHelper } from 'TestHelpers/StorageBridgeHelper';
 
 describe('OperativeEventManagerTest', () => {
     let platform: Platform;

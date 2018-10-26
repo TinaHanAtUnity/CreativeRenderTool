@@ -2,18 +2,18 @@ import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { ProgrammaticAdMobParser } from 'AdMob/Parsers/ProgrammaticAdMobParser';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Session } from 'Ads/Models/Session';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
 import { FileId } from 'Core/Utilities/FileId';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import ValidAdMobCampaign from 'json/campaigns/admob/ValidAdMobCampaign.json';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('ProgrammaticAdMobParser', () => {

@@ -1,10 +1,13 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Session } from 'Ads/Models/Session';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 
 import ProgrammaticMRAIDCampaign from 'json/campaigns/mraid/ProgrammaticMRAIDCampaign.json';
@@ -13,9 +16,6 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { ProgrammaticMraidUrlParser } from 'MRAID/Parsers/ProgrammaticMraidUrlParser';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 
 describe('ProgrammaticMraidUrlParser', () => {
     const placements = ['TestPlacement'];

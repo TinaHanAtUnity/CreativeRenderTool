@@ -3,8 +3,11 @@ import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainer, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { CampaignParserManager } from 'Ads/Managers/CampaignParserManager';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -18,12 +21,17 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
+import { ICoreApi } from 'Core/ICore';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
+import { CacheManager, CacheStatus } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
+import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 
@@ -31,11 +39,9 @@ import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
-import { CacheManager, CacheStatus } from 'Core/Managers/CacheManager';
-import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
@@ -50,12 +56,6 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { IAdsApi } from 'Ads/IAds';
-import { CampaignParserManager } from 'Ads/Managers/CampaignParserManager';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {

@@ -1,25 +1,21 @@
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { IAnalyticsObject } from 'Analytics/AnalyticsProtocol';
+import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
+import { IAnalyticsApi } from 'Analytics/IAnalytics';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { RequestApi } from 'Core/Native/Request';
-import { StorageApi, StorageError, StorageType } from 'Core/Native/Storage';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { IAnalyticsApi } from 'Analytics/IAnalytics';
-import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 
 class TestHelper {
     public static getEventType(data: string) {

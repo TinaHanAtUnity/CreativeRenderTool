@@ -1,4 +1,8 @@
+import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -6,14 +10,10 @@ import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
 
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
-
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ICoreApi } from 'Core/ICore';
-import { Backend } from 'Backend/Backend';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(Platform[platform] + ' - DiagnosticsTest', () => {

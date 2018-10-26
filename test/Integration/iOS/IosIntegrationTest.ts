@@ -1,13 +1,12 @@
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
-import { DeviceInfo } from 'Backend/Api/DeviceInfo';
+import { Backend } from 'Backend/Backend';
 import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
 
 import { Platform } from 'Core/Constants/Platform';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
-import { Backend } from '../../../src/ts/Backend/Backend';
 
 describe('IosIntegrationTest', () => {
 

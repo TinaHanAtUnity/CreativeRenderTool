@@ -1,17 +1,17 @@
+import { IAdsApi } from 'Ads/IAds';
+import { GdprManager } from 'Ads/Managers/GdprManager';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Overlay } from 'Ads/Views/Overlay';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
-import { GdprManager } from 'Ads/Managers/GdprManager';
-import { Privacy } from 'Ads/Views/Privacy';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { IAdsApi } from 'Ads/IAds';
 
 describe('OverlayTest', () => {
     let platform: Platform;

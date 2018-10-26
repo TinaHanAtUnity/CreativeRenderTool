@@ -1,21 +1,21 @@
 import { Video } from 'Ads/Models/Assets/Video';
 import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { VideoMetadata } from 'Core/Constants/Android/VideoMetadata';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
+
+import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CacheError } from 'Core/Native/Cache';
-
-import { CacheManager } from 'Core/Managers/CacheManager';
-import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 
 describe('VideoMetadataTest', () => {
     const validVideo: string = 'https://www.example.net/valid.mp4';

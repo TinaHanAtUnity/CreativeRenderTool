@@ -1,6 +1,6 @@
-import 'mocha';
-import { assert } from 'chai';
 import { Image } from 'Ads/Models/Assets/Image';
+import { assert } from 'chai';
+import 'mocha';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('AssetTest', () => {

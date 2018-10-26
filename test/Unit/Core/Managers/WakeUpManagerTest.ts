@@ -1,12 +1,12 @@
+import { Backend } from 'Backend/Backend';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('WakeUpManagerTest', () => {

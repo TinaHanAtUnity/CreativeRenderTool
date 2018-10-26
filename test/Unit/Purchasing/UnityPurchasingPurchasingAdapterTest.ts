@@ -1,27 +1,23 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
+import { Backend } from 'Backend/Backend';
 
 import { assert } from 'chai';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { PurchasingApi } from 'Promo/Native/Purchasing';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
-import { IPurchasingAdapter } from 'Purchasing/PurchasingAdapter';
-import { IPromoPayload, IPromoRequest } from 'Promo/Utilities/PurchasingUtilities';
-import { Observable1 } from 'Core/Utilities/Observable';
-import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurchasingAdapter';
-
-import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
+import { Observable1 } from 'Core/Utilities/Observable';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { IAdsApi } from 'Ads/IAds';
+import 'mocha';
 import { IPromoApi } from 'Promo/IPromo';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import { IPromoPayload, IPromoRequest } from 'Promo/Utilities/PurchasingUtilities';
+import { IPurchasingAdapter } from 'Purchasing/PurchasingAdapter';
+import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurchasingAdapter';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('UnityPurchasingPurchasingAdapter', () => {
     let platform: Platform;

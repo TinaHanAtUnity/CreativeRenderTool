@@ -1,6 +1,6 @@
 import { assert } from 'chai';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { IJaegerSpan, JaegerSpan } from 'Core/Jaeger/JaegerSpan';
+import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';

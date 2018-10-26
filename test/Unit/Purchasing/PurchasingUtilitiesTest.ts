@@ -1,7 +1,15 @@
-import { assert, expect } from 'chai';
+import { IAdsApi } from 'Ads/IAds';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
-import { PlacementState } from 'Ads/Models/Placement';
+import { Campaign } from 'Ads/Models/Campaign';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
+import { AnalyticsManager } from 'Analytics/AnalyticsManager';
+import { Backend } from 'Backend/Backend';
+import { assert, expect } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
@@ -9,28 +17,15 @@ import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import IapPromoCatalog from 'json/IapPromoCatalog.json';
-import { PurchasingApi } from 'Promo/Native/Purchasing';
+import { IPromoApi } from 'Promo/IPromo';
+import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 
-import { IPromoPayload, IPromoRequest, PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import { IProduct, ITransactionDetails } from 'Purchasing/PurchasingAdapter';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { MonetizationListenerApi } from 'Monetization/Native/MonetizationListener';
-import { PlacementContentsApi } from 'Monetization/Native/PlacementContents';
-import { CustomPurchasingApi } from 'Purchasing/Native/CustomPurchasing';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { Campaign } from 'Ads/Models/Campaign';
-import { IProduct, ITransactionDetails } from 'Purchasing/PurchasingAdapter';
-import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
-import { AnalyticsManager } from 'Analytics/AnalyticsManager';
-import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { PromoEvents } from 'Promo/Utilities/PromoEvents';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
-import { IPromoApi } from 'Promo/IPromo';
-import { IAdsApi } from 'Ads/IAds';
 
 describe('PurchasingUtilitiesTest', () => {
     let platform: Platform;

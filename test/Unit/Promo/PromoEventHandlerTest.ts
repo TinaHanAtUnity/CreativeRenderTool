@@ -1,7 +1,9 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { Backend } from 'Backend/Backend';
 import { FinishState } from 'Core/Constants/FinishState';
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
@@ -12,9 +14,6 @@ import { PromoEventHandler } from 'Promo/EventHandlers/PromoEventHandler';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 
 describe('PromoEventHandlersTest', () => {
     let platform: Platform;

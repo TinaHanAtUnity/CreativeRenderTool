@@ -1,10 +1,10 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
+import { ARApi } from 'AR/Native/AR';
+import { ARUtil } from 'AR/Utilities/ARUtil';
 import { assert } from 'chai';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ARApi } from 'AR/Native/AR';
-import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
-import { ARUtil } from 'AR/Utilities/ARUtil';
+import 'mocha';
+import * as sinon from 'sinon';
 
 describe('ARUtil Test', () => {
     const ANDROID_AR_SUPPORTED_RETRY_COUNT = 5;

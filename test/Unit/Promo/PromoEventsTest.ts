@@ -1,16 +1,16 @@
-import * as sinon from 'sinon';
-import { assert } from 'chai';
-import { PromoEvents } from 'Promo/Utilities/PromoEvents';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
-import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { Platform } from 'Core/Constants/Platform';
-import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
 import { Backend } from 'Backend/Backend';
+import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
+import { PromoEvents } from 'Promo/Utilities/PromoEvents';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('PromoEventsTest', () => {

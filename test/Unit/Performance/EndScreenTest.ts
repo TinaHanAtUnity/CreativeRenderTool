@@ -1,5 +1,10 @@
+import { GdprManager } from 'Ads/Managers/GdprManager';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -10,11 +15,6 @@ import 'mocha';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { GdprManager } from 'Ads/Managers/GdprManager';
-import { Privacy } from 'Ads/Views/Privacy';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 
 describe('EndScreenTest', () => {
     let platform: Platform;

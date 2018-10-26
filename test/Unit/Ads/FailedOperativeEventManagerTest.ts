@@ -1,21 +1,21 @@
 import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { FocusManager } from 'Core/Managers/FocusManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { StorageType } from 'Core/Native/Storage';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import 'mocha';
 import * as sinon from 'sinon';
-import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { StorageBridgeHelper } from 'TestHelpers/StorageBridgeHelper';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
 
 describe('FailedOperativeEventManagerTest', () => {
     let platform: Platform;

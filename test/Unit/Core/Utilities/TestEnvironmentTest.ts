@@ -1,14 +1,14 @@
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import { MetaData } from 'Core/Utilities/MetaData';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('MetaDataTest', () => {

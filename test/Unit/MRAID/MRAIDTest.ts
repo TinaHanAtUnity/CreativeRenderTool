@@ -1,6 +1,11 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
+import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -13,11 +18,6 @@ import { MRAID } from 'MRAID/Views/MRAID';
 
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Campaign } from 'Ads/Models/Campaign';
-import { Privacy } from 'Ads/Views/Privacy';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 
 describe('MRAID', () => {
     let platform: Platform;

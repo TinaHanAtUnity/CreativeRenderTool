@@ -1,17 +1,17 @@
-import 'mocha';
-import * as sinon from 'sinon';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 import { IAdsApi } from 'Ads/IAds';
+import { Backend } from 'Backend/Backend';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import 'mocha';
+import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('NativePromoEventHandlerTest', () => {
     let sandbox: sinon.SinonSandbox;

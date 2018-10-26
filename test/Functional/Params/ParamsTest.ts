@@ -1,47 +1,37 @@
 import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AssetManager } from 'Ads/Managers/AssetManager';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { CampaignParserManager } from 'Ads/Managers/CampaignParserManager';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
-import { AndroidAdUnitApi } from 'Ads/Native/Android/AdUnit';
-import { IosAdUnitApi } from 'Ads/Native/iOS/AdUnit';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
+import { CacheManager } from 'Core/Managers/CacheManager';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
+import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { AndroidDeviceInfoApi, IPackageInfo } from 'Core/Native/Android/DeviceInfo';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
-import { RequestApi } from 'Core/Native/Request';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
-import { CacheManager } from 'Core/Managers/CacheManager';
-import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { IEventSpec, ParamsTestData } from 'Functional/Params/ParamsTestData';
+
+import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 
 import 'mocha';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { IEventSpec, ParamsTestData } from './ParamsTestData';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { CampaignParserManager } from '../../../src/ts/Ads/Managers/CampaignParserManager';
-
-import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 
 class SpecVerifier {
     private _platform: Platform;

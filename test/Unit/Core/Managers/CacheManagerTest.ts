@@ -1,16 +1,16 @@
-import 'mocha';
-import { assert } from 'chai';
-import * as sinon from 'sinon';
 import { Backend } from 'Backend/Backend';
+import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { CacheStatus, CacheManager } from 'Core/Managers/CacheManager';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
+import { CacheManager, CacheStatus } from 'Core/Managers/CacheManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FileId } from 'Core/Utilities/FileId';
+import 'mocha';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 
 [Platform.ANDROID, Platform.IOS].forEach((platform) => {
     describe(Platform[platform] + ' - CacheManagerTest', () => {

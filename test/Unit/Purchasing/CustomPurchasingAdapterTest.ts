@@ -1,19 +1,19 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { AnalyticsManager } from 'Analytics/AnalyticsManager';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
-import { AnalyticsManager } from 'Analytics/AnalyticsManager';
+import 'mocha';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { IProduct, ITransactionErrorDetails, ITransactionDetails } from 'Purchasing/PurchasingAdapter';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { asStub } from 'TestHelpers/Functions';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
+import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import { IProduct, ITransactionDetails, ITransactionErrorDetails } from 'Purchasing/PurchasingAdapter';
+import * as sinon from 'sinon';
+import { asStub } from 'TestHelpers/Functions';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('CustomPurchasingAdapter', () => {
     let platform: Platform;

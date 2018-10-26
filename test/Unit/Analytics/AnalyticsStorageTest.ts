@@ -1,14 +1,14 @@
 import { AnalyticsStorage, IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { Platform } from 'Core/Constants/Platform';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('AnalyticsStorageTest', () => {

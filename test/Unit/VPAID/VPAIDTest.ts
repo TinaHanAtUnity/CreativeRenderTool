@@ -1,4 +1,7 @@
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { Backend } from 'Backend/Backend';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
 import { Observable1 } from 'Core/Utilities/Observable';
@@ -9,9 +12,6 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VPAID as VPAIDModel } from 'VPAID/Models/VPAID';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDHandler, VPAID } from 'VPAID/Views/VPAID';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 
 describe('VPAID View', () => {
     let platform: Platform;

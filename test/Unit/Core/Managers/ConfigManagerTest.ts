@@ -1,22 +1,22 @@
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
 import { ConfigError } from 'Core/Errors/ConfigError';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestError } from 'Core/Errors/RequestError';
+import { ICoreApi } from 'Core/ICore';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { Platform } from 'Core/Constants/Platform';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('ConfigManagerTest', () => {

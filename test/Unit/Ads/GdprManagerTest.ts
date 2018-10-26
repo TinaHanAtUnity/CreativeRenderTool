@@ -1,23 +1,21 @@
 import { GDPREventAction, GDPREventSource, GdprManager } from 'Ads/Managers/GdprManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { SdkApi } from 'Core/Native/Sdk';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
+import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Observable2 } from 'Core/Utilities/Observable';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { IAdsApi } from 'Ads/IAds';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('GdprManagerTest', () => {

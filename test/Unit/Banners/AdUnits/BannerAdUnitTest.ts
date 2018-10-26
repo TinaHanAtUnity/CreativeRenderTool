@@ -2,6 +2,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { Backend } from 'Backend/Backend';
 
 import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
@@ -9,10 +10,12 @@ import { BannerApi } from 'Banners/Native/Banner';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IntentApi } from 'Core/Native/Android/Intent';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 
@@ -23,9 +26,6 @@ import * as sinon from 'sinon';
 
 import { asSpy, asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ICoreApi } from 'Core/ICore';
-import { Backend } from 'Backend/Backend';
-import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('BannerAdUnit', () => {

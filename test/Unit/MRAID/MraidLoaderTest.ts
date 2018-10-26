@@ -1,9 +1,9 @@
-import 'mocha';
 import { assert } from 'chai';
-
-import { TestFixtures } from 'TestHelpers/TestFixtures';
+import 'mocha';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MraidLoader } from 'MRAID/Parsers/MraidLoader';
+
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('MraidLoaderTest', () => {
     it('should reload playable MRAID campaign', () => {

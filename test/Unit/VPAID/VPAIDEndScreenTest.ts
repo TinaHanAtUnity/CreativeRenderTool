@@ -1,8 +1,8 @@
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 
 describe('VPAIDEndScreen', () => {
     const sandbox = sinon.createSandbox();

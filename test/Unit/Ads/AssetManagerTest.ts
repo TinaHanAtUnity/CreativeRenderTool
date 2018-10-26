@@ -1,26 +1,26 @@
+import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { Asset } from 'Ads/Models/Assets/Asset';
 import { HTML } from 'Ads/Models/Assets/HTML';
+import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
+import { CacheManager, CacheStatus } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { CacheManager, CacheStatus } from 'Core/Managers/CacheManager';
-import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { IAdsApi } from 'Ads/IAds';
-import { Campaign, ICampaign } from 'Ads/Models/Campaign';
-import { Asset } from 'Ads/Models/Assets/Asset';
-import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 class TestCampaign extends Campaign {
 

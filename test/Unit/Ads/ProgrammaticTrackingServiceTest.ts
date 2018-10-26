@@ -6,11 +6,11 @@ import {
 } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import 'mocha';
 import * as sinon from 'sinon';
-import { RequestManager } from 'Core/Managers/RequestManager';
 
 describe('Ads/Utilities', () => {
 

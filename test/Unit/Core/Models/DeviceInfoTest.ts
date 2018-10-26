@@ -1,18 +1,17 @@
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { StreamType } from 'Core/Constants/Android/StreamType';
 import { EventCategory } from 'Core/Constants/EventCategory';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
 import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ICoreApi } from 'Core/ICore';
-import { Backend } from 'Backend/Backend';
 
 describe('DeviceInfoTest', () => {
 

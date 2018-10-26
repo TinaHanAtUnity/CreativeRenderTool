@@ -1,10 +1,10 @@
 import { MOAT } from 'Ads/Views/MOAT';
+import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import 'mocha';
 import * as sinon from 'sinon';
-import { Platform } from 'Core/Constants/Platform';
 
 describe('MOAT', () => {
     describe('onMessage', () => {

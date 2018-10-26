@@ -1,7 +1,7 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -9,7 +9,6 @@ import 'mocha';
 import * as protobuf from 'protobufjs/minimal';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { unity_proto } from '../../../src/proto/unity_proto';
-import { Platform } from 'Core/Constants/Platform';
 
 describe('AdMobSignalFactoryTest', () => {
     it('basic test', () => {

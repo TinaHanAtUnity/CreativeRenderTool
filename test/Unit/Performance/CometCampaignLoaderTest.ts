@@ -1,9 +1,9 @@
-import 'mocha';
 import { assert } from 'chai';
-
-import { TestFixtures } from 'TestHelpers/TestFixtures';
+import 'mocha';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { CometCampaignLoader } from 'Performance/Parsers/CometCampaignLoader';
+
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('CometCampaignLoaderTest', () => {
     it('should reload comet campaign', () => {

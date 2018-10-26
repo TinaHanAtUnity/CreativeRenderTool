@@ -1,15 +1,15 @@
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
 import { RequestError } from 'Core/Errors/RequestError';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/ICore';
 
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
-import { Backend } from 'Backend/Backend';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(Platform[platform] + ' - RequestTest', () => {

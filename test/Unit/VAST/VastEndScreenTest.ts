@@ -1,5 +1,9 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import VastEndScreenFixture from 'html/fixtures/VastEndScreenFixture.html';
@@ -7,10 +11,6 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
-import { Privacy } from 'Ads/Views/Privacy';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 
 describe('VastEndScreen', () => {
     let platform: Platform;

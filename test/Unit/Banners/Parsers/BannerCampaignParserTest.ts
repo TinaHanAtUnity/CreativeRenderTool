@@ -3,15 +3,15 @@ import { Session } from 'Ads/Models/Session';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { BannerCampaignParser } from 'Banners/Parsers/BannerCampaignParser';
 import { assert } from 'chai';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { RequestManager } from 'Core/Managers/RequestManager';
 
 import BannerCampaignJSON from 'json/campaigns/banner/ValidBannerCampaign.json';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ICoreApi } from 'Core/ICore';
 
 describe('BannerCampaignParser', () => {
     const placements = ['TestPlacement'];

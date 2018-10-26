@@ -1,6 +1,10 @@
+import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Placement } from 'Ads/Models/Placement';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
@@ -9,10 +13,6 @@ import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampa
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { GdprManager } from 'Ads/Managers/GdprManager';
-import { Privacy } from 'Ads/Views/Privacy';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 

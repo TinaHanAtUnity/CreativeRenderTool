@@ -1,15 +1,14 @@
-import 'mocha';
-import * as sinon from 'sinon';
-import { assert } from 'chai';
-
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Placement } from 'Ads/Models/Placement';
-import { StorageError, StorageType } from 'Core/Native/Storage';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
+import { StorageError, StorageType } from 'Core/Native/Storage';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import 'mocha';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import * as sinon from 'sinon';
 import { StorageBridgeHelper } from 'TestHelpers/StorageBridgeHelper';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('BackupCampaignManagerTest', () => {
     it('should store placement data', () => {

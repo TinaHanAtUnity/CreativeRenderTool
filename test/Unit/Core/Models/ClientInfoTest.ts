@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import 'mocha';
 import { ClientInfoData } from 'Core/Native/Sdk';
+import 'mocha';
 
 describe('ClientInfoTest', () => {
 

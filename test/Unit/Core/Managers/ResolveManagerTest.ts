@@ -1,12 +1,12 @@
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 
 import { ResolveManager } from 'Core/Managers/ResolveManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('ResolveTest', () => {

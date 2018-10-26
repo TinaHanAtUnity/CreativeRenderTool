@@ -1,33 +1,27 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
+import { IAdsApi } from 'Ads/IAds';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable';
 import 'mocha';
 import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
+import { IMonetizationApi } from 'Monetization/IMonetization';
 import { PlacementContentManager } from 'Monetization/Managers/PlacementContentManager';
-import { MonetizationListenerApi } from 'Monetization/Native/MonetizationListener';
-import {
-    IPlacementContentParams,
-    IPlacementContentType,
-    PlacementContentsApi
-} from 'Monetization/Native/PlacementContents';
+import { IPlacementContentParams, IPlacementContentType } from 'Monetization/Native/PlacementContents';
+import { IPromoApi } from 'Promo/IPromo';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { PurchasingApi } from 'Promo/Native/Purchasing';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
 import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { IMonetizationApi } from 'Monetization/IMonetization';
-import { Backend } from 'Backend/Backend';
-import { Platform } from 'Core/Constants/Platform';
-import { IPromoApi } from 'Promo/IPromo';
-import { IAdsApi } from 'Ads/IAds';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('PlacementContentManager', () => {

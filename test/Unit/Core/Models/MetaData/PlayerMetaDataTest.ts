@@ -1,13 +1,13 @@
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('PlayerMetaDataTest', () => {

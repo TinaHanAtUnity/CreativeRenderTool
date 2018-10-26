@@ -1,5 +1,8 @@
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 
@@ -7,9 +10,6 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 
 describe('MissedImpressionManagerTest', () => {
     let missedImpressionManager: MissedImpressionManager;

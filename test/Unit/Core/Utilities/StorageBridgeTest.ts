@@ -1,13 +1,13 @@
+import { Backend } from 'Backend/Backend';
+import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { StorageType } from 'Core/Native/Storage';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { StorageOperation } from 'Core/Utilities/StorageOperation';
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
-import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { StorageType } from 'Core/Native/Storage';
-import { StorageOperation } from 'Core/Utilities/StorageOperation';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Platform } from 'Core/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 import { StorageBridgeHelper } from 'TestHelpers/StorageBridgeHelper';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 

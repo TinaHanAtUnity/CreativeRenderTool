@@ -1,10 +1,10 @@
+import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { FocusManager } from 'Core/Managers/FocusManager';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import 'mocha';
 import * as sinon from 'sinon';
 
@@ -18,8 +18,6 @@ import VastCompanionAdWithoutImages from 'xml/VastCompanionAdWithoutImages.xml';
 import VastRaw from 'xml/VastRaw.xml';
 import VastWithSpaces from 'xml/VastWithSpaces.xml';
 import WrappedVast from 'xml/WrappedVast.xml';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 
 describe('VastParser', () => {
     let request: RequestManager;

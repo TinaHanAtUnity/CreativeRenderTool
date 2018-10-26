@@ -1,8 +1,7 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
-import { DeviceInfo } from 'Backend/Api/DeviceInfo';
-import { Request } from 'Backend/Api/Request';
+import { Backend } from 'Backend/Backend';
 import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
 import { assert } from 'chai';
@@ -11,7 +10,6 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
-import { Backend } from '../../../src/ts/Backend/Backend';
 
 describe('AndroidEventsTest', () => {
 

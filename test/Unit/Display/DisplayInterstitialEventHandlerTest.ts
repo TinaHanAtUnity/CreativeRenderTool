@@ -1,14 +1,18 @@
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { IAdsApi } from 'Ads/IAds';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import {
     DisplayInterstitialAdUnit,
     IDisplayInterstitialAdUnitParameters
@@ -19,10 +23,6 @@ import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Privacy } from 'Ads/Views/Privacy';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
-import { IAdsApi } from 'Ads/IAds';
 
 describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;
