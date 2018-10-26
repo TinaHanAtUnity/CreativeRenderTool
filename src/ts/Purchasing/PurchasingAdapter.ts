@@ -1,5 +1,5 @@
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { Observable1 } from 'Core/Utilities/Observable';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 export interface ITransactionDetails {
     productId: string;

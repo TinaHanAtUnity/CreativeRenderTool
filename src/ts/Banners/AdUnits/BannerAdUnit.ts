@@ -5,12 +5,12 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { BannerViewType } from 'Banners/Native/Banner';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { Promises } from 'Core/Utilities/Promises';
 import { Template } from 'Core/Utilities/Template';
 import BannerContainer from 'html/banner/BannerContainer.html';
-import { ICoreApi } from '../../Core/ICore';
 
 export interface IBannerAdUnitParameters {
     platform: Platform;

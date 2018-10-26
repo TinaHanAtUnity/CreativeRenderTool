@@ -1,6 +1,7 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { IAdsApi } from 'Ads/IAds';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
@@ -9,18 +10,17 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { AnalyticsManager } from 'Analytics/AnalyticsManager';
+import { BannerCampaign } from 'Banners/Models/BannerCampaign';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { ICoreApi } from 'Core/ICore';
-import { Platform } from 'Core/Constants/Platform';
-import { IAdsApi } from 'Ads/IAds';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { BannerCampaign } from '../Models/BannerCampaign';
-import { AnalyticsManager } from '../../Analytics/AnalyticsManager';
 
 export class BannerAdUnitParametersFactory {
 

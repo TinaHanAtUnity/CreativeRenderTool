@@ -1,14 +1,14 @@
+import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
+import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import PrivacyTemplate from 'html/Privacy.html';
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { FinishState } from 'Core/Constants/FinishState';
-import { Platform } from '../../Core/Constants/Platform';
 
 enum PrivacyCardState {
     INITIAL,

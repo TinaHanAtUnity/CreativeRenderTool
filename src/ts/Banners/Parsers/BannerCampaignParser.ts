@@ -3,9 +3,9 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 export class BannerCampaignParser extends CampaignParser {
     public static ContentTypeJS = 'programmatic/banner-js';

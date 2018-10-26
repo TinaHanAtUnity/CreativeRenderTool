@@ -2,16 +2,16 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { VideoAdUnit, VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
+import { IAdsApi } from 'Ads/IAds';
 import { IOperativeSkipEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { IOverlayHandler } from 'Ads/Views/AbstractVideoOverlay';
+import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Double } from 'Core/Utilities/Double';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
-import { IAdsApi } from 'Ads/IAds';
-import { KeyCode } from 'Core/Constants/Android/KeyCode';
 
 export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler implements IOverlayHandler {
     protected _placement: Placement;

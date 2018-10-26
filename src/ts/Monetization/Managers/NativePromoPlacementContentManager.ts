@@ -1,10 +1,10 @@
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { Campaign } from 'Ads/Models/Campaign';
-import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { IMonetizationApi } from '../IMonetization';
+import { Campaign } from 'Ads/Models/Campaign';
+import { IMonetizationApi } from 'Monetization/IMonetization';
+import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 
- export class NativePromoPlacementContentEventManager {
+export class NativePromoPlacementContentEventManager {
     private _configuration: AdsConfiguration;
 
     constructor(monetization: IMonetizationApi, configuration: AdsConfiguration, nativePromoEventHandler: NativePromoEventHandler)  {

@@ -1,16 +1,16 @@
-import { AbstractAdUnitFactory } from '../../Ads/AdUnits/AbstractAdUnitFactory';
-import { IAdUnitParameters } from '../../Ads/AdUnits/AbstractAdUnit';
-import { PerformanceCampaign } from '../Models/PerformanceCampaign';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from './PerformanceAdUnit';
-import { AdUnitStyle } from '../../Ads/Models/AdUnitStyle';
-import { IEndScreenParameters } from '../../Ads/Views/EndScreen';
-import { PerformanceEndScreen } from '../Views/PerformanceEndScreen';
-import { PerformanceOverlayEventHandler } from '../EventHandlers/PerformanceOverlayEventHandler';
-import { PerformanceEndScreenEventHandler } from '../EventHandlers/PerformanceEndScreenEventHandler';
-import { PerformanceVideoEventHandler } from '../EventHandlers/PerformanceVideoEventHandler';
-import { IVideoEventHandlerParams } from '../../Ads/EventHandlers/BaseVideoEventHandler';
-import { Platform } from '../../Core/Constants/Platform';
-import { Privacy } from '../../Ads/Views/Privacy';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
+import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Platform } from 'Core/Constants/Platform';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
+import { PerformanceEndScreenEventHandler } from 'Performance/EventHandlers/PerformanceEndScreenEventHandler';
+import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
+import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 

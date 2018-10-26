@@ -1,7 +1,6 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable2 } from 'Core/Utilities/Observable';
-import {EventCategory} from '../../Constants/EventCategory';
 
 export enum IosPermission {
     AVMediaTypeVideo = 'vide',

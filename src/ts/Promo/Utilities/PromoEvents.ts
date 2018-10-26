@@ -1,14 +1,14 @@
-import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
-import { Platform } from 'Core/Constants/Platform';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { AnalyticsProtocol } from 'Analytics/AnalyticsProtocol';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { AnalyticsProtocol } from 'Analytics/AnalyticsProtocol';
+import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { ICoreApi } from '../../Core/ICore';
+import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
 
 // external fields
 export interface IPurchaseCommon {

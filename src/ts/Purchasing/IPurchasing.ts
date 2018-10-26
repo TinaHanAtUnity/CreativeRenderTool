@@ -1,5 +1,5 @@
-import { CustomPurchasingApi } from './Native/CustomPurchasing';
-import { IApiModule, IModuleApi } from '../Core/Modules/IApiModule';
+import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { CustomPurchasingApi } from 'Purchasing/Native/CustomPurchasing';
 
 export interface IPurchasingApi extends IModuleApi {
     CustomPurchasing: CustomPurchasingApi;

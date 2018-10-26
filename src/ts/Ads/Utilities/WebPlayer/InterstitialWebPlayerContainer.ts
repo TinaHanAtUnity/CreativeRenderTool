@@ -1,7 +1,7 @@
+import { IAdsApi } from 'Ads/IAds';
 import { WebPlayerViewId } from 'Ads/Native/WebPlayer';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { IAdsApi } from 'Ads/IAds';
-import { Platform } from '../../../Core/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 
 export class InterstitialWebPlayerContainer extends WebPlayerContainer {
     constructor(platform: Platform, ads: IAdsApi) {

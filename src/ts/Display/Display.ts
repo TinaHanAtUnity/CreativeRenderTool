@@ -1,6 +1,6 @@
-import { IParserModule } from '../Ads/Modules/IParserModule';
-import { ProgrammaticStaticInterstitialParser } from './Parsers/ProgrammaticStaticInterstitialParser';
-import { DisplayInterstitialAdUnitFactory } from './AdUnits/DisplayInterstitialAdUnitFactory';
+import { IParserModule } from 'Ads/Modules/IParserModule';
+import { DisplayInterstitialAdUnitFactory } from 'Display/AdUnits/DisplayInterstitialAdUnitFactory';
+import { ProgrammaticStaticInterstitialParser } from 'Display/Parsers/ProgrammaticStaticInterstitialParser';
 
 export class Display implements IParserModule {
 

@@ -1,7 +1,6 @@
+import { EventedNativeApi } from 'Core/Native/Bridge/EventedNativeApi';
 import { ApiPackage } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { EventedNativeApi } from 'Core/Native/Bridge/EventedNativeApi';
-import {EventCategory} from '../../../Core/Constants/EventCategory';
 
 enum AndroidVideoPlayerEvent {
     INFO

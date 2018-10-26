@@ -1,6 +1,6 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { EventCategory } from 'Core/Constants/EventCategory';
 
 export enum ApiPackage {
     CORE,

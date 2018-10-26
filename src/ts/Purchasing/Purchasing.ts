@@ -1,6 +1,6 @@
-import { IPurchasing, IPurchasingApi } from './IPurchasing';
-import { CustomPurchasingApi } from './Native/CustomPurchasing';
-import { ICore } from '../Core/ICore';
+import { ICore } from 'Core/ICore';
+import { IPurchasing, IPurchasingApi } from 'Purchasing/IPurchasing';
+import { CustomPurchasingApi } from 'Purchasing/Native/CustomPurchasing';
 
 export class Purchasing implements IPurchasing {
 

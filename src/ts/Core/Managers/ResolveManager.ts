@@ -1,5 +1,5 @@
-import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 import { ICoreApi } from 'Core/ICore';
+import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 
 export class ResolveManager {
 

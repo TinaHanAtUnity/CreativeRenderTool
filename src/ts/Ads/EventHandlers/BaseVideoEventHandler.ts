@@ -1,5 +1,6 @@
 import { ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { VideoAdUnit, VideoState } from 'Ads/AdUnits/VideoAdUnit';
+import { IAdsApi } from 'Ads/IAds';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -9,12 +10,11 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
+import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { IAdsApi } from 'Ads/IAds';
-import { ICoreApi } from 'Core/ICore';
-import { Platform } from 'Core/Constants/Platform';
 
 export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T2 extends Campaign = Campaign, T3 extends OperativeEventManager = OperativeEventManager> {
     adUnit: T;

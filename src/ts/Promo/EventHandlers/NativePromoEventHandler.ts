@@ -1,14 +1,14 @@
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { IAdsApi } from 'Ads/IAds';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
+import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Observable0 } from 'Core/Utilities/Observable';
-import { IAdsApi } from '../../Ads/IAds';
-import { ICoreApi } from '../../Core/ICore';
-import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Url } from 'Core/Utilities/Url';
-import { IPurchasingApi } from '../../Purchasing/IPurchasing';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { PromoEvents } from 'Promo/Utilities/PromoEvents';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 export class NativePromoEventHandler {
 

@@ -1,6 +1,6 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { EventCategory } from '../../Constants/EventCategory';
 
 export abstract class EventedNativeApi<T extends object> extends NativeApi {
 

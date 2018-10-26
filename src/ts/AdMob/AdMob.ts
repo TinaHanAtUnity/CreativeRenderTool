@@ -1,6 +1,6 @@
-import { IParserModule } from '../Ads/Modules/IParserModule';
-import { ProgrammaticAdMobParser } from './Parsers/ProgrammaticAdMobParser';
-import { AdMobAdUnitFactory } from './AdUnits/AdMobAdUnitFactory';
+import { AdMobAdUnitFactory } from 'AdMob/AdUnits/AdMobAdUnitFactory';
+import { ProgrammaticAdMobParser } from 'AdMob/Parsers/ProgrammaticAdMobParser';
+import { IParserModule } from 'Ads/Modules/IParserModule';
 
 export class AdMob implements IParserModule {
 

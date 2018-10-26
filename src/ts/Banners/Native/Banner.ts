@@ -1,8 +1,8 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
+import { WebViewError } from 'Core/Errors/WebViewError';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0, Observable1 } from 'Core/Utilities/Observable';
-import { WebViewError } from 'Core/Errors/WebViewError';
-import {EventCategory} from '../../Core/Constants/EventCategory';
 
 enum BannerEvents {
     BannerEventResized          = 'BANNER_RESIZED',

@@ -1,12 +1,12 @@
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { Platform } from 'Core/Constants/Platform';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 
 import CloserTemplate from 'html/closer.html';
-import { Platform } from 'Core/Constants/Platform';
 
 export interface ICloseHandler extends IGDPREventHandler {
     onClose(skipped: boolean): void;

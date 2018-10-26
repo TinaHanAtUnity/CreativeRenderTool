@@ -2,19 +2,19 @@ import { AdMobAdUnit } from 'AdMob/AdUnits/AdMobAdUnit';
 import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
 import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { ITouchInfo } from 'AdMob/Views/AFMABridge';
+import { IAdsApi } from 'Ads/IAds';
 import { IMotionEvent } from 'Ads/Native/Android/AdUnit';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
 import { MotionEventAction } from 'Core/Constants/Android/MotionEventAction';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { IAdsApi } from 'Ads/IAds';
-import { ICoreApi } from 'Core/ICore';
 
 export class AdMobSignalFactory {
     private _platform: Platform;

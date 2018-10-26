@@ -1,4 +1,5 @@
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';
@@ -6,7 +7,6 @@ import { VastCreative } from 'VAST/Models/VastCreative';
 import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
-import { ICoreApi } from 'Core/ICore';
 
 export class VastParser {
 

@@ -1,12 +1,12 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { Platform } from 'Core/Constants/Platform';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Platform } from 'Core/Constants/Platform';
 
 export interface IVastEndScreenHandler {
     onVastEndScreenClick(): void;

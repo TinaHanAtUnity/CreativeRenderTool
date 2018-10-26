@@ -1,6 +1,6 @@
 import { Placement } from 'Ads/Models/Placement';
-import { ISchema, Model } from 'Core/Models/Model';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
+import { ISchema, Model } from 'Core/Models/Model';
 
 export interface IAdsConfiguration {
     cacheMode: CacheMode;

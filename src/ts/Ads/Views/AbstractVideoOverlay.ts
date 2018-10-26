@@ -1,8 +1,7 @@
-
-import { IVideoOverlayDownloadParameters } from 'Performance/EventHandlers/PerformanceOverlayWithCTAButtonEventHandler';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
-import { View } from 'Core/Views/View';
 import { Platform } from 'Core/Constants/Platform';
+import { View } from 'Core/Views/View';
+import { IVideoOverlayDownloadParameters } from 'Performance/EventHandlers/PerformanceOverlayWithCTAButtonEventHandler';
 
 export interface IOverlayHandler extends IGDPREventHandler {
     onOverlaySkip(position: number): void;

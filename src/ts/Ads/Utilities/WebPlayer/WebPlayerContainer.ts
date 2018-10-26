@@ -1,3 +1,4 @@
+import { IAdsApi } from 'Ads/IAds';
 import {
     IWebPlayerEventSettings,
     IWebPlayerPlayerSettingsAndroid,
@@ -5,9 +6,8 @@ import {
     IWebPlayerWebSettingsIos,
     WebPlayerViewId
 } from 'Ads/Native/WebPlayer';
-import { Observable1, Observable2 } from 'Core/Utilities/Observable';
-import { IAdsApi } from 'Ads/IAds';
 import { Platform } from 'Core/Constants/Platform';
+import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 
 /**
  * The WebPlayerContainer wraps the WebPlayerApi in a way that can be used without needing

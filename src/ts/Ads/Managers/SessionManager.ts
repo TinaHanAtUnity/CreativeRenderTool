@@ -1,12 +1,12 @@
 import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';
 import { Session } from 'Ads/Models/Session';
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { StorageOperation } from 'Core/Utilities/StorageOperation';
+import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
 
 export class SessionManager {
 

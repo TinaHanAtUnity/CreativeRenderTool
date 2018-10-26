@@ -1,12 +1,12 @@
 import { IMoatData, IMoatIds } from 'Ads/Utilities/MoatViewabilityService';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import MOATTemplate from 'html/MOAT.html';
 import MOATContainer from 'html/moat/container.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ICoreApi } from 'Core/ICore';
 
 export enum MoatState {
     PLAYING,

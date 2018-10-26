@@ -1,3 +1,4 @@
+import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
@@ -7,7 +8,6 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 
 export enum VideoType {
     CACHE,

@@ -1,9 +1,9 @@
 import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { RequestManager } from '../../Core/Managers/RequestManager';
 
 export class FailedXpromoOperativeEventManager extends FailedOperativeEventManager {
 

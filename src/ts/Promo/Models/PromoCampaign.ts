@@ -1,8 +1,8 @@
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
 import { ProductInfo } from 'Promo/Models/ProductInfo';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
 export interface IPromoCampaign extends ICampaign {
     additionalTrackingEvents: { [eventName: string]: string[] } | undefined;

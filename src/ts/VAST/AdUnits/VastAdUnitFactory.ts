@@ -1,17 +1,17 @@
-import { AbstractAdUnitFactory } from '../../Ads/AdUnits/AbstractAdUnitFactory';
-import { IAdUnitParameters } from '../../Ads/AdUnits/AbstractAdUnit';
-import { VastCampaign } from '../Models/VastCampaign';
-import { IVastAdUnitParameters, VastAdUnit } from './VastAdUnit';
-import { IVastEndscreenParameters, VastEndScreen } from '../Views/VastEndScreen';
-import { MoatViewabilityService } from '../../Ads/Utilities/MoatViewabilityService';
-import { VastEndScreenEventHandler } from '../EventHandlers/VastEndScreenEventHandler';
-import { Platform } from '../../Core/Constants/Platform';
-import { VastOverlayEventHandler } from '../EventHandlers/VastOverlayEventHandler';
-import { VastVideoEventHandler } from '../EventHandlers/VastVideoEventHandler';
-import { IVideoEventHandlerParams } from '../../Ads/EventHandlers/BaseVideoEventHandler';
-import { IObserver2, IObserver3 } from '../../Core/Utilities/IObserver';
-import { StreamType } from '../../Core/Constants/Android/StreamType';
-import { Privacy } from '../../Ads/Views/Privacy';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
+import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
+import { Privacy } from 'Ads/Views/Privacy';
+import { StreamType } from 'Core/Constants/Android/StreamType';
+import { Platform } from 'Core/Constants/Platform';
+import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
+import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
+import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEventHandler';
+import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
+import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 export class VastAdUnitFactory extends AbstractAdUnitFactory {
 

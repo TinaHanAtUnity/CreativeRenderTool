@@ -1,12 +1,12 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainer, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { IAdsApi } from 'Ads/IAds';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { Rotation } from 'Core/Constants/Android/Rotation';
 import { ScreenOrientation } from 'Core/Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Core/Constants/Android/SystemUiVisibility';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { IAdsApi } from 'Ads/IAds';
 import { ICoreApi } from 'Core/ICore';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;

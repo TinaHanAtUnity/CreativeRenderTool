@@ -1,5 +1,5 @@
-import { CacheApi, IFileInfo } from 'Core/Native/Cache';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
+import { CacheApi, IFileInfo } from 'Core/Native/Cache';
 import { FileId } from 'Core/Utilities/FileId';
 
 export class FileInfo {

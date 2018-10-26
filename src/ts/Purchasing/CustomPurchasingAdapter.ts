@@ -1,14 +1,19 @@
-import { IPurchasingAdapter, ITransactionDetails, IProduct, ITransactionErrorDetails } from 'Purchasing/PurchasingAdapter';
-import { Observable1 } from 'Core/Utilities/Observable';
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { IObserver1 } from 'Core/Utilities/IObserver';
-import { AnalyticsManager } from 'Analytics/AnalyticsManager';
-import { PromoEvents } from 'Promo/Utilities/PromoEvents';
-import { Url } from 'Core/Utilities/Url';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { ICoreApi } from '../Core/ICore';
-import { IPurchasingApi } from './IPurchasing';
+import { AnalyticsManager } from 'Analytics/AnalyticsManager';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
+import { IObserver1 } from 'Core/Utilities/IObserver';
+import { Observable1 } from 'Core/Utilities/Observable';
+import { Url } from 'Core/Utilities/Url';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { PromoEvents } from 'Promo/Utilities/PromoEvents';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import {
+    IProduct,
+    IPurchasingAdapter,
+    ITransactionDetails,
+    ITransactionErrorDetails
+} from 'Purchasing/PurchasingAdapter';
 
 export class CustomPurchasingAdapter implements IPurchasingAdapter {
     public readonly onCatalogRefreshed = new Observable1<IProduct[]>();

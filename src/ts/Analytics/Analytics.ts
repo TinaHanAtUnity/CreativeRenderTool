@@ -1,10 +1,10 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
+import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
+import { IAnalytics, IAnalyticsApi } from 'Analytics/IAnalytics';
+import { AnalyticsApi } from 'Analytics/Native/Analytics';
 import { ICore } from 'Core/ICore';
-import { IAnalytics, IAnalyticsApi } from './IAnalytics';
-import { IApiModule } from '../Core/Modules/IApiModule';
-import { AnalyticsApi } from './Native/Analytics';
-import { AnalyticsStorage } from './AnalyticsStorage';
+import { IApiModule } from 'Core/Modules/IApiModule';
 
 export class Analytics implements IAnalytics, IApiModule {
 

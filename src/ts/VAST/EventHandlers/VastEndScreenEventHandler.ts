@@ -1,13 +1,13 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { Platform } from 'Core/Constants/Platform';
-import { ClientInfo } from 'Core/Models/ClientInfo';
+import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { ClickDelayTrackingTest } from 'Core/Models/ABGroup';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
-import { ICoreApi } from 'Core/ICore';
-import { ClickDelayTrackingTest } from 'Core/Models/ABGroup';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;

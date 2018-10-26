@@ -1,12 +1,12 @@
 import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
 import { IosARApi } from 'AR/Native/iOS/IosARApi';
 import { IARSize } from 'AR/Utilities/ARUtil';
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { Platform } from 'Core/Constants/Platform';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
 import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable';
-import {EventCategory} from '../../Core/Constants/EventCategory';
 
 enum AREvent {
     AR_PLANES_ADDED,

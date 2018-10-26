@@ -1,3 +1,4 @@
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
@@ -5,17 +6,16 @@ import { CacheDiagnostics, ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnost
 import { ProgrammaticTrackingError, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
+import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
+import { ICoreApi } from 'Core/ICore';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
+import { CacheManager, CacheStatus, HeadersType } from 'Core/Managers/CacheManager';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { CacheManager, CacheStatus, HeadersType } from 'Core/Managers/CacheManager';
-import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { ICoreApi } from 'Core/ICore';
-import { Platform } from 'Core/Constants/Platform';
 
 enum CacheType {
     REQUIRED,

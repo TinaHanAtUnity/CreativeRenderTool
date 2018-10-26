@@ -1,10 +1,10 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { INativeResponse } from 'Core/Managers/RequestManager';
 import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export abstract class RefreshManager {
     public static NoFillDelay = 3600;

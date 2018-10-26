@@ -1,7 +1,7 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1 } from 'Core/Utilities/Observable';
-import {EventCategory} from '../../Core/Constants/EventCategory';
 
 export enum PurchasingEvent {
     COMMAND,

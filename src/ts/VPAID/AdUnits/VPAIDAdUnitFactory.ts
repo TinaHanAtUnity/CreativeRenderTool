@@ -1,14 +1,14 @@
-import { AbstractAdUnitFactory } from '../../Ads/AdUnits/AbstractAdUnitFactory';
-import { IAdUnitParameters } from '../../Ads/AdUnits/AbstractAdUnit';
-import { VPAIDCampaign } from '../Models/VPAIDCampaign';
-import { IVPAIDAdUnitParameters, VPAIDAdUnit } from './VPAIDAdUnit';
-import { Closer } from '../../Ads/Views/Closer';
-import { VPAID } from '../Views/VPAID';
-import { VPAIDEndScreen } from '../Views/VPAIDEndScreen';
-import { VPAIDEventHandler } from '../EventHandlers/VPAIDEventHandler';
-import { VPAIDOverlayEventHandler } from '../EventHandlers/VPAIDOverlayEventHandler';
-import { VPAIDEndScreenEventHandler } from '../EventHandlers/VPAIDEndScreenEventHandler';
-import { Privacy } from '../../Ads/Views/Privacy';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { Closer } from 'Ads/Views/Closer';
+import { Privacy } from 'Ads/Views/Privacy';
+import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
+import { VPAIDEndScreenEventHandler } from 'VPAID/EventHandlers/VPAIDEndScreenEventHandler';
+import { VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
+import { VPAIDOverlayEventHandler } from 'VPAID/EventHandlers/VPAIDOverlayEventHandler';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { VPAID } from 'VPAID/Views/VPAID';
+import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 
 export class VPAIDAdUnitFactory extends AbstractAdUnitFactory {
 

@@ -1,9 +1,9 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { Platform } from 'Core/Constants/Platform';
 import { BatchInvocation } from 'Core/Native/Bridge/BatchInvocation';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 import { INativeBridge } from 'Core/Native/Bridge/INativeBridge';
 import { NativeApi } from 'Core/Native/Bridge/NativeApi';
-import { EventCategory } from 'Core/Constants/EventCategory';
 
 export enum CallbackStatus {
     OK,

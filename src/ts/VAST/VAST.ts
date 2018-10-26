@@ -1,6 +1,6 @@
-import { IParserModule } from '../Ads/Modules/IParserModule';
-import { ProgrammaticVastParser } from './Parsers/ProgrammaticVastParser';
-import { VastAdUnitFactory } from './AdUnits/VastAdUnitFactory';
+import { IParserModule } from 'Ads/Modules/IParserModule';
+import { VastAdUnitFactory } from 'VAST/AdUnits/VastAdUnitFactory';
+import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 
 export class VAST implements IParserModule {
 

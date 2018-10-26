@@ -3,11 +3,11 @@ import { Analytics } from 'Ads/Utilities/Analytics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestError } from 'Core/Errors/RequestError';
+import { ICoreApi } from 'Core/ICore';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
-import { ICoreApi } from 'Core/ICore';
 
 enum ThirdPartyEventMethod {
     POST,

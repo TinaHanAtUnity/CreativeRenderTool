@@ -5,14 +5,14 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { ABGroup, ImprovedEndScreenStylesTest } from 'Core/Models/ABGroup';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
 import EndScreenWithImprovedStylesTemplate from 'html/EndScreenWithImprovedStyles.html';
-import { Platform } from '../../Core/Constants/Platform';
-import { ICoreApi } from '../../Core/ICore';
 
 export interface IEndScreenParameters {
     platform: Platform;

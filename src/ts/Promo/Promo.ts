@@ -1,15 +1,14 @@
-import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { IAds } from 'Ads/IAds';
+import { IParserModule } from 'Ads/Modules/IParserModule';
+import { IAnalytics } from 'Analytics/IAnalytics';
+import { ICore } from 'Core/ICore';
+import { PromoAdUnitFactory } from 'Promo/AdUnits/PromoAdUnitFactory';
+import { IPromo, IPromoApi } from 'Promo/IPromo';
 import { PurchasingApi } from 'Promo/Native/Purchasing';
+import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
+import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { IParserModule } from '../Ads/Modules/IParserModule';
-import { PromoCampaignParser } from './Parsers/PromoCampaignParser';
-import { PromoAdUnitFactory } from './AdUnits/PromoAdUnitFactory';
-import { IAds } from '../Ads/IAds';
-import { ICore } from '../Core/ICore';
-import { IPurchasing } from '../Purchasing/IPurchasing';
-import { PromoEvents } from './Utilities/PromoEvents';
-import { IAnalytics } from '../Analytics/IAnalytics';
-import { IPromo, IPromoApi } from './IPromo';
+import { IPurchasing } from 'Purchasing/IPurchasing';
 
 export class Promo implements IParserModule, IPromo {
 

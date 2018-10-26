@@ -1,5 +1,5 @@
-import { IApiModule, IModuleApi } from '../Core/Modules/IApiModule';
-import { PurchasingApi } from './Native/Purchasing';
+import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { PurchasingApi } from 'Promo/Native/Purchasing';
 
 export interface IPromoApi extends IModuleApi {
     Purchasing: PurchasingApi;

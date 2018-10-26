@@ -1,5 +1,5 @@
+import { BackendApi } from 'Backend/BackendApi';
 import { UnityAds } from 'Backend/UnityAds';
-import { BackendApi } from '../BackendApi';
 
 export class Listener extends BackendApi {
 

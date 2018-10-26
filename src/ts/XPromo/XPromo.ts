@@ -1,6 +1,6 @@
-import { IParserModule } from '../Ads/Modules/IParserModule';
-import { XPromoCampaignParser } from './Parsers/XPromoCampaignParser';
-import { XPromoAdUnitFactory } from './AdUnits/XPromoAdUnitFactory';
+import { IParserModule } from 'Ads/Modules/IParserModule';
+import { XPromoAdUnitFactory } from 'XPromo/AdUnits/XPromoAdUnitFactory';
+import { XPromoCampaignParser } from 'XPromo/Parsers/XPromoCampaignParser';
 
 export class XPromo implements IParserModule {
 

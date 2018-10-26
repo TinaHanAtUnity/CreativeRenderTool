@@ -1,13 +1,13 @@
+import { IAdsApi } from 'Ads/IAds';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { Platform } from 'Core/Constants/Platform';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import OverlayTemplate from 'html/Overlay.html';
-import { IAdsApi } from 'Ads/IAds';
-import { DeviceInfo } from '../../Core/Models/DeviceInfo';
-import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
 
 export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 

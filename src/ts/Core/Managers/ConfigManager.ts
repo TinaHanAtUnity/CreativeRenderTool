@@ -1,20 +1,20 @@
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
 import { ConfigError } from 'Core/Errors/ConfigError';
 import { RequestError } from 'Core/Errors/RequestError';
+import { ICoreApi } from 'Core/ICore';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AdapterMetaData } from 'Core/Models/MetaData/AdapterMetaData';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Url } from 'Core/Utilities/Url';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { RequestManager } from 'Core/Managers/RequestManager';
 
 export class ConfigManager {
 

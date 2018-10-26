@@ -1,6 +1,6 @@
-import { IParserModule } from '../Ads/Modules/IParserModule';
-import { ProgrammaticVPAIDParser } from './Parsers/ProgrammaticVPAIDParser';
-import { VPAIDAdUnitFactory } from './AdUnits/VPAIDAdUnitFactory';
+import { IParserModule } from 'Ads/Modules/IParserModule';
+import { VPAIDAdUnitFactory } from 'VPAID/AdUnits/VPAIDAdUnitFactory';
+import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 
 export class VPAID implements IParserModule {
 

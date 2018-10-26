@@ -1,7 +1,7 @@
-import { IPlacementContentParams } from 'Monetization/Native/PlacementContents';
-import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
+import { BackendApi } from 'Backend/BackendApi';
 import { FinishState } from 'Core/Constants/FinishState';
-import { BackendApi } from '../BackendApi';
+import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
+import { IPlacementContentParams } from 'Monetization/Native/PlacementContents';
 
 export class PlacementContents extends BackendApi {
     public sendAdFinished(placementId: string, finishState: FinishState) {

@@ -5,8 +5,10 @@ import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 
 import { ABGroup, FPSCollectionTest } from 'Core/Models/ABGroup';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
@@ -15,8 +17,6 @@ import MRAIDPerfContainer from 'html/mraid/container-perf.html';
 import MRAIDContainer from 'html/mraid/container.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { ICoreApi } from 'Core/ICore';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 

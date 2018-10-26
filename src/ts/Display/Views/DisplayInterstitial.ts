@@ -2,14 +2,14 @@ import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 
 import { View } from 'Core/Views/View';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { ICoreApi } from 'Core/ICore';
 
 export interface IDisplayInterstitialHandler extends IGDPREventHandler {
     onDisplayInterstitialClose(): void;

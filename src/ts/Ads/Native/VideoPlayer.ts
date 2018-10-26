@@ -1,11 +1,11 @@
 import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
 import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { Platform } from 'Core/Constants/Platform';
+import { EventedNativeApi } from 'Core/Native/Bridge/EventedNativeApi';
 import { ApiPackage } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
-import { EventedNativeApi } from 'Core/Native/Bridge/EventedNativeApi';
-import { EventCategory } from '../../Core/Constants/EventCategory';
 
 enum VideoPlayerEvent {
     PROGRESS,

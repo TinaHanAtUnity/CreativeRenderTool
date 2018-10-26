@@ -1,9 +1,9 @@
+import { IAdsApi } from 'Ads/IAds';
+import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
-import { Campaign } from 'Ads/Models/Campaign';
+import { Platform } from 'Core/Constants/Platform';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { Platform } from '../../Core/Constants/Platform';
-import { IAdsApi } from '../IAds';
 
 export class PerformanceVideoOverlayWithCTAButton extends NewVideoOverlay implements IPrivacyHandler {
     private _campaign: Campaign;

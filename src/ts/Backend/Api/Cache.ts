@@ -1,6 +1,6 @@
+import { BackendApi } from 'Backend/BackendApi';
+import { VideoMetadata } from 'Core/Constants/Android/VideoMetadata';
 import { CacheError, CacheEvent, IFileInfo } from 'Core/Native/Cache';
-import { BackendApi } from '../BackendApi';
-import { VideoMetadata } from '../../Core/Constants/Android/VideoMetadata';
 
 export class Cache extends BackendApi {
 

@@ -1,9 +1,9 @@
-import { NativeApi, ApiPackage } from 'Core/Native/Bridge/NativeApi';
-import { Observable1, Observable2 } from 'Core/Utilities/Observable';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { FinishState } from 'Core/Constants/FinishState';
-import {EventCategory} from '../../Core/Constants/EventCategory';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable2 } from 'Core/Utilities/Observable';
+import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
 
 export enum IPlacementContentType {
     SHOW_AD,

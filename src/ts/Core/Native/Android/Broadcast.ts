@@ -1,7 +1,7 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable4 } from 'Core/Utilities/Observable';
-import {EventCategory} from '../../Constants/EventCategory';
 
 enum BroadcastEvent {
     ACTION

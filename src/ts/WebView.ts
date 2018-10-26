@@ -1,6 +1,6 @@
+import { Core } from 'Core/Core';
 import { INativeCallback, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Core } from 'Core/Core';
 
 export class WebView {
 

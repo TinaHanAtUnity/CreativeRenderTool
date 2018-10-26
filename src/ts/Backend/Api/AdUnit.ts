@@ -1,5 +1,5 @@
+import { BackendApi } from 'Backend/BackendApi';
 import { Platform } from 'Core/Constants/Platform';
-import { BackendApi } from '../BackendApi';
 
 export class AdUnit extends BackendApi {
 

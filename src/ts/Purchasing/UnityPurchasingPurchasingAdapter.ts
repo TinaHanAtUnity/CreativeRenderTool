@@ -1,15 +1,15 @@
-import { IPurchasingAdapter, IProduct, ITransactionDetails } from 'Purchasing/PurchasingAdapter';
-import { Observable1 } from 'Core/Utilities/Observable';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { IPromoApi } from '../Promo/IPromo';
-import { ICoreApi } from '../Core/ICore';
-import { PromoEvents } from 'Promo/Utilities/PromoEvents';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { ICoreApi } from 'Core/ICore';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { Observable1 } from 'Core/Utilities/Observable';
 import { Url } from 'Core/Utilities/Url';
+import { IPromoApi } from 'Promo/IPromo';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { PromoEvents } from 'Promo/Utilities/PromoEvents';
+import { IProduct, IPurchasingAdapter, ITransactionDetails } from 'Purchasing/PurchasingAdapter';
 
 export enum IPromoRequest {
     SETIDS = 'setids',

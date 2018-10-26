@@ -1,4 +1,4 @@
-import { BackendApi } from '../BackendApi';
+import { BackendApi } from 'Backend/BackendApi';
 
 export class CustomPurchasing extends BackendApi {
     public available() {

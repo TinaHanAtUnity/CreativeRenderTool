@@ -1,8 +1,8 @@
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
+import { Platform } from 'Core/Constants/Platform';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import InterstitialOverlayTemplate from 'html/InterstitialOverlay.html';
-import { Platform } from 'Core/Constants/Platform';
 
 export class ClosableVideoOverlay extends AbstractVideoOverlay {
 

@@ -1,9 +1,9 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { Platform } from 'Core/Constants/Platform';
 import { AndroidRequestApi } from 'Core/Native/Android/Request';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable3, Observable5 } from 'Core/Utilities/Observable';
-import { EventCategory } from 'Core/Constants/EventCategory';
 
 export enum RequestEvent {
     COMPLETE,

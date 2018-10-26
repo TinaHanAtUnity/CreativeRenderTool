@@ -1,4 +1,3 @@
-
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 
 export enum VASTMediaFileSize {

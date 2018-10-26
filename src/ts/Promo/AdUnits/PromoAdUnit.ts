@@ -10,11 +10,11 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { Promo } from 'Promo/Views/Promo';
-import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Url } from 'Core/Utilities/Url';
-import { IPurchasingApi } from '../../Purchasing/IPurchasing';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { PromoEvents } from 'Promo/Utilities/PromoEvents';
+import { Promo } from 'Promo/Views/Promo';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign> {
     purchasing: IPurchasingApi;

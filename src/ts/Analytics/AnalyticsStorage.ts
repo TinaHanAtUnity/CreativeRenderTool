@@ -1,5 +1,5 @@
-import { StorageError, StorageType } from 'Core/Native/Storage';
 import { ICoreApi } from 'Core/ICore';
+import { StorageError, StorageType } from 'Core/Native/Storage';
 
 export interface IIAPInstrumentation {
     price: number;

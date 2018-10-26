@@ -1,6 +1,6 @@
-import { IParserModule } from '../Ads/Modules/IParserModule';
-import { CometCampaignParser } from './Parsers/CometCampaignParser';
-import { PerformanceAdUnitFactory } from './AdUnits/PerformanceAdUnitFactory';
+import { IParserModule } from 'Ads/Modules/IParserModule';
+import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
+import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 
 export class Performance implements IParserModule {
 

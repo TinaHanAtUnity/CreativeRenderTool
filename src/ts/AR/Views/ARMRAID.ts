@@ -3,12 +3,15 @@ import { Placement } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { IARApi } from 'AR/AR';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { IObserver0, IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { Localization } from 'Core/Utilities/Localization';
+import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { Template } from 'Core/Utilities/Template';
 import MRAIDContainer from 'html/mraid/container.html';
 import WebARScript from 'html/mraid/webar.html';
@@ -16,9 +19,6 @@ import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { ICoreApi } from 'Core/ICore';
-import { IARApi } from 'AR/AR';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;

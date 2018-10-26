@@ -1,23 +1,23 @@
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { Campaign } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
+import { AnalyticsManager } from 'Analytics/AnalyticsManager';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IPromoApi } from 'Promo/IPromo';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingCatalog } from 'Promo/Models/PurchasingCatalog';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { IPurchasingAdapter, IProduct } from 'Purchasing/PurchasingAdapter';
-import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
-import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurchasingAdapter';
-import { Campaign } from 'Ads/Models/Campaign';
-import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { IPurchasingApi } from '../../Purchasing/IPurchasing';
-import { ICoreApi } from '../../Core/ICore';
-import { IPromoApi } from '../IPromo';
+import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import { IProduct, IPurchasingAdapter } from 'Purchasing/PurchasingAdapter';
+import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurchasingAdapter';
 
 export enum IPromoRequest {
     SETIDS = 'setids',

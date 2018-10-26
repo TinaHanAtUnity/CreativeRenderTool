@@ -1,9 +1,9 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { Platform } from 'Core/Constants/Platform';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { ITemplateData, View } from 'Core/Views/View';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;

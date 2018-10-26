@@ -1,16 +1,16 @@
+import { IAdsApi } from 'Ads/IAds';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { Closer } from 'Ads/Views/Closer';
 import { FinishState } from 'Core/Constants/FinishState';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { ICoreApi } from 'Core/ICore';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDHandler } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
-import { ICoreApi } from 'Core/ICore';
-import { IAdsApi } from 'Ads/IAds';
 
 export class VPAIDEventHandler implements IVPAIDHandler {
     private _operativeEventManager: OperativeEventManager;

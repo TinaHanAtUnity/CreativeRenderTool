@@ -4,13 +4,13 @@ import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
+import { ICoreApi } from 'Core/ICore';
 import { ABGroup } from 'Core/Models/ABGroup';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { DOMUtils } from 'Core/Utilities/DOMUtils';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { ICoreApi } from 'Core/ICore';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;

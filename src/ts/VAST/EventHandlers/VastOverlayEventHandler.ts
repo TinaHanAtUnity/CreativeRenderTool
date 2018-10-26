@@ -4,11 +4,11 @@ import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { MOAT } from 'Ads/Views/MOAT';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { ClickDelayTrackingTest } from 'Core/Models/ABGroup';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ICoreApi } from 'Core/ICore';
-import { ClickDelayTrackingTest } from 'Core/Models/ABGroup';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;

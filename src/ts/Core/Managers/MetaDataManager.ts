@@ -1,5 +1,5 @@
-import { BaseMetaData } from 'Core/Models/MetaData/BaseMetaData';
 import { ICoreApi } from 'Core/ICore';
+import { BaseMetaData } from 'Core/Models/MetaData/BaseMetaData';
 
 export class MetaDataManager {
     private _metaDataCache: { [key: string]: any } = {};

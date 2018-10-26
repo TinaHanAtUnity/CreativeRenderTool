@@ -1,5 +1,5 @@
-import { CampaignParser } from '../Parsers/CampaignParser';
-import { AbstractAdUnitFactory } from '../AdUnits/AbstractAdUnitFactory';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 
 export interface IParserModule {
 

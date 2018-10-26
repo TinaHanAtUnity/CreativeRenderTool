@@ -1,10 +1,9 @@
 import { GDPREventAction, GdprManager } from 'Ads/Managers/GdprManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { FinishState } from 'Core/Constants/FinishState';
-import { ABGroup } from 'Core/Models/ABGroup';
 import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
-import { IPromoPayload, IPromoRequest, PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
 export class PromoEventHandler {
 

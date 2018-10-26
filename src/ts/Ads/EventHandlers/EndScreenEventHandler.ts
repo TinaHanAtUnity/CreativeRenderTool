@@ -1,5 +1,6 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
+import { IAdsApi } from 'Ads/IAds';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
@@ -12,18 +13,17 @@ import { IEndScreenHandler } from 'Ads/Views/EndScreen';
 import { Platform } from 'Core/Constants/Platform';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestError } from 'Core/Errors/RequestError';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { IAdsApi } from 'Ads/IAds';
-import { ICoreApi } from 'Core/ICore';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;

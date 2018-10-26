@@ -5,15 +5,15 @@ import {
     Orientation,
     ViewConfiguration
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { IAdsApi } from 'Ads/IAds';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { UIInterfaceOrientation } from 'Core/Constants/iOS/UIInterfaceOrientation';
 import { UIInterfaceOrientationMask } from 'Core/Constants/iOS/UIInterfaceOrientationMask';
+import { ICoreApi } from 'Core/ICore';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { Double } from 'Core/Utilities/Double';
-import { IAdsApi } from 'Ads/IAds';
-import { ICoreApi } from 'Core/ICore';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;

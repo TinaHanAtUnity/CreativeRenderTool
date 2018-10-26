@@ -1,7 +1,7 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
-import {EventCategory} from '../../../Core/Constants/EventCategory';
 
 /*
  // iTunes Store item identifier (NSNumber) of the product

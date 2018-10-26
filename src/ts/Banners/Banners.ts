@@ -1,17 +1,16 @@
-import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
-import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
 import { BannerWebPlayerContainer } from 'Ads//Utilities/WebPlayer/BannerWebPlayerContainer';
+import { IAds } from 'Ads/IAds';
+import { IAnalytics } from 'Analytics/IAnalytics';
+import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
-import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
+import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
 import { BannerApi } from 'Banners/Native/Banner';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
-import { IParserModule } from '../Ads/Modules/IParserModule';
-import { BannerCampaignParser } from './Parsers/BannerCampaignParser';
-import { BannerAdUnitFactory } from './AdUnits/BannerAdUnitFactory';
-import { ICore } from '../Core/ICore';
-import { IAds } from '../Ads/IAds';
-import { IAnalytics } from '../Analytics/IAnalytics';
+import { BannerCampaignParser } from 'Banners/Parsers/BannerCampaignParser';
+import { ICore } from 'Core/ICore';
+import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 
 export interface IBannersApi extends IModuleApi {
     Banner: BannerApi;

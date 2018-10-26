@@ -6,12 +6,12 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { Platform } from 'Core/Constants/Platform';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
-import { VastParser } from 'VAST/Utilities/VastParser';
-import { ICoreApi } from 'Core/ICore';
 import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
+import { VastParser } from 'VAST/Utilities/VastParser';
 
 export class ProgrammaticVastParser extends CampaignParser {
 

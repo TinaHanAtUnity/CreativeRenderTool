@@ -1,7 +1,7 @@
-import { AnalyticsManager } from './AnalyticsManager';
-import { IModuleApi } from '../Core/Modules/IApiModule';
-import { AnalyticsApi } from './Native/Analytics';
-import { AnalyticsStorage } from './AnalyticsStorage';
+import { AnalyticsManager } from 'Analytics/AnalyticsManager';
+import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
+import { AnalyticsApi } from 'Analytics/Native/Analytics';
+import { IModuleApi } from 'Core/Modules/IApiModule';
 
 export interface IAnalyticsApi extends IModuleApi {
     Analytics: AnalyticsApi;

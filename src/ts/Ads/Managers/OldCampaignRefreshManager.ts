@@ -1,4 +1,6 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
+import { IAdsApi } from 'Ads/IAds';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
@@ -13,19 +15,17 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
+import { ICoreApi } from 'Core/ICore';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
+import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CacheManager } from 'Core/Managers/CacheManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { IAdsApi } from 'Ads/IAds';
-import { ICoreApi } from 'Core/ICore';
 
 export class OldCampaignRefreshManager extends RefreshManager {
     private _platform: Platform;

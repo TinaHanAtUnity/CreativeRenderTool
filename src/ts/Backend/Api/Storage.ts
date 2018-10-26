@@ -1,5 +1,5 @@
+import { BackendApi } from 'Backend/BackendApi';
 import { StorageType } from 'Core/Native/Storage';
-import { BackendApi } from '../BackendApi';
 
 export class Storage extends BackendApi {
 

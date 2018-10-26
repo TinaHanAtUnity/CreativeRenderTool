@@ -3,14 +3,14 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { JsonParser } from 'Core/Utilities/JsonParser';
+import { ILimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
+import { IProductInfo, ProductInfo, ProductInfoType } from 'Promo/Models/ProductInfo';
 import { IPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { LimitedTimeOffer, ILimitedTimeOfferData } from 'Promo/Models/LimitedTimeOffer';
-import { ProductInfo, ProductInfoType, IProductInfo } from 'Promo/Models/ProductInfo';
-import { Platform } from '../../Core/Constants/Platform';
-import { ICoreApi } from '../../Core/ICore';
-import { JsonParser } from '../../Core/Utilities/JsonParser';
 
 export class PromoCampaignParser extends CampaignParser {
 

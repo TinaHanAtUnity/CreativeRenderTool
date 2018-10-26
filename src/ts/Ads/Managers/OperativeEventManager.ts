@@ -1,3 +1,4 @@
+import { IAdsApi } from 'Ads/IAds';
 import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -10,7 +11,9 @@ import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -18,12 +21,9 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
+import { StorageApi } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
-import { StorageApi } from 'Core/Native/Storage';
-import { IAdsApi } from 'Ads/IAds';
-import { ICoreApi } from 'Core/ICore';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {

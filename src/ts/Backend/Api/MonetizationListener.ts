@@ -1,5 +1,5 @@
+import { BackendApi } from 'Backend/BackendApi';
 import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
-import { BackendApi } from '../BackendApi';
 
 export class MonetizationListener extends BackendApi {
     public isMonetizationEnabled() {

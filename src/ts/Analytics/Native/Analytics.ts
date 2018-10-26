@@ -1,7 +1,7 @@
-import { NativeApi, ApiPackage } from 'Core/Native/Bridge/NativeApi';
-import { Observable1 } from 'Core/Utilities/Observable';
+import { EventCategory } from 'Core/Constants/EventCategory';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import {EventCategory} from '../../Core/Constants/EventCategory';
+import { Observable1 } from 'Core/Utilities/Observable';
 
 export enum AnalyticsEvent {
     POSTEVENT

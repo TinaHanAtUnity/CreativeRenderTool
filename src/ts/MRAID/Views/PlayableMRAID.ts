@@ -4,7 +4,9 @@ import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { ABGroup, FPSCollectionTest } from 'Core/Models/ABGroup';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import MRAIDPerfContainer from 'html/mraid/container-perf.html';
@@ -12,8 +14,6 @@ import MRAIDContainer from 'html/mraid/container.html';
 import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { ICoreApi } from 'Core/ICore';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 

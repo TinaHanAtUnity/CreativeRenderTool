@@ -1,23 +1,22 @@
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
-import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
+import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHandler';
+import { IOperativeEventParams } from 'Ads/Managers/OperativeEventManager';
+import { Video } from 'Ads/Models/Assets/Video';
+import { IosUtils } from 'Ads/Utilities/IosUtils';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
+import { Platform } from 'Core/Constants/Platform';
+import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { RequestError } from 'Core/Errors/RequestError';
+import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { Platform } from 'Core/Constants/Platform';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHandler';
-import { IOperativeEventParams } from 'Ads/Managers/OperativeEventManager';
-import { RequestError } from 'Core/Errors/RequestError';
-import { Video } from 'Ads/Models/Assets/Video';
-import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
-import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { ICoreApi } from '../../Core/ICore';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
+import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
+import { StoreName } from 'Performance/Models/PerformanceCampaign';
+import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 
 export interface IVideoOverlayDownloadParameters extends IEndScreenDownloadParameters {
     videoDuration: number;

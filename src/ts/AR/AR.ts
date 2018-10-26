@@ -1,9 +1,9 @@
-import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
-import { ARApi } from 'AR/Native/AR';
 import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
+import { ARApi } from 'AR/Native/AR';
 import { IosARApi } from 'AR/Native/iOS/IosARApi';
 import { Platform } from 'Core/Constants/Platform';
-import { ICore } from '../Core/ICore';
+import { ICore } from 'Core/ICore';
+import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 
 export interface IARApi extends IModuleApi {
     AR: ARApi;

@@ -1,9 +1,9 @@
 import { StreamType } from 'Core/Constants/Android/StreamType';
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
 import { Observable3 } from 'Core/Utilities/Observable';
-import { EventCategory } from '../../Constants/EventCategory';
 
 export enum StorageType {
     EXTERNAL,

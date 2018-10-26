@@ -1,5 +1,5 @@
+import { BackendApi } from 'Backend/BackendApi';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { BackendApi } from '../BackendApi';
 
 export class DeviceInfo extends BackendApi {
 

@@ -1,17 +1,17 @@
-import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
-import { IPlacementContentType } from 'Monetization/Native/PlacementContents';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { Placement } from 'Ads/Models/Placement';
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { FinishState } from 'Core/Constants/FinishState';
-import { ProductInfo } from 'Promo/Models/ProductInfo';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { IMonetizationApi } from '../IMonetization';
-import { IPromoApi } from '../../Promo/IPromo';
+import { Campaign } from 'Ads/Models/Campaign';
+import { Placement } from 'Ads/Models/Placement';
+import { FinishState } from 'Core/Constants/FinishState';
+import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
+import { IMonetizationApi } from 'Monetization/IMonetization';
+import { IPlacementContentType } from 'Monetization/Native/PlacementContents';
+import { IPromoApi } from 'Promo/IPromo';
+import { ProductInfo } from 'Promo/Models/ProductInfo';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
 export interface IPlacementContent {
     state: PlacementContentState;

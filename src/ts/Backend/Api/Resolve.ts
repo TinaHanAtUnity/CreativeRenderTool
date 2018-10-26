@@ -1,4 +1,4 @@
-import { BackendApi } from '../BackendApi';
+import { BackendApi } from 'Backend/BackendApi';
 
 export class Resolve extends BackendApi {
 

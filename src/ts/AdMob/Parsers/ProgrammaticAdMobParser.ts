@@ -5,12 +5,12 @@ import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { Platform } from 'Core/Constants/Platform';
-import { FileId } from 'Core/Utilities/FileId';
+import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { FileId } from 'Core/Utilities/FileId';
 import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { VastParser } from 'VAST/Utilities/VastParser';
-import { ICoreApi } from 'Core/ICore';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
 

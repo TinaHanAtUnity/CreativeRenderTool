@@ -2,14 +2,14 @@ import { Placement } from 'Ads/Models/Placement';
 import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
+import { IBannersApi } from 'Banners/Banners';
 import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampaignManager';
 import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
+import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { AdUnitActivities, FocusManager } from 'Core/Managers/FocusManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { IBannersApi } from 'Banners/Banners';
-import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 
 const StandardRefreshDelay = 30;
 

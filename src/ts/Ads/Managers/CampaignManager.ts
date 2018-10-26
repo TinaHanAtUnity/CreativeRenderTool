@@ -1,5 +1,6 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AssetManager } from 'Ads/Managers/AssetManager';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignParserManager } from 'Ads/Managers/CampaignParserManager';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
@@ -18,9 +19,13 @@ import { UserCountData } from 'Ads/Utilities/UserCountData';
 import { Platform } from 'Core/Constants/Platform';
 import { RequestError } from 'Core/Errors/RequestError';
 import { WebViewError } from 'Core/Errors/WebViewError';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
+import { ICoreApi } from 'Core/ICore';
 import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
+import { CacheStatus } from 'Core/Managers/CacheManager';
+import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -31,17 +36,12 @@ import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { CacheError } from 'Core/Native/Cache';
 import { StorageType } from 'Core/Native/Storage';
-import { CacheStatus } from 'Core/Managers/CacheManager';
-import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { ICoreApi } from 'Core/ICore';
 
 export class CampaignManager {
 

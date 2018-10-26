@@ -1,28 +1,28 @@
 import { AdUnit } from 'Backend/Api/AdUnit';
+import { Analytics } from 'Backend/Api/Analytics';
 import { AppSheet } from 'Backend/Api/AppSheet';
 import { Broadcast } from 'Backend/Api/Broadcast';
 import { Cache } from 'Backend/Api/Cache';
 import { Connectivity } from 'Backend/Api/Connectivity';
+import { CustomPurchasing } from 'Backend/Api/CustomPurchasing';
 import { DeviceInfo } from 'Backend/Api/DeviceInfo';
 import { Intent } from 'Backend/Api/Intent';
 import { Lifecycle } from 'Backend/Api/Lifecycle';
 import { Listener } from 'Backend/Api/Listener';
+import { MonetizationListener } from 'Backend/Api/MonetizationListener';
 import { Notification } from 'Backend/Api/Notification';
 import { Placement } from 'Backend/Api/Placement';
+import { PlacementContents } from 'Backend/Api/PlacementContents';
 import { Purchasing } from 'Backend/Api/Purchasing';
 import { Request } from 'Backend/Api/Request';
+import { Resolve } from 'Backend/Api/Resolve';
 import { Sdk } from 'Backend/Api/Sdk';
 import { Storage } from 'Backend/Api/Storage';
 import { UrlScheme } from 'Backend/Api/UrlScheme';
 import { VideoPlayer } from 'Backend/Api/VideoPlayer';
-import { Analytics } from 'Backend/Api/Analytics';
+import { BackendApi } from 'Backend/BackendApi';
 import { Platform } from 'Core/Constants/Platform';
 import { CallbackStatus, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { BackendApi } from './BackendApi';
-import { Resolve } from './Api/Resolve';
-import { MonetizationListener } from 'Backend/Api/MonetizationListener';
-import { CustomPurchasing } from 'Backend/Api/CustomPurchasing';
-import { PlacementContents } from 'Backend/Api/PlacementContents';
 
 interface IInvocation {
     className: string;

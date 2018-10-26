@@ -1,7 +1,7 @@
 import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
-import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
+import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { Platform } from '../Constants/Platform';
+import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
 
 export interface IIosDeviceInfo extends IDeviceInfo {
     userInterfaceIdiom: UIUserInterfaceIdiom;

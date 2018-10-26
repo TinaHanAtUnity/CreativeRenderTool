@@ -1,15 +1,28 @@
-import { AnalyticsProtocol, IAnalyticsObject, IAnalyticsCommonObject, AnalyticsItemAcquiredEvent, AnalyticsGenericEvent, AnalyticsItemSpentEvent, AnalyticsLevelUpEvent, AnalyticsLevelFailedEvent, AnalyticsAdCompleteEvent, AnalyticsIapTransactionEvent, IAnalyticsEvent, IAnalyticsMonetizationExtras, AnalyticsIapPurchaseFailedEvent } from 'Analytics/AnalyticsProtocol';
+import {
+    AnalyticsAdCompleteEvent,
+    AnalyticsGenericEvent,
+    AnalyticsIapPurchaseFailedEvent,
+    AnalyticsIapTransactionEvent,
+    AnalyticsItemAcquiredEvent,
+    AnalyticsItemSpentEvent,
+    AnalyticsLevelFailedEvent,
+    AnalyticsLevelUpEvent,
+    AnalyticsProtocol,
+    IAnalyticsCommonObject,
+    IAnalyticsMonetizationExtras,
+    IAnalyticsObject
+} from 'Analytics/AnalyticsProtocol';
+import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
+import { IAnalyticsApi } from 'Analytics/IAnalytics';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { FocusManager } from 'Core/Managers/FocusManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
-import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
-import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
-import { ICoreApi } from '../Core/ICore';
-import { IAnalyticsApi } from './IAnalytics';
-import { Platform } from '../Core/Constants/Platform';
 
 interface IAnalyticsEventWrapper {
     identifier: string;

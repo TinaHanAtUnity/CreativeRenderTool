@@ -1,8 +1,8 @@
-import { NativeApi, ApiPackage } from 'Core/Native/Bridge/NativeApi';
-import { Observable1, Observable2 } from 'Core/Utilities/Observable';
-import { ITransactionDetails, IProduct, ITransactionErrorDetails } from 'Purchasing/PurchasingAdapter';
+import { EventCategory } from 'Core/Constants/EventCategory';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import {EventCategory} from '../../Core/Constants/EventCategory';
+import { Observable1 } from 'Core/Utilities/Observable';
+import { IProduct, ITransactionDetails, ITransactionErrorDetails } from 'Purchasing/PurchasingAdapter';
 
 export enum CustomPurchasingEvent {
     PRODUCTS_RETRIEVED,

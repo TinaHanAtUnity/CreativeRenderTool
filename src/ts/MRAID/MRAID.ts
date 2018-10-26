@@ -1,7 +1,7 @@
-import { IParserModule } from '../Ads/Modules/IParserModule';
-import { ProgrammaticMraidParser } from './Parsers/ProgrammaticMraidParser';
-import { ProgrammaticMraidUrlParser } from './Parsers/ProgrammaticMraidUrlParser';
-import { MRAIDAdUnitFactory } from './AdUnits/MRAIDAdUnitFactory';
+import { IParserModule } from 'Ads/Modules/IParserModule';
+import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
+import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
+import { ProgrammaticMraidUrlParser } from 'MRAID/Parsers/ProgrammaticMraidUrlParser';
 
 export class MRAID implements IParserModule {
 

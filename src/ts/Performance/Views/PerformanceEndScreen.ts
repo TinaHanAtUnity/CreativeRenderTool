@@ -1,7 +1,7 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { ICoreApi } from 'Core/ICore';
 import { Template } from 'Core/Utilities/Template';
-import { ICoreApi } from '../../Core/ICore';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 
 export class PerformanceEndScreen extends EndScreen {
     protected _template: Template;

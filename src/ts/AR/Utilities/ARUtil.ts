@@ -1,7 +1,7 @@
+import { IARApi } from 'AR/AR';
 import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
 import { IosARApi } from 'AR/Native/iOS/IosARApi';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { IARApi } from 'AR/AR';
 
 export interface IARFrameTransform {
     a: number;

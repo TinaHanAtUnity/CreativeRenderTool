@@ -1,10 +1,10 @@
-import { AbstractAdUnitFactory } from '../../Ads/AdUnits/AbstractAdUnitFactory';
-import { IAdUnitParameters } from '../../Ads/AdUnits/AbstractAdUnit';
-import { AdMobCampaign } from '../Models/AdMobCampaign';
-import { AdMobAdUnit, IAdMobAdUnitParameters } from './AdMobAdUnit';
-import { AdMobView } from '../Views/AdMobView';
-import { AdMobEventHandler } from '../EventHandlers/AdmobEventHandler';
-import { Privacy } from '../../Ads/Views/Privacy';
+import { AdMobAdUnit, IAdMobAdUnitParameters } from 'AdMob/AdUnits/AdMobAdUnit';
+import { AdMobEventHandler } from 'AdMob/EventHandlers/AdmobEventHandler';
+import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
+import { AdMobView } from 'AdMob/Views/AdMobView';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export class AdMobAdUnitFactory extends AbstractAdUnitFactory {
 

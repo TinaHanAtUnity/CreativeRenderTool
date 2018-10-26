@@ -1,18 +1,18 @@
-import { AbstractAdUnitFactory } from '../../Ads/AdUnits/AbstractAdUnitFactory';
-import { IAdUnitParameters } from '../../Ads/AdUnits/AbstractAdUnit';
-import { MRAIDCampaign } from '../Models/MRAIDCampaign';
-import { IMRAIDAdUnitParameters, MRAIDAdUnit } from './MRAIDAdUnit';
-import { IMRAIDViewHandler, MRAIDView } from '../Views/MRAIDView';
-import { PlayableMRAID } from '../Views/PlayableMRAID';
-import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
-import { ARUtil } from '../../AR/Utilities/ARUtil';
-import { ARMRAID } from '../../AR/Views/ARMRAID';
-import { MRAID } from '../Views/MRAID';
-import { PerformanceMRAIDCampaign } from '../../Performance/Models/PerformanceMRAIDCampaign';
-import { CustomFeatures } from '../../Ads/Utilities/CustomFeatures';
-import { PlayableEventHandler } from '../EventHandlers/PlayableEventHandler';
-import { MRAIDEventHandler } from '../EventHandlers/MRAIDEventHandler';
-import { Privacy } from '../../Ads/Views/Privacy';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { Privacy } from 'Ads/Views/Privacy';
+import { ARUtil } from 'AR/Utilities/ARUtil';
+import { ARMRAID } from 'AR/Views/ARMRAID';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
+import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
+import { PlayableEventHandler } from 'MRAID/EventHandlers/PlayableEventHandler';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { MRAID } from 'MRAID/Views/MRAID';
+import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { PlayableMRAID } from 'MRAID/Views/PlayableMRAID';
+import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
 

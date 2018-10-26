@@ -1,10 +1,10 @@
-import { AbstractAdUnitFactory } from '../../Ads/AdUnits/AbstractAdUnitFactory';
-import { IAdUnitParameters } from '../../Ads/AdUnits/AbstractAdUnit';
-import { PromoCampaign } from '../Models/PromoCampaign';
-import { PromoAdUnit } from './PromoAdUnit';
-import { Promo } from '../Views/Promo';
-import { PromoEventHandler } from '../EventHandlers/PromoEventHandler';
-import { Privacy } from '../../Ads/Views/Privacy';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { Privacy } from 'Ads/Views/Privacy';
+import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
+import { PromoEventHandler } from 'Promo/EventHandlers/PromoEventHandler';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { Promo } from 'Promo/Views/Promo';
 
 export class PromoAdUnitFactory extends AbstractAdUnitFactory {
 

@@ -1,12 +1,12 @@
-import { IApiModule } from '../Core/Modules/IApiModule';
-import { IMonetizationApi } from './IMonetization';
-import { PlacementContentsApi } from './Native/PlacementContents';
-import { MonetizationListenerApi } from './Native/MonetizationListener';
-import { ICore } from '../Core/ICore';
-import { PlacementContentManager } from 'Monetization/Managers/PlacementContentManager';
-import { NativePromoPlacementContentEventManager } from 'Monetization/Managers/NativePromoPlacementContentManager';
-import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { IAds } from 'Ads/IAds';
+import { ICore } from 'Core/ICore';
+import { IApiModule } from 'Core/Modules/IApiModule';
+import { IMonetizationApi } from 'Monetization/IMonetization';
+import { NativePromoPlacementContentEventManager } from 'Monetization/Managers/NativePromoPlacementContentManager';
+import { PlacementContentManager } from 'Monetization/Managers/PlacementContentManager';
+import { MonetizationListenerApi } from 'Monetization/Native/MonetizationListener';
+import { PlacementContentsApi } from 'Monetization/Native/PlacementContents';
+import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { IPromo } from 'Promo/IPromo';
 import { IPurchasing } from 'Purchasing/IPurchasing';
 

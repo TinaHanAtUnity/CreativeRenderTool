@@ -1,7 +1,7 @@
 import { Platform } from 'Core/Constants/Platform';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 
 export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file' // a file 20mb and over are considered too large

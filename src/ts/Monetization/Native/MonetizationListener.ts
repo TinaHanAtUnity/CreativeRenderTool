@@ -1,4 +1,4 @@
-import { NativeApi, ApiPackage } from 'Core/Native/Bridge/NativeApi';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
 

@@ -11,16 +11,16 @@ import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { BannerCampaignParserFactory } from 'Banners/Parsers/BannerCampaignParserFactory';
 import { BannerAuctionRequest } from 'Banners/Utilities/BannerAuctionRequest';
 import { Platform } from 'Core/Constants/Platform';
-import { JaegerManager } from 'Core/Managers/JaegerManager';
+import { ICoreApi } from 'Core/ICore';
 import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
+import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
-import { ICoreApi } from 'Core/ICore';
 
 export class NoFillError extends Error {
 }

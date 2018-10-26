@@ -1,15 +1,15 @@
-import { AbstractAdUnitFactory } from '../../Ads/AdUnits/AbstractAdUnitFactory';
-import { IAdUnitParameters } from '../../Ads/AdUnits/AbstractAdUnit';
-import { XPromoCampaign } from '../Models/XPromoCampaign';
-import { IXPromoAdUnitParameters, XPromoAdUnit } from './XPromoAdUnit';
-import { XPromoEndScreen } from '../Views/XPromoEndScreen';
-import { XPromoOverlayEventHandler } from '../EventHandlers/XPromoOverlayEventHandler';
-import { XPromoEndScreenEventHandler } from '../EventHandlers/XPromoEndScreenEventHandler';
-import { XPromoVideoEventHandler } from '../EventHandlers/XPromoVideoEventHandler';
-import { IVideoEventHandlerParams } from '../../Ads/EventHandlers/BaseVideoEventHandler';
-import { XPromoOperativeEventManager } from '../Managers/XPromoOperativeEventManager';
-import { Platform } from '../../Core/Constants/Platform';
-import { Privacy } from '../../Ads/Views/Privacy';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Platform } from 'Core/Constants/Platform';
+import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
+import { XPromoEndScreenEventHandler } from 'XPromo/EventHandlers/XPromoEndScreenEventHandler';
+import { XPromoOverlayEventHandler } from 'XPromo/EventHandlers/XPromoOverlayEventHandler';
+import { XPromoVideoEventHandler } from 'XPromo/EventHandlers/XPromoVideoEventHandler';
+import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 
 export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
 
