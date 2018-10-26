@@ -26,6 +26,7 @@ export class PromoCampaignParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: premiumProduct.getId(),
             willExpireAt: willExpireAt ? Date.now() + (willExpireAt * 1000) : undefined,
+            contentType: PromoCampaignParser.ContentType,
             adType: promoJson.contentType || response.getContentType(),
             correlationId: undefined,
             creativeId: undefined,

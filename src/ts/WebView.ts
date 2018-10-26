@@ -1,6 +1,6 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { AdUnitFactory } from 'Ads/AdUnits/AdUnitFactory';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
@@ -63,7 +63,7 @@ import { HttpKafka } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { Promises, TimeoutError } from 'Core/Utilities/Promises';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Utilities/Request';
 import { Resolve } from 'Core/Utilities/Resolve';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
@@ -78,6 +78,8 @@ import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHan
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
+import { AdUnitFactory } from 'Ads/AdUnits/AdUnitFactory';
 
 export class WebView {
 
@@ -481,7 +483,7 @@ export class WebView {
             }
 
             const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, {
+            this._currentAdUnit = this.getAdUnitFactory(campaign).createAdUnit(this._nativeBridge, {
                 forceOrientation: orientation,
                 focusManager: this._focusManager,
                 container: this._container,
@@ -580,6 +582,11 @@ export class WebView {
         }
     }
 
+    private getAdUnitFactory(campaign: Campaign): AbstractAdUnitFactory {
+        const contentType = campaign.getContentType();
+        return AdUnitFactory.getAdUnitFactory(contentType);
+    }
+
     private onAdUnitClose(): void {
         this._showing = false;
 
@@ -670,7 +677,7 @@ export class WebView {
             }
 
             if(TestEnvironment.get('forcedPlayableMRAID')) {
-                AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
+                MRAIDAdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
             }
 
             if(TestEnvironment.get('forceAuthorization')) {
@@ -685,13 +692,13 @@ export class WebView {
             }
 
             if(TestEnvironment.get('forcedGDPRBanner')) {
-                AdUnitFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
+                AbstractAdUnitFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
             }
 
             let forcedARMRAID = false;
             if (TestEnvironment.get('forcedARMRAID')) {
                 forcedARMRAID = TestEnvironment.get('forcedARMRAID');
-                AdUnitFactory.setForcedARMRAID(forcedARMRAID);
+                MRAIDAdUnitFactory.setForcedARMRAID(forcedARMRAID);
             }
 
             if(TestEnvironment.get('creativeUrl')) {

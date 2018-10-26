@@ -60,6 +60,7 @@ export class CometCampaignParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: json.id,
             willExpireAt: undefined,
+            contentType: CometCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,
             creativeId: undefined,
@@ -92,6 +93,7 @@ export class CometCampaignParser extends CampaignParser {
                 trackingUrls: {},
                 playableConfiguration: undefined
             };
+            parameters.contentType = CometCampaignParser.ContentTypeMRAID;
 
             const mraidCampaign = new PerformanceMRAIDCampaign(parameters);
 

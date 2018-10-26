@@ -1,7 +1,4 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-
-import { AdUnitFactory } from 'Ads/AdUnits/AdUnitFactory';
-
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GdprManager } from 'Ads/Managers/GdprManager';
@@ -25,16 +22,13 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Utilities/Request';
 import { XHRequest } from 'Core/Utilities/XHRequest';
-
 import { DisplayInterstitialAdUnit } from 'Display/AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
-
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
 import { MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
@@ -51,6 +45,10 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
+import { DisplayInterstitialAdUnitFactory } from 'Display/AdUnits/DisplayInterstitialAdUnitFactory';
+import { PromoAdUnitFactory } from 'Promo/AdUnits/PromoAdUnitFactory';
+import { XPromoAdUnitFactory } from 'XPromo/AdUnits/XPromoAdUnitFactory';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -162,37 +160,41 @@ describe('AdUnitFactoryTest', () => {
             });
 
             afterEach(() => {
-                AdUnitFactory.setForcedPlayableMRAID(false);
-                AdUnitFactory.setForcedARMRAID(false);
+                MRAIDAdUnitFactory.setForcedPlayableMRAID(false);
+                MRAIDAdUnitFactory.setForcedARMRAID(false);
             });
 
             it('should create MRAID view', () => {
-                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                const adUnitFactory = new MRAIDAdUnitFactory();
+                const adUnit = adUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>adUnitParameters);
                 assert.isTrue(adUnit.getMRAIDView() instanceof MRAID, 'view should be MRAID');
             });
 
             it('should create PlayableMRAID view', () => {
-                AdUnitFactory.setForcedPlayableMRAID(false);
+                MRAIDAdUnitFactory.setForcedPlayableMRAID(false);
 
                 const resourceUrl = campaign.getResourceUrl();
                 if (resourceUrl) {
                     resourceUrl.set('url', 'https://cdn.unityads.unity3d.com/playables/production/unity/xinstall.html');
                 }
 
-                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                const adUnitFactory = new MRAIDAdUnitFactory();
+                const adUnit = adUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>adUnitParameters);
                 assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
             });
 
             it('should be forced to create PlayableMRAID view', () => {
-                AdUnitFactory.setForcedPlayableMRAID(true);
-                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                MRAIDAdUnitFactory.setForcedPlayableMRAID(true);
+                const adUnitFactory = new MRAIDAdUnitFactory();
+                const adUnit = adUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>adUnitParameters);
                 assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
             });
 
             it('should be forced to create ARMRAID view', () => {
-               AdUnitFactory.setForcedARMRAID(true);
-               const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
-               assert.isTrue(adUnit.getMRAIDView() instanceof ARMRAID, 'view should be ARMRAID');
+                MRAIDAdUnitFactory.setForcedARMRAID(true);
+                const adUnitFactory = new MRAIDAdUnitFactory();
+                const adUnit = adUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>adUnitParameters);
+                assert.isTrue(adUnit.getMRAIDView() instanceof ARMRAID, 'view should be ARMRAID');
             });
         });
 
@@ -210,7 +212,8 @@ describe('AdUnitFactoryTest', () => {
             it('should not send onPlayableAnalyticsEvent for MRAIDCampaign', () => {
                 const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
                 adUnitParameters.campaign = campaign;
-                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                const adUnitFactory = new MRAIDAdUnitFactory();
+                const adUnit = adUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>adUnitParameters);
                 adUnit.show();
                 assert.isFalse(httpKafkaStub.called);
             });
@@ -218,7 +221,8 @@ describe('AdUnitFactoryTest', () => {
             it('should send onPlayableAnalyticsEvent on show if ad is Sonic Playable', () => {
                 const campaign = TestFixtures.getProgrammaticMRAIDCampaign({ creativeId: '109455881' });
                 adUnitParameters.campaign = campaign;
-                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                const adUnitFactory = new MRAIDAdUnitFactory();
+                const adUnit = adUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>adUnitParameters);
                 adUnit.show();
                 sinon.assert.calledWith(<sinon.SinonSpy>httpKafkaStub, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, sinon.match.has('type', 'playable_show'));
                 sinon.assert.calledOnce(httpKafkaStub);
@@ -227,7 +231,8 @@ describe('AdUnitFactoryTest', () => {
             it('should send onPlayableAnalyticsEvent for PerformanceMRAIDCampaign', () => {
                 const campaign = TestFixtures.getPerformanceMRAIDCampaign();
                 adUnitParameters.campaign = campaign;
-                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                const adUnitFactory = new MRAIDAdUnitFactory();
+                const adUnit = adUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>adUnitParameters);
                 adUnit.show();
                 sinon.assert.calledWith(<sinon.SinonSpy>httpKafkaStub, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, sinon.match.has('type', 'playable_show'));
                 sinon.assert.calledOnce(httpKafkaStub);
@@ -271,7 +276,8 @@ describe('AdUnitFactoryTest', () => {
 
             adUnitParameters.campaign = campaign;
             adUnitParameters.operativeEventManager = operativeEventManager;
-            adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            const adUnitFactory = new MRAIDAdUnitFactory();
+            adUnit = adUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>adUnitParameters);
         });
 
         describe('on hide', () => {
@@ -378,7 +384,8 @@ describe('AdUnitFactoryTest', () => {
                 sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
                 sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
 
-                adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                const adUnitFactory = new DisplayInterstitialAdUnitFactory();
+                adUnit = adUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<DisplayInterstitialCampaign>>adUnitParameters);
             });
 
             describe('on show', () => {
@@ -424,7 +431,8 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sandbox.stub(PurchasingUtilities, 'getProductType').returns('NonConsumable');
 
-            promoAdUnit = <PromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            const adUnitFactory = new PromoAdUnitFactory();
+            promoAdUnit = adUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<PromoCampaign>>adUnitParameters);
         });
         describe('on show', () => {
             it('should trigger onStart', (done) => {
@@ -473,7 +481,8 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
             sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
 
-            adUnit = <XPromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            const adUnitFactory = new XPromoAdUnitFactory();
+            adUnit = adUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<XPromoCampaign>>adUnitParameters);
         });
 
         describe('on hide', () => {

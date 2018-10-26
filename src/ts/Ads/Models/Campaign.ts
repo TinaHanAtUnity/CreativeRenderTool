@@ -7,6 +7,7 @@ import { ISchema, Model } from 'Core/Models/Model';
 export interface ICampaign {
     id: string;
     willExpireAt: number | undefined;
+    contentType: string;
     adType: string | undefined;
     correlationId: string | undefined;
     creativeId: string | undefined;
@@ -20,6 +21,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     public static Schema: ISchema<ICampaign> = {
         id: ['string'],
         willExpireAt: ['number', 'undefined'],
+        contentType: ['string'],
         adType: ['string', 'undefined'],
         correlationId: ['string', 'undefined'],
         creativeId: ['string', 'undefined'],
@@ -39,6 +41,10 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
 
     public getSession(): Session {
         return this.get('session');
+    }
+
+    public getContentType(): string {
+        return this.get('contentType');
     }
 
     public getAdType(): string | undefined {
