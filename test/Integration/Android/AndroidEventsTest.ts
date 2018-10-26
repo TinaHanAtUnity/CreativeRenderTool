@@ -1,8 +1,7 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
-import { DeviceInfo } from 'Backend/Api/DeviceInfo';
-import { Request } from 'Backend/Api/Request';
+import { Backend } from 'Backend/Backend';
 import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
 import { assert } from 'chai';
@@ -95,7 +94,7 @@ describe('AndroidEventsTest', () => {
                 if(state === FinishState[FinishState.COMPLETED]) {
                     if(startCount === 2) {
                         setTimeout(() => {
-                            validateRequestLog(Request.getLog(), validationRegexps);
+                            validateRequestLog(UnityAds.getBackend().Api.Request.getLog(), validationRegexps);
                             assert.equal(startCount, 2, 'onUnityAdsStart was not called exactly 2 times');
                             done();
                         }, 2500);
@@ -113,15 +112,18 @@ describe('AndroidEventsTest', () => {
             }
         };
 
-        Request.setLog([]);
+        UnityAds.setBackend(new Backend(Platform.ANDROID));
 
-        DeviceInfo.setAdvertisingTrackingId('78db88cb-2026-4423-bfe0-07e9ed2701c3');
-        DeviceInfo.setManufacturer('LGE');
-        DeviceInfo.setModel('Nexus 5');
-        DeviceInfo.setOsVersion('6.0.1');
-        DeviceInfo.setScreenWidth(1776);
-        DeviceInfo.setScreenHeight(1080);
-        DeviceInfo.setTimeZone('GMT+02:00');
+        UnityAds.getBackend().Api.Request.setPassthrough(true);
+        UnityAds.getBackend().Api.Request.setLog([]);
+
+        UnityAds.getBackend().Api.DeviceInfo.setAdvertisingTrackingId('78db88cb-2026-4423-bfe0-07e9ed2701c3');
+        UnityAds.getBackend().Api.DeviceInfo.setManufacturer('LGE');
+        UnityAds.getBackend().Api.DeviceInfo.setModel('Nexus 5');
+        UnityAds.getBackend().Api.DeviceInfo.setOsVersion('6.0.1');
+        UnityAds.getBackend().Api.DeviceInfo.setScreenWidth(1776);
+        UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1080);
+        UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
 
         AbstractAdUnit.setAutoClose(true);
 

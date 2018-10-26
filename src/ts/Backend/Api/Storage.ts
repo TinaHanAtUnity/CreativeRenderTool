@@ -1,72 +1,134 @@
-export class Storage {
+import { BackendApi } from 'Backend/BackendApi';
+import { StorageType } from 'Core/Native/Storage';
 
-    public static get(storageType: string, key: string) {
-        const rawStorage = window.sessionStorage.getItem(storageType);
-        if(rawStorage) {
-            const splitKeys = key.split('.');
-            const lastKey = splitKeys[splitKeys.length - 1];
-            const object = Storage.findObject(JSON.parse(rawStorage), Storage.getParentKey(key));
-            if(!object) {
-                throw ['COULDNT_GET_VALUE', key];
-            }
-            if(lastKey in object) {
-                return object[lastKey];
-            }
+export class Storage extends BackendApi {
+
+    private _storage: any = {};
+    private _dirty: boolean = false;
+
+    public set<T>(storageType: StorageType, key: string, value: T): Promise<void> {
+        this._dirty = true;
+        this._storage = this.setInMemoryValue(this._storage, key, value);
+        return Promise.resolve(void(0));
+    }
+
+    public get<T>(storageType: StorageType, key: string): Promise<T> {
+        const retValue = this.getInMemoryValue(this._storage, key);
+        if(!retValue) {
+            return Promise.reject(['COULDNT_GET_VALUE', key]);
         }
-        throw ['COULDNT_GET_VALUE', key];
+        return Promise.resolve(retValue);
     }
 
-    public static set(storage: string, key: string, value: any) {
-        return;
+    public getKeys(storageType: StorageType, key: string, recursive: boolean): Promise<string[]> {
+        return Promise.resolve(this.getInMemoryKeys(this._storage, key));
     }
 
-    public static delete(storage: string, key: string) {
-        return;
+    public write(storageType: StorageType): Promise<void> {
+        this._dirty = false;
+        return Promise.resolve(void(0));
     }
 
-    public static getKeys(storage: string, key: string, recursive: boolean) {
-        const rawStorage = window.sessionStorage.getItem(storage);
-        const keys = [];
+    public delete(storageType: StorageType, key: string): Promise<void> {
+        this._dirty = true;
+        this._storage = this.deleteInMemoryValue(this._storage, key);
+        return Promise.resolve(void(0));
+    }
 
-        if(rawStorage) {
-            const object = JSON.parse(rawStorage);
-            for(const k in object[key]) {
-                if(k) {
-                    keys.push(k);
-                }
+    public isDirty(): boolean {
+        return this._dirty;
+    }
+
+    private setInMemoryValue(storage: { [key: string]: any }, key: string, value: any): {} {
+        const keyArray: string[] = key.split('.');
+
+        if(keyArray.length > 1) {
+            if(!storage[keyArray[0]]) {
+                storage[keyArray[0]] = {};
             }
-        }
 
-        return keys;
-    }
-
-    public static write(storage: string) {
-        return;
-    }
-
-    private static findObject(storage: any, key: string) {
-        if (!key.length) {
+            storage[keyArray[0]] = this.setInMemoryValue(storage[keyArray[0]], keyArray.slice(1).join('.'), value);
+            return storage;
+        } else {
+            storage[keyArray[0]] = value;
             return storage;
         }
-
-        const objects = key.split('.');
-        let parentObject = storage;
-
-        for(const object of objects) {
-            if(object in parentObject) {
-                parentObject = parentObject[object];
-            } else {
-                return null;
-            }
-        }
-
-        return parentObject;
     }
 
-    private static getParentKey(key: string) {
-        const splitKey = key.split('.');
-        splitKey.pop();
-        return splitKey.join('.');
+    private getInMemoryValue(storage: { [key: string]: any }, key: string): any {
+        const keyArray: string[] = key.split('.');
+
+        if(keyArray.length > 1) {
+            if(!storage[keyArray[0]]) {
+                return null;
+            }
+
+            return this.getInMemoryValue(storage[keyArray[0]], keyArray.slice(1).join('.'));
+        } else {
+            return storage[key];
+        }
+    }
+
+    private getInMemoryKeys(storage: { [key: string]: any }, key: string): string[] {
+        const keyArray: string[] = key.split('.');
+
+        if(keyArray.length > 1) {
+            if(!storage[keyArray[0]]) {
+                return [];
+            }
+
+            return this.getInMemoryKeys(storage[keyArray[0]], keyArray.slice(1).join('.'));
+        } else {
+            if(!storage[key]) {
+                return [];
+            }
+
+            const retArray: string[] = [];
+            for(const property in storage[key]) {
+                if(storage.hasOwnProperty(key)) {
+                    retArray.push(property);
+                }
+            }
+
+            return retArray;
+        }
+    }
+
+    private deleteInMemoryValue(storage: { [key: string]: any }, key: string): {} {
+        const keyArray: string[] = key.split('.');
+
+        if(keyArray.length > 1) {
+            if(!storage[keyArray[0]]) {
+                storage[keyArray[0]] = {};
+            }
+
+            storage[keyArray[0]] = this.deleteInMemoryValue(storage[keyArray[0]], keyArray.slice(1).join('.'));
+            return storage;
+        } else {
+            delete storage[keyArray[0]];
+            return storage;
+        }
+    }
+
+    public hasFileEntry(fileId: string): boolean {
+        fileId = fileId.split('.')[0];
+        if(this._storage && this._storage.cache && this._storage.cache.files && this._storage.cache.files[fileId]) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public hasCampaignEntry(id: string): boolean {
+        if(this._storage && this._storage.cache && this._storage.cache.campaigns && this._storage.cache.campaigns[id]) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public setStorageContents(contents: any): void {
+        this._storage = contents;
     }
 
 }

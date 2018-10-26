@@ -1,76 +1,136 @@
-import { Backend } from 'Backend/Backend';
+import { BackendApi } from 'Backend/BackendApi';
 import { VideoMetadata } from 'Core/Constants/Android/VideoMetadata';
-import { CacheError, IFileInfo } from 'Core/Native/Cache';
+import { CacheError, CacheEvent, IFileInfo } from 'Core/Native/Cache';
 
-export class Cache {
+export class Cache extends BackendApi {
 
-    public static setProgressInterval() {
+    private _filePrefix = '/test/cache/dir/UnityAdsCache-';
+    private _internet: boolean = true;
+    private _files: { [key: string]: IFileInfo } = {};
+    private _currentFile: string;
+    private _freeSpace = 123456789;
+
+    public setProgressInterval() {
         return;
     }
 
-    public static getFiles() {
-        return [];
+    public download(url: string, fileId: string, headers: Array<[string, string]>, append: boolean): Promise<void> {
+        const byteCount: number = 12345;
+        const duration: number = 6789;
+        const responseCode: number = 200;
+
+        if(this._currentFile !== undefined) {
+            return Promise.reject(CacheError[CacheError.FILE_ALREADY_CACHING]);
+        }
+
+        this.addFile(fileId, 123, 1445875);
+
+        if(this._internet) {
+            this._currentFile = url;
+            setTimeout(() => {
+                delete this._currentFile;
+                this._backend.sendEvent('CACHE', CacheEvent[CacheEvent.DOWNLOAD_END], url, byteCount, byteCount, duration, responseCode, []);
+            }, 1);
+            return Promise.resolve(void(0));
+        } else {
+            return Promise.reject(CacheError[CacheError.NO_INTERNET]);
+        }
     }
 
-    public static isCaching() {
-        return false;
+    public isCaching(): Promise<boolean> {
+        return Promise.resolve(this._currentFile !== undefined);
     }
 
-    public static getHash(url: string) {
+    public getFilePath(fileId: string): Promise<string> {
+        if(fileId in this._files) {
+            return Promise.resolve(this._filePrefix + fileId);
+        }
+        return Promise.reject(new Error(CacheError[CacheError.FILE_NOT_FOUND]));
+    }
+
+    public getFiles(): Promise<IFileInfo[]> {
+        const files: IFileInfo[] = [];
+        for(const key in this._files) {
+            if(this._files.hasOwnProperty(key)) {
+                files.push(this._files[key]);
+            }
+        }
+        return Promise.resolve(files);
+    }
+
+    public getFileInfo(fileId: string): Promise<IFileInfo> {
+        if(fileId in this._files) {
+            return Promise.resolve(this._files[fileId]);
+        }
+        return Promise.reject(new Error(CacheError[CacheError.FILE_NOT_FOUND]));
+    }
+
+    public getHash(value: string): Promise<string> {
+        return Promise.resolve(this.getHashDirect(value));
+    }
+
+    public getHashDirect(value: string): string {
         let hash = 0;
-        if(!url.length) {
+        if(!value.length) {
             return hash.toString();
         }
-        for(let i = 0; i < url.length; i++) {
-            const char = url.charCodeAt(i);
+        for(let i = 0; i < value.length; i++) {
+            const char = value.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
             hash = hash & hash;
         }
         return hash.toString();
     }
 
-    public static getFileInfo(fileId: string): IFileInfo {
-        return {
-            id: fileId,
-            found: true,
-            size: 10000,
-            mtime: 1481112345
-        };
+    public deleteFile(fileId: string): Promise<void> {
+        return Promise.resolve(void(0));
     }
 
-    public static download(url: string, fileId: string) {
-        Cache._fileIdMap[fileId] = url;
-        Backend.sendEvent('CACHE', 'DOWNLOAD_STARTED', url, 0, 10000, 200, []);
-        Backend.sendEvent('CACHE', 'DOWNLOAD_END', url, 10000, 10000, 1000, 200, []);
+    public setInternet(internet: boolean): void {
+        this._internet = internet;
     }
 
-    public static getFilePath(fileId: string) {
-        if(fileId in Cache._fileIdMap) {
-            return Cache._fileIdMap[fileId];
+    public addFile(id: string, mtime: number, size: number): void {
+        const fileInfo: IFileInfo = {id: id, mtime: mtime, size: size, found: true};
+        this._files[id] = fileInfo;
+    }
+
+    public getExtension(url: string): string {
+        const splittedUrl = url.split('.');
+        let extension: string = '';
+        if(splittedUrl.length > 1) {
+            extension = splittedUrl[splittedUrl.length - 1];
         }
-        throw CacheError.FILE_NOT_FOUND;
+        return extension;
     }
 
-    public static getFileContent(fileId: string, encoding: string) {
-        return new Promise((resolve, reject) => {
-            window.localStorage.getItem(fileId);
-        });
+    public addPreviouslyDownloadedFile(url: string) {
+        this.addFile(this.getHashDirect(url) + '.' + this.getExtension(url), 123, 1445875);
     }
 
-    public static setFileContent(fileId: string, encoding: string, content: string) {
-        return new Promise((resolve, reject) => {
-            window.localStorage.setItem(fileId, content);
-
-            Cache._fileIdMap[fileId] = content;
-            resolve();
-        });
+    public getDownloadedFilesCount(): number {
+        let fileCount = 0;
+        for(const key in this._files) {
+            if(this._files.hasOwnProperty(key)) {
+                ++fileCount;
+            }
+        }
+        return fileCount;
     }
 
-    public static getVideoInfo(fileId: string) {
+    public getFreeSpace(): number {
+        return this._freeSpace;
+    }
+
+    public setFreeSpace(freeSpace: number) {
+        this._freeSpace = freeSpace;
+    }
+
+    public getVideoInfo(fileId: string) {
         return [640, 360, 10000];
     }
 
-    public static getMetaData(fileId: string, metadatas: number[]) {
+    public getMetaData(fileId: string, metadatas: number[]) {
         const retValue = [];
 
         for(const metadata of metadatas) {
@@ -88,17 +148,11 @@ export class Cache {
                     break;
 
                 default:
-                    // error handling not implemented
+                // error handling not implemented
             }
         }
 
         return retValue;
     }
-
-    public static getFreeSpace() {
-        return 10159440; // same as default DeviceInfo.getFreeSpace
-    }
-
-    private static _fileIdMap: { [key: string]: string } = {};
 
 }

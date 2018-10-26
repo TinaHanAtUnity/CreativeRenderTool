@@ -1,6 +1,6 @@
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
-import { DeviceInfo } from 'Backend/Api/DeviceInfo';
+import { Backend } from 'Backend/Backend';
 import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
 
@@ -36,13 +36,16 @@ describe('IosIntegrationTest', () => {
             }
         };
 
-        DeviceInfo.setAdvertisingTrackingId('DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21');
-        DeviceInfo.setManufacturer('Apple');
-        DeviceInfo.setModel('iPhone7,2');
-        DeviceInfo.setOsVersion('10.1.1');
-        DeviceInfo.setScreenWidth(357);
-        DeviceInfo.setScreenHeight(647);
-        DeviceInfo.setTimeZone('+0200');
+        UnityAds.setBackend(new Backend(Platform.IOS));
+        UnityAds.getBackend().Api.Request.setPassthrough(true);
+
+        UnityAds.getBackend().Api.DeviceInfo.setAdvertisingTrackingId('DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21');
+        UnityAds.getBackend().Api.DeviceInfo.setManufacturer('Apple');
+        UnityAds.getBackend().Api.DeviceInfo.setModel('iPhone7,2');
+        UnityAds.getBackend().Api.DeviceInfo.setOsVersion('10.1.1');
+        UnityAds.getBackend().Api.DeviceInfo.setScreenWidth(357);
+        UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(647);
+        UnityAds.getBackend().Api.DeviceInfo.setTimeZone('+0200');
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
