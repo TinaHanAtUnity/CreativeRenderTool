@@ -64,7 +64,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this._parsingErrorCount = 0;
         this._noFills = 0;
 
-        this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
+        this._campaignManager.onCampaign.subscribe((placementId, campaign, trackingUrls) => this.onCampaign(placementId, campaign, trackingUrls));
         this._campaignManager.onNoFill.subscribe((placementId) => this.onNoFill(placementId));
         this._campaignManager.onError.subscribe((error, placementIds, diagnosticsType, session) => this.onError(error, placementIds, diagnosticsType, session));
         this._campaignManager.onConnectivityError.subscribe((placementIds) => this.onConnectivityError(placementIds));
@@ -133,7 +133,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
             if(placements.hasOwnProperty(placement)) {
                 promises.push(backupCampaignManager.loadCampaign(this._configuration.getPlacement(placement)).then(campaign => {
                     if(campaign) {
-                        this.setPlacementReady(placement, campaign);
+                        this.setPlacementReady(placement, campaign, undefined); // todo: fix tracking url loading for backup campaigns
                     }
                 }));
             }
@@ -206,7 +206,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         return this._campaignManager.request();
     }
 
-    private onCampaign(placementId: string, campaign: Campaign) {
+    private onCampaign(placementId: string, campaign: Campaign, trackingUrls: { [eventName: string]: string[] } | undefined) {
         PurchasingUtilities.addCampaignPlacementIds(placementId, campaign);
         this._parsingErrorCount = 0;
         const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
@@ -214,12 +214,12 @@ export class OldCampaignRefreshManager extends RefreshManager {
         if (isPromoWithoutProduct) {
             this.onNoFill(placementId);
         } else {
-            this.setPlacementReady(placementId, campaign);
+            this.setPlacementReady(placementId, campaign, trackingUrls);
         }
     }
 
-    private setPlacementReady(placementId: string, campaign: Campaign) {
-        this.setCampaignForPlacement(placementId, campaign);
+    private setPlacementReady(placementId: string, campaign: Campaign, trackingUrls: { [eventName: string]: string[] } | undefined) {
+        this.setCampaignForPlacement(placementId, campaign, trackingUrls);
         this.handlePlacementState(placementId, PlacementState.READY);
     }
 
@@ -227,7 +227,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this._parsingErrorCount = 0;
 
         this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
-        this.setCampaignForPlacement(placementId, undefined);
+        this.setCampaignForPlacement(placementId, undefined, undefined);
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
     }
 
@@ -333,10 +333,11 @@ export class OldCampaignRefreshManager extends RefreshManager {
         }
     }
 
-    private setCampaignForPlacement(placementId: string, campaign: Campaign | undefined) {
+    private setCampaignForPlacement(placementId: string, campaign: Campaign | undefined, trackingUrls: { [eventName: string]: string[] } | undefined) {
         const placement = this._configuration.getPlacement(placementId);
         if(placement) {
             placement.setCurrentCampaign(campaign);
+            placement.setCurrentTrackingUrls(trackingUrls);
         }
     }
 
