@@ -101,6 +101,7 @@ export class CampaignManager {
     private _ignoreEvents: boolean;
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
+    private _isErrorHandlerExperiment: boolean;
 
     constructor(nativeBridge: NativeBridge, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
         this._nativeBridge = nativeBridge;
@@ -118,6 +119,7 @@ export class CampaignManager {
         this._ignoreEvents = false;
         this._jaegerManager = jaegerManager;
         this._backupCampaignManager = backupCampaignManager;
+        this._isErrorHandlerExperiment = false;
     }
 
     public cleanCachedUrl(url: string): string {
@@ -623,14 +625,11 @@ export class CampaignManager {
     }
 
     private handleParseCampaignError(contentType: string, campaignError: CampaignError, placementIds: string[], session?: Session): Promise<void> {
-        this.handleError(campaignError, placementIds, `parse_campaign_${contentType.replace('/', '_')}_error`, session);
-
-        const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._nativeBridge, this._request);
-        if (campaignErrorHandler) {
-            campaignErrorHandler.sendErrorEventWithRequest(campaignError);
+        if (this._isErrorHandlerExperiment) {   // AB test ready
+            const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._nativeBridge, this._request);
+            campaignErrorHandler.handleCampaignError(campaignError);
         }
-
-        return Promise.resolve();
+        return this.handleError(campaignError, placementIds, `parse_campaign_${contentType.replace('/', '_')}_error`, session);
     }
 
     private getBaseUrl(): string {

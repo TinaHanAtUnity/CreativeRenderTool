@@ -70,13 +70,15 @@ export class VastCampaignErrorHandler implements ICampaignErrorHandler {
         this._nativeBridge = nativeBridge;
     }
 
-    public sendErrorEventWithRequest(campaignError: CampaignError): Promise<INativeResponse> {
+    public handleCampaignError(campaignError: CampaignError): Promise<void> {
         if (campaignError.errorTrackingUrl) {
             const errorCode = campaignError.errorCode ? campaignError.errorCode : VastErrorCode.UNDEFINED_ERROR;
             const errorUrl = this.formatVASTErrorURL(campaignError.errorTrackingUrl, errorCode, campaignError.assetUrl);
             this._nativeBridge.Sdk.logInfo(`VAST Campaign Error tracking url: ${errorUrl} with errorCode: ${errorCode} errorMessage: ${campaignError.errorMessage}`);
 
-            return this._request.get(errorUrl, []);
+            this._request.get(errorUrl, []).then(() => {
+                return Promise.resolve();
+            });
         }
         return Promise.reject(new Error('VastCampaignErrorHandler errorTrackingUrl was undefined'));
     }
