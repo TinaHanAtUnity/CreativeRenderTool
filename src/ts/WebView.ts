@@ -568,6 +568,8 @@ export class WebView {
                 } else {
                     this._nativeBridge.Request.setConcurrentRequestCount(8);
                 }
+
+                this._backupCampaignManager.deleteBackupCampaigns();
             });
         });
     }
