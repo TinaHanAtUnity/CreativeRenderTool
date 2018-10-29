@@ -1,5 +1,10 @@
-# Pending
+# Staged
 
+* Refactor Backend to non-static [#6835](https://github.com/Applifier/unity-ads-webview/pull/6835)
+* Quality-of-life improvements for debugging [#6836](https://github.com/Applifier/unity-ads-webview/pull/6836)
+* Delete backup campaigns when showing an ad [#6833](https://github.com/Applifier/unity-ads-webview/pull/6833)
+* Remove autobatching exception for game ID 1448666 [#6832](https://github.com/Applifier/unity-ads-webview/pull/6832)
+* Remove APK download link hack [#6677](https://github.com/Applifier/unity-ads-webview/pull/6677)
 * VastErrorHandler supporting VAST 3.0, ready for abTest [#6812](https://github.com/Applifier/unity-ads-webview/pull/6812)
 
 # Thu Oct 25 21:49:17 UTC 2018
