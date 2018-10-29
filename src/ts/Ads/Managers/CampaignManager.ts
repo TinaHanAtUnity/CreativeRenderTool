@@ -9,7 +9,6 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
@@ -41,6 +40,8 @@ import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
+import { CampaignError } from 'Ads/Errors/CampaignError';
 
 export class CampaignManager {
 
@@ -99,6 +100,7 @@ export class CampaignManager {
     private _realtimeBody: any = {};
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
+    private _isErrorHandlerExperiment: boolean;
 
     constructor(nativeBridge: NativeBridge, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
         this._nativeBridge = nativeBridge;
@@ -115,6 +117,7 @@ export class CampaignManager {
         this._requesting = false;
         this._jaegerManager = jaegerManager;
         this._backupCampaignManager = backupCampaignManager;
+        this._isErrorHandlerExperiment = false;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -325,7 +328,7 @@ export class CampaignManager {
                                 return this.handleError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), fill[mediaId], 'campaign_caching_get_file_path_failed', session);
                             }
 
-                            return this.handleError(error, fill[mediaId], 'handle_campaign_error', session);
+                            return this.handleParseCampaignError(auctionResponse.getContentType(), error, fill[mediaId], session);
                         }));
                     } catch(error) {
                         this.handleError(error, fill[mediaId], 'error_creating_handle_campaign_chain', session);
@@ -455,6 +458,14 @@ export class CampaignManager {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
         this.onError.trigger(error, placementIds, diagnosticsType, session);
         return Promise.resolve();
+    }
+
+    private handleParseCampaignError(contentType: string, campaignError: CampaignError, placementIds: string[], session?: Session): Promise<void> {
+        if (this._isErrorHandlerExperiment) {   // AB test ready
+            const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._nativeBridge, this._request);
+            campaignErrorHandler.handleCampaignError(campaignError);
+        }
+        return this.handleError(campaignError, placementIds, `parse_campaign_${contentType.replace('/', '_')}_error`, session);
     }
 
     private getBaseUrl(): string {
