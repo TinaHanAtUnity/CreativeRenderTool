@@ -1,3 +1,7 @@
+# Pending
+
+* VastErrorHandler supporting VAST 3.0, ready for abTest [#6812](https://github.com/Applifier/unity-ads-webview/pull/6812)
+
 # Thu Oct 25 21:49:17 UTC 2018
 
 * Remove old backup campaign implementation, use new as default [#6778](https://github.com/Applifier/unity-ads-webview/pull/6778)
