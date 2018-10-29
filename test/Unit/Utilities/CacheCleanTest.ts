@@ -164,8 +164,7 @@ class TestStorageApi extends StorageApi {
     }
 
     public hasFileEntry(fileId: string): boolean {
-        fileId = fileId.split('.')[0];
-        if(this._contents && this._contents.cache && this._contents.cache.files && this._contents.cache.files[fileId]) {
+        if(this._contents && this._contents.cache && this._contents.cache.files && this._contents.cache.files[fileId.split('.')[0]]) {
             return true;
         }
 

@@ -184,9 +184,8 @@ describe('EndScreenEventHandlerTest', () => {
                 });
             });
 
-            it('and API is less than 21, it should launch view intent', () => {
+            it('it should launch view intent', () => {
                 sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').resolves();
-                sinon.stub(nativeBridge, 'getApiLevel').returns(20);
 
                 endScreenEventHandler.onEndScreenDownload(downloadParameters);
 
@@ -194,20 +193,6 @@ describe('EndScreenEventHandlerTest', () => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                         'action': 'android.intent.action.VIEW',
                         'uri': performanceAdUnitParameters.campaign.getAppDownloadUrl()
-                    });
-                });
-            });
-
-            it('with appDownloadUrl and API is greater than or equal to 21, it should launch web search intent', () => {
-                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').resolves();
-                sinon.stub(nativeBridge, 'getApiLevel').returns(21);
-
-                endScreenEventHandler.onEndScreenDownload(downloadParameters);
-
-                return resolvedPromise.then(() => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
-                        'action': 'android.intent.action.WEB_SEARCH',
-                        'extras': [{ key: 'query', value: performanceAdUnitParameters.campaign.getAppDownloadUrl()}]
                     });
                 });
             });

@@ -7,22 +7,23 @@ export class VideoPlayer {
     }
 
     public static prepare(url: string) {
-        if(url.indexOf('file://http') !== -1) {
-            url = url.replace('file://', '');
+        let modifiedUrl = url;
+        if(modifiedUrl.indexOf('file://http') !== -1) {
+            modifiedUrl = modifiedUrl.replace('file://', '');
         }
 
         if('exec' in window) {
             // tslint:disable:no-string-literal
             const exec = (<any>window)['exec'];
-            exec('curl -s "' + url + '" | exiftool -j -').then((result: any) => {
+            exec('curl -s "' + modifiedUrl + '" | exiftool -j -').then((result: any) => {
                 const stdout: string = result.stdout;
                 const stream = JSON.parse(stdout)[0];
                 const duration = VideoPlayer._duration = Math.round(parseFloat(stream.Duration) * 1000);
                 const splitImageSize = stream.ImageSize.split('x');
                 const width = VideoPlayer._width = splitImageSize[0];
                 const height = VideoPlayer._height = splitImageSize[1];
-                VideoPlayer._url = url;
-                Backend.sendEvent('VIDEOPLAYER', 'PREPARED', url, duration, width, height);
+                VideoPlayer._url = modifiedUrl;
+                Backend.sendEvent('VIDEOPLAYER', 'PREPARED', modifiedUrl, duration, width, height);
             });
             // tslint:enable:no-string-literal
         } else {
@@ -31,13 +32,13 @@ export class VideoPlayer {
                 videoView = VideoPlayer._videoView = document.createElement('video');
             }
             videoView.addEventListener('canplay', () => {
-                VideoPlayer._url = url;
+                VideoPlayer._url = modifiedUrl;
                 const duration = VideoPlayer._duration = Math.round(videoView.duration * 1000);
                 const width = VideoPlayer._width = videoView.videoWidth;
                 const height = VideoPlayer._height = videoView.videoHeight;
-                Backend.sendEvent('VIDEOPLAYER', 'PREPARED', url, duration, width, height);
+                Backend.sendEvent('VIDEOPLAYER', 'PREPARED', modifiedUrl, duration, width, height);
             }, false);
-            videoView.src = url;
+            videoView.src = modifiedUrl;
         }
     }
 

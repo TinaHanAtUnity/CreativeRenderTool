@@ -48,7 +48,7 @@ import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ABGroupBuilder, BackupCampaignTest } from 'Core/Models/ABGroup';
+import { ABGroupBuilder } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -126,7 +126,6 @@ export class WebView {
     private _requestDelay: number;
     private _wasRealtimePlacement: boolean = false;
 
-    private _cachedCampaignResponse: INativeResponse | undefined;
     private _bannerAdContext: BannerAdContext;
 
     constructor(nativeBridge: NativeBridge) {
@@ -154,8 +153,6 @@ export class WebView {
             } else if(this._clientInfo.getPlatform() === Platform.IOS) {
                 this._deviceInfo = new IosDeviceInfo(this._nativeBridge);
             }
-
-            this._cachedCampaignResponse = undefined;
 
             this._storageBridge = new StorageBridge(this._nativeBridge);
             this._focusManager = new FocusManager(this._nativeBridge);
@@ -250,16 +247,14 @@ export class WebView {
                 Diagnostics.trigger('cleaning_cache_failed', error);
             });
 
-            const cachedCampaignResponsePromise = this._cacheBookkeeping.getCachedCampaignResponse();
             const monetizationEnabledPromise = this._nativeBridge.Monetization.Listener.isMonetizationEnabled();
 
-            return Promise.all([configPromise, cachedCampaignResponsePromise, monetizationEnabledPromise, cachePromise]);
-        }).then(([[coreConfig, adsConfig], cachedCampaignResponse, monetizationEnabled]) => {
+            return Promise.all([configPromise, monetizationEnabledPromise, cachePromise]);
+        }).then(([[coreConfig, adsConfig], monetizationEnabled]) => {
             this._coreConfig = coreConfig;
             this._adsConfig = adsConfig;
             this._clientInfo.setMonetizationInUse(monetizationEnabled);
             this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, this._coreConfig, this._adsConfig, this._request);
-            this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._coreConfig);
             this._jaegerManager.setJaegerTracingEnabled(this._coreConfig.isJaegerTracingEnabled());
 
@@ -323,15 +318,7 @@ export class WebView {
 
             const refreshSpan = this._jaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
-            let refreshPromise;
-            if(BackupCampaignTest.isValid(this._coreConfig.getAbGroup())) {
-                refreshPromise = this._refreshManager.refreshWithBackupCampaigns(this._backupCampaignManager);
-            } else if(this._cachedCampaignResponse !== undefined) {
-                refreshPromise = this._refreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
-            } else {
-                refreshPromise = this._refreshManager.refresh();
-            }
-            return refreshPromise.then((resp) => {
+            return this._refreshManager.refreshWithBackupCampaigns(this._backupCampaignManager).then((resp) => {
                 this._jaegerManager.stop(refreshSpan);
                 return resp;
             }).catch((error) => {
@@ -355,22 +342,23 @@ export class WebView {
                 this._nativeBridge.Request.setConcurrentRequestCount(1);
             }
         }).catch(error => {
-            jaegerInitSpan.addAnnotation(error.message);
+            let modifiedError = error;
+            jaegerInitSpan.addAnnotation(modifiedError.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
-            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
+            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, modifiedError.message);
             if (this._jaegerManager) {
                 this._jaegerManager.stop(jaegerInitSpan);
             }
 
-            if(error instanceof ConfigError) {
-                error = { 'message': error.message, 'name': error.name };
-                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
-            } else if(error instanceof Error && error.name === 'DisabledGame') {
+            if(modifiedError instanceof ConfigError) {
+                modifiedError = { 'message': modifiedError.message, 'name': modifiedError.name };
+                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], modifiedError.message);
+            } else if(modifiedError instanceof Error && modifiedError.name === 'DisabledGame') {
                 return;
             }
 
-            this._nativeBridge.Sdk.logError(`Init error: ${JSON.stringify(error)}`);
-            Diagnostics.trigger('initialization_error', error);
+            this._nativeBridge.Sdk.logError(`Init error: ${JSON.stringify(modifiedError)}`);
+            Diagnostics.trigger('initialization_error', modifiedError);
         });
     }
 
@@ -413,8 +401,6 @@ export class WebView {
             SessionDiagnostics.trigger('campaign_expired', error, campaign.getSession());
             return;
         }
-
-        this._cacheBookkeeping.deleteCachedCampaignResponse();
 
         if (placement.getRealtimeData()) {
             this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
