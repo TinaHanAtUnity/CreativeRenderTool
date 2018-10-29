@@ -9,24 +9,27 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { AllowRewardedAdSkipInSeconds } from 'Constants/ExperimentConstants';
+import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 
 export class PerformanceOverlayEventHandlerWithAllowSkip extends PerformanceOverlayEventHandler {
 
     private _forceOrientation: Orientation;
     private _video: Video;
+    private _unitStyle?: AdUnitStyle;
 
     constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters) {
         super(nativeBridge, adUnit, parameters);
 
         this._forceOrientation = parameters.forceOrientation;
         this._video = parameters.video;
+        this._unitStyle = parameters.adUnitStyle;
     }
 
     private getOperativeEventParams(): IOperativeEventParams {
         return {
             placement: this._placement,
             videoOrientation: this.getVideoOrientation(),
-            adUnitStyle: this._adUnitStyle,
+            adUnitStyle: this._unitStyle,
             asset: this._video
         };
     }
