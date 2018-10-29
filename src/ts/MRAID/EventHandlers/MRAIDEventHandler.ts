@@ -15,6 +15,7 @@ import { Request } from 'Core/Utilities/Request';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { ClickDelayTrackingTest } from 'Core/Models/ABGroup';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -28,6 +29,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _request: Request;
     private _placement: Placement;
     protected _campaign: MRAIDCampaign;
+    private _isClickTestAbGroup: boolean;
 
     constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
         super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
@@ -41,6 +43,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._request = parameters.request;
+        this._isClickTestAbGroup = ClickDelayTrackingTest.isValid(parameters.coreConfig.getAbGroup());
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -56,13 +59,20 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             }
         } else {    // DSP MRAID
             this.setCallButtonEnabled(false);
+            if (this._isClickTestAbGroup) {
+                this.sendTrackingEvents();
+            }
             return this._request.followRedirectChain(url).then((storeUrl) => {
                 return this.openUrl(storeUrl).then(() => {
                     this.setCallButtonEnabled(true);
-                    this.sendTrackingEvents();
+                    if (!this._isClickTestAbGroup) {
+                        this.sendTrackingEvents();
+                    }
                 }).catch((e) => {
                     this.setCallButtonEnabled(true);
-                    this.sendTrackingEvents();
+                    if (!this._isClickTestAbGroup) {
+                        this.sendTrackingEvents();
+                    }
                 });
             });
         }
