@@ -1,5 +1,5 @@
 const fs = require('fs');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const path = require('path');
@@ -11,6 +11,14 @@ const testFilter = process.env.TEST_FILTER;
 const coverage = process.env.COVERAGE;
 const isolated = process.env.ISOLATED;
 const debug = process.env.DEBUG;
+
+const chromiumUserPrefsPath = '.chromium_user_prefs.json';
+if(fs.existsSync(chromiumUserPrefsPath)) {
+    const chromiumUserPrefs = fs.readFileSync(chromiumUserPrefsPath, { encoding: 'utf-8' });
+    if(chromiumUserPrefs) {
+        puppeteer.use(require('puppeteer-extra-plugin-user-preferences')(JSON.parse(chromiumUserPrefs)));
+    }
+}
 
 const runTest = async (browser, isolated, testFilter) => {
     let page;
@@ -70,7 +78,10 @@ const runTest = async (browser, isolated, testFilter) => {
 
 (async () => { try {
     const browser = await puppeteer.launch({
-        args: ['--no-sandbox'],
+        args: [
+            '--no-sandbox',
+            '--start-maximized'
+        ],
         devtools: debug == 1
     });
     if(isolated == 1) {
