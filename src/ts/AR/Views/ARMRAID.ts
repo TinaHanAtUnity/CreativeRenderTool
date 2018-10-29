@@ -442,6 +442,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         switch (functionName) {
             case 'resetPose':
+                if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    if (args[0].configuration) {
+                        args[0].configuration.updateMode = 'LATEST_CAMERA_IMAGE';
+                    }
+                }
                 return this._nativeBridge.AR.restartSession(args[0]);
 
             case 'setDepthNear':
@@ -467,6 +472,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                     return ARUtil.advanceFrameWithScale(this._nativeBridge.AR.Ios);
                 } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
                     return this._nativeBridge.AR.Android.advanceFrame();
+                } else {
+                    return Promise.resolve();
+                }
+
+            case 'swapBuffers':
+                if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    return this._nativeBridge.AR.Android.swapBuffers();
                 } else {
                     return Promise.resolve();
                 }

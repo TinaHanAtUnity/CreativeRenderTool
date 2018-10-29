@@ -24,4 +24,8 @@ export class AndroidARApi extends NativeApi {
     public advanceFrame(): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'advanceFrame');
     }
+
+    public swapBuffers(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'swapBuffers');
+    }
 }

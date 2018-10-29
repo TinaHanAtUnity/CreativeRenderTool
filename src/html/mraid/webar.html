@@ -105,6 +105,10 @@
             callNativeFunction('advanceFrame');
         }
 
+        function nativeSwapBuffers() {
+            callNativeFunction('swapBuffers');
+        }
+
         function nativeLog(message) {
             callNativeFunction('log', message);
         }
@@ -1325,11 +1329,6 @@
                 }
 
                 callRafCallbacks();
-
-                // Only on Android!
-                if (window.ARCore) {
-                    forceRedraw();
-                }
             }
 
             oldRequestAnimationFrame(() => {
@@ -1337,8 +1336,8 @@
                 // the rendering has actually occurred. This is when we can advance the frame
                 // and then schedule our subsequent RAF (double-RAF-trick).
                 nativeAdvanceFrame();
-            oldRequestAnimationFrame(raf);
-        });
+                oldRequestAnimationFrame(raf);
+            });
         }
 
         /**
@@ -1355,12 +1354,11 @@
             for (var i = 0; i < rafCallbacksCopy.length; i++) {
                 rafCallbacksCopy[i](performance.now());
             }
+
+            nativeSwapBuffers();
         }
 
-        // Only on Android!
-        if (window.ARCore) {
-            oldRequestAnimationFrame(raf);
-        }
+        oldRequestAnimationFrame(raf);
 
         // TODO: Implement cancelAnimationFrame. raf needs to return a unique
         // identifier and use it to cancel the call (remove it from the array).
