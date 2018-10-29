@@ -7,6 +7,7 @@ import { VastCreative } from 'VAST/Models/VastCreative';
 import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
+import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 
 export class VastParser {
 
@@ -97,7 +98,7 @@ export class VastParser {
         if (!wrapperURL) {
             return Promise.resolve(parsedVast);
         } else if (depth >= this._maxWrapperDepth) {
-            throw new Error('VAST wrapper depth exceeded');
+            throw new Error(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
         }
 
         nativeBridge.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
