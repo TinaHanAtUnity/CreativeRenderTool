@@ -8,10 +8,12 @@ import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Request } from 'Core/Utilities/Request';
 import { CustomPurchasingApi } from 'Purchasing/Native/CustomPurchasing';
-import { IProduct, ITransactionErrorDetails, ITransactionDetails } from 'Purchasing/PurchasingAdapter';
-import { Observable1 } from 'Core/Utilities/Observable';
+import { IProduct, ITransactionErrorDetails, ITransactionDetails, OrganicPurchase} from 'Purchasing/PurchasingAdapter';
+import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { asStub } from 'TestHelpers/Functions';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
+
 
 describe('CustomPurchasingAdapter', () => {
     let nativeBridge: NativeBridge;
@@ -21,6 +23,13 @@ describe('CustomPurchasingAdapter', () => {
     let sandbox: sinon.SinonSandbox;
     let purchasingAdapter: CustomPurchasingAdapter;
     let customPurchasing: CustomPurchasingApi;
+    let organicPurchase: OrganicPurchase;
+    let onSetStub: sinon.SinonStub;
+    let getStub: sinon.SinonStub;
+    let setStub: sinon.SinonStub;
+    let writeStub: sinon.SinonStub;
+    let iapMetaData:any;
+    let storageTrigger: (eventType: string, data: any) => void;
 
     beforeEach(() => {
         nativeBridge = sinon.createStubInstance(NativeBridge);
@@ -29,6 +38,29 @@ describe('CustomPurchasingAdapter', () => {
         request = sinon.createStubInstance(Request);
         sandbox = sinon.createSandbox();
         customPurchasing = sinon.createStubInstance(CustomPurchasingApi);
+
+        nativeBridge.Storage = sinon.createStubInstance(StorageApi);
+        (<any>nativeBridge.Storage).onSet = new Observable2<string, object>();
+        //organicPurchase = sinon.createStubInstance(OrganicPurchase);
+         onSetStub = sinon.stub(nativeBridge.Storage.onSet, 'subscribe');
+        getStub = <sinon.SinonStub>nativeBridge.Storage.get;
+        setStub = (<sinon.SinonStub>nativeBridge.Storage.set).resolves();
+        writeStub = (<sinon.SinonStub>nativeBridge.Storage.write).resolves();
+        
+       // organicPurchase = new OrganicPurchase();
+        // getStub.withArgs(StorageType.PUBLIC, 'iap.purchases').callsFake(() => {
+        //     return Promise.resolve(iapMetaData);
+        // });
+        iapMetaData = '{ iap_purchases: {productId: {value: \'productIDID\'}, price: {value:1.25} }}';
+        
+        getStub.callsFake((fun) => {
+           //storageTrigger = fun;
+           return Promise.resolve(iapMetaData);
+        });
+         onSetStub.callsFake((fun) => {
+            storageTrigger = fun;
+        });
+
 
         (<any>nativeBridge).Monetization = {
             CustomPurchasing: customPurchasing
@@ -69,6 +101,46 @@ describe('CustomPurchasingAdapter', () => {
 
     afterEach(() => {
         sandbox.restore();
+    });
+
+    it('should subscribe to Storage.onSet', () => {
+        sinon.assert.calledOnce(onSetStub);
+    });
+     describe('iap.purchases metadata', () => {
+        it('should not do anything if iap.purchases is undefined', () => {
+            storageTrigger('', {});
+            sinon.assert.calledOnce(onSetStub);
+            sinon.assert.notCalled(setStub);
+        });
+         it('should get metadata if iap.purchases is defined', () => {
+            storageTrigger('', {'iap.purchases': {productId: {value: 'productIDID'}, price: {value:1.25} }});
+            sinon.assert.calledOnce(onSetStub);
+            sinon.assert.called(getStub);
+        });
+        
+         it('should retrieve iap.purchase metadata',() => {
+            iapMetaData = '{ iap_purchases: {productId: {value: \'productIDID\'}, price: {value:1.25} }}';
+            storageTrigger('', {'iap.purchases': {productId: {value: 'productIDID'}, price: {value:1.25} }});
+           
+           asStub(promoEvents.onOrganicPurchaseSuccess).returns(Promise.resolve());
+            
+            return Promise.resolve().then(() => {
+                sinon.assert.calledOnce(onSetStub);
+                sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'iap.purchases');
+                //sinon.assert.calledWith(setStub, StorageType.PUBLIC, 'iap.purchases', []);
+                return(<Promise<void>>getStub.firstCall.returnValue).then((data) => {
+                    assert.deepEqual(data, iapMetaData);
+                    (<any>purchasingAdapter)['processIAPMetaData']({'iap.purchases': {productId: {value: 'productIDID'}, price: {value:1.25} }});
+                    sinon.assert.called(<sinon.SinonStub>promoEvents.onOrganicPurchaseSuccess);
+                });
+            });     
+        });
+        it('should reset iap.purchase metadata after each retrieve', () => {
+            sinon.assert.calledOnce(onSetStub);
+            return(<Promise<void>>getStub.firstCall.returnValue).then((iapPurchases) => {
+                assert.deepEqual('', '');
+            });
+        });
     });
 
     describe('RefreshCatalog', () => {

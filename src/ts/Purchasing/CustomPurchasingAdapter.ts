@@ -42,14 +42,18 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
 
     private getOrganicPurchase(): Promise<void> {    
         return this._nativeBridge.Storage.get(StorageType.PUBLIC, CustomPurchasingAdapter.InAppPurchaseStorageKey).then((data: any) => {
-            if(data && data.length && data.length > 0){
-                for(const event of data){
-                    const organicPurchaseEvent = new OrganicPurchase(this._nativeBridge, event);
-                    this.postOrganicPurchaseEvents(organicPurchaseEvent);
-                }
-                this.resetIAPPurchaseMetaData();
-            }
+            this.processIAPMetaData(data);
         });
+    }
+
+    private processIAPMetaData(data: any) {
+        if(data && data.length && data.length > 0){
+            for(const event of data){
+                const organicPurchaseEvent = new OrganicPurchase(this._nativeBridge, event);
+                this.postOrganicPurchaseEvents(organicPurchaseEvent);
+            }
+            this.resetIAPPurchaseMetaData();
+        }
     }
 
     private resetIAPPurchaseMetaData(): Promise<void> {
