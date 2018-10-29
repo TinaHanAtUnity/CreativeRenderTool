@@ -1,18 +1,20 @@
-export class Purchasing {
+import { BackendApi } from 'Backend/BackendApi';
 
-    public static initializePurchasing() {
+export class Purchasing extends BackendApi {
+
+    public initializePurchasing() {
         return;
     }
 
-    public static getPromoVersion() {
+    public getPromoVersion() {
         return;
     }
 
-    public static getPromoCatalog() {
+    public getPromoCatalog() {
         return;
     }
 
-    public static initiatePurchasingCommand(event: string) {
+    public initiatePurchasingCommand(event: string) {
         return;
     }
 
