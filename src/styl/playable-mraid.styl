@@ -65,13 +65,11 @@ $camera-permission-panel-height = 100vw;
 
   #mraid-iframe {
     $iframe-default();
-  }
 
-  // @stylint off
-  .mraid-iframe-camera-permission-dialog {
-    height: $camera-permission-panel-height !important;
+    &.mraid-iframe-camera-permission-dialog {
+      height: $camera-permission-panel-height;
+    }
   }
-  // @stylint on
 
   .close-region {
     $iframe-close-region-default();
@@ -305,7 +303,6 @@ $camera-permission-panel-height = 100vw;
     .permission-accept-button {
       $download-container-default($default-scale-size * .5, true);
       flex: 1;
-      //margin: 0 auto 8px 8px;
       padding: .6375rem .35rem;
     }
 
@@ -341,12 +338,12 @@ $camera-permission-panel-height = 100vw;
 .landscape {
   #playable-mraid {
 
-    // @stylint off
-    .mraid-iframe-camera-permission-dialog {
-      width: 50vw !important;
-      height: 100vh !important;
+     #mraid-iframe {
+      &.mraid-iframe-camera-permission-dialog {
+        width: 50vw;
+        height: 100vh;
+      }
     }
-    // @stylint on
 
     .camera-permission-panel {
       position: absolute;
@@ -480,11 +477,11 @@ $camera-permission-panel-height = 100vw;
 
 @media screen and (min-aspect-ratio: 8/19) {
   #playable-mraid {
-    // @stylint off
-    .mraid-iframe-camera-permission-dialog {
-      height: 120vw !important;
+    #mraid-iframe {
+      &.mraid-iframe-camera-permission-dialog {
+        height: 120vw;
+      }
     }
-    // @stylint on
 
     .camera-permission-panel {
       top: 120vw;
@@ -494,11 +491,11 @@ $camera-permission-panel-height = 100vw;
 
 @media screen and (min-aspect-ratio: 9/16) {
   #playable-mraid {
-    // @stylint off
-    .mraid-iframe-camera-permission-dialog {
-      height: 100vw !important;
+    #mraid-iframe {
+      &.mraid-iframe-camera-permission-dialog {
+        height: 100vw;
+      }
     }
-    // @stylint on
 
     .camera-permission-panel {
       top: 100vw;
@@ -508,11 +505,11 @@ $camera-permission-panel-height = 100vw;
 
 @media screen and (min-aspect-ratio: 3/4) {
   #playable-mraid {
-    // @stylint off
-    .mraid-iframe-camera-permission-dialog {
-      height: 70vw !important;
+    #mraid-iframe {
+      &.mraid-iframe-camera-permission-dialog {
+        height: 70vw;
+      }
     }
-    // @stylint on
 
     .camera-permission-panel {
       top: 70vw;
@@ -522,11 +519,11 @@ $camera-permission-panel-height = 100vw;
 
 @media screen and (min-aspect-ratio: 1/2) {
   #playable-mraid {
-    // @stylint off
-    .mraid-iframe-camera-permission-dialog {
-      height: 100vw !important;
+    #mraid-iframe {
+      &.mraid-iframe-camera-permission-dialog {
+        height: 100vw;
+      }
     }
-    // @stylint on
 
     .camera-permission-panel {
       top: 100vw;
@@ -536,11 +533,11 @@ $camera-permission-panel-height = 100vw;
 
 @media screen and (min-aspect-ratio: 2/3) {
   #playable-mraid {
-    // @stylint off
-    .mraid-iframe-camera-permission-dialog {
-      height: 80vw !important;
+    #mraid-iframe {
+      &.mraid-iframe-camera-permission-dialog {
+        height: 80vw;
+      }
     }
-    // @stylint on
 
     .camera-permission-panel {
       top: 80vw;
