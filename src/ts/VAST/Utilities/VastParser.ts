@@ -7,6 +7,7 @@ import { VastCreative } from 'VAST/Models/VastCreative';
 import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
+import { Url } from 'Core/Utilities/Url';
 
 export class VastParser {
 
@@ -100,9 +101,10 @@ export class VastParser {
             throw new Error('VAST wrapper depth exceeded');
         }
 
-        nativeBridge.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
+        const encodedWrapperURL = Url.encodeUrlWithQueryParams(wrapperURL);
+        nativeBridge.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + encodedWrapperURL);
 
-        return request.get(wrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
+        return request.get(encodedWrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
             return this.retrieveVast(response.response, nativeBridge, request, parsedVast, depth + 1);
         });
     }

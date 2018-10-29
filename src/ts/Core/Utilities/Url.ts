@@ -12,11 +12,11 @@ export interface IUrl {
 
 export class Url {
 
-    public static encode(url: string): string {
+    public static encode(url: string, isParam?: boolean): string {
         if(url) {
             let encodedUrl = '';
             let i = 0;
-
+            const isQueryParam = isParam && isParam === true ? true : false;
             while(i < url.length) {
                 // Skip already encoded URL characters
                 if (url[i] === '%' && (url.length - i >= 3) && Url.isNumber(url[i + 1]) && Url.isNumber(url[i + 2])) {
@@ -26,7 +26,11 @@ export class Url {
                     continue;
                 }
 
-                encodedUrl += encodeURI(url[i]);
+                if(isQueryParam) {
+                    encodedUrl += encodeURIComponent(url[i]);
+                } else {
+                    encodedUrl += encodeURI(url[i]);
+                }
                 i++;
             }
 
@@ -34,6 +38,28 @@ export class Url {
         }
 
         return url;
+    }
+
+    public static encodeParam(param: string): string {
+        return Url.encode(param, true);
+    }
+
+    public static encodeUrlWithQueryParams(url: string): string {
+        const queryIndex = url.indexOf('?');
+        if (queryIndex === -1) {
+            return Url.encode(url);
+        }
+
+        let encodedUrl = encodeURI(url.substring(0, queryIndex));
+        const encodedQueryPairs: string[] = [];
+        const queryStrings: string[] = url.split('?')[1].split('&');
+        for (const queryPair of queryStrings) {
+            const queryParam = queryPair.split('=');
+            encodedQueryPairs.push(Url.encodeParam(queryParam[0]) + '=' + Url.encodeParam(queryParam[1]));
+        }
+        encodedUrl += '?' + encodedQueryPairs.join('&');
+
+        return encodedUrl;
     }
 
     public static parse(url: string): IUrl {

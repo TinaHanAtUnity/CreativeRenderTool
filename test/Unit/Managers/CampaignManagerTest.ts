@@ -82,6 +82,7 @@ import WrappedVast3 from 'xml/WrappedVast3.xml';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { Url } from 'Core/Utilities/Url';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -350,10 +351,10 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve({
                 response: OnProgrammaticVastPlcCampaignWrapped
             }));
-            mockRequest.expects('get').withArgs('https://x.vindicosuite.com/?l=454826&t=x&rnd=[Cachebuster_If_Supported_In_Console]', [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
+            mockRequest.expects('get').withArgs(Url.encodeUrlWithQueryParams('https://x.vindicosuite.com/?l=454826&t=x&rnd=[Cachebuster_If_Supported_In_Console]'), [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
                 response: WrappedVast1
             }));
-            mockRequest.expects('get').withArgs('https://ads.pointroll.com/PortalServe/?pid=2810492V01420160323193924&pos=o&secure=1&r=1466475479', [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
+            mockRequest.expects('get').withArgs(Url.encodeUrlWithQueryParams('https://ads.pointroll.com/PortalServe/?pid=2810492V01420160323193924&pos=o&secure=1&r=1466475479'), [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
                 response: WrappedVast2
             }));
 
