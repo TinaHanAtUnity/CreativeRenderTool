@@ -19,7 +19,6 @@
   },
   "include": [
     "src/ts/**/*.ts",
-    "test/**/*.ts",
-    "proto/unity_proto.d.ts"
+    "test/**/*.ts"
   ]
 }

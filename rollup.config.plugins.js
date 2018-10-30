@@ -12,7 +12,8 @@ export default [
         paths: [
             'build/src',
             'build/src/ts',
-            'build/test'
+            'build/test',
+            'build/src/proto'
         ]
     }),
     resolve({
@@ -47,9 +48,6 @@ export default [
             '**/*.json',
             '**/*.css'
         ]
-    }),
-    alias({
-        '../../proto/unity_proto.js': 'src/proto/unity_proto.js',
     })
 ]
 
