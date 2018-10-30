@@ -17,7 +17,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
     private _promoEvents: PromoEvents;
     private _products: {[productId: string]: IProduct};
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _organicPurchase: OrganicPurchase;
     private _request: Request;
     
     private static InAppPurchaseStorageKey = 'iap.purchases';
