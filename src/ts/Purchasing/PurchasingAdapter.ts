@@ -52,17 +52,25 @@ export class OrganicPurchase {
     constructor(data: {[key: string]: any}) {
 
        for (const key in data) {
-           if(key === 'productId') {
-               this._productId = data[key];
-           } else if(key === 'price') {
-               this._price = data[key];
-           } else if(key === 'currency') {
-            this._currency = data[key];
-           } else if(key === 'receiptPurchaseData') {
-               this._receiptPurchaseData = data[key];
-           } else if(key === 'signature') {
-               this._signature = data[key];
-           }
+            switch(key) {
+                case 'productId':
+                    this._productId = data[key];
+                    break;
+                case 'price':
+                    this._price = data[key];
+                    break;
+                case 'currency':
+                    this._currency = data[key];
+                    break;
+                case 'receiptPurchaseData':
+                    this._receiptPurchaseData = data[key];
+                    break;
+                case 'signature':
+                    this._signature = data[key];
+                    break;
+                default:
+                    break;
+            }
         }
     }
 

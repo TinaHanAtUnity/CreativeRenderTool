@@ -43,6 +43,17 @@ describe('CustomPurchasingAdapter', () => {
             assert.exists(organicPurchase);
             assert.isUndefined(organicPurchase.getId());
         });
+
+        it('create OrganicPurchase with unexpected key', () => {
+            const event = {productId: 'productIDID', price: 1.25, randomKey: 'random value'};
+            organicPurchase = new OrganicPurchase(event);
+
+            assert.deepEqual('productIDID', organicPurchase.getId());
+            assert.deepEqual(1.25, organicPurchase.getPrice());
+            assert.isUndefined(organicPurchase.getCurrency());
+            assert.isUndefined(organicPurchase.getReceipt());
+            assert.isUndefined(organicPurchase.getSignature());
+        });
     });
 
 });

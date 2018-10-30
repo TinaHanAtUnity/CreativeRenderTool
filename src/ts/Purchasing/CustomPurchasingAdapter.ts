@@ -73,7 +73,7 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
             native: false}, productType, organicPurchaseEvent.getReceipt()).then((body) => {
                 this._request.post(Url.addParameters('https://events.iap.unity3d.com/events/v1/organic_purchase', {'native': false, 'iap_service': false}), JSON.stringify(body));
             }
-            );
+        );
     }
 
     public refreshCatalog(): Promise<IProduct[]> {
@@ -177,6 +177,7 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
             this._nativeBridge.Monetization.CustomPurchasing.purchaseItem(productId, {}).catch(reject);
         });
     }
+
     public onPromoClosed(campaign: PromoCampaign) {
         // does nothing
     }
