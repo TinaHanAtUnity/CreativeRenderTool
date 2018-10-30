@@ -7,6 +7,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { IVideoEventHandler } from 'Ads/Native/VideoPlayer';
+import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { FinishState } from 'Core/Constants/FinishState';
@@ -173,7 +174,8 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                 duration: duration,
                 campaignId: this._campaign.getId(),
                 url: url,
-                originalUrl: originalUrl
+                originalUrl: originalUrl,
+                isCached: CampaignAssetInfo.isCached(this._campaign)
             });
             return this.handleVideoError('video_too_long', error);
         }
