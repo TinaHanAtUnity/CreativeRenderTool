@@ -85,4 +85,4 @@ export class OrganicPurchase {
     public getSignature(): string | undefined {
         return this._signature;
     }
-    }
+}

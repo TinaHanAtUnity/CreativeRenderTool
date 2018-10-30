@@ -30,7 +30,7 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
         this._thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request, {});
 
         this.getOrganicPurchase();
-        this._nativeBridge.Storage.onSet.subscribe(() => this.getOrganicPurchase());    
+        this._nativeBridge.Storage.onSet.subscribe(() => this.getOrganicPurchase());
     }
 
     public initialize() {
@@ -71,8 +71,8 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
             amount: organicPurchaseEvent.getPrice(),
             currency: organicPurchaseEvent.getCurrency(),
             native: false}, productType, organicPurchaseEvent.getReceipt()).then((body) => {
-                this._request.post(Url.addParameters('https://events.iap.unity3d.com/events/v1/organic_purchase', {'native': false, 'iap_service': false}), JSON.stringify(body));             
-            }                    
+                this._request.post(Url.addParameters('https://events.iap.unity3d.com/events/v1/organic_purchase', {'native': false, 'iap_service': false}), JSON.stringify(body));
+            }
             );
     }
 

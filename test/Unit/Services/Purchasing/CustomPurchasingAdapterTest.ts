@@ -116,7 +116,7 @@ describe('CustomPurchasingAdapter', () => {
                     sinon.assert.called(<sinon.SinonStub>promoEvents.onOrganicPurchaseSuccess);
                     sinon.assert.called(<sinon.SinonStub>request.post);
                 });
-            });  
+            });
         });
         it('should reset iap.purchase metadata after each retrieve', () => {
             sinon.assert.calledOnce(onSetStub);
