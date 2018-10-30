@@ -1,4 +1,4 @@
-# Pending
+# Tue Oct 30 17:52:40 UTC 2018
 
 * Fix Privacy layout on iPhone X series [#6863](https://github.com/Applifier/unity-ads-webview/pull/6863)
 * iPhone XR media queries [#6864](https://github.com/Applifier/unity-ads-webview/pull/6864)
