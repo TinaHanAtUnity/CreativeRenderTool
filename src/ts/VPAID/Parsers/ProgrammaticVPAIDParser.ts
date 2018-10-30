@@ -8,9 +8,10 @@ import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { IVPAIDCampaign, VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
+import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 
 export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
-    public static ContentType = 'programmatic/vast-vpaid';
+    public static ContentType = CampaignContentTypes.ProgrammaticVpaid;
 
     private _vpaidParser: VPAIDParser = new VPAIDParser();
 

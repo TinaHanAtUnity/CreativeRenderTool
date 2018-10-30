@@ -1,26 +1,28 @@
 import { AdUnit } from 'Backend/Api/AdUnit';
+import { Analytics } from 'Backend/Api/Analytics';
 import { AppSheet } from 'Backend/Api/AppSheet';
 import { Broadcast } from 'Backend/Api/Broadcast';
 import { Cache } from 'Backend/Api/Cache';
 import { Connectivity } from 'Backend/Api/Connectivity';
+import { CustomPurchasing } from 'Backend/Api/CustomPurchasing';
 import { DeviceInfo } from 'Backend/Api/DeviceInfo';
 import { Intent } from 'Backend/Api/Intent';
 import { Lifecycle } from 'Backend/Api/Lifecycle';
 import { Listener } from 'Backend/Api/Listener';
+import { MonetizationListener } from 'Backend/Api/MonetizationListener';
 import { Notification } from 'Backend/Api/Notification';
 import { Placement } from 'Backend/Api/Placement';
+import { PlacementContents } from 'Backend/Api/PlacementContents';
 import { Purchasing } from 'Backend/Api/Purchasing';
 import { Request } from 'Backend/Api/Request';
+import { Resolve } from 'Backend/Api/Resolve';
 import { Sdk } from 'Backend/Api/Sdk';
 import { Storage } from 'Backend/Api/Storage';
 import { UrlScheme } from 'Backend/Api/UrlScheme';
 import { VideoPlayer } from 'Backend/Api/VideoPlayer';
-import { Analytics } from 'Backend/Api/Analytics';
+import { BackendApi } from 'Backend/BackendApi';
 import { Platform } from 'Core/Constants/Platform';
-import { CallbackStatus } from 'Core/Native/Bridge/NativeBridge';
-import { MonetizationListener } from 'Backend/Api/MonetizationListener';
-import { CustomPurchasing } from 'Backend/Api/CustomPurchasing';
-import { PlacementContents } from 'Backend/Api/PlacementContents';
+import { CallbackStatus, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 interface IInvocation {
     className: string;
@@ -35,50 +37,79 @@ interface IResult {
     parameters: any[];
 }
 
+interface IBackendApi {
+    [key: string]: BackendApi;
+    AdUnit: AdUnit;
+    AppSheet: AppSheet;
+    Broadcast: Broadcast;
+    Cache: Cache;
+    Connectivity: Connectivity;
+    DeviceInfo: DeviceInfo;
+    Intent: Intent;
+    Lifecycle: Lifecycle;
+    Listener: Listener;
+    Notification: Notification;
+    Placement: Placement;
+    Purchasing: Purchasing;
+    Request: Request;
+    Sdk: Sdk;
+    Storage: Storage;
+    UrlScheme: UrlScheme;
+    VideoPlayer: VideoPlayer;
+}
+
 export class Backend implements IWebViewBridge {
 
-    public static sendEvent(category: string, name: string, ...parameters: any[]) {
-        // tslint:disable:no-string-literal
-        (<any>window)['nativebridge']['handleEvent']([category, name].concat(parameters));
-        // tslint:enable:no-string-literal
+    private _platform: Platform;
+    private _nativeBridge: NativeBridge;
+
+    public readonly Api: IBackendApi;
+
+    constructor(platform: Platform) {
+        this._platform = platform;
+
+        this.Api = {
+            AdUnit: new AdUnit(this),
+            Analytics: new Analytics(this),
+            AppSheet: new AppSheet(this),
+            Broadcast: new Broadcast(this),
+            Cache: new Cache(this),
+            Connectivity: new Connectivity(this),
+            CustomPurchasing: new CustomPurchasing(this),
+            DeviceInfo: new DeviceInfo(this),
+            Intent: new Intent(this),
+            Lifecycle: new Lifecycle(this),
+            Listener: new Listener(this),
+            MonetizationListener: new MonetizationListener(this),
+            Notification: new Notification(this),
+            Placement: new Placement(this),
+            PlacementContents: new PlacementContents(this),
+            Purchasing: new Purchasing(this),
+            Request: new Request(this),
+            Resolve: new Resolve(this),
+            Sdk: new Sdk(this),
+            Storage: new Storage(this),
+            UrlScheme: new UrlScheme(this),
+            VideoPlayer: new VideoPlayer(this)
+        };
     }
 
-    public static getPlatform(): Platform {
-        // tslint:disable:no-string-literal
-        return (<any>window)['nativebridge']['getPlatform']();
-        // tslint:enable:no-string-literal
+    public setNativeBridge(nativeBridge: NativeBridge) {
+        this._nativeBridge = nativeBridge;
     }
 
-    private _apiMap: { [key: string]: any } = {
-        '.*AdUnit': AdUnit,
-        '.*AppSheet': AppSheet,
-        '.*Broadcast': Broadcast,
-        '.*Cache': Cache,
-        '.*Connectivity': Connectivity,
-        '.*DeviceInfo': DeviceInfo,
-        '.*Intent': Intent,
-        '.*Lifecycle': Lifecycle,
-        '.*MonetizationListener': MonetizationListener,
-        '.*CustomPurchasing': CustomPurchasing,
-        '.*Listener': Listener,
-        '.*Notification': Notification,
-        '.*Placement$': Placement,
-        '.*Purchasing': Purchasing,
-        '.*Request': Request,
-        '.*Sdk': Sdk,
-        '.*Storage': Storage,
-        '.*UrlScheme': UrlScheme,
-        '.*VideoPlayer': VideoPlayer,
-        '.*Analytics': Analytics,
-        '.*PlacementContents': PlacementContents
-    };
+    public sendEvent(category: string, name: string, ...parameters: any[]) {
+        this._nativeBridge.handleEvent([category, name].concat(parameters));
+    }
+
+    public getPlatform(): Platform {
+        return this._nativeBridge.getPlatform();
+    }
 
     public handleInvocation(rawInvocations: string): void {
         const invocations: IInvocation[] = JSON.parse(rawInvocations).map((invocation: any) => this.parseInvocation(invocation));
         const results = invocations.map((invocation) => this.executeInvocation(invocation));
-        // tslint:disable:no-string-literal
-        (<any>window)['nativebridge']['handleCallback'](results.map(result => [result.callbackId.toString(), CallbackStatus[result.callbackStatus], result.parameters]));
-        // tslint:enable:no-string-literal
+        this._nativeBridge.handleCallback(results.map(result => [result.callbackId.toString(), CallbackStatus[result.callbackStatus], result.parameters]));
     }
 
     public handleCallback(id: string, status: string, parameters?: string): void {
@@ -96,32 +127,32 @@ export class Backend implements IWebViewBridge {
 
     private executeInvocation(invocation: IInvocation): IResult {
         const api = (() => {
-            for(const apiKey in this._apiMap) {
-                if(this._apiMap.hasOwnProperty(apiKey) && invocation.className.match(apiKey)) {
-                    return this._apiMap[apiKey];
-                }
+            if(this._platform === Platform.ANDROID) {
+                const splitClassName = invocation.className.split('.');
+                const apiKey = splitClassName[splitClassName.length - 1];
+                return this.Api[apiKey];
+            } else if(this._platform === Platform.IOS) {
+                const splitClassName = invocation.className.split('Api');
+                const apiKey = splitClassName[1];
+                return this.Api[apiKey];
             }
         })();
 
-        if (!api) {
-            // tslint:disable:no-console
-            console.info('WARNING! Missing backend API class: ' + invocation.className);
-            // tslint:enable:no-console
-            throw new Error(`Missing API class: ${invocation.className}`);
+        if(!api) {
+            throw new Error('Missing backend API implementation for: ' + invocation.className);
         }
 
-        if (!api[invocation.method]) {
-            // tslint:disable:no-console
-            console.info('WARNING! Missing backend API method: ' + invocation.className + '.' + invocation.method);
-            // tslint:enable:no-console
-            throw new Error(`Missing API method: ${invocation.className}.${invocation.method}`);
+        // @ts-ignore
+        const method = api[invocation.method];
+        if (!method) {
+            throw new Error('Missing backend API method: ' + invocation.className + '.' + invocation.method);
         }
 
         try {
             return {
                 callbackId: invocation.callbackId,
                 callbackStatus: CallbackStatus.OK,
-                parameters: [api[invocation.method].apply(undefined, invocation.parameters)]
+                parameters: [method.apply(api, invocation.parameters)]
             };
         } catch(error) {
             return {

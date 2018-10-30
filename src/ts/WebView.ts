@@ -1,5 +1,5 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
@@ -71,6 +71,20 @@ import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { AdMobAdUnitFactory } from 'AdMob/AdUnits/AdMobAdUnitFactory';
+import { DisplayInterstitialAdUnitFactory } from 'Display/AdUnits/DisplayInterstitialAdUnitFactory';
+import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
+import { PromoAdUnitFactory } from 'Promo/AdUnits/PromoAdUnitFactory';
+import { VastAdUnitFactory } from 'VAST/AdUnits/VastAdUnitFactory';
+import { VPAIDAdUnitFactory } from 'VPAID/AdUnits/VPAIDAdUnitFactory';
+import { XPromoAdUnitFactory } from 'XPromo/AdUnits/XPromoAdUnitFactory';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { PlacementContentManager } from 'Monetization/Managers/PlacementContentManager';
 import { NativePromoPlacementContentEventManager } from 'Monetization/Managers/NativePromoPlacementContentManager';
@@ -79,7 +93,6 @@ import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
-import { AdUnitFactory } from 'Ads/AdUnits/AdUnitFactory';
 
 export class WebView {
 
@@ -129,6 +142,15 @@ export class WebView {
     private _wasRealtimePlacement: boolean = false;
 
     private _bannerAdContext: BannerAdContext;
+
+    private _vastAdUnitFactory = new VastAdUnitFactory();
+    private _mraidAdUnitFactory = new MRAIDAdUnitFactory();
+    private _performanceAdUnitFactory = new PerformanceAdUnitFactory();
+    private _displayInterstitialAdUnitFactory = new DisplayInterstitialAdUnitFactory();
+    private _vpaidAdUnitFactory = new VPAIDAdUnitFactory();
+    private _xpromoAdUnitFactory = new XPromoAdUnitFactory();
+    private _adMobAdUnitFactory = new AdMobAdUnitFactory();
+    private _promoAdUnitFactory = new PromoAdUnitFactory();
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -336,9 +358,7 @@ export class WebView {
             return this._sessionManager.sendUnsentSessions();
         }).then(() => {
             if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                if(!CustomFeatures.isAlwaysAutobatching(this._clientInfo.getGameId())) {
-                    this._nativeBridge.setAutoBatchEnabled(false);
-                }
+                this._nativeBridge.setAutoBatchEnabled(false);
                 this._nativeBridge.Request.Android.setMaximumPoolSize(1);
             } else {
                 this._nativeBridge.Request.setConcurrentRequestCount(1);
@@ -483,7 +503,7 @@ export class WebView {
             }
 
             const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
-            this._currentAdUnit = this.getAdUnitFactory(campaign).createAdUnit(this._nativeBridge, {
+            this._currentAdUnit = this.createAdUnit(this._nativeBridge, {
                 forceOrientation: orientation,
                 focusManager: this._focusManager,
                 container: this._container,
@@ -570,6 +590,8 @@ export class WebView {
                 } else {
                     this._nativeBridge.Request.setConcurrentRequestCount(8);
                 }
+
+                this._backupCampaignManager.deleteBackupCampaigns();
             });
         });
     }
@@ -582,18 +604,35 @@ export class WebView {
         }
     }
 
-    private getAdUnitFactory(campaign: Campaign): AbstractAdUnitFactory {
-        const contentType = campaign.getContentType();
-        return AdUnitFactory.getAdUnitFactory(contentType);
+    private createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
+        AbstractPrivacy.createBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge, parameters.coreConfig);
+
+        if (parameters.campaign instanceof VastCampaign) {
+            return this._vastAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<VastCampaign>>parameters);
+        } else if(parameters.campaign instanceof MRAIDCampaign) {
+            return this._mraidAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>parameters);
+        } else if(parameters.campaign instanceof PerformanceCampaign) {
+            return this._performanceAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<PerformanceCampaign>>parameters);
+        } else if (parameters.campaign instanceof DisplayInterstitialCampaign) {
+            return this._displayInterstitialAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<DisplayInterstitialCampaign>>parameters);
+        } else if (parameters.campaign instanceof VPAIDCampaign) {
+            return this._vpaidAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<VPAIDCampaign>>parameters);
+        } else if (parameters.campaign instanceof XPromoCampaign) {
+            return this._xpromoAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<XPromoCampaign>>parameters);
+        } else if (parameters.campaign instanceof AdMobCampaign) {
+            return this._adMobAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<AdMobCampaign>>parameters);
+        } else if (parameters.campaign instanceof PromoCampaign) {
+            return this._promoAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<PromoCampaign>>parameters);
+        } else {
+            throw new Error('Unknown campaign instance type');
+        }
     }
 
     private onAdUnitClose(): void {
         this._showing = false;
 
         if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            if(!CustomFeatures.isAlwaysAutobatching(this._clientInfo.getGameId())) {
-                this._nativeBridge.setAutoBatchEnabled(false);
-            }
+            this._nativeBridge.setAutoBatchEnabled(false);
             this._nativeBridge.Request.Android.setMaximumPoolSize(1);
         } else {
             this._nativeBridge.Request.setConcurrentRequestCount(1);
