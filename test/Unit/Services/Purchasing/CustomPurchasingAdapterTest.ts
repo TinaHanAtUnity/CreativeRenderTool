@@ -14,7 +14,6 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { asStub } from 'TestHelpers/Functions';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 
-
 describe('CustomPurchasingAdapter', () => {
     let nativeBridge: NativeBridge;
     let analyticsManager: AnalyticsManager;
@@ -44,17 +43,13 @@ describe('CustomPurchasingAdapter', () => {
         getStub = <sinon.SinonStub>nativeBridge.Storage.get;
         setStub = (<sinon.SinonStub>nativeBridge.Storage.set).resolves();
         writeStub = (<sinon.SinonStub>nativeBridge.Storage.write).resolves();
-        
         iapMetaData = '{ iap_purchases: {productId: {value: \'productIDID\'}, price: {value:1.25} }}';
-        
         getStub.callsFake((fun) => {
            return Promise.resolve(iapMetaData);
         });
-        
         onSetStub.callsFake((fun) => {
             storageTrigger = fun;
         });
-
 
         (<any>nativeBridge).Monetization = {
             CustomPurchasing: customPurchasing
@@ -100,7 +95,7 @@ describe('CustomPurchasingAdapter', () => {
     it('should subscribe to Storage.onSet', () => {
         sinon.assert.calledOnce(onSetStub);
     });
-    
+
     describe('iap.purchases metadata', () => {
         it('should not do anything if iap.purchases is undefined', () => {
             storageTrigger('', {});
@@ -111,9 +106,7 @@ describe('CustomPurchasingAdapter', () => {
         it('should retrieve iap.purchase metadata',() => {
             iapMetaData = '{ iap_purchases: {productId: {value: \'productIDID\'}, price: {value:1.25} }}';
             storageTrigger('', {'iap.purchases': {productId: {value: 'productIDID'}, price: {value:1.25} }});
-           
             asStub(promoEvents.onOrganicPurchaseSuccess).returns(Promise.resolve());
-            
             return Promise.resolve().then(() => {
                 sinon.assert.calledOnce(onSetStub);
                 sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'iap.purchases');
@@ -123,7 +116,7 @@ describe('CustomPurchasingAdapter', () => {
                     sinon.assert.called(<sinon.SinonStub>promoEvents.onOrganicPurchaseSuccess);
                     sinon.assert.called(<sinon.SinonStub>request.post);
                 });
-            });     
+            });  
         });
         it('should reset iap.purchase metadata after each retrieve', () => {
             sinon.assert.calledOnce(onSetStub);

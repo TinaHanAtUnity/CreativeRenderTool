@@ -34,7 +34,7 @@ export interface IPurchasingAdapter {
 
     onCatalogRefreshed: Observable1<IProduct[]>;
 }
-export interface IOrganicPurchase{
+export interface IOrganicPurchase {
     productId: string;
     price: number;
     currency: string;
@@ -49,18 +49,18 @@ export class OrganicPurchase {
     private _receiptPurchaseData: string | undefined;
     private _signature: string | undefined;
 
-    constructor(data: { [key: string]: any } ) {
+    constructor(data: {[key: string]: any}) {
 
        for (const key in data) {
-           if(key === 'productId'){
+           if(key === 'productId') {
                this._productId = data[key];
-           } else if(key === 'price'){
+           } else if(key === 'price') {
                this._price = data[key];
-           } else if(key === 'currency'){
+           } else if(key === 'currency') {
             this._currency = data[key];
-           } else if(key === 'receiptPurchaseData'){
+           } else if(key === 'receiptPurchaseData') {
                this._receiptPurchaseData = data[key];
-           } else if(key === 'signature'){
+           } else if(key === 'signature') {
                this._signature = data[key];
            }
         }
@@ -86,4 +86,3 @@ export class OrganicPurchase {
         return this._signature;
     }
     }
-

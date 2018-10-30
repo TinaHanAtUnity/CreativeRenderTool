@@ -14,20 +14,16 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { asStub } from 'TestHelpers/Functions';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 
-
 describe('CustomPurchasingAdapter', () => {
     let sandbox: sinon.SinonSandbox;
     let organicPurchase: OrganicPurchase;
-    
     beforeEach(() => {
         sandbox = sinon.createSandbox();
     });
 
-
     afterEach(() => {
         sandbox.restore();
     });
-
 
     describe('Create OrganicPurchase', () => {
         it('create OrganicPurchase with all fields', () => {
@@ -38,7 +34,7 @@ describe('CustomPurchasingAdapter', () => {
             assert.deepEqual(1.25, organicPurchase.getPrice());
             assert.deepEqual('EUR', organicPurchase.getCurrency());
             assert.deepEqual('testReceiptPurchaseData', organicPurchase.getReceipt());
-            assert.deepEqual('testSignaure', organicPurchase.getSignature());     
+            assert.deepEqual('testSignaure', organicPurchase.getSignature());
         });
 
         it('create OrganicPurchase with missing fields', () => {
@@ -49,7 +45,7 @@ describe('CustomPurchasingAdapter', () => {
             assert.deepEqual(1.25, organicPurchase.getPrice());
             assert.isUndefined(organicPurchase.getCurrency());
             assert.isUndefined(organicPurchase.getReceipt());
-            assert.isUndefined(organicPurchase.getSignature());     
+            assert.isUndefined(organicPurchase.getSignature());
         });
 
         it('create OrganicPurchase with no value', () => {

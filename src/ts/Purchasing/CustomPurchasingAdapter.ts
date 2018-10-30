@@ -18,7 +18,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
     private _products: {[productId: string]: IProduct};
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _request: Request;
-    
     private static InAppPurchaseStorageKey = 'iap.purchases';
 
     constructor(nativeBridge: NativeBridge, analyticsManager: AnalyticsManager | undefined, promoEvents: PromoEvents, request: Request) {
@@ -31,23 +30,22 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
         this._thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request, {});
 
         this.getOrganicPurchase();
-        this._nativeBridge.Storage.onSet.subscribe(() => this.getOrganicPurchase());
-       
+        this._nativeBridge.Storage.onSet.subscribe(() => this.getOrganicPurchase());    
     }
 
     public initialize() {
         return Promise.resolve();
     }
 
-    private getOrganicPurchase(): Promise<void> {    
+    private getOrganicPurchase(): Promise<void> {
         return this._nativeBridge.Storage.get(StorageType.PUBLIC, CustomPurchasingAdapter.InAppPurchaseStorageKey).then((data: any) => {
-            if(data && data.length && data.length > 0){
-                for(const event of data){
+            if (data && data.length && data.length > 0) {
+                for(const event of data) {
                     const organicPurchaseEvent = new OrganicPurchase(event);
                     this.postOrganicPurchaseEvents(organicPurchaseEvent);
                 }
                 this.resetIAPPurchaseMetaData();
-            }   
+            }
         });
     }
 
@@ -66,20 +64,18 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                 productType = product.productType;
             }
         }
-      
-        this._promoEvents.onOrganicPurchaseSuccess({ 
+        this._promoEvents.onOrganicPurchaseSuccess({
             store: this._promoEvents.getAppStoreFromReceipt(organicPurchaseEvent.getReceipt()),
             productId: organicPurchaseEvent.getId(),
             storeSpecificId: organicPurchaseEvent.getId(),
             amount: organicPurchaseEvent.getPrice(),
             currency: organicPurchaseEvent.getCurrency(),
             native: false}, productType, organicPurchaseEvent.getReceipt()).then((body) => {
-
-                this._request.post( Url.addParameters('https://events.iap.unity3d.com/events/v1/organic_purchase', {'native': false, 'iap_service': false}), JSON.stringify(body));             
+                this._request.post(Url.addParameters('https://events.iap.unity3d.com/events/v1/organic_purchase', {'native': false, 'iap_service': false}), JSON.stringify(body));             
             }                    
             );
     }
-    
+
     public refreshCatalog(): Promise<IProduct[]> {
         return new Promise<IProduct[]>((resolve, reject) => {
             const observer = this._nativeBridge.Monetization.CustomPurchasing.onProductsRetrieved.subscribe((products) => {
@@ -99,7 +95,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
         return new Promise<ITransactionDetails>((resolve, reject) => {
             let onError: IObserver1<ITransactionErrorDetails>;
             let onSuccess: IObserver1<ITransactionDetails>;
-            let onOrganicSuccess: IObserver1<ITransactionDetails>;
 
             onSuccess = this._nativeBridge.Monetization.CustomPurchasing.onTransactionComplete.subscribe((details) => {
                 this._nativeBridge.Monetization.CustomPurchasing.onTransactionError.unsubscribe(onError);
@@ -138,7 +133,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                         }
                     }
                 }
-            
                 resolve(details);
             });
             onError = this._nativeBridge.Monetization.CustomPurchasing.onTransactionError.subscribe((details) => {
