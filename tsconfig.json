@@ -9,6 +9,7 @@
     "paths": {
       "*": [
         "src/ts/*",
+        "src/proto/*",
         "test/*"
       ]
     },
@@ -18,6 +19,7 @@
   },
   "include": [
     "src/ts/**/*.ts",
-    "test/**/*.ts"
+    "test/**/*.ts",
+    "proto/unity_proto.d.ts"
   ]
 }
