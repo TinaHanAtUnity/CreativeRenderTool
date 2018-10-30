@@ -1,3 +1,7 @@
+# Pending
+
+* Log Promotions without product [#6780](https://github.com/Applifier/unity-ads-webview/pull/6780)
+
 # Mon Oct 29 21:07:45 UTC 2018
 
 * Refactor Backend to non-static [#6835](https://github.com/Applifier/unity-ads-webview/pull/6835)
