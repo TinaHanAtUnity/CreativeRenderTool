@@ -12,7 +12,7 @@ def waitWebviewDeployed(webviewBranch) {
 }
 
 def main() {
-    commitId = sh(returnStdout: true, script: "git log --format=\"%H\" -n 1")
+    commitId = sh(returnStdout: true, script: "git log --format=\"%H\" -n 1").trim()
     def webviewBranch = env.BRANCH_NAME + '/' + commitId
     def webviewDeployed = false
     //if (env.BRANCH_NAME =~ /^PR-/) {
