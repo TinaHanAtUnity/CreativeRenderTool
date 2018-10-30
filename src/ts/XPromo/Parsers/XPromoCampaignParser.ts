@@ -35,7 +35,6 @@ export class XPromoCampaignParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: json.id,
             willExpireAt: undefined,
-            contentType: XPromoCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,
             creativeId: response.getCreativeId(),
