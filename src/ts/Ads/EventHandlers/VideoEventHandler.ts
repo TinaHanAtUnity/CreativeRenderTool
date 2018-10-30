@@ -175,9 +175,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                 url: url,
                 originalUrl: originalUrl
             });
-            SessionDiagnostics.trigger('video_too_long', error, this._campaign.getSession());
-            this.handleVideoError('video_too_long_error');
-            return;
+            return this.handleVideoError('video_too_long', error);
         }
 
         const overlay = this._adUnit.getOverlay();
