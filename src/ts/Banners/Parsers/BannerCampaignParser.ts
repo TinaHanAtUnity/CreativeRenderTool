@@ -17,7 +17,7 @@ export class BannerCampaignParser extends CampaignParser {
         this._wrapJS = wrapJS;
     }
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
         const markup = this._wrapJS ? this.getJSContent(response) : this.getHTMLContent(response);
         const campaign = <IBannerCampaign>{
             id: this.getProgrammaticCampaignId(nativeBridge),
@@ -30,7 +30,9 @@ export class BannerCampaignParser extends CampaignParser {
             seatId: response.getSeatId(),
             willExpireAt: response.getCacheTTL(),
             markup: markup,
-            trackingUrls: response.getTrackingUrls()
+            trackingUrls: response.getTrackingUrls(),
+            width: response.getWidth(),
+            height: response.getHeight()
         };
         return Promise.resolve(new BannerCampaign(campaign));
     }

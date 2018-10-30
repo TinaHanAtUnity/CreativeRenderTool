@@ -77,7 +77,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         if(this._campaign instanceof XPromoCampaign) {
             const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
             for (const url of clickTrackingUrls) {
-                this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
+                this._thirdPartyEventManager.sendWithGet('xpromo click', this._campaign.getSession().getId(), url);
             }
         }
 
@@ -104,7 +104,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         if(this._campaign instanceof XPromoCampaign) {
             const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
             for (const url of clickTrackingUrls) {
-                this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
+                this._thirdPartyEventManager.sendWithGet('xpromo click', this._campaign.getSession().getId(), url);
             }
         }
 
@@ -133,24 +133,13 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
-        const platform = this._nativeBridge.getPlatform();
-
-        // should be safe to remove after new Comet APK rule changes are deployed
         if (parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
-            const apkDownloadLink = Url.getQueryParameter(parameters.clickAttributionUrl, 'apk_download_link');
-            if (apkDownloadLink && platform === Platform.ANDROID) {
-                if (parameters.clickAttributionUrl) {
-                    this.handleClickAttributionWithoutRedirect(parameters.clickAttributionUrl);
-                }
-                this.handleAppDownloadUrl(apkDownloadLink);
-            } else {
-                this.handleClickAttributionWithRedirects(parameters.clickAttributionUrl, parameters.clickAttributionUrlFollowsRedirects);
-            }
+            this.handleClickAttributionWithRedirects(parameters.clickAttributionUrl);
             return;
         }
 
         if (parameters.clickAttributionUrl) {
-            this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, false);
+            this.handleClickAttributionWithoutRedirect(parameters.clickAttributionUrl);
         }
     }
 
@@ -160,7 +149,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         });
     }
 
-    private handleClickAttributionWithRedirects(clickAttributionUrl: string, clickAttributionUrlFollowsRedirects: boolean) {
+    private handleClickAttributionWithRedirects(clickAttributionUrl: string) {
         const platform = this._nativeBridge.getPlatform();
 
         this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
@@ -177,7 +166,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             } else {
                 Diagnostics.trigger('click_attribution_misconfigured', {
                     url: clickAttributionUrl,
-                    followsRedirects: clickAttributionUrlFollowsRedirects,
+                    followsRedirects: true,
                     response: response
                 });
             }
@@ -187,39 +176,27 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private handleAppDownloadUrl(appDownloadUrl: string) {
-        appDownloadUrl = decodeURIComponent(appDownloadUrl);
+        const modifiedAppDownloadUrl = decodeURIComponent(appDownloadUrl);
 
-        if (this._nativeBridge.getApiLevel() >= 21) {
-            // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
-            this._nativeBridge.Intent.launch({
-                'action': 'android.intent.action.WEB_SEARCH',
-                'extras': [
-                    {
-                        'key': 'query',
-                        'value': appDownloadUrl
-                    }
-                ]
-            });
-        } else {
-            this._nativeBridge.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': appDownloadUrl
-            });
-        }
+        this._nativeBridge.Intent.launch({
+            'action': 'android.intent.action.VIEW',
+            'uri': modifiedAppDownloadUrl
+        });
     }
 
     private triggerDiagnosticsError(error: any, clickAttributionUrl: string) {
         const currentSession = this._campaign.getSession();
+        let diagnosticError = error;
 
         if (error instanceof RequestError) {
-            error = new DiagnosticError(new Error(error.message), {
+            diagnosticError = new DiagnosticError(new Error(error.message), {
                 request: error.nativeRequest,
                 auctionId: currentSession.getId(),
                 url: clickAttributionUrl,
                 response: error.nativeResponse
             });
         }
-        SessionDiagnostics.trigger('click_attribution_failed', error, currentSession);
+        SessionDiagnostics.trigger('click_attribution_failed', diagnosticError, currentSession);
     }
 
     private openAppStore(parameters: IEndScreenDownloadParameters, isAppSheetBroken?: boolean) {

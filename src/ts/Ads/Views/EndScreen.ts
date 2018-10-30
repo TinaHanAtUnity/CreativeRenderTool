@@ -2,22 +2,14 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHandler';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
-import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import {
-    ABGroup,
-    OrangeEndScreenButtonColorTest,
-    GreenEndScreenButtonColorTest,
-    RedEndScreenButtonColorTest,
-    NavyEndScreenButtonColorTest
-} from 'Core/Models/ABGroup';
-
+import { ABGroup } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
-import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
+import { Platform } from 'Core/Constants/Platform';
 
 export interface IEndScreenParameters {
     nativeBridge: NativeBridge;
@@ -62,13 +54,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._campaignId = parameters.campaignId;
         this._osVersion = parameters.osVersion;
 
-        this._template = new Template(this.getTemplate(), this._localization);
-
         this._bindings = [
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .download-container, .game-icon'
+                selector: '.game-background, .download-container, .game-icon, .game-image'
             },
             {
                 event: 'click',
@@ -105,34 +95,25 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
 
+        const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
+        if (ctaButtonColor) {
+            (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
+        }
+
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
+            document.documentElement.classList.add(endScreenAlt);
         }
 
         if (this._showGDPRBanner) {
             this._container.classList.add('show-gdpr-banner');
         }
 
-        this.addCustomDownloadButtonColor();
-    }
-
-    private addCustomDownloadButtonColor(): void {
-        let color: string;
-
-        if (OrangeEndScreenButtonColorTest.isValid(this._abGroup)) {
-            color = '#F8AD00';
-        } else if (GreenEndScreenButtonColorTest.isValid(this._abGroup)) {
-            color = '#83CD0C';
-        } else if (RedEndScreenButtonColorTest.isValid(this._abGroup)) {
-            color = '#ED4400';
-        } else if (NavyEndScreenButtonColorTest.isValid(this._abGroup)) {
-            color = '#2F5FAE';
-        } else {
-            return;
+        // Android <= 4.4.4
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() <= 19) {
+            this._container.classList.add('old-androids');
         }
-
-        (<HTMLElement>this._container.querySelector('.download-container')).style.background = color;
     }
 
     public show(): void {
@@ -182,8 +163,12 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         // do nothing
     }
 
-    protected getEndscreenAlt(campaign?: Campaign) {
+    protected getEndscreenAlt(): string | undefined {
         return undefined;
+    }
+
+    protected getTemplate() {
+        return EndScreenTemplate;
     }
 
     protected abstract onDownloadEvent(event: Event): void;
@@ -202,9 +187,5 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         this._privacy.show();
-    }
-
-    private getTemplate() {
-        return EndScreenTemplate;
     }
 }

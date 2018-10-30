@@ -60,7 +60,16 @@
         <div class="right-corner">
             <div class="call-button button button-bottom button-right">
                 <div class="tab">
-                    <span class="text"><%= data.t("Learn More") %> <span class="go-text">GO</span></span>
+                    <% if (!!data.gameIcon && data.gameIcon !== "") { %>
+                        <div class="download-wrapper">
+                            <div class="game-icon" style="background-image: url('<%= data.gameIcon && data.gameIcon.replace("file://", "") %>')"></div>
+                            <div class="download-container">
+                                <span class="download-text"><%= data.t("Install Now") %></span>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <span class="text"><%= data.t("Learn More") %> <span class="go-text">GO</span></span>
+                    <% } %>
                 </div>
             </div>
         </div>

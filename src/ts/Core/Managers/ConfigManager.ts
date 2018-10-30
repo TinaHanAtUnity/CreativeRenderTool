@@ -51,21 +51,22 @@ export class ConfigManager {
                         configUrl: url,
                         configResponse: response.response
                     });
-                    nativeBridge.Sdk.logError('Config request failed ' + error);
+                    nativeBridge.Sdk.logError('Config request failed ' + error.message);
                     throw new Error(error);
                 }
             }).catch(error => {
-                if (error instanceof RequestError) {
-                    const requestError = error;
+                let modifiedError = error;
+                if (modifiedError instanceof RequestError) {
+                    const requestError = modifiedError;
                     if (requestError.nativeResponse && requestError.nativeResponse.responseCode) {
                         jaegerSpan.addTag(JaegerTags.StatusCode, requestError.nativeResponse.responseCode.toString());
                     }
                     if (requestError.nativeResponse && requestError.nativeResponse.response) {
                         const responseObj = JsonParser.parse(requestError.nativeResponse.response);
-                        error = new ConfigError((new Error(responseObj.error)));
+                        modifiedError = new ConfigError((new Error(responseObj.error)));
                     }
                 }
-                throw error;
+                throw modifiedError;
             });
         });
     }

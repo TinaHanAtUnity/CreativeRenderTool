@@ -1,7 +1,5 @@
 import { AdsConfiguration, IAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 
@@ -14,17 +12,8 @@ export class AdsConfigurationParser {
 
         if (configPlacements) {
             configPlacements.forEach((rawPlacement: any): void => {
-                const placement: Placement = new Placement(rawPlacement);
-                if(clientInfo && CustomFeatures.isMixedPlacementExperiment(clientInfo.getGameId())) {
-                    MixedPlacementUtility.originalPlacements[placement.getId()] = placement;
-                    if (MixedPlacementUtility.isMixedPlacement(placement)) {
-                        MixedPlacementUtility.createMixedPlacements(rawPlacement, placements);
-                    } else {
-                        placements[placement.getId()] = placement;
-                    }
-                } else {
-                    placements[placement.getId()] = placement;
-                }
+                const placement = new Placement(rawPlacement);
+                placements[placement.getId()] = placement;
                 if (placement.isDefault()) {
                     if (placement.isBannerPlacement()) {
                         defaultBannerPlacement = placement;

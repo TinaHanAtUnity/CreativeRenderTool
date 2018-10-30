@@ -1,3 +1,5 @@
+
+import { IVideoOverlayDownloadParameters } from 'Performance/EventHandlers/PerformanceOverlayWithCTAButtonEventHandler';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { View } from 'Core/Views/View';
@@ -8,6 +10,7 @@ export interface IOverlayHandler extends IGDPREventHandler {
     onOverlayPauseForTesting(paused: boolean): void;
     onOverlayCallButton(): void;
     onOverlayClose(): void;
+    onOverlayDownload?(parameters: IVideoOverlayDownloadParameters): void;
 }
 
 export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {

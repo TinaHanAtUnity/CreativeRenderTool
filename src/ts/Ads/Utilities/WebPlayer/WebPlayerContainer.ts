@@ -7,6 +7,7 @@ import {
 } from 'Ads/Native/WebPlayer';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
+import { Platform } from 'Core/Constants/Platform';
 
 /**
  * The WebPlayerContainer wraps the WebPlayerApi in a way that can be used without needing
@@ -79,10 +80,18 @@ export abstract class WebPlayerContainer {
         }
     }
     private handleShouldOverrideUrlLoading(viewId: string, url: string, method: string) {
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            if (method) {
+                // Currently a bug with how we handle API > 21 where both methods will fire this single event.
+                // API < 21 does not have the method as a parameter, so we will only send if
+                return;
+            }
+        }
         if (this._viewId === viewId) {
             this.shouldOverrideUrlLoading.trigger(url, method);
         }
     }
+
     private handleOnCreateWebView(viewId: string, url: string) {
         if (this._viewId === viewId) {
             this.onCreateWebView.trigger(url);

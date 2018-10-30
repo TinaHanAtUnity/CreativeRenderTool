@@ -21,7 +21,13 @@ export abstract class CampaignLoader {
             return undefined;
         }
 
-        return new Session(rawSession.id);
+        const session: Session = new Session(rawSession.id);
+
+        if(rawSession.adPlan) {
+            session.setAdPlan(rawSession.adPlan);
+        }
+
+        return session;
     }
 
     public loadAdUnitStyle(data: string): AdUnitStyle | undefined {

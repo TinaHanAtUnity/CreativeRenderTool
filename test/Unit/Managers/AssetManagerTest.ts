@@ -18,6 +18,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 class TestCacheApi extends CacheApi {
 
@@ -173,6 +174,7 @@ describe('AssetManagerTest', () => {
     let handleInvocation: sinon.SinonSpy;
     let handleCallback: sinon.SinonSpy;
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
     let cacheApi: TestCacheApi;
     let storageApi: TestStorageApi;
     let wakeUpManager: WakeUpManager;
@@ -190,6 +192,7 @@ describe('AssetManagerTest', () => {
             handleInvocation,
             handleCallback
         });
+        storageBridge = new StorageBridge(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
@@ -198,7 +201,7 @@ describe('AssetManagerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-        backupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
+        backupCampaignManager = new BackupCampaignManager(nativeBridge, storageBridge, TestFixtures.getCoreConfiguration());
     });
 
     it('should not cache anything when cache mode is disabled', () => {

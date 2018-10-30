@@ -14,6 +14,13 @@ we currently need to use for some native releases.
 
 All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
+## 3.0.0
+
+* Added MonetizationListener API class.
+* Added CustomPurchasing API class.
+* Added Analytics API class.
+* Added Permissions API class.
+
 ## 2.2.0
 
 * Added home indicator hidden parameter to iOS AdUnit.open method

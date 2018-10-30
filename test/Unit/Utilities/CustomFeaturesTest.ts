@@ -37,43 +37,4 @@ describe('CustomFeatures', () => {
             assert.isFalse(value);
         });
     });
-
-    xdescribe('isMixedPlacementExperiment', () => {
-        it('should return true if gameId is 1543512', () => {
-            const value = CustomFeatures.isMixedPlacementExperiment('1543512');
-            assert.isTrue(value);
-        });
-
-        it('should return true if gameId is 1003628', () => {
-            const value = CustomFeatures.isMixedPlacementExperiment('1003628');
-            assert.isTrue(value);
-        });
-
-        it('should return true if gameId is 1042745', () => {
-            const value = CustomFeatures.isMixedPlacementExperiment('1042745');
-            assert.isTrue(value);
-        });
-
-        it('should return true if gameId is 1543513', () => {
-            const value = CustomFeatures.isMixedPlacementExperiment('1543513');
-            assert.isTrue(value);
-        });
-
-        it('should return false if gameId is anything besides 1543512 and 1003628', () => {
-            const value = CustomFeatures.isMixedPlacementExperiment('asdfasdf');
-            assert.isFalse(value);
-        });
-    });
-
-    describe('isAlwaysAutobatching', () => {
-        it('should return true for gameId 1448666', () => {
-            const value = CustomFeatures.isAlwaysAutobatching('1448666');
-            assert.isTrue(value);
-        });
-
-        it('should return false if gameId is anything besides 1448666', () => {
-            const value = CustomFeatures.isAlwaysAutobatching('14851');
-            assert.isFalse(value);
-        });
-    });
 });

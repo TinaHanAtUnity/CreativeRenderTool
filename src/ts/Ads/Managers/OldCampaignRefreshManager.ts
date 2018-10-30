@@ -6,8 +6,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
@@ -23,6 +21,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export class OldCampaignRefreshManager extends RefreshManager {
@@ -100,6 +99,13 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
     }
 
+    public subscribeNativePromoEvents(eventHandler : NativePromoEventHandler): void {
+        eventHandler.onClose.subscribe(() => {
+            this._needsRefill = true;
+            this.refresh();
+        });
+    }
+
     public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
         if(this.shouldRefill(this._refillTimestamp)) {
             this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
@@ -114,31 +120,13 @@ export class OldCampaignRefreshManager extends RefreshManager {
         return Promise.resolve();
     }
 
-    public refreshFromCache(cachedResponse: INativeResponse, span: JaegerSpan): Promise<INativeResponse | void> {
-        if(this.shouldRefill(this._refillTimestamp)) {
-            span.addAnnotation('should refill');
-            this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
-            this._refillTimestamp = 0;
-            this.invalidateCampaigns(false, this._configuration.getPlacementIds());
-            this._campaignCount = 0;
-            return this._campaignManager.requestFromCache(cachedResponse).then(() => {
-                return this._campaignManager.request();
-           });
-        } else if(this.checkForExpiredCampaigns()) {
-            span.addAnnotation('campaign expired');
-            return this.onCampaignExpired();
-        }
-
-        return Promise.resolve();
-    }
-
-    public refreshWithBackupCampaigns(backupCampaignManager: BackupCampaignManager): Promise<INativeResponse | void> {
+    public refreshWithBackupCampaigns(backupCampaignManager: BackupCampaignManager): Promise<(INativeResponse | void)[]> {
         this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
         this._refillTimestamp = 0;
         this.invalidateCampaigns(false, this._configuration.getPlacementIds());
         this._campaignCount = 0;
 
-        const promises = [];
+        const promises = [this._campaignManager.request()];
 
         const placements = this._configuration.getPlacements();
         for(const placement in this._configuration.getPlacements()) {
@@ -151,9 +139,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
             }
         }
 
-        return Promise.all(promises).then(() => {
-            return this._campaignManager.request();
-        });
+        return Promise.all(promises);
     }
 
     public shouldRefill(timestamp: number): boolean {
@@ -221,13 +207,13 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     private onCampaign(placementId: string, campaign: Campaign) {
+        PurchasingUtilities.addCampaignPlacementIds(placementId, campaign);
         this._parsingErrorCount = 0;
         const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
-        const isMixedPlacementExperiment = CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId());
-        const shouldFillMixedPlacement = MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign);
-        const shouldNoFillMixedPlacement = isMixedPlacementExperiment && !shouldFillMixedPlacement;
 
-        if (shouldNoFillMixedPlacement || isPromoWithoutProduct) {
+        if (isPromoWithoutProduct) {
+            const productID = (<PromoCampaign>campaign).getIapProductId();
+            this._nativeBridge.Sdk.logWarning(`Promo placement: ${placementId} does not have the corresponding product: ${productID} available`);
             this.onNoFill(placementId);
         } else {
             this.setPlacementReady(placementId, campaign);
@@ -248,22 +234,23 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     private onError(error: WebViewError | Error, placementIds: string[], diagnosticsType: string, session?: Session) {
+        let errorInternal = error;
         this.invalidateCampaigns(this._needsRefill, placementIds);
 
         if(error instanceof Error) {
-            error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
+            errorInternal = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
 
         if(session) {
             SessionDiagnostics.trigger(diagnosticsType, {
-                error: error
+                error: errorInternal
             }, session);
         } else {
             Diagnostics.trigger(diagnosticsType, {
-                error: error
+                error: errorInternal
             });
         }
-        this._nativeBridge.Sdk.logError(JSON.stringify(error));
+        this._nativeBridge.Sdk.logError(JSON.stringify(errorInternal));
 
         const minimumRefreshTimestamp = Date.now() + RefreshManager.ErrorRefillDelay * 1000;
         if(this._refillTimestamp === 0 || this._refillTimestamp > minimumRefreshTimestamp) {

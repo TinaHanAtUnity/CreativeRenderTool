@@ -25,6 +25,8 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { StorageBridgeHelper } from 'TestHelpers/StorageBridgeHelper';
 
 class TestStorageApi extends StorageApi {
 
@@ -170,6 +172,7 @@ describe('OperativeEventManagerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
 
     let storageApi: TestStorageApi;
     let requestApi: TestRequestApi;
@@ -190,6 +193,7 @@ describe('OperativeEventManagerTest', () => {
             handleCallback
         });
 
+        storageBridge = new StorageBridge(nativeBridge, 1);
         metaDataManager = new MetaDataManager(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
@@ -202,7 +206,7 @@ describe('OperativeEventManagerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         operativeEventManagerParams = {
             nativeBridge: nativeBridge,
             request: request,
@@ -212,6 +216,7 @@ describe('OperativeEventManagerTest', () => {
             deviceInfo: deviceInfo,
             coreConfig: TestFixtures.getCoreConfiguration(),
             adsConfig: TestFixtures.getAdsConfiguration(),
+            storageBridge: storageBridge,
             campaign: campaign
         };
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
@@ -256,6 +261,8 @@ describe('OperativeEventManagerTest', () => {
 
         const requestSpy = sinon.spy(request, 'post');
 
+        const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
+
         const event = operativeEventManager.sendEvent('test', eventId, sessionId, url, data).then(() => {
             assert.fail('Send failed operative event failed to fail');
         }).catch(() => {
@@ -265,7 +272,9 @@ describe('OperativeEventManagerTest', () => {
 
             const urlKey: string = 'session.' + sessionId + '.operative.' + eventId + '.url';
             const dataKey: string = 'session.' + sessionId + '.operative.' + eventId + '.data';
-            return storageApi.get<string>(StorageType.PRIVATE, urlKey).then(storedUrl => {
+            return storagePromise.then(() => {
+                return storageApi.get<string>(StorageType.PRIVATE, urlKey);
+            }).then(storedUrl => {
                 assert.equal(url, storedUrl, 'Failed operative event url was not correctly stored');
             }).then(() => {
                 return storageApi.get<string>(StorageType.PRIVATE, dataKey);

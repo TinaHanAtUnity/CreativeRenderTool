@@ -95,16 +95,17 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         let fetchingStopTimestamp = Date.now();
         let mraidParseTimestamp = Date.now();
         return this.fetchMRAID().then(mraid => {
+            let modifiedMraid = mraid;
             fetchingStopTimestamp = mraidParseTimestamp = Date.now();
-            if(mraid) {
+            if(modifiedMraid) {
                 const markup = this._campaign.getDynamicMarkup();
                 if(markup) {
-                    mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
+                    modifiedMraid = modifiedMraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
                 }
 
-                mraid = mraid.replace(/\$/g, '$$$');
-                mraid = this.replaceMraidSources(mraid);
-                return container.replace('<body></body>', '<body>' + mraid + '</body>');
+                modifiedMraid = modifiedMraid.replace(/\$/g, '$$$');
+                modifiedMraid = this.replaceMraidSources(modifiedMraid);
+                return container.replace('<body></body>', '<body>' + modifiedMraid + '</body>');
             }
             throw new WebViewError('Unable to fetch MRAID');
         }).then((data) => {

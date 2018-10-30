@@ -4,35 +4,21 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
 import { IPromoPayload, IPromoRequest, PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 export class PromoEventHandler {
 
-    public static onClose(adUnit: PromoAdUnit, gamerToken: string, gameId: string, abGroup: ABGroup, purchaseTrackingUrls: string[], isOptOutEnabled: boolean): void {
+    public static onClose(adUnit: PromoAdUnit, campaign: PromoCampaign, placementId: string) {
         adUnit.setFinishState(FinishState.COMPLETED);
         adUnit.hide();
-        const iapPayload: IPromoPayload = {
-            gamerToken: gamerToken,
-            trackingOptOut: isOptOutEnabled,
-            iapPromo: true,
-            gameId: gameId + '|' + gamerToken,
-            abGroup: abGroup.toNumber(),
-            request: IPromoRequest.CLOSE,
-            purchaseTrackingUrls: purchaseTrackingUrls
-        };
-        PurchasingUtilities.sendPromoPayload(iapPayload);
+        PurchasingUtilities.onPromoClosed(campaign, placementId);
     }
 
-    public static onPromo(adUnit: PromoAdUnit, iapProductId: string, purchaseTrackingUrls: string[]): void {
+    public static onPromoClick(adUnit: PromoAdUnit, campaign: PromoCampaign, placementId: string) {
         adUnit.setFinishState(FinishState.COMPLETED);
-        adUnit.hide();
         adUnit.sendClick();
-        const iapPayload: IPromoPayload = {
-            productId: iapProductId,
-            iapPromo: true,
-            request: IPromoRequest.PURCHASE,
-            purchaseTrackingUrls: purchaseTrackingUrls
-        };
-        PurchasingUtilities.sendPromoPayload(iapPayload);
+        adUnit.hide();
+        PurchasingUtilities.onPurchase(campaign.getIapProductId(), campaign, placementId);
     }
 
     public static onGDPRPopupSkipped(configuration: AdsConfiguration, gdprManager: GdprManager): void {

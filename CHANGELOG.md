@@ -1,5 +1,100 @@
 # Pending
 
+* Fix Privacy layout on iPhone X series [#6863](https://github.com/Applifier/unity-ads-webview/pull/6863)
+* iPhone XR media queries [#6864](https://github.com/Applifier/unity-ads-webview/pull/6864)
+* Square end screen asset support [#6838](https://github.com/Applifier/unity-ads-webview/pull/6838)
+* Experiment: Skippable Rewarded Ads [#6806](https://github.com/Applifier/unity-ads-webview/pull/6806)
+* Log Promotions without product [#6780](https://github.com/Applifier/unity-ads-webview/pull/6780)
+
+# Mon Oct 29 21:07:45 UTC 2018
+
+* Refactor Backend to non-static [#6835](https://github.com/Applifier/unity-ads-webview/pull/6835)
+* Quality-of-life improvements for debugging [#6836](https://github.com/Applifier/unity-ads-webview/pull/6836)
+* Delete backup campaigns when showing an ad [#6833](https://github.com/Applifier/unity-ads-webview/pull/6833)
+* Remove autobatching exception for game ID 1448666 [#6832](https://github.com/Applifier/unity-ads-webview/pull/6832)
+* Remove APK download link hack [#6677](https://github.com/Applifier/unity-ads-webview/pull/6677)
+* VastErrorHandler supporting VAST 3.0, ready for abTest [#6812](https://github.com/Applifier/unity-ads-webview/pull/6812)
+* Remove web search intent for opening appDownloadUrl [#6810](https://github.com/Applifier/unity-ads-webview/pull/6810)
+
+# Thu Oct 25 21:49:17 UTC 2018
+
+* Remove old backup campaign implementation, use new as default [#6778](https://github.com/Applifier/unity-ads-webview/pull/6778)
+* A/B test CTA Button on Video Overlay v2 [#6807](https://github.com/Applifier/unity-ads-webview/pull/6807)
+* Remove endscreen layout A/B test [#6805](https://github.com/Applifier/unity-ads-webview/pull/6805)
+* TSLint no-parameter-reassignment [#6777](https://github.com/Applifier/unity-ads-webview/pull/6777) 
+
+# Wed Oct 24 17:13:55 UTC 2018
+
+* Enable x icon skip for Cheetah [#6781](https://github.com/Applifier/unity-ads-webview/pull/6781)
+* AR logo cropping fix [#6783](https://github.com/Applifier/unity-ads-webview/pull/6783)
+* Remove mixed placement experiment dead code [#6779](https://github.com/Applifier/unity-ads-webview/pull/6779)
+* Use StorageBridge with BackupCampaignManager [#6769](https://github.com/Applifier/unity-ads-webview/pull/6769)
+* Native flag added to promo events [#6705](https://github.com/Applifier/unity-ads-webview/pull/6705)
+* TSLint: one-variable-per-declaration [#6772](https://github.com/Applifier/unity-ads-webview/pull/6772)
+* TSLint: no-single-line-black-comment [#6770](https://github.com/Applifier/unity-ads-webview/pull/6770)
+* Fix product type to only be appended to iap tracking events [#6706](https://github.com/Applifier/unity-ads-webview/pull/6706)
+* Minor adjustments to Reported Ads [#6771](https://github.com/Applifier/unity-ads-webview/pull/6771)
+
+# Thu Oct 18 17:01:37 UTC 2018
+
+* Test CTA button in video overlay [#6403](https://github.com/Applifier/unity-ads-webview/pull/6403)
+
+# Thu Oct 18 10:52:21 UTC 2018
+
+* MediaFile selection based on file size for VAST, ready for auction abTest [#6547](https://github.com/Applifier/unity-ads-webview/pull/6547)
+* Remove CachedAdmobCampaign [#6681](https://github.com/Applifier/unity-ads-webview/pull/6681)
+* Switch AB groups for the Improved endscreen styles test [#6728](https://github.com/Applifier/unity-ads-webview/pull/6726)
+* Move Promo models to Promo Module [#6728](https://github.com/Applifier/unity-ads-webview/pull/6728)
+* Allow streaming of backup campaigns [#6727](https://github.com/Applifier/unity-ads-webview/pull/6727)
+* Update promo parse to use IAP Product ID as a fallback [#6730](https://github.com/Applifier/unity-ads-webview/pull/6730)
+
+# Wed Oct 17 18:20:47 UTC 2018
+
+* Add support for all SDK 3.0.0 Webview Functionality: [List of PRs](https://github.com/Applifier/unity-ads-webview/pulls?q=is%3Apr+is%3Aclosed+label%3A3.0)
+
+# Tue Oct 16 12:43:43 UTC 2018
+
+* Minor optimizations to backup campaign implementation [#6676](https://github.com/Applifier/unity-ads-webview/pull/6676)
+* Enable Android back button on Closable video overlay for Cheetah [#6679](https://github.com/Applifier/unity-ads-webview/pull/6679)
+
+# Mon Oct 15 20:37:20 UTC 2018
+
+* AB Test various improvements to the endscreen layout v2 [#6674](https://github.com/Applifier/unity-ads-webview/pull/6674)
+* Remove smart close button test [#6673](https://github.com/Applifier/unity-ads-webview/pull/6673)
+* Android back button skip for Cheetah [#6675](https://github.com/Applifier/unity-ads-webview/pull/6675)
+* Add check that requested permissions are in manifest [#6358](https://github.com/Applifier/unity-ads-webview/pull/6358)
+* Add tests for AR and Permission APIs [#6495](https://github.com/Applifier/unity-ads-webview/pull/6495)
+* Add method to set authorization header for http request from Webview [#6379](https://github.com/Applifier/unity-ads-webview/pull/6379)
+* Remove calling getSensorList API method on initialization [#6541](https://github.com/Applifier/unity-ads-webview/pull/6541)
+* Remove OpenGL version from DeviceInfo [#6651](https://github.com/Applifier/unity-ads-webview/pull/6651)
+* Show target information in Non-GDPR Privacy Dialog [#6646](https://github.com/Applifier/unity-ads-webview/pull/6646)
+* Add error throwing when API is missing in browser build [#6604](https://github.com/Applifier/unity-ads-webview/pull/6604)
+* Add isCached checking support for Admob Campaigns [#6652](https://github.com/Applifier/unity-ads-webview/pull/6652)
+
+# Wed Oct 10 17:36:31 UTC 2018
+
+* Multiply battery level by 100 for AdMob signal [#6600](https://github.com/Applifier/unity-ads-webview/pull/6600)
+* ABTest for click tracking swap, request from CrossInstall [#6598](https://github.com/Applifier/unity-ads-webview/pull/6598)
+* Fix AdMob campaign loader [#6647](https://github.com/Applifier/unity-ads-webview/pull/6647)
+
+# Tue Oct  9 21:46:34 UTC 2018
+
+* Improve/Rename Reporting Privacy and Remove Other Privacies [#6601](https://github.com/Applifier/unity-ads-webview/pull/6601)
+* Improvements to Banner Lifecycle Logic [#6596](https://github.com/Applifier/unity-ads-webview/pull/6596)
+* Batching storage modifications and writes [#6454](https://github.com/Applifier/unity-ads-webview/pull/6545)
+* Use Allow Skip Flag from Configuration for Rewarded Promo [#6552](https://github.com/Applifier/unity-ads-webview/pull/6552)
+* Never serialize Asset model Session object [#6603](https://github.com/Applifier/unity-ads-webview/pull/6603)
+
+# Mon Oct  8 23:15:42 UTC 2018
+
+* AB Test various improvements to the endscreen layout in groups 16 & 17 [#6556](https://github.com/Applifier/unity-ads-webview/pull/6556)
+* AB Test Smart Close button in groups 18 & 19 [#6238](https://github.com/Applifier/unity-ads-webview/pull/6238) 
+* Fix session ad plan loading for backup campaigns [#6595](https://github.com/Applifier/unity-ads-webview/pull/6595)
+* Removed CTA button color test from groups 16, 17, 18 & 19 [#6472](https://github.com/Applifier/unity-ads-webview/pull/6576/)
+
+# Fri Oct  5 21:40:11 UTC 2018
+
+* Enable Reporting Privacy for All [#6575](https://github.com/Applifier/unity-ads-webview/pull/6575)
 * Support serialization for MRAID campaigns [#6549](https://github.com/Applifier/unity-ads-webview/pull/6549)
 * Remove Ads deps from Core [#6544](https://github.com/Applifier/unity-ads-webview/pull/6544)
 * Add CSS media queries for iPhone XS Max [#6543](https://github.com/Applifier/unity-ads-webview/pull/6543)

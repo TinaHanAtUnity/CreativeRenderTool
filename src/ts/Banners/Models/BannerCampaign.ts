@@ -3,13 +3,17 @@ import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Ads/Models/Campaign
 
 export interface IBannerCampaign extends IProgrammaticCampaign {
     markup: string | undefined;
+    width: number;
+    height: number;
 }
 
 export class BannerCampaign extends ProgrammaticCampaign<IBannerCampaign> {
     constructor(campaign: IBannerCampaign) {
         super('BannerCampaign', {
             ... ProgrammaticCampaign.Schema,
-            markup: ['string', 'undefined']
+            markup: ['string', 'undefined'],
+            width: ['number'],
+            height: ['number']
         }, campaign);
 
         if (campaign.willExpireAt) {
@@ -27,7 +31,12 @@ export class BannerCampaign extends ProgrammaticCampaign<IBannerCampaign> {
     public isConnectionNeeded(): boolean {
         return true;
     }
-
+    public getWidth(): number {
+        return this.get('width');
+    }
+    public getHeight(): number {
+        return this.get('height');
+    }
     public getMarkup(): string | undefined {
         return this.get('markup');
     }

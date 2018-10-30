@@ -5,9 +5,9 @@ import { assert } from 'chai';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { GdprManager } from 'Ads/Managers/GdprManager';
+import { Privacy } from 'Ads/Views/Privacy';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('OverlayTest', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -22,7 +22,7 @@ describe('OverlayTest', () => {
             handleInvocation,
             handleCallback
         });
-        privacy = new GDPRPrivacy(nativeBridge, sinon.createStubInstance(GdprManager), false);
+        privacy = new Privacy(nativeBridge, TestFixtures.getCampaign(), sinon.createStubInstance(GdprManager), false, false);
     });
 
     it('should render', () => {

@@ -30,13 +30,18 @@ import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCa
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { Privacy } from 'Ads/Views/Privacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('EndScreenEventHandlerTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, container: AdUnitContainer, overlay: Overlay, endScreen: PerformanceEndScreen;
+    let nativeBridge: NativeBridge;
+    let container: AdUnitContainer;
+    let overlay: Overlay;
+    let endScreen: PerformanceEndScreen;
+    let storageBridge: StorageBridge;
     let sessionManager: SessionManager;
     let performanceAdUnit: PerformanceAdUnit;
     let metaDataManager: MetaDataManager;
@@ -61,6 +66,7 @@ describe('EndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.ANDROID);
 
+            storageBridge = new StorageBridge(nativeBridge);
             campaign = TestFixtures.getCampaign();
             focusManager = new FocusManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
@@ -70,7 +76,7 @@ describe('EndScreenEventHandlerTest', () => {
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge, request);
+            sessionManager = new SessionManager(nativeBridge, request, storageBridge);
             coreConfig = TestFixtures.getCoreConfiguration();
             adsConfig = TestFixtures.getAdsConfiguration();
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -82,6 +88,7 @@ describe('EndScreenEventHandlerTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -91,7 +98,7 @@ describe('EndScreenEventHandlerTest', () => {
 
             const video = new Video('', TestFixtures.getSession());
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
+            const privacy = new Privacy(nativeBridge, campaign, gdprManager, false, false);
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
@@ -177,9 +184,8 @@ describe('EndScreenEventHandlerTest', () => {
                 });
             });
 
-            it('and API is less than 21, it should launch view intent', () => {
+            it('it should launch view intent', () => {
                 sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').resolves();
-                sinon.stub(nativeBridge, 'getApiLevel').returns(20);
 
                 endScreenEventHandler.onEndScreenDownload(downloadParameters);
 
@@ -187,20 +193,6 @@ describe('EndScreenEventHandlerTest', () => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                         'action': 'android.intent.action.VIEW',
                         'uri': performanceAdUnitParameters.campaign.getAppDownloadUrl()
-                    });
-                });
-            });
-
-            it('with appDownloadUrl and API is greater than or equal to 21, it should launch web search intent', () => {
-                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').resolves();
-                sinon.stub(nativeBridge, 'getApiLevel').returns(21);
-
-                endScreenEventHandler.onEndScreenDownload(downloadParameters);
-
-                return resolvedPromise.then(() => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
-                        'action': 'android.intent.action.WEB_SEARCH',
-                        'extras': [{ key: 'query', value: performanceAdUnitParameters.campaign.getAppDownloadUrl()}]
                     });
                 });
             });
@@ -230,62 +222,6 @@ describe('EndScreenEventHandlerTest', () => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                         'action': 'android.intent.action.VIEW',
                         'uri': 'market://foobar.com'
-                    });
-                });
-            });
-
-            it('with APK download link and API is greater than or equal to 21, it should launch web search intent', () => {
-                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
-
-                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
-                    url: 'http://foo.url.com',
-                    response: 'foo response',
-                    responseCode: 200
-                }));
-
-                sinon.stub(nativeBridge, 'getApiLevel').returns(21);
-
-                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    store: performanceAdUnitParameters.campaign.getStore(),
-                    clickAttributionUrlFollowsRedirects: true,
-                    clickAttributionUrl: 'https://blah.com?apk_download_link=https://cdn.apk.com'
-                });
-
-                return resolvedPromise.then(() => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
-                        'action': 'android.intent.action.WEB_SEARCH',
-                        'extras': [{ key: 'query', value: 'https://cdn.apk.com' }]
-                    });
-                });
-            });
-
-            it('with APK download link and API is less than 21, it should launch view intent', () => {
-                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
-
-                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
-                    url: 'http://foo.url.com',
-                    response: 'foo response',
-                    responseCode: 200
-                }));
-
-                sinon.stub(nativeBridge, 'getApiLevel').returns(20);
-
-                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    store: performanceAdUnitParameters.campaign.getStore(),
-                    clickAttributionUrlFollowsRedirects: true,
-                    clickAttributionUrl: 'https://blah.com?apk_download_link=https://cdn.apk.com'
-                });
-
-                return resolvedPromise.then(() => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
-                        'action': 'android.intent.action.VIEW',
-                        'uri': 'https://cdn.apk.com'
                     });
                 });
             });
@@ -355,13 +291,14 @@ describe('EndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.IOS);
 
+            storageBridge = new StorageBridge(nativeBridge);
             container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
             deviceInfo = TestFixtures.getIosDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge, request);
+            sessionManager = new SessionManager(nativeBridge, request, storageBridge);
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -380,12 +317,13 @@ describe('EndScreenEventHandlerTest', () => {
                 deviceInfo: deviceInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, coreConfig.isCoppaCompliant());
+            const privacy = new Privacy(nativeBridge, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),

@@ -16,6 +16,7 @@ interface IClientInfo {
     webviewVersion: string | null;
     initTimestamp: number;
     reinitialized: boolean;
+    monetizationInUse: boolean;
 }
 
 export class ClientInfo extends Model<IClientInfo> {
@@ -35,7 +36,8 @@ export class ClientInfo extends Model<IClientInfo> {
             webviewHash: ['string', 'null'],
             webviewVersion: ['string', 'null'],
             initTimestamp: ['number'],
-            reinitialized: ['boolean']
+            reinitialized: ['boolean'],
+            monetizationInUse: ['boolean']
         });
 
         this.set('platform', platform);
@@ -53,6 +55,7 @@ export class ClientInfo extends Model<IClientInfo> {
         this.set('webviewVersion', data.shift());
         this.set('initTimestamp', data.shift());
         this.set('reinitialized', data.shift());
+        this.set('monetizationInUse', false);
     }
 
     public getGameId(): string {
@@ -111,6 +114,14 @@ export class ClientInfo extends Model<IClientInfo> {
         return this.get('reinitialized');
     }
 
+    public isMonetizationInUse(): boolean {
+        return this.get('monetizationInUse');
+    }
+
+    public setMonetizationInUse(using: boolean) {
+        this.set('monetizationInUse', using);
+    }
+
     public getDTO() {
         return {
             'gameId': this.getGameId(),
@@ -126,7 +137,8 @@ export class ClientInfo extends Model<IClientInfo> {
             'webviewHash': this.getWebviewHash(),
             'webviewVersion': this.getWebviewVersion(),
             'initTimestamp': this.getInitTimestamp(),
-            'reinitialized': this.isReinitialized()
+            'reinitialized': this.isReinitialized(),
+            'monetizationInUse': this.isMonetizationInUse()
         };
     }
 }
