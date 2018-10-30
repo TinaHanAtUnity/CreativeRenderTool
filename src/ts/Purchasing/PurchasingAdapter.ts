@@ -51,7 +51,7 @@ export class OrganicPurchase {
 
     constructor(data: {[key: string]: any}) {
 
-       for (const key in data) {
+       for (const key of Object.keys(data)) {
             switch(key) {
                 case 'productId':
                     this._productId = data[key];
@@ -69,7 +69,7 @@ export class OrganicPurchase {
                     this._signature = data[key];
                     break;
                 default:
-                    break;
+                    // unknown key, ignore
             }
         }
     }
