@@ -1,5 +1,27 @@
 # Pending
 
+* Remove expired ab group test for click delay [#6861](https://github.com/Applifier/unity-ads-webview/pull/6861)
+
+# Tue Oct 30 17:52:40 UTC 2018
+
+* Fix Privacy layout on iPhone X series [#6863](https://github.com/Applifier/unity-ads-webview/pull/6863)
+* iPhone XR media queries [#6864](https://github.com/Applifier/unity-ads-webview/pull/6864)
+* Square end screen asset support [#6838](https://github.com/Applifier/unity-ads-webview/pull/6838)
+* Experiment: Skippable Rewarded Ads [#6806](https://github.com/Applifier/unity-ads-webview/pull/6806)
+* Log Promotions without product [#6780](https://github.com/Applifier/unity-ads-webview/pull/6780)
+
+# Mon Oct 29 21:07:45 UTC 2018
+
+* Refactor Backend to non-static [#6835](https://github.com/Applifier/unity-ads-webview/pull/6835)
+* Quality-of-life improvements for debugging [#6836](https://github.com/Applifier/unity-ads-webview/pull/6836)
+* Delete backup campaigns when showing an ad [#6833](https://github.com/Applifier/unity-ads-webview/pull/6833)
+* Remove autobatching exception for game ID 1448666 [#6832](https://github.com/Applifier/unity-ads-webview/pull/6832)
+* Remove APK download link hack [#6677](https://github.com/Applifier/unity-ads-webview/pull/6677)
+* VastErrorHandler supporting VAST 3.0, ready for abTest [#6812](https://github.com/Applifier/unity-ads-webview/pull/6812)
+* Remove web search intent for opening appDownloadUrl [#6810](https://github.com/Applifier/unity-ads-webview/pull/6810)
+
+# Thu Oct 25 21:49:17 UTC 2018
+
 * Remove old backup campaign implementation, use new as default [#6778](https://github.com/Applifier/unity-ads-webview/pull/6778)
 * A/B test CTA Button on Video Overlay v2 [#6807](https://github.com/Applifier/unity-ads-webview/pull/6807)
 * Remove endscreen layout A/B test [#6805](https://github.com/Applifier/unity-ads-webview/pull/6805)
