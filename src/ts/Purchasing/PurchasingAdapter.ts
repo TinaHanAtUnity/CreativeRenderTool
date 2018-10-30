@@ -1,7 +1,6 @@
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { Observable1 } from 'Core/Utilities/Observable';
 import { Model } from 'Core/Models/Model';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export interface ITransactionDetails {
     productId: string;
@@ -50,11 +49,8 @@ export class OrganicPurchase {
     private _currency: string | undefined;
     private _receiptPurchaseData: string | undefined;
     private _signature: string | undefined;
-    private _nativeBridge: NativeBridge;
 
-    //(data: { [key: string]: any })
-    constructor(nativeBridge: NativeBridge, data: { [key: string]: any } ) {
-       this._nativeBridge = nativeBridge;
+    constructor(data: { [key: string]: any } ) {
 
        for (const key in data) {
            if(key === 'productId'){
@@ -72,12 +68,10 @@ export class OrganicPurchase {
     }
 
     public getId(): string | undefined {
-        this._nativeBridge.Sdk.logDebug("JINDOU::5"+this._productId);
         return this._productId;
     }
 
     public getPrice(): number | undefined {
-        this._nativeBridge.Sdk.logDebug("JINDOU::5"+this._price);
         return this._price;
     }
 
