@@ -159,6 +159,11 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
 
         assets.push(this.getGameIcon());
 
+        const square = this.getSquare();
+        if(square) {
+            assets.push(square);
+        }
+
         const landscape = this.getLandscape();
         if(landscape) {
             assets.push(landscape);
@@ -167,11 +172,6 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         const portrait = this.getPortrait();
         if(portrait) {
             assets.push(portrait);
-        }
-
-        const square = this.getSquare();
-        if(square) {
-            assets.push(square);
         }
 
         return assets;

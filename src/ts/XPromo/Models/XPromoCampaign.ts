@@ -151,6 +151,11 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
 
         assets.push(this.getGameIcon());
 
+        const square = this.getSquare();
+        if(square) {
+            assets.push(square);
+        }
+
         const landscape = this.getLandscape();
         if(landscape) {
             assets.push(landscape);
@@ -159,11 +164,6 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
         const portrait = this.getPortrait();
         if(portrait) {
             assets.push(portrait);
-        }
-
-        const square = this.getSquare();
-        if(square) {
-            assets.push(square);
         }
 
         return assets;
