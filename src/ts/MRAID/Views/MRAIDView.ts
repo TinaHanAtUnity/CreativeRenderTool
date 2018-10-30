@@ -382,6 +382,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }));
     }
 
+    protected abstract sendMraidAnalyticsEvent(eventName: string, eventData?: any): void;
+
     protected onOpen(url: string) {
         this._handlers.forEach(handler => handler.onMraidClick(url));
     }

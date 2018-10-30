@@ -306,6 +306,16 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
+    protected sendMraidAnalyticsEvent(eventName: string, eventData?: any): void {
+        const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
+        const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
+        const backgroundTime = this._backgroundTime / 1000;
+
+        if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, eventName)) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
+        }
+    }
+
     private onIframeLoaded() {
         this._iframeLoaded = true;
 
@@ -404,10 +414,10 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private onMessage(event: MessageEvent) {
         switch(event.data.type) {
             case 'open':
-                this._handlers.forEach(handler => handler.onMraidClick(encodeURI(event.data.url)));
+                this.onOpen(encodeURI(event.data.url));
                 break;
             case 'close':
-                this._handlers.forEach(handler => handler.onMraidClose());
+                this.onClose();
                 break;
             case 'orientation':
                 let forceOrientation = Orientation.NONE;
@@ -422,31 +432,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
                     default:
                 }
-                this._handlers.forEach(handler => handler.onMraidOrientationProperties({
-                    allowOrientationChange: event.data.properties.allowOrientationChange,
-                    forceOrientation: forceOrientation
-                }));
+                this.onSetOrientationProperties(event.data.properties.allowOrientationChange, forceOrientation);
                 break;
             case 'analyticsEvent':
-                const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
-                const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
-                const backgroundTime = this._backgroundTime / 1000;
-
-                if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, event.data.event)) {
-                    this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
-                }
+                this.sendMraidAnalyticsEvent(event.data.event, event.data.eventData);
                 break;
             case 'customMraidState':
-                switch(event.data.state) {
-                    case 'completed':
-                        if(!this._placement.allowSkip() && this._closeRemaining > 5) {
-                            this._closeRemaining = 5;
-                        }
-                        break;
-                    case 'showEndScreen':
-                        break;
-                    default:
-                }
+                this.onCustomState(event.data.state);
                 break;
             case 'ar':
                 this.onAREvent(event).catch((reason) => this._nativeBridge.Sdk.logError('AR message error: ' + reason.toString()));

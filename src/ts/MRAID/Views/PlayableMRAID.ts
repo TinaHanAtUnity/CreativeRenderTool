@@ -213,7 +213,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
+    protected sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
         const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
         const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;
