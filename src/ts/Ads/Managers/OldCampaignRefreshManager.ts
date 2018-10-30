@@ -212,6 +212,8 @@ export class OldCampaignRefreshManager extends RefreshManager {
         const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
 
         if (isPromoWithoutProduct) {
+            const productID = (<PromoCampaign>campaign).getIapProductId();
+            this._nativeBridge.Sdk.logWarning(`Promo placement: ${placementId} does not have the corresponding product: ${productID} available`);
             this.onNoFill(placementId);
         } else {
             this.setPlacementReady(placementId, campaign);
