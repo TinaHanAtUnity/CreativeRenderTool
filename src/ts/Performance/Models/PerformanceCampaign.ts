@@ -2,6 +2,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
+import { Asset } from 'Ads/Models/Assets/Asset';
 
 export enum StoreName {
     APPLE,
@@ -18,8 +19,9 @@ export interface IPerformanceCampaign extends ICampaign {
     gameIcon: Image;
     rating: number;
     ratingCount: number;
-    landscapeImage: Image;
-    portraitImage: Image;
+    landscapeImage?: Image;
+    portraitImage?: Image;
+    squareImage?: Image;
     video?: Video;
     streamingVideo?: Video;
     videoPortrait?: Video;
@@ -45,8 +47,9 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             gameIcon: ['object'],
             rating: ['number'],
             ratingCount: ['number'],
-            landscapeImage: ['object'],
-            portraitImage: ['object'],
+            landscapeImage: ['object', 'undefined'],
+            portraitImage: ['object', 'undefined'],
+            squareImage: ['object', 'undefined'],
             video: ['object', 'undefined'],
             streamingVideo: ['object', 'undefined'],
             videoPortrait: ['object', 'undefined'],
@@ -91,12 +94,16 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('ratingCount');
     }
 
-    public getPortrait(): Image {
+    public getPortrait(): Image | undefined {
         return this.get('portraitImage');
     }
 
-    public getLandscape(): Image {
+    public getLandscape(): Image | undefined {
         return this.get('landscapeImage');
+    }
+
+    public getSquare(): Image | undefined {
+        return this.get('squareImage');
     }
 
     public getVideo(): Video | undefined {
@@ -148,11 +155,26 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     }
 
     public getOptionalAssets() {
-        return [
-            this.getGameIcon(),
-            this.getPortrait(),
-            this.getLandscape()
-        ];
+        const assets: Asset[] = [];
+
+        assets.push(this.getGameIcon());
+
+        const square = this.getSquare();
+        if(square) {
+            assets.push(square);
+        }
+
+        const landscape = this.getLandscape();
+        if(landscape) {
+            assets.push(landscape);
+        }
+
+        const portrait = this.getPortrait();
+        if(portrait) {
+            assets.push(portrait);
+        }
+
+        return assets;
     }
 
     public getAppDownloadUrl() {
