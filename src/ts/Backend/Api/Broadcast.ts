@@ -1,6 +1,12 @@
-export class Broadcast {
+import { BackendApi } from 'Backend/BackendApi';
 
-    public static addBroadcastListener(name: string, actions: string[]) {
+export class Broadcast extends BackendApi {
+
+    public addBroadcastListener(name: string, actions: string[]) {
+        return;
+    }
+
+    public removeBroadcastListener(name: string) {
         return;
     }
 

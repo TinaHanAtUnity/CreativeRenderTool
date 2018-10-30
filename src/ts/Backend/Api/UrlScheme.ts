@@ -1,6 +1,8 @@
-export class UrlScheme {
+import { BackendApi } from 'Backend/BackendApi';
 
-    public static open(url: string) {
+export class UrlScheme extends BackendApi {
+
+    public open(url: string) {
         window.open(url);
     }
 

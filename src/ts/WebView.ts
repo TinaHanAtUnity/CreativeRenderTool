@@ -335,9 +335,7 @@ export class WebView {
             return this._sessionManager.sendUnsentSessions();
         }).then(() => {
             if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                if(!CustomFeatures.isAlwaysAutobatching(this._clientInfo.getGameId())) {
-                    this._nativeBridge.setAutoBatchEnabled(false);
-                }
+                this._nativeBridge.setAutoBatchEnabled(false);
                 this._nativeBridge.Request.Android.setMaximumPoolSize(1);
             } else {
                 this._nativeBridge.Request.setConcurrentRequestCount(1);
@@ -576,6 +574,8 @@ export class WebView {
                 } else {
                     this._nativeBridge.Request.setConcurrentRequestCount(8);
                 }
+
+                this._backupCampaignManager.deleteBackupCampaigns();
             });
         });
     }
@@ -592,9 +592,7 @@ export class WebView {
         this._showing = false;
 
         if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            if(!CustomFeatures.isAlwaysAutobatching(this._clientInfo.getGameId())) {
-                this._nativeBridge.setAutoBatchEnabled(false);
-            }
+            this._nativeBridge.setAutoBatchEnabled(false);
             this._nativeBridge.Request.Android.setMaximumPoolSize(1);
         } else {
             this._nativeBridge.Request.setConcurrentRequestCount(1);
