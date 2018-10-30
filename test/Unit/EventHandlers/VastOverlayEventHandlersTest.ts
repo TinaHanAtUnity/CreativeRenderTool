@@ -147,7 +147,7 @@ describe('VastOverlayEventHandlersTest', () => {
                 const vastEndScreenParameters: IVastEndscreenParameters = {
                     campaign: vastAdUnitParameters.campaign,
                     clientInfo: vastAdUnitParameters.clientInfo,
-                    seatId: vastAdUnitParameters.campaign.getSeatId(),
+                    country: vastAdUnitParameters.coreConfig.getCountry(),
                     showPrivacyDuringEndscreen: false
                 };
                 const vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);

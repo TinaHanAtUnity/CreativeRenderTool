@@ -27,7 +27,7 @@ describe('VastEndScreen', () => {
         vastEndscreenParameters = {
             clientInfo: sinon.createStubInstance(ClientInfo),
             campaign: TestFixtures.getCompanionVastCampaign(),
-            seatId: 0,
+            country: '',
             showPrivacyDuringEndscreen: true
         };
 

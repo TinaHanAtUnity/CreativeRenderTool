@@ -316,7 +316,7 @@ describe('VastVideoEventHandler tests', () => {
             vastEndScreenParameters = {
                 campaign: vastAdUnitParameters.campaign,
                 clientInfo: vastAdUnitParameters.clientInfo,
-                seatId: vastAdUnitParameters.campaign.getSeatId(),
+                country: vastAdUnitParameters.coreConfig.getCountry(),
                 showPrivacyDuringEndscreen: false
             };
             vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);

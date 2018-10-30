@@ -19,7 +19,7 @@ export interface IVastEndScreenHandler {
 export interface IVastEndscreenParameters {
     campaign: VastCampaign;
     clientInfo: ClientInfo;
-    seatId: number | undefined;
+    country: string | undefined;
     showPrivacyDuringEndscreen: boolean;
 }
 
@@ -29,7 +29,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     private _privacy: AbstractPrivacy;
     private _callButtonEnabled: boolean = true;
     private _campaign: VastCampaign;
-    private _seatId: number | undefined;
+    private _country: string | undefined;
     private _showPrivacyDuringEndscreen: boolean;
 
     constructor(nativeBridge: NativeBridge, parameters: IVastEndscreenParameters, privacy: AbstractPrivacy) {
@@ -37,7 +37,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
 
         this._campaign = parameters.campaign;
         this._template = new Template(VastEndScreenTemplate);
-        this._seatId = parameters.seatId;
+        this._country = parameters.country;
         this._showPrivacyDuringEndscreen = parameters.showPrivacyDuringEndscreen;
 
         if(this._campaign) {
@@ -90,7 +90,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     public render(): void {
         super.render();
 
-        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
+        if (this._country === 'FI') {
             const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
             if (tencentAdTag) {
                 tencentAdTag.innerText = '广告';

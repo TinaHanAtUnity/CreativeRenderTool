@@ -7,8 +7,8 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 export class PerformanceVideoOverlayWithCTAButton extends NewVideoOverlay implements IPrivacyHandler {
     private _campaign: Campaign;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, campaign: PerformanceCampaign, disablePrivacyDuringVideo?: boolean, seatId?: number) {
-        super(nativeBridge, muted, language, gameId, privacy, showGDPRBanner, disablePrivacyDuringVideo, seatId);
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, campaign: PerformanceCampaign, disablePrivacyDuringVideo?: boolean, country?: string) {
+        super(nativeBridge, muted, language, gameId, privacy, showGDPRBanner, disablePrivacyDuringVideo, country);
 
         this._campaign = campaign;
         this._templateData.gameIcon = campaign.getGameIcon() ? campaign.getGameIcon().getUrl() : '';

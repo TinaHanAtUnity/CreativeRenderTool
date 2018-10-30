@@ -37,9 +37,9 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _showGDPRBanner: boolean = false;
     private _showPrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
-    private _seatId: number | undefined;
+    private _country: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean, seatId?: number) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean, country?: string) {
         super(nativeBridge, 'new-video-overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
@@ -47,7 +47,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._showPrivacyDuringVideo = showPrivacyDuringVideo;
         this._gameId = gameId;
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
-        this._seatId = seatId;
+        this._country = country;
 
         this._templateData = {
             muted
@@ -129,10 +129,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this.setupElementReferences();
         this.choosePrivacyShown();
 
-        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
-            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
-            if (tencentAdTag) {
-                tencentAdTag.innerText = '广告';
+        if (this._country === 'FI') {
+            const chinaAdTag = <HTMLElement>this._container.querySelector('.china-advertisement');
+            if (chinaAdTag) {
+                chinaAdTag.innerText = '广告';
             }
         }
 
