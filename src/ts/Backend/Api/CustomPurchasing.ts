@@ -1,13 +1,15 @@
-export class CustomPurchasing {
-    public static available() {
+import { BackendApi } from 'Backend/BackendApi';
+
+export class CustomPurchasing extends BackendApi {
+    public available() {
         return false;
     }
 
-    public static purchaseItem(productId: string, extras: any) {
+    public purchaseItem(productId: string, extras: any) {
         // EMPTY
     }
 
-    public static refreshCatalog() {
+    public refreshCatalog() {
         // EMPTY
     }
 }
