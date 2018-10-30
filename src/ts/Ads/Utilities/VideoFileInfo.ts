@@ -74,6 +74,6 @@ export class VideoFileInfo {
         });
     }
 
-    private static readonly _maxVideoDuration = 40000;
+    public static readonly _maxVideoDuration = 40000;
 
 }
