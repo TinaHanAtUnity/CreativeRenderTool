@@ -12,8 +12,8 @@ def waitWebviewDeployed(webviewBranch) {
 }
 
 def main() {
-    //TODO: use if clause below instead before pushing to master
-    def webviewBranch = env.BRANCH_NAME + '/' + env.GIT_COMMIT
+    commitId = sh(returnStdout: true, script: "git log --format=\"%H\" -n 1")
+    def webviewBranch = env.BRANCH_NAME + '/' + commitId
     def webviewDeployed = false
     //if (env.BRANCH_NAME =~ /^PR-/) {
     if (env.BRANCH_NAME =~ /feature\/jenkinsfile/) {
