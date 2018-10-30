@@ -52,11 +52,6 @@ import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParamete
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 import { ProductInfo, IProductInfo, ProductInfoType } from 'Promo/Models/ProductInfo';
-import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
-import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
-import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
-import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
-import { ProgrammaticStaticInterstitialParser } from 'Display/Parsers/ProgrammaticStaticInterstitialParser';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
