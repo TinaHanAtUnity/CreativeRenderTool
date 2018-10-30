@@ -150,15 +150,6 @@
         </div>
     </div>
     <% } %>
-    <div class="pop-up-content build-side">
-        <% for (var k in data.buildInformation) { %>
-        <p class="build-information-item">
-            <span class="build-information-key">
-                <%= k %>:</span> <span class="build-information-value">
-                <%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>
-        </p>
-        <% } %>
-    </div>
     <div class="pop-up-content report-side">
         <span class="report-title centered-title">Report Advertisement</span>
         <span class="report-dialog">Are you experiencing issues with your current advertisement? Report to Unity Ads directly and let us know!</span>
@@ -179,8 +170,7 @@
     </div>
     <div class="fade-out-gradient-separator"></div>
     <div class="pop-up-footer">
-        <div class="left-side-link"></div>
+        <div class="left-side-link">Privacy info 👁</div>
         <div class="close-button">Confirm</div>
-        <div class="middle-link"></div>
     </div>
 </div>

@@ -11,9 +11,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FinishState } from 'Core/Constants/FinishState';
 
 enum PrivacyCardState {
-    INITIAL,
     PRIVACY,
-    BUILD,
     REPORT
 }
 
@@ -30,23 +28,22 @@ export class Privacy extends AbstractPrivacy {
     private _onReport: Observable2<Campaign, string> = new Observable2();
     private _gdprManager: GdprManager;
     private _dataDeletionConfirmation: boolean = false;
-    private _currentState : number = -1;
+    private _currentState: PrivacyCardState = PrivacyCardState.PRIVACY;
     private _campaign: Campaign;
     private _reportSent: boolean = false;
     private _gdprEnabled: boolean = false;
     private _personalInfoObtained: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: Campaign,
-                gdprManager: GdprManager, gdprEnabled: boolean,
-                isCoppaCompliant: boolean) {
+    constructor(nativeBridge: NativeBridge, campaign: Campaign, gdprManager: GdprManager, isGDPREnabled: boolean, isCoppaCompliant: boolean) {
 
-        super(nativeBridge, isCoppaCompliant, gdprEnabled, 'privacy');
+        super(nativeBridge, isCoppaCompliant, isGDPREnabled, 'privacy');
+
         this._templateData.badAdKeys = Object.keys(ReportReason);
         this._templateData.badAdReasons = (<string[]>(<any>Object).values(ReportReason));
 
         this._template = new Template(PrivacyTemplate);
         this._campaign = campaign;
-        this._gdprEnabled = gdprEnabled;
+        this._gdprEnabled = isGDPREnabled;
         this._gdprManager = gdprManager;
 
         this._bindings = [
@@ -57,7 +54,7 @@ export class Privacy extends AbstractPrivacy {
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onStateClick(event, true),
+                listener: (event: Event) => this.changePrivacyState(event),
                 selector: '.left-side-link'
             },
             {
@@ -74,11 +71,6 @@ export class Privacy extends AbstractPrivacy {
                 event: 'click',
                 listener: (event: Event) => this.onDataDeletionConfirmation(event),
                 selector: '#data-deletion-confirm'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onStateClick(event, false),
-                selector: '.middle-link'
             },
             {
                 event: 'click',
@@ -112,11 +104,6 @@ export class Privacy extends AbstractPrivacy {
                 this._dataDeletionConfirmation = false;
             };
         }
-    }
-
-    public render(): void {
-        super.render();
-        this.setCardState(false);
     }
 
     protected onCloseEvent(event: Event): void {
@@ -158,11 +145,6 @@ export class Privacy extends AbstractPrivacy {
         activeRadioButton.checked = true;
     }
 
-    private onStateClick(event: Event, isLeftClick: boolean): void {
-        event.preventDefault();
-        this.setCardState(isLeftClick);
-    }
-
     private onReportAd(event: Event): void {
         event.preventDefault();
         if (!this._reportSent) {
@@ -192,66 +174,22 @@ export class Privacy extends AbstractPrivacy {
         }
     }
 
-    private setCardState(isLeftClick: boolean) {
+    private changePrivacyState(event: Event) {
+        event.preventDefault();
 
-        const leftEl = <HTMLDivElement>this._container.querySelector('.left-side-link');
-        const middleEl = <HTMLDivElement>this._container.querySelector('.middle-link');
+        const leftSideLink = <HTMLDivElement>this._container.querySelector('.left-side-link');
         const classList = this._container.classList;
-        const rCard = 'Report Ad ⚑';
-        const pCard = 'Privacy info 👁';
-        const bCard = 'Build info ⚙';
+        const reportButtonText = 'Report Ad ⚑';
+        const privacyButtonText = 'Privacy info 👁';
 
-        switch(this._currentState) {
-
-            // Privacy info showing
-            case PrivacyCardState.PRIVACY: {
-                leftEl.innerText = pCard;
-                if (isLeftClick) {
-                    this._currentState = PrivacyCardState.BUILD;
-                    middleEl.innerText = rCard;
-                    classList.add('build');
-                } else {
-                    this._currentState = PrivacyCardState.REPORT;
-                    middleEl.innerText = bCard;
-                    classList.add('report');
-                }
-                break;
-            }
-            // Build info showing
-            case PrivacyCardState.BUILD: {
-                classList.remove('build');
-                if (isLeftClick) {
-                    this._currentState = PrivacyCardState.PRIVACY;
-                    leftEl.innerText = bCard;
-                    middleEl.innerText = rCard;
-                } else {
-                    this._currentState = PrivacyCardState.REPORT;
-                    leftEl.innerText = pCard;
-                    middleEl.innerText = bCard;
-                    classList.add('report');
-                }
-                break;
-            }
-            // Report Ad showing
-            case PrivacyCardState.REPORT: {
-                classList.remove('report');
-                middleEl.innerText = rCard;
-                if (isLeftClick) {
-                    this._currentState = PrivacyCardState.PRIVACY;
-                    leftEl.innerText = bCard;
-                } else {
-                    this._currentState = PrivacyCardState.BUILD;
-                    leftEl.innerText = pCard;
-                    classList.add('build');
-                }
-                break;
-            }
-            // Initial Configuration
-            default: {
-                this._currentState = PrivacyCardState.PRIVACY;
-                leftEl.innerText = bCard;
-                middleEl.innerText = rCard;
-            }
+        if (this._currentState === PrivacyCardState.PRIVACY) {
+            leftSideLink.innerText = privacyButtonText;
+            this._currentState = PrivacyCardState.REPORT;
+            classList.add('report');
+        } else if (this._currentState === PrivacyCardState.REPORT) {
+            leftSideLink.innerText = reportButtonText;
+            this._currentState = PrivacyCardState.PRIVACY;
+            classList.remove('report');
         }
     }
 

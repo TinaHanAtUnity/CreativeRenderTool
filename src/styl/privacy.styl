@@ -18,7 +18,7 @@
       text-align: center;
     }
   }
-  .build-side,
+
   .report-side {
     display: none;
     font-size: $default-size * $default-font-size * .75;
@@ -53,21 +53,6 @@
     }
   }
 
-  &.build {
-    .build-side {
-      display: block;
-      word-wrap: break-word;
-
-      .build-information-key {
-        font-weight: 800;
-      }
-    }
-
-    .pop-up-content:not(.build-side) {
-      display: none;
-    }
-  }
-
   &.report {
     .report-side {
       display: block;
@@ -78,10 +63,6 @@
       display: none;
     }
   }
-}
-
-.build-information-item {
-  margin: 0;
 }
 
 body.android #privacy .gdpr-text-android,
