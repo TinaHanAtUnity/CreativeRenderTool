@@ -2,6 +2,8 @@
 
 * Remove expired ab group test for click delay [#6861](https://github.com/Applifier/unity-ads-webview/pull/6861)
 * Fix error diagnostics for Content Types [#6862](https://github.com/Applifier/unity-ads-webview/pull/6862)
+* Update Error handling for Videos over 40 seconds [#6886](https://github.com/Applifier/unity-ads-webview/pull/6886)
+* Vast media selector abTest using auction feature flag [#6859](https://github.com/Applifier/unity-ads-webview/pull/6859)
 
 # Tue Oct 30 17:52:40 UTC 2018
 
