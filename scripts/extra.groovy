@@ -1,3 +1,5 @@
+import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
+
 def waitWebviewDeployed(webviewBranch) {
     timeout(10) {
         def CONFIG_URL = "https://config.unityads.unity3d.com/webview/${webviewBranch}/test/config.json"
