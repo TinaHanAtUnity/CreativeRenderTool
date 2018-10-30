@@ -1,114 +1,116 @@
-export class Sdk {
+import { BackendApi } from 'Backend/BackendApi';
 
-    public static loadComplete() {
+export class Sdk extends BackendApi {
+
+    public loadComplete() {
         return [
-            Sdk._gameId,
-            Sdk._testMode,
-            Sdk._appName,
-            Sdk._appVersion,
-            Sdk._sdkVersion,
-            Sdk._sdkVersionName,
-            Sdk._debuggable,
-            Sdk._configUrl,
-            Sdk._webViewUrl,
-            Sdk._webViewHash,
-            Sdk._webViewVersion,
-            Sdk._initTimeStamp,
-            Sdk._reinitialized
+            this._gameId,
+            this._testMode,
+            this._appName,
+            this._appVersion,
+            this._sdkVersion,
+            this._sdkVersionName,
+            this._debuggable,
+            this._configUrl,
+            this._webViewUrl,
+            this._webViewHash,
+            this._webViewVersion,
+            this._initTimeStamp,
+            this._reinitialized
         ];
     }
 
-    public static initComplete() {
+    public initComplete() {
         return;
     }
 
-    public static logError(message: string) {
+    public logError(message: string) {
         // tslint:disable:no-console
         console.error(message);
         // tslint:enable:no-console
     }
 
-    public static logWarning(message: string) {
+    public logWarning(message: string) {
         // tslint:disable:no-console
         console.warn(message);
         // tslint:enable:no-console
     }
 
-    public static logInfo(message: string) {
+    public logInfo(message: string) {
         // tslint:disable:no-console
         console.info(message);
         // tslint:enable:no-console
     }
 
-    public static logDebug(message: string) {
+    public logDebug(message: string) {
         // tslint:disable:no-console
         console.log(message);
         // tslint:enable:no-console
     }
 
-    public static setGameId(gameId: string) {
-        Sdk._gameId = gameId;
+    public setGameId(gameId: string) {
+        this._gameId = gameId;
     }
 
-    public static setTestMode(testMode: boolean) {
-        Sdk._testMode = testMode;
+    public setTestMode(testMode: boolean) {
+        this._testMode = testMode;
     }
 
-    public static setAppName(appName: string) {
-        Sdk._appName = appName;
+    public setAppName(appName: string) {
+        this._appName = appName;
     }
 
-    public static setAppVersion(appVersion: string) {
-        Sdk._appVersion = appVersion;
+    public setAppVersion(appVersion: string) {
+        this._appVersion = appVersion;
     }
 
-    public static setSdkVersion(sdkVersion: number) {
-        Sdk._sdkVersion = sdkVersion;
+    public setSdkVersion(sdkVersion: number) {
+        this._sdkVersion = sdkVersion;
     }
 
-    public static setSdkVersionName(sdkVersionName: string) {
-        Sdk._sdkVersionName = sdkVersionName;
+    public setSdkVersionName(sdkVersionName: string) {
+        this._sdkVersionName = sdkVersionName;
     }
 
-    public static setDebuggable(debuggable: boolean) {
-        Sdk._debuggable = debuggable;
+    public setDebuggable(debuggable: boolean) {
+        this._debuggable = debuggable;
     }
 
-    public static setConfigUrl(configUrl: string) {
-        Sdk._configUrl = configUrl;
+    public setConfigUrl(configUrl: string) {
+        this._configUrl = configUrl;
     }
 
-    public static setWebViewUrl(webViewUrl: string) {
-        Sdk._webViewUrl = webViewUrl;
+    public setWebViewUrl(webViewUrl: string) {
+        this._webViewUrl = webViewUrl;
     }
 
-    public static setWebViewHash(webViewHash: string | null) {
-        Sdk._webViewHash = webViewHash;
+    public setWebViewHash(webViewHash: string | null) {
+        this._webViewHash = webViewHash;
     }
 
-    public static setWebViewVersion(webViewVersion: string) {
-        Sdk._webViewVersion = webViewVersion;
+    public setWebViewVersion(webViewVersion: string) {
+        this._webViewVersion = webViewVersion;
     }
 
-    public static setInitTimeStamp(initTimeStamp: number) {
-        Sdk._initTimeStamp = initTimeStamp;
+    public setInitTimeStamp(initTimeStamp: number) {
+        this._initTimeStamp = initTimeStamp;
     }
 
-    public static setReinitialized(reinitialized: boolean) {
-        Sdk._reinitialized = reinitialized;
+    public setReinitialized(reinitialized: boolean) {
+        this._reinitialized = reinitialized;
     }
 
-    private static _gameId: string = '345';
-    private static _testMode: boolean = true;
-    private static _appName: string = 'com.test.app.name';
-    private static _appVersion: string = '1.2.3-appversion';
-    private static _sdkVersion: number = 2000;
-    private static _sdkVersionName: string = '2.0.0-sdkversion';
-    private static _debuggable: boolean = false;
-    private static _configUrl: string = 'https://test.config.url';
-    private static _webViewUrl: string = 'https://test.webview.url';
-    private static _webViewHash: string | null = null;
-    private static _webViewVersion: string = '2.0.0.-webviewversion';
-    private static _initTimeStamp: number = 12345;
-    private static _reinitialized: boolean = false;
+    private _gameId: string = '345';
+    private _testMode: boolean = true;
+    private _appName: string = 'com.test.app.name';
+    private _appVersion: string = '1.2.3-appversion';
+    private _sdkVersion: number = 2000;
+    private _sdkVersionName: string = '2.0.0-sdkversion';
+    private _debuggable: boolean = false;
+    private _configUrl: string = 'https://test.config.url';
+    private _webViewUrl: string = 'https://test.webview.url';
+    private _webViewHash: string | null = null;
+    private _webViewVersion: string = '2.0.0.-webviewversion';
+    private _initTimeStamp: number = 12345;
+    private _reinitialized: boolean = false;
 }
