@@ -1,3 +1,7 @@
+# Pending
+
+* Remove expired ab group test for click delay [#6861](https://github.com/Applifier/unity-ads-webview/pull/6861)
+
 # Tue Oct 30 17:52:40 UTC 2018
 
 * Fix Privacy layout on iPhone X series [#6863](https://github.com/Applifier/unity-ads-webview/pull/6863)
