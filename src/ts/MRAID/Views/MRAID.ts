@@ -160,7 +160,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 break;
 
             case 'close':
-                this._handlers.forEach(handler => handler.onMraidClose());
+                this.onClose();
                 break;
 
             case 'orientation':
@@ -176,21 +176,14 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
                     default:
                 }
-                this._handlers.forEach(handler => handler.onMraidOrientationProperties({
-                    allowOrientationChange: event.data.properties.allowOrientationChange,
-                    forceOrientation: forceOrientation
-                }));
+                this.onSetOrientationProperties(event.data.properties.allowOrientationChange, forceOrientation);
                 break;
             case 'analyticsEvent':
                 this.sendMraidAnalyticsEvent(event.data.event, event.data.eventData);
                 break;
 
             case 'customMraidState':
-                if(event.data.state === 'completed') {
-                    if(!this._placement.allowSkip() && this._closeRemaining > 5) {
-                        this._closeRemaining = 5;
-                    }
-                }
+                this.onCustomState(event.data.state);
                 break;
 
             default:
@@ -201,6 +194,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         if (!this._callButtonEnabled) {
             return;
         }
-        this._handlers.forEach(handler => handler.onMraidClick(url));
+        this.onOpen(url);
     }
 }

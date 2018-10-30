@@ -229,10 +229,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private onMessage(event: MessageEvent) {
         switch(event.data.type) {
             case 'open':
-                this._handlers.forEach(handler => handler.onMraidClick(encodeURI(event.data.url)));
+                this.onOpen(encodeURI(event.data.url));
                 break;
             case 'close':
-                this._handlers.forEach(handler => handler.onMraidClose());
+                this.onClose();
                 break;
             case 'sendStats':
                 this.updateStats({
@@ -254,25 +254,13 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
                     default:
                 }
-                this._handlers.forEach(handler => handler.onMraidOrientationProperties({
-                    allowOrientationChange: event.data.properties.allowOrientationChange,
-                    forceOrientation: forceOrientation
-                }));
+                this.onSetOrientationProperties(event.data.properties.allowOrientationChange, forceOrientation);
                 break;
             case 'analyticsEvent':
                 this.sendMraidAnalyticsEvent(event.data.event, event.data.eventData);
                 break;
             case 'customMraidState':
-                switch(event.data.state) {
-                    case 'completed':
-                        if(!this._placement.allowSkip() && this._closeRemaining > 5) {
-                            this._closeRemaining = 5;
-                        }
-                        break;
-                    case 'showEndScreen':
-                        break;
-                    default:
-                }
+                this.onCustomState(event.data.state);
                 break;
             default:
         }
