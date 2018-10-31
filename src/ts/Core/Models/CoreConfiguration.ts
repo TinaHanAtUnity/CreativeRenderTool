@@ -62,8 +62,7 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
     }
 
     public getAbGroup(): ABGroup {
-        // return this.get('abGroup');
-        return ABGroupBuilder.getAbGroup(99);
+        return this.get('abGroup');
     }
 
     public getProperties(): string {

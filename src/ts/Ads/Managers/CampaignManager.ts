@@ -392,7 +392,6 @@ export class CampaignManager {
                     if(trackingId) {
                         if(json.tracking[trackingId]) {
                             trackingUrls = json.tracking[trackingId];
-                            // todo: validate tracking URLs with Core/Utilities/Url.isValid
                         } else {
                             SessionDiagnostics.trigger('invalid_auction_tracking_id', {
                                 mediaId: mediaId,
