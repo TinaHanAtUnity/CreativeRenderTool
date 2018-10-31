@@ -12,28 +12,56 @@ export interface IUrl {
 
 export class Url {
 
-    public static encode(url: string): string {
+    private static applyEncode(url: string, encodeFunc: (url: string) => string): string {
         if(url) {
             let encodedUrl = '';
             let i = 0;
-
             while(i < url.length) {
                 // Skip already encoded URL characters
-                if (url[i] === '%' && (url.length - i >= 3) && Url.isNumber(url[i + 1]) && Url.isNumber(url[i + 2])) {
+                if(url[i] === '%' && (url.length - i) >=3 && Url.isNumber(url[i + 1]) && Url.isNumber(url[i + 2])) {
                     encodedUrl += url[i++];
                     encodedUrl += url[i++];
                     encodedUrl += url[i++];
                     continue;
                 }
 
-                encodedUrl += encodeURI(url[i]);
+                encodedUrl += encodeFunc(url[i]);
                 i++;
             }
-
             return encodedUrl;
         }
-
         return url;
+    }
+
+    public static encode(url: string): string {
+        return this.applyEncode(url, (str: string) => {
+            return encodeURI(str);
+        });
+    }
+
+    public static encodeParam(param: string): string {
+        return this.applyEncode(param, (str: string) => {
+            return encodeURIComponent(str);
+        });
+    }
+
+    public static encodeUrlWithQueryParams(url: string): string {
+        const queryIndex = url.indexOf('?');
+        if (queryIndex === -1) {
+            return Url.encode(url);
+        }
+
+        const urlAndQuery: string[] = url.split('?');
+        const uri: string = urlAndQuery[0];
+        const queryParams: string[] = urlAndQuery[1].split('&');
+        const encodedQueryPairs: string[] = [];
+        for (const queryPair of queryParams) {
+            const queryParam = queryPair.split('=');
+            encodedQueryPairs.push(Url.encodeParam(queryParam[0]) + '=' + Url.encodeParam(queryParam[1]));
+        }
+
+        const encodedUri = Url.encode(uri);
+        return `${encodedUri}?${encodedQueryPairs.join('&')}`;
     }
 
     public static parse(url: string): IUrl {
