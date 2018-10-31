@@ -388,7 +388,7 @@ export class CampaignManager {
 
                 if(mediaId) {
                     const trackingId: string = json.placements[placement].trackingId;
-                    let trackingUrls: { [eventName: string]: string[] } | undefined = undefined;
+                    let trackingUrls: { [eventName: string]: string[] } | undefined;
                     if(trackingId) {
                         if(json.tracking[trackingId]) {
                             trackingUrls = json.tracking[trackingId];

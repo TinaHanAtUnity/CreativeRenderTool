@@ -1,6 +1,5 @@
-// todo: fix tests
-/*
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { assert } from 'chai';
 
 import OnProgrammaticMraidPlcCampaign from 'json/OnProgrammaticMraidPlcCampaign.json';
@@ -13,11 +12,12 @@ describe('AuctionResponse', () => {
             const mediaId: string = 'UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85';
             const campaignObject: any = json.media[mediaId];
             const correlationId = json.correlationId;
-            const placements: string[] = [];
+            const placements: Array<AuctionPlacement> = [];
 
             for(const placement in json.placements) {
                 if(json.placements.hasOwnProperty(placement)) {
-                    placements.push(placement);
+                    const auctionPlacement = new AuctionPlacement(placement, mediaId);
+                    placements.push(auctionPlacement);
                 }
             }
 
@@ -38,4 +38,3 @@ describe('AuctionResponse', () => {
         });
     });
 });
-*/

@@ -1,6 +1,5 @@
-// todo: fix tests
-/*
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { Session } from 'Ads/Models/Session';
 import { assert } from 'chai';
 
@@ -16,7 +15,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('ProgrammaticMraidParser', () => {
-    const placements = ['TestPlacement'];
+    const placementId = 'TestPlacement';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
 
@@ -40,7 +39,8 @@ describe('ProgrammaticMraidParser', () => {
             let campaign: MRAIDCampaign;
 
             const parse = (data: any) => {
-                const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                const auctionPlacement = new AuctionPlacement(placementId, mediaId);
+                const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                 return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <MRAIDCampaign>parsedCampaign;
                 });
@@ -66,4 +66,3 @@ describe('ProgrammaticMraidParser', () => {
         });
     });
 });
-*/
