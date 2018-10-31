@@ -104,6 +104,7 @@ export class Request extends BackendApi {
                 this._backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
             };
             xhr.open('POST', url);
+            xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(body);
             return;
         }
