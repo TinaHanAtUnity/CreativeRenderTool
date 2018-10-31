@@ -603,7 +603,7 @@ export class CampaignManager {
             const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._nativeBridge, this._request);
             campaignErrorHandler.handleCampaignError(campaignError);
         }
-        return this.handleErrorWrapper(campaignError, placements, `parse_campaign_${contentType.replace('/', '_')}_error`, session);
+        return this.handleErrorWrapper(campaignError, placements, `parse_campaign_${contentType.replace(/[\/-]/g, '_')}_error`, session);
     }
 
     private getBaseUrl(): string {
