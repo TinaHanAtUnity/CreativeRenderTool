@@ -343,6 +343,8 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
             this._container.style.display = 'none';
+            /* tslint:disable:no-unused-expression */
+            this._container.offsetHeight;
             /* tslint:enable:no-unused-expression */
             this._container.style.display = 'block';
             return;
