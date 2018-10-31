@@ -89,6 +89,43 @@ describe('UrlTest', () => {
         });
     });
 
+    describe('encoding url with params', () => {
+        it('should encode unsafe characters in param', () => {
+            const url = 'http://test.com?param=#%{}|Hello[]^\\';
+            assert.equal(Url.encodeUrlWithQueryParams(url), 'http://test.com?param=%23%25%7B%7D%7CHello%5B%5D%5E%5C', 'Url not encoded as expected');
+        });
+
+        it('should not encode already encoded stuff', () => {
+            const url = 'http://test.com?param=|Hello|%20|HelloAgain|';
+            assert.equal(Url.encodeUrlWithQueryParams(url), 'http://test.com?param=%7CHello%7C%20%7CHelloAgain%7C', 'Url not encoded as expected');
+        });
+
+        it('should encode utf8 characters', () => {
+            const url = 'http://test.com?param=%7CHello%7C%20%7CHelloAgain%7CFRVideo19unity封面.png';
+            assert.equal(Url.encodeUrlWithQueryParams(url), 'http://test.com?param=%7CHello%7C%20%7CHelloAgain%7CFRVideo19unity%E5%B0%81%E9%9D%A2.png', 'Url not encoded as expected');
+        });
+
+        it('should encode %', () => {
+            const url = 'http://test.com?param=%7C%%7C%25';
+            assert.equal(Url.encodeUrlWithQueryParams(url), 'http://test.com?param=%7C%25%7C%25', 'Url not encoded as expected');
+        });
+
+        it('should encode % in the end', () => {
+            const url = 'http://test.com?param=%';
+            assert.equal(Url.encodeUrlWithQueryParams(url), 'http://test.com?param=%25', 'Url not encoded as expected');
+        });
+
+        it('should encode % in wrong url escape', () => {
+            const url = 'http://test.com?param=%2';
+            assert.equal(Url.encodeUrlWithQueryParams(url), 'http://test.com?param=%252', 'Url not encoded as expected');
+        });
+
+        it('should encode % in wrong url escape with letters', () => {
+            const url = 'http://test.com?param=%wb';
+            assert.equal(Url.encodeUrlWithQueryParams(url), 'http://test.com?param=%25wb', 'Url not encoded as expected');
+        });
+    });
+
     describe('validating UTF-8', () => {
         it('should allow unicode utf-8 characters', () => {
             let url = 'https://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
