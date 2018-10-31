@@ -4,7 +4,11 @@ import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { ABGroup } from 'Core/Models/ABGroup';
+import {
+    ABGroup,
+    GreenEndScreenButtonColorTest,
+    NativeGreenEndScreenButtonColorTest
+} from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { View } from 'Core/Views/View';
@@ -90,14 +94,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     public render(): void {
         super.render();
-
         if (this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
-        }
-
-        const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
-        if (ctaButtonColor) {
-            (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
         }
 
         const endScreenAlt = this.getEndscreenAlt();
@@ -114,6 +112,28 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         if (this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() <= 19) {
             this._container.classList.add('old-androids');
         }
+
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this.addCustomDownloadButtonColor();
+         } else {
+            const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
+            if (ctaButtonColor) {
+                (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
+            }
+         }
+    }
+
+    private addCustomDownloadButtonColor(): void {
+        let color: string;
+
+        if (GreenEndScreenButtonColorTest.isValid(this._abGroup)) {
+            color = '#83CD0C';
+        } else if (NativeGreenEndScreenButtonColorTest.isValid(this._abGroup)) {
+            color = '#A4C639';
+        } else {
+            return;
+        }
+        (<HTMLElement>this._container.querySelector('.download-container')).style.background = color;
     }
 
     public show(): void {
