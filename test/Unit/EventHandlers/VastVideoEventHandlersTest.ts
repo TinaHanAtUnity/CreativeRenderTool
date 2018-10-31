@@ -316,8 +316,7 @@ describe('VastVideoEventHandler tests', () => {
             vastEndScreenParameters = {
                 campaign: vastAdUnitParameters.campaign,
                 clientInfo: vastAdUnitParameters.clientInfo,
-                seatId: vastAdUnitParameters.campaign.getSeatId(),
-                showPrivacyDuringEndscreen: false
+                seatId: vastAdUnitParameters.campaign.getSeatId()
             };
             vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
             sinon.spy(vastEndScreen, 'show');

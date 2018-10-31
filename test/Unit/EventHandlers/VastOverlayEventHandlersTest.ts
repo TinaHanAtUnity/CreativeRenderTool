@@ -147,8 +147,7 @@ describe('VastOverlayEventHandlersTest', () => {
                 const vastEndScreenParameters: IVastEndscreenParameters = {
                     campaign: vastAdUnitParameters.campaign,
                     clientInfo: vastAdUnitParameters.clientInfo,
-                    seatId: vastAdUnitParameters.campaign.getSeatId(),
-                    showPrivacyDuringEndscreen: false
+                    seatId: vastAdUnitParameters.campaign.getSeatId()
                 };
                 const vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
                 sinon.spy(vastEndScreen, 'show');

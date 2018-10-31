@@ -38,8 +38,9 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _showPrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
     private _seatId: number | undefined;
+    private _isVastVideoWithEndcard: boolean | undefined;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean, seatId?: number) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean, seatId?: number, isVastVideoWithEndcard?: boolean) {
         super(nativeBridge, 'new-video-overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
@@ -48,6 +49,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._gameId = gameId;
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
         this._seatId = seatId;
+        this._isVastVideoWithEndcard = isVastVideoWithEndcard;
 
         this._templateData = {
             muted
@@ -97,7 +99,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             });
         }
 
-        if (showPrivacyDuringVideo) {
+        if (showPrivacyDuringVideo || isVastVideoWithEndcard) {
             this._privacy = privacy;
             this._privacy.render();
             this._privacy.hide();
@@ -113,7 +115,8 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     public hide() {
         super.hide();
 
-        if (this._privacy) {
+        // Vast endcard will be controlled and deleted by endcard
+        if (!this._isVastVideoWithEndcard && this._privacy) {
             this._privacy.hide();
             document.body.removeChild(this._privacy.container());
             delete this._privacy;

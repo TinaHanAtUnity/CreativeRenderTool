@@ -122,7 +122,7 @@ export class AdUnitFactory {
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
         const privacy = this.createPrivacy(nativeBridge, parameters);
         const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose();
-        const overlay = this.createOverlay(nativeBridge, parameters, privacy, showPrivacyDuringVideo);
+        const overlay = this.createOverlay(nativeBridge, parameters, privacy, showPrivacyDuringVideo, false);
 
         const adUnitStyle: AdUnitStyle = parameters.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
 
@@ -202,7 +202,7 @@ export class AdUnitFactory {
     private static createXPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<XPromoCampaign>): XPromoAdUnit {
         const privacy = this.createPrivacy(nativeBridge, parameters);
         const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose();
-        const overlay = this.createOverlay(nativeBridge, parameters, privacy, showPrivacyDuringVideo);
+        const overlay = this.createOverlay(nativeBridge, parameters, privacy, showPrivacyDuringVideo, false);
 
         const endScreenParameters = this.createEndScreenParameters(nativeBridge, privacy, parameters.campaign.getGameName(), parameters);
         const endScreen = new XPromoEndScreen(endScreenParameters, parameters.campaign);
@@ -245,8 +245,7 @@ export class AdUnitFactory {
 
     private static createVastAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>): VastAdUnit {
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        const showPrivacyDuringVideo = !parameters.campaign.hasEndscreen() || this.showGDPRBanner(parameters);
-        const overlay = this.createOverlay(nativeBridge, parameters, privacy, showPrivacyDuringVideo);
+        const overlay = this.createOverlay(nativeBridge, parameters, privacy, true, parameters.campaign.hasEndscreen());
         let vastEndScreen: VastEndScreen | undefined;
 
         const vastAdUnitParameters: IVastAdUnitParameters = {
@@ -259,8 +258,7 @@ export class AdUnitFactory {
             const vastEndscreenParameters: IVastEndscreenParameters = {
                 campaign: vastAdUnitParameters.campaign,
                 clientInfo: vastAdUnitParameters.clientInfo,
-                seatId: vastAdUnitParameters.campaign.getSeatId(),
-                showPrivacyDuringEndscreen: !showPrivacyDuringVideo
+                seatId: vastAdUnitParameters.campaign.getSeatId()
             };
 
             vastEndScreen = new VastEndScreen(nativeBridge, vastEndscreenParameters, privacy);
@@ -520,7 +518,7 @@ export class AdUnitFactory {
         return adUnit;
     }
 
-    private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean | undefined): AbstractVideoOverlay {
+    private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean | undefined, isVastVideoWithEndcard: boolean): AbstractVideoOverlay {
         const showGDPRBanner = (parameters.campaign instanceof VastCampaign) ? this.showGDPRBanner(parameters) : false;
         let overlay: AbstractVideoOverlay;
 
@@ -532,7 +530,7 @@ export class AdUnitFactory {
         } else if (skipAllowed && isPerformanceCampaign && CTAButtonTestEnabled) {
             overlay = new PerformanceVideoOverlayWithCTAButton(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, <PerformanceCampaign>parameters.campaign, showPrivacyDuringVideo, parameters.campaign.getSeatId());
         } else {
-            overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, showPrivacyDuringVideo, parameters.campaign.getSeatId());
+            overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, showPrivacyDuringVideo, parameters.campaign.getSeatId(), isVastVideoWithEndcard);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
