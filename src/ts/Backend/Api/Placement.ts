@@ -16,7 +16,7 @@ export class Placement extends BackendApi {
 
     public getPlacementState(placement?: string) {
         if(!placement) {
-            placement = this._defaultPlacement;
+            return this._placements[this._defaultPlacement!];
         }
         if(placement) {
             return this._placements[placement];

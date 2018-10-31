@@ -7,6 +7,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { IVideoEventHandler } from 'Ads/Native/VideoPlayer';
+import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { FinishState } from 'Core/Constants/FinishState';
@@ -167,17 +168,16 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
 
         this._adUnit.setVideoState(VideoState.READY);
 
-        if(duration > 40000) {
+        if(duration > VideoFileInfo._maxVideoDuration) {
             const originalUrl = this._video.getOriginalUrl();
-            const error: DiagnosticError = new DiagnosticError(new Error('Too long video'), {
+            const error = new DiagnosticError(new Error('Too long video'), {
                 duration: duration,
                 campaignId: this._campaign.getId(),
                 url: url,
-                originalUrl: originalUrl
+                originalUrl: originalUrl,
+                isCached: CampaignAssetInfo.isCached(this._campaign)
             });
-            SessionDiagnostics.trigger('video_too_long', error, this._campaign.getSession());
-            this.handleVideoError('video_too_long_error');
-            return;
+            return this.handleVideoError('video_too_long', error);
         }
 
         const overlay = this._adUnit.getOverlay();

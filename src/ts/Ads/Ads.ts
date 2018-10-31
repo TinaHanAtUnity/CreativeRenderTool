@@ -51,7 +51,6 @@ import { ICore } from 'Core/ICore';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { INativeResponse } from 'Core/Managers/RequestManager';
-import { BackupCampaignTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
@@ -95,7 +94,6 @@ export class Ads implements IAds {
     public RefreshManager: OldCampaignRefreshManager;
 
     private _currentAdUnit: AbstractAdUnit;
-    private _cachedCampaignResponse?: INativeResponse;
     private _showing: boolean = false;
     private _creativeUrl?: string;
     private _requestDelay: number;
@@ -157,10 +155,7 @@ export class Ads implements IAds {
             GameSessionCounters.init();
             return this.setupTestEnvironment();
         }).then(() => {
-            return this._core.CacheBookkeeping.getCachedCampaignResponse();
-        }).then(cachedCampaignResponse => {
             this.GdprManager = new GdprManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager);
-            this._cachedCampaignResponse = cachedCampaignResponse;
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
@@ -214,14 +209,7 @@ export class Ads implements IAds {
 
             const refreshSpan = this._core.JaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._core.NativeBridge.getPlatform()]);
-            let refreshPromise;
-            if(BackupCampaignTest.isValid(this._core.Config.getAbGroup())) {
-                refreshPromise = this.RefreshManager.refreshWithBackupCampaigns(this.BackupCampaignManager);
-            } else if(this._cachedCampaignResponse !== undefined) {
-                refreshPromise = this.RefreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
-            } else {
-                refreshPromise = this.RefreshManager.refresh();
-            }
+            const refreshPromise = this.RefreshManager.refresh();
             return refreshPromise.then((resp) => {
                 this._core.JaegerManager.stop(refreshSpan);
                 return resp;
@@ -466,9 +454,6 @@ export class Ads implements IAds {
         this._showing = false;
 
         if(this._core.NativeBridge.getPlatform() === Platform.ANDROID) {
-            if(!CustomFeatures.isAlwaysAutobatching(this._core.ClientInfo.getGameId())) {
-                this._core.NativeBridge.setAutoBatchEnabled(false);
-            }
             this._core.Api.Request.Android!.setMaximumPoolSize(1);
         } else {
             this._core.Api.Request.setConcurrentRequestCount(1);

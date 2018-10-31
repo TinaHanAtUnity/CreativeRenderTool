@@ -50,4 +50,9 @@ export class PerformanceVideoOverlayWithCTAButton extends NewVideoOverlay implem
             });
         }
     }
+
+    public render() {
+        super.render();
+        this._container.classList.add('cta-button-test');
+    }
 }

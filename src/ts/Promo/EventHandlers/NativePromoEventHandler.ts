@@ -3,11 +3,11 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Url } from 'Core/Utilities/Url';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 export class NativePromoEventHandler {

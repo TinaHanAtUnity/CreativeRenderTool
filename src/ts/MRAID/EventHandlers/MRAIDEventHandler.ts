@@ -10,7 +10,6 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestError } from 'Core/Errors/RequestError';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { ClickDelayTrackingTest } from 'Core/Models/ABGroup';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -32,7 +31,6 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _core: ICoreApi;
     private _ads: IAdsApi;
     protected _campaign: MRAIDCampaign;
-    private _isClickTestAbGroup: boolean;
 
     constructor(adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
         super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
@@ -48,7 +46,6 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._platform = parameters.platform;
         this._core = parameters.core;
         this._ads = parameters.ads;
-        this._isClickTestAbGroup = ClickDelayTrackingTest.isValid(parameters.coreConfig.getAbGroup());
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -64,20 +61,13 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             }
         } else {    // DSP MRAID
             this.setCallButtonEnabled(false);
-            if (this._isClickTestAbGroup) {
-                this.sendTrackingEvents();
-            }
             return this._request.followRedirectChain(url).then((storeUrl) => {
                 return this.openUrl(storeUrl).then(() => {
                     this.setCallButtonEnabled(true);
-                    if (!this._isClickTestAbGroup) {
-                        this.sendTrackingEvents();
-                    }
+                    this.sendTrackingEvents();
                 }).catch((e) => {
                     this.setCallButtonEnabled(true);
-                    if (!this._isClickTestAbGroup) {
-                        this.sendTrackingEvents();
-                    }
+                    this.sendTrackingEvents();
                 });
             });
         }
@@ -139,15 +129,16 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
                     });
                 }
             }).catch(error => {
-                if(error instanceof RequestError) {
-                    error = new DiagnosticError(new Error(error.message), {
+                let modifiedError = error;
+                if(modifiedError instanceof RequestError) {
+                    modifiedError = new DiagnosticError(new Error(modifiedError.message), {
                         request: error.nativeRequest,
                         auctionId: this._campaign.getSession().getId(),
                         url: this._campaign.getClickAttributionUrl(),
                         response: error.nativeResponse
                     });
                 }
-                Diagnostics.trigger('mraid_click_attribution_failed', error);
+                Diagnostics.trigger('mraid_click_attribution_failed', modifiedError);
             });
         } else {
             if (clickAttributionUrl) {

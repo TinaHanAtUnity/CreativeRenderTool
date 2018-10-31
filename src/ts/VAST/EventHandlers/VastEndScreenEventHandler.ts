@@ -3,7 +3,6 @@ import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { ClickDelayTrackingTest } from 'Core/Models/ABGroup';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
@@ -17,7 +16,6 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastEndScreen: VastEndScreen | null;
     private _platform: Platform;
     private _core: ICoreApi;
-    private _isClickTestAbGroup: boolean;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         this._platform = parameters.platform;
@@ -27,23 +25,17 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._request = parameters.request;
         this._campaign = parameters.campaign;
         this._vastEndScreen = this._vastAdUnit.getEndScreen();
-        this._isClickTestAbGroup = ClickDelayTrackingTest.isValid(parameters.coreConfig.getAbGroup());
     }
 
     public onVastEndScreenClick(): Promise<void> {
         this.setCallButtonEnabled(false);
-        if (this._isClickTestAbGroup) {
-            this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._campaign.getSession().getId());
-        }
 
         const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
         if (clickThroughURL) {
             return this._request.followRedirectChain(clickThroughURL).then((url: string) => {
                 return this.onOpenUrl(url).then(() => {
                     this.setCallButtonEnabled(true);
-                    if (!this._isClickTestAbGroup) {
-                        this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._campaign.getSession().getId());
-                    }
+                    this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._campaign.getSession().getId());
                 }).catch((e) => {
                     this.setCallButtonEnabled(true);
                 });

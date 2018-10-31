@@ -13,7 +13,6 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
-import { IPlacementRequestMap, MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -87,7 +86,9 @@ import WrappedVast1 from 'xml/WrappedVast1.xml';
 import WrappedVast2 from 'xml/WrappedVast2.xml';
 import WrappedVast3 from 'xml/WrappedVast3.xml';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { XPromoCampaignParser } from 'XPromo/Parsers/XPromoCampaignParser';
+import { Url } from 'Core/Utilities/Url';
+import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
+import { XPromoCampaignParser } from '../../../src/ts/XPromo/Parsers/XPromoCampaignParser';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -266,10 +267,10 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve({
                 response: OnProgrammaticVastPlcCampaignWrapped
             }));
-            mockRequest.expects('get').withArgs('https://x.vindicosuite.com/?l=454826&t=x&rnd=[Cachebuster_If_Supported_In_Console]', [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
+            mockRequest.expects('get').withArgs(Url.encodeUrlWithQueryParams('https://x.vindicosuite.com/?l=454826&t=x&rnd=[Cachebuster_If_Supported_In_Console]'), [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
                 response: WrappedVast1
             }));
-            mockRequest.expects('get').withArgs('https://ads.pointroll.com/PortalServe/?pid=2810492V01420160323193924&pos=o&secure=1&r=1466475479', [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
+            mockRequest.expects('get').withArgs(Url.encodeUrlWithQueryParams('https://ads.pointroll.com/PortalServe/?pid=2810492V01420160323193924&pos=o&secure=1&r=1466475479'), [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(Promise.resolve({
                 response: WrappedVast2
             }));
 
@@ -390,7 +391,7 @@ describe('CampaignManager', () => {
             campaignParserManager.addParser(new ProgrammaticVastParser());
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
             campaignManager.onError.subscribe((err: WebViewError) => {
-                assert.equal(err.message, 'VAST wrapper depth exceeded');
+                assert.equal(err.message, VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
                 done();
             });
 
@@ -460,7 +461,7 @@ describe('CampaignManager', () => {
                 const response = {
                     response: OnProgrammaticVastPlcCampaignNoVideo
                 };
-                return verifyErrorForResponse(response, 'No video URL found for VAST');
+                return verifyErrorForResponse(response, VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND]);
             });
 
             it('should trigger onError after requesting a wrapped vast placement without a video url', (done) => {
@@ -471,7 +472,7 @@ describe('CampaignManager', () => {
                 const wrappedResponse = Promise.resolve({
                     response: NoVideoWrappedVast
                 });
-                return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'No video URL found for VAST', done);
+                return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], done);
             });
 
             it('should trigger onError after requesting a vast placement with incorrect document element node name', () => {
@@ -497,7 +498,7 @@ describe('CampaignManager', () => {
                 const response = {
                     response: OnProgrammaticVastPlcCampaignNoData
                 };
-                return verifyErrorForResponse(response, 'VAST xml data is missing');
+                return verifyErrorForResponse(response, VastErrorInfo.errorMap[VastErrorCode.XML_PARSER_ERROR]);
             });
 
             it('should trigger onError after requesting a wrapped vast placement when a failure occurred requesting the wrapped VAST', () => {
@@ -505,9 +506,9 @@ describe('CampaignManager', () => {
                     response: OnProgrammaticVastPlcCampaignFailing
                 };
                 const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
-                const wrappedResponse = Promise.reject('Some kind of request error happened');
+                const wrappedResponse = Promise.reject(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_GENERAL_ERROR]);
 
-                return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, 'Some kind of request error happened');
+                return verifyErrorForWrappedResponse(response, wrappedUrl, wrappedResponse, VastErrorInfo.errorMap[VastErrorCode.WRAPPER_GENERAL_ERROR]);
             });
 
             it('should trigger onError after requesting a vast placement with null vast data', () => {
@@ -537,13 +538,6 @@ describe('CampaignManager', () => {
                 });
             });
 
-            it('should trigger onError after requesting a vast placement without an impression url', () => {
-                const response = {
-                    response: OnProgrammaticVastPlcCampaignNoImpression
-                };
-                return verifyErrorForResponse(response, 'Campaign does not have an impression url');
-            });
-
             it('should bail out when max wrapper depth is reached for a wrapped VAST', () => {
 
                 // given a valid VAST response containing a wrapper
@@ -556,7 +550,7 @@ describe('CampaignManager', () => {
 
                 // then we should get an error because there was no video URL,
                 // because the video url would have been in the wrapped xml
-                return verifyErrorForResponse(response, 'VAST wrapper depth exceeded');
+                return verifyErrorForResponse(response, VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
             });
         });
 
@@ -1105,286 +1099,6 @@ describe('CampaignManager', () => {
         assert.equal(previousCampaign, 'defaultPlacement');
     });
 
-    describe('backup campaign', () => {
-
-        let nowStub: sinon.SinonStub;
-
-        beforeEach(() => {
-            nowStub = sinon.stub(Date, 'now').returns(0);
-
-            sinon.stub(core.Storage, 'getKeys').callsFake((type: StorageType, key: string, recursive: boolean) => {
-                if (key && key === 'cache.campaigns') {
-                    return Promise.resolve(['12345', '67890']);
-                }
-                return Promise.resolve([]);
-            });
-        });
-
-        afterEach(() => {
-            nowStub.restore();
-        });
-
-        it('should have cachedCampaigns in request body', () => {
-            let requestData: string = '{}';
-            sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: Array<[string, string]> = [], options?: any) => {
-                requestData = data;
-                return Promise.resolve();
-            });
-
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-
-            return campaignManager.request().then(() => {
-                const requestBody = JSON.parse(requestData);
-                assert.equal(2, requestBody.cachedCampaigns.length, 'Cached campaigns should contain 2 entries');
-                assert.equal('12345', requestBody.cachedCampaigns[0], 'Cached campaigns first entry not what was expected');
-                assert.equal('67890', requestBody.cachedCampaigns[1], 'Cached campaigns second entry not whas was expected');
-            });
-        });
-
-        it('should have cached campaign response', () => {
-            let requestData: string = '{}';
-            sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: Array<[string, string]> = [], options?: any) => {
-                requestData = data;
-                return Promise.resolve<INativeResponse>({url: 'http://test/request', response: OnProgrammaticMraidUrlPlcCampaignJson, responseCode: 200, headers: []});
-            });
-
-            let actualResponse: INativeResponse;
-
-            sinon.stub(cacheBookkeeping, 'setCachedCampaignResponse').callsFake((response: INativeResponse) => {
-                actualResponse = response;
-                return Promise.resolve();
-            });
-
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            campaignParserManager.addParser(new ProgrammaticMraidUrlParser());
-            const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-
-            const now = new Date(Date.now());
-            const utcTimestamp = Math.floor(new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate(),
-                    now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds()).getTime() / 1000);
-
-            return campaignManager.request().then(() => {
-                assert.isObject(actualResponse);
-                assert.equal(actualResponse.url, 'http://test/request');
-                const data = JSON.parse(OnProgrammaticMraidUrlPlcCampaignJson);
-                data.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].absoluteCacheTTL = utcTimestamp + 12345;
-                assert.deepEqual(JSON.parse(actualResponse.response), data);
-            });
-        });
-
-        it('should request from cached response', () => {
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            campaignParserManager.addParser(new ProgrammaticMraidUrlParser());
-            const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-
-            let triggeredCampaign: MRAIDCampaign;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
-                triggeredCampaign = <MRAIDCampaign>campaign;
-            });
-
-            let onAdPlanReceived = false;
-            campaignManager.onAdPlanReceived.subscribe(() => {
-                onAdPlanReceived = true;
-            });
-
-            return campaignManager.requestFromCache(<INativeResponse>{
-                response: OnProgrammaticMraidUrlPlcCampaignJson,
-                url: 'https://auction.unityads.unity3d.com/v4/games/12345/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=647&screenHeight=357&connectionType=wifi&networkType=0'
-            }).then(() => {
-                assert.isDefined(triggeredCampaign);
-                assert.equal(coreConfig.getAbGroup(), ABGroupBuilder.getAbGroup(99));
-                assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
-            });
-        });
-
-        it('should ignore cached response if game id mismatch', () => {
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            campaignParserManager.addParser(new ProgrammaticMraidUrlParser());
-            const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-
-            let triggeredCampaign: MRAIDCampaign;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
-                triggeredCampaign = <MRAIDCampaign>campaign;
-            });
-
-            let onAdPlanReceived = false;
-            campaignManager.onAdPlanReceived.subscribe(() => {
-                onAdPlanReceived = true;
-            });
-
-            return campaignManager.requestFromCache(<INativeResponse>{
-                response: OnProgrammaticMraidUrlPlcCampaignJson,
-                url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=647&screenHeight=357&connectionType=wifi&networkType=0'
-            }).then(() => {
-                assert.isUndefined(triggeredCampaign);
-                assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
-            });
-        });
-
-        it('should ignore cached response if campaign expired', () => {
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            campaignParserManager.addParser(new ProgrammaticMraidUrlParser());
-            const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-
-            nowStub.reset();
-            nowStub.returns(36000 * 1000);
-
-            const now = new Date(Date.now());
-            const utcTimestamp = Math.floor(new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate(),
-                    now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds()).getTime() / 1000);
-
-            let triggeredCampaign: MRAIDCampaign;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
-                triggeredCampaign = <MRAIDCampaign>campaign;
-            });
-
-            let onAdPlanReceived = false;
-            campaignManager.onAdPlanReceived.subscribe(() => {
-                onAdPlanReceived = true;
-            });
-
-            const data = JSON.parse(OnProgrammaticMraidUrlPlcCampaignJson);
-            data.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].absoluteCacheTTL = utcTimestamp - 12345;
-
-            return campaignManager.requestFromCache(<INativeResponse>{
-                response: JSON.stringify(data),
-                url: 'https://auction.unityads.unity3d.com/v4/games/12345/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=647&screenHeight=357&connectionType=wifi&networkType=0s'
-            }).then(() => {
-                assert.isUndefined(triggeredCampaign);
-                assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
-            });
-        });
-
-        it('should ignore expired placements', () => {
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            campaignParserManager.addParser(new ProgrammaticMraidParser());
-            const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-
-            nowStub.reset();
-            nowStub.returns(36000 * 1000);
-
-            const now = new Date(Date.now());
-            const utcTimestamp = Math.floor(new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate(),
-                    now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds()).getTime() / 1000);
-
-            let campaignCount = 0;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
-                campaignCount++;
-            });
-
-            let onAdPlanReceived = false;
-            campaignManager.onAdPlanReceived.subscribe(() => {
-                onAdPlanReceived = true;
-            });
-
-            const data = JSON.parse(OnProgrammaticMraidPlcTwoMedia);
-            data.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85_1'].absoluteCacheTTL = utcTimestamp - 12345;
-
-            return campaignManager.requestFromCache(<INativeResponse>{
-                response: JSON.stringify(data),
-                url: 'https://auction.unityads.unity3d.com/v4/games/12345/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=647&screenHeight=357&connectionType=wifi&networkType=0s'
-            }).then(() => {
-                assert.equal(campaignCount, 1);
-                assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
-            });
-        });
-
-        it('should request from cached response even with different connection type and network', () => {
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            campaignParserManager.addParser(new ProgrammaticMraidUrlParser());
-            const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-
-            let triggeredCampaign: MRAIDCampaign;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
-                triggeredCampaign = <MRAIDCampaign>campaign;
-            });
-
-            let onAdPlanReceived = false;
-            campaignManager.onAdPlanReceived.subscribe(() => {
-                onAdPlanReceived = true;
-            });
-
-            return campaignManager.requestFromCache(<INativeResponse>{
-                response: OnProgrammaticMraidUrlPlcCampaignJson,
-                url: 'https://auction.unityads.unity3d.com/v4/games/12345/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=647&screenHeight=357&connectionType=test&networkType=1'
-            }).then(() => {
-                assert.equal(coreConfig.getAbGroup(), ABGroupBuilder.getAbGroup(99));
-                assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
-            });
-        });
-
-        it('should request from cached response, no fill', () => {
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-
-            let triggeredCampaign: MRAIDCampaign;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
-                triggeredCampaign = <MRAIDCampaign>campaign;
-            });
-
-            let noFill = false;
-            campaignManager.onNoFill.subscribe(() => {
-                noFill = true;
-            });
-
-            let onError = false;
-            campaignManager.onError.subscribe(() => {
-                onError = true;
-            });
-
-            let onAdPlanReceived = false;
-            campaignManager.onAdPlanReceived.subscribe(() => {
-                onAdPlanReceived = true;
-            });
-
-            return campaignManager.requestFromCache(<INativeResponse>{
-                response: OnProgrammaticVastPlcCampaignNullData,
-                url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=647&screenHeight=357&connectionType=wifi&networkType=0'
-            }).then(() => {
-                assert.isUndefined(triggeredCampaign);
-                assert.isFalse(noFill, 'onNoFill was triggered');
-                assert.isFalse(onError, 'onError was triggered');
-                assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
-            });
-        });
-
-        it('should request from cached response, error', () => {
-            const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-
-            let triggeredCampaign: MRAIDCampaign;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
-                triggeredCampaign = <MRAIDCampaign>campaign;
-            });
-
-            let noFill = false;
-            campaignManager.onNoFill.subscribe(() => {
-                noFill = true;
-            });
-
-            let onError = false;
-            campaignManager.onError.subscribe(() => {
-                onError = true;
-            });
-
-            let onAdPlanReceived = false;
-            campaignManager.onAdPlanReceived.subscribe(() => {
-                onAdPlanReceived = true;
-            });
-
-            return campaignManager.requestFromCache(<INativeResponse>{
-                response: OnProgrammaticVastPlcCampaignNullData,
-                url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=647&screenHeight=357&connectionType=wifi&networkType=0'
-            }).then(() => {
-                assert.isUndefined(triggeredCampaign);
-                assert.isFalse(noFill, 'onNoFill was triggered');
-                assert.isFalse(onError, 'onError was triggered');
-                assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
-            });
-        });
-    });
-
     describe('the organizationId-property', () => {
         let requestData: string = '{}';
         let assetManager: AssetManager;
@@ -1415,51 +1129,4 @@ describe('CampaignManager', () => {
         });
     });
 
-    xdescribe('on mixed placement request', () => {
-        let requestData: string = '{}';
-        let assetManager: AssetManager;
-        let campaignManager: CampaignManager;
-
-        const placements = MixedPlacementUtility.originalPlacements;
-        const placementRequestMap: { [id: string]: IPlacementRequestMap } = {};
-
-        beforeEach(() => {
-            sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: Array<[string, string]> = [], options?: any) => {
-                requestData = data;
-                return Promise.resolve();
-            });
-
-            const clientInfoMixedExperiment = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
-            coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements), clientInfoMixedExperiment);
-            assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-        });
-
-        afterEach(() => {
-            MixedPlacementUtility.originalPlacements = {};
-        });
-
-        it('should strip mixedPlacements from the placement request map in request body sent to auction when mixedplacment experiment is enabled', () => {
-            for (const placementid in placements) {
-                if(placements.hasOwnProperty(placementid)) {
-                    placementRequestMap[placementid] = {
-                        adTypes: placements[placementid].getAdTypes(),
-                        allowSkip: placements[placementid].allowSkip()
-                    };
-
-                    if (placementRequestMap[placementid].adTypes === undefined) {
-                        delete placementRequestMap[placementid].adTypes;
-                    }
-                }
-            }
-
-            return campaignManager.request().then(() => {
-                const requestBody = JSON.parse(requestData);
-                assert.notEqual(MixedPlacementUtility.originalPlacements, adsConfig.getPlacements());
-                assert.notEqual(requestBody.placements, {});
-                assert.deepEqual(requestBody.placements, placementRequestMap);
-            });
-        });
-    });
 });

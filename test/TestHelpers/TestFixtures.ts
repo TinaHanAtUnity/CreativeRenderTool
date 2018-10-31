@@ -516,10 +516,6 @@ export class TestFixtures {
     }
 
     public static getClientInfo(platform?: Platform, gameId?: string): ClientInfo {
-        if(typeof platform === 'undefined') {
-            platform = Platform.ANDROID;
-        }
-
         return new ClientInfo([
             gameId ? gameId : '12345',
             false,

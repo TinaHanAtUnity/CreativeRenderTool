@@ -34,6 +34,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             return request.get(successUrl).then((response) => {
                 assert.equal(successMessage, response.response, 'Did not receive correct response');
             }).catch(error => {
+                // tslint:disable-next-line
                 error = <RequestError>error;
                 throw new Error('Get without headers failed: ' + error.message);
             });
@@ -46,6 +47,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             return request.get(failUrl).then(response => {
                 throw new Error('Request should have failed but got response: ' + response);
             }).catch(error => {
+                // tslint:disable-next-line
                 error = <RequestError>error;
                 assert.equal(failMessage, error.message, 'Did not receive correct error message');
             });
@@ -59,6 +61,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             return request.get(headerUrl, [[headerField, headerMessage]]).then(response => {
                 assert.equal(headerMessage, response.response, 'Did not get correctly forwarded header response');
             }).catch(error => {
+                // tslint:disable-next-line
                 error = <RequestError>error;
                 throw new Error('Get with header forwarding failed: ' + error);
             });
@@ -78,6 +81,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             }).then(response => {
                 assert.equal(successMessage, response.response, 'Did not get success message when retrying');
             }).catch(error => {
+                // tslint:disable-next-line
                 error = <RequestError>error;
                 throw new Error('Get with retrying failed: ' + error.message);
             });
@@ -90,6 +94,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             return request.post(successUrl, 'Test').then(response => {
                 assert.equal(successMessage, response.response, 'Did not receive correct response');
             }).catch(error => {
+                // tslint:disable-next-line
                 error = <RequestError>error;
                 throw new Error('Post without headers failed: ' + error.message);
             });
@@ -102,6 +107,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             return request.post(failUrl, 'Test').then(response => {
                 throw new Error('Request should have failed but got response: ' + response);
             }).catch(error => {
+                // tslint:disable-next-line
                 error = <RequestError>error;
                 assert.equal(failMessage, error.message, 'Did not receive correct error message');
             });
@@ -115,6 +121,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             return request.post(headerUrl, 'Test', [[headerField, headerMessage]]).then(response => {
                 assert.equal(headerMessage, response.response, 'Did not get correctly forwarded header response');
             }).catch(error => {
+                // tslint:disable-next-line
                 error = <RequestError>error;
                 throw new Error('Post with header forwarding failed: ' + error.message);
             });
@@ -127,6 +134,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             return request.post(testUrl, bodyMessage).then(response => {
                 assert.equal(bodyMessage, response.response, 'Did not get correctly forwarded body');
             }).catch(error => {
+                // tslint:disable-next-line
                 error = <RequestError>error;
                 throw new Error('Post with body forwarding failed: ' + error.message);
             });
@@ -146,6 +154,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             }).then(response => {
                 assert.equal(successMessage, response.response, 'Did not get success message when retrying');
             }).catch(error => {
+                // tslint:disable-next-line
                 error = <RequestError>error;
                 throw new Error('Post with retrying failed: ' + error.message);
             });
@@ -164,6 +173,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             }).then(response => {
                 throw new Error('Should not have received a response');
             }).catch(error => {
+                // tslint:disable-next-line
                 error = <RequestError>error;
                 assert.equal('This URL always fails', error.message, 'Error was not correct after retries');
             });
@@ -184,6 +194,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             }).then((response) => {
                 assert.equal(successMessage, response.response, 'Did not receive correct response');
             }).catch(error => {
+                // tslint:disable-next-line
                 error = <RequestError>error;
                 throw new Error('Get with connection event failed: ' + error.message);
             });
@@ -206,6 +217,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     return request.get(successUrl).then((response) => {
                         assert.equal(successMessage, response.response, 'Did not receive correct response');
                     }).catch(error => {
+                        // tslint:disable-next-line
                         error = <RequestError>error;
                         throw new Error('Get without headers failed: ' + error.message);
                     });
@@ -224,6 +236,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                         assert.fail('Should not resolve');
                     }).catch(error => {
                         assert.instanceOf(error, RequestError);
+                        // tslint:disable-next-line
                         error = <RequestError>error;
                         assert.equal(error.message, reason);
                         assert.equal(error.nativeResponse.responseCode, i);
@@ -243,6 +256,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     assert.fail('Should not resolve');
                 }).catch(error => {
                     assert.instanceOf(error, RequestError);
+                    // tslint:disable-next-line
                     error = <RequestError>error;
                     assert.equal(error.message, reason);
                     assert.equal(error.nativeResponse.responseCode, 600);
@@ -258,6 +272,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     return request.followRedirectChain(redirectUrl).then((url) => {
                         assert.equal('http://www.example.org/endurl/', url);
                     }).catch(error => {
+                        // tslint:disable-next-line
                         error = <RequestError>error;
                         throw new Error('Head without headers failed: ' + error.message);
                     });

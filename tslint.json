@@ -25,7 +25,6 @@
     "max-line-length": [false, 140],
     "no-floating-promises": false,
     "max-func-body-length": [false, 100, {"ignore-parameters-to-function-regex": "describe"}],
-    "no-parameter-reassignment": false,
     "ordered-imports": false,
     "import-name": false,
     "match-default-export-name": false,

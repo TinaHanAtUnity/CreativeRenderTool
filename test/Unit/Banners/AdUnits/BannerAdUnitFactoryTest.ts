@@ -1,5 +1,5 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
+import { BannerAdUnit, IBannerAdUnitParameters } from 'Banners/AdUnits/BannerAdUnit';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { assert } from 'chai';
@@ -11,12 +11,12 @@ describe('BannerAdUnitFactoryTest', () => {
     describe('when creating an ad unit for a BannerCampaign', () => {
         let campaign: BannerCampaign;
         let nativeBridge: NativeBridge;
-        let parameters: IAdUnitParameters<BannerCampaign>;
+        let parameters: IBannerAdUnitParameters;
 
         beforeEach(() => {
             campaign = sinon.createStubInstance(BannerCampaign);
             nativeBridge = sinon.createStubInstance(NativeBridge);
-            parameters = <IAdUnitParameters<BannerCampaign>>{
+            parameters = <IBannerAdUnitParameters>{
                 campaign
             };
         });

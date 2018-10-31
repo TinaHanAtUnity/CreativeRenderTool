@@ -111,8 +111,8 @@ export class Storage extends BackendApi {
     }
 
     public hasFileEntry(fileId: string): boolean {
-        fileId = fileId.split('.')[0];
-        if(this._storage && this._storage.cache && this._storage.cache.files && this._storage.cache.files[fileId]) {
+        const splitFileId = fileId.split('.')[0];
+        if(this._storage && this._storage.cache && this._storage.cache.files && this._storage.cache.files[splitFileId]) {
             return true;
         }
 

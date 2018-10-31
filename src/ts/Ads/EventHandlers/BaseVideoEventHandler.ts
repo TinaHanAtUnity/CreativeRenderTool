@@ -64,14 +64,12 @@ export abstract class BaseVideoEventHandler {
         this._adUnit.onFinish.trigger();
     }
 
-    protected handleVideoError(errorType?: string, errorData?: any) {
+    protected handleVideoError(errorType: string, errorData: any) {
         if(this._adUnit.getVideoState() !== VideoState.ERRORED) {
             const previousState = this._adUnit.getVideoState();
             this._adUnit.setVideoState(VideoState.ERRORED);
 
-            if(errorType && errorData) {
-                SessionDiagnostics.trigger(errorType, errorData, this._campaign.getSession());
-            }
+            SessionDiagnostics.trigger(errorType, errorData, this._campaign.getSession());
 
             this._adUnit.setFinishState(FinishState.ERROR);
 

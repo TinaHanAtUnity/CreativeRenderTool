@@ -5,17 +5,19 @@ import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { Platform } from 'Core/Constants/Platform';
-import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
-import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
 import { VastParser } from 'VAST/Utilities/VastParser';
+import { Url } from 'Core/Utilities/Url';
+import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
+import { CampaignError } from 'Ads/Errors/CampaignError';
+import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
+import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 export class ProgrammaticVastParser extends CampaignParser {
-
-    public static ContentType = 'programmatic/vast';
+    public static ContentType = CampaignContentTypes.ProgrammaticVast;
 
     public static setVastParserMaxDepth(depth: number): void {
         ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH = depth;
@@ -23,6 +25,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     private static VAST_PARSER_MAX_DEPTH: number;
     private _isMediaExperiment: boolean = false;
+    private _isErrorTrackingExperiment: boolean = false;
 
     protected _vastParser: VastParser = new VastParser();
 
@@ -32,7 +35,9 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
-
+        if(response.isMediaExperiment() && response.isMediaExperiment() === true) {
+            this._isMediaExperiment = true;
+        }
         if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
             this._vastParser.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
         }
@@ -59,33 +64,53 @@ export class ProgrammaticVastParser extends CampaignParser {
             mediaId: response.getMediaId()
         };
 
+        let errorTrackingUrl;
+        if (vast.getErrorURLTemplate()) {
+            errorTrackingUrl = vast.getErrorURLTemplate()!;
+        }
+
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
         if(portraitUrl) {
-            portraitAsset = new Image(this.validateAndEncodeUrl(portraitUrl, session), session);
+            if (!Url.isValid(portraitUrl)) {
+                throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED, portraitUrl);
+            }
+            portraitAsset = new Image(Url.encode(portraitUrl), session);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
         let landscapeAsset;
         if(landscapeUrl) {
-            landscapeAsset = new Image(this.validateAndEncodeUrl(landscapeUrl, session), session);
+            if (!Url.isValid(landscapeUrl)) {
+                throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED, landscapeUrl);
+            }
+            landscapeAsset = new Image(Url.encode(landscapeUrl), session);
         }
 
-        let videoUrl;
-        if (this._isMediaExperiment && connectionType) {    // TODO: ab test with auction feature flag
-            videoUrl = VastMediaSelector.getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
-            if (!videoUrl) {
-                throw new Error('No video URL found for VAST');
-            }
-        } else {
-            videoUrl = vast.getVideoUrl();
+        let mediaVideoUrl = vast.getMediaVideoUrl();
+        if (this._isMediaExperiment) {
+            mediaVideoUrl = VastMediaSelector.getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
         }
+
+        if (!mediaVideoUrl) {
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND);
+        }
+
+        if (platform === Platform.IOS && !mediaVideoUrl.match(/^https:\/\//)) {
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS, mediaVideoUrl);
+        }
+
+        if (!Url.isValid(mediaVideoUrl)) {
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED, mediaVideoUrl);
+        }
+
+        mediaVideoUrl = Url.encode(mediaVideoUrl);
 
         const vastCampaignParms: IVastCampaign = {
             ... baseCampaignParams,
             vast: vast,
-            video: new Video(this.validateAndEncodeUrl(videoUrl, session), session),
-            hasEndscreen: !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(),
+            video: new Video(mediaVideoUrl, session),
+            hasEndscreen: !!portraitAsset || !!landscapeAsset,
             portrait: portraitAsset,
             landscape: landscapeAsset,
             trackingUrls: response.getTrackingUrls(),
@@ -102,24 +127,6 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         const campaign = new VastCampaign(vastCampaignParms);
 
-        if(campaign.getImpressionUrls().length === 0) {
-            throw new Error('Campaign does not have an impression url');
-        }
-
-        if(!campaign.getVideo().getUrl()) {
-            const videoUrlError = new DiagnosticError(
-                new Error('Campaign does not have a video url'),
-                {rootWrapperVast: response.getContent()}
-            );
-            throw videoUrlError;
-        }
-        if(platform === Platform.IOS && !campaign.getVideo().getUrl().match(/^https:\/\//)) {
-            const videoUrlError = new DiagnosticError(
-                new Error('Campaign video url needs to be https for iOS'),
-                {rootWrapperVast: response.getContent()}
-            );
-            throw videoUrlError;
-        }
         return Promise.resolve(campaign);
     }
 }

@@ -2,6 +2,9 @@ import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { ICoreApi } from 'Core/ICore';
 import { Template } from 'Core/Utilities/Template';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
+
+const SQUARE_END_SCREEN = 'square-end-screen';
 
 export class PerformanceEndScreen extends EndScreen {
     protected _template: Template;
@@ -11,16 +14,24 @@ export class PerformanceEndScreen extends EndScreen {
     constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign) {
         super(parameters);
 
+        this._campaign = campaign;
+
+        this._template = new Template(this.getTemplate(), this._localization);
+
+        const portraitImage = campaign.getPortrait();
+        const landscapeImage = campaign.getLandscape();
+        const squareImage = campaign.getSquare();
         const adjustedRating: number = campaign.getRating() * 20;
         this._templateData = {
             'gameName': campaign.getGameName(),
             'gameIcon': campaign.getGameIcon().getUrl(),
             // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
-            'endScreenLandscape': campaign.getPortrait().getUrl(),
-            'endScreenPortrait': campaign.getLandscape().getUrl(),
+            'endScreenLandscape': portraitImage ? portraitImage.getUrl() : undefined,
+            'endScreenPortrait': landscapeImage ? landscapeImage.getUrl() : undefined,
+            'endScreenSquare': squareImage ? squareImage.getUrl() : undefined,
             'rating': adjustedRating.toString(),
             'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
-            'endscreenAlt': this.getEndscreenAlt(campaign)
+            'endscreenAlt': this.getEndscreenAlt()
         };
 
         this._core = parameters.core;
@@ -38,6 +49,21 @@ export class PerformanceEndScreen extends EndScreen {
             appDownloadUrl: this._campaign.getAppDownloadUrl(),
             adUnitStyle: this._adUnitStyle
         }));
+    }
+
+    protected getEndscreenAlt(): string | undefined {
+        if (this._campaign.getSquare()) {
+            return SQUARE_END_SCREEN;
+        }
+        return undefined;
+    }
+
+    protected getTemplate() {
+        if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
+            return SquareEndScreenTemplate;
+
+        }
+        return super.getTemplate();
     }
 
 }

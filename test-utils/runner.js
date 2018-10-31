@@ -12,17 +12,13 @@ const coverage = process.env.COVERAGE;
 const isolated = process.env.ISOLATED;
 const debug = process.env.DEBUG;
 
-puppeteer.use(require('puppeteer-extra-plugin-user-preferences')({
-    userPrefs: {
-        devtools: {
-            preferences: {
-                "InspectorView.splitViewState": "{\"vertical\":{\"size\":9999}}",
-                "sourcesPanelSplitViewState": "{\"vertical\":{\"size\":450,\"showMode\":\"Both\"}}",
-                "uiTheme": "\"dark\"",
-            }
-        }
+const chromiumUserPrefsPath = '.chromium_user_prefs.json';
+if(fs.existsSync(chromiumUserPrefsPath)) {
+    const chromiumUserPrefs = fs.readFileSync(chromiumUserPrefsPath, { encoding: 'utf-8' });
+    if(chromiumUserPrefs) {
+        puppeteer.use(require('puppeteer-extra-plugin-user-preferences')(JSON.parse(chromiumUserPrefs)));
     }
-}));
+}
 
 const runTest = async (browser, isolated, testFilter) => {
     let page;

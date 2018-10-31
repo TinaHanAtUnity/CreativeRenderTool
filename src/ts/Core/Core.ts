@@ -225,6 +225,7 @@ export class Core implements ICore {
             }
 
             if(error instanceof ConfigError) {
+                // tslint:disable-next-line
                 error = { 'message': error.message, 'name': error.name };
                 this.Api.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
             } else if(error instanceof Error && error.name === 'DisabledGame') {

@@ -21,6 +21,8 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Double } from 'Core/Utilities/Double';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { ABGroup } from 'Core/Models/ABGroup';
+import { AllowRewardedAdSkipInSeconds } from 'Constants/ExperimentConstants';
 
 export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParameters<T> {
     video: Video;
@@ -55,6 +57,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     private _finalVideoUrl: string;
     private _videoState: VideoState = VideoState.NOT_READY;
     private _clientInfo: ClientInfo;
+    private _parameters: IVideoAdUnitParameters<T>;
 
     constructor(parameters: IVideoAdUnitParameters<T>) {
         super(parameters);
@@ -70,6 +73,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
         this._clientInfo = parameters.clientInfo;
+        this._parameters = parameters;
 
         this.prepareOverlay();
     }
@@ -268,6 +272,13 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             document.body.appendChild(overlay.container());
 
             if(!this._placement.allowSkip()) {
+                if (CustomFeatures.allowSkipInRewardedVideos(this._parameters)) {
+                    overlay.setSkipEnabled(true);
+                    // Use the same value as in the PerformanceOverlayEventHandlerWithAllowSkip canSkipVideo()
+                    overlay.setSkipDuration(AllowRewardedAdSkipInSeconds);
+                    return;
+                }
+
                 overlay.setSkipEnabled(false);
             } else {
                 overlay.setSkipEnabled(true);
