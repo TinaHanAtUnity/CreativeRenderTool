@@ -51,6 +51,7 @@ XML_SOURCES := $(filter %.xml, $(SOURCES))
 
 TESTS := $(shell find $(TEST_DIR) -type f -name '*.ts' -and -not -name '*.d.ts')
 UNIT_TESTS := $(shell find $(TEST_DIR)/Unit -type f -name '*Test.ts' -and -not -name '*.d.ts')
+FUNCTIONAL_TESTS := $(shell find $(TEST_DIR)/Functional -type f -name '*Test.ts' -and -not -name '*.d.ts')
 INTEGRATION_TESTS := $(shell find $(TEST_DIR)/Integration -type f -name '*Test.ts' -and -not -name '*.d.ts')
 
 # Targets
@@ -69,6 +70,7 @@ XML_TARGETS := $(addprefix $(BUILD_DIR)/, $(XML_SOURCES))
 
 TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(TESTS)))
 UNIT_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(UNIT_TESTS)))
+FUNCTIONAL_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(FUNCTIONAL_TESTS)))
 INTEGRATION_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(INTEGRATION_TESTS)))
 
 # Build Targets
@@ -101,14 +103,14 @@ build-test: all $(TEST_BUILD_TARGETS)
 test: test-unit test-integration
 
 test-unit: start-server build/test/UnitBundle.js build/test/unit-test.html
-	TEST_LIST="$(UNIT_TESTS)" TEST_URL="http://localhost:8000/build/test/unit-test.html" node test-utils/runner.js
+	TEST_LIST="$(UNIT_TESTS) $(FUNCTIONAL_TESTS)" TEST_URL="http://localhost:8000/build/test/unit-test.html" node test-utils/runner.js
 
 test-integration: start-server build/test/IntegrationBundle.js build/test/integration-test.html
 	TEST_LIST="$(INTEGRATION_TESTS)" TEST_URL="http://localhost:8000/build/test/integration-test.html" ISOLATED=1 node test-utils/runner.js
 
 test-coverage: start-server build/test/CoverageBundle.js build/test/coverage-test.html
 	mkdir -p build/coverage
-	TEST_LIST="$(UNIT_TESTS)" TEST_URL="http://localhost:8000/build/test/coverage-test.html" COVERAGE=1 node test-utils/runner.js
+	TEST_LIST="$(UNIT_TESTS) $(FUNCTIONAL_TESTS)" TEST_URL="http://localhost:8000/build/test/coverage-test.html" COVERAGE=1 node test-utils/runner.js
 	$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage -t html
 	$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage/summary -t text-summary
 	cat build/coverage/summary && echo "\n"
@@ -215,9 +217,9 @@ $(TEST_BUILD_DIR)/%.js: %.ts
 	$(TYPESCRIPT) --project tsconfig.json
 
 $(TEST_BUILD_DIR)/Unit.js:
-	mkdir -p $(dir $@) && echo "import 'Workarounds';" $(UNIT_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
+	mkdir -p $(dir $@) && echo "import 'Workarounds';" $(UNIT_TESTS) $(FUNCTIONAL_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
 
-$(TEST_BUILD_DIR)/UnitBundle.js: $(TEST_BUILD_DIR)/Unit.js $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS) $(UNIT_TEST_TARGETS)
+$(TEST_BUILD_DIR)/UnitBundle.js: $(TEST_BUILD_DIR)/Unit.js $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS) $(UNIT_TEST_TARGETS) $(FUNCTIONAL_TEST_TARGETS)
 	$(ROLLUP) --config rollup.config.test.unit.js
 
 $(TEST_BUILD_DIR)/UnitBundle.min.js: $(TEST_BUILD_DIR)/UnitBundle.js
@@ -229,7 +231,7 @@ $(TEST_BUILD_DIR)/Integration.js:
 $(TEST_BUILD_DIR)/IntegrationBundle.js: $(TEST_BUILD_DIR)/Integration.js $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS) $(INTEGRATION_TEST_TARGETS)
 	$(ROLLUP) --config rollup.config.test.integration.js
 
-$(TEST_BUILD_DIR)/CoverageBundle.js: $(TEST_BUILD_DIR)/Unit.js $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS) $(UNIT_TEST_TARGETS)
+$(TEST_BUILD_DIR)/CoverageBundle.js: $(TEST_BUILD_DIR)/Unit.js $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS) $(UNIT_TEST_TARGETS) $(FUNCTIONAL_TEST_TARGETS)
 	$(ROLLUP) --config rollup.config.test.coverage.js
 
 %::
