@@ -66,7 +66,7 @@ export class AdMobSignalFactory {
             signal.setIsNetworkMetered(false);
         }
 
-        promises.push(UserCountData.getRequestCount(this._core.Storage).then(requestCount => {
+        promises.push(UserCountData.getRequestCount(this._core).then(requestCount => {
             if (typeof requestCount === 'number') {
                 signal.setNumPriorUserRequests(requestCount);
             }
@@ -86,7 +86,7 @@ export class AdMobSignalFactory {
             }));
         }
 
-        promises.push(UserCountData.getClickCount(this._core.Storage).then(clickCount => {
+        promises.push(UserCountData.getClickCount(this._core).then(clickCount => {
             if (typeof clickCount === 'number') {
                 signal.setPriorClickCount(clickCount);
             }
@@ -94,7 +94,7 @@ export class AdMobSignalFactory {
             this.logFailure('priorClickCount');
         }));
 
-        promises.push(UserCountData.getPriorRequestToReadyTime(this._core.Storage).then(priorReadyTime => {
+        promises.push(UserCountData.getPriorRequestToReadyTime(this._core).then(priorReadyTime => {
             if (typeof priorReadyTime === 'number') {
                 signal.setAdLoadDuration(priorReadyTime);
             }

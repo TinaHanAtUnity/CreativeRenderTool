@@ -62,7 +62,7 @@ describe('FailedOperativeEventManagerTest', () => {
             describe('Performance events', () => {
                 it('Should send single event', () => {
                     const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
-                    const manager = new FailedOperativeEventManager(core.Storage, '12345', '12345');
+                    const manager = new FailedOperativeEventManager(core, '12345', '12345');
                     return manager.sendFailedEvent(request, storageBridge).then(() => {
                         return storagePromise;
                     }).then(() => {
@@ -78,8 +78,8 @@ describe('FailedOperativeEventManagerTest', () => {
 
                 it('Should send multiple events', () => {
                     const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
-                    const manager = new FailedOperativeEventManager(core.Storage, '12345');
-                    return manager.sendFailedEvents(core.Storage, request, storageBridge).then(() => {
+                    const manager = new FailedOperativeEventManager(core, '12345');
+                    return manager.sendFailedEvents(request, storageBridge).then(() => {
                         return storagePromise;
                     }).then(() => {
                         sinon.assert.calledOnce(<sinon.SinonSpy>core.Storage.getKeys);
@@ -92,7 +92,7 @@ describe('FailedOperativeEventManagerTest', () => {
                 });
 
                 it('Should not send event without eventId', () => {
-                    const manager = new FailedOperativeEventManager(core.Storage, '12345');
+                    const manager = new FailedOperativeEventManager(core, '12345');
                     return manager.sendFailedEvent(request, storageBridge).then(() => {
                         sinon.assert.notCalled(<sinon.SinonSpy>core.Storage.get);
                         sinon.assert.notCalled(<sinon.SinonSpy>request.post);
@@ -112,7 +112,7 @@ describe('FailedOperativeEventManagerTest', () => {
                     HttpKafka.setRequest(request);
 
                     const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
-                    const manager = new FailedXpromoOperativeEventManager(core.Storage, '12345', '12345');
+                    const manager = new FailedXpromoOperativeEventManager(core, '12345', '12345');
                     return manager.sendFailedEvent(request, storageBridge).then(() => {
                         return storagePromise;
                     }).then(() => {
@@ -137,7 +137,7 @@ describe('FailedOperativeEventManagerTest', () => {
 
             it('Single event', () => {
                 const storagePromise = StorageBridgeHelper.waitForPrivateStorageBatch(storageBridge);
-                const manager = new FailedOperativeEventManager(core.Storage, '12345', '12345');
+                const manager = new FailedOperativeEventManager(core, '12345', '12345');
                 return manager.storeFailedEvent(storageBridge, {test1: 'test1', test2: 'test2'}).then(() => {
                     return storagePromise;
                 }).then(() => {

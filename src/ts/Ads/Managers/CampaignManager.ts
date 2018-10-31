@@ -734,9 +734,9 @@ export class CampaignManager {
         SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
         SdkStats.increaseAdRequestOrdinal();
 
-        UserCountData.getRequestCount(this._core.Storage).then((requestCount) => {
+        UserCountData.getRequestCount(this._core).then((requestCount) => {
             if (typeof requestCount === 'number') {
-                UserCountData.setRequestCount(requestCount + 1, this._core.Storage);
+                UserCountData.setRequestCount(requestCount + 1, this._core);
             }
         }).catch(() => {
             Diagnostics.trigger('request_count_failure', {

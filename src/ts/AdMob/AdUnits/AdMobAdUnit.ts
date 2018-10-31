@@ -92,9 +92,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.sendTrackingEvent('click');
         this._operativeEventManager.sendClick(this.getOperativeEventParams());
 
-        UserCountData.getClickCount(this._core.Storage).then((clickCount) => {
+        UserCountData.getClickCount(this._core).then((clickCount) => {
             if (typeof clickCount === 'number') {
-                UserCountData.setClickCount(clickCount + 1, this._core.Storage);
+                UserCountData.setClickCount(clickCount + 1, this._core);
             }
         }).catch(() => {
             Diagnostics.trigger('request_count_failure', {

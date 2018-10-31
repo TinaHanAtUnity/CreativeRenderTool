@@ -104,7 +104,7 @@ describe('VastVideoEventHandler tests', () => {
         wakeUpManager = new WakeUpManager(core);
         request = new RequestManager(platform, core, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
-        sessionManager = new SessionManager(core.Storage, request, storageBridge);
+        sessionManager = new SessionManager(core, request, storageBridge);
 
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();

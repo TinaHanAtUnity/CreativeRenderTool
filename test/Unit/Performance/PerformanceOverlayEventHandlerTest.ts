@@ -70,7 +70,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
         video = new Video('', TestFixtures.getSession());
         const thirdPartyEventManager = new ThirdPartyEventManager(core, request);
-        const sessionManager = new SessionManager(core.Storage, request, storageBridge);
+        const sessionManager = new SessionManager(core, request, storageBridge);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
             core,

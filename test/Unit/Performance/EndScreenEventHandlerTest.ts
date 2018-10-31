@@ -83,7 +83,7 @@ describe('EndScreenEventHandlerTest', () => {
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             thirdPartyEventManager = new ThirdPartyEventManager(core, request);
-            sessionManager = new SessionManager(core.Storage, request, storageBridge);
+            sessionManager = new SessionManager(core, request, storageBridge);
             coreConfig = TestFixtures.getCoreConfiguration();
             adsConfig = TestFixtures.getAdsConfiguration();
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -315,7 +315,7 @@ describe('EndScreenEventHandlerTest', () => {
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
             deviceInfo = TestFixtures.getIosDeviceInfo(core);
             thirdPartyEventManager = new ThirdPartyEventManager(core, request);
-            sessionManager = new SessionManager(core.Storage, request, storageBridge);
+            sessionManager = new SessionManager(core, request, storageBridge);
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 

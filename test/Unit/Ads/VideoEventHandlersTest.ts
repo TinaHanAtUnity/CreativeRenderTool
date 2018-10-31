@@ -108,7 +108,7 @@ describe('VideoEventHandlersTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
 
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
-        sessionManager = new SessionManager(core.Storage, request, storageBridge);
+        sessionManager = new SessionManager(core, request, storageBridge);
         vastCampaign = TestFixtures.getEventVastCampaign();
         performanceCampaign = TestFixtures.getCampaign();
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);

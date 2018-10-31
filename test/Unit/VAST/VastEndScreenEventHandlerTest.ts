@@ -75,7 +75,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
 
             const campaign = TestFixtures.getCompanionVastCampaign();
             const thirdPartyEventManager = new ThirdPartyEventManager(core, request);
-            const sessionManager = new SessionManager(core.Storage, request, storageBridge);
+            const sessionManager = new SessionManager(core, request, storageBridge);
             const coreConfig = TestFixtures.getCoreConfiguration();
             const adsConfig = TestFixtures.getAdsConfiguration();
             const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({

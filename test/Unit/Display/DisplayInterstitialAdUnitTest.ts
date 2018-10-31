@@ -90,7 +90,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 sandbox.stub(container, 'open').returns(Promise.resolve());
                 sandbox.stub(container, 'close').returns(Promise.resolve());
                 thirdPartyEventManager = new ThirdPartyEventManager(core, request);
-                sessionManager = new SessionManager(core.Storage, request, storageBridge);
+                sessionManager = new SessionManager(core, request, storageBridge);
                 const gdprManager = sinon.createStubInstance(GdprManager);
                 const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({

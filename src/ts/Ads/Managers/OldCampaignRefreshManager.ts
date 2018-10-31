@@ -359,7 +359,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
                 if(placementState === PlacementState.READY) {
                     SdkStats.setReadyEventTimestamp(placementId);
                     SdkStats.sendReadyEvent(placementId);
-                    UserCountData.setPriorRequestToReadyTime(SdkStats.getRequestToReadyTime(placementId), this._core.Storage);
+                    UserCountData.setPriorRequestToReadyTime(SdkStats.getRequestToReadyTime(placementId), this._core);
                     this._core.Sdk.logDebug('Unity Ads placement ' + placementId + ' request to ready time took ' + SdkStats.getRequestToReadyTime(placementId));
                 }
             });
@@ -370,7 +370,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
             if(placementState === PlacementState.READY) {
                 SdkStats.setReadyEventTimestamp(placementId);
                 SdkStats.sendReadyEvent(placementId);
-                UserCountData.setPriorRequestToReadyTime(SdkStats.getRequestToReadyTime(placementId), this._core.Storage);
+                UserCountData.setPriorRequestToReadyTime(SdkStats.getRequestToReadyTime(placementId), this._core);
                 this._core.Sdk.logDebug('Unity Ads placement ' + placementId + ' request to ready time took ' + SdkStats.getRequestToReadyTime(placementId));
             }
         }

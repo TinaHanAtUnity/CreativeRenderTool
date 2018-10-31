@@ -94,7 +94,7 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
             request = new RequestManager(platform, core, wakeUpManager);
 
             thirdPartyEventManager = new ThirdPartyEventManager(core, request);
-            sessionManager = new SessionManager(core.Storage, request, storageBridge);
+            sessionManager = new SessionManager(core, request, storageBridge);
             request = new RequestManager(platform, core, wakeUpManager);
             sinon.stub(request, 'followRedirectChain').callsFake((url) => {
                 return Promise.resolve(url);

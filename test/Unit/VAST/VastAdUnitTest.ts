@@ -95,7 +95,7 @@ describe('VastAdUnitTest', () => {
             video.setDuration(duration);
         }
 
-        const sessionManager = new SessionManager(core.Storage, request, storageBridge);
+        const sessionManager = new SessionManager(core, request, storageBridge);
         const metaDataManager = new MetaDataManager(core);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,

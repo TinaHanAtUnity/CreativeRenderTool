@@ -85,7 +85,7 @@ describe('OverlayEventHandlerTest', () => {
 
         campaign = TestFixtures.getCampaign();
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
-        sessionManager = new SessionManager(core.Storage, request, storageBridge);
+        sessionManager = new SessionManager(core, request, storageBridge);
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
             core,

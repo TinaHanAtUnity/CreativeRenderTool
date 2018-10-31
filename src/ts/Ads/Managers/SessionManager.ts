@@ -2,21 +2,22 @@ import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventMa
 import { Session } from 'Ads/Models/Session';
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
+import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { StorageOperation } from 'Core/Utilities/StorageOperation';
 import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
+import { ICoreApi } from 'Core/ICore';
 
 export class SessionManager {
 
-    private _storage: StorageApi;
+    private _core: ICoreApi;
     private _request: RequestManager;
     private _storageBridge: StorageBridge;
     private _gameSessionId: number;
 
-    constructor(storage: StorageApi, request: RequestManager, storageBridge: StorageBridge) {
-        this._storage = storage;
+    constructor(core: ICoreApi, request: RequestManager, storageBridge: StorageBridge) {
+        this._core = core;
         this._request = request;
         this._storageBridge = storageBridge;
     }
@@ -70,11 +71,11 @@ export class SessionManager {
     }
 
     private getUnsentSessions(): Promise<string[]> {
-        return this._storage.getKeys(StorageType.PRIVATE, 'session', false);
+        return this._core.Storage.getKeys(StorageType.PRIVATE, 'session', false);
     }
 
     private isSessionOutdated(sessionId: string): Promise<boolean> {
-        return this._storage.get<number>(StorageType.PRIVATE, SessionUtils.getSessionStorageTimestampKey(sessionId)).then(timestamp => {
+        return this._core.Storage.get<number>(StorageType.PRIVATE, SessionUtils.getSessionStorageTimestampKey(sessionId)).then(timestamp => {
             const timeThresholdMin: number = new Date().getTime() - 7 * 24 * 60 * 60 * 1000;
             const timeThresholdMax: number = new Date().getTime();
 
@@ -86,10 +87,10 @@ export class SessionManager {
 
     private sendUnsentEvents(sessionId: string): Promise<any[]> {
         const promises: Array<Promise<any>> = [];
-        const failedOperativeEventManager = new FailedOperativeEventManager(this._storage, sessionId);
-        promises.push(failedOperativeEventManager.sendFailedEvents(this._storage, this._request, this._storageBridge));
-        const failedXpromoOperativeEventManager = new FailedXpromoOperativeEventManager(this._storage, sessionId);
-        promises.push(failedXpromoOperativeEventManager.sendFailedEvents(this._storage, this._request, this._storageBridge));
+        const failedOperativeEventManager = new FailedOperativeEventManager(this._core, sessionId);
+        promises.push(failedOperativeEventManager.sendFailedEvents(this._request, this._storageBridge));
+        const failedXpromoOperativeEventManager = new FailedXpromoOperativeEventManager(this._core, sessionId);
+        promises.push(failedXpromoOperativeEventManager.sendFailedEvents(this._request, this._storageBridge));
         return Promise.all(promises);
     }
 }

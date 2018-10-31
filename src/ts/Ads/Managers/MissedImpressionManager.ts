@@ -1,13 +1,13 @@
-import { StorageApi, StorageType } from 'Core/Native/Storage';
+import { StorageType } from 'Core/Native/Storage';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { ICoreApi } from 'Core/ICore';
 
 export class MissedImpressionManager {
-    private _storage: StorageApi;
+    private _core: ICoreApi;
 
-    constructor(storage: StorageApi) {
-        this._storage = storage;
-
-        this._storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
+    constructor(core: ICoreApi) {
+        this._core = core;
+        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
     private onStorageSet(eventType: string, data: any) {
@@ -15,8 +15,8 @@ export class MissedImpressionManager {
             HttpKafka.sendEvent('ads.sdk2.events.missedimpression.json', KafkaCommonObjectType.ANONYMOUS, {
                 ordinal: data.mediation.missedImpressionOrdinal.value
             });
-            this._storage.delete(StorageType.PUBLIC, 'mediation.missedImpressionOrdinal');
-            this._storage.write(StorageType.PUBLIC);
+            this._core.Storage.delete(StorageType.PUBLIC, 'mediation.missedImpressionOrdinal');
+            this._core.Storage.write(StorageType.PUBLIC);
         }
     }
 }

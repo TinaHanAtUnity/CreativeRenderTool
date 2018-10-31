@@ -21,7 +21,6 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
-import { StorageApi } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
@@ -81,7 +80,6 @@ export class OperativeEventManager {
     protected _clientInfo: ClientInfo;
     protected _campaign: Campaign;
     protected _metaDataManager: MetaDataManager;
-    protected _storage: StorageApi;
     protected _storageBridge: StorageBridge;
     private _deviceInfo: DeviceInfo;
     private _request: RequestManager;
@@ -274,7 +272,7 @@ export class OperativeEventManager {
             followRedirects: false,
             retryWithConnectionEvents: false
         }).catch(() => {
-            new FailedOperativeEventManager(this._storage, sessionId, eventId).storeFailedEvent(this._storageBridge, {
+            new FailedOperativeEventManager(this._core, sessionId, eventId).storeFailedEvent(this._storageBridge, {
                url: url,
                data: data
             });

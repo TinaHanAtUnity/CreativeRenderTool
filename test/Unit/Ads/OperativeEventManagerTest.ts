@@ -66,7 +66,7 @@ describe('OperativeEventManagerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
 
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
-        sessionManager = new SessionManager(core.Storage, request, storageBridge);
+        sessionManager = new SessionManager(core, request, storageBridge);
         operativeEventManagerParams = {
             platform,
             core,
