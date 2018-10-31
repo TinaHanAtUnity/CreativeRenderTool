@@ -402,6 +402,8 @@ export class CampaignManager {
                         }
                     }
 
+                    this._backupCampaignManager.storePlacement(this._adsConfig.getPlacement(placement), mediaId, trackingUrls);
+
                     const auctionPlacement: AuctionPlacement = new AuctionPlacement(placement, mediaId, trackingUrls);
 
                     if(campaigns[mediaId]) {

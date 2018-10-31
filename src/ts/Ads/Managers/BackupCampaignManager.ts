@@ -29,7 +29,7 @@ export class BackupCampaignManager {
         this._coreConfiguration = coreConfiguration;
     }
 
-    public storePlacement(placement: Placement, mediaId: string) {
+    public storePlacement(placement: Placement, mediaId: string, trackingUrls?: { [eventName: string]: string[] }) {
         // never store data when in test mode
         if(this._coreConfiguration.getTestMode()) {
             return;
@@ -40,6 +40,11 @@ export class BackupCampaignManager {
         const operation = new StorageOperation(StorageType.PRIVATE);
         operation.set(rootKey + '.mediaid', mediaId);
         operation.set(rootKey + '.adtypes', JSON.stringify(placement.getAdTypes()));
+
+        if(trackingUrls) {
+            operation.set(rootKey + '.trackingurls', JSON.stringify(trackingUrls));
+        }
+
         this._storageBridge.queue(operation);
     }
 
@@ -101,6 +106,14 @@ export class BackupCampaignManager {
             } else {
                 return undefined;
             }
+        }).catch(() => {
+            return undefined;
+        });
+    }
+
+    public loadTrackingUrls(placement: Placement): Promise<{ [eventName: string]: string[] } | undefined> {
+        return this.getString('backupcampaign.placement.' + placement.getId() + '.trackingurls').then(rawTrackingUrls => {
+            return JSON.parse(rawTrackingUrls);
         }).catch(() => {
             return undefined;
         });

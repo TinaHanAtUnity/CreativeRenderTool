@@ -131,11 +131,12 @@ export class OldCampaignRefreshManager extends RefreshManager {
         const placements = this._configuration.getPlacements();
         for(const placement in this._configuration.getPlacements()) {
             if(placements.hasOwnProperty(placement)) {
-                promises.push(backupCampaignManager.loadCampaign(this._configuration.getPlacement(placement)).then(campaign => {
+                const promise = Promise.all([backupCampaignManager.loadCampaign(this._configuration.getPlacement(placement)), backupCampaignManager.loadTrackingUrls(this._configuration.getPlacement(placement))]).then(([campaign, trackingUrls]) => {
                     if(campaign) {
-                        this.setPlacementReady(placement, campaign, undefined); // todo: fix tracking url loading for backup campaigns
+                        // todo: during auction v5 test it's ok if trackingUrls is undefined but after unconditional transition to v5 loading trackingUrls should be enforced
+                        this.setPlacementReady(placement, campaign, trackingUrls);
                     }
-                }));
+                });
             }
         }
 
