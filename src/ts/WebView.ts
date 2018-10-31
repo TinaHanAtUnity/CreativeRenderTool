@@ -1,6 +1,6 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { AdUnitFactory } from 'Ads/AdUnits/AdUnitFactory';
+import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
@@ -63,7 +63,7 @@ import { HttpKafka } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { Promises, TimeoutError } from 'Core/Utilities/Promises';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Utilities/Request';
 import { Resolve } from 'Core/Utilities/Resolve';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
@@ -71,6 +71,20 @@ import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { AdMobAdUnitFactory } from 'AdMob/AdUnits/AdMobAdUnitFactory';
+import { DisplayInterstitialAdUnitFactory } from 'Display/AdUnits/DisplayInterstitialAdUnitFactory';
+import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
+import { PromoAdUnitFactory } from 'Promo/AdUnits/PromoAdUnitFactory';
+import { VastAdUnitFactory } from 'VAST/AdUnits/VastAdUnitFactory';
+import { VPAIDAdUnitFactory } from 'VPAID/AdUnits/VPAIDAdUnitFactory';
+import { XPromoAdUnitFactory } from 'XPromo/AdUnits/XPromoAdUnitFactory';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { PlacementContentManager } from 'Monetization/Managers/PlacementContentManager';
 import { NativePromoPlacementContentEventManager } from 'Monetization/Managers/NativePromoPlacementContentManager';
@@ -78,6 +92,7 @@ import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHan
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
 
 export class WebView {
 
@@ -127,6 +142,15 @@ export class WebView {
     private _wasRealtimePlacement: boolean = false;
 
     private _bannerAdContext: BannerAdContext;
+
+    private _vastAdUnitFactory = new VastAdUnitFactory();
+    private _mraidAdUnitFactory = new MRAIDAdUnitFactory();
+    private _performanceAdUnitFactory = new PerformanceAdUnitFactory();
+    private _displayInterstitialAdUnitFactory = new DisplayInterstitialAdUnitFactory();
+    private _vpaidAdUnitFactory = new VPAIDAdUnitFactory();
+    private _xpromoAdUnitFactory = new XPromoAdUnitFactory();
+    private _adMobAdUnitFactory = new AdMobAdUnitFactory();
+    private _promoAdUnitFactory = new PromoAdUnitFactory();
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -310,7 +334,7 @@ export class WebView {
 
             const bannerCampaignManager = new BannerCampaignManager(this._nativeBridge, this._coreConfig, this._adsConfig, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._jaegerManager);
             const bannerWebPlayerContainer = new BannerWebPlayerContainer(this._nativeBridge);
-            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._coreConfig, this._adsConfig, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer, this._programmaticTrackingService, this._storageBridge);
+            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._clientInfo, bannerWebPlayerContainer);
             this._bannerAdContext = new BannerAdContext(this._nativeBridge, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, this._focusManager, this._deviceInfo);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._coreConfig, this._adsConfig, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo, this._cache);
@@ -479,7 +503,7 @@ export class WebView {
             }
 
             const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, {
+            this._currentAdUnit = this.createAdUnit(this._nativeBridge, {
                 forceOrientation: orientation,
                 focusManager: this._focusManager,
                 container: this._container,
@@ -580,6 +604,29 @@ export class WebView {
         }
     }
 
+    private createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
+
+        if (parameters.campaign instanceof VastCampaign) {
+            return this._vastAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<VastCampaign>>parameters);
+        } else if(parameters.campaign instanceof MRAIDCampaign) {
+            return this._mraidAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>parameters);
+        } else if(parameters.campaign instanceof PerformanceCampaign) {
+            return this._performanceAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<PerformanceCampaign>>parameters);
+        } else if (parameters.campaign instanceof DisplayInterstitialCampaign) {
+            return this._displayInterstitialAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<DisplayInterstitialCampaign>>parameters);
+        } else if (parameters.campaign instanceof VPAIDCampaign) {
+            return this._vpaidAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<VPAIDCampaign>>parameters);
+        } else if (parameters.campaign instanceof XPromoCampaign) {
+            return this._xpromoAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<XPromoCampaign>>parameters);
+        } else if (parameters.campaign instanceof AdMobCampaign) {
+            return this._adMobAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<AdMobCampaign>>parameters);
+        } else if (parameters.campaign instanceof PromoCampaign) {
+            return this._promoAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<PromoCampaign>>parameters);
+        } else {
+            throw new Error('Unknown campaign instance type');
+        }
+    }
+
     private onAdUnitClose(): void {
         this._showing = false;
 
@@ -668,7 +715,7 @@ export class WebView {
             }
 
             if(TestEnvironment.get('forcedPlayableMRAID')) {
-                AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
+                MRAIDAdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
             }
 
             if(TestEnvironment.get('forceAuthorization')) {
@@ -683,13 +730,13 @@ export class WebView {
             }
 
             if(TestEnvironment.get('forcedGDPRBanner')) {
-                AdUnitFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
+                AbstractAdUnitFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
             }
 
             let forcedARMRAID = false;
             if (TestEnvironment.get('forcedARMRAID')) {
                 forcedARMRAID = TestEnvironment.get('forcedARMRAID');
-                AdUnitFactory.setForcedARMRAID(forcedARMRAID);
+                MRAIDAdUnitFactory.setForcedARMRAID(forcedARMRAID);
             }
 
             if(TestEnvironment.get('creativeUrl')) {
