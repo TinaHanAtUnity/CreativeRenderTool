@@ -130,6 +130,10 @@ export class Request {
     }
 
     public get(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
+        if(typeof options === 'undefined') {
+            options = Request.getDefaultRequestOptions();
+        }
+
         const id = Request._callbackId++;
         const promise = this.registerCallback(id);
         this.invokeRequest(id, {
@@ -137,12 +141,16 @@ export class Request {
             url: url,
             headers: Request.applyAuthorizationHeader(url, headers),
             retryCount: 0,
-            options: this.getOptions(options)
+            options: options
         });
         return promise;
     }
 
     public post(url: string, data: string = '', headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
+        if(typeof options === 'undefined') {
+            options = Request.getDefaultRequestOptions();
+        }
+
         headers.push(['Content-Type', 'application/json']);
 
         const id = Request._callbackId++;
@@ -153,12 +161,15 @@ export class Request {
             data: data,
             headers: Request.applyAuthorizationHeader(url, headers),
             retryCount: 0,
-            options: this.getOptions(options)
+            options: options
         });
         return promise;
     }
 
     public head(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
+        if(typeof options === 'undefined') {
+            options = Request.getDefaultRequestOptions();
+        }
 
         // fix for Android 4.0 and older, https://code.google.com/p/android/issues/detail?id=24672
         if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 16) {
@@ -172,7 +183,7 @@ export class Request {
             url: url,
             headers: headers,
             retryCount: 0,
-            options: this.getOptions(options)
+            options: options
         });
         return promise;
     }
@@ -182,16 +193,15 @@ export class Request {
         let redirectCount = 0;
         return new Promise((resolve, reject) => {
             const makeRequest = (requestUrl: string) => {
-                let modifiedRequestUrl = requestUrl;
                 redirectCount++;
-                modifiedRequestUrl = modifiedRequestUrl.trim();
+                requestUrl = requestUrl.trim();
                 if (redirectCount >= Request._redirectLimit) {
                     reject(new Error('redirect limit reached'));
-                } else if (modifiedRequestUrl.indexOf('http') === -1) {
+                } else if (requestUrl.indexOf('http') === -1) {
                     // market:// or itunes:// urls can be opened directly
-                    resolve(modifiedRequestUrl);
+                    resolve(requestUrl);
                 } else {
-                    this.head(modifiedRequestUrl).then((response: INativeResponse) => {
+                    this.head(requestUrl).then((response: INativeResponse) => {
                         if (Request.is3xxRedirect(response.responseCode)) {
                             const location = Request.getHeader(response.headers, 'location');
                             if (location) {
@@ -200,12 +210,12 @@ export class Request {
                                 reject(new Error(`${response.responseCode} response did not have a "Location" header`));
                             }
                         } else if (Request.is2xxSuccessful(response.responseCode)) {
-                            resolve(modifiedRequestUrl);
+                            resolve(requestUrl);
                         } else {
                             if (resolveOnHttpError) {
-                                resolve(modifiedRequestUrl);
+                                resolve(requestUrl);
                             } else {
-                                reject(new Error(`Request to ${modifiedRequestUrl} failed with status ${response.responseCode}`));
+                                reject(new Error(`Request to ${requestUrl} failed with status ${response.responseCode}`));
                             }
                         }
                     }).catch(reject);
@@ -213,14 +223,6 @@ export class Request {
             };
             makeRequest(url);
         });
-    }
-
-    private getOptions(options?: IRequestOptions): IRequestOptions {
-        if (options) {
-            return options;
-        } else {
-            return Request.getDefaultRequestOptions();
-        }
     }
 
     private registerCallback(id: number): Promise<INativeResponse> {

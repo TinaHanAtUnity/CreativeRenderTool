@@ -122,18 +122,17 @@ export class PerformanceOverlayWithCTAButtonEventHandler extends PerformanceOver
     }
 
     private triggerDiagnosticsError(error: any, clickAttributionUrl: string) {
-        let modifiedError = error;
         const currentSession = this._campaign.getSession();
 
-        if (modifiedError instanceof RequestError) {
-            modifiedError = new DiagnosticError(new Error(modifiedError.message), {
-                request: modifiedError.nativeRequest,
+        if (error instanceof RequestError) {
+            error = new DiagnosticError(new Error(error.message), {
+                request: error.nativeRequest,
                 auctionId: currentSession.getId(),
                 url: clickAttributionUrl,
-                response: modifiedError.nativeResponse
+                response: error.nativeResponse
             });
         }
-        SessionDiagnostics.trigger('click_attribution_failed', modifiedError, currentSession);
+        SessionDiagnostics.trigger('click_attribution_failed', error, currentSession);
     }
 
     private openAppStore(parameters: IVideoOverlayDownloadParameters) {
