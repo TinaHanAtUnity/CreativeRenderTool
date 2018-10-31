@@ -1,17 +1,18 @@
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
-import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
-import { Privacy } from 'Ads/Views/Privacy';
-import { StreamType } from 'Core/Constants/Android/StreamType';
-import { Platform } from 'Core/Constants/Platform';
-import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
-import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
-import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEventHandler';
-import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
-import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
+import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
+import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEventHandler';
+import { Platform } from 'Core/Constants/Platform';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
+import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
+import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
+import { StreamType } from 'Core/Constants/Android/StreamType';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export class VastAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -46,20 +47,26 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory {
 
         const vastAdUnit = new VastAdUnit(vastAdUnitParameters);
 
+        const vastOverlayHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
+        overlay.addEventHandler(vastOverlayHandler);
+
         if(parameters.campaign.hasEndscreen() && vastEndScreen) {
             const vastEndScreenHandler = new VastEndScreenEventHandler(vastAdUnit, vastAdUnitParameters);
             vastEndScreen.addEventHandler(vastEndScreenHandler);
 
             if (parameters.platform === Platform.ANDROID) {
-                const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => vastEndScreenHandler.onKeyEvent(keyCode));
+                const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) =>  {
+                    vastEndScreenHandler.onKeyEvent(keyCode);
+                    if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                        vastOverlayHandler.onKeyEvent(keyCode);
+                    }
+                });
+
                 vastAdUnit.onClose.subscribe(() => {
                     parameters.ads.Android!.AdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
                 });
             }
         }
-
-        const vastOverlayHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
-        overlay.addEventHandler(vastOverlayHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(vastAdUnit, parameters.campaign.getVideo(), undefined, vastAdUnitParameters);
         const vastVideoEventHandler = this.prepareVideoPlayer(VastVideoEventHandler, <IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);

@@ -134,6 +134,7 @@ export abstract class AbstractAdUnitFactory {
     protected createPrivacy(parameters: IAdUnitParameters<Campaign>): Privacy {
         const privacy = new Privacy(parameters.platform, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
         const privacyEventHandler = new PrivacyEventHandler(parameters);
+
         privacy.addEventHandler(privacyEventHandler);
         return privacy;
     }

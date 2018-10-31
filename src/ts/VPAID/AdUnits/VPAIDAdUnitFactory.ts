@@ -1,22 +1,17 @@
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { Closer } from 'Ads/Views/Closer';
-import { Privacy } from 'Ads/Views/Privacy';
-import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
-import { VPAIDEndScreenEventHandler } from 'VPAID/EventHandlers/VPAIDEndScreenEventHandler';
-import { VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
-import { VPAIDOverlayEventHandler } from 'VPAID/EventHandlers/VPAIDOverlayEventHandler';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
-import { VPAID } from 'VPAID/Views/VPAID';
+import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
+import { VPAIDOverlayEventHandler } from 'VPAID/EventHandlers/VPAIDOverlayEventHandler';
+import { VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
+import { VPAIDEndScreenEventHandler } from 'VPAID/EventHandlers/VPAIDEndScreenEventHandler';
+import { Closer } from 'Ads/Views/Closer';
+import { VPAID } from 'VPAID/Views/VPAID';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export class VPAIDAdUnitFactory extends AbstractAdUnitFactory {
-
-    public static ContentType = 'programmatic/vast-vpaid';
-
-    public canCreateAdUnit(contentType: string): boolean {
-        return contentType === VPAIDAdUnitFactory.ContentType;
-    }
 
     public createAdUnit(parameters: IAdUnitParameters<VPAIDCampaign>): VPAIDAdUnit {
         // WebPlayerContainer will always be defined, checking and throwing just to remove the undefined type.

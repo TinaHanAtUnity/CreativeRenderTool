@@ -25,6 +25,7 @@ export class PromoAdUnitFactory extends AbstractAdUnitFactory {
 
         promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.adsConfig, parameters.gdprManager));
         promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.campaign, parameters.placement.getId()));
+        promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromoClick(promoAdUnit, parameters.campaign, parameters.placement.getId()));
         Privacy.setupReportListener(privacy, promoAdUnit);
 
         return promoAdUnit;

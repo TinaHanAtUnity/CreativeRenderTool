@@ -1,7 +1,6 @@
 import { Core } from 'Core/Core';
 import { INativeCallback, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-
 export class WebView {
 
     private readonly _core: Core;
@@ -40,4 +39,5 @@ export class WebView {
         });
         return true; // returning true from window.onerror will suppress the error (in theory)
     }
+
 }

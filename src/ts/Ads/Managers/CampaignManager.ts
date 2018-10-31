@@ -1,7 +1,5 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { CampaignParserManager } from 'Ads/Managers/CampaignParserManager';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -42,6 +40,8 @@ import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
 import { CampaignError } from 'Ads/Errors/CampaignError';
+import { BackupCampaignManager } from './BackupCampaignManager';
+import { CampaignParserManager } from './CampaignParserManager';
 
 export class CampaignManager {
 

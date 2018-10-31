@@ -11,6 +11,10 @@ import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/Perfor
 import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { PerformanceVideoOverlayWithCTAButton } from 'Ads/Views/PerformanceVideoOverlayWithCTAButton';
+import { PerformanceOverlayEventHandlerWithAllowSkip } from 'Performance/EventHandlers/PerformanceOverlayEventHandlerWithAllowSkip';
+import { PerformanceOverlayWithCTAButtonEventHandler } from 'Performance/EventHandlers/PerformanceOverlayWithCTAButtonEventHandler';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -48,7 +52,18 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
         };
 
         const performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
-        const performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, performanceAdUnitParameters);
+
+        let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
+        const skipAllowed = parameters.placement.allowSkip();
+
+        if (overlay instanceof PerformanceVideoOverlayWithCTAButton) {
+            performanceOverlayEventHandler = new PerformanceOverlayWithCTAButtonEventHandler(performanceAdUnit, performanceAdUnitParameters);
+        } else if (!skipAllowed && CustomFeatures.allowSkipInRewardedVideos(parameters)) {
+            performanceOverlayEventHandler = new PerformanceOverlayEventHandlerWithAllowSkip(performanceAdUnit, performanceAdUnitParameters);
+        } else {
+            performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, performanceAdUnitParameters);
+        }
+
         overlay.addEventHandler(performanceOverlayEventHandler);
         const endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters);
         endScreen.addEventHandler(endScreenEventHandler);
@@ -57,7 +72,13 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
         this.prepareVideoPlayer(PerformanceVideoEventHandler, <IVideoEventHandlerParams<PerformanceAdUnit>>videoEventHandlerParams);
 
         if (parameters.platform === Platform.ANDROID) {
-            const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
+            const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
+                endScreenEventHandler.onKeyEvent(keyCode);
+
+                if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                    performanceOverlayEventHandler.onKeyEvent(keyCode);
+                }
+            });
             performanceAdUnit.onClose.subscribe(() => {
                 if(onBackKeyObserver) {
                     parameters.ads.Android!.AdUnit.onKeyDown.unsubscribe(onBackKeyObserver);

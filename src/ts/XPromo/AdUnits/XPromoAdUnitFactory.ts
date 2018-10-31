@@ -1,15 +1,16 @@
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
-import { Privacy } from 'Ads/Views/Privacy';
-import { Platform } from 'Core/Constants/Platform';
-import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
-import { XPromoEndScreenEventHandler } from 'XPromo/EventHandlers/XPromoEndScreenEventHandler';
-import { XPromoOverlayEventHandler } from 'XPromo/EventHandlers/XPromoOverlayEventHandler';
-import { XPromoVideoEventHandler } from 'XPromo/EventHandlers/XPromoVideoEventHandler';
-import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { IXPromoAdUnitParameters, XPromoAdUnit } from './XPromoAdUnit';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
+import { XPromoOverlayEventHandler } from 'XPromo/EventHandlers/XPromoOverlayEventHandler';
+import { XPromoEndScreenEventHandler } from 'XPromo/EventHandlers/XPromoEndScreenEventHandler';
+import { XPromoVideoEventHandler } from 'XPromo/EventHandlers/XPromoVideoEventHandler';
+import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
+import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
+import { Platform } from 'Core/Constants/Platform';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -40,7 +41,12 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
         this.prepareVideoPlayer(XPromoVideoEventHandler, <IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>>videoEventHandlerParams);
 
         if (parameters.platform === Platform.ANDROID) {
-            const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
+            const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
+                endScreenEventHandler.onKeyEvent(keyCode);
+                if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                    xPromoOverlayEventHandler.onKeyEvent(keyCode);
+                }
+            });
             xPromoAdUnit.onClose.subscribe(() => {
                 if(onBackKeyObserver) {
                     parameters.ads.Android!.AdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
