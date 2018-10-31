@@ -74,6 +74,7 @@ export class VideoFileInfo {
         });
     }
 
-    private static readonly _maxVideoDuration = 40000;
+    // Longest video shown should be no more than 40 seconds
+    public static readonly _maxVideoDuration = 40000;
 
 }
