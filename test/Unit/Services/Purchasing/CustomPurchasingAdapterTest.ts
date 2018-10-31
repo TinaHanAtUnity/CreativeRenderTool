@@ -8,7 +8,7 @@ import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Request } from 'Core/Utilities/Request';
 import { CustomPurchasingApi } from 'Purchasing/Native/CustomPurchasing';
-import { IProduct, ITransactionErrorDetails, ITransactionDetails, OrganicPurchase} from 'Purchasing/PurchasingAdapter';
+import { IProduct, ITransactionErrorDetails, ITransactionDetails} from 'Purchasing/PurchasingAdapter';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { asStub } from 'TestHelpers/Functions';

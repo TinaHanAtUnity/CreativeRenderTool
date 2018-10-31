@@ -78,6 +78,7 @@ import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHan
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { OrganicPurchaseManager } from 'Purchasing/OrganicPurchaseManager';
 
 export class WebView {
 
@@ -107,6 +108,7 @@ export class WebView {
     private _focusManager: FocusManager;
     private _analyticsManager: AnalyticsManager | undefined;
     private _promoEvents: PromoEvents;
+    private _organicPurchaseManager: OrganicPurchaseManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _missedImpressionManager: MissedImpressionManager;
     private _gdprManager: GdprManager;
@@ -279,6 +281,8 @@ export class WebView {
                 });
             }
             this._promoEvents = new PromoEvents(this._coreConfig, this._adsConfig, this._nativeBridge, this._clientInfo, this._deviceInfo, new AnalyticsStorage(this._nativeBridge));
+            this._organicPurchaseManager = new OrganicPurchaseManager(this._nativeBridge, this._promoEvents, this._request);
+            this._organicPurchaseManager.initialize();
             const gdprConsentPromise = this._gdprManager.getConsentAndUpdateConfiguration().catch((error) => {
                 // do nothing
                 // error happens when consent value is undefined

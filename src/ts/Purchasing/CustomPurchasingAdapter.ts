@@ -1,4 +1,4 @@
-import { IPurchasingAdapter, ITransactionDetails, IProduct, ITransactionErrorDetails, OrganicPurchase, IOrganicPurchase } from 'Purchasing/PurchasingAdapter';
+import { IPurchasingAdapter, ITransactionDetails, IProduct, ITransactionErrorDetails } from 'Purchasing/PurchasingAdapter';
 import { Observable1 } from 'Core/Utilities/Observable';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
@@ -8,7 +8,6 @@ import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Url } from 'Core/Utilities/Url';
 import { Request } from 'Core/Utilities/Request';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { StorageType } from 'Core/Native/Storage';
 
 export class CustomPurchasingAdapter implements IPurchasingAdapter {
     public readonly onCatalogRefreshed = new Observable1<IProduct[]>();
@@ -17,63 +16,18 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
     private _promoEvents: PromoEvents;
     private _products: {[productId: string]: IProduct};
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _request: Request;
-    private static InAppPurchaseStorageKey = 'iap.purchases';
 
     constructor(nativeBridge: NativeBridge, analyticsManager: AnalyticsManager | undefined, promoEvents: PromoEvents, request: Request) {
         this._nativeBridge = nativeBridge;
         this._analyticsManager = analyticsManager;
         this._promoEvents = promoEvents;
         this._products = {};
-        this._request = request;
 
         this._thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request, {});
-
-        this.getOrganicPurchase();
-        this._nativeBridge.Storage.onSet.subscribe(() => this.getOrganicPurchase());
     }
 
     public initialize() {
         return Promise.resolve();
-    }
-
-    private getOrganicPurchase(): Promise<void> {
-        return this._nativeBridge.Storage.get(StorageType.PUBLIC, CustomPurchasingAdapter.InAppPurchaseStorageKey).then((data: any) => {
-            if (data && data.length && data.length > 0) {
-                for(const event of data) {
-                    const organicPurchaseEvent = new OrganicPurchase(event);
-                    this.postOrganicPurchaseEvents(organicPurchaseEvent);
-                }
-                this.resetIAPPurchaseMetaData();
-            }
-        });
-    }
-
-    private resetIAPPurchaseMetaData(): Promise<void> {
-        return this._nativeBridge.Storage.set(StorageType.PUBLIC, CustomPurchasingAdapter.InAppPurchaseStorageKey, []).then(() => {
-            this._nativeBridge.Storage.write(StorageType.PUBLIC);
-        });
-    }
-
-    private postOrganicPurchaseEvents(organicPurchaseEvent: OrganicPurchase) {
-        const productId = organicPurchaseEvent.getId();
-        let productType: string | undefined;
-        if (productId) {
-            const product = this._products[productId];
-            if (product) {
-                productType = product.productType;
-            }
-        }
-        this._promoEvents.onOrganicPurchaseSuccess({
-            store: this._promoEvents.getAppStoreFromReceipt(organicPurchaseEvent.getReceipt()),
-            productId: organicPurchaseEvent.getId(),
-            storeSpecificId: organicPurchaseEvent.getId(),
-            amount: organicPurchaseEvent.getPrice(),
-            currency: organicPurchaseEvent.getCurrency(),
-            native: false}, productType, organicPurchaseEvent.getReceipt()).then((body) => {
-                this._request.post(Url.addParameters('https://events.iap.unity3d.com/events/v1/organic_purchase', {'native': false, 'iap_service': false}), JSON.stringify(body));
-            }
-        );
     }
 
     public refreshCatalog(): Promise<IProduct[]> {

@@ -1,7 +1,7 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { IProduct, ITransactionErrorDetails, ITransactionDetails, OrganicPurchase} from 'Purchasing/PurchasingAdapter';
+import { OrganicPurchase, IOrganicPurchase } from 'Purchasing/OrganicPurchaseManager';
 
 describe('CustomPurchasingAdapter', () => {
     let sandbox: sinon.SinonSandbox;
@@ -27,7 +27,7 @@ describe('CustomPurchasingAdapter', () => {
         });
 
         it('create OrganicPurchase with missing fields', () => {
-            const event = {productId: 'productIDID', price: 1.25};
+            const event = <IOrganicPurchase>{productId: 'productIDID', price: 1.25};
             organicPurchase = new OrganicPurchase(event);
 
             assert.deepEqual('productIDID', organicPurchase.getId());
@@ -38,7 +38,7 @@ describe('CustomPurchasingAdapter', () => {
         });
 
         it('create OrganicPurchase with no value', () => {
-            organicPurchase = new OrganicPurchase({});
+            organicPurchase = new OrganicPurchase(<IOrganicPurchase>{});
 
             assert.exists(organicPurchase);
             assert.isUndefined(organicPurchase.getId());
