@@ -241,7 +241,7 @@ export class Privacy extends AbstractPrivacy {
                 break;
             }
             default: {
-                // Thanks linter
+                // Must be included. Thanks linter.
             }
         }
     }

@@ -19,6 +19,7 @@ export class NewVastVideoOverlay extends NewVideoOverlay implements IPrivacyHand
     public hide() {
         super.hide();
 
+        // Only delete if control doesn't need to be transferred to endscreen
         if (!this._hasEndcard && this._privacy) {
             this._privacy.hide();
             document.body.removeChild(this._privacy.container());
