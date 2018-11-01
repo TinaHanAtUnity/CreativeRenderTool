@@ -17,8 +17,8 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
     protected _placement: Placement;
     protected _nativeBridge: NativeBridge;
     protected _campaign: T;
-    protected _operativeEventManager: OperativeEventManager;
-    protected _adUnit: VideoAdUnit<T>;
+    private _adUnit: VideoAdUnit<T>;
+    private _operativeEventManager: OperativeEventManager;
     private _adUnitStyle?: AdUnitStyle;
 
     constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
@@ -90,7 +90,7 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
         return position >= allowSkipInMs;
     }
 
-    protected getVideoOrientation(): string | undefined {
+    private getVideoOrientation(): string | undefined {
         if(this._adUnit instanceof PerformanceAdUnit) {
             return (<PerformanceAdUnit>this._adUnit).getVideoOrientation();
         }
