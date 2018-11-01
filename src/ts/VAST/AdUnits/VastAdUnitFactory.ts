@@ -19,7 +19,7 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory {
 
     public createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>): VastAdUnit {
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        const overlay = this.createOverlay(nativeBridge, parameters, privacy, true, parameters.campaign.hasEndscreen());
+        const overlay = this.createOverlay(nativeBridge, parameters, privacy, true);
         let vastEndScreen: VastEndScreen | undefined;
 
         const vastAdUnitParameters: IVastAdUnitParameters = {

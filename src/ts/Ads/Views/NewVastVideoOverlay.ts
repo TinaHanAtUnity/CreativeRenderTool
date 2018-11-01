@@ -5,9 +5,9 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 
-import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
+import NewVastVideoOverlayTemplate from 'html/NewVastVideoOverlay.html';
 
-export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
+export class NewVastVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
@@ -37,15 +37,18 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _showGDPRBanner: boolean = false;
     private _showPrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
+    private _seatId: number | undefined;
+    private _hasEndcard: boolean;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, hasEndcard: boolean, seatId: number | undefined) {
         super(nativeBridge, 'new-video-overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
         this._showGDPRBanner = showGDPRBanner;
-        this._showPrivacyDuringVideo = showPrivacyDuringVideo;
         this._gameId = gameId;
-        this._template = new Template(NewVideoOverlayTemplate, this._localization);
+        this._template = new Template(NewVastVideoOverlayTemplate, this._localization);
+        this._seatId = seatId;
+        this._hasEndcard = hasEndcard;
 
         this._templateData = {
             muted
@@ -95,13 +98,11 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             });
         }
 
-        if (showPrivacyDuringVideo) {
-            this._privacy = privacy;
-            this._privacy.render();
-            this._privacy.hide();
-            document.body.appendChild(this._privacy.container());
-            this._privacy.addEventHandler(this);
-        }
+        this._privacy = privacy;
+        this._privacy.render();
+        this._privacy.hide();
+        document.body.appendChild(this._privacy.container());
+        this._privacy.addEventHandler(this);
 
         setTimeout(() => {
             this.fadeIn();
@@ -111,7 +112,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     public hide() {
         super.hide();
 
-        if (this._privacy) {
+        if (!this._hasEndcard && this._privacy) {
             this._privacy.hide();
             document.body.removeChild(this._privacy.container());
             delete this._privacy;
@@ -126,6 +127,13 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         super.render();
         this.setupElementReferences();
         this.choosePrivacyShown();
+
+        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
+            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
+            if (tencentAdTag) {
+                tencentAdTag.innerText = '广告';
+            }
+        }
 
         if(CustomFeatures.isCheetahGame(this._gameId)) {
             this._skipButtonElement.classList.add('close-icon-skip');
@@ -152,7 +160,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     public setVideoProgress(value: number): void {
-        if (NewVideoOverlay.AutoSkip) {
+        if (NewVastVideoOverlay.AutoSkip) {
             this._handlers.forEach(handler => handler.onOverlaySkip(value));
         }
 

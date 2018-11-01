@@ -22,7 +22,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
     public createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
         const privacy = this.createPrivacy(nativeBridge, parameters);
         const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose();
-        const overlay = this.createOverlay(nativeBridge, parameters, privacy, showPrivacyDuringVideo, false);
+        const overlay = this.createOverlay(nativeBridge, parameters, privacy, showPrivacyDuringVideo);
 
         const adUnitStyle: AdUnitStyle = parameters.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
 

@@ -15,15 +15,16 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { Privacy } from 'Ads/Views/Privacy';
+import { NewVastVideoOverlay } from 'Ads/Views/NewVastVideoOverlay';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
+import { PerformanceVideoOverlayWithCTAButton } from 'Ads/Views/PerformanceVideoOverlayWithCTAButton';
+import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
+import { PerformanceVideoOverlayCTAButtonTest } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { PerformanceVideoOverlayCTAButtonTest } from 'Core/Models/ABGroup';
-import { PerformanceVideoOverlayWithCTAButton } from 'Ads/Views/PerformanceVideoOverlayWithCTAButton';
 
 export abstract class AbstractAdUnitFactory {
 
@@ -95,8 +96,9 @@ export abstract class AbstractAdUnitFactory {
         });
     }
 
-    protected createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean | undefined, isVastVideoWithEndcard: boolean): AbstractVideoOverlay {
-        const showGDPRBanner = (parameters.campaign instanceof VastCampaign) ? this.showGDPRBanner(parameters) : false;
+    protected createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean | undefined): AbstractVideoOverlay {
+        const isVastVideo = parameters.campaign instanceof VastCampaign;
+        const showGDPRBanner = isVastVideo ? this.showGDPRBanner(parameters) : false;
         let overlay: AbstractVideoOverlay;
 
         const skipAllowed = parameters.placement.allowSkip();
@@ -105,9 +107,11 @@ export abstract class AbstractAdUnitFactory {
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else if (skipAllowed && isPerformanceCampaign && CTAButtonTestEnabled) {
-            overlay = new PerformanceVideoOverlayWithCTAButton(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, <PerformanceCampaign>parameters.campaign, showPrivacyDuringVideo, parameters.campaign.getSeatId());
+            overlay = new PerformanceVideoOverlayWithCTAButton(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, <PerformanceCampaign>parameters.campaign, showPrivacyDuringVideo);
+        } else if (isVastVideo) {
+            overlay = new NewVastVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, (<VastCampaign>parameters.campaign).hasEndscreen(), parameters.campaign.getSeatId());
         } else {
-            overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, showPrivacyDuringVideo, parameters.campaign.getSeatId(), isVastVideoWithEndcard);
+            overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, showPrivacyDuringVideo);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
