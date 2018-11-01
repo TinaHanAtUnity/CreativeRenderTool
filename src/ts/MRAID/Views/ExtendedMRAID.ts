@@ -11,11 +11,11 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import MRAIDPerfContainer from 'html/mraid/container-perf.html';
 import MRAIDContainer from 'html/mraid/container.html';
-import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
+import ExtendedMRAIDTemplate from 'html/ExtendedMRAID.html';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 
-export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
+export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private static CloseLength = 30;
 
@@ -49,13 +49,13 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     protected _campaign: PerformanceMRAIDCampaign;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: PerformanceMRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
-        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
+        super(nativeBridge, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
         this._placement = placement;
         this._campaign = campaign;
         this._localization = new Localization(language, 'loadingscreen');
 
-        this._template = new Template(PlayableMRAIDTemplate, this._localization);
+        this._template = new Template(ExtendedMRAIDTemplate, this._localization);
 
         if(campaign) {
             this._templateData = {
@@ -251,7 +251,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private showMRAIDAd() {
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
-            this._closeRemaining = PlayableMRAID.CloseLength;
+            this._closeRemaining = ExtendedMRAID.CloseLength;
             let skipRemaining = skipLength;
             this._updateInterval = setInterval(() => {
                 if(this._closeRemaining > 0) {
@@ -272,9 +272,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 }
             }, 1000);
         } else {
-            this._closeRemaining = PlayableMRAID.CloseLength;
+            this._closeRemaining = ExtendedMRAID.CloseLength;
             const updateInterval = setInterval(() => {
-                const progress = (PlayableMRAID.CloseLength - this._closeRemaining) / PlayableMRAID.CloseLength;
+                const progress = (ExtendedMRAID.CloseLength - this._closeRemaining) / ExtendedMRAID.CloseLength;
                 if(progress >= 0.75 && !this._didReward) {
                     this._handlers.forEach(handler => handler.onMraidReward());
                     this._didReward = true;

@@ -715,8 +715,8 @@ export class WebView {
                 AdUnitContainer.setForcedOrientation(TestEnvironment.get('forcedOrientation'));
             }
 
-            if(TestEnvironment.get('forcedPlayableMRAID')) {
-                MRAIDAdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
+            if(TestEnvironment.get('forcedExtendedMRAID')) {
+                MRAIDAdUnitFactory.setForcedExtendedMRAID(TestEnvironment.get('forcedExtendedMRAID'));
             }
 
             if(TestEnvironment.get('forceAuthorization')) {
