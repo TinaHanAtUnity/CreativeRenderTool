@@ -17,8 +17,8 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
     protected _placement: Placement;
     protected _nativeBridge: NativeBridge;
     protected _campaign: T;
-    protected _adUnit: VideoAdUnit<T>;
     protected _operativeEventManager: OperativeEventManager;
+    protected _adUnit: VideoAdUnit<T>;
     private _adUnitStyle?: AdUnitStyle;
 
     constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
