@@ -1,18 +1,18 @@
 @font-face {
   font-family: "skip-icon-test-icons";
-  src:url("../fonts/skip-icon-test/skip-icon-test-icons.ttf") format("truetype");
+  src: url("../fonts/skip-icon-test/skip-icon-test-icons.ttf") format("truetype");
 }
 
 .exit-icon-skip,
 .next-icon-skip {
   [data-icon]:before {
     content: attr(data-icon);
-    font-family: "skip-icon-test-icons" !important;  
+    font-family: "skip-icon-test-icons" !important; // @stylint ignore
   }
 
   [class^="icon-"]:before,
   [class*=" icon-"]:before {
-    font-family: "skip-icon-test-icons" !important;
+    font-family: "skip-icon-test-icons" !important; // @stylint ignore
   }
 }
 

@@ -1,7 +1,6 @@
 @import "vars.styl";
 @import "gdpr-pop-up.styl";
 @import "iphone-x-series.styl";
-@import "skip-icon-test-icons.styl";
 
 $new-video-overlay-styles = {
   base-size: unit(16px/16, "em") * $default-size,
@@ -50,9 +49,7 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
 
   .skip-button {
     .icon-skip,
-    .icon-close,
-    .icon-exit,
-    .icon-next {
+    .icon-close {
       display: none;
     }
 
@@ -64,18 +61,6 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
 
     &.skip-icon-skip {
       .icon-skip {
-        display: block;
-      }
-    }
-
-    &.exit-icon-skip {
-      .icon-exit {
-        display: block;
-      }
-    }
-
-    &.next-icon-skip {
-      .icon-next {
         display: block;
       }
     }
