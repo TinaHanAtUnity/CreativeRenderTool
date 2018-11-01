@@ -37,14 +37,16 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _showGDPRBanner: boolean = false;
     private _showPrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
+    private _isVastCampaign: boolean;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean | undefined, isVastCampaign: boolean) {
         super(nativeBridge, 'new-video-overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
         this._showGDPRBanner = showGDPRBanner;
         this._showPrivacyDuringVideo = showPrivacyDuringVideo;
         this._gameId = gameId;
+        this._isVastCampaign = isVastCampaign;
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
 
         this._templateData = {
@@ -111,7 +113,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     public hide() {
         super.hide();
 
-        if (this._privacy) {
+        if (!this._isVastCampaign && this._privacy) {
             this._privacy.hide();
             document.body.removeChild(this._privacy.container());
             delete this._privacy;

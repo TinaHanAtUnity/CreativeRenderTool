@@ -111,7 +111,7 @@ export abstract class AbstractAdUnitFactory {
         } else if (isVastVideo) {
             overlay = new NewVastVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, (<VastCampaign>parameters.campaign).hasEndscreen(), parameters.campaign.getSeatId());
         } else {
-            overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, showPrivacyDuringVideo);
+            overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, showPrivacyDuringVideo, false);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
