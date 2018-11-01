@@ -42,6 +42,7 @@ import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCam
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
 import { CampaignError } from 'Ads/Errors/CampaignError';
+import { HttpKafka2 } from 'Core/Utilities/HttpKafka2';
 
 export class CampaignManager {
 
@@ -51,6 +52,10 @@ export class CampaignManager {
 
     public static setSessionId(sessionId: string) {
         CampaignManager.SessionId = sessionId;
+    }
+
+    public static setCreativeId(creativeId: string) {
+        CampaignManager.CreativeId = creativeId;
     }
 
     public static setCountry(country: string) {
@@ -74,6 +79,7 @@ export class CampaignManager {
     private static CampaignId: string | undefined;
     private static SessionId: string | undefined;
     private static Country: string | undefined;
+    private static CreativeId: string | undefined;
 
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
@@ -464,6 +470,13 @@ export class CampaignManager {
         if (this._isErrorHandlerExperiment) {   // AB test ready
             const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._nativeBridge, this._request);
             campaignErrorHandler.handleCampaignError(campaignError);
+        }
+        if (CampaignManager.CreativeId) {
+            const kafkaObject: any = {};
+            kafkaObject.type = 'parse_error';
+            kafkaObject.creativeId = CampaignManager.CampaignId;
+
+            HttpKafka2.sendEvent('ads.creative.blocking', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
         }
         return this.handleError(campaignError, placementIds, `parse_campaign_${contentType.replace(/[\/-]/g, '_')}_error`, session);
     }

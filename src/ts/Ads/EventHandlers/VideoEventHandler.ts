@@ -15,6 +15,7 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Double } from 'Core/Utilities/Double';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { HttpKafka2, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka2';
 
 export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEventHandler {
 
@@ -177,6 +178,13 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                 originalUrl: originalUrl,
                 isCached: CampaignAssetInfo.isCached(this._campaign)
             });
+            if (this._campaign.getCreativeId) {
+                const kafkaObject: any = {};
+                kafkaObject.type = 'video_length_error';
+                kafkaObject.creativeId = this._campaign.getCreativeId();
+
+                HttpKafka2.sendEvent('ads.creative.blocking', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+            }
             return this.handleVideoError('video_too_long', error);
         }
 

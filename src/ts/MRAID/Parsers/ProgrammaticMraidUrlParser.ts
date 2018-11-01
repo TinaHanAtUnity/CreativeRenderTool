@@ -8,6 +8,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 export class ProgrammaticMraidUrlParser extends CampaignParser {
     public static ContentType = CampaignContentTypes.ProgrammaticMraidUrl;
@@ -26,6 +27,11 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
         }
 
         const cacheTTL = response.getCacheTTL();
+
+        const creativeId = response.getCreativeId();
+        if (creativeId) {
+            CampaignManager.setCreativeId(creativeId);
+        }
 
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(nativeBridge),

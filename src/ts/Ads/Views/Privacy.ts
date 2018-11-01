@@ -9,6 +9,8 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FinishState } from 'Core/Constants/FinishState';
+import { HttpKafka2 } from 'Core/Utilities/HttpKafka2';
+import { KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 enum PrivacyCardState {
     INITIAL,
@@ -285,6 +287,15 @@ export class Privacy extends AbstractPrivacy {
         } else {
             adType = campaign.getAdType();
             finishState = 'VIDEO_PROGRESS';
+        }
+
+        const creativeId = campaign.getCreativeId();
+        if (creativeId) {
+            const kafkaObject: any = {};
+            kafkaObject.type = 'report';
+            kafkaObject.creativeId = creativeId;
+
+            HttpKafka2.sendEvent('ads.creative.blocking', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
         }
 
         const error = {

@@ -11,12 +11,19 @@ import { Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { VastParser } from 'VAST/Utilities/VastParser';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
+
+        const creativeId = response.getCreativeId();
+        if (creativeId) {
+            CampaignManager.setCreativeId(creativeId);
+        }
+
         const platform = nativeBridge.getPlatform();
         const videoPromise = this.getVideoFromMarkup(markup, request, session, platform).catch((e) => {
             nativeBridge.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
