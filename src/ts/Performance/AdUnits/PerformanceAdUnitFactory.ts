@@ -7,8 +7,6 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
-import { PerformanceVideoOverlayWithCTAButton } from 'Ads/Views/PerformanceVideoOverlayWithCTAButton';
-import { PerformanceOverlayWithCTAButtonEventHandler } from 'Performance/EventHandlers/PerformanceOverlayWithCTAButtonEventHandler';
 import { PerformanceEndScreenEventHandler } from 'Performance/EventHandlers/PerformanceEndScreenEventHandler';
 import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
@@ -49,9 +47,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
         let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
         const skipAllowed = parameters.placement.allowSkip();
 
-        if (overlay instanceof PerformanceVideoOverlayWithCTAButton) {
-            performanceOverlayEventHandler = new PerformanceOverlayWithCTAButtonEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
-        } else if (!skipAllowed && CustomFeatures.allowSkipInRewardedVideos(parameters)) {
+        if (!skipAllowed && CustomFeatures.allowSkipInRewardedVideos(parameters)) {
             performanceOverlayEventHandler = new PerformanceOverlayEventHandlerWithAllowSkip(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         } else {
             performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
