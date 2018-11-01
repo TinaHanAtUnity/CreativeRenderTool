@@ -6,6 +6,7 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
+import { ABGroup, CloseSkipIconTest } from 'Core/Models/ABGroup';
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _localization: Localization;
@@ -38,8 +39,9 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _showPrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
     private _seatId: number | undefined;
+    private _abGroup: ABGroup;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean, seatId?: number) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, showPrivacyDuringVideo?: boolean, seatId?: number) {
         super(nativeBridge, 'new-video-overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
@@ -48,6 +50,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._gameId = gameId;
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
         this._seatId = seatId;
+        this._abGroup = abGroup;
 
         this._templateData = {
             muted
@@ -136,7 +139,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             }
         }
 
-        if(CustomFeatures.isCheetahGame(this._gameId)) {
+        if (CustomFeatures.isCheetahGame(this._gameId) || CloseSkipIconTest.isValid(this._abGroup)) {
             this._skipButtonElement.classList.add('close-icon-skip');
         }
     }
