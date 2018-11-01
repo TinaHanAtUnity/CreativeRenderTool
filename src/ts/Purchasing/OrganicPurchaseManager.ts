@@ -6,18 +6,17 @@ import { Request } from 'Core/Utilities/Request';
 import { Model, ISchema } from 'Core/Models/Model';
 
 export interface IOrganicPurchase {
-    productId: string;
-    price: number;
-    currency: string;
-    receiptPurchaseData:string;
-    signature:string;
+    productId: string | undefined;
+    price: number | undefined;
+    currency: string | undefined;
+    receiptPurchaseData: string | undefined;
+    signature: string | undefined;
 }
 
 export class OrganicPurchase extends Model<IOrganicPurchase> {
-
     public static Schema: ISchema<IOrganicPurchase> = {
         productId: ['string', 'undefined'],
-        price: ['string', 'undefined'],
+        price: ['number', 'undefined'],
         currency: ['string', 'undefined'],
         receiptPurchaseData: ['string', 'undefined'],
         signature: ['string', 'undefined']
