@@ -474,7 +474,7 @@ export class CampaignManager {
         if (CampaignManager.CreativeId) {
             const kafkaObject: any = {};
             kafkaObject.type = 'parse_error';
-            kafkaObject.creativeId = CampaignManager.CampaignId;
+            kafkaObject.creativeId = CampaignManager.CreativeId;
 
             HttpKafka2.sendEvent('ads.creative.blocking', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
         }
