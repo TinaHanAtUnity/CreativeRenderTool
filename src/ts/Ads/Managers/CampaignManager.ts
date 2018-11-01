@@ -162,16 +162,18 @@ export class CampaignManager {
                     retryWithConnectionEvents: false
                 });
             }).then(response => {
-                if (response && response.responseCode) {
-                    jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
-                }
                 if(response) {
+                    if (response.responseCode) {
+                        jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
+                    }
+
                     this.setSDKSignalValues(requestTimestamp);
 
                     return this.parseCampaigns(response).catch((e) => {
                         this.handleError(e, this._adsConfig.getPlacementIds(), 'parse_campaigns_error');
                     });
                 }
+
                 throw new WebViewError('Empty campaign response', 'CampaignRequestError');
             }).then(() => {
                 this._requesting = false;
@@ -258,6 +260,8 @@ export class CampaignManager {
 
         const session: Session = this._sessionManager.create(json.auctionId);
         session.setAdPlan(response.response);
+
+        const auctionStatusCode: number = json.statusCode;
 
         this._backupCampaignManager.deleteBackupCampaigns();
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
