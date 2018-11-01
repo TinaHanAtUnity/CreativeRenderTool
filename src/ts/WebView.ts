@@ -606,6 +606,7 @@ export class WebView {
 
     private createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
 
+        AbstractPrivacy.createBuildInformation(this._clientInfo, parameters.campaign, nativeBridge, parameters.coreConfig);
         if (parameters.campaign instanceof VastCampaign) {
             return this._vastAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<VastCampaign>>parameters);
         } else if(parameters.campaign instanceof MRAIDCampaign) {
