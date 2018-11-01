@@ -61,7 +61,7 @@ def main() {
                             'Android hybrid tests': {
                                 def _jobName = 'ads-sdk-hybrid-test-android'
                                 def _build = build(
-                                  job: _jobName,
+                                  job: "Applifier/unity-ads-sdk-tests/$_jobName",
                                   propagate: false,
                                   wait: true,
                                   parameters: [
@@ -77,7 +77,7 @@ def main() {
                             'iOS hybrid tests': {
                                 def _jobName = 'ads-sdk-hybrid-test-ios'
                                 def _build = build(
-                                  job: _jobName,
+                                  job: "Applifier/unity-ads-sdk-tests/$_jobName",
                                   propagate: false,
                                   wait: true,
                                   parameters: [
