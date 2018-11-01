@@ -40,17 +40,15 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _showGDPRBanner: boolean = false;
     private _showPrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
-    private _isVastCampaign: boolean;
     private _abGroup: ABGroup;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, showPrivacyDuringVideo: boolean | undefined, isVastCampaign: boolean) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, showPrivacyDuringVideo: boolean | undefined) {
         super(nativeBridge, 'new-video-overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
         this._showGDPRBanner = showGDPRBanner;
         this._showPrivacyDuringVideo = showPrivacyDuringVideo;
         this._gameId = gameId;
-        this._isVastCampaign = isVastCampaign;
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
         this._abGroup = abGroup;
 
@@ -118,12 +116,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     public hide() {
         super.hide();
 
-        // NewVastVideoOverlay will handle the privacy for Vast campaigns if necessary
-        if (!this._isVastCampaign && this._privacy) {
-            this._privacy.hide();
-            document.body.removeChild(this._privacy.container());
-            delete this._privacy;
-        }
+        this.cleanUpPrivacy();
 
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
@@ -359,5 +352,14 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private fadeOut() {
         this._container.classList.remove('fade-in');
         this._areControlsVisible = false;
+    }
+
+    protected cleanUpPrivacy() {
+        // NewVastVideoOverlay will handle the privacy for Vast campaigns if necessary
+        if (this._privacy) {
+            this._privacy.hide();
+            document.body.removeChild(this._privacy.container());
+            delete this._privacy;
+        }
     }
 }

@@ -10,21 +10,10 @@ export class NewVastVideoOverlay extends NewVideoOverlay implements IPrivacyHand
     private _hasEndcard: boolean;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, hasEndcard: boolean, seatId: number | undefined) {
-        super(nativeBridge, muted, language, gameId, privacy, showGDPRBanner, abGroup, true, true);
+        super(nativeBridge, muted, language, gameId, privacy, showGDPRBanner, abGroup, true);
 
         this._seatId = seatId;
         this._hasEndcard = hasEndcard;
-    }
-
-    public hide() {
-        super.hide();
-
-        // Only delete if control doesn't need to be transferred to endscreen
-        if (!this._hasEndcard && this._privacy) {
-            this._privacy.hide();
-            document.body.removeChild(this._privacy.container());
-            delete this._privacy;
-        }
     }
 
     public render(): void {
@@ -35,6 +24,15 @@ export class NewVastVideoOverlay extends NewVideoOverlay implements IPrivacyHand
             if (tencentAdTag) {
                 tencentAdTag.innerText = '广告';
             }
+        }
+    }
+
+    protected cleanUpPrivacy() {
+        // Only delete if control doesn't need to be transferred to endscreen
+        if (!this._hasEndcard && this._privacy) {
+            this._privacy.hide();
+            document.body.removeChild(this._privacy.container());
+            delete this._privacy;
         }
     }
 }
