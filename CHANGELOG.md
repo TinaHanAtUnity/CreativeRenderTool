@@ -1,3 +1,7 @@
+# Pending
+
+* Remove feature flag test for vast3 error tracking [#6895](https://github.com/Applifier/unity-ads-webview/pull/6895)
+
 # Thu Nov  1 20:15:06 UTC 2018
 
 * Use X as skip icon experiment [#6920](https://github.com/Applifier/unity-ads-webview/pull/6920)
