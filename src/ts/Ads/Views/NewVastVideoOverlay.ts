@@ -2,14 +2,15 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { NewVideoOverlay } from './NewVideoOverlay';
+import { ABGroup } from 'Core/Models/ABGroup';
 
 export class NewVastVideoOverlay extends NewVideoOverlay implements IPrivacyHandler {
 
     private _seatId: number | undefined;
     private _hasEndcard: boolean;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, hasEndcard: boolean, seatId: number | undefined) {
-        super(nativeBridge, muted, language, gameId, privacy, showGDPRBanner, true, true);
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, hasEndcard: boolean, seatId: number | undefined) {
+        super(nativeBridge, muted, language, gameId, privacy, showGDPRBanner, abGroup, true, true);
 
         this._seatId = seatId;
         this._hasEndcard = hasEndcard;

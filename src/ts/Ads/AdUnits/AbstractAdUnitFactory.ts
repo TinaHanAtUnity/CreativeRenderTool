@@ -17,13 +17,10 @@ import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { NewVastVideoOverlay } from 'Ads/Views/NewVastVideoOverlay';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
-import { PerformanceVideoOverlayWithCTAButton } from 'Ads/Views/PerformanceVideoOverlayWithCTAButton';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
-import { PerformanceVideoOverlayCTAButtonTest } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export abstract class AbstractAdUnitFactory {
@@ -102,16 +99,12 @@ export abstract class AbstractAdUnitFactory {
         let overlay: AbstractVideoOverlay;
 
         const skipAllowed = parameters.placement.allowSkip();
-        const CTAButtonTestEnabled = PerformanceVideoOverlayCTAButtonTest.isValid(parameters.coreConfig.getAbGroup());
-        const isPerformanceCampaign = parameters.campaign instanceof PerformanceCampaign;
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
-        } else if (skipAllowed && isPerformanceCampaign && CTAButtonTestEnabled) {
-            overlay = new PerformanceVideoOverlayWithCTAButton(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, <PerformanceCampaign>parameters.campaign, showPrivacyDuringVideo);
         } else if (isVastVideo) {
-            overlay = new NewVastVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, (<VastCampaign>parameters.campaign).hasEndscreen(), parameters.campaign.getSeatId());
+            overlay = new NewVastVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), (<VastCampaign>parameters.campaign).hasEndscreen(), parameters.campaign.getSeatId());
         } else {
-            overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, showPrivacyDuringVideo, false);
+            overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), showPrivacyDuringVideo, false);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
