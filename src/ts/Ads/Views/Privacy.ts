@@ -12,6 +12,7 @@ import { FinishState } from 'Core/Constants/FinishState';
 
 enum PrivacyCardState {
     PRIVACY,
+    BUILD,
     REPORT
 }
 
@@ -54,8 +55,13 @@ export class Privacy extends AbstractPrivacy {
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.changePrivacyState(event),
+                listener: (event: Event) => this.changePrivacyState(event, true),
                 selector: '.left-side-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.changePrivacyState(event, false),
+                selector: '.middle-link'
             },
             {
                 event: 'click',
@@ -174,22 +180,69 @@ export class Privacy extends AbstractPrivacy {
         }
     }
 
-    private changePrivacyState(event: Event) {
+    private changePrivacyState(event: Event, isLeftClick: boolean) {
         event.preventDefault();
 
         const leftSideLink = <HTMLDivElement>this._container.querySelector('.left-side-link');
+        const middleLink = <HTMLDivElement>this._container.querySelector('.middle-link');
+        const closeButton = <HTMLDivElement>this._container.querySelector('.close-button');
         const classList = this._container.classList;
         const reportButtonText = 'Report Ad ⚑';
         const privacyButtonText = 'Privacy info 👁';
+        const buildButtonText = 'Build info ⚙';
+        const confirmText = 'Confirm';
+        const closeText = 'Close';
 
-        if (this._currentState === PrivacyCardState.PRIVACY) {
-            leftSideLink.innerText = privacyButtonText;
-            this._currentState = PrivacyCardState.REPORT;
-            classList.add('report');
-        } else if (this._currentState === PrivacyCardState.REPORT) {
-            leftSideLink.innerText = reportButtonText;
-            this._currentState = PrivacyCardState.PRIVACY;
-            classList.remove('report');
+        switch (this._currentState) {
+            // Privacy screen showing
+            case PrivacyCardState.PRIVACY: {
+                leftSideLink.innerText = privacyButtonText;
+                closeButton.innerText = closeText;
+                if (isLeftClick) {
+                    this._currentState = PrivacyCardState.BUILD;
+                    middleLink.innerText = reportButtonText;
+                    classList.add('build');
+                } else {
+                    this._currentState = PrivacyCardState.REPORT;
+                    middleLink.innerText = buildButtonText;
+                    classList.add('report');
+                }
+                break;
+            }
+            // Build screen showing
+            case PrivacyCardState.BUILD: {
+                classList.remove('build');
+                if (isLeftClick) {
+                    this._currentState = PrivacyCardState.PRIVACY;
+                    leftSideLink.innerText = buildButtonText;
+                    middleLink.innerText = reportButtonText;
+                    closeButton.innerText = confirmText;
+                } else {
+                    this._currentState = PrivacyCardState.REPORT;
+                    leftSideLink.innerText = privacyButtonText;
+                    middleLink.innerText = buildButtonText;
+                    classList.add('report');
+                }
+                break;
+            }
+            // Report screen showing
+            case PrivacyCardState.REPORT: {
+                classList.remove('report');
+                middleLink.innerText = reportButtonText;
+                if (isLeftClick) {
+                    this._currentState = PrivacyCardState.PRIVACY;
+                    leftSideLink.innerText = buildButtonText;
+                    closeButton.innerText = confirmText;
+                } else {
+                    this._currentState = PrivacyCardState.BUILD;
+                    leftSideLink.innerText = privacyButtonText;
+                    classList.add('build');
+                }
+                break;
+            }
+            default: {
+                // Thanks linter
+            }
         }
     }
 
