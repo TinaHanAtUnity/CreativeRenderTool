@@ -1,4 +1,4 @@
-# Pending
+# Wed Oct 31 23:02:03 UTC 2018
 
 * Refactor AdUnitFactory [#6834](https://github.com/Applifier/unity-ads-webview/pull/6834)
 * Remove expired ab group test for click delay [#6861](https://github.com/Applifier/unity-ads-webview/pull/6861)
