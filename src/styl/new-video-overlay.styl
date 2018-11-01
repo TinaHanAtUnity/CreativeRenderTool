@@ -47,22 +47,21 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     }
   }
 
-  .skip-button {
-    .icon-skip,
+  .skip-button:not(.close-icon-skip) {
+    .icon-skip {
+      display: block;
+    }
     .icon-close {
       display: none;
     }
+  }
 
-    &.close-icon-skip {
-      .icon-close {
-        display: block;
-      }
+  .skip-button.close-icon-skip {
+    .icon-skip {
+      display: none;
     }
-
-    &.skip-icon-skip {
-      .icon-skip {
-        display: block;
-      }
+    .icon-close {
+      display: block;
     }
   }
 
