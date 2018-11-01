@@ -1,4 +1,4 @@
-# Pending
+# Thu Nov  1 20:15:06 UTC 2018
 
 * Use X as skip icon experiment [#6920](https://github.com/Applifier/unity-ads-webview/pull/6920)
 * Remove early CTA button experiment [#6918](https://github.com/Applifier/unity-ads-webview/pull/6918)
