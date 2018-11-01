@@ -148,8 +148,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
         window.addEventListener('message', this._messageListener, false);
-
-        this.choosePrivacyShown();
     }
 
     public setViewableState(viewable: boolean): void {
@@ -420,19 +418,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this.onClose();
                 break;
             case 'orientation':
-                let forceOrientation = Orientation.NONE;
-                switch(event.data.properties.forceOrientation) {
-                    case 'portrait':
-                        forceOrientation = Orientation.PORTRAIT;
-                        break;
-
-                    case 'landscape':
-                        forceOrientation = Orientation.LANDSCAPE;
-                        break;
-
-                    default:
-                }
-                this.onSetOrientationProperties(event.data.properties.allowOrientationChange, forceOrientation);
+                this.onSetOrientationProperties(event.data.properties.allowOrientationChange, event.data.properties.forceOrientation);
                 break;
             case 'analyticsEvent':
                 this.sendMraidAnalyticsEvent(event.data.event, event.data.eventData);

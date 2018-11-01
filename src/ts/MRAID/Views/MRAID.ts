@@ -46,7 +46,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public show(): void {
         super.show();
-        this.choosePrivacyShown();
         this._showTimestamp = Date.now();
         this.sendMraidAnalyticsEvent('playable_show');
 
@@ -118,7 +117,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 iframe.sandbox = 'allow-scripts allow-same-origin';
             }
         }).catch(e => {
-            this._nativeBridge.Sdk.logError('failed to create mraid: ' + e);
+            this._nativeBridge.Sdk.logError('failed to create mraid: ' + e.message);
 
             SessionDiagnostics.trigger('create_mraid_error', {
                 message: e.message
@@ -164,19 +163,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 break;
 
             case 'orientation':
-                let forceOrientation = Orientation.NONE;
-                switch(event.data.properties.forceOrientation) {
-                    case 'portrait':
-                        forceOrientation = Orientation.PORTRAIT;
-                        break;
-
-                    case 'landscape':
-                        forceOrientation = Orientation.LANDSCAPE;
-                        break;
-
-                    default:
-                }
-                this.onSetOrientationProperties(event.data.properties.allowOrientationChange, forceOrientation);
+                this.onSetOrientationProperties(event.data.properties.allowOrientationChange, event.data.properties.forceOrientation);
                 break;
             case 'analyticsEvent':
                 this.sendMraidAnalyticsEvent(event.data.event, event.data.eventData);

@@ -124,17 +124,17 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
         this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
+        this.choosePrivacyShown();
     }
 
     public hide() {
+        super.hide();
         this.setViewableState(false);
 
         if(this._updateInterval) {
             clearInterval(this._updateInterval);
             this._updateInterval = undefined;
         }
-
-        super.hide();
 
         if(this._privacy) {
             this._privacy.removeEventHandler(this);
@@ -375,7 +375,19 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._privacy.show();
     }
 
-    protected onSetOrientationProperties(allowOrientationChange: boolean, forceOrientation: Orientation) {
+    protected onSetOrientationProperties(allowOrientationChange: boolean, orientation: string) {
+        let forceOrientation = Orientation.NONE;
+            switch(orientation) {
+                case 'portrait':
+                    forceOrientation = Orientation.PORTRAIT;
+                    break;
+
+                case 'landscape':
+                    forceOrientation = Orientation.LANDSCAPE;
+                    break;
+
+                default:
+        }
         this._handlers.forEach(handler => handler.onMraidOrientationProperties({
             allowOrientationChange: allowOrientationChange,
             forceOrientation: forceOrientation

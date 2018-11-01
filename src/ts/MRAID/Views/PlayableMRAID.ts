@@ -68,7 +68,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public show(): void {
         super.show();
-        this.choosePrivacyShown();
         this._showTimestamp = Date.now();
         this.sendMraidAnalyticsEvent('playable_show');
         this.showLoadingScreen();
@@ -242,19 +241,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 });
                 break;
             case 'orientation':
-                let forceOrientation = Orientation.NONE;
-                switch(event.data.properties.forceOrientation) {
-                    case 'portrait':
-                        forceOrientation = Orientation.PORTRAIT;
-                        break;
-
-                    case 'landscape':
-                        forceOrientation = Orientation.LANDSCAPE;
-                        break;
-
-                    default:
-                }
-                this.onSetOrientationProperties(event.data.properties.allowOrientationChange, forceOrientation);
+                this.onSetOrientationProperties(event.data.properties.allowOrientationChange, event.data.properties.forceOrientation);
                 break;
             case 'analyticsEvent':
                 this.sendMraidAnalyticsEvent(event.data.event, event.data.eventData);
