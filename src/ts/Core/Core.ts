@@ -212,6 +212,7 @@ export class Core implements ICore {
             this.JaegerManager.stop(jaegerInitSpan);
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
+                this.NativeBridge.setAutoBatchEnabled(false);
                 this.Api.Request.Android!.setMaximumPoolSize(1);
             } else {
                 this.Api.Request.setConcurrentRequestCount(1);

@@ -454,6 +454,7 @@ export class Ads implements IAds {
         this._showing = false;
 
         if(this._core.NativeBridge.getPlatform() === Platform.ANDROID) {
+            this._core.NativeBridge.setAutoBatchEnabled(false);
             this._core.Api.Request.Android!.setMaximumPoolSize(1);
         } else {
             this._core.Api.Request.setConcurrentRequestCount(1);
