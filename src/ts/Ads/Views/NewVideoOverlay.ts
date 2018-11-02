@@ -10,6 +10,18 @@ import { ABGroup, ExitSkipIconTest } from 'Core/Models/ABGroup';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { Placement } from 'Ads/Models/Placement';
+
+export interface IVideoOverlayParameters<T extends Campaign> {
+    deviceInfo: DeviceInfo;
+    clientInfo: ClientInfo;
+    campaign: T;
+    coreConfig: CoreConfiguration;
+    placement: Placement;
+}
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _localization: Localization;
@@ -45,7 +57,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _abGroup: ABGroup;
     private _campaign: Campaign;
 
-    constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean) {
+    constructor(nativeBridge: NativeBridge, parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean) {
         super(nativeBridge, 'new-video-overlay', parameters.placement.muteVideo());
 
         this._localization = new Localization(parameters.deviceInfo.getLanguage(), 'overlay');
@@ -63,7 +75,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         // TODO: or should we make a PerformanceVideoOverlay.ts?
         if (this._campaign instanceof PerformanceCampaign) {
             this._templateData.isPerformanceCampaign = true;
-            this._templateData.gameIcon = this._campaign.getGameIcon() ? parameters.campaign.getGameIcon().getUrl() : '';
+            this._templateData.gameIcon = this._campaign.getGameIcon() ? this._campaign.getGameIcon().getUrl() : '';
         }
 
         this._bindings = [
