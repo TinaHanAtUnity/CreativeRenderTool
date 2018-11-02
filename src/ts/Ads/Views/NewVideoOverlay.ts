@@ -36,18 +36,13 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
     private _fadeTimer: any;
     private _areControlsVisible: boolean = false;
-    private _gdprPopupClicked: boolean = false;
-    private _showGDPRBanner: boolean = false;
-    private _showPrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
     private _abGroup: ABGroup;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, showPrivacyDuringVideo: boolean | undefined) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, abGroup: ABGroup, showPrivacyDuringVideo: boolean | undefined) {
         super(nativeBridge, 'new-video-overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
-        this._showGDPRBanner = showGDPRBanner;
-        this._showPrivacyDuringVideo = showPrivacyDuringVideo;
         this._gameId = gameId;
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
         this._abGroup = abGroup;
@@ -115,18 +110,12 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
     public hide() {
         super.hide();
-
         this.cleanUpPrivacy();
-
-        if (this._showGDPRBanner && !this._gdprPopupClicked) {
-            this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
-        }
     }
 
     public render(): void {
         super.render();
         this.setupElementReferences();
-        this.choosePrivacyShown();
 
         if (CustomFeatures.isCheetahGame(this._gameId) || CloseSkipIconTest.isValid(this._abGroup)) {
             this._skipButtonElement.classList.add('close-icon-skip');
@@ -225,27 +214,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         // do nothing
     }
 
-    public choosePrivacyShown(): void {
-        if (!this._showPrivacyDuringVideo) {
-            this._container.classList.remove('show-gdpr-banner');
-            this._container.classList.remove('show-gdpr-button');
-        } else if (!this._gdprPopupClicked && this._showGDPRBanner) {
-            this._container.classList.add('show-gdpr-banner');
-            this._container.classList.remove('show-gdpr-button');
-        } else {
-            this._container.classList.remove('show-gdpr-banner');
-            this._container.classList.add('show-gdpr-button');
-        }
-    }
-
-    private onGDPRPopupEvent(event: Event) {
+    protected onGDPRPopupEvent(event: Event) {
         event.preventDefault();
         event.stopPropagation();
         this._isPrivacyShowing = true;
-        if (!this._gdprPopupClicked) {
-            this._gdprPopupClicked = true;
-            this.choosePrivacyShown();
-        }
         this._nativeBridge.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();

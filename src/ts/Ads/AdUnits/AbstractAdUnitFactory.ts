@@ -15,13 +15,11 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { NewVastVideoOverlay } from 'Ads/Views/NewVastVideoOverlay';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export abstract class AbstractAdUnitFactory {
 
@@ -94,17 +92,14 @@ export abstract class AbstractAdUnitFactory {
     }
 
     protected createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean | undefined): AbstractVideoOverlay {
-        const isVastVideo = parameters.campaign instanceof VastCampaign;
-        const showGDPRBanner = isVastVideo ? this.showGDPRBanner(parameters) : false;
+
         let overlay: AbstractVideoOverlay;
 
         const skipAllowed = parameters.placement.allowSkip();
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
-        } else if (isVastVideo) {
-            overlay = new NewVastVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), (<VastCampaign>parameters.campaign).hasEndscreen(), parameters.campaign.getSeatId());
         } else {
-            overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), showPrivacyDuringVideo);
+            overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, parameters.coreConfig.getAbGroup(), showPrivacyDuringVideo);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
