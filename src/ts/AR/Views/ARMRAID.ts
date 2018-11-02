@@ -58,7 +58,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._template = new Template(ExtendedMRAIDTemplate, this._localization);
 
-        this._bindings = [
+        this._bindings = this._bindings.concat([
             {
                 event: 'click',
                 listener: (event: Event) => {
@@ -94,7 +94,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 },
                 selector: '.hide-learn-more-button'
             }
-        ];
+        ]);
     }
 
     public render(): void {
