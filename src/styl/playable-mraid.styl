@@ -259,16 +259,16 @@ $camera-permission-panel-height = 100vw;
   }
 
   .camera-permission-panel {
-    background: $camera-permission-panel-color;
-    bottom: 0;
-    height: inherit;
-    left: 0;
-    overflow: hidden;
     position: absolute;
-    right: 0;
     top: $camera-permission-panel-height;
-    width: 100vw;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: 105;
+    overflow: hidden;
+    width: 100vw;
+    height: inherit;
+    background: $camera-permission-panel-color;
 
     .container {
       width: 80%;
@@ -358,8 +358,8 @@ $camera-permission-panel-height = 100vw;
 
     .gdpr-pop-up {
       &.mraid-container {
-        bottom: 0;
         top: inherit;
+        bottom: 0;
         width: 50vw;
       }
     }
