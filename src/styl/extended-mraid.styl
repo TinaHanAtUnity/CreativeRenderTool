@@ -6,6 +6,7 @@ $filling-bar-width = $progress-bar-width * .3;
 $permissions-max-width = 300px;
 $permissions-gray = #a6a6a6;
 $camera-permission-panel-color = #fafafa;
+$camera-permission-panel-height = 100vw;
 
 #extended-mraid {
 
@@ -64,6 +65,10 @@ $camera-permission-panel-color = #fafafa;
 
   #mraid-iframe {
     $iframe-default();
+
+    &.mraid-iframe-camera-permission-dialog {
+      height: $camera-permission-panel-height;
+    }
   }
 
   .close-region {
@@ -249,7 +254,7 @@ $camera-permission-panel-color = #fafafa;
 
   .camera-permission-panel {
     position: absolute;
-    top: 100vw;
+    top: $camera-permission-panel-height;
     right: 0;
     bottom: 0;
     left: 0;
@@ -259,19 +264,18 @@ $camera-permission-panel-color = #fafafa;
     background: $camera-permission-panel-color;
 
     .container {
-      max-width: $permissions-max-width;
       width: 80%;
-      justify-content: flex-start;
+      justify-content: center;
     }
 
     .permission-text {
       margin: 0 0 8px;
       text-align: center;
-      font-size:4vw;
+      font-size: $default-font-size * .85;
     }
 
     .arads-logo {
-      margin: 20px auto 15px;
+      margin: 0 auto 15px;
       width: 166.5px;
       height: 30px;
       background-image: url("../img/adsar.png");
@@ -283,7 +287,7 @@ $camera-permission-panel-color = #fafafa;
       display: flex;
 
       margin: 0 auto;
-      max-width: $permissions-max-width;
+      max-width: 90%;
       width: 90%;
 
       -webkit-box-orient: horizontal;
@@ -297,16 +301,15 @@ $camera-permission-panel-color = #fafafa;
     }
 
     .permission-accept-button {
-      $download-container-default($default-scale-size * .85, true);
+      $download-container-default($default-scale-size * .5, true);
       flex: 1;
-      margin: 0 auto 8px 8px;
       padding: .6375rem .35rem;
     }
 
     .permission-decline-button {
-      $download-container-default($default-scale-size * .85, true);
+      $download-container-default($default-scale-size * .5, true);
       flex: 1;
-      margin: 0 0 8px;
+      margin: 0 8px 0 0;
       padding: .6375rem .35rem;
       background: $permissions-gray;
       color: $white;
@@ -314,14 +317,14 @@ $camera-permission-panel-color = #fafafa;
 
     .gdpr-link {
       position: absolute;
-      bottom: 10px;
-      left: 10px;
+      bottom: .5rem;
+      left: .5rem;
     }
 
     .show-learn-more-button {
       position: absolute;
-      right: 10px;
-      bottom: 10px;
+      right: .5rem;
+      bottom: -.5rem;
     }
 
     .icon-gdpr,
@@ -329,22 +332,34 @@ $camera-permission-panel-color = #fafafa;
       color: $permissions-gray;
       font-size: 1.25rem;
     }
+
+    .icon-info-ar {
+      color: $permissions-gray;
+      font-size: 2.5rem;
+    }
   }
 }
 
 .landscape {
   #extended-mraid {
+    #mraid-iframe {
+      &.mraid-iframe-camera-permission-dialog {
+        width: 50vw;
+        height: 100vh;
+      }
+    }
+
     .camera-permission-panel {
       position: absolute;
       top: 0;
       right: 0;
       bottom: 0;
-      left: 100vh;
+      left: 50vw;
       width: inherit;
       height: inherit;
 
       .container {
-        width: 100%;
+        width: 80%;
         justify-content: center;
       }
 
@@ -354,7 +369,7 @@ $camera-permission-panel-color = #fafafa;
 
       .permission-text {
         padding: 0 8px;
-        font-size: 2vw;
+        font-size: $default-font-size * .85;
       }
 
       .permission-choice-buttons {
@@ -368,13 +383,17 @@ $camera-permission-panel-color = #fafafa;
         justify-content: space-around;
       }
 
+      .permission-decline-button {
+        margin: 0;
+      }
+
       .gdpr-link {
         display: none;
       }
 
       .show-learn-more-button {
-        right: 5px;
-        bottom: 0;
+        right: .5rem;
+        bottom: -.5rem;
       }
 
       .permission-accept-button {
@@ -457,6 +476,87 @@ $camera-permission-panel-color = #fafafa;
 
   100% {
     left: 100%;
+  }
+}
+
+@media screen and (min-aspect-ratio: 8/19) {
+  #extended-mraid {
+    #mraid-iframe {
+      &.mraid-iframe-camera-permission-dialog {
+        height: 120vw;
+      }
+    }
+
+    .camera-permission-panel {
+      top: 120vw;
+    }
+  }
+}
+
+@media screen and (min-aspect-ratio: 9/16) {
+  #extended-mraid {
+    #mraid-iframe {
+      &.mraid-iframe-camera-permission-dialog {
+        height: 100vw;
+      }
+    }
+
+    .camera-permission-panel {
+      top: 100vw;
+    }
+  }
+}
+
+@media screen and (min-aspect-ratio: 3/4) {
+  #extended-mraid {
+    #mraid-iframe {
+      &.mraid-iframe-camera-permission-dialog {
+        height: 70vw;
+      }
+    }
+
+    .camera-permission-panel {
+      top: 70vw;
+    }
+  }
+}
+
+@media screen and (min-aspect-ratio: 1/2) {
+  #extended-mraid {
+    #mraid-iframe {
+      &.mraid-iframe-camera-permission-dialog {
+        height: 100vw;
+      }
+    }
+
+    .camera-permission-panel {
+      top: 100vw;
+    }
+  }
+}
+
+@media screen and (min-aspect-ratio: 2/3) {
+  #extended-mraid {
+    #mraid-iframe {
+      &.mraid-iframe-camera-permission-dialog {
+        height: 80vw;
+      }
+    }
+
+    .camera-permission-panel {
+      top: 80vw;
+    }
+  }
+}
+
+
+@media screen and (min-aspect-ratio: 1/1) {
+  .mraid {
+    height: 50vw;
+  }
+
+  .panel {
+    top: 50vw;
   }
 }
 
