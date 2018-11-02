@@ -305,11 +305,11 @@ export class OldCampaignRefreshManager extends RefreshManager {
         if(campaignCount === 0) {
             this._noFills++;
 
-            let delay: number = 0;
+            let delay: number = refreshDelay / 1000;
 
             // delay starts from 20 secs, then increased 50% for each additional no fill (20 secs, 30 secs, 45 secs etc.)
             if(this._noFills > 0 && this._noFills < 15) {
-                delay = 20;
+                delay += 20;
                 for(let i: number = 1; i < this._noFills; i++) {
                     delay = delay * 1.5;
                 }
