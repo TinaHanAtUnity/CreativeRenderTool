@@ -294,7 +294,7 @@ export class Privacy extends AbstractPrivacy {
             kafkaObject.type = 'report';
             kafkaObject.creativeId = creativeId;
             kafkaObject.seatId = campaign.getSeatId();
-            kafkaObject.reason = reasonKey;
+            kafkaObject.message = reasonKey;
 
             HttpKafka.sendEvent('ads.creative.blocking', KafkaCommonObjectType.EMPTY, kafkaObject);
         }

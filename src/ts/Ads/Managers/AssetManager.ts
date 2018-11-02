@@ -15,6 +15,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 enum CacheType {
     REQUIRED,
@@ -404,6 +405,17 @@ export class AssetManager {
             }
             const errorData = this._pts.buildErrorData(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
             this._pts.reportError(errorData);
+        }
+
+        const creativeId = campaign.getCreativeId();
+        if (creativeId && totalSize > 0) {
+            const kafkaObject: any = {};
+            kafkaObject.type = 'too_large_file';
+            kafkaObject.creativeId = creativeId;
+            kafkaObject.seatId = campaign.getSeatId();
+            kafkaObject.fileSize = Math.floor(totalSize / (1024 * 1024));
+
+            HttpKafka.sendEvent('ads.creative.blocking', KafkaCommonObjectType.EMPTY, kafkaObject);
         }
     }
 }
