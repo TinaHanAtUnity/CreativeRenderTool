@@ -9,8 +9,7 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FinishState } from 'Core/Constants/FinishState';
-import { HttpKafka2 } from 'Core/Utilities/HttpKafka2';
-import { KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { KafkaCommonObjectType, HttpKafka } from 'Core/Utilities/HttpKafka';
 
 enum PrivacyCardState {
     INITIAL,
@@ -294,8 +293,10 @@ export class Privacy extends AbstractPrivacy {
             const kafkaObject: any = {};
             kafkaObject.type = 'report';
             kafkaObject.creativeId = creativeId;
+            kafkaObject.seatId = campaign.getSeatId();
+            kafkaObject.reason = reasonKey;
 
-            HttpKafka2.sendEvent('ads.creative.blocking', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+            HttpKafka.sendEvent('ads.creative.blocking', KafkaCommonObjectType.EMPTY, kafkaObject);
         }
 
         const error = {
