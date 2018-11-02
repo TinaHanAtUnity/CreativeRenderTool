@@ -43,7 +43,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _gameId: string;
     private _seatId: number | undefined;
     private _abGroup: ABGroup;
-    private _isPerformanceCampaign: boolean = false;
+    private _campaign: Campaign;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean) {
         super(nativeBridge, 'new-video-overlay', parameters.placement.muteVideo());
@@ -55,16 +55,15 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
         this._seatId = parameters.campaign.getSeatId();
         this._abGroup = parameters.coreConfig.getAbGroup();
-
+        this._campaign = parameters.campaign;
         this._templateData = {
             muted: parameters.placement.muteVideo()
         };
 
         // TODO: or should we make a PerformanceVideoOverlay.ts?
-        if (parameters.campaign instanceof PerformanceCampaign) {
-            this._isPerformanceCampaign = true;
+        if (this._campaign instanceof PerformanceCampaign) {
             this._templateData.isPerformanceCampaign = true;
-            this._templateData.gameIcon = parameters.campaign.getGameIcon() ? parameters.campaign.getGameIcon().getUrl() : '';
+            this._templateData.gameIcon = this._campaign.getGameIcon() ? parameters.campaign.getGameIcon().getUrl() : '';
         }
 
         this._bindings = [
@@ -220,7 +219,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     public setCallButtonVisible(value: boolean) {
         if (this._callButtonVisible !== value) {
 
-            if(this._isPerformanceCampaign && !this._skipEnabled) {
+            if (this._campaign instanceof PerformanceCampaign && !this._skipEnabled) {
                 return;
             }
 
@@ -321,6 +320,23 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         event.stopPropagation();
         this.resetFadeTimer();
         this._handlers.forEach(handler => handler.onOverlayCallButton());
+
+        if (this._campaign instanceof PerformanceCampaign) {
+            const campaign = this._campaign;
+            this._handlers.forEach((handler) => {
+                if (typeof handler.onOverlayDownload === 'function') {
+                    handler.onOverlayDownload({
+                        clickAttributionUrl: campaign.getClickAttributionUrl(),
+                        clickAttributionUrlFollowsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
+                        bypassAppSheet: campaign.getBypassAppSheet(),
+                        appStoreId: campaign.getAppStoreId(),
+                        store: campaign.getStore(),
+                        videoDuration: this._videoDuration,
+                        videoProgress: this._videoProgress
+                    });
+                }
+            });
+        }
     }
 
     private onPauseForTestingEvent(event: Event): void {
