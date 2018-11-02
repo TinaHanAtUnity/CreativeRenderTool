@@ -132,6 +132,15 @@ $iphone-x-styles() {
 
   .landscape {
     #playable-mraid {
+
+      .gdpr-pop-up {
+        &.mraid-container {
+          width: calc(50vw - env(safe-area-inset-left));
+          bottom: 0;
+          top: inherit;
+        }
+      }
+
       .camera-permission-panel {
         .show-learn-more-button {
           right: constant(safe-area-inset-right);
