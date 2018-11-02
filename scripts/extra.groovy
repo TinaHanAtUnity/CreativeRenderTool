@@ -26,7 +26,7 @@ def downloadArtifacts(job) {
             gcloud auth activate-service-account --key-file $BUCKET_KEY
 
             gsutil cp -r gs://unity-ads-jenkins-artifacts/$job ./results/
-            gsutil rm -r gs://unity-ads-jenkins-artifacts/$path
+            gsutil rm -r gs://unity-ads-jenkins-artifacts/$job
             """
         }
     } catch (e) {
@@ -138,12 +138,11 @@ def main() {
                 }
             }
         }
-
-        post {
-            always {
-                archiveArtifacts artifacts: "results/**", fingerprint: true
-                step ([$class: "JUnitResultArchiver", testResults: "results/**/*.xml"])
-            }
+    }
+    post {
+        always {
+            archiveArtifacts artifacts: "results/**", fingerprint: true
+            step ([$class: "JUnitResultArchiver", testResults: "results/**/*.xml"])
         }
     }
 }
