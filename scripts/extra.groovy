@@ -138,6 +138,7 @@ def main() {
                         }
                     }
                 } finally {
+                    sh "pwd && ls -la"
                     archiveArtifacts artifacts: "results/**", fingerprint: true
                     step ([$class: "JUnitResultArchiver", testResults: "results/**/*.xml"])
                 }
