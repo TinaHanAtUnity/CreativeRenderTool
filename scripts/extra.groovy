@@ -52,97 +52,96 @@ def main() {
 
         stage('Run tests') {
             if (webviewDeployed) {
-                dir('results') {
-                    //TODO: use if clause below instead before pushing to master
-                    //if (env.BRANCH_NAME =~ /^staging/) {
-                    if (env.BRANCH_NAME =~ /feature\/jenkinsfile/) {
-                        parallel (
-                            // run hybrid tests for staging branches
-                            'Android hybrid tests': {
-                                def _jobName = 'ads-sdk-hybrid-test-android'
-                                def _build = build(
-                                  job: "Applifier/unity-ads-sdk-tests/$_jobName",
-                                  propagate: false,
-                                  wait: true,
-                                  parameters: [
-                                    string(name: 'WEBVIEW_BRANCH', value: webviewBranch),
-                                  ]
-                                )
+                try {
+                    dir('results') {
+                        //TODO: use if clause below instead before pushing to master
+                        //if (env.BRANCH_NAME =~ /^staging/) {
+                        if (env.BRANCH_NAME =~ /feature\/jenkinsfile/) {
+                            parallel (
+                                // run hybrid tests for staging branches
+                                'Android hybrid tests': {
+                                    def _jobName = 'ads-sdk-hybrid-test-android'
+                                    def _build = build(
+                                      job: "Applifier/unity-ads-sdk-tests/$_jobName",
+                                      propagate: false,
+                                      wait: true,
+                                      parameters: [
+                                        string(name: 'WEBVIEW_BRANCH', value: webviewBranch),
+                                      ]
+                                    )
 
-                                def artifactFolder = "$_jobName-$_build.number"
+                                    def artifactFolder = "$_jobName-$_build.number"
 
-                                downloadArtifacts(artifactFolder)
-                            },
+                                    downloadArtifacts(artifactFolder)
+                                },
 
-                            'iOS hybrid tests': {
-                                def _jobName = 'ads-sdk-hybrid-test-ios'
-                                def _build = build(
-                                  job: "Applifier/unity-ads-sdk-tests/$_jobName",
-                                  propagate: false,
-                                  wait: true,
-                                  parameters: [
-                                    string(name: 'WEBVIEW_BRANCH', value: webviewBranch),
-                                  ],
-                                )
+                                'iOS hybrid tests': {
+                                    def _jobName = 'ads-sdk-hybrid-test-ios'
+                                    def _build = build(
+                                      job: "Applifier/unity-ads-sdk-tests/$_jobName",
+                                      propagate: false,
+                                      wait: true,
+                                      parameters: [
+                                        string(name: 'WEBVIEW_BRANCH', value: webviewBranch),
+                                      ],
+                                    )
 
-                                def artifactFolder = "$_jobName-$_build.number"
+                                    def artifactFolder = "$_jobName-$_build.number"
 
-                                downloadArtifacts(artifactFolder)
-                            },
-                            // run deployment tests for staging branches
-                            // TODO: add iOS system tests
-                            'System tests': {
-                                //TODO: uncomment the line below before pushing to master
-                                //def nativeBranch = env.BRANCH_NAME.replace("staging/", "");
-                                def nativeBranch = "master"
-                                build(
-                                  job: "Applifier/unity-ads-sdk-tests/ads-sdk-systest-android/",
-                                  propagate: false,
-                                  wait: true,
-                                  parameters: [
-                                    string(name: 'WEBVIEW_BRANCH', value: env.BRANCH_NAME),
-                                    string(name: 'UNITY_ADS_ANDROID_BRANCH', value: nativeBranch),
-                                    booleanParam(name: 'RUN_TD_TESTS', value: false)
-                                  ],
-                                )
-                            }
-                        )
-                    } else {
-                        // run hybrid tests for all pull requests
-                        echo "This is a placeholder for running hybrid tests on PR, branch: ${env.BRANCH_NAME}"
-                        // parallel (
-                        //     // run hybrid tests for staging branches
-                        //     'Android hybrid tests': {
-                        //         build(
-                        //           job: "Applifier/unity-ads-sdk-tests/ads-sdk-hybrid-test-android/",
-                        //           propagate: true,
-                        //           wait: true,
-                        //           parameters: [
-                        //             string(name: 'WEBVIEW_BRANCH', value: webviewBranch),
-                        //           ]
-                        //         )
-                        //     },
-                        //
-                        //     'iOS hybrid tests': {
-                        //         build(
-                        //           job: "Applifier/unity-ads-sdk-tests/ads-sdk-hybrid-test-ios/",
-                        //           propagate: true,
-                        //           wait: true,
-                        //           parameters: [
-                        //             string(name: 'WEBVIEW_BRANCH', value: webviewBranch),
-                        //           ],
-                        //         )
-                        //     }
-                        // )
+                                    downloadArtifacts(artifactFolder)
+                                },
+                                // run deployment tests for staging branches
+                                // TODO: add iOS system tests
+                                'System tests': {
+                                    //TODO: uncomment the line below before pushing to master
+                                    //def nativeBranch = env.BRANCH_NAME.replace("staging/", "");
+                                    def nativeBranch = "master"
+                                    build(
+                                      job: "Applifier/unity-ads-sdk-tests/ads-sdk-systest-android/",
+                                      propagate: false,
+                                      wait: true,
+                                      parameters: [
+                                        string(name: 'WEBVIEW_BRANCH', value: env.BRANCH_NAME),
+                                        string(name: 'UNITY_ADS_ANDROID_BRANCH', value: nativeBranch),
+                                        booleanParam(name: 'RUN_TD_TESTS', value: false)
+                                      ],
+                                    )
+                                }
+                            )
+                        } else {
+                            // run hybrid tests for all pull requests
+                            echo "This is a placeholder for running hybrid tests on PR, branch: ${env.BRANCH_NAME}"
+                            // parallel (
+                            //     // run hybrid tests for staging branches
+                            //     'Android hybrid tests': {
+                            //         build(
+                            //           job: "Applifier/unity-ads-sdk-tests/ads-sdk-hybrid-test-android/",
+                            //           propagate: true,
+                            //           wait: true,
+                            //           parameters: [
+                            //             string(name: 'WEBVIEW_BRANCH', value: webviewBranch),
+                            //           ]
+                            //         )
+                            //     },
+                            //
+                            //     'iOS hybrid tests': {
+                            //         build(
+                            //           job: "Applifier/unity-ads-sdk-tests/ads-sdk-hybrid-test-ios/",
+                            //           propagate: true,
+                            //           wait: true,
+                            //           parameters: [
+                            //             string(name: 'WEBVIEW_BRANCH', value: webviewBranch),
+                            //           ],
+                            //         )
+                            //     }
+                            // )
+                        }
                     }
+                } finally {
+                    archiveArtifacts artifacts: "results/**", fingerprint: true
+                    step ([$class: "JUnitResultArchiver", testResults: "results/**/*.xml"])
                 }
             }
-        }
-    }
-    post {
-        always {
-            archiveArtifacts artifacts: "results/**", fingerprint: true
-            step ([$class: "JUnitResultArchiver", testResults: "results/**/*.xml"])
         }
     }
 }
