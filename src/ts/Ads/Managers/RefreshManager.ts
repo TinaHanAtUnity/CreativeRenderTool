@@ -7,7 +7,7 @@ import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHan
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export abstract class RefreshManager {
-    public static NoFillDelay = 3600;
+    public static NoFillDelay = 3600;   // in milliseconds
     public static ErrorRefillDelay = 3600;
     public static ParsingErrorRefillDelay = 60;
 

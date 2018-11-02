@@ -296,7 +296,11 @@ export class CampaignManager {
 
             for(const placement of noFill) {
                 promises.push(this.handleNoFill(placement));
-                refreshDelay = RefreshManager.NoFillDelay;
+                if(auctionStatusCode && auctionStatusCode === 999) {
+                    refreshDelay = this.getNextDayUTCTimeDelta();
+                } else {
+                    refreshDelay = RefreshManager.NoFillDelay;
+                }
             }
 
             let campaigns: number = 0;
@@ -739,5 +743,15 @@ export class CampaignManager {
                 signal: 'requestCount'
             });
         });
+    }
+
+    private getNextDayUTCTimeDelta(): number {
+        const nowSec = Date.now();
+        const d2Sec = nowSec + 24 * 60 * 60 * 1000; // next day in milliseconds
+        const nextDay = new Date();
+        nextDay.setTime(d2Sec);
+        nextDay.setUTCHours(0, 0, 0, 0);
+
+        return nextDay.getTime() - nowSec;
     }
 }
