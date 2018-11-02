@@ -135,9 +135,12 @@ $iphone-x-styles() {
 
       .gdpr-pop-up {
         &.mraid-container {
-          width: calc(50vw - env(safe-area-inset-left));
           bottom: 0;
           top: inherit;
+
+          width: calc(50vw - constant(safe-area-inset-left));
+
+          width: calc(50vw - env(safe-area-inset-left));
         }
       }
 
