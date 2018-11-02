@@ -1,7 +1,6 @@
 import include from 'rollup-plugin-includepaths';
 import string from 'rollup-plugin-string';
 import html from 'rollup-plugin-html';
-import alias from 'rollup-plugin-alias';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import sourcemaps from 'rollup-plugin-sourcemaps';
