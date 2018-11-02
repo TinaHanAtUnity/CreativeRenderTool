@@ -111,7 +111,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             let container = MRAIDContainer;
             if (arSupported) {
                 container = container.replace('<script id=\"webar\"></script>', WebARScript);
-                iframe.classList.add('fullscreen');
             }
 
             this.createMRAID(container).then(mraid => {
