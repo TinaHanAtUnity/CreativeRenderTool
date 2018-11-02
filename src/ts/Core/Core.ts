@@ -148,6 +148,9 @@ export class Core implements ICore {
             return Promise.all([this.DeviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
             HttpKafka.setDeviceInfo(this.DeviceInfo);
+            this._initialized = true;
+            this._initializedAt = Date.now();
+            this.Api.Sdk.initComplete();
 
             this.WakeUpManager.setListenConnectivity(true);
             if(this.NativeBridge.getPlatform() === Platform.IOS) {
@@ -206,9 +209,6 @@ export class Core implements ICore {
             this.Purchasing = new Purchasing(this);
             return this.Ads.initialize(jaegerInitSpan);
         }).then(() => {
-            this._initialized = true;
-            this._initializedAt = Date.now();
-            this.Api.Sdk.initComplete();
             this.JaegerManager.stop(jaegerInitSpan);
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
