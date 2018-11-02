@@ -355,7 +355,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     protected cleanUpPrivacy() {
-        // NewVastVideoOverlay will handle the privacy for Vast campaigns if necessary
         if (this._privacy) {
             this._privacy.hide();
             document.body.removeChild(this._privacy.container());
