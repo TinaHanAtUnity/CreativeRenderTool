@@ -28,7 +28,7 @@ import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Request } from 'Core/Utilities/Request';
 import { StorageApi } from 'Core/Native/Storage';
 
-describe('PurchasingUtilitiesTest', () => {
+describe('PurchasingUtilitiesTest @skipOnDevice', () => {
     let nativeBridge: NativeBridge;
     let purchasing: PurchasingApi;
 
