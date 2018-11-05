@@ -3,6 +3,7 @@ import { RequestError } from 'Core/Errors/RequestError';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 const enum RequestStatus {
     COMPLETE,
@@ -130,8 +131,14 @@ export class Request {
     }
 
     public get(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
-        if(typeof options === 'undefined') {
-            options = Request.getDefaultRequestOptions();
+        // note: Emergency hack to prevent file URLs from crashing Android native SDK.
+        // File URLs should not get this far and they should be rejected earlier.
+        // Once validation is fixed, this hack should probably be removed.
+        if(url.substring(0, 7) === 'file://') {
+            Diagnostics.trigger('rejected_get_file_url', {
+                url: url
+            });
+            return Promise.reject(RequestStatus.FAILED);
         }
 
         const id = Request._callbackId++;
@@ -141,14 +148,20 @@ export class Request {
             url: url,
             headers: Request.applyAuthorizationHeader(url, headers),
             retryCount: 0,
-            options: options
+            options: this.getOptions(options)
         });
         return promise;
     }
 
     public post(url: string, data: string = '', headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
-        if(typeof options === 'undefined') {
-            options = Request.getDefaultRequestOptions();
+        // note: Emergency hack to prevent file URLs from crashing Android native SDK.
+        // File URLs should not get this far and they should be rejected earlier.
+        // Once validation is fixed, this hack should probably be removed.
+        if(url.substring(0, 7) === 'file://') {
+            Diagnostics.trigger('rejected_post_file_url', {
+                url: url
+            });
+            return Promise.reject(RequestStatus.FAILED);
         }
 
         headers.push(['Content-Type', 'application/json']);
@@ -161,14 +174,20 @@ export class Request {
             data: data,
             headers: Request.applyAuthorizationHeader(url, headers),
             retryCount: 0,
-            options: options
+            options: this.getOptions(options)
         });
         return promise;
     }
 
     public head(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
-        if(typeof options === 'undefined') {
-            options = Request.getDefaultRequestOptions();
+        // note: Emergency hack to prevent file URLs from crashing Android native SDK.
+        // File URLs should not get this far and they should be rejected earlier.
+        // Once validation is fixed, this hack should probably be removed.
+        if(url.substring(0, 7) === 'file://') {
+            Diagnostics.trigger('rejected_head_file_url', {
+                url: url
+            });
+            return Promise.reject(RequestStatus.FAILED);
         }
 
         // fix for Android 4.0 and older, https://code.google.com/p/android/issues/detail?id=24672
@@ -183,7 +202,7 @@ export class Request {
             url: url,
             headers: headers,
             retryCount: 0,
-            options: options
+            options: this.getOptions(options)
         });
         return promise;
     }
@@ -223,6 +242,14 @@ export class Request {
             };
             makeRequest(url);
         });
+    }
+
+    private getOptions(options?: IRequestOptions): IRequestOptions {
+        if (options) {
+            return options;
+        } else {
+            return Request.getDefaultRequestOptions();
+        }
     }
 
     private registerCallback(id: number): Promise<INativeResponse> {

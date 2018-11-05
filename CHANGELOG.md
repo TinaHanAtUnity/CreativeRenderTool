@@ -1,5 +1,16 @@
 # Pending
 
+* Remove feature flag test for vast3 error tracking [#6895](https://github.com/Applifier/unity-ads-webview/pull/6895)
+* Update AR styling for iPhoneX and Info button [#6837](https://github.com/Applifier/unity-ads-webview/pull/6837)
+* MRAID Views Refactor [#6775](https://github.com/Applifier/unity-ads-webview/pull/6775)
+* Resize MRAID Views [#6782](https://github.com/Applifier/unity-ads-webview/pull/6782)
+
+# Mon Nov  5 13:44:02 UTC 2018
+
+* Block file URLs from all Request and Cache API invocations [#6948](https://github.com/Applifier/unity-ads-webview/pull/6948)
+
+# Thu Nov  1 20:15:06 UTC 2018
+
 * Use X as skip icon experiment [#6920](https://github.com/Applifier/unity-ads-webview/pull/6920)
 * Remove early CTA button experiment [#6918](https://github.com/Applifier/unity-ads-webview/pull/6918)
 
