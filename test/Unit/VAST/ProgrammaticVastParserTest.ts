@@ -38,7 +38,7 @@ describe('ProgrammaticVastParser', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         (<any>core.Sdk) = sinon.createStubInstance(SdkApi);
 
-        request = sinon.createStubInstance(Request);
+        request = sinon.createStubInstance(RequestManager);
         session = TestFixtures.getSession();
 
         parser = new ProgrammaticVastParser();

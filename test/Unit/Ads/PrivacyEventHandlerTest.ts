@@ -26,6 +26,7 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('PrivacyEventHandlerTest', () => {
@@ -59,7 +60,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 campaign: sinon.createStubInstance(PerformanceCampaign),
                 coreConfig: sinon.createStubInstance(CoreConfiguration),
                 adsConfig: sinon.createStubInstance(AdsConfiguration),
-                request: sinon.createStubInstance(Request),
+                request: sinon.createStubInstance(RequestManager),
                 options: {},
                 endScreen: sinon.createStubInstance(PerformanceEndScreen),
                 overlay: sinon.createStubInstance(Overlay),

@@ -35,7 +35,7 @@ describe('CustomPurchasingAdapter', () => {
         purchasing = TestFixtures.getPurchasingApi(nativeBridge);
         analyticsManager = sinon.createStubInstance(AnalyticsManager);
         promoEvents = sinon.createStubInstance(PromoEvents);
-        request = sinon.createStubInstance(Request);
+        request = sinon.createStubInstance(RequestManager);
         sandbox = sinon.createSandbox();
 
         sinon.stub(purchasing.CustomPurchasing, 'refreshCatalog').returns(Promise.resolve());

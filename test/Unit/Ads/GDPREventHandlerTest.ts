@@ -24,6 +24,7 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 describe('GDPREventHandlerTest', () => {
 
@@ -58,7 +59,7 @@ describe('GDPREventHandlerTest', () => {
             campaign: sinon.createStubInstance(PerformanceCampaign),
             coreConfig: TestFixtures.getCoreConfiguration(),
             adsConfig: TestFixtures.getAdsConfiguration(),
-            request: sinon.createStubInstance(Request),
+            request: sinon.createStubInstance(RequestManager),
             options: {},
             endScreen: sinon.createStubInstance(PerformanceEndScreen),
             overlay: sinon.createStubInstance(Overlay),

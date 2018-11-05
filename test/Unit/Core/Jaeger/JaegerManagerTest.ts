@@ -12,7 +12,7 @@ describe('JaegerManager', () => {
     let requestPostStub: sinon.SinonStub;
 
     beforeEach(() => {
-        const _request = sinon.createStubInstance(Request);
+        const _request = sinon.createStubInstance(RequestManager);
         request = _request;
         jaegerManager = new JaegerManager(_request);
     });

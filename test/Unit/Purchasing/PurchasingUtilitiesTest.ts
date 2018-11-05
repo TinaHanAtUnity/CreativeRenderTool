@@ -58,7 +58,7 @@ describe('PurchasingUtilitiesTest @skipOnDevice', () => {
         campaignManager = sinon.createStubInstance(CampaignManager);
         analyticsManager = sinon.createStubInstance(AnalyticsManager);
         promoEvents = sinon.createStubInstance(PromoEvents);
-        request = sinon.createStubInstance(Request);
+        request = sinon.createStubInstance(RequestManager);
 
         sdk = sinon.createStubInstance(SdkApi);
         clientInfo = sinon.createStubInstance(ClientInfo);

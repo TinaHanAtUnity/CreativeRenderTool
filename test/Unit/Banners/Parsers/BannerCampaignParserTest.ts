@@ -29,7 +29,7 @@ describe('BannerCampaignParser', () => {
     beforeEach(() => {
         nativeBridge = sinon.createStubInstance(NativeBridge);
         core = TestFixtures.getCoreApi(nativeBridge);
-        request = sinon.createStubInstance(Request);
+        request = sinon.createStubInstance(RequestManager);
         session = TestFixtures.getSession();
 
         parser = new BannerCampaignParser();

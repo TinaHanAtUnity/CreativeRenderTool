@@ -75,7 +75,7 @@ describe('MRAIDEventHandlersTest', () => {
 
             focusManager = new FocusManager(platform, core);
             container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
-            request = sinon.createStubInstance(Request);
+            request = sinon.createStubInstance(RequestManager);
             placement = TestFixtures.getPlacement();
             request = new RequestManager(platform, core, new WakeUpManager(core));
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);

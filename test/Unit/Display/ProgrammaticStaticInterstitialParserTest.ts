@@ -38,7 +38,7 @@ describe('ProgrammaticVPAIDParser', () => {
 
         (<any>core.Sdk) = sinon.createStubInstance(SdkApi);
 
-        request = sinon.createStubInstance(Request);
+        request = sinon.createStubInstance(RequestManager);
         session = TestFixtures.getSession();
     });
 
