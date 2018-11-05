@@ -15,15 +15,18 @@ export class SliderPerformanceEndScreen extends EndScreen {
 
         const screenshots = campaign.getScreenshots().map(s => s.getUrl());
 
+        const portraitImage = campaign.getPortrait();
+        const landscapeImage = campaign.getLandscape();
+
         this._templateData = {
             'gameName': campaign.getGameName(),
             'gameIcon': campaign.getGameIcon().getUrl(),
             // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
-            'endScreenLandscape': campaign.getPortrait().getUrl(),
-            'endScreenPortrait': campaign.getLandscape().getUrl(),
+            'endScreenLandscape': portraitImage ? portraitImage.getUrl() : undefined,
+            'endScreenPortrait': landscapeImage ? landscapeImage.getUrl() : undefined,
             'rating': adjustedRating.toString(),
             'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
-            'endscreenAlt': this.getEndscreenAlt(campaign),
+            'endscreenAlt': this.getEndscreenAlt(),
             'screenshots': screenshots
         };
 
