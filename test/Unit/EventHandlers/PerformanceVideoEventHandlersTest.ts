@@ -9,7 +9,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
@@ -26,13 +26,15 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { AssertionError } from 'assert';
+import { asSpy } from 'TestHelpers/Functions';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
-    let overlay: Overlay;
+    let overlay: NewVideoOverlay;
     let endScreen: PerformanceEndScreen;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
@@ -87,7 +89,15 @@ describe('PerformanceVideoEventHandlersTest', () => {
             targetGameName: campaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, campaign);
-        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
+
+        const overlayParams: IVideoOverlayParameters<PerformanceCampaign> = {
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            campaign: campaign,
+            coreConfig: coreConfig,
+            placement: TestFixtures.getPlacement()
+        };
+        overlay = new NewVideoOverlay(nativeBridge, overlayParams, privacy, false);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         performanceAdUnitParameters = {
@@ -147,6 +157,14 @@ describe('PerformanceVideoEventHandlersTest', () => {
             // Cause an error by giving too large duration
             performanceVideoEventHandler.onPrepared(video.getUrl(), 50000, 1024, 768);
             sinon.assert.called(<sinon.SinonSpy>endScreen.show);
+        });
+    });
+
+    describe('with onPrepared', () => {
+        it('should show set overlay call button visible ', () => {
+            sinon.spy(overlay, 'setCallButtonVisible');
+            performanceVideoEventHandler.onPrepared(video.getUrl(), 5, 1024, 768);
+            sinon.assert.calledWith(<sinon.SinonSpy>overlay.setCallButtonVisible, true);
         });
     });
 });
