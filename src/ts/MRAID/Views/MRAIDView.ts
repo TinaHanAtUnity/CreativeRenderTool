@@ -376,7 +376,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._privacy.show();
     }
 
-    protected onSetOrientationProperties(allowOrientationChange: boolean, orientation: string) {
+    protected handleSetOrientationProperties(allowOrientationChange: boolean, orientation: string) {
         let forceOrientation = Orientation.NONE;
             switch(orientation) {
                 case 'portrait':
@@ -389,9 +389,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
                 default:
         }
+        this.onSetOrientationProperties(allowOrientationChange, forceOrientation);
+    }
+
+    protected onSetOrientationProperties(allowOrientationChange: boolean, orientation: Orientation) {
         this._handlers.forEach(handler => handler.onMraidOrientationProperties({
             allowOrientationChange: allowOrientationChange,
-            forceOrientation: forceOrientation
+            forceOrientation: orientation
         }));
     }
 

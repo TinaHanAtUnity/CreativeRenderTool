@@ -418,7 +418,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this.onClose();
                 break;
             case 'orientation':
-                this.onSetOrientationProperties(event.data.properties.allowOrientationChange, event.data.properties.forceOrientation);
+                this.handleSetOrientationProperties(event.data.properties.allowOrientationChange, event.data.properties.forceOrientation);
                 break;
             case 'analyticsEvent':
                 this.sendMraidAnalyticsEvent(event.data.event, event.data.eventData);
