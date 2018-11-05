@@ -93,6 +93,7 @@ import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
+import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
 
 export class WebView {
 
@@ -613,6 +614,8 @@ export class WebView {
             return this._mraidAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>parameters);
         } else if(parameters.campaign instanceof PerformanceCampaign) {
             return this._performanceAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<PerformanceCampaign>>parameters);
+        } else if (parameters.campaign instanceof SliderPerformanceCampaign) {
+            return this._performanceAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<SliderPerformanceCampaign>>parameters);
         } else if (parameters.campaign instanceof DisplayInterstitialCampaign) {
             return this._displayInterstitialAdUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<DisplayInterstitialCampaign>>parameters);
         } else if (parameters.campaign instanceof VPAIDCampaign) {

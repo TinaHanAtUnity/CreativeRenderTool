@@ -14,6 +14,8 @@ import { Platform } from 'Core/Constants/Platform';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { PerformanceOverlayEventHandlerWithAllowSkip } from 'Performance/EventHandlers/PerformanceOverlayEventHandlerWithAllowSkip';
+import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
+import { SliderPerformanceEndScreen } from 'Performance/Views/SliderPerformanceEndScreen';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -30,7 +32,14 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
             campaignId: parameters.campaign.getId(),
             osVersion: parameters.deviceInfo.getOsVersion()
         };
-        const endScreen = new PerformanceEndScreen(endScreenParameters, parameters.campaign);
+
+        let endScreen;
+        if(parameters.campaign instanceof SliderPerformanceCampaign) {
+            endScreen = new SliderPerformanceEndScreen(endScreenParameters, parameters.campaign);
+        } else {
+            endScreen = new PerformanceEndScreen(endScreenParameters, parameters.campaign);
+        }
+
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
