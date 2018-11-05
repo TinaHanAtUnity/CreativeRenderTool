@@ -28,7 +28,7 @@ import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 import { RequestManager } from 'Core/Managers/RequestManager';
 
-describe('VPAIDEventHandlerTest', () => {
+describe('VPAIDEventHandlerTest @skipOnDevice', () => {
     let eventHandler: VPAIDEventHandler;
     let platform: Platform;
     let backend: Backend;
