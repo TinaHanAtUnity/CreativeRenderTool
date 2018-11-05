@@ -408,11 +408,11 @@ export class AssetManager {
         }
 
         const creativeId = campaign.getCreativeId();
-        if (creativeId && totalSize > 0) {
+        if (creativeId && seatId && totalSize > 0) {
             const kafkaObject: any = {};
             kafkaObject.type = 'too_large_file';
             kafkaObject.creativeId = creativeId;
-            kafkaObject.seatId = campaign.getSeatId();
+            kafkaObject.seatId = seatId;
             kafkaObject.fileSize = Math.floor(totalSize / (1024 * 1024));
 
             HttpKafka.sendEvent('ads.creative.blocking', KafkaCommonObjectType.EMPTY, kafkaObject);

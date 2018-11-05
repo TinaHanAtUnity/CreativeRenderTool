@@ -289,7 +289,8 @@ export class Privacy extends AbstractPrivacy {
         }
 
         const creativeId = campaign.getCreativeId();
-        if (creativeId) {
+        const seatId = campaign.getSeatId();
+        if (creativeId && seatId) {
             const kafkaObject: any = {};
             kafkaObject.type = 'report';
             kafkaObject.creativeId = creativeId;
@@ -300,10 +301,10 @@ export class Privacy extends AbstractPrivacy {
         }
 
         const error = {
-            creativeId: campaign.getCreativeId(),
+            creativeId: creativeId,
             reason: reasonKey,
             adType: adType,
-            seatId: campaign.getSeatId(),
+            seatId: seatId,
             finishState: finishState,
             isCached: isCached
         };

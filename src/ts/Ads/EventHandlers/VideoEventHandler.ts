@@ -178,7 +178,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                 originalUrl: originalUrl,
                 isCached: CampaignAssetInfo.isCached(this._campaign)
             });
-            if (this._campaign.getCreativeId) {
+            if (this._campaign.getCreativeId && this._campaign.getSeatId()) {
                 const kafkaObject: any = {};
                 kafkaObject.type = 'video_length_error';
                 kafkaObject.creativeId = this._campaign.getCreativeId();

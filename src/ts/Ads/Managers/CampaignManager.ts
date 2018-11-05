@@ -475,7 +475,7 @@ export class CampaignManager {
             const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._nativeBridge, this._request);
             campaignErrorHandler.handleCampaignError(campaignError);
         }
-        if (CampaignManager.CreativeId) {
+        if (CampaignManager.CreativeId && CampaignManager.SeatId) {
             const kafkaObject: any = {};
             kafkaObject.type = 'parse_error';
             kafkaObject.creativeId = CampaignManager.CreativeId;
