@@ -49,14 +49,11 @@ import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { ICore } from 'Core/ICore';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
-import { ConfigManager } from 'Core/Managers/ConfigManager';
-import { INativeResponse } from 'Core/Managers/RequestManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { CallbackStatus, INativeCallback } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { HttpKafka } from 'Core/Utilities/HttpKafka';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { Promises, TimeoutError } from 'Core/Utilities/Promises';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
@@ -467,14 +464,6 @@ export class Ads implements IAds {
                 ProgrammaticOperativeEventManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));
                 AuctionRequest.setBaseUrl(TestEnvironment.get('serverUrl'));
-            }
-
-            if(TestEnvironment.get('configUrl')) {
-                ConfigManager.setTestBaseUrl(TestEnvironment.get('configUrl'));
-            }
-
-            if(TestEnvironment.get('kafkaUrl')) {
-                HttpKafka.setTestBaseUrl(TestEnvironment.get('kafkaUrl'));
             }
 
             if(TestEnvironment.get('campaignId')) {
