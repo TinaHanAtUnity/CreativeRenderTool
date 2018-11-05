@@ -1,6 +1,6 @@
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
 import { IosARApi } from 'AR/Native/iOS/IosARApi';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 export interface IARFrameTransform {

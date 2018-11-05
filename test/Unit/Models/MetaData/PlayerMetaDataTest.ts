@@ -51,7 +51,8 @@ class TestStorageApi extends StorageApi {
 describe('PlayerMetaDataTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, storageApi: TestStorageApi;
+    let nativeBridge: NativeBridge;
+    let storageApi: TestStorageApi;
 
     before(() => {
         nativeBridge = new NativeBridge({

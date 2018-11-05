@@ -127,7 +127,7 @@
                     } else {
                         this.addEventListener('showFallback', listener);
                     }
-                }
+                };
 
                 this.addEventListener = function(event, listener) {
                     if(event in listeners) {
@@ -259,11 +259,15 @@
 
                 this.getConfiguration = function() {
                     return playableConfiguration;
-                }
+                };
 
                 this.getPermissionStatus = function(type) {
                     return permissions[type];
-                }
+                };
+
+                this.supports = function() {
+                    return false;
+                };
             };
             window.mraid = new MRAID();
         })();

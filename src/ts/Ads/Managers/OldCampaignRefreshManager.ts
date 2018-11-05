@@ -2,12 +2,12 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
@@ -15,19 +15,20 @@ import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Cache } from 'Core/Utilities/Cache';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export class OldCampaignRefreshManager extends RefreshManager {
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
     private _campaignManager: CampaignManager;
-    private _configuration: Configuration;
+    private _configuration: AdsConfiguration;
     private _currentAdUnit: AbstractAdUnit;
     private _focusManager: FocusManager;
     private _sessionManager: SessionManager;
@@ -46,7 +47,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
     // this constant is intentionally named "magic" constant because the value is only a best guess and not a real technical constant
     private _startRefreshMagicConstant: number = 5000;
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: Request, cache: Cache) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: AdsConfiguration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: Request, cache: Cache) {
         super();
 
         this._nativeBridge = nativeBridge;
@@ -98,6 +99,13 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
     }
 
+    public subscribeNativePromoEvents(eventHandler : NativePromoEventHandler): void {
+        eventHandler.onClose.subscribe(() => {
+            this._needsRefill = true;
+            this.refresh();
+        });
+    }
+
     public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
         if(this.shouldRefill(this._refillTimestamp)) {
             this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
@@ -112,22 +120,26 @@ export class OldCampaignRefreshManager extends RefreshManager {
         return Promise.resolve();
     }
 
-    public refreshFromCache(cachedResponse: INativeResponse, span: JaegerSpan): Promise<INativeResponse | void> {
-        if(this.shouldRefill(this._refillTimestamp)) {
-            span.addAnnotation('should refill');
-            this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
-            this._refillTimestamp = 0;
-            this.invalidateCampaigns(false, this._configuration.getPlacementIds());
-            this._campaignCount = 0;
-            return this._campaignManager.requestFromCache(cachedResponse).then(() => {
-                return this._campaignManager.request();
-           });
-        } else if(this.checkForExpiredCampaigns()) {
-            span.addAnnotation('campaign expired');
-            return this.onCampaignExpired();
+    public refreshWithBackupCampaigns(backupCampaignManager: BackupCampaignManager): Promise<(INativeResponse | void)[]> {
+        this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
+        this._refillTimestamp = 0;
+        this.invalidateCampaigns(false, this._configuration.getPlacementIds());
+        this._campaignCount = 0;
+
+        const promises = [this._campaignManager.request()];
+
+        const placements = this._configuration.getPlacements();
+        for(const placement in this._configuration.getPlacements()) {
+            if(placements.hasOwnProperty(placement)) {
+                promises.push(backupCampaignManager.loadCampaign(this._configuration.getPlacement(placement)).then(campaign => {
+                    if(campaign) {
+                        this.setPlacementReady(placement, campaign);
+                    }
+                }));
+            }
         }
 
-        return Promise.resolve();
+        return Promise.all(promises);
     }
 
     public shouldRefill(timestamp: number): boolean {
@@ -195,13 +207,13 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     private onCampaign(placementId: string, campaign: Campaign) {
+        PurchasingUtilities.addCampaignPlacementIds(placementId, campaign);
         this._parsingErrorCount = 0;
         const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
-        const isMixedPlacementExperiment = CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId());
-        const shouldFillMixedPlacement = MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign);
-        const shouldNoFillMixedPlacement = isMixedPlacementExperiment && !shouldFillMixedPlacement;
 
-        if (shouldNoFillMixedPlacement || isPromoWithoutProduct) {
+        if (isPromoWithoutProduct) {
+            const productID = (<PromoCampaign>campaign).getIapProductId();
+            this._nativeBridge.Sdk.logWarning(`Promo placement: ${placementId} does not have the corresponding product: ${productID} available`);
             this.onNoFill(placementId);
         } else {
             this.setPlacementReady(placementId, campaign);
@@ -222,16 +234,23 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     private onError(error: WebViewError | Error, placementIds: string[], diagnosticsType: string, session?: Session) {
+        let errorInternal = error;
         this.invalidateCampaigns(this._needsRefill, placementIds);
 
         if(error instanceof Error) {
-            error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
+            errorInternal = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
 
-        Diagnostics.trigger(diagnosticsType, {
-            error: error
-        }, session);
-        this._nativeBridge.Sdk.logError(JSON.stringify(error));
+        if(session) {
+            SessionDiagnostics.trigger(diagnosticsType, {
+                error: errorInternal
+            }, session);
+        } else {
+            Diagnostics.trigger(diagnosticsType, {
+                error: errorInternal
+            });
+        }
+        this._nativeBridge.Sdk.logError(JSON.stringify(errorInternal));
 
         const minimumRefreshTimestamp = Date.now() + RefreshManager.ErrorRefillDelay * 1000;
         if(this._refillTimestamp === 0 || this._refillTimestamp > minimumRefreshTimestamp) {

@@ -25,7 +25,7 @@ const animationFrame = window.requestAnimationFrame || window.webkitRequestAnima
 let runningResizeEvent = false;
 
 export const detectOrientation = () => {
-    /* Calculate orientation based on width and height by default */
+    // Calculate orientation based on width and height by default
     let orientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
 
     if (typeof window.orientation !== 'undefined' && platform === 'ios' && !isIOS7) {
@@ -95,7 +95,7 @@ const onChangeOrientation = () => {
 document.addEventListener('DOMContentLoaded', onChangeOrientation, false);
 window.addEventListener('orientationchange', onChangeOrientation, false);
 
-/* TODO: Avoid run this *if* in browser */
+// TODO: Avoid run this *if* in browser
 if(typeof location !== 'undefined' && location.href.indexOf('build/browser') === -1) {
     let nativeBridge: NativeBridge;
     switch(platform) {

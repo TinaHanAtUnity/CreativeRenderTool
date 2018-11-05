@@ -3,11 +3,12 @@ import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
@@ -16,18 +17,21 @@ import { MRAIDOperativeEventManager } from 'MRAID/Managers/MRAIDOperativeEventMa
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('OperativeEventManagerFactoryTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
 
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
     let request: Request;
     let metaDataManager: MetaDataManager;
     let sessionManager: SessionManager;
     let clientInfo: ClientInfo;
     let deviceInfo: DeviceInfo;
-    let configuration: Configuration;
+    let coreConfig: CoreConfiguration;
+    let adsConfig: AdsConfiguration;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -35,12 +39,14 @@ describe('OperativeEventManagerFactoryTest', () => {
             handleCallback
         }, Platform.ANDROID);
 
+        storageBridge = new StorageBridge(nativeBridge);
         request = sinon.createStubInstance(Request);
         sessionManager = sinon.createStubInstance(SessionManager);
         metaDataManager = new MetaDataManager(nativeBridge);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
-        configuration = TestFixtures.getConfiguration();
+        coreConfig = TestFixtures.getCoreConfiguration();
+        adsConfig = TestFixtures.getAdsConfiguration();
     });
 
     describe('should return correct type of operative manager', () => {
@@ -53,7 +59,9 @@ describe('OperativeEventManagerFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
@@ -69,7 +77,9 @@ describe('OperativeEventManagerFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
@@ -85,7 +95,9 @@ describe('OperativeEventManagerFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 
@@ -101,7 +113,9 @@ describe('OperativeEventManagerFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
+                storageBridge: storageBridge,
                 campaign: campaign
             });
 

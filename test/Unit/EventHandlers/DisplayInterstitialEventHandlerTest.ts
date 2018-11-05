@@ -5,8 +5,6 @@ import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { Privacy } from 'Ads/Views/Privacy';
-
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -21,6 +19,7 @@ import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Privacy } from 'Ads/Views/Privacy';
 
 describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;
@@ -64,10 +63,11 @@ describe('DisplayInterstitialEventHandler', () => {
             const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const configuration = TestFixtures.getConfiguration();
+
+            const coreConfig = TestFixtures.getCoreConfiguration();
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
-            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            const privacy = new Privacy(nativeBridge, campaign, gdprManager, false, false);
 
             view = new DisplayInterstitial(nativeBridge, placement, campaign, privacy, false);
 
@@ -81,7 +81,8 @@ describe('DisplayInterstitialEventHandler', () => {
                 operativeEventManager: operativeEventManager,
                 placement: placement,
                 campaign: campaign,
-                configuration: TestFixtures.getConfiguration(),
+                coreConfig: TestFixtures.getCoreConfiguration(),
+                adsConfig: TestFixtures.getAdsConfiguration(),
                 request: request,
                 options: {},
                 view: view,

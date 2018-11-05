@@ -1,8 +1,7 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
-import { DeviceInfo } from 'Backend/Api/DeviceInfo';
-import { Request } from 'Backend/Api/Request';
+import { Backend } from 'Backend/Backend';
 import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
 import { assert } from 'chai';
@@ -42,10 +41,10 @@ describe('IosEventsTest', () => {
 
     beforeEach(function(done) {
         // tslint:disable:no-invalid-this
-        this.timeout(7000);
+        this.timeout(15000);
         // tslint:enable
         const xhr = new XMLHttpRequest();
-        xhr.timeout = 5000;
+        xhr.timeout = 10000;
         xhr.onload = (event: Event) => {
             const responseObj: any = JSON.parse(xhr.responseText);
             currentGameId = responseObj.game_id;
@@ -60,10 +59,10 @@ describe('IosEventsTest', () => {
 
     afterEach(function(done) {
         // tslint:disable:no-invalid-this
-        this.timeout(7000);
+        this.timeout(15000);
         // tslint:enable
         const xhr = new XMLHttpRequest();
-        xhr.timeout = 5000;
+        xhr.timeout = 10000;
         xhr.onload = (event: Event) => {
             done();
         };
@@ -95,7 +94,7 @@ describe('IosEventsTest', () => {
                 if(state === FinishState[FinishState.COMPLETED]) {
                     if(startCount === 2) {
                         setTimeout(() => {
-                            validateRequestLog(Request.getLog(), validationRegexps);
+                            validateRequestLog(UnityAds.getBackend().Api.Request.getLog(), validationRegexps);
                             assert.equal(startCount, 2, 'onUnityAdsStart was not called exactly 2 times');
                             done();
                         }, 2500);
@@ -113,15 +112,18 @@ describe('IosEventsTest', () => {
             }
         };
 
-        Request.setLog([]);
+        UnityAds.setBackend(new Backend(Platform.IOS));
 
-        DeviceInfo.setAdvertisingTrackingId('DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21');
-        DeviceInfo.setManufacturer('Apple');
-        DeviceInfo.setModel('iPhone7,2');
-        DeviceInfo.setOsVersion('10.1.1');
-        DeviceInfo.setScreenWidth(647);
-        DeviceInfo.setScreenHeight(357);
-        DeviceInfo.setTimeZone('+0200');
+        UnityAds.getBackend().Api.Request.setPassthrough(true);
+        UnityAds.getBackend().Api.Request.setLog([]);
+
+        UnityAds.getBackend().Api.DeviceInfo.setAdvertisingTrackingId('DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21');
+        UnityAds.getBackend().Api.DeviceInfo.setManufacturer('Apple');
+        UnityAds.getBackend().Api.DeviceInfo.setModel('iPhone7,2');
+        UnityAds.getBackend().Api.DeviceInfo.setOsVersion('10.1.1');
+        UnityAds.getBackend().Api.DeviceInfo.setScreenWidth(647);
+        UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(357);
+        UnityAds.getBackend().Api.DeviceInfo.setTimeZone('+0200');
 
         AbstractAdUnit.setAutoClose(true);
 

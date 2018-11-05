@@ -66,10 +66,11 @@ describe('PromoCampaignParser', () => {
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
-                assert.equal(campaign.getIapProductId(), content.iapProductId, 'IAP Product ID is not equal');
+                assert.equal(campaign.getIapProductId(), content.premiumProduct.productId, 'IAP Product ID is not equal');
                 assert.equal(campaign.getDynamicMarkup(), content.dynamicMarkup, 'Dynamic Markup is not equal');
                 assert.equal(campaign.getRewardedPromo(), content.rewardedPromo, 'Allow Skip is not equal');
-                assert.equal(campaign.getCreativeResource().getUrl(), content.creativeUrl, 'Creative URL is not equal');
+                assert.equal(campaign.getCreativeResource()!.getUrl(), content.creativeUrl, 'Creative URL is not equal');
+                assert.equal(campaign.getLimitedTimeOffer()!.getDuration(), 86400, 'Limited Time Offer duration is not equal');
             });
         });
 
@@ -93,13 +94,12 @@ describe('PromoCampaignParser', () => {
             afterEach(() => {
                 sandbox.restore();
             });
-
             it('should update tracking event urls for product type correctly', () => {
                 const expected: { [url: string]: string[]} = {
-                    'click': ['https://events.iap.unity3d.com/events/v1/click?fakeEvent=true&val=1.99&productType=nonConsumable', 'https://tracking.adsx.unityads.unity3d.com/operative?fakeEvent=true&val=1.99&productType=nonConsumable'],
-                    'complete': ['https://events.iap.unity3d.com/events/v1/complete?fakeEvent=true&val=1.99&productType=nonConsumable', 'https://tracking.adsx.unityads.unity3d.com/complete?fakeEvent=true&val=1.99&productType=nonConsumable'],
-                    'impression': ['https://events.iap.unity3d.com/events/v1/impression?fakeEvent=true&val=1.99&productType=nonConsumable', 'https://tracking.adsx.unityads.unity3d.com/impression?fakeEvent=truem&val=1.99&productType=nonConsumable'],
-                    'purchase': ['https://events.iap.unity3d.com/events/v1/purchase?fakeEvent=true&val=1.99&productType=nonConsumable','https://tracking.adsx.unityads.unity3d.com/operative?fakeEvent=true&val=1.99&productType=nonConsumable']
+                    'click': ['https://events.iap.unity3d.com/events/v1/click?fakeEvent=true&val=1.99&productType=nonConsumable', 'https://tracking.adsx.unityads.unity3d.com/operative?fakeEvent=true&val=1.99'],
+                    'complete': ['https://events.iap.unity3d.com/events/v1/complete?fakeEvent=true&val=1.99&productType=nonConsumable', 'https://tracking.adsx.unityads.unity3d.com/complete?fakeEvent=true&val=1.99'],
+                    'impression': ['https://events.iap.unity3d.com/events/v1/impression?fakeEvent=true&val=1.99&productType=nonConsumable', 'https://tracking.adsx.unityads.unity3d.com/impression?fakeEvent=truem&val=1.99'],
+                    'purchase': ['https://events.iap.unity3d.com/events/v1/purchase?fakeEvent=true&val=1.99&productType=nonConsumable','https://tracking.adsx.unityads.unity3d.com/operative?fakeEvent=true&val=1.99']
                  };
                 const actual = campaign.getTrackingEventUrls();
                 assert.deepEqual(actual, expected);

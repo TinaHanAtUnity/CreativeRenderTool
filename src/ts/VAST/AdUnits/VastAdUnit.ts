@@ -1,4 +1,3 @@
-import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IVideoAdUnitParameters, VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
@@ -8,17 +7,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
-
-class DeviceOrientation {
-    public static getDeviceOrientation(): Orientation {
-        let height = window.innerHeight;
-        if (height <= 0) {
-            height = 1;
-        }
-        const aspectRatio = window.innerWidth / height;
-        return aspectRatio >= 1 ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
-    }
-}
 
 export interface IVastAdUnitParameters extends IVideoAdUnitParameters<VastCampaign> {
     endScreen?: VastEndScreen;
@@ -132,7 +120,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {
-                this._thirdPartyEventManager.sendEvent(`vast ${eventName}`, sessionId, url);
+                this._thirdPartyEventManager.sendWithGet(`vast ${eventName}`, sessionId, url);
             }
         }
     }
@@ -158,7 +146,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     public sendCompanionTrackingEvent(sessionId: string): void {
         const companionTrackingUrls = this._vastCampaign.getVast().getCompanionCreativeViewTrackingUrls();
         for (const url of companionTrackingUrls) {
-            this._thirdPartyEventManager.sendEvent('companion', sessionId, url);
+            this._thirdPartyEventManager.sendWithGet('companion', sessionId, url);
         }
     }
 
@@ -169,7 +157,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
         if (clickTrackingEventUrls) {
             for (const clickTrackingEventUrl of clickTrackingEventUrls) {
-                this._thirdPartyEventManager.sendEvent('vast video click', sessionId, clickTrackingEventUrl);
+                this._thirdPartyEventManager.sendWithGet('vast video click', sessionId, clickTrackingEventUrl);
             }
         }
     }

@@ -1,15 +1,15 @@
-import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
-import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
+import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampaignManager';
 import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
 import { AdUnitActivities, FocusManager } from 'Core/Managers/FocusManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 
 const StandardRefreshDelay = 30;
 
@@ -26,7 +26,7 @@ export class BannerAdContext {
     private _nativeBridge: NativeBridge;
     private _adUnit: BannerAdUnit;
     private _placement: Placement;
-    private _campaign: Campaign;
+    private _campaign: BannerCampaign;
     private _deviceInfo: DeviceInfo;
     private _campaignManager: BannerCampaignManager;
     private _placementManager: BannerPlacementManager;
@@ -37,8 +37,6 @@ export class BannerAdContext {
     private _isShowing = false;
     private _shouldRefresh = true;
     private _refreshTimeoutID = 0;
-    private _hideTimestamp: number;
-    private _showTimestamp: number;
 
     constructor(nativeBridge: NativeBridge, adUnitParametersFactory: BannerAdUnitParametersFactory, campaignManager: BannerCampaignManager, placementManager: BannerPlacementManager, focusManager: FocusManager, deviceInfo: DeviceInfo) {
         this._nativeBridge = nativeBridge;
@@ -84,7 +82,9 @@ export class BannerAdContext {
             this._placementManager.sendBannersWaiting();
             this.setState(BannerLoadState.Loading);
             return this.loadBannerAdUnit().catch((e) => {
-                this._placementManager.sendBannersReady();
+                if (e instanceof NoFillError) {
+                    this.setUpBannerRefresh();
+                }
                 throw e;
             });
         }
@@ -103,11 +103,10 @@ export class BannerAdContext {
         return Promise.resolve();
     }
 
-    private loadBannerAdUnit() {
+    private loadBannerAdUnit(): Promise<void> {
         return this._campaignManager.request(this._placement).then((campaign) => {
-                this._campaign = campaign;
+                this._campaign = <BannerCampaign>campaign;
                 return this.createAdUnit().then((adUnit) => {
-                    this._showTimestamp = Date.now();
                     if (this._adUnit) {
                         this._adUnit.destroy();
                     }
@@ -125,16 +124,15 @@ export class BannerAdContext {
                     }
                 });
             }).catch((e) => {
-                this.setState(BannerLoadState.Unloaded);
                 return this.handleBannerRequestError(e);
             });
     }
 
-    private handleBannerRequestError(e: Error) {
+    private handleBannerRequestError(e: Error): Promise<void> {
         return Promise.reject(e);
     }
 
-    private sendBannerError(e: Error) {
+    private sendBannerError(e: Error): Promise<void> {
         this._nativeBridge.BannerListener.sendErrorEvent(e.message);
         return Promise.reject(e);
     }
@@ -142,7 +140,6 @@ export class BannerAdContext {
     private onBannerShow() {
         if (this.isState(BannerLoadState.Loaded)) {
             this._isShowing = true;
-            this._showTimestamp = Date.now();
             if (this._campaign.isExpired()) {
                 this.loadBannerAdUnit();
             } else {
@@ -156,7 +153,6 @@ export class BannerAdContext {
 
     private onBannerHide() {
         this._isShowing = false;
-        this._hideTimestamp = Date.now();
         window.clearTimeout(this._refreshTimeoutID);
         if (this._adUnit) {
             this._adUnit.hide();
@@ -171,11 +167,12 @@ export class BannerAdContext {
     }
 
     private onRefreshBanner() {
-        if (!this._isShowing) {
+        if (!this._isShowing && this.isState(BannerLoadState.Loaded)) {
             this.setUpBannerRefresh();
         } else {
             this.loadBannerAdUnit()
-                .then(() => this.setUpBannerRefresh());
+                .then(() => this.setUpBannerRefresh())
+                .catch(() => this.setUpBannerRefresh());
         }
     }
 
@@ -184,11 +181,13 @@ export class BannerAdContext {
     }
 
     private onAppForeground() {
-        this._isShowing = false;
+        if (this.isState(BannerLoadState.Loaded)) {
+            this.setUpBannerRefresh();
+        }
     }
 
     private onAppBackground() {
-        this._isShowing = true;
+        window.clearTimeout(this._refreshTimeoutID);
     }
 
     private onActivityResumed(activity: string) {
@@ -218,11 +217,18 @@ export class BannerAdContext {
     }
 
     private loadBanner(): Promise<void> {
+        const sizePromise = this.getBannerSize();
         if (this.isState(BannerLoadState.Loaded)) {
-            return this._nativeBridge.Banner.setViews(this._adUnit.getViews());
+            return sizePromise.then(([width, height]) => {
+                return this._nativeBridge.Banner.setBannerFrame(
+                    this._placement.getBannerStyle() || 'bottomcenter',
+                    width,
+                    height
+                ).then(() => this._nativeBridge.Banner.setViews(this._adUnit.getViews()));
+            });
         } else {
             return new Promise<void>((resolve, reject) => {
-                this.getBannerSize().then(([width, height]) => {
+                sizePromise.then(([width, height]) => {
                     const observer = this._nativeBridge.Banner.onBannerLoaded.subscribe(() => {
                         this._nativeBridge.Banner.onBannerLoaded.unsubscribe(observer);
                         resolve();
@@ -234,8 +240,8 @@ export class BannerAdContext {
     }
 
     private getBannerSize(): Promise<[number, number]> {
-        let width = StandardBannerWidth;
-        let height = StandardBannerHeight;
+        let width = this._campaign ? this._campaign.getWidth() : StandardBannerWidth;
+        let height = this._campaign ? this._campaign.getHeight() : StandardBannerHeight;
         if (this._deviceInfo instanceof AndroidDeviceInfo) {
             const density = this._deviceInfo.getScreenDensity();
             width = Math.floor(width * (density / 160));

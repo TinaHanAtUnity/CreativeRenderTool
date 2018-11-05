@@ -11,18 +11,18 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
+import { KeyCode } from 'Core/Constants/Android/KeyCode';
 
 export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler implements IOverlayHandler {
     protected _placement: Placement;
     protected _nativeBridge: NativeBridge;
     protected _campaign: T;
-
-    private _adUnit: VideoAdUnit<T>;
-    private _operativeEventManager: OperativeEventManager;
+    protected _operativeEventManager: OperativeEventManager;
+    protected _adUnit: VideoAdUnit<T>;
     private _adUnitStyle?: AdUnitStyle;
 
     constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
-        super(parameters.gdprManager, parameters.configuration);
+        super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._adUnit = adUnit;
@@ -70,7 +70,27 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
         this._adUnit.hide();
     }
 
-    private getVideoOrientation(): string | undefined {
+    public onKeyEvent(keyCode: number): void {
+        if(keyCode === KeyCode.BACK && this.canSkipVideo()) {
+            if(!this._placement.skipEndCardOnClose()) {
+                this.onOverlaySkip(this._adUnit.getVideo().getPosition());
+            } else {
+                this.onOverlayClose();
+            }
+        }
+    }
+
+    protected canSkipVideo(): boolean {
+        if(!this._placement.allowSkip() || !this._adUnit.isShowing() || !this._adUnit.canPlayVideo()) {
+            return false;
+        }
+
+        const position = this._adUnit.getVideo().getPosition();
+        const allowSkipInMs = this._placement.allowSkipInSeconds() * 1000;
+        return position >= allowSkipInMs;
+    }
+
+    protected getVideoOrientation(): string | undefined {
         if(this._adUnit instanceof PerformanceAdUnit) {
             return (<PerformanceAdUnit>this._adUnit).getVideoOrientation();
         }

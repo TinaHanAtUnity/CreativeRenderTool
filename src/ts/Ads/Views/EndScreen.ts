@@ -2,16 +2,14 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHandler';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
-import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { ABGroup } from 'Core/Models/ABGroup';
-
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
-import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
+import { Platform } from 'Core/Constants/Platform';
 
 export interface IEndScreenParameters {
     nativeBridge: NativeBridge;
@@ -56,13 +54,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._campaignId = parameters.campaignId;
         this._osVersion = parameters.osVersion;
 
-        this._template = new Template(this.getTemplate(), this._localization);
-
         this._bindings = [
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .download-container, .game-icon'
+                selector: '.game-background, .download-container, .game-icon, .game-image'
             },
             {
                 event: 'click',
@@ -107,10 +103,16 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
+            document.documentElement.classList.add(endScreenAlt);
         }
 
         if (this._showGDPRBanner) {
             this._container.classList.add('show-gdpr-banner');
+        }
+
+        // Android <= 4.4.4
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() <= 19) {
+            this._container.classList.add('old-androids');
         }
     }
 
@@ -161,8 +163,12 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         // do nothing
     }
 
-    protected getEndscreenAlt(campaign?: Campaign) {
+    protected getEndscreenAlt(): string | undefined {
         return undefined;
+    }
+
+    protected getTemplate() {
+        return EndScreenTemplate;
     }
 
     protected abstract onDownloadEvent(event: Event): void;
@@ -181,9 +187,5 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         this._privacy.show();
-    }
-
-    protected getTemplate() {
-        return EndScreenTemplate;
     }
 }

@@ -16,7 +16,7 @@ export class VPAIDOverlayEventHandler extends GDPREventHandler implements IClose
     private _endScreen: VPAIDEndScreen | undefined;
 
     constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
-        super(parameters.gdprManager, parameters.configuration);
+        super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
         this._adUnit = adUnit;
         this._operativeEventManager = parameters.operativeEventManager;
         this._campaign = parameters.campaign;

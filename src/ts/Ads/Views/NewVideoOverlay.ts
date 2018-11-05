@@ -1,11 +1,12 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
+
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
+import { ABGroup, CloseSkipIconTest } from 'Core/Models/ABGroup';
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _localization: Localization;
@@ -35,20 +36,21 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _privacy: AbstractPrivacy;
     private _gdprPopupClicked: boolean = false;
     private _showGDPRBanner: boolean = false;
-    private _disablePrivacyDuringVideo: boolean | undefined;
+    private _showPrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
     private _seatId: number | undefined;
+    private _abGroup: ABGroup;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, seatId?: number) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, showPrivacyDuringVideo?: boolean, seatId?: number) {
         super(nativeBridge, 'new-video-overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
-        this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
-        this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
+        this._showPrivacyDuringVideo = showPrivacyDuringVideo;
         this._gameId = gameId;
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
         this._seatId = seatId;
+        this._abGroup = abGroup;
 
         this._templateData = {
             muted
@@ -98,10 +100,13 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             });
         }
 
-        this._privacy.render();
-        this._privacy.hide();
-        document.body.appendChild(this._privacy.container());
-        this._privacy.addEventHandler(this);
+        if (showPrivacyDuringVideo) {
+            this._privacy = privacy;
+            this._privacy.render();
+            this._privacy.hide();
+            document.body.appendChild(this._privacy.container());
+            this._privacy.addEventHandler(this);
+        }
 
         setTimeout(() => {
             this.fadeIn();
@@ -134,7 +139,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             }
         }
 
-        if(CustomFeatures.isCloseIconSkipApp(this._gameId)) {
+        if (CustomFeatures.isCheetahGame(this._gameId) || CloseSkipIconTest.isValid(this._abGroup)) {
             this._skipButtonElement.classList.add('close-icon-skip');
         }
     }
@@ -232,7 +237,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     public choosePrivacyShown(): void {
-        if (this._disablePrivacyDuringVideo) {
+        if (!this._showPrivacyDuringVideo) {
             this._container.classList.remove('show-gdpr-banner');
             this._container.classList.remove('show-gdpr-button');
         } else if (!this._gdprPopupClicked && this._showGDPRBanner) {

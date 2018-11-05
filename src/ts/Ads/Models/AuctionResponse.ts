@@ -22,6 +22,7 @@ export interface IAuctionResponse {
     width: number | undefined;
     height: number | undefined;
     isMoatEnabled: boolean | undefined;
+    isMediaExperiment: boolean | undefined;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
@@ -46,7 +47,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             mediaId: ['string'],
             width: ['number', 'undefined'],
             height: ['number', 'undefined'],
-            isMoatEnabled: ['boolean', 'undefined']
+            isMoatEnabled: ['boolean', 'undefined'],
+            isMediaExperiment: ['boolean', 'undefined']
         });
 
         this.set('placements', placements);
@@ -69,6 +71,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('width', data.width);
         this.set('height', data.height);
         this.set('isMoatEnabled', data.isMoatEnabled);
+        this.set('isMediaExperiment', data.isMediaExperiment);
     }
 
     public getPlacements(): string[] {
@@ -153,6 +156,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public isMoatEnabled(): boolean | undefined {
         return this.get('isMoatEnabled');
+    }
+
+    public isMediaExperiment(): boolean | undefined {
+        return this.get('isMediaExperiment');
     }
 
     public getDTO(): {[key: string]: any } {

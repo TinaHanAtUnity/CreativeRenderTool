@@ -1,5 +1,4 @@
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { Privacy } from 'Ads/Views/Privacy';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
 import { Observable1 } from 'Core/Utilities/Observable';
@@ -11,7 +10,7 @@ import { VPAID as VPAIDModel } from 'VPAID/Models/VPAID';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDHandler, VPAID } from 'VPAID/Views/VPAID';
 
-describe('VPAID View', () => {
+describe('VPAID View @skipOnDevice', () => {
     let nativeBridge: NativeBridge;
     let campaign: VPAIDCampaign;
     let eventHandler: IVPAIDHandler;
@@ -36,7 +35,6 @@ describe('VPAID View', () => {
         model.getCreativeParameters.returns('{}');
         (<sinon.SinonStub>campaign.getVPAID).returns(model);
 
-        const privacy = new Privacy(nativeBridge, true);
         view = new VPAID(nativeBridge, webPlayerContainer, campaign, TestFixtures.getPlacement());
 
         eventHandler = {

@@ -10,6 +10,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { CampaignAssetInfo, VideoType } from 'Ads/Utilities/CampaignAssetInfo';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
@@ -18,10 +19,11 @@ import { WebViewError } from 'Core/Errors/WebViewError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { ABGroup } from 'Core/Models/ABGroup';
+import { AllowRewardedAdSkipInSeconds } from 'Constants/ExperimentConstants';
 
 export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParameters<T> {
     video: Video;
@@ -56,6 +58,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     private _finalVideoUrl: string;
     private _videoState: VideoState = VideoState.NOT_READY;
     private _clientInfo: ClientInfo;
+    private _parameters: IVideoAdUnitParameters<T>;
 
     constructor(nativeBridge: NativeBridge, parameters: IVideoAdUnitParameters<T>) {
         super(nativeBridge, parameters);
@@ -71,6 +74,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
         this._clientInfo = parameters.clientInfo;
+        this._parameters = parameters;
 
         this.prepareOverlay();
     }
@@ -245,7 +249,8 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                 }
                 break;
 
-            case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_ENDED || AdUnitContainerSystemMessage.AUDIO_SESSION_ROUTE_CHANGED:
+            case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_ENDED:
+            case AdUnitContainerSystemMessage.AUDIO_SESSION_ROUTE_CHANGED:
                 if(this.isShowing() && this.isActive() && this.canPlayVideo()) {
                     this.setVideoState(VideoState.PLAYING);
                     this._nativeBridge.VideoPlayer.play();
@@ -268,6 +273,13 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             document.body.appendChild(overlay.container());
 
             if(!this._placement.allowSkip()) {
+                if (CustomFeatures.allowSkipInRewardedVideos(this._parameters)) {
+                    overlay.setSkipEnabled(true);
+                    // Use the same value as in the PerformanceOverlayEventHandlerWithAllowSkip canSkipVideo()
+                    overlay.setSkipDuration(AllowRewardedAdSkipInSeconds);
+                    return;
+                }
+
                 overlay.setSkipEnabled(false);
             } else {
                 overlay.setSkipEnabled(true);
@@ -318,7 +330,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                     if(result.found) {
                         const remoteVideoSize: number | undefined = this.getVideo().getSize();
                         if(remoteVideoSize && remoteVideoSize !== result.size) {
-                            Diagnostics.trigger('video_size_mismatch', {
+                            SessionDiagnostics.trigger('video_size_mismatch', {
                                 remoteVideoSize: remoteVideoSize,
                                 localVideoSize: result.size
                             }, this._campaign.getSession());
@@ -330,7 +342,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
                         return this.getVideo().getUrl();
                     } else {
-                        Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error('File not found'), {
+                        SessionDiagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error('File not found'), {
                             url: this.getVideo().getUrl(),
                             originalUrl: this.getVideo().getOriginalUrl(),
                             campaignId: this._campaign.getId()
@@ -343,7 +355,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                         return streamingUrl;
                     }
                 }).catch(error => {
-                    Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error(error), {
+                    SessionDiagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error(error), {
                         url: this.getVideo().getUrl(),
                         originalUrl: this.getVideo().getOriginalUrl(),
                         campaignId: this._campaign.getId()

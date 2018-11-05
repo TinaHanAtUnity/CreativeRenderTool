@@ -1,7 +1,7 @@
 import {Platform} from 'Core/Constants/Platform';
 import {NativeBridge} from 'Core/Native/Bridge/NativeBridge';
 import {AndroidPermission} from 'Core/Native/Android/AndroidPermissions';
-import {IosPermission} from 'Core/Native/iOS/IosPermissions';
+import {IosPermission, IosBundleKeys} from 'Core/Native/iOS/IosPermissions';
 
 export enum CurrentPermission {
     UNKNOWN,
@@ -17,6 +17,17 @@ export enum PermissionTypes {
 
 export class PermissionsUtil {
     private static readonly ANDROID_PERMISSIONS_ASKED_KEY = 'unity-ads-permissions-asked';
+
+    public static checkPermissionInManifest(nativeBridge: NativeBridge, permission: PermissionTypes): Promise<boolean> {
+        const platform = nativeBridge.getPlatform();
+        const platformPermission = PermissionsUtil.getPlatformPermission(platform, permission);
+        if (platform === Platform.ANDROID) {
+            return PermissionsUtil.checkAndroidPermissionInManifest(nativeBridge, platformPermission);
+        } else {
+            return PermissionsUtil.checkIosPermissionInManifest(nativeBridge, platformPermission);
+        }
+        return Promise.resolve(false);
+    }
 
     public static checkPermissions(nativeBridge: NativeBridge, permission: PermissionTypes): Promise<CurrentPermission> {
         const platform = nativeBridge.getPlatform();
@@ -62,6 +73,26 @@ export class PermissionsUtil {
             return PermissionTypes.AUDIO;
         }
         return PermissionTypes.INVALID;
+    }
+
+    private static checkAndroidPermissionInManifest(nativeBridge: NativeBridge, permission: string): Promise<boolean> {
+        return nativeBridge.Permissions.Android.getPermissions()
+            .then((permissions: string[]) => permissions.some((key: string) => key === permission))
+            .catch(() => false);
+    }
+
+    private static checkIosPermissionInManifest(nativeBridge: NativeBridge, permission: string): Promise<boolean> {
+        let key = '';
+        if (permission === IosPermission.AVMediaTypeVideo) {
+            key = IosBundleKeys.Camera;
+        } else if (permission === IosPermission.AVMediaTypeAudio) {
+            key = IosBundleKeys.Audio;
+        } else {
+            return Promise.resolve(false);
+        }
+        return nativeBridge.MainBundle.getDataForKey(key)
+            .then((value: [string, any]) => value[0] !== '')
+            .catch(() => false);
     }
 
     private static checkAndroidPermission(nativeBridge: NativeBridge, permission: PermissionTypes): Promise<CurrentPermission> {

@@ -1,4 +1,3 @@
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
@@ -165,8 +164,7 @@ class TestStorageApi extends StorageApi {
     }
 
     public hasFileEntry(fileId: string): boolean {
-        fileId = fileId.split('.')[0];
-        if(this._contents && this._contents.cache && this._contents.cache.files && this._contents.cache.files[fileId]) {
+        if(this._contents && this._contents.cache && this._contents.cache.files && this._contents.cache.files[fileId.split('.')[0]]) {
             return true;
         }
 
@@ -214,9 +212,8 @@ describe('CacheCleanTest', () => {
         const focusManager = new FocusManager(nativeBridge);
         const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request: Request = new Request(nativeBridge, wakeUpManager);
-        const programmaticTrackingService: ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
-        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService);
+        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
         cacheApi = new TestCacheApi(nativeBridge);
         storageApi = new TestStorageApi(nativeBridge);
         nativeBridge.Cache = cacheApi;

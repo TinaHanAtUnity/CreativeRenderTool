@@ -1,16 +1,20 @@
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
+import { CacheDiagnostics, ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
+import { ProgrammaticTrackingError, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { WebViewError } from 'Core/Errors/WebViewError';
-import { CacheMode } from 'Core/Models/Configuration';
+import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Cache, CacheStatus, ICacheDiagnostics } from 'Core/Utilities/Cache';
+import { Cache, CacheStatus, HeadersType } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { FileInfo } from 'Core/Utilities/FileInfo';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 enum CacheType {
     REQUIRED,
@@ -32,7 +36,7 @@ type IAssetQueueRejectFunction = (reason?: any) => void;
 
 interface IAssetQueueObject {
     url: string;
-    diagnostics: ICacheDiagnostics;
+    diagnostics?: ICacheDiagnostics;
     resolve: IAssetQueueResolveFunction;
     reject: IAssetQueueRejectFunction;
 }
@@ -42,6 +46,7 @@ export class AssetManager {
     private _cache: Cache;
     private _cacheMode: CacheMode;
     private _cacheBookkeeping: CacheBookkeeping;
+    private _pts: ProgrammaticTrackingService;
     private _deviceInfo: DeviceInfo;
     private _stopped: boolean;
     private _caching: boolean;
@@ -51,11 +56,15 @@ export class AssetManager {
     private _campaignQueue: { [id: number]: ICampaignQueueObject };
     private _queueId: number;
     private _nativeBridge: NativeBridge;
+    private _backupCampaignManager: BackupCampaignManager;
 
-    constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeeping, nativeBridge: NativeBridge) {
+    private _sendCacheDiagnostics = false;
+
+    constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeeping, pts: ProgrammaticTrackingService, nativeBridge: NativeBridge, backupCampaignManager: BackupCampaignManager) {
         this._cache = cache;
         this._cacheMode = cacheMode;
         this._cacheBookkeeping = cacheBookkeeping;
+        this._pts = pts;
         this._deviceInfo = deviceInfo;
         this._stopped = false;
         this._caching = false;
@@ -65,10 +74,15 @@ export class AssetManager {
         this._campaignQueue = {};
         this._queueId = 0;
         this._nativeBridge = nativeBridge;
+        this._backupCampaignManager = backupCampaignManager;
 
         if(cacheMode === CacheMode.ADAPTIVE) {
             this._cache.onFastConnectionDetected.subscribe(() => this.onFastConnectionDetected());
         }
+    }
+
+    public setCacheDiagnostics(value: boolean) {
+        this._sendCacheDiagnostics = value;
     }
 
     public setup(campaign: Campaign): Promise<Campaign> {
@@ -83,7 +97,10 @@ export class AssetManager {
 
             if(this._cacheMode === CacheMode.FORCED) {
                 return requiredChain.then(() => {
-                    this.cache(optionalAssets, campaign, CacheType.OPTIONAL).catch(() => {
+                    this.cache(optionalAssets, campaign, CacheType.OPTIONAL).then(() => {
+                        // store as backup campaign only when all required and optional assets are cached
+                        this._backupCampaignManager.storeCampaign(campaign);
+                    }).catch(() => {
                         // allow optional assets to fail caching when in CacheMode.FORCED
                     });
                     return campaign;
@@ -132,7 +149,10 @@ export class AssetManager {
                     return promise;
                 }
             } else {
-                requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).catch(() => {
+                requiredChain.then(() => this.cache(optionalAssets, campaign, CacheType.OPTIONAL)).then(() => {
+                    // store as backup campaign only when all required and optional assets are cached
+                    this._backupCampaignManager.storeCampaign(campaign);
+                }).catch(() => {
                     // allow optional assets to fail caching when not in CacheMode.FORCED
                 });
             }
@@ -210,7 +230,7 @@ export class AssetManager {
                     return Promise.reject(CacheStatus.STOPPED);
                 }
 
-                const promise = this.queueAsset(asset.getOriginalUrl(), this.getCacheDiagnostics(asset, campaign), cacheType).then(([fileId, fileUrl]) => {
+                const promise = this.queueAsset(asset.getOriginalUrl(), cacheType, this.getCacheDiagnostics(asset, campaign)).then(([fileId, fileUrl]) => {
                     asset.setFileId(fileId);
                     asset.setCachedUrl(fileUrl);
                     return fileId;
@@ -228,7 +248,7 @@ export class AssetManager {
         return chain;
     }
 
-    private queueAsset(url: string, diagnostics: ICacheDiagnostics, cacheType: CacheType): Promise<string[]> {
+    private queueAsset(url: string, cacheType: CacheType, diagnostics?: ICacheDiagnostics): Promise<string[]> {
         return new Promise<string[]>((resolve, reject) => {
             const queueObject: IAssetQueueObject = {
                 url: url,
@@ -254,11 +274,26 @@ export class AssetManager {
             if(currentAsset) {
                 const asset: IAssetQueueObject = currentAsset;
                 this._caching = true;
-                this._cache.cache(asset.url, asset.diagnostics, campaign).then(([fileId, fileUrl]) => {
+                const tooLargeFileObserver = this._cache.onTooLargeFile.subscribe((callback, size, totalSize, responseCode, headers) => {
+                    this.handleTooLargeFile(asset.url, campaign, size, totalSize, responseCode, headers);
+                });
+                let cacheDiagnostics: CacheDiagnostics | undefined;
+                if(currentAsset.diagnostics) {
+                    cacheDiagnostics = new CacheDiagnostics(this._cache, currentAsset.diagnostics);
+                }
+                this._cache.cache(asset.url).then(([fileId, fileUrl]) => {
+                    this._cache.onTooLargeFile.unsubscribe(tooLargeFileObserver);
+                    if(cacheDiagnostics) {
+                        cacheDiagnostics.stop();
+                    }
                     asset.resolve([fileId, fileUrl]);
                     this._caching = false;
                     this.executeAssetQueue(campaign);
                 }).catch(error => {
+                    this._cache.onTooLargeFile.unsubscribe(tooLargeFileObserver);
+                    if(cacheDiagnostics) {
+                        cacheDiagnostics.stop();
+                    }
                     asset.reject(error);
                     this._caching = false;
                     this.executeAssetQueue(campaign);
@@ -271,7 +306,7 @@ export class AssetManager {
         const promises = [];
         for(const asset of assets) {
             if(asset instanceof Video) {
-                promises.push(FileInfo.isVideoValid(this._nativeBridge, asset, campaign).then(valid => {
+                promises.push(VideoFileInfo.isVideoValid(this._nativeBridge, asset, campaign).then(valid => {
                     if(!valid) {
                         throw new Error('Video failed to validate: ' + asset.getOriginalUrl());
                     }
@@ -341,11 +376,34 @@ export class AssetManager {
         });
     }
 
-    private getCacheDiagnostics(asset: Asset, campaign: Campaign): ICacheDiagnostics {
-        return {
-            creativeType: asset.getDescription(),
-            targetGameId: campaign instanceof PerformanceCampaign ? campaign.getGameId() : 0,
-            targetCampaignId: campaign.getId()
-        };
+    private getCacheDiagnostics(asset: Asset, campaign: Campaign): ICacheDiagnostics | undefined {
+        if(this._sendCacheDiagnostics) {
+            return {
+                creativeType: asset.getDescription(),
+                targetGameId: campaign instanceof PerformanceCampaign ? campaign.getGameId() : 0,
+                targetCampaignId: campaign.getId()
+            };
+        }
+        return undefined;
+    }
+
+    private handleTooLargeFile(url: string, campaign: Campaign, size: number, totalSize: number, responseCode: number, headers: HeadersType) {
+        SessionDiagnostics.trigger('too_large_file', {
+            url: url,
+            size: size,
+            totalSize: totalSize,
+            responseCode: responseCode,
+            headers: headers
+        }, campaign.getSession());
+        const seatId = campaign.getSeatId();
+        if (seatId !== undefined) {
+            let adType: string = '';
+            const maybeAdType: string | undefined = campaign.getAdType();
+            if (maybeAdType !== undefined) {
+                adType = maybeAdType;
+            }
+            const errorData = this._pts.buildErrorData(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
+            this._pts.reportError(errorData);
+        }
     }
 }

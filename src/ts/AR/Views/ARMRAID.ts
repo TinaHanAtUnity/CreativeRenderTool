@@ -1,13 +1,13 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { Platform } from 'Core/Constants/Platform';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PermissionsUtil, PermissionTypes, CurrentPermission } from 'Core/Utilities/Permissions';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IObserver0, IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
@@ -23,11 +23,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _localization: Localization;
 
-    private _closeElement: HTMLElement;
     private _loadingScreen: HTMLElement;
     private _iframe: HTMLIFrameElement;
-    private _gdprBanner: HTMLElement;
-    private _privacyButton: HTMLElement;
     private _cameraPermissionPanel: HTMLElement;
     private _permissionLearnMorePanel: HTMLElement;
 
@@ -37,17 +34,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _deviceorientationListener: any;
     private _loadingScreenTimeout: any;
     private _prepareTimeout: any;
-    private _updateInterval: any;
-
-    private _canClose = false;
-    private _canSkip = false;
-    private _didReward = false;
-
-    private _closeRemaining: number;
-    private _showTimestamp: number;
-    private _playableStartTimestamp: number;
-    private _backgroundTime: number = 0;
-    private _backgroundTimestamp: number;
 
     private _arFrameUpdatedObserver: IObserver1<string>;
     private _arPlanesAddedObserver: IObserver1<string>;
@@ -63,8 +49,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _hasCameraPermission = false;
     private _permissionResultObserver: IObserver2<string, boolean>;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
-        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
+        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
         this._placement = placement;
         this._campaign = campaign;
@@ -72,24 +58,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._template = new Template(PlayableMRAIDTemplate, this._localization);
 
-        this._bindings = [
-            {
-                event: 'click',
-                listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.close-region'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.privacy-button'
-            },
+        this._bindings = this._bindings.concat([
             {
                 event: 'click',
                 listener: (event: Event) => {
-                    this.onGDPRPopupEvent(event);
-                    this.choosePrivacyShown();
+                    this.onPrivacyClicked(event);
                 },
-                selector: '.gdpr-link'
+                selector: '.launch-privacy'
             },
             {
                 event: 'click',
@@ -119,21 +94,18 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 },
                 selector: '.hide-learn-more-button'
             }
-        ];
+        ]);
     }
 
     public render(): void {
         super.render();
 
-        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
         this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen-ar');
 
         this._cameraPermissionPanel = <HTMLElement>this._container.querySelector('.camera-permission-panel');
         this._permissionLearnMorePanel = <HTMLElement>this._container.querySelector('.permissions-learn-more');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
 
         ARUtil.isARSupported(this._nativeBridge).then(arSupported => {
             let container = MRAIDContainer;
@@ -168,7 +140,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }).catch((err) => {
                 this._nativeBridge.Sdk.logError('failed to create mraid: ' + err);
 
-                Diagnostics.trigger('create_mraid_error', {
+                SessionDiagnostics.trigger('create_mraid_error', {
                     message: err.message
                 }, this._campaign.getSession());
             });
@@ -176,8 +148,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
         window.addEventListener('message', this._messageListener, false);
-
-        this.choosePrivacyShown();
     }
 
     public setViewableState(viewable: boolean): void {
@@ -186,29 +156,24 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 type: 'viewable',
                 value: viewable
             }, '*');
-
-            // background time for analytics
-            if(!viewable) {
-                this._backgroundTimestamp = Date.now();
-            } else {
-                if (this._backgroundTimestamp) {
-                    this._backgroundTime += Date.now() - this._backgroundTimestamp;
-                }
-            }
         }
+
+        this.setAnalyticsBackgroundTime(viewable);
     }
 
     public show(): void {
         super.show();
         this._showTimestamp = Date.now();
-        const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
-        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(0, 0, backgroundTime, 'playable_show', {}));
+        const backgroundTime = this._backgroundTime / 1000;
+
+        if (this.isKPIDataValid({backgroundTime}, 'ar_playable_show')) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(0, 0, backgroundTime, 'playable_show', {}));
+        }
+
         this.showLoadingScreen();
     }
 
     public hide() {
-        this.setViewableState(false);
-
         if (this._arFrameUpdatedObserver) {
             this._nativeBridge.AR.onFrameUpdated.unsubscribe(this._arFrameUpdatedObserver);
             this._nativeBridge.AR.onPlanesAdded.unsubscribe(this._arPlanesAddedObserver);
@@ -229,11 +194,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }
         }
 
-        if(this._messageListener) {
-            window.removeEventListener('message', this._messageListener, false);
-            this._messageListener = undefined;
-        }
-
         if(this._loadingScreenTimeout) {
             clearTimeout(this._loadingScreenTimeout);
             this._loadingScreenTimeout = undefined;
@@ -244,22 +204,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._prepareTimeout = undefined;
         }
 
-        if(this._updateInterval) {
-            clearInterval(this._updateInterval);
-            this._updateInterval = undefined;
-        }
         super.hide();
-    }
 
-    protected choosePrivacyShown(): void {
-        if (this._showGDPRBanner && !this._gdprPopupClicked) {
-            this._gdprBanner.style.visibility = 'visible';
-            this._privacyButton.style.pointerEvents = '1';
-            this._privacyButton.style.visibility = 'hidden';
-        } else {
-            this._privacyButton.style.visibility = 'visible';
-            this._gdprBanner.style.pointerEvents = '1';
-            this._gdprBanner.style.visibility = 'hidden';
+        if(this._messageListener) {
+            window.removeEventListener('message', this._messageListener, false);
+            this._messageListener = undefined;
         }
     }
 
@@ -277,7 +226,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                     this.updateProgressCircle(this._closeElement, 1);
 
                     const resourceUrl = this._campaign.getResourceUrl();
-                    Diagnostics.trigger('playable_prepare_timeout', {
+                    SessionDiagnostics.trigger('playable_prepare_timeout', {
                         'url': resourceUrl ? resourceUrl.getOriginalUrl() : ''
                     }, this._campaign.getSession());
 
@@ -333,52 +282,36 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private updateProgressCircle(container: HTMLElement, value: number) {
-        const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
-
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
-            wrapperElement.style.display = 'none';
-            this._container.style.display = 'none';
-            /* tslint:disable:no-unused-expression */
-            this._container.offsetHeight;
-            /* tslint:enable:no-unused-expression */
-            this._container.style.display = 'block';
-            return;
-        }
-
-        const leftCircleElement = <HTMLElement>container.querySelector('.circle-left');
-        const rightCircleElement = <HTMLElement>container.querySelector('.circle-right');
-
-        const degrees = value * 360;
-        leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
-
-        if(value >= 0.5) {
-            wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
-            rightCircleElement.style.webkitAnimationName = 'right-spin';
-        }
-    }
-
-    private onCloseEvent(event: Event): void {
+    protected onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        const timeFromShow = ARMRAID.checkIsValid((Date.now() - this._showTimestamp) / 1000);
-        const timeFromPlayableStart = ARMRAID.checkIsValid((Date.now() - this._playableStartTimestamp) / 1000);
-        const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
 
-        if(this._canSkip && !this._canClose) {
+        const skip = this._canSkip && !this._canClose;
+        const eventName = skip ? 'playable_skip' : 'playable_close';
+
+        const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
+        const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
+        const backgroundTime = this._backgroundTime / 1000;
+
+        if (skip) {
             this._handlers.forEach(handler => handler.onMraidSkip());
-            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_skip', undefined));
-        } else if(this._canClose) {
+        } else if (this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
-            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_close', undefined));
+        }
+
+        if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, 'ar_' + eventName)) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, undefined));
         }
     }
 
-    private static checkIsValid(timeInSeconds: number): number | undefined {
-        if (timeInSeconds < 0 || timeInSeconds > 600) {
-            return undefined;
+    protected sendMraidAnalyticsEvent(eventName: string, eventData?: any): void {
+        const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
+        const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
+        const backgroundTime = this._backgroundTime / 1000;
+
+        if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, eventName)) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
         }
-        return timeInSeconds;
     }
 
     private onIframeLoaded() {
@@ -390,13 +323,15 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this.showARPermissionPanel();
         }
 
-        const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
-        this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
+        const frameLoadDuration = (Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId()) / 1000);
+        this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' s');
 
-        const timeFromShow = ARMRAID.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
-        const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
+        const timeFromShow = (this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000;
+        const backgroundTime = this._backgroundTime / 1000;
 
-        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'playable_loading_time', {}));
+        if (this.isKPIDataValid({timeFromShow, backgroundTime}, 'ar_playable_loading_time')) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'playable_loading_time', {}));
+        }
     }
 
     private handleAREvent(event: string, parameters: string) {
@@ -477,46 +412,19 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private onMessage(event: MessageEvent) {
         switch(event.data.type) {
             case 'open':
-                this._handlers.forEach(handler => handler.onMraidClick(encodeURI(event.data.url)));
+                this.onOpen(encodeURI(event.data.url));
                 break;
             case 'close':
-                this._handlers.forEach(handler => handler.onMraidClose());
+                this.onClose();
                 break;
             case 'orientation':
-                let forceOrientation = Orientation.NONE;
-                switch(event.data.properties.forceOrientation) {
-                    case 'portrait':
-                        forceOrientation = Orientation.PORTRAIT;
-                        break;
-
-                    case 'landscape':
-                        forceOrientation = Orientation.LANDSCAPE;
-                        break;
-
-                    default:
-                }
-                this._handlers.forEach(handler => handler.onMraidOrientationProperties({
-                    allowOrientationChange: event.data.properties.allowOrientationChange,
-                    forceOrientation: forceOrientation
-                }));
+                this.onSetOrientationProperties(event.data.properties.allowOrientationChange, event.data.properties.forceOrientation);
                 break;
             case 'analyticsEvent':
-                const timeFromShow = ARMRAID.checkIsValid((Date.now() - this._showTimestamp) / 1000);
-                const timeFromPlayableStart = ARMRAID.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
-                const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
-                this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
+                this.sendMraidAnalyticsEvent(event.data.event, event.data.eventData);
                 break;
             case 'customMraidState':
-                switch(event.data.state) {
-                    case 'completed':
-                        if(!this._placement.allowSkip() && this._closeRemaining > 5) {
-                            this._closeRemaining = 5;
-                        }
-                        break;
-                    case 'showEndScreen':
-                        break;
-                    default:
-                }
+                this.onCustomState(event.data.state);
                 break;
             case 'ar':
                 this.onAREvent(event).catch((reason) => this._nativeBridge.Sdk.logError('AR message error: ' + reason.toString()));
@@ -548,9 +456,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
-                const timeFromShow = ARMRAID.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
-                const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
-                this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+                const timeFromShow = (this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000;
+                const backgroundTime = this._backgroundTime / 1000;
+
+                if (this.isKPIDataValid({timeFromShow, backgroundTime}, 'ar_playable_start')) {
+                    this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+                }
+
                 this.setViewableState(true);
 
                 this._loadingScreen.style.display = 'none';
@@ -565,7 +477,12 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 return;
             }
 
-            PermissionsUtil.checkPermissions(this._nativeBridge, PermissionTypes.CAMERA).then(results => {
+            PermissionsUtil.checkPermissionInManifest(this._nativeBridge, PermissionTypes.CAMERA).then((available: boolean) => {
+                if (!available) {
+                    return CurrentPermission.DENIED;
+                }
+                return PermissionsUtil.checkPermissions(this._nativeBridge, PermissionTypes.CAMERA);
+            }).then((results: CurrentPermission) => {
                 const requestPermissionText = <HTMLElement>this._cameraPermissionPanel.querySelector('.request-text');
                 if (results === CurrentPermission.DENIED) {
                     this.onCameraPermissionEvent(false);
@@ -574,6 +491,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                         requestPermissionText.style.display = 'none';
                     }
                     this._cameraPermissionPanel.style.display = 'block';
+                    this._iframe.classList.add('mraid-iframe-camera-permission-dialog');
                 }
             });
         });
@@ -591,6 +509,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this.showMRAIDAd();
         this._cameraPermissionPanel.classList.add('hidden');
+        this._iframe.classList.remove('mraid-iframe-camera-permission-dialog');
     }
 
     private onShowAr() {
@@ -599,13 +518,24 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this.onCameraPermissionEvent(granted);
             }
         });
-
-        PermissionsUtil.requestPermission(this._nativeBridge, PermissionTypes.CAMERA).then(() => {
-            this._nativeBridge.Sdk.logDebug('Required permission for showing camera');
-        });
+        PermissionsUtil.requestPermission(this._nativeBridge, PermissionTypes.CAMERA);
     }
 
     private onShowFallback() {
         this.onCameraPermissionEvent(false);
+    }
+
+    private onPrivacyClicked(event: Event) {
+        event.stopPropagation();
+        event.preventDefault();
+        const url = (<HTMLLinkElement>event.target).href;
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._nativeBridge.UrlScheme.open(url);
+        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
+        }
     }
 }

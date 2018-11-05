@@ -34,6 +34,7 @@ const GroupSeventeen = new ABGroup(17);
 const GroupEighteen = new ABGroup(18);
 const GroupNineteen = new ABGroup(19);
 const GroupTest = new ABGroup(99);
+export const GroupDisabled = new ABGroup(666);
 
 export class ABGroupBuilder {
     public static getAbGroup = (group: number) => {
@@ -102,3 +103,5 @@ class ABTest {
 // Example : export const GdprBaseAbTest = new ABTest(GroupSixteen, GroupSeventeen);
 
 export const FPSCollectionTest = new ABTest(GroupSixteen);
+export const AllowRewardedSkipTest = new ABTest(GroupSixteen, GroupSeventeen);
+export const CloseSkipIconTest = new ABTest(GroupEighteen, GroupNineteen);

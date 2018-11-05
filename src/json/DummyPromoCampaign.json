@@ -17,6 +17,10 @@
             ],
             "click": [
                 "http://test.complete.com/click1"
+            ],
+            "purchase": [
+                "https://events.iap.unity3d.com/events/v1/purchase",
+                "http://test.purchase.com/purchase"
             ]
         }
     },

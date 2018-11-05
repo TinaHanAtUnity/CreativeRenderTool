@@ -14,7 +14,11 @@ class TestRequestApi extends RequestApi {
     private _toggleUrl: boolean = false;
 
     public get(id: string, url: string, headers: Array<[string, string]>): Promise<string> {
-        if(url.indexOf('/success') !== -1) {
+        if(url.indexOf('/auth') !== -1) {
+            const header = headers.find((x) => x[0] === 'Authorization');
+            const auth = header === undefined ? '' : header[1];
+            this.sendSuccessResponse(id, url, auth, 200, []);
+        } else if(url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
         } else if(url.indexOf('/fail') !== -1) {
             this.sendFailResponse(id, url, 'Fail response');
@@ -60,7 +64,11 @@ class TestRequestApi extends RequestApi {
     }
 
     public post(id: string, url: string, body: string, headers: Array<[string, string]>): Promise<string> {
-        if(url.indexOf('/success') !== -1) {
+        if(url.indexOf('/auth') !== -1) {
+            const header = headers.find((x) => x[0] === 'Authorization');
+            const auth = header === undefined ? '' : header[1];
+            this.sendSuccessResponse(id, url, auth, 200, []);
+        } else if(url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
         } else if(url.indexOf('/fail') !== -1) {
             this.sendFailResponse(id, url, 'Fail response');
@@ -120,7 +128,10 @@ class TestRequestApi extends RequestApi {
 describe('RequestTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, requestApi: TestRequestApi, request: Request, wakeUpManager: WakeUpManager;
+    let nativeBridge: NativeBridge;
+    let requestApi: TestRequestApi;
+    let request: Request;
+    let wakeUpManager: WakeUpManager;
     let focusManager: FocusManager;
 
     beforeEach(() => {
@@ -144,7 +155,6 @@ describe('RequestTest', () => {
         return request.get(successUrl).then((response) => {
             assert.equal(successMessage, response.response, 'Did not receive correct response');
         }).catch(error => {
-            error = <RequestError>error;
             throw new Error('Get without headers failed: ' + error.message);
         });
     });
@@ -156,7 +166,6 @@ describe('RequestTest', () => {
         return request.get(failUrl).then(response => {
             throw new Error('Request should have failed but got response: ' + response);
         }).catch(error => {
-            error = <RequestError>error;
             assert.equal(failMessage, error.message, 'Did not receive correct error message');
         });
     });
@@ -169,7 +178,6 @@ describe('RequestTest', () => {
         return request.get(headerUrl, [[headerField, headerMessage]]).then(response => {
             assert.equal(headerMessage, response.response, 'Did not get correctly forwarded header response');
         }).catch(error => {
-            error = <RequestError>error;
             throw new Error('Get with header forwarding failed: ' + error);
         });
     });
@@ -188,7 +196,6 @@ describe('RequestTest', () => {
         }).then(response => {
             assert.equal(successMessage, response.response, 'Did not get success message when retrying');
         }).catch(error => {
-            error = <RequestError>error;
             throw new Error('Get with retrying failed: ' + error.message);
         });
     });
@@ -200,7 +207,6 @@ describe('RequestTest', () => {
         return request.post(successUrl, 'Test').then(response => {
             assert.equal(successMessage, response.response, 'Did not receive correct response');
         }).catch(error => {
-            error = <RequestError>error;
             throw new Error('Post without headers failed: ' + error.message);
         });
     });
@@ -212,7 +218,6 @@ describe('RequestTest', () => {
         return request.post(failUrl, 'Test').then(response => {
             throw new Error('Request should have failed but got response: ' + response);
         }).catch(error => {
-            error = <RequestError>error;
             assert.equal(failMessage, error.message, 'Did not receive correct error message');
         });
     });
@@ -225,7 +230,6 @@ describe('RequestTest', () => {
         return request.post(headerUrl, 'Test', [[headerField, headerMessage]]).then(response => {
             assert.equal(headerMessage, response.response, 'Did not get correctly forwarded header response');
         }).catch(error => {
-            error = <RequestError>error;
             throw new Error('Post with header forwarding failed: ' + error.message);
         });
     });
@@ -237,7 +241,6 @@ describe('RequestTest', () => {
         return request.post(testUrl, bodyMessage).then(response => {
             assert.equal(bodyMessage, response.response, 'Did not get correctly forwarded body');
         }).catch(error => {
-            error = <RequestError>error;
             throw new Error('Post with body forwarding failed: ' + error.message);
         });
     });
@@ -256,7 +259,6 @@ describe('RequestTest', () => {
         }).then(response => {
             assert.equal(successMessage, response.response, 'Did not get success message when retrying');
         }).catch(error => {
-            error = <RequestError>error;
             throw new Error('Post with retrying failed: ' + error.message);
         });
     });
@@ -274,7 +276,6 @@ describe('RequestTest', () => {
         }).then(response => {
             throw new Error('Should not have received a response');
         }).catch(error => {
-            error = <RequestError>error;
             assert.equal('This URL always fails', error.message, 'Error was not correct after retries');
         });
     });
@@ -294,7 +295,6 @@ describe('RequestTest', () => {
         }).then((response) => {
             assert.equal(successMessage, response.response, 'Did not receive correct response');
         }).catch(error => {
-            error = <RequestError>error;
             throw new Error('Get with connection event failed: ' + error.message);
         });
 
@@ -316,7 +316,6 @@ describe('RequestTest', () => {
                 return request.get(successUrl).then((response) => {
                     assert.equal(successMessage, response.response, 'Did not receive correct response');
                 }).catch(error => {
-                    error = <RequestError>error;
                     throw new Error('Get without headers failed: ' + error.message);
                 });
             });
@@ -333,11 +332,12 @@ describe('RequestTest', () => {
                 return request.get(failureUrl).then((response) => {
                     assert.fail('Should not resolve');
                 }).catch(error => {
-                    assert.instanceOf(error, RequestError);
-                    error = <RequestError>error;
-                    assert.equal(error.message, reason);
-                    assert.equal(error.nativeResponse.responseCode, i);
-                    assert.equal(error.nativeResponse.response, failureResponse);
+                    let modifiedError = error;
+                    assert.instanceOf(modifiedError, RequestError);
+                    modifiedError = <RequestError>modifiedError;
+                    assert.equal(modifiedError.message, reason);
+                    assert.equal(modifiedError.nativeResponse.responseCode, i);
+                    assert.equal(modifiedError.nativeResponse.response, failureResponse);
                 });
             });
         }
@@ -352,11 +352,12 @@ describe('RequestTest', () => {
             return request.get(failureUrl).then((response) => {
                 assert.fail('Should not resolve');
             }).catch(error => {
-                assert.instanceOf(error, RequestError);
-                error = <RequestError>error;
-                assert.equal(error.message, reason);
-                assert.equal(error.nativeResponse.responseCode, 600);
-                assert.equal(error.nativeResponse.response, failureResponse);
+                let modifiedError = error;
+                assert.instanceOf(modifiedError, RequestError);
+                modifiedError = <RequestError>modifiedError;
+                assert.equal(modifiedError.message, reason);
+                assert.equal(modifiedError.nativeResponse.responseCode, 600);
+                assert.equal(modifiedError.nativeResponse.response, failureResponse);
             });
         });
     });
@@ -368,7 +369,6 @@ describe('RequestTest', () => {
                 return request.followRedirectChain(redirectUrl).then((url) => {
                     assert.equal('http://www.example.org/endurl/', url);
                 }).catch(error => {
-                    error = <RequestError>error;
                     throw new Error('Head without headers failed: ' + error.message);
                 });
 
@@ -381,6 +381,106 @@ describe('RequestTest', () => {
                 assert.fail('Should not resolve');
             }).catch(error => {
                 assert.equal(error.message, 'redirect limit reached');
+            });
+        });
+    });
+
+    describe('Request Authorization', () => {
+        afterEach(() => {
+            Request.clearAllAuthorization();
+        });
+
+        it('get', () => {
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = 'Bearer 1234567890';
+
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
+
+            return request.get(successUrl).then((response) => {
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
+            }).catch(error => {
+                throw new Error('Get without headers failed: ' + error.message);
+            });
+        });
+
+        it('post', () => {
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = 'Bearer 1234567890';
+
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
+
+            return request.post(successUrl).then((response) => {
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
+            }).catch(error => {
+                throw new Error('Get without headers failed: ' + error.message);
+            });
+        });
+
+        it('get for https', () => {
+            const successUrl: string = 'https://www.example.org/auth';
+            const expectedToken = 'Bearer 1234567890';
+
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
+
+            return request.get(successUrl).then((response) => {
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
+            }).catch(error => {
+                throw new Error('Get without headers failed: ' + error.message);
+            });
+        });
+
+        it('get multiple auth', () => {
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = 'Bearer 0987654321';
+
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
+            Request.setAuthorizationHeaderForHost('www.example.org', 'Bearer 1234567890');
+
+            return request.get(successUrl).then((response) => {
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
+            }).catch(error => {
+                throw new Error('Get without headers failed: ' + error.message);
+            });
+        });
+
+        it('get trim token string', () => {
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = '   Bearer 0987654321   ';
+
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
+
+            return request.get(successUrl).then((response) => {
+                assert.equal(expectedToken.trim(), response.response, 'Did not receive correct response');
+            }).catch(error => {
+                throw new Error('Get without headers failed: ' + error.message);
+            });
+        });
+
+        it('get ignore host', () => {
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = 'Bearer 0987654321';
+
+            Request.setAuthorizationHeaderForHost('www.not-example.org', 'Bearer 1234567890');
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
+
+            return request.get(successUrl).then((response) => {
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
+            }).catch(error => {
+                throw new Error('Get without headers failed: ' + error.message);
+            });
+        });
+
+        it('get no auth for host', () => {
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = '';
+
+            Request.setAuthorizationHeaderForHost('www.not-example.org', 'Bearer 1234567890');
+            Request.setAuthorizationHeaderForHost('www.google.org', 'Bearer 1');
+
+            return request.get(successUrl).then((response) => {
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
+            }).catch(error => {
+                throw new Error('Get without headers failed: ' + error.message);
             });
         });
     });

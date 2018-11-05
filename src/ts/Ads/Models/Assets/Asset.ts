@@ -1,7 +1,7 @@
 import { Session } from 'Ads/Models/Session';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ISchema, Model } from 'Core/Models/Model';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export interface IAsset {
     url: string;
@@ -53,7 +53,7 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
         this.set('cachedUrl', url);
     }
 
-    public setFileId(fileId: string) {
+    public setFileId(fileId: string | undefined) {
         this.set('fileId', fileId);
     }
 
@@ -78,7 +78,15 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
     }
 
     protected handleError(error: WebViewError) {
-        Diagnostics.trigger('set_model_value_failed', error, this.getSession());
+        SessionDiagnostics.trigger('set_model_value_failed', error, this.getSession());
         throw error;
+    }
+
+    protected serializeFilter(key: string, value: any): any {
+        if(key === 'session') {
+            return undefined;
+        } else {
+            return value;
+        }
     }
 }

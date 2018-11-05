@@ -26,7 +26,9 @@ class TestResolveApi extends ResolveApi {
 describe('ResolveTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    let nativeBridge: NativeBridge, resolveApi: TestResolveApi, resolve: Resolve;
+    let nativeBridge: NativeBridge;
+    let resolveApi: TestResolveApi;
+    let resolve: Resolve;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({

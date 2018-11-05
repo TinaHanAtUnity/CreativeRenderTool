@@ -26,6 +26,8 @@ export class XPromoCampaignParser extends CampaignParser {
             case 'xiaomi':
                 storeName = StoreName.XIAOMI;
                 break;
+            case 'standalone_android':
+                throw new Error('Android APK not supported on cross promotion.');
             default:
                 throw new Error('Unknown store value "' + json.store + '"');
         }
@@ -51,8 +53,9 @@ export class XPromoCampaignParser extends CampaignParser {
             gameIcon: new Image(this.validateAndEncodeUrl(json.gameIcon, session), session),
             rating: json.rating,
             ratingCount: json.ratingCount,
-            landscapeImage: new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session),
-            portraitImage: new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session),
+            landscapeImage: json.endScreenLandscape ? new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session) : undefined,
+            portraitImage: json.endScreenPortrait ? new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session) : undefined,
+            squareImage: json.endScreen ? new Image(this.validateAndEncodeUrl(json.endScreen, session), session) : undefined,
             clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl, session) : undefined,
             clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
             bypassAppSheet: json.bypassAppSheet,

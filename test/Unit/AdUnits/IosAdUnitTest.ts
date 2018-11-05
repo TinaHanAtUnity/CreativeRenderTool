@@ -25,6 +25,7 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import * as sinon from 'sinon';
 import { TestAdUnit } from 'TestHelpers/TestAdUnit';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -43,17 +44,19 @@ describe('IosAdUnitTest', () => {
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
+        const storageBridge = new StorageBridge(nativeBridge);
         const clientInfo = TestFixtures.getClientInfo();
         focusManager = new FocusManager(nativeBridge);
         const metaDataManager = new MetaDataManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request = new Request(nativeBridge, wakeUpManager);
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        const sessionManager = new SessionManager(nativeBridge, request);
+        const sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         const deviceInfo = TestFixtures.getIosDeviceInfo();
         container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
         const campaign = TestFixtures.getCampaign();
-        const configuration = TestFixtures.getConfiguration();
+        const coreConfig = TestFixtures.getCoreConfiguration();
+        const adsConfig = TestFixtures.getAdsConfiguration();
         const gdprManager = sinon.createStubInstance(GdprManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -63,7 +66,9 @@ describe('IosAdUnitTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: campaign
         });
 
@@ -77,7 +82,8 @@ describe('IosAdUnitTest', () => {
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             gdprManager: gdprManager,

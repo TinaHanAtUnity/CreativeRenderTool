@@ -9,7 +9,6 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { MOAT } from 'Ads/Views/MOAT';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
@@ -25,7 +24,9 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
+import { Privacy } from 'Ads/Views/Privacy';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -36,6 +37,7 @@ describe('VastOverlayEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
+    let storageBridge: StorageBridge;
     let vastAdUnit: VastAdUnit;
     let container: AdUnitContainer;
     let sessionManager: SessionManager;
@@ -60,11 +62,13 @@ describe('VastOverlayEventHandlersTest', () => {
             handleCallback
         });
 
+        storageBridge = new StorageBridge(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
-        privacy = new Privacy(nativeBridge, true);
+        const gdprManager = sinon.createStubInstance(GdprManager);
+        privacy = new Privacy(nativeBridge, campaign, gdprManager, false, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -74,13 +78,14 @@ describe('VastOverlayEventHandlersTest', () => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge, request);
+        sessionManager = new SessionManager(nativeBridge, request, storageBridge);
         request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
         sinon.stub(request, 'followRedirectChain').callsFake((url) => {
             return Promise.resolve(url);
         });
 
-        const configuration = TestFixtures.getConfiguration();
+        const coreConfig = TestFixtures.getCoreConfiguration();
+        const adsConfig = TestFixtures.getAdsConfiguration();
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -88,11 +93,11 @@ describe('VastOverlayEventHandlersTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
+            storageBridge: storageBridge,
             campaign: campaign
         });
-
-        const gdprManager = sinon.createStubInstance(GdprManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -104,7 +109,8 @@ describe('VastOverlayEventHandlersTest', () => {
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             endScreen: undefined,
@@ -138,8 +144,13 @@ describe('VastOverlayEventHandlersTest', () => {
 
         describe('When ad unit has an endscreen', () => {
             it('should hide endcard', () => {
-                const endScreenPrivacy = new Privacy(nativeBridge, false);
-                const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId(), endScreenPrivacy);
+                const vastEndScreenParameters: IVastEndscreenParameters = {
+                    campaign: vastAdUnitParameters.campaign,
+                    clientInfo: vastAdUnitParameters.clientInfo,
+                    seatId: vastAdUnitParameters.campaign.getSeatId(),
+                    showPrivacyDuringEndscreen: false
+                };
+                const vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
                 sinon.spy(vastEndScreen, 'show');
                 vastAdUnitParameters.endScreen = vastEndScreen;
                 vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
@@ -161,7 +172,7 @@ describe('VastOverlayEventHandlersTest', () => {
         const testMuteEvent = (muted: boolean) => {
             const eventName = muted ? 'mute' : 'unmute';
             const mockEventManager = sinon.mock(thirdPartyEventManager);
-            mockEventManager.expects('sendEvent').withArgs(`vast ${eventName}`, '12345', `http://localhost:3500/brands/14851/${eventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%`);
+            mockEventManager.expects('sendWithGet').withArgs(`vast ${eventName}`, '12345', `http://localhost:3500/brands/14851/${eventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%`);
 
             vastOverlayEventHandler.onOverlayMute(muted);
             mockEventManager.verify();
