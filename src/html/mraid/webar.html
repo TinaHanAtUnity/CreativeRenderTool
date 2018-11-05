@@ -97,10 +97,6 @@
             callNativeFunction('removeAnchor', identifier);
         }
 
-        function nativeGetFrame() {
-            return callNativeFunction('getFrame');
-        }
-
         function nativeAdvanceFrame() {
             callNativeFunction('advanceFrame');
         }
@@ -1319,18 +1315,6 @@
         };
 
         function raf() {
-            var frameStr = nativeGetFrame();
-            var frame = JSON.parse(frameStr);
-            if (frame.data) {
-                window.WebARonARKitSetData(frame.data);
-
-                if (frame.planes) {
-                    window.WebARonARKitDispatchARDisplayEvent(frame.planes);
-                }
-
-                callRafCallbacks();
-            }
-
             oldRequestAnimationFrame(() => {
                 // When we get the first RAF after modifying the DOM, we are guaranteed that
                 // the rendering has actually occurred. This is when we can advance the frame
