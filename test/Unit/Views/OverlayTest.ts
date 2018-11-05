@@ -65,7 +65,13 @@ describe('VideoOverlayTest', () => {
         assert.isNotNull(overlay.container().querySelector('.gdpr-pop-up'));
     });
 
-    // TODO: Add test to check that we don't show install button for non-skippable?
+    it('should render with translations', () => {
+        videoOverlayParameters.deviceInfo.getLanguage = () => 'fi';
+        const overlay = new NewVideoOverlay(nativeBridge, videoOverlayParameters, privacy, false);
+        overlay.render();
+        const callToActionElement = overlay.container().querySelectorAll('.call-button .download-text')[0];
+        assert.equal(callToActionElement.innerHTML, 'Asenna nyt');
+    });
 
     it('should render PerformanceCampaign with install button', () => {
         const overlay = new NewVideoOverlay(nativeBridge, videoOverlayParameters, privacy, false);
@@ -80,13 +86,5 @@ describe('VideoOverlayTest', () => {
         overlay.render();
         assert.isNotNull(overlay.container().querySelector('.vast-button'));
         assert.isNull(overlay.container().querySelector('.install-button'));
-    });
-
-    it('should render with translations', () => {
-        videoOverlayParameters.deviceInfo.getLanguage = () => 'fi';
-        const overlay = new NewVideoOverlay(nativeBridge, videoOverlayParameters, privacy, false);
-        overlay.render();
-        const callToActionElement = overlay.container().querySelectorAll('.call-button .download-text')[0];
-        assert.equal(callToActionElement.innerHTML, 'Asenna nyt');
     });
 });
