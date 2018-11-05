@@ -215,6 +215,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
 
         this.showLoadingScreen();
+        this._nativeBridge.setAutoBatchEnabled(false);
     }
 
     public hide() {
@@ -442,11 +443,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         switch (functionName) {
             case 'resetPose':
-                if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                    if (args[0].configuration) {
-                        args[0].configuration.updateMode = 'LATEST_CAMERA_IMAGE';
-                    }
-                }
                 return this._nativeBridge.AR.restartSession(args[0]);
 
             case 'setDepthNear':
