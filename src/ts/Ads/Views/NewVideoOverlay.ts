@@ -228,12 +228,11 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     public setCallButtonVisible(value: boolean) {
+        if (this._campaign instanceof PerformanceCampaign && !this._skipEnabled) {
+            return;
+        }
+
         if (this._callButtonVisible !== value) {
-
-            if (this._campaign instanceof PerformanceCampaign && !this._skipEnabled) {
-                return;
-            }
-
             this._callButtonElement.style.display = value ? 'block' : 'none';
         }
     }
@@ -334,7 +333,8 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         if (this._campaign instanceof PerformanceCampaign) {
             const campaign = this._campaign;
-            this._handlers.forEach((handler) => {
+            this._handlers.filter(handler => typeof handler.onOverlayDownload === 'function')
+            .forEach((handler) => {
                 if (typeof handler.onOverlayDownload === 'function') {
                     handler.onOverlayDownload({
                         clickAttributionUrl: campaign.getClickAttributionUrl(),
