@@ -5,6 +5,10 @@
 * MRAID Views Refactor [#6775](https://github.com/Applifier/unity-ads-webview/pull/6775)
 * Resize MRAID Views [#6782](https://github.com/Applifier/unity-ads-webview/pull/6782)
 
+# Mon Nov  5 13:44:02 UTC 2018
+
+* Block file URLs from all Request and Cache API invocations [#6948](https://github.com/Applifier/unity-ads-webview/pull/6948)
+
 # Thu Nov  1 20:15:06 UTC 2018
 
 * Use X as skip icon experiment [#6920](https://github.com/Applifier/unity-ads-webview/pull/6920)
