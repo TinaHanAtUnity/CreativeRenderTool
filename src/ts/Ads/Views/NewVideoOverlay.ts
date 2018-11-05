@@ -72,7 +72,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             muted: parameters.placement.muteVideo()
         };
 
-        // TODO: or should we make a PerformanceVideoOverlay.ts?
         if (this._campaign instanceof PerformanceCampaign) {
             this._templateData.isPerformanceCampaign = true;
             this._templateData.gameIcon = this._campaign.getGameIcon() ? this._campaign.getGameIcon().getUrl() : '';
@@ -380,7 +379,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private showSkipButton() {
         if (this._skipEnabled) {
             this._skipButtonElement.classList.add('show-skip-button');
-            if (this._isPerformanceCampaign) {
+            if (this._campaign instanceof PerformanceCampaign) {
                 this.showCallButton();
             }
         }
