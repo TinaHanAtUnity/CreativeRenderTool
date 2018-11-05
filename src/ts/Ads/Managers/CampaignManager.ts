@@ -102,7 +102,6 @@ export class CampaignManager {
     private _realtimeBody: any = {};
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
-    private _isErrorHandlerExperiment: boolean;
 
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, campaignParserManager: CampaignParserManager, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
         this._platform = platform;
@@ -121,7 +120,6 @@ export class CampaignManager {
         this._requesting = false;
         this._jaegerManager = jaegerManager;
         this._backupCampaignManager = backupCampaignManager;
-        this._isErrorHandlerExperiment = false;
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -465,10 +463,8 @@ export class CampaignManager {
     }
 
     private handleParseCampaignError(contentType: string, campaignError: CampaignError, placementIds: string[], session?: Session): Promise<void> {
-        if (this._isErrorHandlerExperiment) {   // AB test ready
-            const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._core, this._request);
-            campaignErrorHandler.handleCampaignError(campaignError);
-        }
+        const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._core, this._request);
+        campaignErrorHandler.handleCampaignError(campaignError);
         return this.handleError(campaignError, placementIds, `parse_campaign_${contentType.replace(/[\/-]/g, '_')}_error`, session);
     }
 

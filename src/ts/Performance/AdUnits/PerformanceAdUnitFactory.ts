@@ -3,18 +3,16 @@ import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { Privacy } from 'Ads/Views/Privacy';
-import { Platform } from 'Core/Constants/Platform';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceEndScreenEventHandler } from 'Performance/EventHandlers/PerformanceEndScreenEventHandler';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { PerformanceVideoOverlayWithCTAButton } from 'Ads/Views/PerformanceVideoOverlayWithCTAButton';
 import { PerformanceOverlayEventHandlerWithAllowSkip } from 'Performance/EventHandlers/PerformanceOverlayEventHandlerWithAllowSkip';
-import { PerformanceOverlayWithCTAButtonEventHandler } from 'Performance/EventHandlers/PerformanceOverlayWithCTAButtonEventHandler';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Platform } from 'Core/Constants/Platform';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -56,9 +54,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
         let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
         const skipAllowed = parameters.placement.allowSkip();
 
-        if (overlay instanceof PerformanceVideoOverlayWithCTAButton) {
-            performanceOverlayEventHandler = new PerformanceOverlayWithCTAButtonEventHandler(performanceAdUnit, performanceAdUnitParameters);
-        } else if (!skipAllowed && CustomFeatures.allowSkipInRewardedVideos(parameters)) {
+        if (!skipAllowed && CustomFeatures.allowSkipInRewardedVideos(parameters)) {
             performanceOverlayEventHandler = new PerformanceOverlayEventHandlerWithAllowSkip(performanceAdUnit, performanceAdUnitParameters);
         } else {
             performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, performanceAdUnitParameters);

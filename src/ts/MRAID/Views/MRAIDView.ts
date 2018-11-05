@@ -11,6 +11,8 @@ import { DOMUtils } from 'Core/Utilities/DOMUtils';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
+import { DeviceInfo } from '../../Core/Models/DeviceInfo';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -42,6 +44,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected _core: ICoreApi;
     protected _placement: Placement;
+    protected _deviceInfo: DeviceInfo;
     protected _campaign: MRAIDCampaign;
     protected _privacy: AbstractPrivacy;
     protected _showGDPRBanner = false;
@@ -54,11 +57,31 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected _callButtonEnabled: boolean = true;
 
-    constructor(platform: Platform, core: ICoreApi, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
+    protected _isLoaded = false;
+
+    protected _gdprBanner: HTMLElement;
+    protected _privacyButton: HTMLElement;
+
+    protected _canClose = false;
+    protected _canSkip = false;
+
+    protected _closeElement: HTMLElement;
+    protected _didReward = false;
+    protected _updateInterval: any;
+    protected _closeRemaining: number;
+    protected _CLOSE_LENGTH = 30;
+
+    protected _showTimestamp: number;
+    protected _playableStartTimestamp: number;
+    protected _backgroundTime: number = 0;
+    protected _backgroundTimestamp: number;
+
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(platform, id);
 
         this._core = core;
         this._placement = placement;
+        this._deviceInfo = deviceInfo;
         this._campaign = campaign;
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
@@ -70,12 +93,54 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
 
+        this._bindings = [
+            {
+                event: 'click',
+                listener: (event: Event) => this.onCloseEvent(event),
+                selector: '.close-region'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.privacy-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => {
+                    this.onGDPRPopupEvent(event);
+                    this._gdprPopupClicked = true;
+                    this.choosePrivacyShown();
+                },
+                selector: '.gdpr-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.icon-gdpr'
+            }
+        ];
+
         this._gameSessionId = gameSessionId || 0;
     }
 
     public abstract setViewableState(viewable: boolean): void;
 
+    public render() {
+        super.render();
+        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
+        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
+        this.choosePrivacyShown();
+    }
+
     public hide() {
+        this.setViewableState(false);
+
+        if(this._updateInterval) {
+            clearInterval(this._updateInterval);
+            this._updateInterval = undefined;
+        }
+
         super.hide();
 
         if(this._privacy) {
@@ -142,12 +207,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         return valid;
     }
 
-    public onPrivacyClose(): void {
-        if(this._privacy) {
-            this._privacy.hide();
-        }
-    }
-
     public onPrivacy(url: string): void {
         // do nothing
     }
@@ -162,19 +221,17 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    protected onPrivacyEvent(event: Event): void {
-        event.preventDefault();
-
-        this._privacy.show();
+    protected choosePrivacyShown(): void {
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
+            this._gdprBanner.style.visibility = 'visible';
+            this._privacyButton.style.pointerEvents = '1';
+            this._privacyButton.style.visibility = 'hidden';
+        } else {
+            this._privacyButton.style.visibility = 'visible';
+            this._gdprBanner.style.pointerEvents = '1';
+            this._gdprBanner.style.visibility = 'hidden';
+        }
     }
-
-    protected onGDPRPopupEvent(event: Event) {
-        event.preventDefault();
-        this._gdprPopupClicked = true;
-        this._privacy.show();
-    }
-
-    protected abstract choosePrivacyShown(): void;
 
     protected updateStats(stats: IMRAIDStats): void {
         this._stats = {
@@ -182,6 +239,86 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             averageFps: stats.frameCount / stats.totalTime,
             averagePlayFps: stats.frameCount / stats.playTime
         };
+    }
+
+    protected prepareProgressCircle() {
+        if(this._placement.allowSkip()) {
+            const skipLength = this._placement.allowSkipInSeconds();
+            this._closeRemaining = this._CLOSE_LENGTH;
+            let skipRemaining = skipLength;
+            this._updateInterval = setInterval(() => {
+                if(this._closeRemaining > 0) {
+                    this._closeRemaining--;
+                }
+                if(skipRemaining > 0) {
+                    skipRemaining--;
+                    this.updateProgressCircle(this._closeElement, (skipLength - skipRemaining) / skipLength);
+                }
+                if(skipRemaining <= 0) {
+                    this._canSkip = true;
+                    this._closeElement.style.opacity = '1';
+                    this.updateProgressCircle(this._closeElement, 1);
+                }
+                if (this._closeRemaining <= 0) {
+                    clearInterval(this._updateInterval);
+                    this._canClose = true;
+                }
+            }, 1000);
+        } else {
+            this._closeRemaining = this._CLOSE_LENGTH;
+            this._updateInterval = setInterval(() => {
+                const progress = (this._CLOSE_LENGTH - this._closeRemaining) / this._CLOSE_LENGTH;
+                if(progress >= 0.75 && !this._didReward) {
+                    this._handlers.forEach(handler => handler.onMraidReward());
+                    this._didReward = true;
+                }
+                if(this._closeRemaining > 0) {
+                    this._closeRemaining--;
+                    this.updateProgressCircle(this._closeElement, progress);
+                }
+                if (this._closeRemaining <= 0) {
+                    clearInterval(this._updateInterval);
+                    this._canClose = true;
+                    this._closeElement.style.opacity = '1';
+                    this.updateProgressCircle(this._closeElement, 1);
+                }
+            }, 1000);
+        }
+    }
+
+    protected updateProgressCircle(container: HTMLElement, value: number) {
+        const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
+
+        if(this._platform === Platform.ANDROID && (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() < 15) {
+            wrapperElement.style.display = 'none';
+            this._container.style.display = 'none';
+            /* tslint:disable:no-unused-expression */
+            this._container.offsetHeight;
+            /* tslint:enable:no-unused-expression */
+            this._container.style.display = 'block';
+            return;
+        }
+
+        const leftCircleElement = <HTMLElement>container.querySelector('.circle-left');
+        const rightCircleElement = <HTMLElement>container.querySelector('.circle-right');
+
+        const degrees = value * 360;
+        leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
+
+        if(value >= 0.5) {
+            wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
+            rightCircleElement.style.webkitAnimationName = 'right-spin';
+        }
+    }
+
+    protected setAnalyticsBackgroundTime(viewable: boolean) {
+        if(!viewable) {
+            this._backgroundTimestamp = Date.now();
+        } else {
+            if (this._backgroundTimestamp) {
+                this._backgroundTime += Date.now() - this._backgroundTimestamp;
+            }
+        }
     }
 
     private replaceMraidSources(mraid: string): string {
@@ -224,5 +361,65 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             }
         }
         return Promise.resolve(this._campaign.getResource());
+    }
+
+    protected abstract onCloseEvent(event: Event): void;
+
+    public onPrivacyClose(): void {
+        if(this._privacy) {
+            this._privacy.hide();
+        }
+    }
+
+    public onPrivacyEvent(event: Event): void {
+        event.preventDefault();
+        this._privacy.show();
+    }
+
+    public onGDPRPopupEvent(event: Event) {
+        event.preventDefault();
+        this._gdprPopupClicked = true;
+        this._privacy.show();
+    }
+
+    protected onSetOrientationProperties(allowOrientationChange: boolean, orientation: string) {
+        let forceOrientation = Orientation.NONE;
+            switch(orientation) {
+                case 'portrait':
+                    forceOrientation = Orientation.PORTRAIT;
+                    break;
+
+                case 'landscape':
+                    forceOrientation = Orientation.LANDSCAPE;
+                    break;
+
+                default:
+        }
+        this._handlers.forEach(handler => handler.onMraidOrientationProperties({
+            allowOrientationChange: allowOrientationChange,
+            forceOrientation: forceOrientation
+        }));
+    }
+
+    protected abstract sendMraidAnalyticsEvent(eventName: string, eventData?: any): void;
+
+    protected onOpen(url: string) {
+        this._handlers.forEach(handler => handler.onMraidClick(url));
+    }
+
+    protected onClose() {
+        this._handlers.forEach(handler => handler.onMraidClose());
+    }
+
+    protected onCustomState(customState: string) {
+        if(customState === 'completed') {
+            if(!this._placement.allowSkip() && this._closeRemaining > 5) {
+                this._closeRemaining = 5;
+            }
+        }
+    }
+
+    protected onResizeWebview() {
+        // this._handlers.forEach(handler => handler.onWebViewResize(false));
     }
 }

@@ -92,10 +92,11 @@ export abstract class AbstractAdUnitFactory {
         const showGDPRBanner = (parameters.campaign instanceof VastCampaign) ? this.showGDPRBanner(parameters) : false;
         let overlay: AbstractVideoOverlay;
 
-        if (parameters.placement.allowSkip() && parameters.placement.skipEndCardOnClose()) {
+        const skipAllowed = parameters.placement.allowSkip();
+        if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(parameters.platform, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            overlay = new NewVideoOverlay(parameters.platform, parameters.ads, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, showPrivacyDuringVideo, parameters.campaign.getSeatId());
+            overlay = new NewVideoOverlay(parameters.platform, parameters.ads, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), showPrivacyDuringVideo, parameters.campaign.getSeatId());
         }
 
         if (parameters.placement.disableVideoControlsFade()) {

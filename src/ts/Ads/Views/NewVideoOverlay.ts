@@ -7,6 +7,7 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
+import { ABGroup, CloseSkipIconTest } from 'Core/Models/ABGroup';
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
     protected _template: Template;
@@ -15,18 +16,18 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
     private _spinnerEnabled: boolean = false;
 
-    protected _skipEnabled: boolean;
+    private _skipEnabled: boolean;
 
     private _videoDurationEnabled: boolean = false;
-    protected _videoProgress: number;
+    private _videoProgress: number;
 
     private _muteEnabled: boolean = false;
 
     private _debugMessageVisible: boolean = false;
     private _callButtonVisible: boolean = false;
-    protected _callButtonEnabled: boolean = true;
+    private _callButtonEnabled: boolean = true;
 
-    protected _skipButtonElement: HTMLElement;
+    private _skipButtonElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
@@ -34,15 +35,16 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _timerElement: HTMLElement;
 
     private _fadeTimer: any;
-    protected _areControlsVisible: boolean = false;
+    private _areControlsVisible: boolean = false;
     private _privacy: AbstractPrivacy;
     private _gdprPopupClicked: boolean = false;
     private _showGDPRBanner: boolean = false;
     private _showPrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
     private _seatId: number | undefined;
+    private _abGroup: ABGroup;
 
-    constructor(platform: Platform, ads: IAdsApi, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean, seatId?: number) {
+    constructor(platform: Platform, ads: IAdsApi, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, showPrivacyDuringVideo?: boolean, seatId?: number) {
         super(platform, 'new-video-overlay', muted);
 
         this._ads = ads;
@@ -52,6 +54,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._gameId = gameId;
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
         this._seatId = seatId;
+        this._abGroup = abGroup;
 
         this._templateData = {
             muted
@@ -140,7 +143,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             }
         }
 
-        if(CustomFeatures.isCheetahGame(this._gameId)) {
+        if (CustomFeatures.isCheetahGame(this._gameId) || CloseSkipIconTest.isValid(this._abGroup)) {
             this._skipButtonElement.classList.add('close-icon-skip');
         }
     }
@@ -296,7 +299,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._handlers.forEach(handler => handler.onOverlayMute(this._muted));
     }
 
-    protected onCallButtonEvent(event: Event): void {
+    private onCallButtonEvent(event: Event): void {
         if (!this._callButtonEnabled) {
             return;
         }
@@ -332,7 +335,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._timerElement = <HTMLElement>this._container.querySelector('.timer');
     }
 
-    protected showSkipButton() {
+    private showSkipButton() {
         if (this._skipEnabled) {
             this._skipButtonElement.classList.add('show-skip-button');
         }
@@ -345,7 +348,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         }
     }
 
-    protected showCallButton() {
+    private showCallButton() {
         if (!this._areControlsVisible) {
             return;
         }
@@ -353,7 +356,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._callButtonElement.classList.add('show-go-text');
     }
 
-    protected fadeIn() {
+    private fadeIn() {
         this._container.classList.add('fade-in');
         this._areControlsVisible = true;
         setTimeout(() => {
