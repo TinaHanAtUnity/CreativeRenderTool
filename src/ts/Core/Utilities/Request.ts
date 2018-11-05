@@ -3,6 +3,7 @@ import { RequestError } from 'Core/Errors/RequestError';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 const enum RequestStatus {
     COMPLETE,
@@ -130,6 +131,16 @@ export class Request {
     }
 
     public get(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
+        // note: Emergency hack to prevent file URLs from crashing Android native SDK.
+        // File URLs should not get this far and they should be rejected earlier.
+        // Once validation is fixed, this hack should probably be removed.
+        if(url.substring(0, 7) === 'file://') {
+            Diagnostics.trigger('rejected_get_file_url', {
+                url: url
+            });
+            return Promise.reject(RequestStatus.FAILED);
+        }
+
         const id = Request._callbackId++;
         const promise = this.registerCallback(id);
         this.invokeRequest(id, {
@@ -143,6 +154,16 @@ export class Request {
     }
 
     public post(url: string, data: string = '', headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
+        // note: Emergency hack to prevent file URLs from crashing Android native SDK.
+        // File URLs should not get this far and they should be rejected earlier.
+        // Once validation is fixed, this hack should probably be removed.
+        if(url.substring(0, 7) === 'file://') {
+            Diagnostics.trigger('rejected_post_file_url', {
+                url: url
+            });
+            return Promise.reject(RequestStatus.FAILED);
+        }
+
         headers.push(['Content-Type', 'application/json']);
 
         const id = Request._callbackId++;
@@ -159,6 +180,15 @@ export class Request {
     }
 
     public head(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
+        // note: Emergency hack to prevent file URLs from crashing Android native SDK.
+        // File URLs should not get this far and they should be rejected earlier.
+        // Once validation is fixed, this hack should probably be removed.
+        if(url.substring(0, 7) === 'file://') {
+            Diagnostics.trigger('rejected_head_file_url', {
+                url: url
+            });
+            return Promise.reject(RequestStatus.FAILED);
+        }
 
         // fix for Android 4.0 and older, https://code.google.com/p/android/issues/detail?id=24672
         if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 16) {
