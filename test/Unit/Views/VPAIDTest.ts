@@ -10,7 +10,7 @@ import { VPAID as VPAIDModel } from 'VPAID/Models/VPAID';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDHandler, VPAID } from 'VPAID/Views/VPAID';
 
-describe('VPAID View', () => {
+describe('VPAID View @skipOnDevice', () => {
     let nativeBridge: NativeBridge;
     let campaign: VPAIDCampaign;
     let eventHandler: IVPAIDHandler;
