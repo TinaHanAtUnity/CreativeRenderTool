@@ -77,6 +77,17 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
     public abstract onVideoError(): void;
 
+    public open(): Promise<void> {
+        this.setShowing(true);
+        this.setActive(true);
+
+        this._container.addEventHandler(this);
+
+        return this._container.open(this, ['videoplayer', 'webview'], true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options).then(() => {
+            this.onStart.trigger();
+        });
+    }
+
     public show(): Promise<void> {
         this.setShowing(true);
         this.setActive(true);

@@ -23,6 +23,7 @@ export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign>
 }
 
 export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
+
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -72,6 +73,10 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             this.startAccelerometerUpdates();
             this.showView();
         });
+    }
+
+    public open(): Promise<void> {
+        return Promise.resolve();
     }
 
     public hide(): Promise<void> {

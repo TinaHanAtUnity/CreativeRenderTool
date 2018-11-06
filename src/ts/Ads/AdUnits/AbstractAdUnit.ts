@@ -17,6 +17,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Utilities/Request';
+import { GDPRConsent } from 'Ads/Views/GDPRConsent';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -37,6 +38,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     webPlayerContainer?: WebPlayerContainer;
     programmaticTrackingService: ProgrammaticTrackingService;
     gameSessionId?: number;
+    gdprConsentView?: GDPRConsent;
 }
 
 export abstract class AbstractAdUnit {
@@ -73,6 +75,7 @@ export abstract class AbstractAdUnit {
     private _showing: boolean;
     private _finishState: FinishState;
     private _baseCampaign: Campaign;
+    private _gdprConsent: GDPRConsent;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
         this._nativeBridge = nativeBridge;
@@ -82,6 +85,8 @@ export abstract class AbstractAdUnit {
         this._finishState = FinishState.ERROR;
         this._baseCampaign = parameters.campaign;
     }
+
+    public abstract open(): Promise<void>;
 
     public abstract show(): Promise<void>;
 
@@ -121,5 +126,11 @@ export abstract class AbstractAdUnit {
 
     public markAsSkipped() {
         this._finishState = FinishState.SKIPPED;
+    }
+
+    protected showAd(): void {
+        if (this._gdprConsent) {
+            this._gdprConsent.show();
+        }
     }
 }
