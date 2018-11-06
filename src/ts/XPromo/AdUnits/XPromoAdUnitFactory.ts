@@ -12,7 +12,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
-import { DownloadEventHandler, IDownloadEventHandlerParameters } from 'Ads/EventHandlers/DownloadEventHandler';
+import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 
 export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -35,7 +35,7 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
 
         const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
 
-        const downloadEventHandlerParameters: IDownloadEventHandlerParameters = {
+        const downloadEventHandlerParameters: IAppStoreDownloadHelperParameters = {
             thirdPartyEventManager: parameters.thirdPartyEventManager,
             operativeEventManager: parameters.operativeEventManager,
             deviceInfo: parameters.deviceInfo,
@@ -46,7 +46,7 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
             coreConfig: parameters.coreConfig
         };
 
-        const downloadEventHandler = new DownloadEventHandler(nativeBridge, downloadEventHandlerParameters);
+        const downloadEventHandler = new AppStoreDownloadHelper(nativeBridge, downloadEventHandlerParameters);
 
         const xPromoOverlayEventHandler = new XPromoOverlayEventHandler(nativeBridge, xPromoAdUnit, xPromoAdUnitParameters, downloadEventHandler);
         overlay.addEventHandler(xPromoOverlayEventHandler);

@@ -22,11 +22,11 @@ import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
-export interface IDownloadEventHandler {
-    onDownload(parameters: IDownloadParameters): void;
+export interface IAppStoreDownloadHelper {
+    download(parameters: IDownloadParameters): void;
 }
 
-export interface IDownloadEventHandlerParameters {
+export interface IAppStoreDownloadHelperParameters {
     thirdPartyEventManager: ThirdPartyEventManager;
     operativeEventManager: OperativeEventManager;
     deviceInfo: DeviceInfo;
@@ -47,7 +47,7 @@ export interface IDownloadParameters {
     adUnitStyle?: AdUnitStyle;
 }
 
-export class DownloadEventHandler  {
+export class AppStoreDownloadHelper  {
 
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
@@ -60,7 +60,7 @@ export class DownloadEventHandler  {
 
     protected _thirdPartyEventManager: ThirdPartyEventManager;
 
-    constructor(nativeBridge: NativeBridge, parameters: IDownloadEventHandlerParameters) {
+    constructor(nativeBridge: NativeBridge, parameters: IAppStoreDownloadHelperParameters) {
         this._nativeBridge = nativeBridge;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._operativeEventManager = parameters.operativeEventManager;
@@ -72,7 +72,7 @@ export class DownloadEventHandler  {
         this._adUnit = parameters.adUnit;
     }
 
-    public onDownload(parameters: IDownloadParameters): void {
+    public download(parameters: IDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
         const operativeEventParameters = this.getOperativeEventParams(parameters);
         this._operativeEventManager.sendClick(operativeEventParameters);

@@ -4,14 +4,14 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
-import { IDownloadEventHandler, IDownloadParameters } from 'Ads/EventHandlers/DownloadEventHandler';
+import { IAppStoreDownloadHelper, IDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<PerformanceCampaign, PerformanceAdUnit> {
 
     private _thirdPartyEventManager: ThirdPartyEventManager;
 
-    constructor(adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters, downloadHelper: IDownloadEventHandler) {
+    constructor(adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters, downloadHelper: IAppStoreDownloadHelper) {
         super(adUnit, parameters, downloadHelper);
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
     }

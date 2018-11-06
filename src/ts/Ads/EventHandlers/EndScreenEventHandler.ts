@@ -4,7 +4,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
 import { IEndScreenHandler } from 'Ads/Views/EndScreen';
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
-import { IDownloadEventHandler, IDownloadParameters } from 'Ads/EventHandlers/DownloadEventHandler';
+import { IAppStoreDownloadHelper, IDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -21,16 +21,16 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     protected _adUnit: T2;
     protected _campaign: T;
 
-    private _downloadHelper: IDownloadEventHandler;
+    private _downloadHelper: IAppStoreDownloadHelper;
 
-    constructor(adUnit: T2, parameters: IAdUnitParameters<T>, downloadHelper: IDownloadEventHandler) {
+    constructor(adUnit: T2, parameters: IAdUnitParameters<T>, downloadHelper: IAppStoreDownloadHelper) {
         super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
         this._adUnit = adUnit;
         this._downloadHelper = downloadHelper;
     }
 
     public onEndScreenDownload(parameters: IDownloadParameters): void {
-        this._downloadHelper.onDownload(parameters);
+        this._downloadHelper.download(parameters);
     }
 
     public onEndScreenClose(): void {

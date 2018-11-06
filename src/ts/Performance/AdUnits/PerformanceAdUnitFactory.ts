@@ -13,7 +13,7 @@ import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandle
 import { Platform } from 'Core/Constants/Platform';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
-import { DownloadEventHandler, IDownloadEventHandlerParameters } from 'Ads/EventHandlers/DownloadEventHandler';
+import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -46,7 +46,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
         let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
 
-        const downloadEventHandlerParameters: IDownloadEventHandlerParameters = {
+        const downloadEventHandlerParameters: IAppStoreDownloadHelperParameters = {
             thirdPartyEventManager: parameters.thirdPartyEventManager,
             operativeEventManager: parameters.operativeEventManager,
             deviceInfo: parameters.deviceInfo,
@@ -56,7 +56,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
             campaign: parameters.campaign,
             coreConfig: parameters.coreConfig
         };
-        const downloadEventHandler = new DownloadEventHandler(nativeBridge, downloadEventHandlerParameters);
+        const downloadEventHandler = new AppStoreDownloadHelper(nativeBridge, downloadEventHandlerParameters);
 
         performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
         overlay.addEventHandler(performanceOverlayEventHandler);

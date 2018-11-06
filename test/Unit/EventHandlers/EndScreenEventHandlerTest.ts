@@ -32,7 +32,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { IDownloadEventHandlerParameters, DownloadEventHandler } from 'Ads/EventHandlers/DownloadEventHandler';
+import { IAppStoreDownloadHelperParameters, AppStoreDownloadHelper } from 'Ads/Utilities/AppStoreDownloadHelper';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -57,7 +57,7 @@ describe('EndScreenEventHandlerTest', () => {
     let placement: Placement;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
-    let downloadEventHandler: DownloadEventHandler;
+    let downloadEventHandler: AppStoreDownloadHelper;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -139,7 +139,7 @@ describe('EndScreenEventHandlerTest', () => {
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
-            const downloadEventHandlerParameters: IDownloadEventHandlerParameters = {
+            const downloadEventHandlerParameters: IAppStoreDownloadHelperParameters = {
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
                 deviceInfo: deviceInfo,
@@ -149,7 +149,7 @@ describe('EndScreenEventHandlerTest', () => {
                 campaign: campaign,
                 coreConfig: coreConfig
             };
-            downloadEventHandler = new DownloadEventHandler(nativeBridge, downloadEventHandlerParameters);
+            downloadEventHandler = new AppStoreDownloadHelper(nativeBridge, downloadEventHandlerParameters);
             endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
         });
 
@@ -375,7 +375,7 @@ describe('EndScreenEventHandlerTest', () => {
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
-            const downloadEventHandlerParameters: IDownloadEventHandlerParameters = {
+            const downloadEventHandlerParameters: IAppStoreDownloadHelperParameters = {
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
                 deviceInfo: deviceInfo,
@@ -385,7 +385,7 @@ describe('EndScreenEventHandlerTest', () => {
                 campaign: campaign,
                 coreConfig: coreConfig
             };
-            downloadEventHandler = new DownloadEventHandler(nativeBridge, downloadEventHandlerParameters);
+            downloadEventHandler = new AppStoreDownloadHelper(nativeBridge, downloadEventHandlerParameters);
             endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
         });
 

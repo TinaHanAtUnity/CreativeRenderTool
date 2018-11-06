@@ -26,7 +26,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { IDownloadEventHandler, DownloadEventHandler, IDownloadEventHandlerParameters } from 'Ads/EventHandlers/DownloadEventHandler';
+import { IAppStoreDownloadHelper, AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 import { Placement } from 'Ads/Models/Placement';
 
 describe('PerformanceOverlayEventHandlerTest', () => {
@@ -45,7 +45,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
     let request: Request;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
-    let downloadEventHandler: DownloadEventHandler;
+    let downloadEventHandler: AppStoreDownloadHelper;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -120,7 +120,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
-        const downloadEventHandlerParameters: IDownloadEventHandlerParameters = {
+        const downloadEventHandlerParameters: IAppStoreDownloadHelperParameters = {
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
             deviceInfo: deviceInfo,
@@ -130,7 +130,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             campaign: campaign,
             coreConfig: coreConfig
         };
-        downloadEventHandler = new DownloadEventHandler(nativeBridge, downloadEventHandlerParameters);
+        downloadEventHandler = new AppStoreDownloadHelper(nativeBridge, downloadEventHandlerParameters);
 
         performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
     });

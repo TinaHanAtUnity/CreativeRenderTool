@@ -5,7 +5,7 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { IDownloadEventHandler, IDownloadParameters } from 'Ads/EventHandlers/DownloadEventHandler';
+import { IAppStoreDownloadHelper, IDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 import { OverlayEventHandlerWithDownload } from 'Ads/EventHandlers/OverlayEventHandlerWithDownload';
 
 export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownload<PerformanceCampaign> {
@@ -13,7 +13,7 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownl
     protected _performanceAdUnit: PerformanceAdUnit;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
 
-    constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters, downloadHelper: IDownloadEventHandler) {
+    constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters, downloadHelper: IAppStoreDownloadHelper) {
         super(nativeBridge, adUnit, parameters, downloadHelper, parameters.adUnitStyle);
         this._performanceAdUnit = adUnit;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;

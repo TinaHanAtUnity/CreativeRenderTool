@@ -4,7 +4,7 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { IDownloadEventHandler, IDownloadParameters } from 'Ads/EventHandlers/DownloadEventHandler';
+import { IAppStoreDownloadHelper, IDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 import { VideoAdUnit, IVideoAdUnitParameters } from 'Ads/AdUnits/VideoAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
@@ -15,11 +15,11 @@ export interface IVideoOverlayDownloadParameters extends IDownloadParameters {
 
 export class OverlayEventHandlerWithDownload<T extends Campaign> extends OverlayEventHandler<T> {
 
-    private _downloadHelper: IDownloadEventHandler;
+    private _downloadHelper: IAppStoreDownloadHelper;
     private _overlay: AbstractVideoOverlay | undefined;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
 
-    constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IVideoAdUnitParameters<T>, downloadHelper: IDownloadEventHandler, adUnitStyle?: AdUnitStyle) {
+    constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IVideoAdUnitParameters<T>, downloadHelper: IAppStoreDownloadHelper, adUnitStyle?: AdUnitStyle) {
         super(nativeBridge, adUnit, parameters, adUnitStyle);
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._overlay = this._adUnit.getOverlay();
@@ -28,7 +28,7 @@ export class OverlayEventHandlerWithDownload<T extends Campaign> extends Overlay
 
     public onOverlayDownload(parameters: IVideoOverlayDownloadParameters): void {
         this.setCallButtonEnabled(false);
-        this._downloadHelper.onDownload(parameters);
+        this._downloadHelper.download(parameters);
 
         // TODO: Can this be here or before onDonwload, is event order ok?
         if(this._campaign instanceof PerformanceCampaign) {
