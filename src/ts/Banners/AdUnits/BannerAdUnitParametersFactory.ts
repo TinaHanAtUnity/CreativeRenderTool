@@ -5,7 +5,7 @@ import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
-import { IBannerAdUnitParameters } from 'Banners/AdUnits/BannerAdUnit';
+import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
 
 export class BannerAdUnitParametersFactory {
 
