@@ -36,7 +36,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._mraidBridge = new MraidIFrameEventBridge(nativeBridge, {
             onSetOrientationProperties: (allowOrientationChange: boolean, forceOrientation: Orientation) => this.onSetOrientationProperties(allowOrientationChange, forceOrientation),
             onOpen: (url: string) => this.onOpen(encodeURI(url)),
-            onLoaded: () => this.onMRAIDLoaded(),
+            onLoaded: () => {/*do nothing*/},
             onAnalyticsEvent: (event: string, eventData: string) => this.sendMraidAnalyticsEvent(event, eventData),
             onClose: () => this.onClose(),
             onStateChange: (customState: string) => this.onCustomState(customState),
@@ -230,9 +230,5 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }, 'playable_mraid_' + eventName)) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
         }
-    }
-
-    public onMRAIDLoaded() {
-        // do nothing
     }
 }
