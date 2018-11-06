@@ -73,8 +73,8 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             muted: parameters.placement.muteVideo()
         };
 
-        if (this._campaign instanceof PerformanceCampaign) {
-            this._templateData.isPerformanceCampaign = true;
+        if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
+            this._templateData.showInstallButton = true;
             this._templateData.gameIcon = this._campaign.getGameIcon() ? this._campaign.getGameIcon().getUrl() : '';
         }
 
@@ -229,7 +229,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     public setCallButtonVisible(value: boolean) {
-        if (this._campaign instanceof PerformanceCampaign && !this._skipEnabled) {
+        if ((this._campaign instanceof XPromoCampaign || this._campaign instanceof PerformanceCampaign) && !this._skipEnabled) {
             return;
         }
 
@@ -379,7 +379,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private showSkipButton() {
         if (this._skipEnabled) {
             this._skipButtonElement.classList.add('show-skip-button');
-            if (this._campaign instanceof PerformanceCampaign) {
+            if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
                 this.showCallButton();
             }
         }
