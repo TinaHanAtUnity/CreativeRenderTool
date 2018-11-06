@@ -14,14 +14,14 @@ export enum MRAIDEvents {
 }
 
 export interface IMRAIDHandler {
-    onSetOrientationProperties(allowOrientationChange: boolean, orientation: Orientation): void;
-    onOpen(url: string): void;
-    onLoaded(): void;
-    onAnalyticsEvent(event: string, eventData: string): void;
-    onClose(): void;
-    onStateChange(customState: string): void;
-    onResizeWebview(): void;
-    onSendStats(totalTime: number, playTime: number, frameCount: number): void;
+    onBridgeSetOrientationProperties(allowOrientationChange: boolean, orientation: Orientation): void;
+    onBridgeOpen(url: string): void;
+    onBridgeLoad(): void;
+    onBridgeAnalyticsEvent(event: string, eventData: string): void;
+    onBridgeClose(): void;
+    onBridgeStateChange(customState: string): void;
+    onBridgeResizeWebview(): void;
+    onBridgeSendStats(totalTime: number, playTime: number, frameCount: number): void;
 }
 
 export interface IMRAIDOrientationProperties {
@@ -90,31 +90,31 @@ export class MraidIFrameEventBridge {
             default:
             }
         }
-        this._handler.onSetOrientationProperties(properties.allowOrientationChange, forceOrientation);
+        this._handler.onBridgeSetOrientationProperties(properties.allowOrientationChange, forceOrientation);
     }
 
     private handleOpen(url: string) {
-        this._handler.onOpen(url);
+        this._handler.onBridgeOpen(url);
     }
 
     private handleLoaded() {
-        this._handler.onLoaded();
+        this._handler.onBridgeLoad();
     }
 
     private handleAnalyticsEvent(event: string, eventData: string) {
-        this._handler.onAnalyticsEvent(event, eventData);
+        this._handler.onBridgeAnalyticsEvent(event, eventData);
     }
 
     private handleClose() {
-        this._handler.onClose();
+        this._handler.onBridgeClose();
     }
 
     private handleCustomState(customState: string) {
-        this._handler.onStateChange(customState);
+        this._handler.onBridgeStateChange(customState);
     }
 
     private handleSendStats(totalTime: number, playTime: number, frameCount: number) {
-        this._handler.onSendStats(totalTime, playTime, frameCount);
+        this._handler.onBridgeSendStats(totalTime, playTime, frameCount);
     }
 
     private postMessage(event: string, data?: any) {

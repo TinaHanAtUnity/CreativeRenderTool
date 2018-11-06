@@ -15,6 +15,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Privacy } from 'Ads/Views/Privacy';
+import { MraidIFrameEventBridge } from 'Ads/Views/MraidIFrameEventBridge';
 
 describe('MRAID', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -54,6 +55,7 @@ describe('MRAID', () => {
     it('should render', (done) => {
         const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
         const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false, configuration.getAbGroup());
+        mraid.setMraidEventBridge(new MraidIFrameEventBridge(nativeBridge, <MRAID>mraid));
 
         mraid.render();
 

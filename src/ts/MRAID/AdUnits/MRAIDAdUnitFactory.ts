@@ -13,6 +13,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { PlayableEventHandler } from 'MRAID/EventHandlers/PlayableEventHandler';
 import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
 import { Privacy } from 'Ads/Views/Privacy';
+import { MraidIFrameEventBridge } from 'Ads/Views/MraidIFrameEventBridge';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -38,10 +39,12 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
 
         if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || MRAIDAdUnitFactory._forcedPlayableMRAID) {
             mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
+            mraid.setMraidEventBridge(new MraidIFrameEventBridge(nativeBridge, <PlayableMRAID>mraid));
         } else if (ARUtil.isARCreative(parameters.campaign) || MRAIDAdUnitFactory._forcedARMRAID) {
             mraid = new ARMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         } else {
             mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
+            mraid.setMraidEventBridge(new MraidIFrameEventBridge(nativeBridge, <MRAID>mraid));
         }
 
         const mraidAdUnitParameters: IMRAIDAdUnitParameters = {

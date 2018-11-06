@@ -14,17 +14,17 @@ import MRAIDPerfContainer from 'html/mraid/container-perf.html';
 import MRAIDContainer from 'html/mraid/container.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { MraidIFrameEventBridge } from 'Ads/Views/MraidIFrameEventBridge';
+import { MraidIFrameEventBridge, IMRAIDHandler } from 'Ads/Views/MraidIFrameEventBridge';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 
-export class MRAID extends MRAIDView<IMRAIDViewHandler> {
+export class MRAID extends MRAIDView<IMRAIDViewHandler> implements IMRAIDHandler {
 
     private readonly onLoaded = new Observable0();
     private _domContentLoaded = false;
     private _creativeId: string | undefined;
 
     private _iframe: HTMLIFrameElement;
-    private _mraidBridge: MraidIFrameEventBridge;
+    // private _mraidBridge: MraidIFrameEventBridge;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(nativeBridge, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
@@ -34,20 +34,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this._creativeId = campaign.getCreativeId();
 
         this._template = new Template(MRAIDTemplate);
-        this._mraidBridge = new MraidIFrameEventBridge(nativeBridge, {
-            onSetOrientationProperties: (allowOrientationChange: boolean, forceOrientation: Orientation) => this.onSetOrientationProperties(allowOrientationChange, forceOrientation),
-            onOpen: (url: string) => this.onMessageOpen(url),
-            onLoaded: () => this.onLoadedEvent(),
-            onAnalyticsEvent: (event: string, eventData: string) => this.sendMraidAnalyticsEvent(event, eventData),
-            onClose: () => this.onClose(),
-            onStateChange: (customState: string) => this.onCustomState(customState),
-            onResizeWebview: () => this.onResizeWebview(),
-            onSendStats: (totalTime: number, playTime: number, frameCount: number) => this.updateStats({
-                totalTime: totalTime,
-                playTime: playTime,
-                frameCount: frameCount
-            })
-        });
+        // this._mraidBridge = new MraidIFrameEventBridge(nativeBridge, this);
     }
 
     public render(): void {
@@ -82,6 +69,42 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             this._mraidBridge.sendViewableEvent(viewable);
         }
         this.setAnalyticsBackgroundTime(viewable);
+    }
+
+    public onBridgeSetOrientationProperties(allowOrientationChange: boolean, forceOrientation: Orientation) {
+        this.onSetOrientationProperties(allowOrientationChange, forceOrientation);
+    }
+
+    public onBridgeOpen(url: string) {
+        this.onMessageOpen(url);
+    }
+
+    public onBridgeLoad() {
+        this.onLoadedEvent();
+    }
+
+    public onBridgeAnalyticsEvent(event: string, eventData: string) {
+        this.sendMraidAnalyticsEvent(event, eventData);
+    }
+
+    public onBridgeClose() {
+        this.onClose();
+    }
+
+    public onBridgeStateChange(customState: string) {
+        this.onCustomState(customState);
+    }
+
+    public onBridgeResizeWebview() {
+        this.onResizeWebview();
+    }
+
+    public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {
+        this.updateStats({
+            totalTime: totalTime,
+            playTime: playTime,
+            frameCount: frameCount
+        });
     }
 
     protected sendMraidAnalyticsEvent(eventName: string, eventData?: any) {

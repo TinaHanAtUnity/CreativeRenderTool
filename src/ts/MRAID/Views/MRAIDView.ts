@@ -11,6 +11,7 @@ import { XHRequest } from 'Core/Utilities/XHRequest';
 import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { MraidIFrameEventBridge } from 'Ads/Views/MraidIFrameEventBridge';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -71,6 +72,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _playableStartTimestamp: number;
     protected _backgroundTime: number = 0;
     protected _backgroundTimestamp: number;
+
+    protected _mraidBridge: MraidIFrameEventBridge;
 
     constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(nativeBridge, id);
@@ -149,6 +152,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         if (this._stats !== undefined) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(this._stats.averageFps, this._stats.averagePlayFps, 0, 'playable_performance_stats', this._stats));
         }
+    }
+
+    public setMraidEventBridge(mraidBridge: MraidIFrameEventBridge) {
+        this._mraidBridge = mraidBridge;
     }
 
     public createMRAID(container: any): Promise<string> {

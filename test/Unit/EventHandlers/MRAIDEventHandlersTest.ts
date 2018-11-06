@@ -30,6 +30,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { MraidIFrameEventBridge } from 'Ads/Views/MraidIFrameEventBridge';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -145,6 +146,7 @@ describe('MRAIDEventHandlersTest', () => {
                 }));
 
                 mraidView = new MRAID(nativeBridge, placement, playableMraidCampaign, playableMraidAdUnitParams.privacy, true, playableMraidAdUnitParams.coreConfig.getAbGroup());
+                mraidView.setMraidEventBridge(new MraidIFrameEventBridge(nativeBridge, <MRAID>mraidView));
                 sinon.stub(mraidView, 'createMRAID').callsFake(() => {
                     return Promise.resolve();
                 });
@@ -305,6 +307,7 @@ describe('MRAIDEventHandlersTest', () => {
 
             privacy = new Privacy(nativeBridge, programmaticMraidCampaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             mraidView = new MRAID(nativeBridge, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup());
+            mraidView.setMraidEventBridge(new MraidIFrameEventBridge(nativeBridge, <MRAID>mraidView));
 
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,

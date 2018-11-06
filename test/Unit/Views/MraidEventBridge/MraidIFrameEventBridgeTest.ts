@@ -15,14 +15,14 @@ describe('MraidIframeEventBridge', () => {
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
         handler = {
-            onSetOrientationProperties: sinon.spy(),
-            onOpen: sinon.spy(),
-            onLoaded: sinon.spy(),
-            onAnalyticsEvent: sinon.spy(),
-            onClose: sinon.spy(),
-            onStateChange: sinon.spy(),
-            onResizeWebview: sinon.spy(),
-            onSendStats: sinon.spy()
+            onBridgeSetOrientationProperties: sinon.spy(),
+            onBridgeOpen: sinon.spy(),
+            onBridgeLoad: sinon.spy(),
+            onBridgeAnalyticsEvent: sinon.spy(),
+            onBridgeClose: sinon.spy(),
+            onBridgeStateChange: sinon.spy(),
+            onBridgeResizeWebview: sinon.spy(),
+            onBridgeSendStats: sinon.spy()
         };
         mraidBridge = new MraidIFrameEventBridge(nativeBridge, handler);
         iframe = document.createElement('iframe');
@@ -50,7 +50,7 @@ describe('MraidIframeEventBridge', () => {
             };
             beforeEach(sendEvent(MRAIDEvents.OPEN, 'unityads.unity3d.com'));
             it(`should handle the Mraid ${MRAIDEvents.OPEN} event`, () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>handler.onOpen, 'unityads.unity3d.com');
+                sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeOpen, 'unityads.unity3d.com');
             });
         });
 
@@ -67,7 +67,7 @@ describe('MraidIframeEventBridge', () => {
             };
             beforeEach(sendEvent(MRAIDEvents.LOADED));
             it(`should handle the ${MRAIDEvents.LOADED} event`, () => {
-                sinon.assert.called(<sinon.SinonSpy>handler.onLoaded);
+                sinon.assert.called(<sinon.SinonSpy>handler.onBridgeLoad);
             });
         });
 
@@ -86,7 +86,7 @@ describe('MraidIframeEventBridge', () => {
             };
             beforeEach(sendEvent(MRAIDEvents.ANALYTICS_EVENT, 'x', 'y'));
             it(`should handle the ${MRAIDEvents.ANALYTICS_EVENT} event`, () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>handler.onAnalyticsEvent, 'x', 'y');
+                sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeAnalyticsEvent, 'x', 'y');
             });
         });
 
@@ -104,7 +104,7 @@ describe('MraidIframeEventBridge', () => {
             };
             beforeEach(sendEvent(MRAIDEvents.STATE_CHANGE, 'test'));
             it(`should handle the ${MRAIDEvents.STATE_CHANGE} event`, () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>handler.onStateChange, 'test');
+                sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeStateChange, 'test');
             });
         });
 
@@ -124,7 +124,7 @@ describe('MraidIframeEventBridge', () => {
             };
             beforeEach(sendEvent(MRAIDEvents.SEND_STATS, 20, 10, 200));
             it(`should handle the ${MRAIDEvents.SEND_STATS} event`, () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>handler.onSendStats, 20, 10, 200);
+                sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeSendStats, 20, 10, 200);
             });
         });
 
@@ -142,7 +142,7 @@ describe('MraidIframeEventBridge', () => {
             };
             beforeEach(sendEvent(MRAIDEvents.ORIENTATION, {allowOrientationChange: true, forceOrientation: 'portrait'}));
             it(`should handle the ${MRAIDEvents.ORIENTATION} event`, () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>handler.onSetOrientationProperties, true, Orientation.PORTRAIT);
+                sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeSetOrientationProperties, true, Orientation.PORTRAIT);
             });
         });
 
@@ -160,7 +160,7 @@ describe('MraidIframeEventBridge', () => {
             };
             beforeEach(sendEvent(MRAIDEvents.ORIENTATION, {allowOrientationChange: true, forceOrientation: 'landscape'}));
             it(`should handle the ${MRAIDEvents.ORIENTATION} event`, () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>handler.onSetOrientationProperties, true, Orientation.LANDSCAPE);
+                sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeSetOrientationProperties, true, Orientation.LANDSCAPE);
             });
         });
 
@@ -177,7 +177,7 @@ describe('MraidIframeEventBridge', () => {
             };
             beforeEach(sendEvent(MRAIDEvents.CLOSE));
             it(`should handle the ${MRAIDEvents.CLOSE} event`, () => {
-                sinon.assert.called(<sinon.SinonSpy>handler.onClose);
+                sinon.assert.called(<sinon.SinonSpy>handler.onBridgeClose);
             });
         });
     });
