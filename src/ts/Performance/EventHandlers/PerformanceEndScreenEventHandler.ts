@@ -8,11 +8,8 @@ import { IDownloadEventHandler, IDownloadParameters } from 'Ads/EventHandlers/Do
 
 export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<PerformanceCampaign, PerformanceAdUnit> {
 
-    private _downloadHelper: IDownloadEventHandler;
-
     constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters, downloadHelper: IDownloadEventHandler) {
         super(nativeBridge, adUnit, parameters, downloadHelper);
-        this._downloadHelper = downloadHelper;
     }
 
     public onKeyEvent(keyCode: number): void {
@@ -23,8 +20,6 @@ export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<Perf
 
     public onEndScreenDownload(parameters: IDownloadParameters): void {
         super.onEndScreenDownload(parameters);
-
-        // TODO: Can this be moved to the DownloadEventHandler's onDownload?
         this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.CLICK);
     }
 }

@@ -46,10 +46,18 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
         let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
 
-        const downloadEventHandler = new DownloadEventHandler(nativeBridge, {
-            ...performanceAdUnitParameters,
-            adUnit: performanceAdUnit
-        });
+        const downloadEventHandlerParameters: IDownloadEventHandlerParameters = {
+            thirdPartyEventManager: parameters.thirdPartyEventManager,
+            operativeEventManager: parameters.operativeEventManager,
+            deviceInfo: parameters.deviceInfo,
+            clientInfo: parameters.clientInfo,
+            placement: parameters.placement,
+            adUnit: performanceAdUnit,
+            campaign: parameters.campaign,
+            coreConfig: parameters.coreConfig
+        };
+
+        const downloadEventHandler = new DownloadEventHandler(nativeBridge, downloadEventHandlerParameters);
 
         performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
         overlay.addEventHandler(performanceOverlayEventHandler);

@@ -19,8 +19,8 @@ import { Placement } from 'Ads/Models/Placement';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
-import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 export interface IDownloadEventHandler {
     onDownload(parameters: IDownloadParameters): void;
@@ -33,6 +33,8 @@ export interface IDownloadEventHandlerParameters {
     clientInfo: ClientInfo;
     placement: Placement;
     adUnit: VideoAdUnit;
+    campaign: Campaign;
+    coreConfig: CoreConfiguration;
 }
 
 export interface IDownloadParameters {
@@ -54,25 +56,23 @@ export class DownloadEventHandler  {
     private _campaign: Campaign;
     private _operativeEventManager: OperativeEventManager;
     private _adUnit: PerformanceAdUnit;
+    private _coreConfig: CoreConfiguration;
 
-    protected _performanceAdUnit: PerformanceAdUnit;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
 
     constructor(nativeBridge: NativeBridge, parameters: IDownloadEventHandlerParameters) {
+        this._nativeBridge = nativeBridge;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._operativeEventManager = parameters.operativeEventManager;
         this._clientInfo = parameters.clientInfo;
         this._deviceInfo = parameters.deviceInfo;
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
+        this._coreConfig = parameters.coreConfig;
     }
 
     public onDownload(parameters: IDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-
-        // TODO: PerformanceEndScreenEventHandler has this in there. Can it be removed and this left here or is this something
-        // we can't send for example for MRAID and XPROMO?
-        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.CLICK);
 
         const operativeEventParameters = this.getOperativeEventParams(parameters);
         this._operativeEventManager.sendClick(operativeEventParameters);
@@ -269,9 +269,12 @@ export class DownloadEventHandler  {
     }
 
     private getVideo(): Video | undefined {
-        return this._performanceAdUnit.getVideo();
+        return this._adUnit.getVideo();
 
-        // TODO: Also here, is this needed?
+        // TODO: Is above ok or do we need to check for PerformanceAdUnit? Other type would be XPromoAdUnit
+        // Was added with message 'Send videoOrientation only for performance ads'
+        // https://github.com/Applifier/unity-ads-webview/commit/cd6f00b261354ce0459dd77c7c934e3310e2c73e
+        // So does this mean we don't want to send this information for XPromos?
         /*        if(this._adUnit instanceof PerformanceAdUnit) {
             return this._adUnit.getVideo();
         }
@@ -280,15 +283,7 @@ export class DownloadEventHandler  {
     }
 
     private getVideoOrientation(): string | undefined {
-        // Not 100% just this is enough, below is the original implementation?
-        // Depends on how this is used for XPromo and MRAID endscreen event handler?
         return this._adUnit.getVideoOrientation();
-        /*
-        if (this._adUnit instanceof PerformanceAdUnit || this._adUnit instanceof XPromoAdUnit) {
-            return (<PerformanceAdUnit>this._adUnit).getVideoOrientation();
-        }
-
-        return undefined;*/
     }
 
     private getOperativeEventParams(parameters: IDownloadParameters): IOperativeEventParams {

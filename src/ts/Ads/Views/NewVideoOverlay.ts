@@ -14,6 +14,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Placement } from 'Ads/Models/Placement';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export interface IVideoOverlayParameters<T extends Campaign> {
     deviceInfo: DeviceInfo;
@@ -331,7 +332,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this.resetFadeTimer();
         this._handlers.forEach(handler => handler.onOverlayCallButton());
 
-        if (this._campaign instanceof PerformanceCampaign) {
+        if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             const campaign = this._campaign;
             this._handlers.filter(handler => typeof handler.onOverlayDownload === 'function')
             .forEach((handler) => {
@@ -342,7 +343,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
                         bypassAppSheet: campaign.getBypassAppSheet(),
                         appStoreId: campaign.getAppStoreId(),
                         store: campaign.getStore(),
-                        videoDuration: this._videoDuration,
                         videoProgress: this._videoProgress
                     });
                 }
