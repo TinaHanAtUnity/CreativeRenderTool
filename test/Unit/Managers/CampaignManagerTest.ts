@@ -1051,7 +1051,7 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredCampaign.getCreativeId(), 'mraid-url-sample-creative-id');
                     assert.equal(triggeredCampaign.getSeatId(), 901);
                     assert.equal(triggeredCampaign.getCorrelationId(), '0zGg2TfRsBNbqlc7AVdhLAw');
-                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://img.serveroute.com/mini_8ball_fast/inlined.html', triggeredCampaign.getSession()));
+                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://localhost', triggeredCampaign.getSession()));
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getDynamicMarkup(), 'var markup = \'dynamic\';');
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getTrackingUrls(), {
                         'impression': [
