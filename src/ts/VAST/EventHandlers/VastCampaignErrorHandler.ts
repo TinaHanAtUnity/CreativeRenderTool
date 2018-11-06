@@ -2,6 +2,7 @@ import { Request, INativeResponse } from 'Core/Utilities/Request';
 import { ICampaignErrorHandler } from 'Ads/Errors/CampaignErrorHandlerFactory';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CampaignError } from 'Ads/Errors/CampaignError';
+import { Url } from 'Core/Utilities/Url';
 
 // VAST Error code defined in 3.0
 // https://wiki.iabtechlab.com/index.php?title=VAST_Error_Code_Troubleshooting_Matrix
@@ -86,7 +87,7 @@ export class VastCampaignErrorHandler implements ICampaignErrorHandler {
     private formatVASTErrorURL(errorUrl: string, errorCode: VastErrorCode, assetUrl?: string): string {
         let formattedUrl = errorUrl.replace('[ERRORCODE]', errorCode.toString());
         if (assetUrl) {
-            formattedUrl = formattedUrl.replace('[ASSETURI]', assetUrl);
+            formattedUrl = formattedUrl.replace('[ASSETURI]', Url.encodeParam(assetUrl));
         }
         return formattedUrl;
     }
