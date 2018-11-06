@@ -28,12 +28,11 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             core = TestFixtures.getCoreApi(nativeBridge);
         });
 
-        after(() => {
+        afterEach(() => {
             HttpKafka.setConfiguration(undefined);
             HttpKafka.setClientInfo(undefined);
             HttpKafka.setDeviceInfo(undefined);
             HttpKafka.setRequest(undefined);
-            (<sinon.SinonStub>Date.now).restore();
         });
 
         it('should not allow primitives as root values', () => {
@@ -74,6 +73,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             const request = new RequestManager(platform, core, new WakeUpManager(core));
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
             sinon.stub(request, 'post').returns(resolvedPromise);
+            sinon.stub(Date, 'now').returns(123456);
             HttpKafka.setRequest(request);
 
             Diagnostics.trigger('test', {'test': true});
@@ -88,6 +88,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
             sinon.stub(request, 'post').returns(resolvedPromise);
+            sinon.stub(Date, 'now').returns(123456);
 
             const clientInfo = new ClientInfo([
                 '12345',

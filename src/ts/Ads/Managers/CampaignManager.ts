@@ -40,8 +40,8 @@ import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
 import { CampaignError } from 'Ads/Errors/CampaignError';
-import { BackupCampaignManager } from './BackupCampaignManager';
-import { CampaignParserManager } from './CampaignParserManager';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { CampaignParserManager } from 'Ads/Managers/CampaignParserManager';
 
 export class CampaignManager {
 

@@ -11,8 +11,8 @@ import { DOMUtils } from 'Core/Utilities/DOMUtils';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { AndroidDeviceInfo } from '../../Core/Models/AndroidDeviceInfo';
-import { DeviceInfo } from '../../Core/Models/DeviceInfo';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;

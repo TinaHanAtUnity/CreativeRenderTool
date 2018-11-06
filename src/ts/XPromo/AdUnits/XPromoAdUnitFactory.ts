@@ -1,7 +1,6 @@
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { IXPromoAdUnitParameters, XPromoAdUnit } from './XPromoAdUnit';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { XPromoOverlayEventHandler } from 'XPromo/EventHandlers/XPromoOverlayEventHandler';
 import { XPromoEndScreenEventHandler } from 'XPromo/EventHandlers/XPromoEndScreenEventHandler';
@@ -11,6 +10,7 @@ import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEven
 import { Platform } from 'Core/Constants/Platform';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
+import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 
 export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
 

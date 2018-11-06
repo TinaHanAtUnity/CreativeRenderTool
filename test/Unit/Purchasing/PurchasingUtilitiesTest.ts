@@ -27,7 +27,7 @@ import { IProduct, ITransactionDetails } from 'Purchasing/PurchasingAdapter';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
-describe('PurchasingUtilitiesTest @skipOnDevice', () => {
+describe('PurchasingUtilitiesTest', () => {
     let platform: Platform;
     let backend: Backend;
     let nativeBridge: NativeBridge;

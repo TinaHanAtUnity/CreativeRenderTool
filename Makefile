@@ -217,7 +217,7 @@ $(TEST_BUILD_DIR)/%.js: %.ts
 	$(TYPESCRIPT) --project tsconfig.json
 
 $(TEST_BUILD_DIR)/Unit.js:
-	mkdir -p $(dir $@) && echo "import 'Workarounds';" $(UNIT_TESTS) $(FUNCTIONAL_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
+	mkdir -p $(dir $@) && echo "import 'Workarounds'; import 'TestHelpers/Workarounds';" $(UNIT_TESTS) $(FUNCTIONAL_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
 
 $(TEST_BUILD_DIR)/UnitBundle.js: $(TEST_BUILD_DIR)/Unit.js $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS) $(UNIT_TEST_TARGETS) $(FUNCTIONAL_TEST_TARGETS)
 	$(ROLLUP) --config rollup.config.test.unit.js

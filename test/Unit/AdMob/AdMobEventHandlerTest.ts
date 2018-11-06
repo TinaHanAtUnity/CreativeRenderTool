@@ -25,7 +25,7 @@ import * as protobuf from 'protobufjs/minimal';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
-import { unity_proto } from '../../../src/proto/unity_proto';
+import { unity_proto } from 'unity_proto';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));
