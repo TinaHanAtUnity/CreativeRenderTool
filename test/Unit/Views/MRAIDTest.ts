@@ -55,7 +55,7 @@ describe('MRAID', () => {
     it('should render', (done) => {
         const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
         const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false, configuration.getAbGroup());
-        mraid.setMraidEventBridge(new MraidIFrameEventBridge(nativeBridge, <MRAID>mraid));
+        mraid.setMraidEventBridge(new MraidIFrameEventBridge(nativeBridge, mraid));
 
         mraid.render();
 

@@ -146,7 +146,7 @@ describe('MRAIDEventHandlersTest', () => {
                 }));
 
                 mraidView = new MRAID(nativeBridge, placement, playableMraidCampaign, playableMraidAdUnitParams.privacy, true, playableMraidAdUnitParams.coreConfig.getAbGroup());
-                mraidView.setMraidEventBridge(new MraidIFrameEventBridge(nativeBridge, <MRAID>mraidView));
+                mraidView.setMraidEventBridge(new MraidIFrameEventBridge(nativeBridge, mraidView));
                 sinon.stub(mraidView, 'createMRAID').callsFake(() => {
                     return Promise.resolve();
                 });
@@ -307,7 +307,7 @@ describe('MRAIDEventHandlersTest', () => {
 
             privacy = new Privacy(nativeBridge, programmaticMraidCampaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             mraidView = new MRAID(nativeBridge, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup());
-            mraidView.setMraidEventBridge(new MraidIFrameEventBridge(nativeBridge, <MRAID>mraidView));
+            mraidView.setMraidEventBridge(new MraidIFrameEventBridge(nativeBridge, mraidView));
 
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
