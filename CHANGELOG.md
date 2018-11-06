@@ -1,5 +1,13 @@
 # Pending
 
+* Exit skip button test [#6991](https://github.com/Applifier/unity-ads-webview/pull/6991)
+* Revert skippable rewarded ads test [#6990](https://github.com/Applifier/unity-ads-webview/pull/6990)
+* SafeDK hacks [#6992](https://github.com/Applifier/unity-ads-webview/pull/6992)
+* Add a global afterEach which restores sinon default sandbox [#6968](https://github.com/Applifier/unity-ads-webview/pull/6968)
+
+# Tue Nov  6 11:53:35 UTC 2018
+
+* TSLint no-relative-imports [#6888](https://github.com/Applifier/unity-ads-webview/pull/6888)
 * Remove feature flag test for vast3 error tracking [#6895](https://github.com/Applifier/unity-ads-webview/pull/6895)
 * Update AR styling for iPhoneX and Info button [#6837](https://github.com/Applifier/unity-ads-webview/pull/6837)
 * MRAID Views Refactor [#6775](https://github.com/Applifier/unity-ads-webview/pull/6775)
