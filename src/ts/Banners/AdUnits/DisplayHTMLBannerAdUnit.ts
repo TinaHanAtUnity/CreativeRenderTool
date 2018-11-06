@@ -47,13 +47,17 @@ export class DisplayHTMLBannerAdUnit extends HTMLBannerAdUnit {
 
     private getEventSettings(): IWebPlayerEventSettings {
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            // <any> for temporary hack around 'returnValue' being the incorrect key in the model.
-            return <any>{
-                'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': true }
+            return {
+                shouldOverrideUrlLoading: {
+                    sendEvent: true,
+                    returnValue: true
+                }
             };
         } else {
             return {
-                'onCreateWindow': { 'sendEvent': true }
+                onCreateWindow: {
+                    sendEvent: true
+                }
             };
         }
     }
