@@ -1,5 +1,4 @@
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';

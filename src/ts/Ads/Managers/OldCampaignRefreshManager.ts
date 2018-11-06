@@ -14,7 +14,6 @@ import { UserCountData } from 'Ads/Utilities/UserCountData';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ICoreApi } from 'Core/ICore';
-import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';

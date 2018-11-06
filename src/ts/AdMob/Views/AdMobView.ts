@@ -38,7 +38,7 @@ const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
 const AFMADelayMacro = '{{AFMA_RDVT_PLACEHOLDER}}';
 
 export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandler {
-    protected _template: Template;
+
     private _campaign: AdMobCampaign;
     private _iframe: HTMLIFrameElement;
     private _adMobSignalFactory: AdMobSignalFactory;

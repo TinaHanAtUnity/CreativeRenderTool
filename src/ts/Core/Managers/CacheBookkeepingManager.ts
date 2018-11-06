@@ -1,6 +1,5 @@
 import { ICoreApi } from 'Core/ICore';
 import { ICacheCampaignsResponse } from 'Core/Managers/CacheManager';
-import { INativeResponse } from 'Core/Managers/RequestManager';
 import { IFileInfo } from 'Core/Native/Cache';
 import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';

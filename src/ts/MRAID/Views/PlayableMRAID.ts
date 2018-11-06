@@ -20,8 +20,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _loadingScreenTimeout: any;
     private _prepareTimeout: any;
 
-    protected _template: Template;
-
     private _iframe: HTMLIFrameElement;
 
     private _localization: Localization;

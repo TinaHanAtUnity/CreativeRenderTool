@@ -25,7 +25,6 @@ export interface IVastEndscreenParameters {
 
 export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandler {
 
-    protected _template: Template;
     private _isSwipeToCloseEnabled: boolean = false;
     private _privacy: AbstractPrivacy;
     private _callButtonEnabled: boolean = true;

@@ -27,7 +27,6 @@ enum ReportReason {
 
 export class Privacy extends AbstractPrivacy {
 
-    protected _template: Template;
     private _onReport: Observable2<Campaign, string> = new Observable2();
     private _gdprManager: GdprManager;
     private _dataDeletionConfirmation: boolean = false;

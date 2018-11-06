@@ -10,7 +10,7 @@ import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
 import { ABGroup, CloseSkipIconTest } from 'Core/Models/ABGroup';
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
-    protected _template: Template;
+
     private _ads: IAdsApi;
     private _localization: Localization;
 

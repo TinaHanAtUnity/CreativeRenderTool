@@ -21,7 +21,6 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Double } from 'Core/Utilities/Double';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { ABGroup } from 'Core/Models/ABGroup';
 import { AllowRewardedAdSkipInSeconds } from 'Constants/ExperimentConstants';
 
 export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParameters<T> {

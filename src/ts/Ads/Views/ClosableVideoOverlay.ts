@@ -6,8 +6,6 @@ import InterstitialOverlayTemplate from 'html/InterstitialOverlay.html';
 
 export class ClosableVideoOverlay extends AbstractVideoOverlay {
 
-    protected _template: Template;
-
     private _spinnerEnabled: boolean = false;
 
     private _closeElement: HTMLElement;

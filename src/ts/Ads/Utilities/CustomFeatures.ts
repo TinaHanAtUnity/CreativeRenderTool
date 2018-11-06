@@ -1,4 +1,4 @@
-import { ABGroup, AllowRewardedSkipTest } from 'Core/Models/ABGroup';
+import { AllowRewardedSkipTest } from 'Core/Models/ABGroup';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';

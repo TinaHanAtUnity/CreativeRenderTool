@@ -40,8 +40,6 @@ interface IVPAIDTemplateData {
 export class VPAID extends View<IVPAIDHandler> {
     private static stuckDelay = 5 * 1000;
 
-    protected _template: Template;
-
     private _core: ICoreApi;
 
     private vpaidSrcTag = '{{VPAID_SRC_URL}}';

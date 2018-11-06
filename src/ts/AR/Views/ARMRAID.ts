@@ -22,7 +22,6 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;
 
-    protected _template: Template;
     private _ar: IARApi;
 
     private _localization: Localization;

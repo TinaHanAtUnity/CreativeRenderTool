@@ -26,7 +26,6 @@ enum BadAdReason {
 
 export class ReportingPrivacy extends AbstractPrivacy {
 
-    protected _template: Template;
     private _onReport: Observable0 = new Observable0();
     private _gdprManager: GdprManager;
     private _dataDeletionConfirmation: boolean = false;

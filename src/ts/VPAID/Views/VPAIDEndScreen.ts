@@ -14,7 +14,6 @@ export interface IVPAIDEndScreenHandler {
 }
 
 export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
-    protected _template: Template;
     private _isSwipeToCloseEnabled: boolean = false;
 
     constructor(platform: Platform, campaign: VPAIDCampaign, gameId: string) {

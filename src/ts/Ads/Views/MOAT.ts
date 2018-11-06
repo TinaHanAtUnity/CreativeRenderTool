@@ -16,7 +16,7 @@ export enum MoatState {
 }
 
 export class MOAT extends View<VastCampaign> {
-    protected _template: Template;
+
     private _core: ICoreApi;
     private _iframe: HTMLIFrameElement;
     private _resizeHandler: any;

@@ -8,7 +8,6 @@ import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
 
 export class GDPRPrivacy extends AbstractPrivacy {
 
-    protected _template: Template;
     private _gdprManager: GdprManager;
     private _isCoppaCompliant: boolean;
     private _personalInfoObtained: boolean = false;

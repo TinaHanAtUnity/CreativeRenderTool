@@ -17,8 +17,6 @@ export class Promo extends View<{}> implements IPrivacyHandler {
     public readonly onClose = new Observable0();
     public readonly onGDPRPopupSkipped = new Observable0();
 
-    protected _template: Template;
-
     private _core: ICoreApi;
     private _promoCampaign: PromoCampaign;
     private _localization: Localization;

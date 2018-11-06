@@ -24,7 +24,7 @@ export abstract class View<T extends object> {
     }
 
     protected _platform: Platform;
-    protected abstract _template: Template;
+    protected _template: Template;
     protected _templateData: { [key: string]: TemplateDataType | ITemplateData } = {};
     protected _bindings: IViewBinding[] = [];
     protected _container: HTMLElement;

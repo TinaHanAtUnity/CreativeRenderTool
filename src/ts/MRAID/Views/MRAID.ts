@@ -23,8 +23,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _domContentLoaded = false;
     private _creativeId: string | undefined;
 
-    protected _template: Template;
-
     private _iframe: HTMLIFrameElement;
     private _messageListener: any;
 

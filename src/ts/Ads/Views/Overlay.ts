@@ -11,7 +11,6 @@ import OverlayTemplate from 'html/Overlay.html';
 
 export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
-    protected _template: Template;
     private _ads: IAdsApi;
     private _deviceInfo: DeviceInfo;
     private _localization: Localization;

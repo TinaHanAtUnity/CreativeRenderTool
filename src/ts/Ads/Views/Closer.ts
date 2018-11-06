@@ -17,8 +17,6 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
     public readonly onPrivacyOpened: Observable0 = new Observable0();
     public readonly onPrivacyClosed: Observable0 = new Observable0();
 
-    protected _template: Template;
-
     private _placement: Placement;
     private _allowClose: boolean;
     private _canReward = false;

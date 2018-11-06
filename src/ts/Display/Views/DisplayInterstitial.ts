@@ -20,7 +20,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     public readonly onPrivacyOpened: Observable0 = new Observable0();
     public readonly onPrivacyClosed: Observable0 = new Observable0();
 
-    protected _template: Template;
     private _core: ICoreApi;
     private _deviceInfo: AndroidDeviceInfo;
     private _placement: Placement;
