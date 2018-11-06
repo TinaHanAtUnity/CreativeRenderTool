@@ -4,11 +4,15 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
+import { IDownloadEventHandler, IDownloadParameters } from 'Ads/EventHandlers/DownloadEventHandler';
 
 export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<PerformanceCampaign, PerformanceAdUnit> {
 
-    constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters) {
-        super(nativeBridge, adUnit, parameters);
+    private _downloadHelper: IDownloadEventHandler;
+
+    constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters, downloadHelper: IDownloadEventHandler) {
+        super(nativeBridge, adUnit, parameters, downloadHelper);
+        this._downloadHelper = downloadHelper;
     }
 
     public onKeyEvent(keyCode: number): void {
@@ -17,8 +21,10 @@ export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<Perf
         }
     }
 
-    public onEndScreenDownload(parameters: IEndScreenDownloadParameters): void {
+    public onEndScreenDownload(parameters: IDownloadParameters): void {
         super.onEndScreenDownload(parameters);
+
+        // TODO: Can this be moved to the DownloadEventHandler's onDownload?
         this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.CLICK);
     }
 }
