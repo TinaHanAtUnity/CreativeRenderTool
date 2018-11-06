@@ -5,11 +5,15 @@ import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdU
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { IDownloadEventHandler, IDownloadParameters } from 'Ads/EventHandlers/DownloadEventHandler';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<PerformanceCampaign, PerformanceAdUnit> {
 
-    constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters, downloadHelper: IDownloadEventHandler) {
-        super(nativeBridge, adUnit, parameters, downloadHelper);
+    private _thirdPartyEventManager: ThirdPartyEventManager;
+
+    constructor(adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters, downloadHelper: IDownloadEventHandler) {
+        super(adUnit, parameters, downloadHelper);
+        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
     }
 
     public onKeyEvent(keyCode: number): void {

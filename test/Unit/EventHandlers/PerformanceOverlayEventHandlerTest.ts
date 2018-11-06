@@ -26,6 +26,8 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { IDownloadEventHandler, DownloadEventHandler, IDownloadEventHandlerParameters } from 'Ads/EventHandlers/DownloadEventHandler';
+import { Placement } from 'Ads/Models/Placement';
 
 describe('PerformanceOverlayEventHandlerTest', () => {
 
@@ -43,6 +45,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
     let request: Request;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
+    let downloadEventHandler: DownloadEventHandler;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -91,6 +94,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         endScreen = new PerformanceEndScreen(endScreenParams, campaign);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        const placement = TestFixtures.getPlacement();
 
         performanceAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -100,7 +104,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            placement: TestFixtures.getPlacement(),
+            placement: placement,
             campaign: campaign,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
@@ -115,7 +119,20 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         };
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
-        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
+
+        const downloadEventHandlerParameters: IDownloadEventHandlerParameters = {
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            placement: placement,
+            adUnit: performanceAdUnit,
+            campaign: campaign,
+            coreConfig: coreConfig
+        };
+        downloadEventHandler = new DownloadEventHandler(nativeBridge, downloadEventHandlerParameters);
+
+        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
     });
 
     describe('with onSkip', () => {

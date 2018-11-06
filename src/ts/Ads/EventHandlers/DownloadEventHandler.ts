@@ -55,7 +55,7 @@ export class DownloadEventHandler  {
     private _nativeBridge: NativeBridge;
     private _campaign: Campaign;
     private _operativeEventManager: OperativeEventManager;
-    private _adUnit: PerformanceAdUnit;
+    private _adUnit: VideoAdUnit;
     private _coreConfig: CoreConfiguration;
 
     protected _thirdPartyEventManager: ThirdPartyEventManager;
@@ -69,6 +69,7 @@ export class DownloadEventHandler  {
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
         this._coreConfig = parameters.coreConfig;
+        this._adUnit = parameters.adUnit;
     }
 
     public onDownload(parameters: IDownloadParameters): void {

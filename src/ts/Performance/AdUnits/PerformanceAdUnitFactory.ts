@@ -56,12 +56,11 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
             campaign: parameters.campaign,
             coreConfig: parameters.coreConfig
         };
-
         const downloadEventHandler = new DownloadEventHandler(nativeBridge, downloadEventHandlerParameters);
 
         performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
         overlay.addEventHandler(performanceOverlayEventHandler);
-        const endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
+        const endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
         endScreen.addEventHandler(endScreenEventHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, performanceAdUnit, video, performanceAdUnitParameters.adUnitStyle, performanceAdUnitParameters);

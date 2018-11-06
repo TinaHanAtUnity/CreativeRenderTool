@@ -31,6 +31,7 @@ import { StoreName, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { IDownloadEventHandlerParameters, DownloadEventHandler } from 'Ads/EventHandlers/DownloadEventHandler';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -54,6 +55,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let campaign: XPromoCampaign;
     let placement: Placement;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let downloadEventHandler: DownloadEventHandler;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -136,7 +138,20 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             };
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
-            endScreenEventHandler = new XPromoEndScreenEventHandler(nativeBridge, xPromoAdUnit, xPromoAdUnitParameters);
+
+            const downloadEventHandlerParameters: IDownloadEventHandlerParameters = {
+                thirdPartyEventManager: thirdPartyEventManager,
+                operativeEventManager: operativeEventManager,
+                deviceInfo: deviceInfo,
+                clientInfo: clientInfo,
+                placement: placement,
+                adUnit: xPromoAdUnit,
+                campaign: campaign,
+                coreConfig: coreConfig
+            };
+            downloadEventHandler = new DownloadEventHandler(nativeBridge, downloadEventHandlerParameters);
+
+            endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadEventHandler);
         });
 
         it('should send a click to HttpKafka', () => {
@@ -236,7 +251,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             };
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
-            endScreenEventHandler = new XPromoEndScreenEventHandler(nativeBridge, xPromoAdUnit, xPromoAdUnitParameters);
+            endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadEventHandler);
         });
 
         it('should send a click to HttpKafka', () => {
