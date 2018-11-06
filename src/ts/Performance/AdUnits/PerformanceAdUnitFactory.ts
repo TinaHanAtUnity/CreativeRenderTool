@@ -9,7 +9,6 @@ import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/Performa
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { PerformanceOverlayEventHandlerWithAllowSkip } from 'Performance/EventHandlers/PerformanceOverlayEventHandlerWithAllowSkip';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
@@ -52,13 +51,8 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
         const performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
 
         let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
-        const skipAllowed = parameters.placement.allowSkip();
 
-        if (!skipAllowed && CustomFeatures.allowSkipInRewardedVideos(parameters)) {
-            performanceOverlayEventHandler = new PerformanceOverlayEventHandlerWithAllowSkip(performanceAdUnit, performanceAdUnitParameters);
-        } else {
-            performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, performanceAdUnitParameters);
-        }
+        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, performanceAdUnitParameters);
 
         overlay.addEventHandler(performanceOverlayEventHandler);
         const endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters);

@@ -81,7 +81,7 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
         }
     }
 
-    protected canSkipVideo(): boolean {
+    private canSkipVideo(): boolean {
         if(!this._placement.allowSkip() || !this._adUnit.isShowing() || !this._adUnit.canPlayVideo()) {
             return false;
         }
