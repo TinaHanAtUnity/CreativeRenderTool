@@ -2,7 +2,7 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
 
 export interface IBannerCampaign extends IProgrammaticCampaign {
-    markup: string | undefined;
+    markup: string;
     width: number;
     height: number;
 }
@@ -11,7 +11,7 @@ export class BannerCampaign extends ProgrammaticCampaign<IBannerCampaign> {
     constructor(campaign: IBannerCampaign) {
         super('BannerCampaign', {
             ... ProgrammaticCampaign.Schema,
-            markup: ['string', 'undefined'],
+            markup: ['string'],
             width: ['number'],
             height: ['number']
         }, campaign);
@@ -37,7 +37,7 @@ export class BannerCampaign extends ProgrammaticCampaign<IBannerCampaign> {
     public getHeight(): number {
         return this.get('height');
     }
-    public getMarkup(): string | undefined {
+    public getMarkup(): string {
         return this.get('markup');
     }
 }
