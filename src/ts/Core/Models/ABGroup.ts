@@ -104,5 +104,4 @@ class ABTest {
 export const GreenEndScreenButtonColorTest = new ABTest(GroupEighteen);
 export const NativeGreenEndScreenButtonColorTest = new ABTest(GroupNineteen);
 export const FPSCollectionTest = new ABTest(GroupSixteen);
-export const AllowRewardedSkipTest = new ABTest(GroupSixteen, GroupSeventeen);
 export const CloseSkipIconTest = new ABTest(GroupEighteen, GroupNineteen);
