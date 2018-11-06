@@ -34,7 +34,7 @@ import { Privacy } from 'Ads/Views/Privacy';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { IDownloadEventHandlerParameters, DownloadEventHandler } from 'Ads/EventHandlers/DownloadEventHandler';
 
-xdescribe('EndScreenEventHandlerTest', () => {
+describe('EndScreenEventHandlerTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
@@ -138,6 +138,18 @@ xdescribe('EndScreenEventHandlerTest', () => {
             };
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+
+            const downloadEventHandlerParameters: IDownloadEventHandlerParameters = {
+                thirdPartyEventManager: thirdPartyEventManager,
+                operativeEventManager: operativeEventManager,
+                deviceInfo: deviceInfo,
+                clientInfo: clientInfo,
+                placement: placement,
+                adUnit: performanceAdUnit,
+                campaign: campaign,
+                coreConfig: coreConfig
+            };
+            downloadEventHandler = new DownloadEventHandler(nativeBridge, downloadEventHandlerParameters);
             endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
         });
 

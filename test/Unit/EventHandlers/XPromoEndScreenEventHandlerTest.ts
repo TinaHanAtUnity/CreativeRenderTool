@@ -55,10 +55,10 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let campaign: XPromoCampaign;
     let placement: Placement;
     let programmaticTrackingService: ProgrammaticTrackingService;
-    let downloadEventHandler: DownloadEventHandler;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
+        let downloadEventHandler: DownloadEventHandler;
 
         beforeEach(() => {
             nativeBridge = new NativeBridge({
@@ -154,6 +154,20 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadEventHandler);
         });
 
+        it('should call onDownload on DownloadEventHandler', () => {
+            sinon.spy(downloadEventHandler, 'onDownload');
+
+            endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
+                bypassAppSheet: xPromoAdUnitParameters.campaign.getBypassAppSheet(),
+                store: xPromoAdUnitParameters.campaign.getStore(),
+                clickAttributionUrlFollowsRedirects: xPromoAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
+            });
+
+            sinon.assert.called(<sinon.SinonSpy>downloadEventHandler.onDownload);
+        });
+
         it('should send a click to HttpKafka', () => {
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
@@ -174,6 +188,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
     describe('with onDownloadIos', () => {
         let resolvedPromise: Promise<INativeResponse>;
+        let downloadEventHandler: DownloadEventHandler;
 
         beforeEach(() => {
             nativeBridge = new NativeBridge({
@@ -251,7 +266,34 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             };
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
+
+            const downloadEventHandlerParameters: IDownloadEventHandlerParameters = {
+                thirdPartyEventManager: thirdPartyEventManager,
+                operativeEventManager: operativeEventManager,
+                deviceInfo: deviceInfo,
+                clientInfo: clientInfo,
+                placement: placement,
+                adUnit: xPromoAdUnit,
+                campaign: campaign,
+                coreConfig: coreConfig
+            };
+            downloadEventHandler = new DownloadEventHandler(nativeBridge, downloadEventHandlerParameters);
+
             endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadEventHandler);
+        });
+
+        it('should call onDownload on DownloadEventHandler', () => {
+            sinon.spy(downloadEventHandler, 'onDownload');
+
+            endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
+                bypassAppSheet: xPromoAdUnitParameters.campaign.getBypassAppSheet(),
+                store: xPromoAdUnitParameters.campaign.getStore(),
+                clickAttributionUrlFollowsRedirects: xPromoAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
+            });
+
+            sinon.assert.called(<sinon.SinonSpy>downloadEventHandler.onDownload);
         });
 
         it('should send a click to HttpKafka', () => {
