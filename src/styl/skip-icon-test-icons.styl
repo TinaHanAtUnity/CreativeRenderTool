@@ -3,30 +3,29 @@
   src: url("../fonts/skip-icon-test/skip-icon-test-icons.ttf") format("truetype");
 }
 
-.exit-icon-skip,
-.next-icon-skip {
-  [data-icon]:before {
-    content: attr(data-icon);
-    font-family: "skip-icon-test-icons" !important; // @stylint ignore
-  }
 
-  [class^="icon-"]:before,
-  [class*=" icon-"]:before {
-    font-family: "skip-icon-test-icons" !important; // @stylint ignore
-  }
+[data-icon]:before {
+  content: attr(data-icon);
+  font-family: "skip-icon-test-icons" !important; // @stylint ignore
 }
+
+[class^="test-icon-"]:before,
+[class*=" test-icon-"]:before {
+  font-family: "skip-icon-test-icons" !important; // @stylint ignore
+}
+
 
 /*
     Dummy icon that won't be rendered on android 4.2 and 4.3,
     thus always make sure that your font is packed so that first icon will
     no be visible on those old androids.
 */
-.icon-android:before {
+.test-icon-android:before {
   content: "\61";
 }
-.icon-exit:before {
+.test-icon-exit:before {
   content: "\62";
 }
-.icon-next:before {
+.test-icon-next:before {
   content: "\63";
 }

@@ -6,7 +6,7 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
-import { ABGroup, CloseSkipIconTest } from 'Core/Models/ABGroup';
+import { ABGroup, ExitSkipIconTest } from 'Core/Models/ABGroup';
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _localization: Localization;
@@ -139,7 +139,9 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             }
         }
 
-        if (CustomFeatures.isCheetahGame(this._gameId) || CloseSkipIconTest.isValid(this._abGroup)) {
+        if (ExitSkipIconTest.isValid(this._abGroup)) {
+            this._skipButtonElement.classList.add('exit-icon-skip');
+        } else if (CustomFeatures.isCheetahGame(this._gameId)) {
             this._skipButtonElement.classList.add('close-icon-skip');
         }
     }
