@@ -4,7 +4,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
-import { IAppStoreDownloadHelper, IDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { IAppStoreDownloadHelper, IAppStoreDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<PerformanceCampaign, PerformanceAdUnit> {
@@ -22,7 +22,7 @@ export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<Perf
         }
     }
 
-    public onEndScreenDownload(parameters: IDownloadParameters): void {
+    public onEndScreenDownload(parameters: IAppStoreDownloadParameters): void {
         super.onEndScreenDownload(parameters);
         this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.CLICK);
     }

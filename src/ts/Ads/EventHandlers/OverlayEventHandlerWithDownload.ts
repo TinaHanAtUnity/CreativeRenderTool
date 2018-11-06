@@ -4,12 +4,12 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { IAppStoreDownloadHelper, IDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { IAppStoreDownloadHelper, IAppStoreDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 import { VideoAdUnit, IVideoAdUnitParameters } from 'Ads/AdUnits/VideoAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 
-export interface IVideoOverlayDownloadParameters extends IDownloadParameters {
+export interface IVideoOverlayDownloadParameters extends IAppStoreDownloadParameters {
     videoProgress: number;
 }
 

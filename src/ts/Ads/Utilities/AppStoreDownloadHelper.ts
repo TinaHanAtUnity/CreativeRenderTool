@@ -23,7 +23,7 @@ import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 export interface IAppStoreDownloadHelper {
-    download(parameters: IDownloadParameters): void;
+    download(parameters: IAppStoreDownloadParameters): void;
 }
 
 export interface IAppStoreDownloadHelperParameters {
@@ -37,7 +37,7 @@ export interface IAppStoreDownloadHelperParameters {
     coreConfig: CoreConfiguration;
 }
 
-export interface IDownloadParameters {
+export interface IAppStoreDownloadParameters {
     clickAttributionUrl: string | undefined;
     clickAttributionUrlFollowsRedirects: boolean | undefined;
     bypassAppSheet: boolean | undefined;
@@ -72,7 +72,7 @@ export class AppStoreDownloadHelper  {
         this._adUnit = parameters.adUnit;
     }
 
-    public download(parameters: IDownloadParameters): void {
+    public download(parameters: IAppStoreDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
         const operativeEventParameters = this.getOperativeEventParams(parameters);
         this._operativeEventManager.sendClick(operativeEventParameters);
@@ -91,7 +91,7 @@ export class AppStoreDownloadHelper  {
         }
     }
 
-    private onDownloadAndroid(parameters: IDownloadParameters): void {
+    private onDownloadAndroid(parameters: IAppStoreDownloadParameters): void {
         if (parameters.store === StoreName.STANDALONE_ANDROID) {
             this.handleStandaloneAndroid(parameters);
             return;
@@ -117,7 +117,7 @@ export class AppStoreDownloadHelper  {
         });
     }
 
-    private handleStandaloneAndroid(parameters: IDownloadParameters) {
+    private handleStandaloneAndroid(parameters: IAppStoreDownloadParameters) {
         if (parameters.clickAttributionUrl) {
             this.handleClickAttributionWithoutRedirect(parameters.clickAttributionUrl);
         }
@@ -130,7 +130,7 @@ export class AppStoreDownloadHelper  {
         }
     }
 
-    private onDownloadIos(parameters: IDownloadParameters): void {
+    private onDownloadIos(parameters: IAppStoreDownloadParameters): void {
         const isAppSheetBroken = IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion(), this._deviceInfo.getModel());
         if (parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
@@ -142,7 +142,7 @@ export class AppStoreDownloadHelper  {
         }
     }
 
-    private handleClickAttribution(parameters: IDownloadParameters) {
+    private handleClickAttribution(parameters: IAppStoreDownloadParameters) {
         if (parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
             this.handleClickAttributionWithRedirects(parameters.clickAttributionUrl);
             return;
@@ -200,7 +200,7 @@ export class AppStoreDownloadHelper  {
         SessionDiagnostics.trigger('click_attribution_failed', diagnosticError, currentSession);
     }
 
-    private openAppStore(parameters: IDownloadParameters, isAppSheetBroken?: boolean) {
+    private openAppStore(parameters: IAppStoreDownloadParameters, isAppSheetBroken?: boolean) {
         const platform = this._nativeBridge.getPlatform();
         let packageName: string | undefined;
 
@@ -251,7 +251,7 @@ export class AppStoreDownloadHelper  {
         }
     }
 
-    private getAppStoreUrl(parameters: IDownloadParameters, packageName?: string): string | undefined {
+    private getAppStoreUrl(parameters: IAppStoreDownloadParameters, packageName?: string): string | undefined {
         if (!parameters.appStoreId) {
             return;
         }
@@ -280,7 +280,7 @@ export class AppStoreDownloadHelper  {
         return this._adUnit.getVideoOrientation();
     }
 
-    private getOperativeEventParams(parameters: IDownloadParameters): IOperativeEventParams {
+    private getOperativeEventParams(parameters: IAppStoreDownloadParameters): IOperativeEventParams {
         return {
             placement: this._placement,
             videoOrientation: this.getVideoOrientation(),
