@@ -29,25 +29,24 @@ describe('PlacementManagerTest', () => {
     });
 
     describe('addCampaignPlacementIds', () => {
-        const placementManager = new PlacementManager(nativeBridge, adsConfig);
-        const campaign: PromoCampaign = TestFixtures.getPromoCampaign();
-        sinon.stub(campaign, 'getAdType').returns('purchasing/iap');
-
         it('should add passed placementid and campaign to the placementCampaignMap', () => {
+            const placementManager = new PlacementManager(nativeBridge, adsConfig);
+            const campaign: PromoCampaign = TestFixtures.getPromoCampaign();
+            sinon.stub(campaign, 'getAdType').returns('purchasing/iap');
             placementManager.addCampaignPlacementIds('testid', campaign);
             assert.deepEqual(placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType), {'testid': campaign});
         });
     });
 
     describe('getPlacementCampaignMap', () => {
-        const placementManager = new PlacementManager(nativeBridge, adsConfig);
-
-        const campaign1 = TestFixtures.getPromoCampaign();
-        const campaign2 = TestFixtures.getXPromoCampaign();
-        sinon.stub(campaign1, 'getAdType').returns('purchasing/iap');
-        sinon.stub(campaign2, 'getAdType').returns('xpromo/video');
-
         it('should return map of only placements specified by the content type of the campaign in the placement campaign map', () => {
+            const placementManager = new PlacementManager(nativeBridge, adsConfig);
+
+            const campaign1 = TestFixtures.getPromoCampaign();
+            const campaign2 = TestFixtures.getXPromoCampaign();
+            sinon.stub(campaign1, 'getAdType').returns('purchasing/iap');
+            sinon.stub(campaign2, 'getAdType').returns('xpromo/video');
+
             let map = placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType);
             expect(Object.keys(map)).to.have.length(0);
 
@@ -62,11 +61,11 @@ describe('PlacementManagerTest', () => {
     });
 
     describe('clear', () => {
-        const placementManager = new PlacementManager(nativeBridge, adsConfig);
-        const campaign: PromoCampaign = TestFixtures.getPromoCampaign();
-        sinon.stub(campaign, 'getAdType').returns('purchasing/iap');
-
         it('should empty all placement IDs', () => {
+            const placementManager = new PlacementManager(nativeBridge, adsConfig);
+            const campaign: PromoCampaign = TestFixtures.getPromoCampaign();
+            sinon.stub(campaign, 'getAdType').returns('purchasing/iap');
+
             placementManager.addCampaignPlacementIds('testid', campaign);
             assert.equal(Object.keys(placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType)).length, 1);
             placementManager.clear();
