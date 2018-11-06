@@ -113,7 +113,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             this._container.classList.add('old-androids');
         }
 
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID && (GreenEndScreenButtonColorTest.isValid(this._abGroup) || NativeGreenEndScreenButtonColorTest.isValid(this._abGroup))) {
             this.addCustomDownloadButtonColor();
          } else {
             const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
