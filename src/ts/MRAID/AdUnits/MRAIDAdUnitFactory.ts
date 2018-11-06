@@ -4,7 +4,6 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
 import { PlayableEventHandler } from 'MRAID/EventHandlers/PlayableEventHandler';
@@ -37,11 +36,11 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
         parameters.gameSessionId = parameters.gameSessionId || 0;
 
         if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || MRAIDAdUnitFactory._forcedPlayableMRAID) {
-            mraid = new PlayableMRAID(parameters.platform, parameters.core, <AndroidDeviceInfo>parameters.deviceInfo, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
+            mraid = new PlayableMRAID(parameters.platform, parameters.core, parameters.deviceInfo, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         } else if (ARUtil.isARCreative(parameters.campaign) || MRAIDAdUnitFactory._forcedARMRAID) {
-            mraid = new ARMRAID(parameters.platform, parameters.core, parameters.ar!, <AndroidDeviceInfo>parameters.deviceInfo, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
+            mraid = new ARMRAID(parameters.platform, parameters.core, parameters.ar, parameters.deviceInfo, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         } else {
-            mraid = new MRAID(parameters.platform, parameters.core, <AndroidDeviceInfo>parameters.deviceInfo, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
+            mraid = new MRAID(parameters.platform, parameters.core, parameters.deviceInfo, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         }
 
         const mraidAdUnitParameters: IMRAIDAdUnitParameters = {

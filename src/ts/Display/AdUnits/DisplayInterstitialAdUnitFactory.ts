@@ -15,7 +15,7 @@ export class DisplayInterstitialAdUnitFactory extends AbstractAdUnitFactory {
     public createAdUnit(parameters: IAdUnitParameters<DisplayInterstitialCampaign>): DisplayInterstitialAdUnit {
         const privacy = this.createPrivacy(parameters);
 
-        const view = new DisplayInterstitial(parameters.platform, parameters.core, <AndroidDeviceInfo>parameters.deviceInfo, parameters.placement, parameters.campaign, privacy, this.showGDPRBanner(parameters));
+        const view = new DisplayInterstitial(parameters.platform, parameters.core, parameters.deviceInfo, parameters.placement, parameters.campaign, privacy, this.showGDPRBanner(parameters));
         const displayInterstitialParameters: IDisplayInterstitialAdUnitParameters = {
             ... parameters,
             view: view

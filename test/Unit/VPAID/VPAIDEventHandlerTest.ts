@@ -27,6 +27,8 @@ import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('VPAIDEventHandlerTest @skipOnDevice', () => {
     let eventHandler: VPAIDEventHandler;
@@ -35,6 +37,8 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let ar: IARApi;
+    let purchasing: IPurchasingApi;
     let adUnit: VPAIDAdUnit;
     let parameters: IVPAIDAdUnitParameters;
 
@@ -44,12 +48,16 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        ar = TestFixtures.getARApi(nativeBridge);
+        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         parameters = {
             platform,
             core,
             ads,
+            ar,
+            purchasing,
             campaign: sinon.createStubInstance(VPAIDCampaign),
             closer: sinon.createStubInstance(Closer),
             vpaid: sinon.createStubInstance(VPAID),

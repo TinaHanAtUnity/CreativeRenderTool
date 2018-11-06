@@ -29,6 +29,8 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -37,6 +39,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let ar: IARApi;
+    let purchasing: IPurchasingApi;
     let overlay: Overlay;
     let endScreen: PerformanceEndScreen;
     let storageBridge: StorageBridge;
@@ -52,6 +56,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        ar = TestFixtures.getARApi(nativeBridge);
+        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
         storageBridge = new StorageBridge(core);
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
@@ -103,6 +109,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             platform,
             core,
             ads,
+            ar,
+            purchasing,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,

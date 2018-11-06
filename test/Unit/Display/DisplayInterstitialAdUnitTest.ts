@@ -35,6 +35,8 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('DisplayInterstitialAdUnitTest', () => {
@@ -43,6 +45,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
         let ads: IAdsApi;
+        let ar: IARApi;
+        let purchasing: IPurchasingApi;
         let container: AdUnitContainer;
         let sessionManager: SessionManager;
         let placement: Placement;
@@ -69,6 +73,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 nativeBridge = TestFixtures.getNativeBridge(platform, backend);
                 core = TestFixtures.getCoreApi(nativeBridge);
                 ads = TestFixtures.getAdsApi(nativeBridge);
+                ar = TestFixtures.getARApi(nativeBridge);
+                purchasing = TestFixtures.getPurchasingApi(nativeBridge);
                 const storageBridge = new StorageBridge(core);
                 placement = TestFixtures.getPlacement();
 
@@ -126,6 +132,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     platform: platform,
                     core: core,
                     ads: ads,
+                    ar,
+                    purchasing,
                     webPlayerContainer,
                     forceOrientation: Orientation.LANDSCAPE,
                     focusManager: focusManager,

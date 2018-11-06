@@ -34,6 +34,8 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -43,6 +45,8 @@ describe('MRAIDEventHandlersTest', () => {
     let container: AdUnitContainer;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let ar: IARApi;
+    let purchasing: IPurchasingApi;
     let storageBridge: StorageBridge;
     let mraidAdUnit: MRAIDAdUnit;
     let mraidView: MRAID;
@@ -69,6 +73,8 @@ describe('MRAIDEventHandlersTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
+            ar = TestFixtures.getARApi(nativeBridge);
+            purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
             sinon.spy(core.Android!.Intent, 'launch');
             sinon.spy(ads.Listener, 'sendClickEvent');
@@ -97,6 +103,8 @@ describe('MRAIDEventHandlersTest', () => {
                 platform,
                 core,
                 ads,
+                ar,
+                purchasing,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -335,6 +343,8 @@ describe('MRAIDEventHandlersTest', () => {
                 platform,
                 core,
                 ads,
+                ar,
+                purchasing,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,

@@ -22,6 +22,7 @@ export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign>
     mraid: MRAIDView<IMRAIDViewHandler>;
     endScreen?: EndScreen;
     privacy: AbstractPrivacy;
+    ar: IARApi;
 }
 
 export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
@@ -29,7 +30,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _mraid: MRAIDView<IMRAIDViewHandler>;
-    private _ar?: IARApi;
+    private _ar: IARApi;
     private _options: any;
     private _orientationProperties: IOrientationProperties;
     private _endScreen?: EndScreen;

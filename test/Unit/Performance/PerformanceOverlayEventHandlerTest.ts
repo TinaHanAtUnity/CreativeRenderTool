@@ -30,6 +30,8 @@ import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/Perfor
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('PerformanceOverlayEventHandlerTest', () => {
 
@@ -38,6 +40,8 @@ describe('PerformanceOverlayEventHandlerTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let ar: IARApi;
+    let purchasing: IPurchasingApi;
     let storageBridge: StorageBridge;
     let overlay: Overlay;
     let endScreen: PerformanceEndScreen;
@@ -56,6 +60,8 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        ar = TestFixtures.getARApi(nativeBridge);
+        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
         storageBridge = new StorageBridge(core);
         const metaDataManager = new MetaDataManager(core);
@@ -106,6 +112,8 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             platform,
             core,
             ads,
+            ar,
+            purchasing,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,

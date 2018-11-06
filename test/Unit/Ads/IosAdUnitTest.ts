@@ -29,6 +29,8 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import * as sinon from 'sinon';
 import { TestAdUnit } from 'TestHelpers/TestAdUnit';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('IosAdUnitTest', () => {
     let platform: Platform;
@@ -36,6 +38,8 @@ describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let ar: IARApi;
+    let purchasing: IPurchasingApi;
     let container: ViewController;
     let testAdUnit: TestAdUnit;
     let focusManager: FocusManager;
@@ -55,6 +59,8 @@ describe('IosAdUnitTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        ar = TestFixtures.getARApi(nativeBridge);
+        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
         const storageBridge = new StorageBridge(core);
         const clientInfo = TestFixtures.getClientInfo();
         focusManager = new FocusManager(platform, core);
@@ -89,6 +95,8 @@ describe('IosAdUnitTest', () => {
             platform,
             core,
             ads,
+            ar,
+            purchasing,
             forceOrientation: Orientation.NONE,
             focusManager: focusManager,
             container: container,

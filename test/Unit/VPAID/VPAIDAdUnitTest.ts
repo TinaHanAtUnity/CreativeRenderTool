@@ -31,6 +31,8 @@ import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
+import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('VPAIDAdUnit', () => {
     let platform: Platform;
@@ -38,6 +40,8 @@ describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let ar: IARApi;
+    let purchasing: IPurchasingApi;
     let webPlayerContainer: WebPlayerContainer;
     let parameters: IVPAIDAdUnitParameters;
     let adUnit: VPAIDAdUnit;
@@ -48,6 +52,8 @@ describe('VPAIDAdUnit', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        ar = TestFixtures.getARApi(nativeBridge);
+        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
         webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
         (<sinon.SinonStub>webPlayerContainer.setSettings).returns(Promise.resolve());
@@ -58,6 +64,8 @@ describe('VPAIDAdUnit', () => {
             platform,
             core,
             ads,
+            ar,
+            purchasing,
             webPlayerContainer,
             campaign: sinon.createStubInstance(VPAIDCampaign),
             closer: sinon.createStubInstance(Closer),

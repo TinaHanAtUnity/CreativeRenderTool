@@ -31,6 +31,8 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('VastAdUnitTest', () => {
 
@@ -40,6 +42,8 @@ describe('VastAdUnitTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let ar: IARApi;
+    let purchasing: IPurchasingApi;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let vastAdUnit: VastAdUnit;
     let focusManager: FocusManager;
@@ -76,6 +80,8 @@ describe('VastAdUnitTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        ar = TestFixtures.getARApi(nativeBridge);
+        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         const storageBridge = new StorageBridge(core);
@@ -121,6 +127,8 @@ describe('VastAdUnitTest', () => {
             platform,
             core,
             ads,
+            ar,
+            purchasing,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: activity,

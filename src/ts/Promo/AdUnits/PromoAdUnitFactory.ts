@@ -17,7 +17,7 @@ export class PromoAdUnitFactory extends AbstractAdUnitFactory {
             ...parameters,
             view: promoView,
             privacy: privacy,
-            purchasing: parameters.purchasing!
+            purchasing: parameters.purchasing
         });
 
         promoView.render();

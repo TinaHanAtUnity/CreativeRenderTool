@@ -36,6 +36,8 @@ import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCa
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -44,6 +46,8 @@ describe('EndScreenEventHandlerTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let ar: IARApi;
+    let purchasing: IPurchasingApi;
     let container: AdUnitContainer;
     let overlay: Overlay;
     let endScreen: PerformanceEndScreen;
@@ -72,6 +76,8 @@ describe('EndScreenEventHandlerTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
+            ar = TestFixtures.getARApi(nativeBridge);
+            purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
             storageBridge = new StorageBridge(core);
             campaign = TestFixtures.getCampaign();
@@ -127,6 +133,8 @@ describe('EndScreenEventHandlerTest', () => {
                 platform,
                 core,
                 ads,
+                ar,
+                purchasing,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -361,6 +369,8 @@ describe('EndScreenEventHandlerTest', () => {
                 platform,
                 core,
                 ads,
+                ar,
+                purchasing,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,

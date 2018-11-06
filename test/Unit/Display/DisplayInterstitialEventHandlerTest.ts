@@ -23,6 +23,8 @@ import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;
@@ -30,6 +32,8 @@ describe('DisplayInterstitialEventHandler', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let ar: IARApi;
+    let purchasing: IPurchasingApi;
     let placement: Placement;
     let campaign: DisplayInterstitialCampaign;
     let sandbox: sinon.SinonSandbox;
@@ -50,6 +54,8 @@ describe('DisplayInterstitialEventHandler', () => {
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
+            ar = TestFixtures.getARApi(nativeBridge);
+            purchasing = TestFixtures.getPurchasingApi(nativeBridge);
             placement = new Placement({
                 id: '123',
                 name: 'test',
@@ -85,6 +91,8 @@ describe('DisplayInterstitialEventHandler', () => {
                 platform: platform,
                 core: core,
                 ads: ads,
+                ar,
+                purchasing,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,

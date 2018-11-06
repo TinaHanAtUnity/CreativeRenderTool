@@ -3,13 +3,14 @@ import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 
 import { View } from 'Core/Views/View';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export interface IDisplayInterstitialHandler extends IGDPREventHandler {
     onDisplayInterstitialClose(): void;
@@ -21,7 +22,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     public readonly onPrivacyClosed: Observable0 = new Observable0();
 
     private _core: ICoreApi;
-    private _deviceInfo: AndroidDeviceInfo;
+    private _deviceInfo: DeviceInfo;
     private _placement: Placement;
     private _campaign: DisplayInterstitialCampaign;
 
@@ -37,7 +38,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     private _timers: number[] = [];
     private _showGDPRBanner: boolean;
 
-    constructor(platform: Platform, core: ICoreApi, deviceInfo: AndroidDeviceInfo, placement: Placement, campaign: DisplayInterstitialCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: DisplayInterstitialCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(platform, 'display-interstitial');
 
         this._core = core;
@@ -144,7 +145,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     private updateProgressCircle(container: HTMLElement, progress: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
-        if(this._platform === Platform.ANDROID && this._deviceInfo.getApiLevel() < 15) {
+        if(this._platform === Platform.ANDROID && (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
             this._container.style.display = 'none';
             /* tslint:disable:no-unused-expression */

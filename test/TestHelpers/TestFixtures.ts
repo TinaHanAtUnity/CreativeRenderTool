@@ -100,6 +100,10 @@ import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { IARApi } from 'AR/AR';
+import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
+import { ARApi } from 'AR/Native/AR';
+import { IosARApi } from 'AR/Native/iOS/IosARApi';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -644,6 +648,19 @@ export class TestFixtures {
     public static getPurchasingApi(nativeBridge: NativeBridge): IPurchasingApi {
         return {
             CustomPurchasing: new CustomPurchasingApi(nativeBridge)
+        };
+    }
+
+    public static getARApi(nativeBridge: NativeBridge): IARApi {
+        const platform = nativeBridge.getPlatform();
+        return {
+            AR: new ARApi(nativeBridge),
+            Android: platform === Platform.ANDROID ? {
+                AR: new AndroidARApi(nativeBridge)
+            } : undefined,
+            iOS: platform === Platform.IOS ? {
+                AR: new IosARApi(nativeBridge)
+            } : undefined
         };
     }
 

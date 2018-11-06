@@ -56,6 +56,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -112,6 +114,8 @@ describe('CampaignRefreshManager', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let ar: IARApi;
+    let purchasing: IPurchasingApi;
     let request: RequestManager;
     let storageBridge: StorageBridge;
     let assetManager: AssetManager;
@@ -141,6 +145,8 @@ describe('CampaignRefreshManager', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        ar = TestFixtures.getARApi(nativeBridge);
+        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
         storageBridge = new StorageBridge(core);
         placementManager = sinon.createStubInstance(PlacementManager);
@@ -183,6 +189,8 @@ describe('CampaignRefreshManager', () => {
             platform,
             core,
             ads,
+            ar,
+            purchasing,
             forceOrientation: Orientation.NONE,
             focusManager: focusManager,
             container: container,

@@ -68,6 +68,7 @@ import { VAST } from 'VAST/VAST';
 import { VPAID } from 'VPAID/VPAID';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromo } from 'XPromo/XPromo';
+import { AR } from 'AR/AR';
 
 export class Ads implements IAds {
 
@@ -102,6 +103,7 @@ export class Ads implements IAds {
 
     public Banners: Banners;
     public Monetization: Monetization;
+    public AR: AR;
 
     constructor(config: any, core: ICore) {
         this.Config = AdsConfigurationParser.parse(config, core.ClientInfo);
@@ -192,6 +194,7 @@ export class Ads implements IAds {
 
             this.Banners = new Banners(this._core, this, this._core.Analytics);
             this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
+            this.AR = new AR(this._core);
 
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.CampaignParserManager, this._core.JaegerManager, this.BackupCampaignManager);
             this.RefreshManager = new OldCampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
@@ -342,6 +345,8 @@ export class Ads implements IAds {
                 platform: this._core.NativeBridge.getPlatform(),
                 core: this._core.Api,
                 ads: this.Api,
+                ar: this.AR.Api,
+                purchasing: this._core.Purchasing.Api,
                 forceOrientation: orientation,
                 focusManager: this._core.FocusManager,
                 container: this.Container,

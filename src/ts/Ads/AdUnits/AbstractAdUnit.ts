@@ -10,7 +10,6 @@ import { Placement } from 'Ads/Models/Placement';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { IARApi } from 'AR/AR';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -20,6 +19,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Observable0 } from 'Core/Utilities/Observable';
+import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 export interface IAdUnitParameters<T extends Campaign> {
@@ -35,8 +35,8 @@ export interface IAdUnitParameters<T extends Campaign> {
     platform: Platform;
     core: ICoreApi;
     ads: IAdsApi;
-    ar?: IARApi; // todo: fix optional
-    purchasing?: IPurchasingApi; // todo: fix optional
+    ar: IARApi;
+    purchasing: IPurchasingApi;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
     request: RequestManager;

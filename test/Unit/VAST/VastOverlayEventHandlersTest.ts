@@ -33,6 +33,8 @@ import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastOverlayEventHandlersTest', () => {
@@ -45,6 +47,8 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
         let ads: IAdsApi;
+        let ar: IARApi;
+        let purchasing: IPurchasingApi;
         let storageBridge: StorageBridge;
         let vastAdUnit: VastAdUnit;
         let container: AdUnitContainer;
@@ -69,6 +73,8 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
+            ar = TestFixtures.getARApi(nativeBridge);
+            purchasing = TestFixtures.getPurchasingApi(nativeBridge);
             storageBridge = new StorageBridge(core);
             focusManager = new FocusManager(platform, core);
             metaDataManager = new MetaDataManager(core);
@@ -121,6 +127,8 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
                 platform,
                 core,
                 ads,
+                ar,
+                purchasing,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
