@@ -114,7 +114,7 @@ if(typeof location !== 'undefined') {
 
     // SafeDK garbage
     (<any>extWindow.webview)._configuration = {
-        getPlacement: () => { return { getCurrentCampaign: () => 'fuck you SafeDK' }; }
+        getPlacement: () => { return { getCurrentCampaign: () => 'SafeDK violates Unity Ads SDK internals, please disable your SafeDK integration.' }; }
     };
 
     document.addEventListener('DOMContentLoaded', () => extWindow.webview.initialize(), false);
