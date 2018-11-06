@@ -8,7 +8,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as protobuf from 'protobufjs/minimal';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { unity_proto } from '../../../src/proto/unity_proto.js';
+import { unity_proto } from 'unity_proto';
 
 describe('AdMobSignalFactoryTest', () => {
     xit('basic test', () => {
