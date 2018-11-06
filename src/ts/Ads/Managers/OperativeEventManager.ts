@@ -322,7 +322,7 @@ export class OperativeEventManager {
             'gdprEnabled': this._adsConfig.isGDPREnabled(),
             'optOutEnabled': this._adsConfig.isOptOutEnabled(),
             'optOutRecorded': this._adsConfig.isOptOutRecorded(),
-            'gameSessionCounters': GameSessionCounters.getDTO()
+            'gameSessionCounters': GameSessionCounters.getCountersForOperativeEvent()
         };
 
         if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {

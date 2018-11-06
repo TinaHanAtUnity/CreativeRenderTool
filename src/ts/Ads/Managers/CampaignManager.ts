@@ -690,7 +690,7 @@ export class CampaignManager {
                 body.properties = this._coreConfig.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
                 body.projectId = this._coreConfig.getUnityProjectId();
-                body.gameSessionCounters = GameSessionCounters.getDTO();
+                body.gameSessionCounters = GameSessionCounters.getCurrentCounters();
                 body.gdprEnabled = this._adsConfig.isGDPREnabled();
                 body.optOutEnabled = this._adsConfig.isOptOutEnabled();
                 body.optOutRecorded = this._adsConfig.isOptOutRecorded();
