@@ -3,129 +3,85 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
-import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Request } from 'Core/Utilities/Request';
-import { CustomPurchasingApi } from 'Purchasing/Native/CustomPurchasing';
-import { OrganicPurchase, IOrganicPurchase } from 'Purchasing/OrganicPurchaseManager';
-import { IProduct, ITransactionErrorDetails, ITransactionDetails} from 'Purchasing/PurchasingAdapter';
-import { Observable1, Observable2 } from 'Core/Utilities/Observable';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { asStub } from 'TestHelpers/Functions';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
+import { OrganicPurchase, IOrganicPurchase, OrganicPurchaseManager } from 'Purchasing/OrganicPurchaseManager';
+import { Observable2 } from 'Core/Utilities/Observable';
+import { StorageApi } from 'Core/Native/Storage';
 
-describe('CustomPurchasingAdapter', () => {
+describe('OrganicPurchaseManager', () => {
+
+    let organicPurchase: OrganicPurchase | undefined;
+
     let nativeBridge: NativeBridge;
-    // let analyticsManager: AnalyticsManager;
     let promoEvents: PromoEvents;
     let request: Request;
-    let sandbox: sinon.SinonSandbox;
-    let purchasingAdapter: CustomPurchasingAdapter;
-    // let customPurchasing: CustomPurchasingApi;
-    let onSetStub: sinon.SinonStub;
+    let organicPurchaseManager: OrganicPurchaseManager;
+    let onSetObservable: Observable2<string, object>;
     let getStub: sinon.SinonStub;
     let setStub: sinon.SinonStub;
-    // let writeStub: sinon.SinonStub;
-    let iapMetaData:any;
-    let organicPurchase: OrganicPurchase | undefined; 
-    let storageTrigger: (eventType: string, data: any) => void;
+    let writeStub: sinon.SinonStub;
+    let postStub: sinon.SinonStub;
 
     beforeEach(() => {
+
         nativeBridge = sinon.createStubInstance(NativeBridge);
-        //analyticsManager = sinon.createStubInstance(AnalyticsManager);
-        //promoEvents = sinon.createStubInstance(PromoEvents);
-        request = sinon.createStubInstance(Request);
-        sandbox = sinon.createSandbox();
-        //customPurchasing = sinon.createStubInstance(CustomPurchasingApi);
-
         nativeBridge.Storage = sinon.createStubInstance(StorageApi);
-        (<any>nativeBridge.Storage).onSet = new Observable2<string, object>();
-        onSetStub = sinon.stub(nativeBridge.Storage.onSet, 'subscribe');
+        request = sinon.createStubInstance(Request);
+        promoEvents = sinon.createStubInstance(PromoEvents);
+        organicPurchaseManager = new OrganicPurchaseManager(nativeBridge, promoEvents, request);
+
+        onSetObservable = new Observable2();
+        nativeBridge.Storage.onSet = onSetObservable;
         getStub = <sinon.SinonStub>nativeBridge.Storage.get;
-        setStub = (<sinon.SinonStub>nativeBridge.Storage.set).resolves();
-        // writeStub = (<sinon.SinonStub>nativeBridge.Storage.write).resolves();
-        iapMetaData = '{ iap_purchases: {productId: {value: \'productIDID\'}, price: {value:1.25} }}';
-        
-        getStub.callsFake((fun) => {
-           return Promise.resolve(iapMetaData);
+        setStub = (<sinon.SinonStub>nativeBridge.Storage.set);
+        writeStub = (<sinon.SinonStub>nativeBridge.Storage.write);
+        postStub = (<sinon.SinonStub>request.post);
+
+        getStub.resolves({});
+        setStub.resolves({});
+        writeStub.resolves({});
+        postStub.resolves({});
+        (<sinon.SinonStub>promoEvents.onOrganicPurchaseSuccess).resolves({});
+    });
+
+    it('should subscribe to Storage.onSet in initialize', () => {
+        const subscribeStub = sinon.stub(onSetObservable, 'subscribe');
+        return organicPurchaseManager.initialize().then(() => {
+            sinon.assert.calledOnce(subscribeStub);
         });
-        onSetStub.callsFake((fun) => {
-            storageTrigger = fun;
-        });
-
-        // (<any>nativeBridge).Monetization = {
-        //     CustomPurchasing: customPurchasing
-        // };
-
-        // (<sinon.SinonStub>customPurchasing.refreshCatalog).returns(Promise.resolve());
-        // (<sinon.SinonStub>customPurchasing.purchaseItem).returns(Promise.resolve());
-
-        // (<any>nativeBridge).Monetization.CustomPurchasing.onProductsRetrieved = new Observable1<IProduct[]>();
-        // (<any>nativeBridge).Monetization.CustomPurchasing.onTransactionComplete = new Observable1<ITransactionDetails>();
-        // (<any>nativeBridge).Monetization.CustomPurchasing.onTransactionError = new Observable1<ITransactionErrorDetails>();
-
-        //purchasingAdapter = new CustomPurchasingAdapter(nativeBridge, analyticsManager, promoEvents, request);
-        sandbox.stub((<any>purchasingAdapter)._thirdPartyEventManager, 'sendWithGet');
-        sandbox.stub((<any>purchasingAdapter)._thirdPartyEventManager, 'sendWithPost');
     });
 
-    // const triggerRefreshCatalog = (value: IProduct[]) => {
-    //     return new Promise((resolve) => {
-    //         (<any>nativeBridge).Monetization.CustomPurchasing.onProductsRetrieved.trigger(value);
-    //         setTimeout(resolve);
-    //     });
-    // };
-
-    // const triggerTransactionComplete = (value: ITransactionDetails) => {
-    //     return new Promise((resolve) => {
-    //         (<any>nativeBridge).Monetization.CustomPurchasing.onTransactionComplete.trigger(value);
-    //         setTimeout(resolve);
-    //     });
-    // };
-
-    // const triggerTransactionError = (value: ITransactionErrorDetails) => {
-    //     return new Promise((resolve) => {
-    //         (<any>nativeBridge).Monetization.CustomPurchasing.onTransactionError.trigger(value);
-    //         setTimeout(resolve);
-    //     });
-    // };
-
-    afterEach(() => {
-        sandbox.restore();
-    });
-
-    it('should subscribe to Storage.onSet', () => {
-        sinon.assert.calledOnce(onSetStub);
-    });
-
-    describe('iap.purchases metadata', () => {
-        it('should not do anything if iap.purchases is undefined', () => {
-            storageTrigger('', {});
-            sinon.assert.calledOnce(onSetStub);
+    it('should not do anything if iap.purchases is undefined', () => {
+        return organicPurchaseManager.initialize().then(() => {
+            sinon.assert.calledOnce(getStub);
             sinon.assert.notCalled(setStub);
+            sinon.assert.notCalled(writeStub);
+            sinon.assert.notCalled(postStub);
+            sinon.assert.notCalled(<sinon.SinonStub>promoEvents.onOrganicPurchaseSuccess);
         });
+    });
 
-        it('should retrieve iap.purchase metadata',() => {
-            iapMetaData = '{ iap_purchases: {productId: {value: \'productIDID\'}, price: {value:1.25} }}';
-            storageTrigger('', {'iap.purchases': {productId: {value: 'productIDID'}, price: {value:1.25} }});
-            asStub(promoEvents.onOrganicPurchaseSuccess).returns(Promise.resolve());
-            return Promise.resolve().then(() => {
-                sinon.assert.calledOnce(onSetStub);
-                sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'iap.purchases');
-                sinon.assert.calledWith(setStub, StorageType.PUBLIC, 'iap.purchases', []);
-                return(<Promise<void>>getStub.firstCall.returnValue).then((data) => {
-                    assert.deepEqual(data, iapMetaData);
-                    sinon.assert.called(<sinon.SinonStub>promoEvents.onOrganicPurchaseSuccess);
-                    sinon.assert.called(<sinon.SinonStub>request.post);
-                });
-            });
+    it('happy path with one purchase',() => {
+        getStub.resolves([{'productId': 'testId', 'price': 1234, 'currency': 'USD', 'receiptPurchaseData': 'test receipt data', 'signature': 'testSignature'}]);
+        return organicPurchaseManager.initialize().then(() => {
+            sinon.assert.calledOnce(getStub);
+            sinon.assert.calledOnce(setStub);
+            sinon.assert.calledOnce(writeStub);
+            sinon.assert.calledOnce(postStub);
+            sinon.assert.calledOnce(<sinon.SinonStub>promoEvents.onOrganicPurchaseSuccess);
+            assert.equal(postStub.firstCall.args[0], 'https://events.iap.unity3d.com/events/v1/organic_purchase?native=false&iap_service=false');
         });
-        it('should reset iap.purchase metadata after each retrieve', () => {
-            sinon.assert.calledOnce(onSetStub);
-            return(<Promise<void>>getStub.firstCall.returnValue).then((data) => {
-                assert.isUndefined(data);
-            });
+    });
+
+    it('happy path with two purchases',() => {
+        getStub.resolves([{'productId': 'testId', 'price': 1234, 'currency': 'USD', 'receiptPurchaseData': 'test receipt data', 'signature': 'testSignature'}, {'productId': 'testId', 'price': 1234, 'currency': 'USD', 'receiptPurchaseData': 'test receipt data', 'signature': 'testSignature'}]);
+        return organicPurchaseManager.initialize().then(() => {
+            sinon.assert.calledOnce(getStub);
+            sinon.assert.calledOnce(setStub);
+            sinon.assert.calledOnce(writeStub);
+            sinon.assert.calledTwice(postStub);
+            sinon.assert.calledTwice(<sinon.SinonStub>promoEvents.onOrganicPurchaseSuccess);
         });
     });
 
@@ -137,62 +93,53 @@ describe('CustomPurchasingAdapter', () => {
                 currency: 'EUR',
                 receiptPurchaseData: 'testReceiptPurchaseData',
                 signature: 'testSignaure'
-            } 
+            };
             organicPurchase = new OrganicPurchase(organicPurchaseEvent);
-            
-            assert.deepEqual('productIDID', organicPurchase.getId());
-            assert.deepEqual(1.25, organicPurchase.getPrice());
-            assert.deepEqual('EUR', organicPurchase.getCurrency());
-            assert.deepEqual('testReceiptPurchaseData', organicPurchase.getReceipt());
+
+            assert.equal('productIDID', organicPurchase.getId());
+            assert.equal(1.25, organicPurchase.getPrice());
+            assert.equal('EUR', organicPurchase.getCurrency());
+            assert.equal('testReceiptPurchaseData', organicPurchase.getReceipt());
             assert.deepEqual('testSignaure', organicPurchase.getSignature());
         });
 
-        xit('create OrganicPurchase with missing fields', () => {
-            const organicPurchaseEvent: IOrganicPurchase = {
+        it('create OrganicPurchase with missing fields', () => {
+            const organicPurchaseEvent: IOrganicPurchase = <IOrganicPurchase>{
                 productId: 'productIDID',
-                price: 1.25,
-                currency: 'EUR',
-                receiptPurchaseData: 'testReceiptPurchaseData',
-                signature: 'testSignaure'
-            }; 
+                price: 1.25
+            };
             organicPurchase = new OrganicPurchase(organicPurchaseEvent);
 
-            assert.deepEqual('productIDID', organicPurchase.getId());
-            assert.deepEqual(1.25, organicPurchase.getPrice());
+            assert.equal('productIDID', organicPurchase.getId());
+            assert.equal(1.25, organicPurchase.getPrice());
             assert.isUndefined(organicPurchase.getCurrency());
             assert.isUndefined(organicPurchase.getReceipt());
             assert.isUndefined(organicPurchase.getSignature());
         });
 
-        xit('create OrganicPurchase with no value', () => {
-            const organicPurchaseEvent: IOrganicPurchase = {
-                productId: 'productIDID',
-                price: 1.25,
-                currency: 'EUR',
-                receiptPurchaseData: 'testReceiptPurchaseData',
-                signature: 'testSignaure'
-            } 
+        it('create OrganicPurchase with no value', () => {
+            const organicPurchaseEvent: IOrganicPurchase = <any>undefined;
             organicPurchase = new OrganicPurchase(organicPurchaseEvent);
 
             assert.exists(organicPurchase);
             assert.isUndefined(organicPurchase.getId());
         });
 
-        xit('create OrganicPurchase with unexpected key', () => {
-            const organicPurchaseEvent: IOrganicPurchase = {
+        it('create OrganicPurchase with extra key', () => {
+            const organicPurchaseEvent: IOrganicPurchase = <IOrganicPurchase><any>{
                 productId: 'productIDID',
                 price: 1.25,
                 currency: 'EUR',
                 receiptPurchaseData: 'testReceiptPurchaseData',
-                signature: 'testSignaure'
-            } 
-            organicPurchase = new OrganicPurchase(organicPurchaseEvent);
-
-            assert.deepEqual('productIDID', organicPurchase.getId());
-            assert.deepEqual(1.25, organicPurchase.getPrice());
-            assert.isUndefined(organicPurchase.getCurrency());
-            assert.isUndefined(organicPurchase.getReceipt());
-            assert.isUndefined(organicPurchase.getSignature());
+                signature: 'testSignaure',
+                extraKey: 'test'
+            };
+            try {
+                organicPurchase = new OrganicPurchase(organicPurchaseEvent);
+                assert.fail('should throw');
+            } catch (error) {
+                assert.exists(error);
+            }
         });
     });
 

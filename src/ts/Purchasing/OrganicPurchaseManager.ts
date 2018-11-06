@@ -4,6 +4,7 @@ import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Url } from 'Core/Utilities/Url';
 import { Request } from 'Core/Utilities/Request';
 import { Model, ISchema } from 'Core/Models/Model';
+import { Promises } from 'Core/Utilities/Promises';
 
 export interface IOrganicPurchase {
     productId: string | undefined;
@@ -72,39 +73,44 @@ export class OrganicPurchaseManager {
         this._request = request;
     }
 
-    public initialize() {
-        this.getOrganicPurchase();
+    public initialize(): Promise<void> {
+        const promise = this.getOrganicPurchase();
         this._nativeBridge.Storage.onSet.subscribe(() => this.getOrganicPurchase());
+        return Promises.voidResult(promise);
     }
 
-    private getOrganicPurchase(): Promise<void> {
+    private getOrganicPurchase(): Promise<void[]> {
         return this._nativeBridge.Storage.get(StorageType.PUBLIC, OrganicPurchaseManager.InAppPurchaseStorageKey).then((data: any) => {
+            const promises: Promise<void>[] = [];
             if (data && data.length && data.length > 0) {
                 for(const event of data) {
                     const organicPurchaseEvent = new OrganicPurchase(event);
-                    this.postOrganicPurchaseEvents(organicPurchaseEvent);
+                    const promise = this.postOrganicPurchaseEvents(organicPurchaseEvent);
+                    promises.push(promise);
                 }
-                this.resetIAPPurchaseMetaData();
+                promises.push(this.resetIAPPurchaseMetaData());
             }
+            return Promise.all(promises);
         });
     }
 
     private resetIAPPurchaseMetaData(): Promise<void> {
         return this._nativeBridge.Storage.set(StorageType.PUBLIC, OrganicPurchaseManager.InAppPurchaseStorageKey, []).then(() => {
-            this._nativeBridge.Storage.write(StorageType.PUBLIC);
+            return this._nativeBridge.Storage.write(StorageType.PUBLIC);
         });
     }
 
-    private postOrganicPurchaseEvents(organicPurchaseEvent: OrganicPurchase) {
+    private postOrganicPurchaseEvents(organicPurchaseEvent: OrganicPurchase): Promise<void> {
         const productId = organicPurchaseEvent.getId();
-        this._promoEvents.onOrganicPurchaseSuccess({
+        return this._promoEvents.onOrganicPurchaseSuccess({
             store: this._promoEvents.getAppStoreFromReceipt(organicPurchaseEvent.getReceipt()),
             productId: productId,
             storeSpecificId: productId,
             amount: organicPurchaseEvent.getPrice(),
             currency: organicPurchaseEvent.getCurrency(),
             native: false}, undefined, organicPurchaseEvent.getReceipt()).then((body) => {
-                this._request.post(Url.addParameters('https://events.iap.unity3d.com/events/v1/organic_purchase', {'native': false, 'iap_service': false}), JSON.stringify(body));
+                const promise = this._request.post(Url.addParameters('https://events.iap.unity3d.com/events/v1/organic_purchase', {'native': false, 'iap_service': false}), JSON.stringify(body));
+                return Promises.voidResult(promise);
             }
         );
     }

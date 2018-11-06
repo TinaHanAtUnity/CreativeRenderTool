@@ -9,10 +9,9 @@ import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Request } from 'Core/Utilities/Request';
 import { CustomPurchasingApi } from 'Purchasing/Native/CustomPurchasing';
 import { IProduct, ITransactionErrorDetails, ITransactionDetails} from 'Purchasing/PurchasingAdapter';
-import { Observable1, Observable2 } from 'Core/Utilities/Observable';
+import { Observable1 } from 'Core/Utilities/Observable';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { asStub } from 'TestHelpers/Functions';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
 
 describe('CustomPurchasingAdapter', () => {
     let nativeBridge: NativeBridge;
@@ -22,9 +21,6 @@ describe('CustomPurchasingAdapter', () => {
     let sandbox: sinon.SinonSandbox;
     let purchasingAdapter: CustomPurchasingAdapter;
     let customPurchasing: CustomPurchasingApi;
-    let onSetStub: sinon.SinonStub;
-    let getStub: sinon.SinonStub;
-    let iapMetaData:any;
 
     beforeEach(() => {
         nativeBridge = sinon.createStubInstance(NativeBridge);
@@ -73,10 +69,6 @@ describe('CustomPurchasingAdapter', () => {
 
     afterEach(() => {
         sandbox.restore();
-    });
-
-    it('should subscribe to Storage.onSet', () => {
-        sinon.assert.calledOnce(onSetStub);
     });
 
     describe('RefreshCatalog', () => {
