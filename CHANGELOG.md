@@ -1,4 +1,4 @@
-# Pending
+# Tue Nov  6 21:05:41 UTC 2018
 
 * Exit skip button test [#6991](https://github.com/Applifier/unity-ads-webview/pull/6991)
 * Revert skippable rewarded ads test [#6990](https://github.com/Applifier/unity-ads-webview/pull/6990)
