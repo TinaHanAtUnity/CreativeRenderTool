@@ -24,7 +24,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> implements IMRAIDHandler
     private _creativeId: string | undefined;
 
     private _iframe: HTMLIFrameElement;
-    // private _mraidBridge: MraidIFrameEventBridge;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(nativeBridge, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
@@ -34,7 +33,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> implements IMRAIDHandler
         this._creativeId = campaign.getCreativeId();
 
         this._template = new Template(MRAIDTemplate);
-        // this._mraidBridge = new MraidIFrameEventBridge(nativeBridge, this);
     }
 
     public render(): void {
