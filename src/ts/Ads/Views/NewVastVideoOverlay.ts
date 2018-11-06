@@ -1,8 +1,8 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { NewVideoOverlay } from './NewVideoOverlay';
+import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { ABGroup } from 'Core/Models/ABGroup';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export class NewVastVideoOverlay extends NewVideoOverlay implements IPrivacyHandler {
 
