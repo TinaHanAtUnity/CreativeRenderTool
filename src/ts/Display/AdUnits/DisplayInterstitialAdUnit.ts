@@ -267,12 +267,12 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         let webPlayerSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos;
         if (platform === Platform.ANDROID) {
             webPlayerSettings = {
-                'setJavaScriptCanOpenWindowsAutomatically': [true],
-                'setSupportMultipleWindows': [false]
+                setJavaScriptCanOpenWindowsAutomatically: [true],
+                setSupportMultipleWindows: [false]
             };
         } else {
             webPlayerSettings = {
-                'javaScriptCanOpenWindowsAutomatically': true
+                javaScriptCanOpenWindowsAutomatically: true
             };
         }
         return this._webPlayerContainer.setSettings(webPlayerSettings, {}).then(() => {
@@ -297,8 +297,14 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
 
     private setWebplayerSettings(shouldOverrideUrlLoadingReturnValue: boolean): Promise<void> {
         const eventSettings = {
-            'onPageStarted': {'sendEvent': true},
-            'shouldOverrideUrlLoading': {'sendEvent': true, 'returnValue': shouldOverrideUrlLoadingReturnValue, 'callSuper': false}
+            onPageStarted: {
+                sendEvent: true
+            },
+            shouldOverrideUrlLoading: {
+                sendEvent: true,
+                returnValue: shouldOverrideUrlLoadingReturnValue,
+                callSuper: false
+            }
         };
         return this._webPlayerContainer.setEventSettings(eventSettings);
     }
