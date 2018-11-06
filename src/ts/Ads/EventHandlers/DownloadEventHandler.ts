@@ -74,7 +74,6 @@ export class DownloadEventHandler  {
 
     public onDownload(parameters: IDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-
         const operativeEventParameters = this.getOperativeEventParams(parameters);
         this._operativeEventManager.sendClick(operativeEventParameters);
 
@@ -270,17 +269,11 @@ export class DownloadEventHandler  {
     }
 
     private getVideo(): Video | undefined {
-        return this._adUnit.getVideo();
-
-        // TODO: Is above ok or do we need to check for PerformanceAdUnit? Other type would be XPromoAdUnit
-        // Was added with message 'Send videoOrientation only for performance ads'
-        // https://github.com/Applifier/unity-ads-webview/commit/cd6f00b261354ce0459dd77c7c934e3310e2c73e
-        // So does this mean we don't want to send this information for XPromos?
-        /*        if(this._adUnit instanceof PerformanceAdUnit) {
+        if (this._adUnit instanceof PerformanceAdUnit) {
             return this._adUnit.getVideo();
         }
 
-        return undefined;*/
+        return undefined;
     }
 
     private getVideoOrientation(): string | undefined {
