@@ -104,4 +104,4 @@ class ABTest {
 
 export const FPSCollectionTest = new ABTest(GroupSixteen);
 export const AllowRewardedSkipTest = new ABTest(GroupSixteen, GroupSeventeen);
-export const ExitSkipIconTest = new ABTest(GroupEighteen, GroupNineteen);
+export const ExitSkipIconTest = new ABTest(GroupSixteen, GroupSeventeen);
