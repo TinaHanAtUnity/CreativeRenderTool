@@ -1,13 +1,10 @@
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
-import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { Request } from 'Core/Utilities/Request';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHandler';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { RequestError } from 'Core/Errors/RequestError';
 import { Video } from 'Ads/Models/Assets/Video';
@@ -21,6 +18,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 
 export interface IAppStoreDownloadHelper {
     download(parameters: IAppStoreDownloadParameters): void;
