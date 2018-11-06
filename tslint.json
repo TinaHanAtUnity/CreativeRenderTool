@@ -41,7 +41,6 @@
     "no-for-in": false,
     "no-function-constructor-with-string-args": false,
     "promise-must-complete": false,
-    "no-relative-imports": false,
     "array-type": [false, "array"],
     "prefer-array-literal": false,
     "max-classes-per-file": [false, 3],
