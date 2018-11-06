@@ -112,5 +112,10 @@ if(typeof location !== 'undefined') {
     extWindow.nativebridge = nativeBridge;
     extWindow.webview = new WebView(nativeBridge);
 
+    // SafeDK garbage
+    (<any>extWindow.webview)._configuration = {
+        getPlacement: () => { return { getCurrentCampaign: () => 'fuck you SafeDK' }; }
+    };
+
     document.addEventListener('DOMContentLoaded', () => extWindow.webview.initialize(), false);
 }
