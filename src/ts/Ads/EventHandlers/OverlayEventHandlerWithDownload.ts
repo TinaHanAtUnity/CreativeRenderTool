@@ -35,7 +35,6 @@ export class OverlayEventHandlerWithDownload<T extends Campaign> extends Overlay
             this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.CLICK);
         }
 
-        //TODO: is there need to skip these if app store url or id is missing?
         this.onOverlaySkip(parameters.videoProgress);
         this.setCallButtonEnabled(true);
     }
