@@ -103,13 +103,22 @@ export class BannerAdUnit {
         let eventSettings: any;
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             eventSettings = {
-                'onPageFinished': { 'sendEvent': true },
-                'shouldOverrideUrlLoading': { 'sendEvent': sendOverrideURLEvent, 'returnValue': true }
+                onPageFinished: {
+                    sendEvent: true
+                },
+                shouldOverrideUrlLoading: {
+                    sendEvent: sendOverrideURLEvent,
+                    returnValue: true
+                }
             };
         } else {
             eventSettings = {
-                'onPageFinished': { 'sendEvent': true },
-                'onCreateWindow': { 'sendEvent': sendOverrideURLEvent }
+                onPageFinished: {
+                    sendEvent: true
+                },
+                onCreateWindow: {
+                    sendEvent: sendOverrideURLEvent
+                }
             };
         }
         return this._webPlayerContainer.setEventSettings(eventSettings);
@@ -120,13 +129,13 @@ export class BannerAdUnit {
         let webPlayerSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos;
         if (platform === Platform.ANDROID) {
             webPlayerSettings = {
-                'setJavaScriptCanOpenWindowsAutomatically': [true],
-                'setSupportMultipleWindows': [false]
+                setJavaScriptCanOpenWindowsAutomatically: [true],
+                setSupportMultipleWindows: [false]
             };
         } else {
             webPlayerSettings = {
-                'javaScriptCanOpenWindowsAutomatically': true,
-                'scalesPagesToFit': true
+                javaScriptCanOpenWindowsAutomatically: true,
+                scalesPagesToFit: true
             };
         }
         return this._webPlayerContainer.setSettings(webPlayerSettings, {});
