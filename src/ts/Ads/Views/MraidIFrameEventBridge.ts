@@ -10,7 +10,8 @@ export enum MRAIDEvents {
     CLOSE               = 'close',
     STATE_CHANGE        = 'customMraidState',
     RESIZE_WEBVIEW      = 'resizeWebview',
-    SEND_STATS          = 'sendStats'
+    SEND_STATS          = 'sendStats',
+    AR                  = 'ar'
 }
 
 export interface IMRAIDHandler {
@@ -22,6 +23,7 @@ export interface IMRAIDHandler {
     onBridgeStateChange(customState: string): void;
     onBridgeResizeWebview(): void;
     onBridgeSendStats(totalTime: number, playTime: number, frameCount: number): void;
+    onBridgeAREvent(event: MessageEvent): void;
 }
 
 export interface IMRAIDOrientationProperties {
@@ -50,6 +52,7 @@ export class MraidIFrameEventBridge {
         this._mraidHandlers[MRAIDEvents.CLOSE] = (msg: any) => this.handleClose();
         this._mraidHandlers[MRAIDEvents.STATE_CHANGE] = (msg: any) => this.handleCustomState(msg.state);
         this._mraidHandlers[MRAIDEvents.SEND_STATS] = (msg: any) => this.handleSendStats(msg.totalTime, msg.playTime, msg.frameCount);
+        this._mraidHandlers[MRAIDEvents.AR] = (msg: any) => this.handleAr(msg);
     }
 
     public connect(iframe: HTMLIFrameElement) {
@@ -115,6 +118,10 @@ export class MraidIFrameEventBridge {
 
     private handleSendStats(totalTime: number, playTime: number, frameCount: number) {
         this._handler.onBridgeSendStats(totalTime, playTime, frameCount);
+    }
+
+    private handleAr(event: MessageEvent) {
+        this._handler.onBridgeAREvent(event);
     }
 
     private postMessage(event: string, data?: any) {

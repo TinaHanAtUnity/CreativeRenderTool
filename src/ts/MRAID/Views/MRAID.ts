@@ -14,10 +14,8 @@ import MRAIDPerfContainer from 'html/mraid/container-perf.html';
 import MRAIDContainer from 'html/mraid/container.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { MraidIFrameEventBridge, IMRAIDHandler } from 'Ads/Views/MraidIFrameEventBridge';
-import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 
-export class MRAID extends MRAIDView<IMRAIDViewHandler> implements IMRAIDHandler {
+export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private readonly onLoaded = new Observable0();
     private _domContentLoaded = false;
@@ -69,42 +67,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> implements IMRAIDHandler
         this.setAnalyticsBackgroundTime(viewable);
     }
 
-    public onBridgeSetOrientationProperties(allowOrientationChange: boolean, forceOrientation: Orientation) {
-        this.onSetOrientationProperties(allowOrientationChange, forceOrientation);
-    }
-
-    public onBridgeOpen(url: string) {
-        this.onMessageOpen(url);
-    }
-
-    public onBridgeLoad() {
-        this.onLoadedEvent();
-    }
-
-    public onBridgeAnalyticsEvent(event: string, eventData: string) {
-        this.sendMraidAnalyticsEvent(event, eventData);
-    }
-
-    public onBridgeClose() {
-        this.onClose();
-    }
-
-    public onBridgeStateChange(customState: string) {
-        this.onCustomState(customState);
-    }
-
-    public onBridgeResizeWebview() {
-        this.onResizeWebview();
-    }
-
-    public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {
-        this.updateStats({
-            totalTime: totalTime,
-            playTime: playTime,
-            frameCount: frameCount
-        });
-    }
-
     protected sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
         const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
@@ -152,7 +114,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> implements IMRAIDHandler
         });
     }
 
-    private onLoadedEvent(): void {
+    protected onLoadedEvent(): void {
         this._domContentLoaded = true;
         this.onLoaded.trigger();
 
@@ -167,10 +129,10 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> implements IMRAIDHandler
         this.sendMraidAnalyticsEvent('playable_start');
     }
 
-    private onMessageOpen(url: string) {
+    protected onOpen(url: string) {
         if (!this._callButtonEnabled) {
             return;
         }
-        this.onOpen(url);
+        this._handlers.forEach(handler => handler.onMraidClick(url));
     }
 }

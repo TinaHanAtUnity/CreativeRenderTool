@@ -39,13 +39,13 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
 
         if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || MRAIDAdUnitFactory._forcedPlayableMRAID) {
             mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
-            mraid.setMraidEventBridge(new MraidIFrameEventBridge(nativeBridge, <PlayableMRAID>mraid));
         } else if (ARUtil.isARCreative(parameters.campaign) || MRAIDAdUnitFactory._forcedARMRAID) {
             mraid = new ARMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         } else {
             mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
-            mraid.setMraidEventBridge(new MraidIFrameEventBridge(nativeBridge, <MRAID>mraid));
         }
+
+        mraid.setMraidEventBridge(new MraidIFrameEventBridge(nativeBridge, mraid));
 
         const mraidAdUnitParameters: IMRAIDAdUnitParameters = {
             ... parameters,

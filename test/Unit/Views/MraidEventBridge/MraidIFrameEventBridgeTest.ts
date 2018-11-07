@@ -21,8 +21,9 @@ describe('MraidIframeEventBridge', () => {
             onBridgeAnalyticsEvent: sinon.spy(),
             onBridgeClose: sinon.spy(),
             onBridgeStateChange: sinon.spy(),
-            onBridgeResizeWebview: sinon.spy(),
-            onBridgeSendStats: sinon.spy()
+            onBridgeResizeWebview: sinon.spy(), // add test for this
+            onBridgeSendStats: sinon.spy(),
+            onBridgeAREvent: sinon.spy() // add test for this
         };
         mraidBridge = new MraidIFrameEventBridge(nativeBridge, handler);
         iframe = document.createElement('iframe');
