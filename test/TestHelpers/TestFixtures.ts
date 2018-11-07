@@ -147,7 +147,6 @@ export class TestFixtures {
             clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
             bypassAppSheet: json.bypassAppSheet,
             store: storeName,
-            trackingUrls: json.trackingUrls,
             videoEventUrls: json.videoEventUrls
         };
 

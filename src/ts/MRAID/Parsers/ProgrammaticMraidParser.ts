@@ -37,7 +37,7 @@ export class ProgrammaticMraidParser extends CampaignParser {
             meta: jsonMraid.meta,
             session: session,
             mediaId: response.getMediaId(),
-            trackingUrls: response.getTrackingUrls()
+            trackingUrls: response.getTrackingUrls() || {}
         };
 
         const parameters: IMRAIDCampaign = {

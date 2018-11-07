@@ -42,7 +42,7 @@ export class XPromoCampaignParser extends CampaignParser {
             meta: json.meta,
             session: session,
             mediaId: response.getMediaId(),
-            trackingUrls: response.getTrackingUrls() ? this.validateAndEncodeTrackingUrls(response.getTrackingUrls(), session) : undefined
+            trackingUrls: response.getTrackingUrls()? this.validateAndEncodeTrackingUrls(response.getTrackingUrls(), session) : {}
         };
 
         const parameters: IXPromoCampaign = {

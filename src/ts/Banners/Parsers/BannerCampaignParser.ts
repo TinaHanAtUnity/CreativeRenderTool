@@ -30,7 +30,7 @@ export class BannerCampaignParser extends CampaignParser {
             seatId: response.getSeatId(),
             willExpireAt: response.getCacheTTL(),
             markup: markup,
-            trackingUrls: response.getTrackingUrls(),
+            trackingUrls: response.getTrackingUrls() || {},
             width: response.getWidth(),
             height: response.getHeight()
         };

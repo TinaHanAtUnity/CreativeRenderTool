@@ -51,19 +51,17 @@ export class NativePromoEventHandler {
     private sendTrackingEvent(eventName: string, campaign: PromoCampaign): Promise<void> {
         return this._nativeBridge.Monetization.CustomPurchasing.available().then((isAvailable) => {
             const sessionId = campaign.getSession().getId();
-            const trackingEventUrls = campaign.getTrackingUrlsForEvent(eventName);
+            let trackingEventUrls = campaign.getTrackingUrlsForEvent(eventName);
 
-            trackingEventUrls.map((value: string): string => {
+            trackingEventUrls = trackingEventUrls.map((value: string): string => {
                 // add native flag true to designate native promo
                 if (PromoEvents.purchaseHostnameRegex.test(value)) {
                     return Url.addParameters(value, { 'native': true, 'iap_service': !isAvailable });
                 }
                 return value;
             });
-            if (trackingEventUrls) {
-                for (const url of trackingEventUrls) {
-                    this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
-                }
+            for (const url of trackingEventUrls) {
+                this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
             }
         });
     }

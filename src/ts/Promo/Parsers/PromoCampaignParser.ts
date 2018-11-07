@@ -33,7 +33,7 @@ export class PromoCampaignParser extends CampaignParser {
             meta: promoJson.meta,
             session: session,
             mediaId: response.getMediaId(),
-            trackingUrls: response.getTrackingUrls()
+            trackingUrls: response.getTrackingUrls() || {}
         };
         const promoCampaignParams: IPromoCampaign = {
             ... baseCampaignParams,
