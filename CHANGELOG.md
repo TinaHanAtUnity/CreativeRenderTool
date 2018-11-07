@@ -1,4 +1,4 @@
-# Pending
+# Wed Nov  7 18:30:55 UTC 2018
 
 * AB test for different green shades on Android CTA button [#6891](https://github.com/Applifier/unity-ads-webview/pull/6891)
 
