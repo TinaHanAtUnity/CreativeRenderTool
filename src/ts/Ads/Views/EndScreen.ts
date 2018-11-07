@@ -6,8 +6,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import {
     ABGroup,
-    GreenEndScreenButtonColorTest,
-    NativeGreenEndScreenButtonColorTest
+    GreenEndScreenButtonColorTest
 } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
@@ -126,12 +125,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         if (GreenEndScreenButtonColorTest.isValid(this._abGroup)) {
             return '#83CD0C';
         }
-        else if (NativeGreenEndScreenButtonColorTest.isValid(this._abGroup)) {
-            return '#A4C639';
-        }
-        else {
             return ctaButtonColor;
-        }
     }
 
     public show(): void {
