@@ -108,32 +108,30 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             this._container.classList.add('show-gdpr-banner');
         }
 
-        // Android <= 4.4.4
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() <= 19) {
-            this._container.classList.add('old-androids');
+        let ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
+
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            if (this._nativeBridge.getApiLevel() <= 19) {   // Android <= 4.4.4
+                this._container.classList.add('old-androids');
+            }
+            ctaButtonColor = this.overrideButtonColor(ctaButtonColor);
         }
 
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID && (GreenEndScreenButtonColorTest.isValid(this._abGroup) || NativeGreenEndScreenButtonColorTest.isValid(this._abGroup))) {
-            this.addCustomDownloadButtonColor();
-         } else {
-            const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
-            if (ctaButtonColor) {
-                (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
-            }
-         }
+        if (ctaButtonColor) {
+            (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
+        }
     }
 
-    private addCustomDownloadButtonColor(): void {
-        let color: string;
-
+    private overrideButtonColor(ctaButtonColor: string | undefined): string | undefined {
         if (GreenEndScreenButtonColorTest.isValid(this._abGroup)) {
-            color = '#83CD0C';
-        } else if (NativeGreenEndScreenButtonColorTest.isValid(this._abGroup)) {
-            color = '#A4C639';
-        } else {
-            return;
+            return '#83CD0C';
         }
-        (<HTMLElement>this._container.querySelector('.download-container')).style.background = color;
+        else if (NativeGreenEndScreenButtonColorTest.isValid(this._abGroup)) {
+            return '#A4C639';
+        }
+        else {
+            return ctaButtonColor;
+        }
     }
 
     public show(): void {
