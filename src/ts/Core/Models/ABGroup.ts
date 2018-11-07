@@ -34,7 +34,6 @@ const GroupSeventeen = new ABGroup(17);
 const GroupEighteen = new ABGroup(18);
 const GroupNineteen = new ABGroup(19);
 const GroupTest = new ABGroup(99);
-export const GroupDisabled = new ABGroup(666);
 
 export class ABGroupBuilder {
     public static getAbGroup = (group: number) => {
@@ -99,8 +98,25 @@ class ABTest {
     }
 }
 
+class DisabledABTest extends ABTest {
+    constructor(...groups: ABGroup[]) {
+        super(...groups);
+    }
+
+    public isValid(group: ABGroup): boolean {
+        return false;
+    }
+}
+
 // Add ABTests below
-// Example : export const GdprBaseAbTest = new ABTest(GroupSixteen, GroupSeventeen);
+// Example:
+//
+// export const GdprBaseAbTest = new ABTest(GroupSixteen, GroupSeventeen);
+//
+//
+// Example for disabled AB test:
+//
+// export const GdprBaseAbTest = new DisabledABTest(GroupSixteen, GroupSeventeen);
 
 export const FPSCollectionTest = new ABTest(GroupSixteen);
 export const ExitSkipIconTest = new ABTest(GroupSixteen, GroupSeventeen);
