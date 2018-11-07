@@ -1,9 +1,30 @@
 # Pending
 
+* Use proper keyname for WebPlayer returnValue [#7012](https://github.com/Applifier/unity-ads-webview/pull/7012)
+* Revert TSLint : no-parameter-reassignment [#6897](https://github.com/Applifier/unity-ads-webview/pull/6897)
+* Fix GDPR Banner for AR MRAID [#6943](https://github.com/Applifier/unity-ads-webview/pull/6943)
+* Log Promo error whenever no creatives detected [#6803](https://github.com/Applifier/unity-ads-webview/pull/6803)
+* Respect iPhone x safe areas for Admob [#6989](https://github.com/Applifier/unity-ads-webview/pull/6989)
+* Refactor Banner Ad Unit [#6889](https://github.com/Applifier/unity-ads-webview/pull/6889)
+
+# Tue Nov  6 21:05:41 UTC 2018
+
+* Exit skip button test [#6991](https://github.com/Applifier/unity-ads-webview/pull/6991)
+* Revert skippable rewarded ads test [#6990](https://github.com/Applifier/unity-ads-webview/pull/6990)
+* SafeDK hacks [#6992](https://github.com/Applifier/unity-ads-webview/pull/6992)
+* Add a global afterEach which restores sinon default sandbox [#6968](https://github.com/Applifier/unity-ads-webview/pull/6968)
+
+# Tue Nov  6 11:53:35 UTC 2018
+
+* TSLint no-relative-imports [#6888](https://github.com/Applifier/unity-ads-webview/pull/6888)
 * Remove feature flag test for vast3 error tracking [#6895](https://github.com/Applifier/unity-ads-webview/pull/6895)
 * Update AR styling for iPhoneX and Info button [#6837](https://github.com/Applifier/unity-ads-webview/pull/6837)
 * MRAID Views Refactor [#6775](https://github.com/Applifier/unity-ads-webview/pull/6775)
 * Resize MRAID Views [#6782](https://github.com/Applifier/unity-ads-webview/pull/6782)
+
+# Mon Nov  5 13:44:02 UTC 2018
+
+* Block file URLs from all Request and Cache API invocations [#6948](https://github.com/Applifier/unity-ads-webview/pull/6948)
 
 # Thu Nov  1 20:15:06 UTC 2018
 
