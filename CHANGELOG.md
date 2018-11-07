@@ -1,4 +1,17 @@
-# Pending
+# Wed Nov  7 18:30:55 UTC 2018
+
+* AB test for different green shades on Android CTA button [#6891](https://github.com/Applifier/unity-ads-webview/pull/6891)
+
+# Wed Nov  7 13:47:22 UTC 2018
+
+* Use proper keyname for WebPlayer returnValue [#7012](https://github.com/Applifier/unity-ads-webview/pull/7012)
+* Revert TSLint : no-parameter-reassignment [#6897](https://github.com/Applifier/unity-ads-webview/pull/6897)
+* Fix GDPR Banner for AR MRAID [#6943](https://github.com/Applifier/unity-ads-webview/pull/6943)
+* Log Promo error whenever no creatives detected [#6803](https://github.com/Applifier/unity-ads-webview/pull/6803)
+* Respect iPhone x safe areas for Admob [#6989](https://github.com/Applifier/unity-ads-webview/pull/6989)
+* Refactor Banner Ad Unit [#6889](https://github.com/Applifier/unity-ads-webview/pull/6889)
+
+# Tue Nov  6 21:05:41 UTC 2018
 
 * Exit skip button test [#6991](https://github.com/Applifier/unity-ads-webview/pull/6991)
 * Revert skippable rewarded ads test [#6990](https://github.com/Applifier/unity-ads-webview/pull/6990)
