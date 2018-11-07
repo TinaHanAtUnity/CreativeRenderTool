@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { ABGroupBuilder, FakeEnabledABTest, FakeDisabledABTest } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import 'mocha';
@@ -29,6 +29,38 @@ describe('ABGroupBuilder tests', () => {
             assert.equal(abGroup.toNumber(), -1);
         });
     });
+});
+
+describe('FakeEnabledABTest tests', () => {
+    for(let i = 0; i < 20; i++) {
+        if (i === 16 || i === 17) {
+            continue;
+        }
+
+        it(`should return false for AB group ${i}`, () => {
+            const abGroup = ABGroupBuilder.getAbGroup(i);
+            assert.isFalse(FakeDisabledABTest.isValid(abGroup));
+        });
+    }
+
+    it(`should return true for AB group 16`, () => {
+        const abGroup = ABGroupBuilder.getAbGroup(16);
+        assert.isFalse(FakeDisabledABTest.isValid(abGroup));
+    });
+
+    it(`should return true for AB group 17`, () => {
+        const abGroup = ABGroupBuilder.getAbGroup(17);
+        assert.isFalse(FakeDisabledABTest.isValid(abGroup));
+    });
+});
+
+describe('FakeDisabledABTest tests', () => {
+    for(let i = 0; i < 20; i++) {
+        it(`should return false for AB group ${i}`, () => {
+            const abGroup = ABGroupBuilder.getAbGroup(i);
+            assert.isFalse(FakeDisabledABTest.isValid(abGroup));
+        });
+    }
 });
 
 describe('ABGroup tests', () => {

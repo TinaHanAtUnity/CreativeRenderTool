@@ -110,13 +110,13 @@ class DisabledABTest extends ABTest {
 
 // Add ABTests below
 // Example:
-//
-// export const GdprBaseAbTest = new ABTest(GroupSixteen, GroupSeventeen);
+export const FakeEnabledABTest = new ABTest(GroupSixteen, GroupSeventeen);
 //
 //
 // Example for disabled AB test:
-//
-// export const GdprBaseAbTest = new DisabledABTest(GroupSixteen, GroupSeventeen);
+export const FakeDisabledABTest = new DisabledABTest(GroupSixteen, GroupSeventeen);
+
+// Actual AB Tests
 
 export const FPSCollectionTest = new ABTest(GroupSixteen);
 export const ExitSkipIconTest = new ABTest(GroupSixteen, GroupSeventeen);
