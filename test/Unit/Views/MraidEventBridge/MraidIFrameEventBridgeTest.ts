@@ -150,6 +150,23 @@ describe('MraidIframeEventBridge', () => {
             });
         });
 
+        describe(`${MRAIDEvents.CLOSE} MRAID event`, () => {
+            const sendEvent = (e: string, data?: any) => {
+                return () => {
+                    return new Promise((res) => {
+                        window.postMessage({
+                            type: e
+                        }, '*');
+                        setTimeout(res);
+                    });
+                };
+            };
+            beforeEach(sendEvent(MRAIDEvents.CLOSE));
+            it(`should handle the ${MRAIDEvents.CLOSE} event`, () => {
+                sinon.assert.called(<sinon.SinonSpy>handler.onBridgeClose);
+            });
+        });
+
         xdescribe(`portrait ${MRAIDEvents.ORIENTATION} MRAID event`, () => {
             const sendEvent = (e: string, data?: any) => {
                 return () => {
@@ -183,23 +200,6 @@ describe('MraidIframeEventBridge', () => {
             beforeEach(sendEvent(MRAIDEvents.ORIENTATION, {allowOrientationChange: true, forceOrientation: 'landscape'}));
             it(`should handle the ${MRAIDEvents.ORIENTATION} event`, () => {
                 sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeSetOrientationProperties, true, Orientation.LANDSCAPE);
-            });
-        });
-
-        xdescribe(`${MRAIDEvents.CLOSE} MRAID event`, () => {
-            const sendEvent = (e: string, data?: any) => {
-                return () => {
-                    return new Promise((res) => {
-                        window.postMessage({
-                            type: e
-                        }, '*');
-                        setTimeout(res);
-                    });
-                };
-            };
-            beforeEach(sendEvent(MRAIDEvents.CLOSE));
-            it(`should handle the ${MRAIDEvents.CLOSE} event`, () => {
-                sinon.assert.called(<sinon.SinonSpy>handler.onBridgeClose);
             });
         });
     });
