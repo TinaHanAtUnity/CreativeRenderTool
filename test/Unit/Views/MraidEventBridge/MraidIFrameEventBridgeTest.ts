@@ -39,14 +39,12 @@ describe('MraidIframeEventBridge', () => {
     describe('receiving MRAID events', () => {
         describe(`${MRAIDEvents.OPEN} MRAID event`, () => {
             const sendEvent = (e: string, data?: any) => {
-                return () => {
-                    return new Promise((res) => {
-                        window.postMessage({
-                            type: e,
-                            url: data
-                        }, '*');
-                        setTimeout(res);
-                    });
+                return (done: () => void) => {
+                    window.postMessage({
+                        type: e,
+                        url: data
+                    }, '*');
+                    setTimeout(done);
                 };
             };
             beforeEach(sendEvent(MRAIDEvents.OPEN, 'unityads.unity3d.com'));
@@ -57,13 +55,11 @@ describe('MraidIframeEventBridge', () => {
 
         describe(`${MRAIDEvents.LOADED} MRAID event`, () => {
             const sendEvent = (e: string, data?: any) => {
-                return () => {
-                    return new Promise((res) => {
-                        window.postMessage({
-                            type: e
-                        }, '*');
-                        setTimeout(res);
-                    });
+                return (done: () => void) => {
+                    window.postMessage({
+                        type: e
+                    }, '*');
+                    setTimeout(done);
                 };
             };
             beforeEach(sendEvent(MRAIDEvents.LOADED));
@@ -74,15 +70,13 @@ describe('MraidIframeEventBridge', () => {
 
         describe(`${MRAIDEvents.ANALYTICS_EVENT} MRAID event`, () => {
             const sendEvent = (e: string, event: any, eventData: any) => {
-                return () => {
-                    return new Promise((res) => {
-                        window.postMessage({
-                            type: e,
-                            event: event,
-                            eventData: eventData
-                        }, '*');
-                        setTimeout(res);
-                    });
+                return (done: () => void) => {
+                    window.postMessage({
+                        type: e,
+                        event: event,
+                        eventData: eventData
+                    }, '*');
+                    setTimeout(done);
                 };
             };
             beforeEach(sendEvent(MRAIDEvents.ANALYTICS_EVENT, 'x', 'y'));
@@ -93,14 +87,12 @@ describe('MraidIframeEventBridge', () => {
 
         describe(`${MRAIDEvents.STATE_CHANGE} MRAID event`, () => {
             const sendEvent = (e: string, data?: any) => {
-                return () => {
-                    return new Promise((res) => {
-                        window.postMessage({
-                            type: e,
-                            state: data
-                        }, '*');
-                        setTimeout(res);
-                    });
+                return (done: () => void) => {
+                    window.postMessage({
+                        type: e,
+                        state: data
+                    }, '*');
+                    setTimeout(done);
                 };
             };
             beforeEach(sendEvent(MRAIDEvents.STATE_CHANGE, 'test'));
@@ -111,16 +103,14 @@ describe('MraidIframeEventBridge', () => {
 
         describe(`${MRAIDEvents.SEND_STATS} MRAID event`, () => {
             const sendEvent = (e: string, totalTime: any, playTime: any, frameCount: any) => {
-                return () => {
-                    return new Promise((res) => {
-                        window.postMessage({
-                            type: e,
-                            totalTime: totalTime,
-                            playTime: playTime,
-                            frameCount: frameCount
-                        }, '*');
-                        setTimeout(res);
-                    });
+                return (done: () => void) => {
+                    window.postMessage({
+                        type: e,
+                        totalTime: totalTime,
+                        playTime: playTime,
+                        frameCount: frameCount
+                    }, '*');
+                    setTimeout(done);
                 };
             };
             beforeEach(sendEvent(MRAIDEvents.SEND_STATS, 20, 10, 200));
@@ -131,17 +121,15 @@ describe('MraidIframeEventBridge', () => {
 
         describe(`${MRAIDEvents.AR} MRAID event`, () => {
             const sendEvent = (e: string, functionName: string, args?: any) => {
-                return () => {
-                    return new Promise((res) => {
-                        window.postMessage({
-                            type: e,
-                            data: {
-                                functionName: functionName,
-                                args: args
-                            }
-                        }, '*');
-                        setTimeout(res);
-                    });
+                return (done: () => void) => {
+                    window.postMessage({
+                        type: e,
+                        data: {
+                            functionName: functionName,
+                            args: args
+                        }
+                    }, '*');
+                    setTimeout(done);
                 };
             };
             beforeEach(sendEvent(MRAIDEvents.AR, 'log'));
@@ -150,15 +138,13 @@ describe('MraidIframeEventBridge', () => {
             });
         });
 
-        xdescribe(`${MRAIDEvents.CLOSE} MRAID event`, () => {
+        describe(`${MRAIDEvents.CLOSE} MRAID event`, () => {
             const sendEvent = (e: string, data?: any) => {
-                return () => {
-                    return new Promise((res) => {
-                        window.postMessage({
-                            type: e
-                        }, '*');
-                        setTimeout(res);
-                    });
+                return (done: () => void) => {
+                    window.postMessage({
+                        type: e
+                    }, '*');
+                    setTimeout(done);
                 };
             };
             beforeEach(sendEvent(MRAIDEvents.CLOSE));
@@ -167,16 +153,14 @@ describe('MraidIframeEventBridge', () => {
             });
         });
 
-        xdescribe(`landscape ${MRAIDEvents.ORIENTATION} MRAID event`, () => {
+        describe(`landscape ${MRAIDEvents.ORIENTATION} MRAID event`, () => {
             const sendEvent = (e: string, data?: any) => {
-                return () => {
-                    return new Promise((res) => {
-                        window.postMessage({
-                            type: e,
-                            properties: data
-                        }, '*');
-                        setTimeout(res);
-                    });
+                return (done: () => void) => {
+                    window.postMessage({
+                        type: e,
+                        properties: data
+                    }, '*');
+                    setTimeout(done);
                 };
             };
             beforeEach(sendEvent(MRAIDEvents.ORIENTATION, {allowOrientationChange: true, forceOrientation: 'landscape'}));
