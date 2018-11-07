@@ -26,8 +26,6 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { AssertionError } from 'assert';
-import { asSpy } from 'TestHelpers/Functions';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
