@@ -13,7 +13,7 @@ export interface IVideoOverlayDownloadParameters extends IAppStoreDownloadParame
     videoProgress: number;
 }
 
-export class OverlayEventHandlerWithDownload<T extends Campaign> extends OverlayEventHandler<T> {
+export class OverlayEventHandlerWithDownloadSupport<T extends Campaign> extends OverlayEventHandler<T> {
 
     private _downloadHelper: IAppStoreDownloadHelper;
     private _overlay: AbstractVideoOverlay | undefined;
@@ -28,7 +28,7 @@ export class OverlayEventHandlerWithDownload<T extends Campaign> extends Overlay
 
     public onOverlayDownload(parameters: IVideoOverlayDownloadParameters): void {
         this.setCallButtonEnabled(false);
-        this._downloadHelper.download(parameters);
+        this._downloadHelper.onDownload(parameters);
 
         // TODO: Can this be here or before onDonwload, is event order ok?
         if(this._campaign instanceof PerformanceCampaign) {

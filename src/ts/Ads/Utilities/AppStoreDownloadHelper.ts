@@ -21,7 +21,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 
 export interface IAppStoreDownloadHelper {
-    download(parameters: IAppStoreDownloadParameters): void;
+    onDownload(parameters: IAppStoreDownloadParameters): void;
 }
 
 export interface IAppStoreDownloadHelperParameters {
@@ -70,7 +70,7 @@ export class AppStoreDownloadHelper  {
         this._adUnit = parameters.adUnit;
     }
 
-    public download(parameters: IAppStoreDownloadParameters): void {
+    public onDownload(parameters: IAppStoreDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
         const operativeEventParameters = this.getOperativeEventParams(parameters);
         this._operativeEventManager.sendClick(operativeEventParameters);

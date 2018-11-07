@@ -1,7 +1,7 @@
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { View } from 'Core/Views/View';
-import { IVideoOverlayDownloadParameters } from 'Ads/EventHandlers/OverlayEventHandlerWithDownload';
+import { IVideoOverlayDownloadParameters } from 'Ads/EventHandlers/OverlayEventHandlerWithDownloadSupport';
 
 export interface IOverlayHandler extends IGDPREventHandler {
     onOverlaySkip(position: number): void;

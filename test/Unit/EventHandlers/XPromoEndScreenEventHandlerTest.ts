@@ -155,7 +155,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
         });
 
         it('should call onDownload on AppStoreDownloadHelper', () => {
-            sinon.spy(downloadEventHandler, 'download');
+            sinon.spy(downloadEventHandler, 'onDownload');
 
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
@@ -165,7 +165,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.called(<sinon.SinonSpy>downloadEventHandler.download);
+            sinon.assert.called(<sinon.SinonSpy>downloadEventHandler.onDownload);
         });
 
         it('should send a click to HttpKafka', () => {
@@ -283,7 +283,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
         });
 
         it('should call onDownload on AppStoreDownloadHelper', () => {
-            sinon.spy(downloadEventHandler, 'download');
+            sinon.spy(downloadEventHandler, 'onDownload');
 
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
@@ -293,7 +293,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.called(<sinon.SinonSpy>downloadEventHandler.download);
+            sinon.assert.called(<sinon.SinonSpy>downloadEventHandler.onDownload);
         });
 
         it('should send a click to HttpKafka', () => {

@@ -2,10 +2,10 @@ import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { OverlayEventHandlerWithDownload } from 'Ads/EventHandlers/OverlayEventHandlerWithDownload';
+import { OverlayEventHandlerWithDownloadSupport } from 'Ads/EventHandlers/OverlayEventHandlerWithDownloadSupport';
 import { IAppStoreDownloadHelper } from 'Ads/Utilities/AppStoreDownloadHelper';
 
-export class XPromoOverlayEventHandler extends OverlayEventHandlerWithDownload<XPromoCampaign> {
+export class XPromoOverlayEventHandler extends OverlayEventHandlerWithDownloadSupport<XPromoCampaign> {
     private _xPromoAdUnit: XPromoAdUnit;
 
     constructor(nativeBridge: NativeBridge, adUnit: XPromoAdUnit, parameters: IXPromoAdUnitParameters, downloadHelper: IAppStoreDownloadHelper) {

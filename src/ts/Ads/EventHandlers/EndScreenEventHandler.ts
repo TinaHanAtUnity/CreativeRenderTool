@@ -30,7 +30,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     public onEndScreenDownload(parameters: IAppStoreDownloadParameters): void {
-        this._downloadHelper.download(parameters);
+        this._downloadHelper.onDownload(parameters);
     }
 
     public onEndScreenClose(): void {

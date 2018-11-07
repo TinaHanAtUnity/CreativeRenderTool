@@ -4,9 +4,9 @@ import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { IAppStoreDownloadHelper } from 'Ads/Utilities/AppStoreDownloadHelper';
-import { OverlayEventHandlerWithDownload } from 'Ads/EventHandlers/OverlayEventHandlerWithDownload';
+import { OverlayEventHandlerWithDownloadSupport } from 'Ads/EventHandlers/OverlayEventHandlerWithDownloadSupport';
 
-export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownload<PerformanceCampaign> {
+export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownloadSupport<PerformanceCampaign> {
 
     protected _performanceAdUnit: PerformanceAdUnit;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
