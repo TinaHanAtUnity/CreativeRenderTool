@@ -4,18 +4,15 @@ import { Session } from 'Ads/Models/Session';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Backend } from 'Backend/Backend';
 
-import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
+import { DisplayHTMLBannerAdUnit } from 'Banners/AdUnits/DisplayHTMLBannerAdUnit';
+import { IBannersApi } from 'Banners/Banners';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
-import { BannerApi } from 'Banners/Native/Banner';
-import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { IntentApi } from 'Core/Native/Android/Intent';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 
@@ -26,15 +23,17 @@ import * as sinon from 'sinon';
 
 import { asSpy, asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { IntentApi } from 'Core/Native/Android/Intent';
+import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe('BannerAdUnit', () => {
+    describe('DisplayHTMLBannerAdUnit', () => {
 
-        let adUnit: BannerAdUnit;
+        let adUnit: DisplayHTMLBannerAdUnit;
         let backend: Backend;
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
-        let banner: BannerApi;
+        let banners: IBannersApi;
         let deviceInfo: DeviceInfo;
         let placement: Placement;
         let campaign: BannerCampaign;
@@ -55,23 +54,21 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             backend = TestFixtures.getBackend(platform);
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
-            const banners = TestFixtures.getBannersApi(nativeBridge);
+
             if(platform === Platform.ANDROID) {
                 core.Android!.Intent = sinon.createStubInstance(IntentApi);
             }
             if(platform === Platform.IOS) {
                 core.iOS!.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
             }
-            banners.Listener = sinon.createStubInstance(BannerListenerApi);
 
-            banner = sinon.createStubInstance(BannerApi);
-            (<any>banner).onBannerAttachedState = new Observable1<boolean>();
-            (<any>banner).onBannerLoaded = new Observable0();
-            (<any>banner).onBannerOpened = new Observable0();
-            asStub(banner.load).callsFake(() => {
-                return Promise.resolve().then(() => banner.onBannerLoaded.trigger());
+            banners = TestFixtures.getBannersApi(nativeBridge);
+            (<any>banners.Banner).onBannerAttachedState = new Observable1<boolean>();
+            (<any>banners.Banner).onBannerLoaded = new Observable0();
+            (<any>banners.Banner).onBannerOpened = new Observable0();
+            sinon.stub(banners.Banner, 'load').callsFake(() => {
+                return Promise.resolve().then(() => banners.Banner.onBannerLoaded.trigger());
             });
-            banners.Banner = banner;
 
             if(platform === Platform.ANDROID) {
                 deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
@@ -97,9 +94,9 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             asStub(webPlayerContainer.setEventSettings).resolves();
             asStub(webPlayerContainer.setSettings).resolves();
 
-            adUnit = new BannerAdUnit({
-                platform: nativeBridge.getPlatform(),
-                core: core,
+            adUnit = new DisplayHTMLBannerAdUnit({
+                platform,
+                core,
                 campaign,
                 placement,
                 clientInfo,
@@ -114,7 +111,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     if(platform === Platform.ANDROID) {
                         describe('on android', () => {
                             it('should set the proper settings', () => {
-                                return adUnit.load().then(() => {
+                                return adUnit.onLoad().then(() => {
                                     sinon.assert.calledWith(asSpy(webPlayerContainer.setSettings), {
                                         'setJavaScriptCanOpenWindowsAutomatically': [true],
                                         'setSupportMultipleWindows': [false]
@@ -123,11 +120,10 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                             });
 
                             it('should set up banner events disallowing the shouldOverrideUrlLoading event', () => {
-                                return adUnit.load().then(() => {
+                                return adUnit.onLoad().then(() => {
                                     const call = asSpy(webPlayerContainer.setEventSettings).getCall(0);
                                     call.calledWith({
-                                        'onPageFinished': {'sendEvent': true},
-                                        'shouldOverrideUrlLoading': {'sendEvent': false, 'returnValue': true}
+                                        'onPageFinished': {'sendEvent': true}
                                     });
                                 });
                             });
@@ -136,7 +132,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     if(platform === Platform.IOS) {
                         describe('on iOS', () => {
                             it('should set the proper settings', () => {
-                                return adUnit.load().then(() => {
+                                return adUnit.onLoad().then(() => {
                                     sinon.assert.calledWith(asSpy(webPlayerContainer.setSettings), {
                                         'javaScriptCanOpenWindowsAutomatically': true,
                                         'scalesPagesToFit': true
@@ -144,11 +140,10 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                                 });
                             });
                             it('should set up banner events disallowing the createWindow event', () => {
-                                return adUnit.load().then(() => {
+                                return adUnit.onLoad().then(() => {
                                     const call = asSpy(webPlayerContainer.setEventSettings).getCall(0);
                                     call.calledWith({
-                                        'onPageFinished': {'sendEvent': true},
-                                        'onCreateWindow': {'sendEvent': false}
+                                        'onPageFinished': {'sendEvent': true}
                                     });
                                 });
                             });
@@ -159,10 +154,10 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
             describe('setting the markup', () => {
                 it('should set the markup within the banner player', () => {
-                    return adUnit.load().then(() => {
+                    return adUnit.onLoad().then(() => {
                         const tpl = new Template(BannerContainer);
                         const markup = tpl.render({
-                            markup: decodeURIComponent(campaign.getMarkup()!)
+                            markup: decodeURIComponent(campaign.getMarkup())
                         });
                         sinon.assert.calledWith(asSpy(webPlayerContainer.setData), markup, 'text/html', 'UTF-8');
                     });
@@ -172,10 +167,9 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     if(platform === Platform.ANDROID) {
                         describe('on android', () => {
                             it('should set up banner events with allowing the shouldOverrideUrlLoading event', () => {
-                                return adUnit.load().then(() => {
+                                return adUnit.onLoad().then(() => {
                                     const call = asSpy(webPlayerContainer.setEventSettings).getCall(1);
                                     sinon.assert.calledWith(call, {
-                                        'onPageFinished': {'sendEvent': true},
                                         'shouldOverrideUrlLoading': {'sendEvent': true, 'returnValue': true}
                                     });
                                 });
@@ -186,10 +180,9 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     if(platform === Platform.IOS) {
                         describe('on ios', () => {
                             it('should set up banner events with allowing the onCreateWindow event', () => {
-                                return adUnit.load().then(() => {
+                                return adUnit.onLoad().then(() => {
                                     const call = asSpy(webPlayerContainer.setEventSettings).getCall(1);
                                     sinon.assert.calledWith(call, {
-                                        'onPageFinished': {'sendEvent': true},
                                         'onCreateWindow': {'sendEvent': true}
                                     });
                                 });
@@ -204,7 +197,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             if(platform === Platform.IOS) {
                 describe('on iOS', () => {
                     it('should open the URL', () => {
-                        return adUnit.load().then(() => {
+                        return adUnit.onLoad().then(() => {
                             const url = 'http://unity3d.com';
                             webPlayerContainer.onCreateWebView.trigger(url);
                             sinon.assert.calledWith(asSpy(core.iOS!.UrlScheme.open), url);
@@ -216,7 +209,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             if(platform === Platform.ANDROID) {
                 describe('on Android', () => {
                     it('should launch an intent with the given URL', () => {
-                        return adUnit.load().then(() => {
+                        return adUnit.onLoad().then(() => {
                             const url = 'http://unity3d.com';
                             webPlayerContainer.shouldOverrideUrlLoading.trigger(url, 'GET');
                             sinon.assert.calledWith(asSpy(core.Android!.Intent.launch), {
@@ -231,8 +224,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
         describe('destroy', () => {
             it('should unsubscribe from the banner player override url loading observer', () => {
-                return adUnit.load()
-                    .then(() => adUnit.destroy())
+                return adUnit.onLoad()
+                    .then(() => adUnit.onDestroy())
                     .then(() => {
                         assert.equal((<any>webPlayerContainer.shouldOverrideUrlLoading)._observers.length, 0, 'Was still subscribed');
                     });

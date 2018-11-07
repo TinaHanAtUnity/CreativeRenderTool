@@ -4,17 +4,16 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export class SessionDiagnostics {
     public static trigger(type: string, error: {}, session: Session): Promise<INativeResponse> {
-        let modifiedError = error;
         // ElasticSearch schema generation can result in dropping errors if root values are not the same type across errors
-        if(!modifiedError || typeof modifiedError !== 'object' || Array.isArray(modifiedError)) {
-            modifiedError = {
-                value: modifiedError
+        if(!error || typeof error !== 'object' || Array.isArray(error)) {
+            error = {
+                value: error
             };
         }
 
         const kafkaObject: any = {};
         kafkaObject.type = type;
-        kafkaObject[type] = modifiedError;
+        kafkaObject[type] = error;
         kafkaObject.timestamp = Date.now();
         if (session.getAdPlan() !== undefined) {
             kafkaObject.adPlan = session.getAdPlan();

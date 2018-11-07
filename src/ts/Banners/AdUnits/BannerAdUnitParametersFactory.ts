@@ -4,9 +4,9 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { IBannerAdUnitParameters } from 'Banners/AdUnits/BannerAdUnit';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
+import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
 
 export class BannerAdUnitParametersFactory {
 

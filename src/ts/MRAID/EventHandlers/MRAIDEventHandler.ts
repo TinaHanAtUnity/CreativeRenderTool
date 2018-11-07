@@ -129,16 +129,15 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
                     });
                 }
             }).catch(error => {
-                let modifiedError = error;
-                if(modifiedError instanceof RequestError) {
-                    modifiedError = new DiagnosticError(new Error(modifiedError.message), {
+                if(error instanceof RequestError) {
+                    error = new DiagnosticError(new Error(error.message), {
                         request: error.nativeRequest,
                         auctionId: this._campaign.getSession().getId(),
                         url: this._campaign.getClickAttributionUrl(),
                         response: error.nativeResponse
                     });
                 }
-                Diagnostics.trigger('mraid_click_attribution_failed', modifiedError);
+                Diagnostics.trigger('mraid_click_attribution_failed', error);
             });
         } else {
             if (clickAttributionUrl) {

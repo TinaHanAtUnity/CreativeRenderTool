@@ -497,6 +497,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                     }
                     this._cameraPermissionPanel.style.display = 'block';
                     this._iframe.classList.add('mraid-iframe-camera-permission-dialog');
+                    this._gdprBanner.classList.add('mraid-container');
                 }
             });
         });
@@ -515,6 +516,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this.showMRAIDAd();
         this._cameraPermissionPanel.classList.add('hidden');
         this._iframe.classList.remove('mraid-iframe-camera-permission-dialog');
+        this._gdprBanner.classList.remove('mraid-container');
     }
 
     private onShowAr() {
