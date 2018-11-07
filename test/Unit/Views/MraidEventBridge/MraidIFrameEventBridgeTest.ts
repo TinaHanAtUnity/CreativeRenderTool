@@ -184,23 +184,5 @@ describe('MraidIframeEventBridge', () => {
                 sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeSetOrientationProperties, true, Orientation.LANDSCAPE);
             });
         });
-
-        xdescribe(`portrait ${MRAIDEvents.ORIENTATION} MRAID event`, () => {
-            const sendEvent = (e: string, data?: any) => {
-                return () => {
-                    return new Promise((res) => {
-                        window.postMessage({
-                            type: e,
-                            properties: data
-                        }, '*');
-                        setTimeout(res);
-                    });
-                };
-            };
-            beforeEach(sendEvent(MRAIDEvents.ORIENTATION, {allowOrientationChange: true, forceOrientation: 'portrait'}));
-            it(`should handle the ${MRAIDEvents.ORIENTATION} event`, () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeSetOrientationProperties, true, Orientation.PORTRAIT);
-            });
-        });
     });
 });
