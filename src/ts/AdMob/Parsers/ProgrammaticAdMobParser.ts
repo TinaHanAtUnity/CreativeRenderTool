@@ -36,13 +36,13 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 seatId: response.getSeatId() || undefined,
                 meta: undefined,
                 session: session,
-                mediaId: response.getMediaId()
+                mediaId: response.getMediaId(),
+                trackingUrls: response.getTrackingUrls()
             };
 
             const adMobCampaignParams: IAdMobCampaign = {
                 ... baseCampaignParams,
                 dynamicMarkup: markup,
-                trackingUrls: response.getTrackingUrls(),
                 useWebViewUserAgentForTracking: true,
                 video: video
             };

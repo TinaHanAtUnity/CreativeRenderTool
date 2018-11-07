@@ -32,13 +32,13 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
             seatId: response.getSeatId() || undefined,
             meta: undefined,
             session: session,
-            mediaId: response.getMediaId()
+            mediaId: response.getMediaId(),
+            trackingUrls: response.getTrackingUrls()
         };
 
         const displayInterstitialParams: IDisplayInterstitialCampaign = {
             ... baseCampaignParams,
             dynamicMarkup: dynamicMarkup,
-            trackingUrls: response.getTrackingUrls(),
             useWebViewUserAgentForTracking: false,
             width: response.getWidth() || undefined,
             height: response.getHeight() || undefined

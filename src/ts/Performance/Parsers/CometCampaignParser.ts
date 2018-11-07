@@ -66,7 +66,8 @@ export class CometCampaignParser extends CampaignParser {
             seatId: undefined,
             meta: json.meta,
             session: session,
-            mediaId: response.getMediaId()
+            mediaId: response.getMediaId(),
+            trackingUrls: response.getTrackingUrls()
         };
 
         if(json && json.mraidUrl) {
@@ -89,7 +90,7 @@ export class CometCampaignParser extends CampaignParser {
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 appStoreId: json.appStoreId,
-                trackingUrls: {},
+                trackingUrls: {}, // Overwrite unused tracking urls
                 playableConfiguration: undefined
             };
 
@@ -129,8 +130,7 @@ export class CometCampaignParser extends CampaignParser {
                 videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
-                adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle),
-                trackingUrls: response.getTrackingUrls()
+                adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle)
             };
 
             if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
