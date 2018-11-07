@@ -446,6 +446,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     public onBridgeAREvent(msg: MessageEvent) {
-        this.onAREvent(msg).catch((reason) => this._nativeBridge.Sdk.logError('AR message error: ' + reason.toString())); // --> ARMRAID
+        this.onAREvent(msg).catch((reason) => this._nativeBridge.Sdk.logError('AR message error: ' + reason.toString()));
     }
 }

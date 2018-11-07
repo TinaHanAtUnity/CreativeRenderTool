@@ -21,9 +21,9 @@ describe('MraidIframeEventBridge', () => {
             onBridgeAnalyticsEvent: sinon.spy(),
             onBridgeClose: sinon.spy(),
             onBridgeStateChange: sinon.spy(),
-            onBridgeResizeWebview: sinon.spy(), // add test for this
+            onBridgeResizeWebview: sinon.spy(),
             onBridgeSendStats: sinon.spy(),
-            onBridgeAREvent: sinon.spy() // add test for this
+            onBridgeAREvent: sinon.spy()
         };
         mraidBridge = new MraidIFrameEventBridge(nativeBridge, handler);
         iframe = document.createElement('iframe');
@@ -126,6 +126,27 @@ describe('MraidIframeEventBridge', () => {
             beforeEach(sendEvent(MRAIDEvents.SEND_STATS, 20, 10, 200));
             it(`should handle the ${MRAIDEvents.SEND_STATS} event`, () => {
                 sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeSendStats, 20, 10, 200);
+            });
+        });
+
+        describe(`${MRAIDEvents.AR} MRAID event`, () => {
+            const sendEvent = (e: string, functionName: string, args?: any) => {
+                return () => {
+                    return new Promise((res) => {
+                        window.postMessage({
+                            type: e,
+                            data: {
+                                functionName: functionName,
+                                args: args
+                            }
+                        }, '*');
+                        setTimeout(res);
+                    });
+                };
+            };
+            beforeEach(sendEvent(MRAIDEvents.AR, 'log'));
+            it(`should handle the ${MRAIDEvents.AR} event`, () => {
+                sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeAREvent, { data: { args: undefined, functionName: 'log' }, type: 'ar' });
             });
         });
 
