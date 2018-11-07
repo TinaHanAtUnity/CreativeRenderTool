@@ -4,7 +4,7 @@ import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { IAppStoreDownloadHelper } from 'Ads/Utilities/AppStoreDownloadHelper';
-import { OverlayEventHandlerWithDownloadSupport } from 'Ads/EventHandlers/OverlayEventHandlerWithDownloadSupport';
+import { OverlayEventHandlerWithDownloadSupport, IVideoOverlayDownloadParameters } from 'Ads/EventHandlers/OverlayEventHandlerWithDownloadSupport';
 
 export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownloadSupport<PerformanceCampaign> {
 
@@ -15,6 +15,11 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownl
         super(nativeBridge, adUnit, parameters, downloadHelper, parameters.adUnitStyle);
         this._performanceAdUnit = adUnit;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+    }
+
+    public onOverlayDownload(parameters: IVideoOverlayDownloadParameters): void {
+        super.onOverlayDownload(parameters);
+        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.CLICK);
     }
 
     public onOverlaySkip(position: number): void {

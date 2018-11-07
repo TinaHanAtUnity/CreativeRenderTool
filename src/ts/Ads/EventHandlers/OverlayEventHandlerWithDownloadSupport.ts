@@ -29,12 +29,6 @@ export class OverlayEventHandlerWithDownloadSupport<T extends Campaign> extends 
     public onOverlayDownload(parameters: IVideoOverlayDownloadParameters): void {
         this.setCallButtonEnabled(false);
         this._downloadHelper.onDownload(parameters);
-
-        // TODO: Can this be here or before onDonwload, is event order ok?
-        if(this._campaign instanceof PerformanceCampaign) {
-            this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.CLICK);
-        }
-
         this.onOverlaySkip(parameters.videoProgress);
         this.setCallButtonEnabled(true);
     }
