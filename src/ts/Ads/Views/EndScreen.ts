@@ -125,7 +125,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         if (GreenEndScreenButtonColorTest.isValid(this._abGroup)) {
             return '#83CD0C';
         }
-            return ctaButtonColor;
+        return ctaButtonColor;
     }
 
     public show(): void {
