@@ -147,6 +147,12 @@ $camera-permission-panel-height = 100vw;
 
   .gdpr-pop-up {
     $gdpr-pop-up($default-scale-size);
+  
+    &.mraid-container {
+      top: 100vw;
+      bottom: inherit;
+      z-index: 109;
+    }
   }
 
   .privacy-button {
@@ -259,6 +265,7 @@ $camera-permission-panel-height = 100vw;
     bottom: 0;
     left: 0;
     z-index: 105;
+    overflow: hidden;
     width: 100vw;
     height: inherit;
     background: $camera-permission-panel-color;
@@ -346,6 +353,14 @@ $camera-permission-panel-height = 100vw;
       &.mraid-iframe-camera-permission-dialog {
         width: 50vw;
         height: 100vh;
+      }
+    }
+
+    .gdpr-pop-up {
+      &.mraid-container {
+        top: inherit;
+        bottom: 0;
+        width: 50vw;
       }
     }
 
@@ -490,6 +505,12 @@ $camera-permission-panel-height = 100vw;
     .camera-permission-panel {
       top: 120vw;
     }
+
+    .gdpr-pop-up {
+      &.mraid-container {
+        top: 120vw;
+      }
+    }
   }
 }
 
@@ -503,6 +524,12 @@ $camera-permission-panel-height = 100vw;
 
     .camera-permission-panel {
       top: 100vw;
+    }
+
+    .gdpr-pop-up {
+      &.mraid-container {
+        top: 100vw;
+      }
     }
   }
 }
@@ -518,6 +545,12 @@ $camera-permission-panel-height = 100vw;
     .camera-permission-panel {
       top: 70vw;
     }
+
+    .gdpr-pop-up {
+      &.mraid-container {
+        top: 70vw;
+      }
+    }
   }
 }
 
@@ -532,6 +565,12 @@ $camera-permission-panel-height = 100vw;
     .camera-permission-panel {
       top: 100vw;
     }
+
+    .gdpr-pop-up {
+      &.mraid-container {
+        top: 100vw;
+      }
+    }
   }
 }
 
@@ -545,6 +584,12 @@ $camera-permission-panel-height = 100vw;
 
     .camera-permission-panel {
       top: 80vw;
+    }
+
+    .gdpr-pop-up {
+      &.mraid-container {
+        top: 80vw;
+      }
     }
   }
 }

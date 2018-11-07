@@ -27,9 +27,8 @@ describe('DiagnosticsTest', () => {
         }, Platform.TEST, false);
     });
 
-    after(() => {
+    afterEach(() => {
         HttpKafka.setRequest(undefined);
-        (<sinon.SinonStub>Date.now).restore();
     });
 
     it('should not allow primitives as root values', () => {
@@ -72,6 +71,7 @@ describe('DiagnosticsTest', () => {
         const request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
         resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
         sinon.stub(request, 'post').returns(resolvedPromise);
+        sinon.stub(Date, 'now').returns(123456);
         HttpKafka.setRequest(request);
 
         Diagnostics.trigger('test', {'test': true});
@@ -87,6 +87,7 @@ describe('DiagnosticsTest', () => {
 
         resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
         sinon.stub(request, 'post').returns(resolvedPromise);
+        sinon.stub(Date, 'now').returns(123456);
 
         const clientInfo = new ClientInfo(Platform.ANDROID, [
             '12345',

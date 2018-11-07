@@ -13,7 +13,6 @@ import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandle
 import { Platform } from 'Core/Constants/Platform';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
-import { PerformanceOverlayEventHandlerWithAllowSkip } from 'Performance/EventHandlers/PerformanceOverlayEventHandlerWithAllowSkip';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -47,11 +46,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
         let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
         const skipAllowed = parameters.placement.allowSkip();
 
-        if (!skipAllowed && CustomFeatures.allowSkipInRewardedVideos(parameters)) {
-            performanceOverlayEventHandler = new PerformanceOverlayEventHandlerWithAllowSkip(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
-        } else {
-            performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
-        }
+        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
 
         overlay.addEventHandler(performanceOverlayEventHandler);
         const endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
