@@ -74,7 +74,6 @@ export class AppStoreDownloadHelper  {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
         const operativeEventParameters = this.getOperativeEventParams(parameters);
         this._operativeEventManager.sendClick(operativeEventParameters);
-
         if (this._campaign instanceof XPromoCampaign) {
             const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
             for (const url of clickTrackingUrls) {
@@ -107,11 +106,11 @@ export class AppStoreDownloadHelper  {
     }
 
     private handleAppDownloadUrl(appDownloadUrl: string) {
-        const modifiedAppDownloadUrl = decodeURIComponent(appDownloadUrl);
+        appDownloadUrl = decodeURIComponent(appDownloadUrl);
 
         this._nativeBridge.Intent.launch({
             'action': 'android.intent.action.VIEW',
-            'uri': modifiedAppDownloadUrl
+            'uri': appDownloadUrl
         });
     }
 
@@ -185,17 +184,16 @@ export class AppStoreDownloadHelper  {
 
     private triggerDiagnosticsError(error: any, clickAttributionUrl: string) {
         const currentSession = this._campaign.getSession();
-        let diagnosticError = error;
 
         if (error instanceof RequestError) {
-            diagnosticError = new DiagnosticError(new Error(error.message), {
+            error = new DiagnosticError(new Error(error.message), {
                 request: error.nativeRequest,
                 auctionId: currentSession.getId(),
                 url: clickAttributionUrl,
                 response: error.nativeResponse
             });
         }
-        SessionDiagnostics.trigger('click_attribution_failed', diagnosticError, currentSession);
+        SessionDiagnostics.trigger('click_attribution_failed', error, currentSession);
     }
 
     private openAppStore(parameters: IAppStoreDownloadParameters, isAppSheetBroken?: boolean) {
