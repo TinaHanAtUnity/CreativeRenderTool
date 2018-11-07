@@ -46,7 +46,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
         let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
 
-        const downloadEventHandlerParameters: IAppStoreDownloadHelperParameters = {
+        const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
             thirdPartyEventManager: parameters.thirdPartyEventManager,
             operativeEventManager: parameters.operativeEventManager,
             deviceInfo: parameters.deviceInfo,
@@ -56,11 +56,11 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
             campaign: parameters.campaign,
             coreConfig: parameters.coreConfig
         };
-        const downloadEventHandler = new AppStoreDownloadHelper(nativeBridge, downloadEventHandlerParameters);
+        const downloadHelper = new AppStoreDownloadHelper(nativeBridge, downloadHelperParameters);
 
-        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
+        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters, downloadHelper);
         overlay.addEventHandler(performanceOverlayEventHandler);
-        const endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
+        const endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
         endScreen.addEventHandler(endScreenEventHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, performanceAdUnit, video, performanceAdUnitParameters.adUnitStyle, performanceAdUnitParameters);

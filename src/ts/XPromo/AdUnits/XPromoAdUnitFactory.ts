@@ -35,7 +35,7 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
 
         const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
 
-        const downloadEventHandlerParameters: IAppStoreDownloadHelperParameters = {
+        const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
             thirdPartyEventManager: parameters.thirdPartyEventManager,
             operativeEventManager: parameters.operativeEventManager,
             deviceInfo: parameters.deviceInfo,
@@ -46,11 +46,11 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
             coreConfig: parameters.coreConfig
         };
 
-        const downloadEventHandler = new AppStoreDownloadHelper(nativeBridge, downloadEventHandlerParameters);
+        const downloadHelper = new AppStoreDownloadHelper(nativeBridge, downloadHelperParameters);
 
-        const xPromoOverlayEventHandler = new XPromoOverlayEventHandler(nativeBridge, xPromoAdUnit, xPromoAdUnitParameters, downloadEventHandler);
+        const xPromoOverlayEventHandler = new XPromoOverlayEventHandler(nativeBridge, xPromoAdUnit, xPromoAdUnitParameters, downloadHelper);
         overlay.addEventHandler(xPromoOverlayEventHandler);
-        const endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadEventHandler);
+        const endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadHelper);
         endScreen.addEventHandler(endScreenEventHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, xPromoAdUnit, video, undefined, xPromoAdUnitParameters);

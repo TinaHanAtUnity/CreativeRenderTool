@@ -58,7 +58,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
-        let downloadEventHandler: AppStoreDownloadHelper;
+        let downloadHelper: AppStoreDownloadHelper;
 
         beforeEach(() => {
             nativeBridge = new NativeBridge({
@@ -139,7 +139,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
 
-            const downloadEventHandlerParameters: IAppStoreDownloadHelperParameters = {
+            const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
                 deviceInfo: deviceInfo,
@@ -149,13 +149,13 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 campaign: campaign,
                 coreConfig: coreConfig
             };
-            downloadEventHandler = new AppStoreDownloadHelper(nativeBridge, downloadEventHandlerParameters);
+            downloadHelper = new AppStoreDownloadHelper(nativeBridge, downloadHelperParameters);
 
-            endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadEventHandler);
+            endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadHelper);
         });
 
         it('should call onDownload on AppStoreDownloadHelper', () => {
-            sinon.spy(downloadEventHandler, 'onDownload');
+            sinon.spy(downloadHelper, 'onDownload');
 
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
@@ -165,7 +165,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.called(<sinon.SinonSpy>downloadEventHandler.onDownload);
+            sinon.assert.called(<sinon.SinonSpy>downloadHelper.onDownload);
         });
 
         it('should send a click to HttpKafka', () => {
@@ -188,7 +188,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
     describe('with onDownloadIos', () => {
         let resolvedPromise: Promise<INativeResponse>;
-        let downloadEventHandler: AppStoreDownloadHelper;
+        let downloadHelper: AppStoreDownloadHelper;
 
         beforeEach(() => {
             nativeBridge = new NativeBridge({
@@ -267,7 +267,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
 
-            const downloadEventHandlerParameters: IAppStoreDownloadHelperParameters = {
+            const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
                 deviceInfo: deviceInfo,
@@ -277,13 +277,13 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 campaign: campaign,
                 coreConfig: coreConfig
             };
-            downloadEventHandler = new AppStoreDownloadHelper(nativeBridge, downloadEventHandlerParameters);
+            downloadHelper = new AppStoreDownloadHelper(nativeBridge, downloadHelperParameters);
 
-            endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadEventHandler);
+            endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadHelper);
         });
 
         it('should call onDownload on AppStoreDownloadHelper', () => {
-            sinon.spy(downloadEventHandler, 'onDownload');
+            sinon.spy(downloadHelper, 'onDownload');
 
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
@@ -293,7 +293,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.called(<sinon.SinonSpy>downloadEventHandler.onDownload);
+            sinon.assert.called(<sinon.SinonSpy>downloadHelper.onDownload);
         });
 
         it('should send a click to HttpKafka', () => {

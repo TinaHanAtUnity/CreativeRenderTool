@@ -57,7 +57,7 @@ describe('EndScreenEventHandlerTest', () => {
     let placement: Placement;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
-    let downloadEventHandler: AppStoreDownloadHelper;
+    let downloadHelper: AppStoreDownloadHelper;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -139,7 +139,7 @@ describe('EndScreenEventHandlerTest', () => {
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
-            const downloadEventHandlerParameters: IAppStoreDownloadHelperParameters = {
+            const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
                 deviceInfo: deviceInfo,
@@ -149,8 +149,8 @@ describe('EndScreenEventHandlerTest', () => {
                 campaign: campaign,
                 coreConfig: coreConfig
             };
-            downloadEventHandler = new AppStoreDownloadHelper(nativeBridge, downloadEventHandlerParameters);
-            endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
+            downloadHelper = new AppStoreDownloadHelper(nativeBridge, downloadHelperParameters);
+            endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
         });
 
         it('should send a click with session manager', () => {
@@ -375,7 +375,7 @@ describe('EndScreenEventHandlerTest', () => {
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
-            const downloadEventHandlerParameters: IAppStoreDownloadHelperParameters = {
+            const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
                 deviceInfo: deviceInfo,
@@ -385,15 +385,15 @@ describe('EndScreenEventHandlerTest', () => {
                 campaign: campaign,
                 coreConfig: coreConfig
             };
-            downloadEventHandler = new AppStoreDownloadHelper(nativeBridge, downloadEventHandlerParameters);
-            endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
+            downloadHelper = new AppStoreDownloadHelper(nativeBridge, downloadHelperParameters);
+            endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
         });
 
         it('should send a click with session manager', () => {
             sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             performanceAdUnitParameters.deviceInfo = deviceInfo;
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
-            endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
+            endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
 
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
@@ -416,7 +416,7 @@ describe('EndScreenEventHandlerTest', () => {
                 sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
                 performanceAdUnitParameters.deviceInfo = deviceInfo;
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
-                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
+                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
 
                 campaign = TestFixtures.getCampaignFollowsRedirects();
                 campaign.set('store', StoreName.APPLE);
@@ -477,7 +477,7 @@ describe('EndScreenEventHandlerTest', () => {
                 performanceAdUnitParameters.deviceInfo = deviceInfo;
                 performanceAdUnitParameters.campaign = campaign;
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
-                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
+                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
 
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
@@ -510,7 +510,7 @@ describe('EndScreenEventHandlerTest', () => {
                 performanceAdUnitParameters.campaign = campaign;
 
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
-                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
+                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
 
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
@@ -532,7 +532,7 @@ describe('EndScreenEventHandlerTest', () => {
                 sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
                 performanceAdUnitParameters.deviceInfo = deviceInfo;
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
-                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
+                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
                 sinon.stub(campaign, 'getClickAttributionUrlFollowsRedirects').returns(false);
                 sinon.stub(campaign, 'getBypassAppSheet').returns(false);
                 sinon.stub(nativeBridge.AppSheet, 'canOpen').returns(Promise.resolve(true));

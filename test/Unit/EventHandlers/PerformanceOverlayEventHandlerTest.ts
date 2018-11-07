@@ -45,7 +45,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
     let request: Request;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
-    let downloadEventHandler: AppStoreDownloadHelper;
+    let downloadHelper: AppStoreDownloadHelper;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -120,7 +120,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
-        const downloadEventHandlerParameters: IAppStoreDownloadHelperParameters = {
+        const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
             deviceInfo: deviceInfo,
@@ -130,9 +130,9 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             campaign: campaign,
             coreConfig: coreConfig
         };
-        downloadEventHandler = new AppStoreDownloadHelper(nativeBridge, downloadEventHandlerParameters);
+        downloadHelper = new AppStoreDownloadHelper(nativeBridge, downloadHelperParameters);
 
-        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters, downloadEventHandler);
+        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters, downloadHelper);
     });
 
     describe('with onSkip', () => {
