@@ -463,12 +463,11 @@ export class TestFixtures {
     }
 
     public static getClientInfo(platform?: Platform, gameId?: string): ClientInfo {
-        let modifiedPlatform = platform;
-        if(typeof modifiedPlatform === 'undefined') {
-            modifiedPlatform = Platform.ANDROID;
+        if(typeof platform === 'undefined') {
+            platform = Platform.ANDROID;
         }
 
-        return new ClientInfo(modifiedPlatform, [
+        return new ClientInfo(platform, [
             gameId ? gameId : '12345',
             false,
             'com.unity3d.ads.example',
@@ -510,9 +509,8 @@ export class TestFixtures {
     }
 
     public static getNativeBridge(platform?: Platform): NativeBridge {
-        let modifiedPlatform = platform;
-        if(typeof modifiedPlatform === 'undefined') {
-            modifiedPlatform = Platform.TEST;
+        if(typeof platform === 'undefined') {
+            platform = Platform.TEST;
         }
         const backend = {
             handleInvocation: () => {
@@ -522,7 +520,7 @@ export class TestFixtures {
                 // no-op
             }
         };
-        return new NativeBridge(backend, modifiedPlatform);
+        return new NativeBridge(backend, platform);
     }
 
     public static getCoreConfiguration(): CoreConfiguration {
