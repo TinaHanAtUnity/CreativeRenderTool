@@ -17,8 +17,12 @@ export class PromoCampaignParser extends CampaignParser {
         const promoJson = response.getJsonContent();
 
         const creativeId = response.getCreativeId();
+        const seatId = response.getSeatId();
         if (creativeId) {
             CampaignManager.setCreativeId(creativeId);
+        }
+        if (seatId) {
+            CampaignManager.setSeatId(seatId);
         }
 
         let willExpireAt: number | undefined;

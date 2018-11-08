@@ -46,10 +46,14 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, campaignId: string, session: Session, response: AuctionResponse, connectionType?: string): Promise<Campaign> {
         const cacheTTL = response.getCacheTTL();
-        const creativeId = response.getCreativeId();
 
+        const creativeId = response.getCreativeId();
+        const seatId = response.getSeatId();
         if (creativeId) {
             CampaignManager.setCreativeId(creativeId);
+        }
+        if (seatId) {
+            CampaignManager.setSeatId(seatId);
         }
 
         const baseCampaignParams: ICampaign = {

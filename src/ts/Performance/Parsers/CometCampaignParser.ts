@@ -40,8 +40,12 @@ export class CometCampaignParser extends CampaignParser {
         const json = response.getJsonContent();
 
         const creativeId = response.getCreativeId();
+        const seatId = response.getSeatId();
         if (creativeId) {
             CampaignManager.setCreativeId(creativeId);
+        }
+        if (seatId) {
+            CampaignManager.setSeatId(seatId);
         }
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';

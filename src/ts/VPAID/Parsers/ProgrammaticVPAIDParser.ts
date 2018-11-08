@@ -27,8 +27,12 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
                 const cacheTTL = response.getCacheTTL();
 
                 const creativeId = response.getCreativeId();
+                const seatId = response.getSeatId();
                 if (creativeId) {
                     CampaignManager.setCreativeId(creativeId);
+                }
+                if (seatId) {
+                    CampaignManager.setSeatId(seatId);
                 }
 
                 const baseCampaignParams: ICampaign = {
