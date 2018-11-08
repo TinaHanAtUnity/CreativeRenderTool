@@ -109,6 +109,21 @@
             callNativeFunction('log', message);
         }
 
+        function getOS() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            if (/android/i.test(userAgent)) {
+                return 'Android';
+            }
+
+            // iOS detection from: http://stackoverflow.com/a/9039885/177710
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                return 'iOS';
+            }
+
+            return 'unknown';
+        }
+        const os = getOS();
+
         var nextDisplayId = 1000;
 
         var pixels = null;
@@ -1093,21 +1108,8 @@
                 WebARonARKitVRDisplay.projectionMatrix_[i] = data.projectionMatrix[i];
             }
 
-            // Did the native side pass the camera frame? Then update the image!
-            if (window.WebARonARKitSendsCameraFrames && data.cameraFrame !== "") {
-                WebARonARKitVRDisplay.passThroughCameraImage_.src = data.cameraFrame;
-                // The raf callbacks and the advance of the frame will be done once the
-                // image is loaded (see the image load event above)
-            }
-            else {
-                // Only on iOS and when there is no camera frame, call the raf callbacks
-                // and advance a frame
-                if (!window.ARCore) {
-                    callRafCallbacks();
-                    nativeAdvanceFrame();
-                }
-            }
-
+            callRafCallbacks();
+            nativeAdvanceFrame();
         };
 
         window.WebARonARKitDispatchARDisplayEvent = function(events) {
@@ -1339,7 +1341,9 @@
                 rafCallbacksCopy[i](performance.now());
             }
 
-            nativeSwapBuffers();
+            if (os === 'Android') {
+                nativeSwapBuffers();
+            }
         }
 
         oldRequestAnimationFrame(raf);
