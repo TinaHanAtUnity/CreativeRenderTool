@@ -7,7 +7,6 @@ import { UnityAds } from 'Backend/UnityAds';
 import { Platform } from 'Core/Constants/Platform';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
-import { assert } from 'chai';
 
 describe('IosIntegrationTest', () => {
 
