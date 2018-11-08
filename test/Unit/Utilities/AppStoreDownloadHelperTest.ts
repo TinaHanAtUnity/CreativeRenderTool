@@ -88,6 +88,5 @@ describe('AppStoreDownloadHelper', () => {
                 sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'xpromo click', campaign.getSession().getId(), trackingUrl);
             });
         });
-
     });
 });
