@@ -127,7 +127,7 @@ describe('ThirdPartyEventManagerTest', () => {
         ].forEach((event) =>
             it(`should send the tracking event: ${event}`, () => {
                 return thirdPartyEventManager.sendPerformanceTrackingEvent(campaign, event).then(() => {
-                    sinon.assert.calledWith(sendEventStub, event, campaign.getSession().getId(), campaign.getTrackingUrls()[event][0]);
+                    sinon.assert.calledWith(sendEventStub, event, campaign.getSession().getId(), campaign.getTrackingUrlsForEvent(event)[0]);
                 }).catch(() => {
                     assert.fail(`Tracking url was not sent for event: ${event}`);
                 });
