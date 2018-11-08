@@ -61,7 +61,8 @@ export class ProgrammaticVastParser extends CampaignParser {
             seatId: response.getSeatId() || undefined,
             meta: undefined,
             session: session,
-            mediaId: response.getMediaId()
+            mediaId: response.getMediaId(),
+            trackingUrls: response.getTrackingUrls() || {}
         };
 
         let errorTrackingUrl;
@@ -113,7 +114,6 @@ export class ProgrammaticVastParser extends CampaignParser {
             hasEndscreen: !!portraitAsset || !!landscapeAsset,
             portrait: portraitAsset,
             landscape: landscapeAsset,
-            trackingUrls: response.getTrackingUrls(),
             useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
             buyerId: response.getBuyerId() || undefined,
             appCategory: response.getCategory() || undefined,

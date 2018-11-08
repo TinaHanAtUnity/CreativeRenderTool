@@ -57,23 +57,17 @@ export class NativePromoEventHandler {
     private sendTrackingEvent(eventName: string, campaign: PromoCampaign): Promise<void> {
         return this._purchasing.CustomPurchasing.available().then((isAvailable) => {
             const sessionId = campaign.getSession().getId();
-            let trackingEvents;
-            if (campaign instanceof PromoCampaign) {
-                trackingEvents = campaign.getTrackingEventUrls();
-            }
-            if (trackingEvents) {
-                const trackingEventUrls = trackingEvents[eventName].map((value: string): string => {
-                    // add native flag true to designate native promo
-                    if (PromoEvents.purchaseHostnameRegex.test(value)) {
-                        return Url.addParameters(value, {'native': true, 'iap_service': !isAvailable});
-                    }
-                    return value;
-                });
-                if (trackingEventUrls) {
-                    for (const url of trackingEventUrls) {
-                        this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
-                    }
+            let trackingEventUrls = campaign.getTrackingUrlsForEvent(eventName);
+
+            trackingEventUrls = trackingEventUrls.map((value: string): string => {
+                // add native flag true to designate native promo
+                if (PromoEvents.purchaseHostnameRegex.test(value)) {
+                    return Url.addParameters(value, { 'native': true, 'iap_service': !isAvailable });
                 }
+                return value;
+            });
+            for (const url of trackingEventUrls) {
+                this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
             }
         });
     }

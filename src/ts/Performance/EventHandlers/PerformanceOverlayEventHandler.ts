@@ -6,7 +6,6 @@ import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser
 
 export class PerformanceOverlayEventHandler extends OverlayEventHandler<PerformanceCampaign> {
 
-    private _trackingUrls: {[key: string]: string[]};
     protected _performanceAdUnit: PerformanceAdUnit;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
 
@@ -14,7 +13,6 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandler<Performa
         super(adUnit, parameters, parameters.adUnitStyle);
         this._performanceAdUnit = adUnit;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
-        this._trackingUrls = parameters.campaign.getTrackingUrls();
     }
 
     public onOverlaySkip(position: number): void {

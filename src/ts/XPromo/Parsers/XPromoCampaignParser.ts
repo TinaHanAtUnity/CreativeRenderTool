@@ -49,7 +49,8 @@ export class XPromoCampaignParser extends CampaignParser {
             seatId: undefined,
             meta: json.meta,
             session: session,
-            mediaId: response.getMediaId()
+            mediaId: response.getMediaId(),
+            trackingUrls: response.getTrackingUrls() ? this.validateAndEncodeTrackingUrls(response.getTrackingUrls(), session) : {}
         };
 
         const parameters: IXPromoCampaign = {
@@ -67,7 +68,6 @@ export class XPromoCampaignParser extends CampaignParser {
             clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl, session) : undefined,
             clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
             bypassAppSheet: json.bypassAppSheet,
-            trackingUrls: response.getTrackingUrls() ? this.validateAndEncodeTrackingUrls(response.getTrackingUrls(), session) : undefined,
             videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
             store: storeName
         };
