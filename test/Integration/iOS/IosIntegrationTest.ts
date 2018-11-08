@@ -13,7 +13,6 @@ describe('IosIntegrationTest', () => {
 
     it('should handle happy path on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(10000);
-        assert(<any>true === false);
         let readyCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
