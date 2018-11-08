@@ -93,7 +93,6 @@ import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
-import { ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
 
 export class WebView {
 
@@ -429,11 +428,9 @@ export class WebView {
             return;
         }
 
-        if(campaign instanceof ProgrammaticCampaign) {
-            const trackingUrls = placement.getCurrentTrackingUrls();
-            if(trackingUrls) {
-                campaign.setTrackingUrls(trackingUrls);
-            }
+        const trackingUrls = placement.getCurrentTrackingUrls();
+        if(trackingUrls) {
+            campaign.setTrackingUrls(trackingUrls);
         }
 
         if (placement.getRealtimeData()) {
