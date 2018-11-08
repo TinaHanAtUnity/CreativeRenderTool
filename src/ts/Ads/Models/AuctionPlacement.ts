@@ -1,13 +1,15 @@
 import { Model } from 'Core/Models/Model';
+import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 
 export interface IAuctionPlacement {
     placementId: string;
     mediaId: string;
-    trackingUrls: { [eventName: string]: string[] } | undefined;
+    trackingUrls: ICampaignTrackingUrls | undefined;
 }
 
 export class AuctionPlacement extends Model<IAuctionPlacement> {
-    constructor(placementId: string, mediaId: string, trackingUrls?: { [eventName: string]: string[] }) {
+    // todo: once auction v5 is unconditionally adopoted, trackingUrls should no longer be optional
+    constructor(placementId: string, mediaId: string, trackingUrls?: ICampaignTrackingUrls) {
         super('AuctionPlacement', {
             placementId: ['string'],
             mediaId: ['string'],
@@ -27,7 +29,7 @@ export class AuctionPlacement extends Model<IAuctionPlacement> {
         return this.get('mediaId');
     }
 
-    public getTrackingUrls(): { [eventName: string]: string[] } | undefined {
+    public getTrackingUrls(): ICampaignTrackingUrls | undefined {
         return this.get('trackingUrls');
     }
 

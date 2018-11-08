@@ -56,7 +56,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('contentType', data.contentType);
         this.set('content', data.content);
         this.set('cacheTTL', data.cacheTTL);
-        this.set('trackingUrls', data.trackingUrls ? data.trackingUrls : {}); // todo: hack for auction v5 test
+        this.set('trackingUrls', data.trackingUrls ? data.trackingUrls : {}); // todo: hack for auction v5 test, trackingUrls should be removed from this model once auction v5 is unconditionally adopted
         this.set('adType', data.adType);
         this.set('creativeId', data.creativeId);
         this.set('seatId', data.seatId);

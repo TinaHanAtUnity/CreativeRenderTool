@@ -1,4 +1,4 @@
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
@@ -29,7 +29,8 @@ export class BackupCampaignManager {
         this._coreConfiguration = coreConfiguration;
     }
 
-    public storePlacement(placement: Placement, mediaId: string, trackingUrls?: { [eventName: string]: string[] }) {
+    // todo: once auction v5 is unconditionally adopoted, trackingUrls should not be optional
+    public storePlacement(placement: Placement, mediaId: string, trackingUrls?: ICampaignTrackingUrls) {
         // never store data when in test mode
         if(this._coreConfiguration.getTestMode()) {
             return;
@@ -111,7 +112,7 @@ export class BackupCampaignManager {
         });
     }
 
-    public loadTrackingUrls(placement: Placement): Promise<{ [eventName: string]: string[] } | undefined> {
+    public loadTrackingUrls(placement: Placement): Promise<ICampaignTrackingUrls | undefined> {
         return this.getString('backupcampaign.placement.' + placement.getId() + '.trackingurls').then(rawTrackingUrls => {
             return JSON.parse(rawTrackingUrls);
         }).catch(() => {

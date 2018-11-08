@@ -5,7 +5,7 @@ import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
@@ -77,7 +77,7 @@ export class CampaignManager {
     private static SessionId: string | undefined;
     private static Country: string | undefined;
 
-    public readonly onCampaign = new Observable3<string, Campaign, { [eventName: string]: string[] } | undefined>();
+    public readonly onCampaign = new Observable3<string, Campaign, ICampaignTrackingUrls | undefined>();
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable4<WebViewError, string[], string, Session | undefined>();
     public readonly onConnectivityError = new Observable1<string[]>();
@@ -386,7 +386,7 @@ export class CampaignManager {
 
                 if(mediaId) {
                     const trackingId: string = json.placements[placement].trackingId;
-                    let trackingUrls: { [eventName: string]: string[] } | undefined;
+                    let trackingUrls: ICampaignTrackingUrls | undefined;
                     if(trackingId) {
                         if(json.tracking[trackingId]) {
                             trackingUrls = json.tracking[trackingId];
@@ -397,6 +397,11 @@ export class CampaignManager {
                             }, session);
                             throw new Error('Invalid tracking ID ' + trackingId);
                         }
+                    } else {
+                        SessionDiagnostics.trigger('missing_auction_tracking_id', {
+                            mediaId: mediaId
+                        }, session);
+                        throw new Error('Missing tracking ID');
                     }
 
                     this._backupCampaignManager.storePlacement(this._adsConfig.getPlacement(placement), mediaId, trackingUrls);

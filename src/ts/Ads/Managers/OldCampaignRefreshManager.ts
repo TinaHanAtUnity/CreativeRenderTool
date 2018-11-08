@@ -3,7 +3,7 @@ import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
@@ -207,7 +207,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         return this._campaignManager.request();
     }
 
-    private onCampaign(placementId: string, campaign: Campaign, trackingUrls: { [eventName: string]: string[] } | undefined) {
+    private onCampaign(placementId: string, campaign: Campaign, trackingUrls: ICampaignTrackingUrls | undefined) {
         PurchasingUtilities.addCampaignPlacementIds(placementId, campaign);
         this._parsingErrorCount = 0;
         const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
@@ -335,7 +335,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         }
     }
 
-    private setCampaignForPlacement(placementId: string, campaign: Campaign | undefined, trackingUrls: { [eventName: string]: string[] } | undefined) {
+    private setCampaignForPlacement(placementId: string, campaign: Campaign | undefined, trackingUrls: ICampaignTrackingUrls | undefined) {
         const placement = this._configuration.getPlacement(placementId);
         if(placement) {
             placement.setCurrentCampaign(campaign);

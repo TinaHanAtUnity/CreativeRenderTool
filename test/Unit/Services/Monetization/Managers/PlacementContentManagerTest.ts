@@ -2,7 +2,7 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { assert } from 'chai';
 import { FinishState } from 'Core/Constants/FinishState';
@@ -42,7 +42,7 @@ describe('PlacementContentManager', () => {
         asStub(nativeBridge.Monetization.Listener.sendPlacementContentReady).resolves();
         asStub(nativeBridge.Monetization.Listener.sendPlacementContentStateChanged).resolves();
         campaignManager = sinon.createStubInstance(CampaignManager);
-        (<any>campaignManager).onCampaign = new Observable3<string, Campaign, { [eventName: string]: string[] } | undefined>();
+        (<any>campaignManager).onCampaign = new Observable3<string, Campaign, ICampaignTrackingUrls | undefined>();
         (<any>campaignManager).onNoFill = new Observable1<string>();
         (<any>nativeBridge.Purchasing).onIAPSendEvent = new Observable1<string>();
         placementManager = new PlacementManager(nativeBridge, configuration);
