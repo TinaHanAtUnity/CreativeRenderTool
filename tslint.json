@@ -42,7 +42,6 @@
     "no-for-in": false,
     "no-function-constructor-with-string-args": false,
     "promise-must-complete": false,
-    "array-type": [false, "array"],
     "prefer-array-literal": false,
     "max-classes-per-file": [false, 3],
     "no-string-based-set-timeout": false,
