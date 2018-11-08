@@ -1,3 +1,7 @@
+# Pending
+
+* Load square asset when constructing backup campaign [#7074](https://github.com/Applifier/unity-ads-webview/pull/7074)
+
 # Thu Nov  8 11:34:51 UTC 2018
 
 * Move trackingUrls to base Campaign model [#7053](https://github.com/Applifier/unity-ads-webview/pull/7053)
