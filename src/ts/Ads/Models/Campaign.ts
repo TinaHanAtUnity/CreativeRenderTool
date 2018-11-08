@@ -4,6 +4,8 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ISchema, Model } from 'Core/Models/Model';
 
+export type ICampaignTrackingUrls = { [key: string]: string[] };
+
 export interface ICampaign {
     id: string;
     willExpireAt: number | undefined;
@@ -14,6 +16,7 @@ export interface ICampaign {
     meta: string | undefined;
     session: Session;
     mediaId: string;
+    trackingUrls: ICampaignTrackingUrls;
 }
 
 export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
@@ -26,7 +29,8 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         seatId: ['number', 'undefined'],
         meta: ['string', 'undefined'],
         session: ['object'],
-        mediaId: ['string']
+        mediaId: ['string'],
+        trackingUrls: ['object']
     };
 
     constructor(name: string, schema: ISchema<T>, data: T) {
@@ -76,6 +80,22 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
 
     public getMediaId(): string {
         return this.get('mediaId');
+    }
+
+    public setTrackingUrls(trackingUrls: ICampaignTrackingUrls) {
+        this.set('trackingUrls', trackingUrls);
+    }
+
+    public getTrackingUrls(): ICampaignTrackingUrls {
+        return this.get('trackingUrls');
+    }
+
+    public getTrackingUrlsForEvent(event: string): string[] {
+        const urls = this.getTrackingUrls();
+        if (urls) {
+            return urls[event] || [];
+        }
+        return [];
     }
 
     public getDTO(): { [key: string]: any } {
