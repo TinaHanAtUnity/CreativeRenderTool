@@ -306,7 +306,7 @@ export class TestFixtures {
         return {
             ... baseCampaignParams,
             dynamicMarkup: json.content,
-            trackingUrls: json.display.tracking || undefined,
+            trackingUrls: json.display.tracking || {},
             useWebViewUserAgentForTracking: false,
             width: json.display.width || undefined,
             height: json.display.height || undefined
@@ -368,7 +368,7 @@ export class TestFixtures {
         };
         return {
             ... this.getCometCampaignBaseParams(session, json.promo.id, json.meta, adType),
-            trackingUrls: json.promo.tracking ? json.promo.tracking : undefined, // Overwrite tracking urls from comet campaign
+            trackingUrls: json.promo.tracking ? json.promo.tracking : {}, // Overwrite tracking urls from comet campaign
             dynamicMarkup: json.promo.dynamicMarkup,
             creativeAsset: new HTML(json.promo.creativeUrl, session),
             rewardedPromo: isRewardedPromo,
