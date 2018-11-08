@@ -4,11 +4,29 @@ import { Session } from 'Ads/Models/Session';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 
 export abstract class CampaignParser {
     public abstract parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign>;
+
+    protected _creativeID: string | undefined;
+    protected _seatID: number | undefined;
+
+    public alertCreativeService(parseError: any) {
+        if (this._creativeID && this._seatID) {
+                const kafkaObject: any = {};
+                kafkaObject.type = 'parse_error';
+                kafkaObject.creativeId = this._creativeID;
+                kafkaObject.seatId = this._seatID;
+                if (parseError.errorCode && parseError.message) {
+                    kafkaObject.errorCode = parseError.errorCode;
+                    kafkaObject.message = parseError.message;
+                }
+                HttpKafka.sendEvent('ads.creative.blocking', KafkaCommonObjectType.EMPTY, kafkaObject);
+        }
+    }
 
     protected getProgrammaticCampaignId(nativeBridge: NativeBridge): string {
         switch (nativeBridge.getPlatform()) {

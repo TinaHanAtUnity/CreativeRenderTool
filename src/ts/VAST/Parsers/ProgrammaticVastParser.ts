@@ -15,7 +15,6 @@ import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
 import { CampaignError } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 export class ProgrammaticVastParser extends CampaignParser {
     public static ContentType = CampaignContentTypes.ProgrammaticVast;
@@ -47,14 +46,8 @@ export class ProgrammaticVastParser extends CampaignParser {
     protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, campaignId: string, session: Session, response: AuctionResponse, connectionType?: string): Promise<Campaign> {
         const cacheTTL = response.getCacheTTL();
 
-        const creativeId = response.getCreativeId();
-        const seatId = response.getSeatId();
-        if (creativeId) {
-            CampaignManager.setCreativeId(creativeId);
-        }
-        if (seatId) {
-            CampaignManager.setSeatId(seatId);
-        }
+        this._creativeID = response.getCreativeId();
+        this._seatID = response.getSeatId();
 
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(nativeBridge),

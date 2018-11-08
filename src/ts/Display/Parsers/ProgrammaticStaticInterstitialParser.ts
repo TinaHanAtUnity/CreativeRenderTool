@@ -5,7 +5,6 @@ import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     public static ContentTypeHtml = 'programmatic/static-interstitial-html';
@@ -24,14 +23,8 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
         }
         const cacheTTL = response.getCacheTTL();
 
-        const creativeId = response.getCreativeId();
-        const seatId = response.getSeatId();
-        if (creativeId) {
-            CampaignManager.setCreativeId(creativeId);
-        }
-        if (seatId) {
-            CampaignManager.setSeatId(seatId);
-        }
+        this._creativeID = response.getCreativeId();
+        this._seatID = response.getSeatId();
 
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(nativeBridge),

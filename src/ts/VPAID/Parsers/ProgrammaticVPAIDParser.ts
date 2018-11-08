@@ -9,7 +9,6 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { IVPAIDCampaign, VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
     public static ContentType = CampaignContentTypes.ProgrammaticVpaid;
@@ -26,14 +25,8 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
 
                 const cacheTTL = response.getCacheTTL();
 
-                const creativeId = response.getCreativeId();
-                const seatId = response.getSeatId();
-                if (creativeId) {
-                    CampaignManager.setCreativeId(creativeId);
-                }
-                if (seatId) {
-                    CampaignManager.setSeatId(seatId);
-                }
+                this._creativeID = response.getCreativeId();
+                this._seatID = response.getSeatId();
 
                 const baseCampaignParams: ICampaign = {
                     id: this.getProgrammaticCampaignId(nativeBridge),

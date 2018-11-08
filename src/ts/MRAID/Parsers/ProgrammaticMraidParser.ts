@@ -7,7 +7,6 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 export class ProgrammaticMraidParser extends CampaignParser {
     public static ContentType = CampaignContentTypes.ProgrammaticMraid;
@@ -28,14 +27,8 @@ export class ProgrammaticMraidParser extends CampaignParser {
         const markup = decodeURIComponent(jsonMraid.markup);
         const cacheTTL = response.getCacheTTL();
 
-        const creativeId = response.getCreativeId();
-        const seatId = response.getSeatId();
-        if (creativeId) {
-            CampaignManager.setCreativeId(creativeId);
-        }
-        if (seatId) {
-            CampaignManager.setSeatId(seatId);
-        }
+        this._creativeID = response.getCreativeId();
+        this._seatID = response.getSeatId();
 
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(nativeBridge),

@@ -9,21 +9,14 @@ import { IPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { LimitedTimeOffer, ILimitedTimeOfferData } from 'Promo/Models/LimitedTimeOffer';
 import { ProductInfo, ProductInfoType, IProductInfo } from 'Promo/Models/ProductInfo';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 export class PromoCampaignParser extends CampaignParser {
     public static ContentType = 'purchasing/iap';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
         const promoJson = response.getJsonContent();
 
-        const creativeId = response.getCreativeId();
-        const seatId = response.getSeatId();
-        if (creativeId) {
-            CampaignManager.setCreativeId(creativeId);
-        }
-        if (seatId) {
-            CampaignManager.setSeatId(seatId);
-        }
+        this._creativeID = response.getCreativeId();
+        this._seatID = response.getSeatId();
 
         let willExpireAt: number | undefined;
         if (promoJson.expiry) {

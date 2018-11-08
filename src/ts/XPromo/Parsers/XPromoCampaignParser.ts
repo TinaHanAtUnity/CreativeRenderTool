@@ -8,21 +8,14 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 export class XPromoCampaignParser extends CampaignParser {
     public static ContentType = 'xpromo/video';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
         const json = response.getJsonContent();
 
-        const creativeId = response.getCreativeId();
-        const seatId = response.getSeatId();
-        if (creativeId) {
-            CampaignManager.setCreativeId(creativeId);
-        }
-        if (seatId) {
-            CampaignManager.setSeatId(seatId);
-        }
+        this._creativeID = response.getCreativeId();
+        this._seatID = response.getSeatId();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;

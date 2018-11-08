@@ -11,7 +11,6 @@ import { Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { VastParser } from 'VAST/Utilities/VastParser';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
@@ -19,14 +18,8 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
 
-        const creativeId = response.getCreativeId();
-        const seatId = response.getSeatId();
-        if (creativeId) {
-            CampaignManager.setCreativeId(creativeId);
-        }
-        if (seatId) {
-            CampaignManager.setSeatId(seatId);
-        }
+        this._creativeID = response.getCreativeId();
+        this._seatID = response.getSeatId();
 
         const platform = nativeBridge.getPlatform();
         const videoPromise = this.getVideoFromMarkup(markup, request, session, platform).catch((e) => {

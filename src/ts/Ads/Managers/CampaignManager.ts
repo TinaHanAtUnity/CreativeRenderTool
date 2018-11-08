@@ -53,14 +53,6 @@ export class CampaignManager {
         CampaignManager.SessionId = sessionId;
     }
 
-    public static setSeatId(seatId: number) {
-        CampaignManager.SeatId = seatId;
-    }
-
-    public static setCreativeId(creativeId: string) {
-        CampaignManager.CreativeId = creativeId;
-    }
-
     public static setCountry(country: string) {
         CampaignManager.Country = country;
     }
@@ -82,8 +74,6 @@ export class CampaignManager {
     private static CampaignId: string | undefined;
     private static SessionId: string | undefined;
     private static Country: string | undefined;
-    private static CreativeId: string | undefined;
-    private static SeatId: number | undefined;
 
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
@@ -401,6 +391,9 @@ export class CampaignManager {
             campaign.setMediaId(response.getMediaId());
 
             return this.setupCampaignAssets(response.getPlacements(), campaign, response.getContentType(), session);
+        }).catch((error) => {
+            parser.alertCreativeService(error);
+            throw error;
         });
     }
 
@@ -469,19 +462,6 @@ export class CampaignManager {
     }
 
     private handleParseCampaignError(contentType: string, campaignError: CampaignError, placementIds: string[], session?: Session): Promise<void> {
-
-        if (CampaignManager.CreativeId && CampaignManager.SeatId) {
-            const kafkaObject: any = {};
-            kafkaObject.type = 'parse_error';
-            kafkaObject.creativeId = CampaignManager.CreativeId;
-            kafkaObject.seatId = CampaignManager.SeatId;
-            if (campaignError.errorCode && campaignError.message) {
-                kafkaObject.errorCode = campaignError.errorCode;
-                kafkaObject.message = campaignError.message;
-            }
-
-            HttpKafka.sendEvent('ads.creative.blocking', KafkaCommonObjectType.EMPTY, kafkaObject);
-        }
 
         const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._nativeBridge, this._request);
         campaignErrorHandler.handleCampaignError(campaignError);
