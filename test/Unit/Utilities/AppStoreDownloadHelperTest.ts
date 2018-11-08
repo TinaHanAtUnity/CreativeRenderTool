@@ -64,7 +64,7 @@ describe('AppStoreDownloadHelper', () => {
             beforeEach(() => {
                 campaign = TestFixtures.getXPromoCampaign();
                 xPromoAdUnit = TestFixtures.getXPromoAdUnit();
-                downloadHelper = TestFixtures.getAppStoreDownloadHelper(campaign, xPromoAdUnit, thirdPartyEventManager);
+                downloadHelper = TestFixtures.getAppStoreDownloadHelper(campaign, xPromoAdUnit, thirdPartyEventManager, nativeBridge);
                 downloadParameters = TestFixtures.getAppStoreDownloadParameters(campaign);
             });
 

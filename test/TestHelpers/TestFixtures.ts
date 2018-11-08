@@ -615,7 +615,7 @@ export class TestFixtures {
     }
 
     public static getXPromoAdUnit(): XPromoAdUnit {
-        const parameters: IXPromoAdUnitParameters = <IXPromoAdUnitParameters>TestFixtures.getXPromoAdUnitParameters();
+        const parameters: IXPromoAdUnitParameters = TestFixtures.getXPromoAdUnitParameters();
         return new XPromoAdUnit(TestFixtures.getNativeBridge(), parameters);
     }
 
@@ -634,9 +634,7 @@ export class TestFixtures {
         };
     }
 
-    public static getAppStoreDownloadHelper(campaign: Campaign, adUnit: VideoAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge?: NativeBridge): AppStoreDownloadHelper {
-        nativeBridge = nativeBridge || TestFixtures.getNativeBridge();
-
+    public static getAppStoreDownloadHelper(campaign: Campaign, adUnit: VideoAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): AppStoreDownloadHelper {
         const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: TestFixtures.getOperativeEventManager(campaign),
