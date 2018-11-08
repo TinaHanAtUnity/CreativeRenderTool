@@ -60,20 +60,20 @@ export interface IWebPlayerEventSettings {
     onReceivedTouchIconUrl?: { sendEvent?: boolean; shouldCallSuper?: boolean };
     onShowCustomView?: { sendEvent?: boolean; shouldCallSuper?: boolean };
     onHideCustomView?: { sendEvent?: boolean; shouldCallSuper?: boolean };
-    onCreateWindow?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    onCreateWindow?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
     onRequestFocus?: { sendEvent?: boolean; shouldCallSuper?: boolean };
     onCloseWindow?: { sendEvent?: boolean; shouldCallSuper?: boolean };
-    onJsAlert?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
-    onJsConfirm?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
-    onJsPrompt?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
-    onConsoleMessage?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
-    onShowFileChooser?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
-    onDownloadStart?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
-    shouldOverrideUrlLoading?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    onJsAlert?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
+    onJsConfirm?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
+    onJsPrompt?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
+    onConsoleMessage?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
+    onShowFileChooser?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
+    onDownloadStart?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
+    shouldOverrideUrlLoading?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
     onPageCommitVisible?: { sendEvent?: boolean; shouldCallSuper?: boolean };
     shouldInterceptRequest?: { sendEvent?: boolean; shouldCallSuper?: boolean };
     onFormResubmission?: { sendEvent?: boolean; shouldCallSuper?: boolean };
-    shouldOverrideKeyEvent?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    shouldOverrideKeyEvent?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
     onUnhandledKeyEvent?: { sendEvent?: boolean; shouldCallSuper?: boolean };
 }
 

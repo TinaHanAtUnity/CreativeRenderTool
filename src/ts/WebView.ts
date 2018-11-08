@@ -365,23 +365,22 @@ export class WebView {
                 this._nativeBridge.Request.setConcurrentRequestCount(1);
             }
         }).catch(error => {
-            let modifiedError = error;
-            jaegerInitSpan.addAnnotation(modifiedError.message);
+            jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
-            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, modifiedError.message);
+            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
             if (this._jaegerManager) {
                 this._jaegerManager.stop(jaegerInitSpan);
             }
 
-            if(modifiedError instanceof ConfigError) {
-                modifiedError = { 'message': modifiedError.message, 'name': modifiedError.name };
-                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], modifiedError.message);
-            } else if(modifiedError instanceof Error && modifiedError.name === 'DisabledGame') {
+            if(error instanceof ConfigError) {
+                error = { 'message': error.message, 'name': error.name };
+                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
+            } else if(error instanceof Error && error.name === 'DisabledGame') {
                 return;
             }
 
-            this._nativeBridge.Sdk.logError(`Init error: ${JSON.stringify(modifiedError)}`);
-            Diagnostics.trigger('initialization_error', modifiedError);
+            this._nativeBridge.Sdk.logError(`Init error: ${JSON.stringify(error)}`);
+            Diagnostics.trigger('initialization_error', error);
         });
     }
 
@@ -408,6 +407,11 @@ export class WebView {
 
         if(!campaign) {
             this.showError(true, placementId, 'Campaign not found');
+            return;
+        }
+
+        if (campaign instanceof PromoCampaign && campaign.getRequiredAssets().length === 0) {
+            this._nativeBridge.Sdk.logError('Show invocation failed: No creatives found for promo campaign');
             return;
         }
 
