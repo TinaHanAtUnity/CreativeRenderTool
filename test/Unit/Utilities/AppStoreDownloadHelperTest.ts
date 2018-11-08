@@ -75,17 +75,16 @@ describe('AppStoreDownloadHelper', () => {
             });
 
             it('should not send a xpromo click when campaign has no tracking urls', () => {
+                sinon.stub(campaign, 'getTrackingUrlsForEvent').returns([]);
                 sinon.spy(thirdPartyEventManager, 'sendWithGet');
                 downloadHelper.onDownload(downloadParameters);
                 sinon.assert.notCalled(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet);
             });
 
             it('should send a xpromo click when campaign has tracking urls', () => {
-                const trackingUrl = 'http://fake-tracking-url.unity3d.com/';
-                sinon.stub(campaign, 'getTrackingUrlsForEvent').returns([trackingUrl]);
                 sinon.spy(thirdPartyEventManager, 'sendWithGet');
                 downloadHelper.onDownload(downloadParameters);
-                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'xpromo click', campaign.getSession().getId(), trackingUrl);
+                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'xpromo click', campaign.getSession().getId());
             });
         });
     });
