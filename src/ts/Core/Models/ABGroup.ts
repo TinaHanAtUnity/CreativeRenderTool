@@ -117,6 +117,6 @@ export const FakeEnabledABTest = new ABTest(GroupSixteen, GroupSeventeen);
 export const FakeDisabledABTest = new DisabledABTest(GroupSixteen, GroupSeventeen);
 
 // Actual AB Tests
-
+export const GreenEndScreenButtonColorTest = new ABTest(GroupEighteen, GroupNineteen);
 export const FPSCollectionTest = new ABTest(GroupSixteen);
 export const ExitSkipIconTest = new ABTest(GroupSixteen, GroupSeventeen);
