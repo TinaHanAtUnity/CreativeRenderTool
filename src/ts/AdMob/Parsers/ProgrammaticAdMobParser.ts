@@ -43,13 +43,13 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 seatId: response.getSeatId() || undefined,
                 meta: undefined,
                 session: session,
-                mediaId: response.getMediaId()
+                mediaId: response.getMediaId(),
+                trackingUrls: response.getTrackingUrls() || {}
             };
 
             const adMobCampaignParams: IAdMobCampaign = {
                 ... baseCampaignParams,
                 dynamicMarkup: markup,
-                trackingUrls: response.getTrackingUrls(),
                 useWebViewUserAgentForTracking: true,
                 video: video
             };
@@ -123,8 +123,9 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         return new VastParser().parseVast(xml);
     }
 
-    private sanitizeXML(xml: string): string {
-        return this.replaceHexChars(xml).replace(/\\n/g, '');
+    private sanitizeXML(xml: string) {
+        xml = this.replaceHexChars(xml);
+        return xml.replace(/\\n/g, '');
     }
 
     private replaceHexChars(str: string) {
