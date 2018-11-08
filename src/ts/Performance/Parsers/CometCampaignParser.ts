@@ -90,7 +90,6 @@ export class CometCampaignParser extends CampaignParser {
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 appStoreId: json.appStoreId,
-                trackingUrls: {}, // Overwrite unused tracking urls
                 playableConfiguration: undefined
             };
 
