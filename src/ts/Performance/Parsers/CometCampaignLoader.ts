@@ -22,6 +22,10 @@ export class CometCampaignLoader extends CampaignLoader {
             campaign.gameIcon = this.loadImage(campaign.gameIcon, campaign.session);
         }
 
+        if(campaign.squareImage) {
+            campaign.squareImage = this.loadImage(campaign.squareImage, campaign.session);
+        }
+
         if(campaign.landscapeImage) {
             campaign.landscapeImage = this.loadImage(campaign.landscapeImage, campaign.session);
         }
