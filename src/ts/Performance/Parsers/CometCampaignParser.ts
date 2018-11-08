@@ -66,7 +66,8 @@ export class CometCampaignParser extends CampaignParser {
             seatId: undefined,
             meta: json.meta,
             session: session,
-            mediaId: response.getMediaId()
+            mediaId: response.getMediaId(),
+            trackingUrls: response.getTrackingUrls() || {}
         };
 
         if(json && json.mraidUrl) {
@@ -89,7 +90,6 @@ export class CometCampaignParser extends CampaignParser {
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 appStoreId: json.appStoreId,
-                trackingUrls: {},
                 playableConfiguration: undefined
             };
 
@@ -120,16 +120,16 @@ export class CometCampaignParser extends CampaignParser {
                 gameIcon: new Image(this.validateAndEncodeUrl(json.gameIcon, session), session),
                 rating: json.rating,
                 ratingCount: json.ratingCount,
-                landscapeImage: new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session),
-                portraitImage: new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session),
+                landscapeImage: json.endScreenLandscape ? new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session) : undefined,
+                portraitImage: json.endScreenPortrait ? new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session) : undefined,
+                squareImage: json.endScreen ? new Image(this.validateAndEncodeUrl(json.endScreen, session), session) : undefined,
                 clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl, session) : undefined,
                 clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
                 clickUrl: this.validateAndEncodeUrl(json.clickUrl, session),
                 videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
-                adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle),
-                trackingUrls: response.getTrackingUrls()
+                adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle)
             };
 
             if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {

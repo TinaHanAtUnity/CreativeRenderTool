@@ -182,6 +182,18 @@ export class Cache {
                 headers = [['Range', 'bytes=' + fileInfo.size + '-']];
             }
 
+            // note: Emergency hack to prevent file URLs from crashing Android native SDK.
+            // File URLs should not get this far and they should be rejected earlier.
+            // Once validation is fixed, this hack should probably be removed.
+            if(url.substring(0, 7) === 'file://') {
+                Diagnostics.trigger('rejected_cache_file_url', {
+                    url: url,
+                    fileId: fileId
+                });
+                this.fulfillCallback(url, CacheStatus.FAILED);
+                return;
+            }
+
             this._nativeBridge.Cache.download(url, fileId, headers, append).catch(error => {
                 const callback = this._callbacks[url];
                 if(callback) {

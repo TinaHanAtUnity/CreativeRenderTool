@@ -1,19 +1,19 @@
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { Campaign } from 'Ads/Models/Campaign';
-import { BannerAdUnit, IBannerAdUnitParameters } from 'Banners/AdUnits/BannerAdUnit';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
+import { DisplayHTMLBannerAdUnit } from 'Banners/AdUnits/DisplayHTMLBannerAdUnit';
+import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
 
 export class BannerAdUnitFactory {
-    public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): BannerAdUnit {
+    public static createAdUnit(nativeBridge: NativeBridge, parameters: IBannerAdUnitParameters): IBannerAdUnit {
         if (parameters.campaign instanceof BannerCampaign) {
-            return this.createBannerAdUnit(nativeBridge, <IAdUnitParameters<BannerCampaign>>parameters);
+            return this.createBannerAdUnit(nativeBridge, parameters);
         } else {
             throw new Error('Unknown campaign instance type');
         }
     }
 
-    private static createBannerAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<BannerCampaign>): BannerAdUnit {
-        return new BannerAdUnit(nativeBridge, <IBannerAdUnitParameters>parameters);
+    private static createBannerAdUnit(nativeBridge: NativeBridge, parameters: IBannerAdUnitParameters): IBannerAdUnit {
+        return new DisplayHTMLBannerAdUnit(nativeBridge, parameters);
     }
 }

@@ -3,6 +3,7 @@ import { RequestError } from 'Core/Errors/RequestError';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 const enum RequestStatus {
     COMPLETE,
@@ -130,6 +131,16 @@ export class Request {
     }
 
     public get(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
+        // note: Emergency hack to prevent file URLs from crashing Android native SDK.
+        // File URLs should not get this far and they should be rejected earlier.
+        // Once validation is fixed, this hack should probably be removed.
+        if(url.substring(0, 7) === 'file://') {
+            Diagnostics.trigger('rejected_get_file_url', {
+                url: url
+            });
+            return Promise.reject(RequestStatus.FAILED);
+        }
+
         const id = Request._callbackId++;
         const promise = this.registerCallback(id);
         this.invokeRequest(id, {
@@ -143,6 +154,16 @@ export class Request {
     }
 
     public post(url: string, data: string = '', headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
+        // note: Emergency hack to prevent file URLs from crashing Android native SDK.
+        // File URLs should not get this far and they should be rejected earlier.
+        // Once validation is fixed, this hack should probably be removed.
+        if(url.substring(0, 7) === 'file://') {
+            Diagnostics.trigger('rejected_post_file_url', {
+                url: url
+            });
+            return Promise.reject(RequestStatus.FAILED);
+        }
+
         headers.push(['Content-Type', 'application/json']);
 
         const id = Request._callbackId++;
@@ -159,6 +180,15 @@ export class Request {
     }
 
     public head(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
+        // note: Emergency hack to prevent file URLs from crashing Android native SDK.
+        // File URLs should not get this far and they should be rejected earlier.
+        // Once validation is fixed, this hack should probably be removed.
+        if(url.substring(0, 7) === 'file://') {
+            Diagnostics.trigger('rejected_head_file_url', {
+                url: url
+            });
+            return Promise.reject(RequestStatus.FAILED);
+        }
 
         // fix for Android 4.0 and older, https://code.google.com/p/android/issues/detail?id=24672
         if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 16) {
@@ -182,16 +212,15 @@ export class Request {
         let redirectCount = 0;
         return new Promise((resolve, reject) => {
             const makeRequest = (requestUrl: string) => {
-                let modifiedRequestUrl = requestUrl;
                 redirectCount++;
-                modifiedRequestUrl = modifiedRequestUrl.trim();
+                requestUrl = requestUrl.trim();
                 if (redirectCount >= Request._redirectLimit) {
                     reject(new Error('redirect limit reached'));
-                } else if (modifiedRequestUrl.indexOf('http') === -1) {
+                } else if (requestUrl.indexOf('http') === -1) {
                     // market:// or itunes:// urls can be opened directly
-                    resolve(modifiedRequestUrl);
+                    resolve(requestUrl);
                 } else {
-                    this.head(modifiedRequestUrl).then((response: INativeResponse) => {
+                    this.head(requestUrl).then((response: INativeResponse) => {
                         if (Request.is3xxRedirect(response.responseCode)) {
                             const location = Request.getHeader(response.headers, 'location');
                             if (location) {
@@ -200,12 +229,12 @@ export class Request {
                                 reject(new Error(`${response.responseCode} response did not have a "Location" header`));
                             }
                         } else if (Request.is2xxSuccessful(response.responseCode)) {
-                            resolve(modifiedRequestUrl);
+                            resolve(requestUrl);
                         } else {
                             if (resolveOnHttpError) {
-                                resolve(modifiedRequestUrl);
+                                resolve(requestUrl);
                             } else {
-                                reject(new Error(`Request to ${modifiedRequestUrl} failed with status ${response.responseCode}`));
+                                reject(new Error(`Request to ${requestUrl} failed with status ${response.responseCode}`));
                             }
                         }
                     }).catch(reject);

@@ -23,11 +23,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _localization: Localization;
 
-    private _closeElement: HTMLElement;
     private _loadingScreen: HTMLElement;
     private _iframe: HTMLIFrameElement;
-    private _gdprBanner: HTMLElement;
-    private _privacyButton: HTMLElement;
     private _cameraPermissionPanel: HTMLElement;
     private _permissionLearnMorePanel: HTMLElement;
 
@@ -37,17 +34,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _deviceorientationListener: any;
     private _loadingScreenTimeout: any;
     private _prepareTimeout: any;
-    private _updateInterval: any;
-
-    private _canClose = false;
-    private _canSkip = false;
-    private _didReward = false;
-
-    private _closeRemaining: number;
-    private _showTimestamp: number;
-    private _playableStartTimestamp: number;
-    private _backgroundTime: number = 0;
-    private _backgroundTimestamp: number;
 
     private _arFrameUpdatedObserver: IObserver1<string>;
     private _arPlanesAddedObserver: IObserver1<string>;
@@ -72,25 +58,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._template = new Template(PlayableMRAIDTemplate, this._localization);
 
-        this._bindings = [
-            {
-                event: 'click',
-                listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.close-region'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.privacy-button'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => {
-                    this.onGDPRPopupEvent(event);
-                    this.choosePrivacyShown();
-                },
-                selector: '.gdpr-link'
-            },
+        this._bindings = this._bindings.concat([
             {
                 event: 'click',
                 listener: (event: Event) => {
@@ -126,21 +94,18 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 },
                 selector: '.hide-learn-more-button'
             }
-        ];
+        ]);
     }
 
     public render(): void {
         super.render();
 
-        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
         this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen-ar');
 
         this._cameraPermissionPanel = <HTMLElement>this._container.querySelector('.camera-permission-panel');
         this._permissionLearnMorePanel = <HTMLElement>this._container.querySelector('.permissions-learn-more');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
 
         ARUtil.isARSupported(this._nativeBridge).then(arSupported => {
             let container = MRAIDContainer;
@@ -183,8 +148,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
         window.addEventListener('message', this._messageListener, false);
-
-        this.choosePrivacyShown();
     }
 
     public setViewableState(viewable: boolean): void {
@@ -195,14 +158,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }, '*');
         }
 
-        // background time for analytics
-        if(!viewable) {
-            this._backgroundTimestamp = Date.now();
-        } else {
-            if (this._backgroundTimestamp) {
-                this._backgroundTime += Date.now() - this._backgroundTimestamp;
-            }
-        }
+        this.setAnalyticsBackgroundTime(viewable);
     }
 
     public show(): void {
@@ -218,8 +174,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     public hide() {
-        this.setViewableState(false);
-
         if (this._arFrameUpdatedObserver) {
             this._nativeBridge.AR.onFrameUpdated.unsubscribe(this._arFrameUpdatedObserver);
             this._nativeBridge.AR.onPlanesAdded.unsubscribe(this._arPlanesAddedObserver);
@@ -240,11 +194,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }
         }
 
-        if(this._messageListener) {
-            window.removeEventListener('message', this._messageListener, false);
-            this._messageListener = undefined;
-        }
-
         if(this._loadingScreenTimeout) {
             clearTimeout(this._loadingScreenTimeout);
             this._loadingScreenTimeout = undefined;
@@ -255,22 +204,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._prepareTimeout = undefined;
         }
 
-        if(this._updateInterval) {
-            clearInterval(this._updateInterval);
-            this._updateInterval = undefined;
-        }
         super.hide();
-    }
 
-    protected choosePrivacyShown(): void {
-        if (this._showGDPRBanner && !this._gdprPopupClicked) {
-            this._gdprBanner.style.visibility = 'visible';
-            this._privacyButton.style.pointerEvents = '1';
-            this._privacyButton.style.visibility = 'hidden';
-        } else {
-            this._privacyButton.style.visibility = 'visible';
-            this._gdprBanner.style.pointerEvents = '1';
-            this._gdprBanner.style.visibility = 'hidden';
+        if(this._messageListener) {
+            window.removeEventListener('message', this._messageListener, false);
+            this._messageListener = undefined;
         }
     }
 
@@ -344,32 +282,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private updateProgressCircle(container: HTMLElement, value: number) {
-        const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
-
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
-            wrapperElement.style.display = 'none';
-            this._container.style.display = 'none';
-            /* tslint:disable:no-unused-expression */
-            this._container.offsetHeight;
-            /* tslint:enable:no-unused-expression */
-            this._container.style.display = 'block';
-            return;
-        }
-
-        const leftCircleElement = <HTMLElement>container.querySelector('.circle-left');
-        const rightCircleElement = <HTMLElement>container.querySelector('.circle-right');
-
-        const degrees = value * 360;
-        leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
-
-        if(value >= 0.5) {
-            wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
-            rightCircleElement.style.webkitAnimationName = 'right-spin';
-        }
-    }
-
-    private onCloseEvent(event: Event): void {
+    protected onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
 
@@ -388,6 +301,16 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, 'ar_' + eventName)) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, undefined));
+        }
+    }
+
+    protected sendMraidAnalyticsEvent(eventName: string, eventData?: any): void {
+        const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
+        const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
+        const backgroundTime = this._backgroundTime / 1000;
+
+        if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, eventName)) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
         }
     }
 
@@ -489,49 +412,19 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private onMessage(event: MessageEvent) {
         switch(event.data.type) {
             case 'open':
-                this._handlers.forEach(handler => handler.onMraidClick(encodeURI(event.data.url)));
+                this.onOpen(encodeURI(event.data.url));
                 break;
             case 'close':
-                this._handlers.forEach(handler => handler.onMraidClose());
+                this.onClose();
                 break;
             case 'orientation':
-                let forceOrientation = Orientation.NONE;
-                switch(event.data.properties.forceOrientation) {
-                    case 'portrait':
-                        forceOrientation = Orientation.PORTRAIT;
-                        break;
-
-                    case 'landscape':
-                        forceOrientation = Orientation.LANDSCAPE;
-                        break;
-
-                    default:
-                }
-                this._handlers.forEach(handler => handler.onMraidOrientationProperties({
-                    allowOrientationChange: event.data.properties.allowOrientationChange,
-                    forceOrientation: forceOrientation
-                }));
+                this.onSetOrientationProperties(event.data.properties.allowOrientationChange, event.data.properties.forceOrientation);
                 break;
             case 'analyticsEvent':
-                const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
-                const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
-                const backgroundTime = this._backgroundTime / 1000;
-
-                if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, event.data.event)) {
-                    this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
-                }
+                this.sendMraidAnalyticsEvent(event.data.event, event.data.eventData);
                 break;
             case 'customMraidState':
-                switch(event.data.state) {
-                    case 'completed':
-                        if(!this._placement.allowSkip() && this._closeRemaining > 5) {
-                            this._closeRemaining = 5;
-                        }
-                        break;
-                    case 'showEndScreen':
-                        break;
-                    default:
-                }
+                this.onCustomState(event.data.state);
                 break;
             case 'ar':
                 this.onAREvent(event).catch((reason) => this._nativeBridge.Sdk.logError('AR message error: ' + reason.toString()));
@@ -598,6 +491,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                         requestPermissionText.style.display = 'none';
                     }
                     this._cameraPermissionPanel.style.display = 'block';
+                    this._iframe.classList.add('mraid-iframe-camera-permission-dialog');
+                    this._gdprBanner.classList.add('mraid-container');
                 }
             });
         });
@@ -615,6 +510,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this.showMRAIDAd();
         this._cameraPermissionPanel.classList.add('hidden');
+        this._iframe.classList.remove('mraid-iframe-camera-permission-dialog');
+        this._gdprBanner.classList.remove('mraid-container');
     }
 
     private onShowAr() {

@@ -2,15 +2,17 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHandler';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
-import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { ABGroup } from 'Core/Models/ABGroup';
+import {
+    ABGroup,
+    GreenEndScreenButtonColorTest
+} from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
-import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
+import { Platform } from 'Core/Constants/Platform';
 
 export interface IEndScreenParameters {
     nativeBridge: NativeBridge;
@@ -55,13 +57,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._campaignId = parameters.campaignId;
         this._osVersion = parameters.osVersion;
 
-        this._template = new Template(this.getTemplate(), this._localization);
-
         this._bindings = [
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .download-container, .game-icon'
+                selector: '.game-background, .download-container, .game-icon, .game-image'
             },
             {
                 event: 'click',
@@ -93,24 +93,39 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     public render(): void {
         super.render();
-
         if (this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
-        }
-
-        const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
-        if (ctaButtonColor) {
-            (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
         }
 
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
+            document.documentElement.classList.add(endScreenAlt);
         }
 
         if (this._showGDPRBanner) {
             this._container.classList.add('show-gdpr-banner');
         }
+
+        let ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
+
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            if (this._nativeBridge.getApiLevel() <= 19) {   // Android <= 4.4.4
+                this._container.classList.add('old-androids');
+            }
+            ctaButtonColor = this.overrideButtonColor(ctaButtonColor);
+        }
+
+        if (ctaButtonColor) {
+            (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
+        }
+    }
+
+    private overrideButtonColor(ctaButtonColor: string | undefined): string | undefined {
+        if (GreenEndScreenButtonColorTest.isValid(this._abGroup)) {
+            return '#83CD0C';
+        }
+        return ctaButtonColor;
     }
 
     public show(): void {
@@ -160,8 +175,12 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         // do nothing
     }
 
-    protected getEndscreenAlt(campaign?: Campaign) {
+    protected getEndscreenAlt(): string | undefined {
         return undefined;
+    }
+
+    protected getTemplate() {
+        return EndScreenTemplate;
     }
 
     protected abstract onDownloadEvent(event: Event): void;
@@ -180,9 +199,5 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         this._privacy.show();
-    }
-
-    private getTemplate() {
-        return EndScreenTemplate;
     }
 }

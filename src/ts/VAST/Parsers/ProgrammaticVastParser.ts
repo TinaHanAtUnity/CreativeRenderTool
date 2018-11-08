@@ -30,7 +30,9 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
-
+        if(response.isMediaExperiment() && response.isMediaExperiment() === true) {
+            this._isMediaExperiment = true;
+        }
         if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
             this._vastParser.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
         }
@@ -53,7 +55,8 @@ export class ProgrammaticVastParser extends CampaignParser {
             seatId: response.getSeatId() || undefined,
             meta: undefined,
             session: session,
-            mediaId: response.getMediaId()
+            mediaId: response.getMediaId(),
+            trackingUrls: response.getTrackingUrls() || {}
         };
 
         let errorTrackingUrl;
@@ -80,7 +83,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         }
 
         let mediaVideoUrl = vast.getMediaVideoUrl();
-        if (this._isMediaExperiment && connectionType) {    // TODO: ab test with auction feature flag
+        if (this._isMediaExperiment) {
             mediaVideoUrl = VastMediaSelector.getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
         }
 
@@ -105,7 +108,6 @@ export class ProgrammaticVastParser extends CampaignParser {
             hasEndscreen: !!portraitAsset || !!landscapeAsset,
             portrait: portraitAsset,
             landscape: landscapeAsset,
-            trackingUrls: response.getTrackingUrls(),
             useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
             buyerId: response.getBuyerId() || undefined,
             appCategory: response.getCategory() || undefined,
