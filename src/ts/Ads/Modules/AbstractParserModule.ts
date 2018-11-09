@@ -1,29 +1,23 @@
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 
-export interface IParserModule {
-    getParsers(): CampaignParser[];
-    getAdUnitFactories(): { [key: string]: AbstractAdUnitFactory };
+export interface IContentTypeHandler {
+    parser: CampaignParser;
+    factory: AbstractAdUnitFactory;
 }
 
-export abstract class AbstractParserModule implements IParserModule {
+export type ContentTypeHandlerMapType = { [key: string]: IContentTypeHandler };
 
-    protected readonly _parsers: CampaignParser[];
-    protected readonly _factories: { [key: string]: AbstractAdUnitFactory };
+export abstract class AbstractParserModule {
 
-    protected constructor(parsers: CampaignParser[], factories: { [key: string]: AbstractAdUnitFactory }) {
-        this._parsers = parsers;
-        this._factories = factories;
+    protected readonly _contentTypeHandlerMap: ContentTypeHandlerMapType;
+
+    protected constructor(contentTypeHandlerMap: ContentTypeHandlerMapType) {
+        this._contentTypeHandlerMap = contentTypeHandlerMap;
     }
 
-    public getParsers(): CampaignParser[] {
-        const parsers = [];
-        for(const contentType in this._contentTypeHandlerMap) {
-            if(this._contentTypeHandlerMap.hasOwnProperty(contentType)) {
-                parsers.push(this._contentTypeHandlerMap[contentType].parser);
-            }
-        }
-        return parsers;
+    public getContentTypeHandlerMap(): ContentTypeHandlerMapType {
+        return this._contentTypeHandlerMap;
     }
 
 }

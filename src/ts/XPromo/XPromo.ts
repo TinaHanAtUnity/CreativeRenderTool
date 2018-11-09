@@ -8,7 +8,7 @@ export class XPromo extends AbstractParserModule {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         contentTypeHandlerMap[XPromoCampaignParser.ContentType] = {
             parser: new XPromoCampaignParser(),
-            adUnitFactory: new XPromoAdUnitFactory()
+            factory: new XPromoAdUnitFactory()
         };
         super(contentTypeHandlerMap);
     }

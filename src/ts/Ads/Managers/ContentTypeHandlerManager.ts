@@ -1,24 +1,18 @@
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { IContentTypeHandler } from 'Ads/Modules/AbstractParserModule';
 
 export class ContentTypeHandlerManager {
 
     private _parsers: { [key: string]: CampaignParser } = {};
     private _factories: { [key: string]: AbstractAdUnitFactory } = {};
 
-    public addParser(contentType: string, parser: CampaignParser) {
-        if(!(contentType in this._parsers)) {
-            this._parsers[contentType] = parser;
+    public addHandler(contentType: string, handler: IContentTypeHandler) {
+        if(!(contentType in this._parsers) && !(contentType in this._factories)) {
+            this._parsers[contentType] = handler.parser;
+            this._factories[contentType] = handler.factory;
         } else {
-            throw new Error('Parser already defined for: ' + contentType);
-        }
-    }
-
-    public addFactory(contentType: string, factory: AbstractAdUnitFactory) {
-        if(!(contentType in this._factories)) {
-            this._factories[contentType] = factory;
-        } else {
-            throw new Error('AdUnitFactory already defined for: ' + contentType);
+            throw new Error('Handler already defined for content-type: ' + contentType);
         }
     }
 

@@ -6,14 +6,14 @@ export class Display extends AbstractParserModule {
 
     constructor() {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
-        const adUnitFactory = new DisplayInterstitialAdUnitFactory();
+        const factory = new DisplayInterstitialAdUnitFactory();
         contentTypeHandlerMap[ProgrammaticStaticInterstitialParser.ContentTypeHtml] = {
             parser: new ProgrammaticStaticInterstitialParser(false),
-            adUnitFactory
+            factory
         };
         contentTypeHandlerMap[ProgrammaticStaticInterstitialParser.ContentTypeJs] = {
             parser: new ProgrammaticStaticInterstitialParser(true),
-            adUnitFactory
+            factory
         };
         super(contentTypeHandlerMap);
     }

@@ -8,7 +8,7 @@ export class VPAID extends AbstractParserModule {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         contentTypeHandlerMap[ProgrammaticVPAIDParser.ContentType] = {
             parser: new ProgrammaticVPAIDParser(),
-            adUnitFactory: new VPAIDAdUnitFactory()
+            factory: new VPAIDAdUnitFactory()
         };
         super(contentTypeHandlerMap);
     }

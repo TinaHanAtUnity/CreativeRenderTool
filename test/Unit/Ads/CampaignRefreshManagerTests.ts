@@ -7,7 +7,7 @@ import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { ContentTypeHandlerManager } from 'ContentTypeHandlerManager.ts';
+import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';

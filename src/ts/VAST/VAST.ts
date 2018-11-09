@@ -8,7 +8,7 @@ export class VAST extends AbstractParserModule {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         contentTypeHandlerMap[ProgrammaticVastParser.ContentType] = {
             parser: new ProgrammaticVastParser(),
-            adUnitFactory: new VastAdUnitFactory()
+            factory: new VastAdUnitFactory()
         };
         super(contentTypeHandlerMap);
     }

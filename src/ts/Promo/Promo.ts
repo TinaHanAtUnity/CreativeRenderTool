@@ -25,7 +25,7 @@ export class Promo extends AbstractParserModule implements IPromo {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         contentTypeHandlerMap[PromoCampaignParser.ContentType] = {
             parser: new PromoCampaignParser(),
-            adUnitFactory: new PromoAdUnitFactory()
+            factory: new PromoAdUnitFactory()
         };
         super(contentTypeHandlerMap);
 

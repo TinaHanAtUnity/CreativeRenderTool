@@ -7,14 +7,14 @@ export class MRAID extends AbstractParserModule {
 
     constructor() {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
-        const adUnitFactory = new MRAIDAdUnitFactory();
+        const factory = new MRAIDAdUnitFactory();
         contentTypeHandlerMap[ProgrammaticMraidParser.ContentType] = {
             parser: new ProgrammaticMraidParser(),
-            adUnitFactory
+            factory
         };
         contentTypeHandlerMap[ProgrammaticMraidUrlParser.ContentType] = {
             parser: new ProgrammaticMraidUrlParser(),
-            adUnitFactory
+            factory
         };
         super(contentTypeHandlerMap);
     }

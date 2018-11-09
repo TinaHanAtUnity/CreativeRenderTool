@@ -10,11 +10,11 @@ export class Performance extends AbstractParserModule {
         const parser = new CometCampaignParser();
         contentTypeHandlerMap[CometCampaignParser.ContentType] = {
             parser,
-            adUnitFactory: new PerformanceAdUnitFactory()
+            factory: new PerformanceAdUnitFactory()
         };
         contentTypeHandlerMap[CometCampaignParser.ContentTypeMRAID] = {
             parser,
-            adUnitFactory: new MRAIDAdUnitFactory()
+            factory: new MRAIDAdUnitFactory()
         };
         super(contentTypeHandlerMap);
     }

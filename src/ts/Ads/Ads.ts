@@ -9,7 +9,7 @@ import { IAds, IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { ContentTypeHandlerManager } from 'ContentTypeHandlerManager.ts';
+import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
@@ -54,7 +54,6 @@ import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { CallbackStatus, INativeCallback } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { MetaData } from 'Core/Utilities/MetaData';
 import { Promises, TimeoutError } from 'Core/Utilities/Promises';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Display } from 'Display/Display';
@@ -96,8 +95,6 @@ export class Ads implements IAds {
     private _creativeUrl?: string;
     private _requestDelay: number;
     private _wasRealtimePlacement: boolean = false;
-
-    private _adUnitFactories: { [key: string]: AbstractAdUnitFactory } = {};
 
     private _core: ICore;
 
@@ -174,29 +171,27 @@ export class Ads implements IAds {
             const parserModules = [AdMob, Display, MRAID, Performance, VAST, VPAID, XPromo];
             parserModules.forEach(moduleConstructor => {
                 const module = new moduleConstructor();
-                const parsers = module.getParsers();
-                this.CampaignParserManager.addParsers(parsers);
-                parsers.forEach(parser => {
-                    parser.getContentTypes().forEach(contentType => {
-                        this._adUnitFactories[contentType] = module.getAdUnitFactory(contentType);
-                    });
-                });
+                const contentTypeHandlerMap = module.getContentTypeHandlerMap();
+                for(const contentType in contentTypeHandlerMap) {
+                    if(contentTypeHandlerMap.hasOwnProperty(contentType)) {
+                        this.ContentTypeHandlerManager.addHandler(contentType, contentTypeHandlerMap[contentType]);
+                    }
+                }
             });
 
             const promo = new Promo(this._core, this, this._core.Purchasing, this._core.Analytics);
-            const promoParsers = promo.getParsers();
-            this.CampaignParserManager.addParsers(promoParsers);
-            promoParsers.forEach(parser => {
-                parser.getContentTypes().forEach(contentType => {
-                    this._adUnitFactories[contentType] = promo.getAdUnitFactory(contentType);
-                });
-            });
+            const promoContentTypeHandlerMap = promo.getContentTypeHandlerMap();
+            for(const contentType in promoContentTypeHandlerMap) {
+                if(promoContentTypeHandlerMap.hasOwnProperty(contentType)) {
+                    this.ContentTypeHandlerManager.addHandler(contentType, promoContentTypeHandlerMap[contentType]);
+                }
+            }
 
             this.Banners = new Banners(this._core, this, this._core.Analytics);
             this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
             this.AR = new AR(this._core);
 
-            this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.CampaignParserManager, this._core.JaegerManager, this.BackupCampaignManager);
+            this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this._core.JaegerManager, this.BackupCampaignManager);
             this.RefreshManager = new OldCampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
 
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
@@ -441,7 +436,7 @@ export class Ads implements IAds {
 
     private getAdUnitFactory(campaign: Campaign) {
         const contentType = campaign.getContentType();
-        return this._adUnitFactories[contentType];
+        return this.ContentTypeHandlerManager.getFactory(contentType);
     }
 
     private showError(sendFinish: boolean, placementId: string, errorMsg: string): void {
