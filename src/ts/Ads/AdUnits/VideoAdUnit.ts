@@ -115,7 +115,8 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public showAd(): void {
-        console.log('showAd');
+        this.prepareOverlay();
+
         this.setShowingAd(true);
         if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
             if(this.getVideo().isCached()) {
