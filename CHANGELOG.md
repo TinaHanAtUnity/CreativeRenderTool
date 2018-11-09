@@ -1,4 +1,4 @@
-# Pending
+# Thu Nov  8 14:32:20 UTC 2018
 
 * Load square asset when constructing backup campaign [#7074](https://github.com/Applifier/unity-ads-webview/pull/7074)
 
