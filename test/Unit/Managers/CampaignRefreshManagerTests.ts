@@ -79,16 +79,23 @@ export class TestContainer extends AdUnitContainer {
 }
 
 export class TestAdUnit extends AbstractAdUnit {
+
+    public open(): Promise<void> {
+        return Promise.resolve();
+    }
     public show(): Promise<void> {
         return Promise.resolve();
     }
     public hide(): Promise<void> {
         return Promise.resolve();
     }
+    public showAd(): void {
+
+    }
     public description(): string {
         return 'TestAdUnit';
     }
-    public isShowing() {
+    public isShowingAd() {
         return true;
     }
     public isCached() {

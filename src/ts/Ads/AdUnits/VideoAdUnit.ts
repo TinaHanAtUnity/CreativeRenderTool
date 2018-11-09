@@ -78,18 +78,16 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     public abstract onVideoError(): void;
 
     public open(): Promise<void> {
-        this.setShowing(true);
         this.setActive(true);
 
         this._container.addEventHandler(this);
-
-        return this._container.open(this, ['videoplayer', 'webview'], true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options).then(() => {
+        return this.openContainer(this, ['videoplayer', 'webview'], true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options).then(() => {
             this.onStart.trigger();
         });
     }
 
     public show(): Promise<void> {
-        this.setShowing(true);
+        this.setShowingAd(true);
         this.setActive(true);
 
         this._container.addEventHandler(this);
@@ -100,11 +98,11 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public hide(): Promise<void> {
-        if(!this.isShowing()) {
+        if(!this.isShowingAd()) {
             return Promise.resolve();
         }
 
-        this.setShowing(false);
+        this.setShowingAd(false);
         this.hideChildren();
         this.unsetReferences();
 
@@ -114,6 +112,20 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         return this._container.close().then(() => {
             this.onClose.trigger();
         });
+    }
+
+    public showAd(): void {
+        console.log('showAd');
+        this.setShowingAd(true);
+        if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
+            if(this.getVideo().isCached()) {
+                this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
+            } else {
+                this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
+            }
+        }
+
+        this.prepareVideo();
     }
 
     public setVideoState(videoState: VideoState): void {
@@ -173,7 +185,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public onContainerShow(): void {
-        if(this.isShowing() && this.isActive()) {
+        if(this.isShowingAd() && this.isActive()) {
             if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
                 if(this.getVideo().isCached()) {
                     this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
@@ -187,7 +199,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public onContainerDestroy(): void {
-        if(this.isShowing()) {
+        if(this.isShowingAd()) {
             this.setActive(false);
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
@@ -195,7 +207,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public onContainerBackground(): void {
-        if(this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+        if(this.isShowingAd() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
             this.setActive(false);
             this.setFinishState(FinishState.SKIPPED);
             this.setVideoState(VideoState.SKIPPED);
@@ -203,7 +215,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             return;
         }
 
-        if(this.isShowing() && this.getContainer().isPaused()) {
+        if(this.isShowingAd() && this.getContainer().isPaused()) {
             this.setActive(false);
             if(this.canShowVideo()) {
                 this.setVideoState(VideoState.PAUSED);
@@ -223,7 +235,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public onContainerForeground(): void {
-        if(this.isShowing() && !this.isActive() && !this.getContainer().isPaused()) {
+        if(this.isShowingAd() && !this.isActive() && !this.getContainer().isPaused()) {
             this.setActive(true);
             /*
                 Check if we can show the video and if the video is paused.
@@ -244,13 +256,13 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
         switch(message) {
             case AdUnitContainerSystemMessage.MEMORY_WARNING:
-                if(this.isShowing()) {
+                if(this.isShowingAd()) {
                     this._lowMemory = true;
                 }
                 break;
 
             case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_BEGAN:
-                if(this.isShowing() && this.isActive() && this.getVideoState() === VideoState.PLAYING) {
+                if(this.isShowingAd() && this.isActive() && this.getVideoState() === VideoState.PLAYING) {
                     this.setVideoState(VideoState.PAUSED);
                     this._nativeBridge.VideoPlayer.pause();
                 }
@@ -258,7 +270,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
             case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_ENDED:
             case AdUnitContainerSystemMessage.AUDIO_SESSION_ROUTE_CHANGED:
-                if(this.isShowing() && this.isActive() && this.canPlayVideo()) {
+                if(this.isShowingAd() && this.isActive() && this.canPlayVideo()) {
                     this.setVideoState(VideoState.PLAYING);
                     this._nativeBridge.VideoPlayer.play();
                 }

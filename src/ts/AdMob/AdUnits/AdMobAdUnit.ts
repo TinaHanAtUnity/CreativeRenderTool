@@ -55,7 +55,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public show(): Promise<void> {
         this._requestToViewTime = Date.now() - SdkStats.getAdRequestTimestamp();
-        this.setShowing(true);
+        this.setShowingAd(true);
 
         this.sendTrackingEvent('show');
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
@@ -84,6 +84,10 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.hideView();
         this._container.removeEventHandler(this);
         return this._container.close();
+    }
+
+    public showAd(): void {
+        // todo
     }
 
     public description(): string {
@@ -171,14 +175,14 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public onContainerBackground(): void {
         this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
 
-        if (this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+        if (this.isShowingAd() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
     }
 
     public onContainerDestroy(): void {
-        if (this.isShowing()) {
+        if (this.isShowingAd()) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
@@ -203,7 +207,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private onHide() {
-        this.setShowing(false);
+        this.setShowingAd(false);
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
 

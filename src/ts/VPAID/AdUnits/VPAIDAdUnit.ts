@@ -81,6 +81,10 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._closer.choosePrivacyShown();
     }
 
+    public open(): Promise<void> {
+        return Promise.resolve();
+    }
+
     public show(): Promise<void> {
         this.onShow();
         return this.setupWebPlayer().then(() => {
@@ -90,6 +94,10 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 this.onStart.trigger();
             });
         });
+    }
+
+    public showAd(): void {
+        // todo
     }
 
     public hide(): Promise<void> {
@@ -148,7 +156,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerShow(): void {
-        this.setShowing(true);
+        this.setShowingAd(true);
         this.onContainerForeground();
     }
 
@@ -159,7 +167,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public onContainerBackground(): void {
         this._view.pauseAd();
 
-        if (this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+        if (this.isShowingAd() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
             this.hide();
         }
     }
@@ -264,7 +272,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private onShow() {
         this._timer.start();
-        this.setShowing(true);
+        this.setShowingAd(true);
 
         this._container.addEventHandler(this);
     }
@@ -275,7 +283,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
 
         this._timer.stop();
-        this.setShowing(false);
+        this.setShowingAd(false);
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
         this._webPlayerContainer.shouldOverrideUrlLoading.unsubscribe(this._urlLoadingObserver);

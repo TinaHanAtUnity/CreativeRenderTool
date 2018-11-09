@@ -126,7 +126,7 @@ describe('DisplayInterstitialAdUnitTest', () => {
         });
 
         afterEach(() => {
-            if(adUnit.isShowing()) {
+            if(adUnit.isShowingAd()) {
                 adUnit.hide();
             }
             sandbox.restore();

@@ -10,7 +10,7 @@ export class MRAIDEndScreenEventHandler extends EndScreenEventHandler<MRAIDCampa
     }
 
     public onKeyEvent(keyCode: number): void {
-        if (keyCode === KeyCode.BACK && this._adUnit.isShowing() && !this._adUnit.isShowingMRAID()) {
+        if (keyCode === KeyCode.BACK && this._adUnit.isShowingAd() && !this._adUnit.isShowingMRAID()) {
             this._adUnit.hide();
         }
     }

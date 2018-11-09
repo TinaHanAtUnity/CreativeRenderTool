@@ -8,6 +8,10 @@ export class TestAdUnit extends AbstractAdUnit {
         super(nativeBridge, parameters);
     }
 
+    public open(): Promise<void> {
+        return Promise.resolve();
+    }
+
     public show(): Promise<void> {
         return Promise.resolve();
     }
@@ -16,7 +20,7 @@ export class TestAdUnit extends AbstractAdUnit {
         return Promise.resolve();
     }
 
-    public isShowing(): boolean {
+    public isShowingAd(): boolean {
         return false;
     }
 
@@ -26,5 +30,9 @@ export class TestAdUnit extends AbstractAdUnit {
 
     public isCached(): boolean {
         return false;
+    }
+
+    public showAd(): void {
+        // todo
     }
 }

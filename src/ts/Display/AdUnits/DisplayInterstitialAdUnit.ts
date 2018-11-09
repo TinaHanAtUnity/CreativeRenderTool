@@ -61,7 +61,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         document.body.appendChild(this._view.container());
 
         this._options = parameters.options;
-        this.setShowing(false);
+        this.setShowingAd(false);
 
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._topWebViewAreaHeight = Math.floor(this.getAndroidViewSize(this._topWebViewAreaMinHeight, this.getScreenDensity()));
@@ -70,8 +70,12 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         }
     }
 
+    public open(): Promise<void> {
+        return Promise.resolve();
+    }
+
     public show(): Promise<void> {
-        this.setShowing(true);
+        this.setShowingAd(true);
         this._onPageStartedObserver = this._webPlayerContainer.onPageStarted.subscribe((url) => this.onPageStarted(url));
         this._shouldOverrideUrlLoadingObserver = this._webPlayerContainer.shouldOverrideUrlLoading.subscribe((url: string, method: string) => this.shouldOverrideUrlLoading(url, method));
 
@@ -89,11 +93,11 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     }
 
     public hide(): Promise<void> {
-        if(!this.isShowing()) {
+        if(!this.isShowingAd()) {
             return Promise.resolve();
         }
 
-        this.setShowing(false);
+        this.setShowingAd(false);
         this._container.removeEventHandler(this);
 
         this._webPlayerContainer.onPageStarted.unsubscribe(this._onPageStartedObserver);
@@ -111,6 +115,10 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
                 this.onClose.trigger();
             });
         });
+    }
+
+    public showAd(): void {
+        // todo
     }
 
     public description(): string {
@@ -139,13 +147,13 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     }
 
     public onContainerDestroy(): void {
-        if(this.isShowing()) {
+        if(this.isShowingAd()) {
             this.onClose.trigger();
         }
     }
 
     public onContainerBackground(): void {
-        if(this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+        if(this.isShowingAd() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
             this.hide();
         }
         // EMPTY

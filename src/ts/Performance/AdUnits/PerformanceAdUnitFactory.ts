@@ -13,10 +13,13 @@ import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandle
 import { Platform } from 'Core/Constants/Platform';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
+import { GDPRConsent } from 'Ads/Views/GDPRConsent';
+import { GDPRConsentHandler } from "../../Ads/EventHandlers/GDPRConsentHandler";
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
     public createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
+        const gdprConsent = new GDPRConsent({nativeBridge: nativeBridge});
         const privacy = this.createPrivacy(nativeBridge, parameters);
         const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose();
         const overlay = this.createOverlay(nativeBridge, parameters, privacy, showPrivacyDuringVideo);
@@ -38,7 +41,8 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
             overlay: overlay,
             endScreen: endScreen,
             adUnitStyle: adUnitStyle,
-            privacy: privacy
+            privacy: privacy,
+            gdprConsentView: gdprConsent
         };
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -70,6 +74,8 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
             });
         }
         Privacy.setupReportListener(privacy, performanceAdUnit);
+
+        gdprConsent.addEventHandler(new GDPRConsentHandler(performanceAdUnit, parameters));
 
         return performanceAdUnit;
     }
