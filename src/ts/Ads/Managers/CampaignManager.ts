@@ -170,7 +170,7 @@ export class CampaignManager {
 
                     if(AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
                         return this.parseAuctionV5Campaigns(response).catch((e) => {
-                            this.handleError(e, this._adsConfig.getPlacementIds(), 'parse_campaigns_error');
+                            this.handleError(e, this._adsConfig.getPlacementIds(), 'parse_auction_v5_campaigns_error');
                         });
                     } else {
                         return this.parseCampaigns(response).catch((e) => {
@@ -354,7 +354,7 @@ export class CampaignManager {
         try {
             json = JsonParser.parse(response.response);
         } catch (e) {
-            Diagnostics.trigger('auction_invalid_v5_json', {
+            Diagnostics.trigger('invalid_auction_v5_json', {
                 response: response.response
             });
             return Promise.reject(new Error('Could not parse campaign JSON: ' + e.message));
@@ -391,14 +391,14 @@ export class CampaignManager {
                         if(json.tracking[trackingId]) {
                             trackingUrls = json.tracking[trackingId];
                         } else {
-                            SessionDiagnostics.trigger('invalid_auction_tracking_id', {
+                            SessionDiagnostics.trigger('invalid_auction_v5_tracking_id', {
                                 mediaId: mediaId,
                                 trackingId: trackingId
                             }, session);
                             throw new Error('Invalid tracking ID ' + trackingId);
                         }
                     } else {
-                        SessionDiagnostics.trigger('missing_auction_tracking_id', {
+                        SessionDiagnostics.trigger('missing_auction_v5_tracking_id', {
                             mediaId: mediaId
                         }, session);
                         throw new Error('Missing tracking ID');
@@ -462,10 +462,10 @@ export class CampaignManager {
                             return this.handleErrorWrapper(new WebViewError('Getting file path failed', 'GetFilePathFailed'), campaigns[mediaId], 'campaign_caching_get_file_path_failed', session);
                         }
 
-                        return this.handleErrorWrapper(error, campaigns[mediaId], 'handle_campaign_error', session);
+                        return this.handleErrorWrapper(error, campaigns[mediaId], 'handle_auction_v5_campaign_error', session);
                     }));
                 } catch(error) {
-                    this.handleErrorWrapper(error, campaigns[mediaId], 'error_creating_handle_campaign_chain', session);
+                    this.handleErrorWrapper(error, campaigns[mediaId], 'error_creating_auction_v5_handle_campaign_chain', session);
                 }
             }
         }
