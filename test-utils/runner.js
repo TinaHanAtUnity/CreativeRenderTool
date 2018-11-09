@@ -86,8 +86,9 @@ const runTest = async (browser, isolated, testFilter) => {
     });
     if(isolated == 1) {
         const tests = testList.split(' ').map(testPath => path.parse(testPath).name);
+        process.exitCode = 0;
         for(const test of tests) {
-            process.exitCode = await runTest(browser, isolated, test);
+            process.exitCode += await runTest(browser, isolated, test);
         }
     } else {
         process.exitCode = await runTest(browser, isolated, testFilter);
