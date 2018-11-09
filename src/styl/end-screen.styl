@@ -10,6 +10,15 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       $close-button-default($scale-size);
       padding: $default-size * $scale-size * .25;
     }
+
+    .china-advertisement {
+      $china-overlay($default-scale-size);
+      right: 0;
+      bottom: 0;
+      padding: $default-size * $scale-size * .5;
+      color: $black;
+    }
+
     .download-container {
       $download-container-default($scale-size);
     }
@@ -32,14 +41,6 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
     .unityads-logo {
       $unityads-logo-default($scale-size);
-    }
-
-    .china-advertisement {
-      $china-overlay($default-scale-size);
-      bottom: 0;
-      right: 0;
-      padding: $default-size * $scale-size * .5;
-      color: $black;
     }
 
     .name-container {
