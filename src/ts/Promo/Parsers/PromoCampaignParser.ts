@@ -13,11 +13,11 @@ import { ProductInfo, ProductInfoType, IProductInfo } from 'Promo/Models/Product
 export class PromoCampaignParser extends CampaignParser {
     public static ContentType = 'purchasing/iap';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
-        const promoJson = response.getJsonContent();
 
         this._creativeID = response.getCreativeId();
         this._seatID = response.getSeatId();
 
+        const promoJson = response.getJsonContent();
         let willExpireAt: number | undefined;
         if (promoJson.expiry) {
             willExpireAt = parseInt(promoJson.expiry, 10);
@@ -31,8 +31,8 @@ export class PromoCampaignParser extends CampaignParser {
             willExpireAt: willExpireAt ? Date.now() + (willExpireAt * 1000) : undefined,
             adType: promoJson.contentType || response.getContentType(),
             correlationId: undefined,
-            creativeId: undefined,
-            seatId: undefined,
+            creativeId: this._creativeID,
+            seatId: this._seatID,
             meta: promoJson.meta,
             session: session,
             mediaId: response.getMediaId(),

@@ -11,6 +11,9 @@ import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 export class ProgrammaticMraidParser extends CampaignParser {
     public static ContentType = CampaignContentTypes.ProgrammaticMraid;
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+
+        this._creativeID = response.getCreativeId();
+        this._seatID = response.getSeatId();
         const jsonMraid = response.getJsonContent();
 
         if(!jsonMraid) {
@@ -27,16 +30,13 @@ export class ProgrammaticMraidParser extends CampaignParser {
         const markup = decodeURIComponent(jsonMraid.markup);
         const cacheTTL = response.getCacheTTL();
 
-        this._creativeID = response.getCreativeId();
-        this._seatID = response.getSeatId();
-
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(nativeBridge),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
-            creativeId: response.getCreativeId() || undefined,
-            seatId: response.getSeatId() || undefined,
+            creativeId: this._creativeID,
+            seatId: this._seatID,
             meta: jsonMraid.meta,
             session: session,
             mediaId: response.getMediaId(),

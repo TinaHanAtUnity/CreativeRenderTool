@@ -21,20 +21,21 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
             const vpaidMediaFile = this.getVPAIDMediaFile(vast);
             const campaignId = this.getProgrammaticCampaignId(nativeBridge);
             if (vpaidMediaFile) {
-                const vpaid = this._vpaidParser.parseFromVast(vast, vpaidMediaFile);
-
-                const cacheTTL = response.getCacheTTL();
 
                 this._creativeID = response.getCreativeId();
                 this._seatID = response.getSeatId();
+
+                const vpaid = this._vpaidParser.parseFromVast(vast, vpaidMediaFile);
+
+                const cacheTTL = response.getCacheTTL();
 
                 const baseCampaignParams: ICampaign = {
                     id: this.getProgrammaticCampaignId(nativeBridge),
                     willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
                     adType: response.getAdType() || undefined,
                     correlationId: response.getCorrelationId() || undefined,
-                    creativeId: response.getCreativeId() || undefined,
-                    seatId: response.getSeatId() || undefined,
+                    creativeId: this._creativeID,
+                    seatId: this._seatID,
                     meta: undefined,
                     session: session,
                     mediaId: response.getMediaId(),

@@ -15,11 +15,12 @@ import { VastParser } from 'VAST/Utilities/VastParser';
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
-        const markup = response.getContent();
-        const cacheTTL = response.getCacheTTL();
 
         this._creativeID = response.getCreativeId();
         this._seatID = response.getSeatId();
+
+        const markup = response.getContent();
+        const cacheTTL = response.getCacheTTL();
 
         const platform = nativeBridge.getPlatform();
         const videoPromise = this.getVideoFromMarkup(markup, request, session, platform).catch((e) => {
@@ -36,8 +37,8 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
                 adType: response.getAdType() || undefined,
                 correlationId: response.getCorrelationId() || undefined,
-                creativeId: response.getCreativeId() || undefined,
-                seatId: response.getSeatId() || undefined,
+                creativeId: this._creativeID,
+                seatId: this._seatID,
                 meta: undefined,
                 session: session,
                 mediaId: response.getMediaId(),

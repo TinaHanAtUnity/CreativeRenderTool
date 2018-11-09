@@ -36,11 +36,11 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeMRAID = 'comet/mraid-url';
 
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
-        const json = response.getJsonContent();
 
         this._creativeID = response.getCreativeId();
         this._seatID = response.getSeatId();
 
+        const json = response.getJsonContent();
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;
         switch(campaignStore) {
@@ -65,8 +65,8 @@ export class CometCampaignParser extends CampaignParser {
             willExpireAt: undefined,
             adType: undefined,
             correlationId: undefined,
-            creativeId: undefined,
-            seatId: undefined,
+            creativeId: this._creativeID,
+            seatId: this._seatID,
             meta: json.meta,
             session: session,
             mediaId: response.getMediaId(),

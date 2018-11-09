@@ -12,10 +12,10 @@ import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 export class XPromoCampaignParser extends CampaignParser {
     public static ContentType = 'xpromo/video';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
-        const json = response.getJsonContent();
 
         this._creativeID = response.getCreativeId();
         this._seatID = response.getSeatId();
+        const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;
@@ -40,8 +40,8 @@ export class XPromoCampaignParser extends CampaignParser {
             willExpireAt: undefined,
             adType: undefined,
             correlationId: undefined,
-            creativeId: response.getCreativeId(),
-            seatId: undefined,
+            creativeId: this._creativeID,
+            seatId: this._seatID,
             meta: json.meta,
             session: session,
             mediaId: response.getMediaId(),

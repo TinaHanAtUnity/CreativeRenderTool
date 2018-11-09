@@ -17,22 +17,23 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     }
 
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+
+        this._creativeID = response.getCreativeId();
+        this._seatID = response.getSeatId();
+
         let dynamicMarkup = decodeURIComponent(response.getContent());
         if (this._wrapWithScriptTag) {
             dynamicMarkup = '<script>' + dynamicMarkup + '</script>';
         }
         const cacheTTL = response.getCacheTTL();
 
-        this._creativeID = response.getCreativeId();
-        this._seatID = response.getSeatId();
-
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(nativeBridge),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
-            creativeId: response.getCreativeId() || undefined,
-            seatId: response.getSeatId() || undefined,
+            creativeId: this._creativeID,
+            seatId: this._seatID,
             meta: undefined,
             session: session,
             mediaId: response.getMediaId(),
