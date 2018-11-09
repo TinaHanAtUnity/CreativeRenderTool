@@ -28,7 +28,7 @@ interface INativeRequest {
     method: RequestMethod;
     url: string;
     data?: string;
-    headers: Array<[string, string]>;
+    headers: [string, string][];
     retryCount: number;
     options: IRequestOptions;
 }
@@ -37,7 +37,7 @@ export interface INativeResponse {
     url: string;
     response: string;
     responseCode: number;
-    headers: Array<[string, string]>;
+    headers: [string, string][];
 }
 
 export class Request {
@@ -46,7 +46,7 @@ export class Request {
     public static RedirectResponseCodes = new RegExp('30[0-8]');
     public static ErrorResponseCodes = new RegExp('[4-5][0-9]{2}');
 
-    public static getHeader(headers: Array<[string, string]>, headerName: string): string | null {
+    public static getHeader(headers: [string, string][], headerName: string): string | null {
         for(const header of headers) {
             const key = header[0];
             const value = header[1];
@@ -72,7 +72,7 @@ export class Request {
     private static _callbackId: number = 1;
     private static _callbacks: { [key: number]: CallbackContainer<INativeResponse> } = {};
     private static _requests: { [key: number]: INativeRequest } = {};
-    private static _authorizations: Array<{ host: RegExp; authorizationHeader: string }> = [];
+    private static _authorizations: { host: RegExp; authorizationHeader: string }[] = [];
 
     private static getDefaultRequestOptions(): IRequestOptions {
         return {
@@ -106,7 +106,7 @@ export class Request {
         Request._authorizations = [];
     }
 
-    public static applyAuthorizationHeader(url: string, headers: Array<[string, string]> = []): Array<[string, string]> {
+    public static applyAuthorizationHeader(url: string, headers: [string, string][] = []): [string, string][] {
         if (this._authorizations.length === 0) {
             return headers;
         }
@@ -130,7 +130,7 @@ export class Request {
         ];
     }
 
-    public get(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
+    public get(url: string, headers: [string, string][] = [], options?: IRequestOptions): Promise<INativeResponse> {
         // note: Emergency hack to prevent file URLs from crashing Android native SDK.
         // File URLs should not get this far and they should be rejected earlier.
         // Once validation is fixed, this hack should probably be removed.
@@ -153,7 +153,7 @@ export class Request {
         return promise;
     }
 
-    public post(url: string, data: string = '', headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
+    public post(url: string, data: string = '', headers: [string, string][] = [], options?: IRequestOptions): Promise<INativeResponse> {
         // note: Emergency hack to prevent file URLs from crashing Android native SDK.
         // File URLs should not get this far and they should be rejected earlier.
         // Once validation is fixed, this hack should probably be removed.
@@ -179,7 +179,7 @@ export class Request {
         return promise;
     }
 
-    public head(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
+    public head(url: string, headers: [string, string][] = [], options?: IRequestOptions): Promise<INativeResponse> {
         // note: Emergency hack to prevent file URLs from crashing Android native SDK.
         // File URLs should not get this far and they should be rejected earlier.
         // Once validation is fixed, this hack should probably be removed.
@@ -308,7 +308,7 @@ export class Request {
         }
     }
 
-    private onRequestComplete(rawId: string, url: string, response: string, responseCode: number, headers: Array<[string, string]>): void {
+    private onRequestComplete(rawId: string, url: string, response: string, responseCode: number, headers: [string, string][]): void {
         const id = parseInt(rawId, 10);
         const nativeResponse: INativeResponse = {
             url: url,
