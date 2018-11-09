@@ -4,7 +4,7 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID//Views/MRAIDView';
-import { PlayableMRAID } from 'MRAID//Views/PlayableMRAID';
+import { ExtendedMRAID } from 'MRAID//Views/ExtendedMRAID';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
 import { MRAID } from 'MRAID//Views/MRAID';
@@ -17,11 +17,11 @@ import { MraidIFrameEventBridge } from 'Ads/Views/MraidIFrameEventBridge';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
 
-    private static _forcedPlayableMRAID: boolean = false;
+    private static _forcedExtendedMRAID: boolean = false;
     private static _forcedARMRAID: boolean = false;
 
-    public static setForcedPlayableMRAID(value: boolean) {
-        MRAIDAdUnitFactory._forcedPlayableMRAID = value;
+    public static setForcedExtendedMRAID(value: boolean) {
+        MRAIDAdUnitFactory._forcedExtendedMRAID = value;
     }
 
     public static setForcedARMRAID(value: boolean) {
@@ -37,8 +37,8 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
 
         parameters.gameSessionId = parameters.gameSessionId || 0;
 
-        if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || MRAIDAdUnitFactory._forcedPlayableMRAID) {
-            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
+        if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || MRAIDAdUnitFactory._forcedExtendedMRAID) {
+            mraid = new ExtendedMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         } else if (ARUtil.isARCreative(parameters.campaign) || MRAIDAdUnitFactory._forcedARMRAID) {
             mraid = new ARMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         } else {

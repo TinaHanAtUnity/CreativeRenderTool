@@ -94,14 +94,14 @@ describe('GdprManagerTest', () => {
 
     describe('when storage is set', () => {
         describe('and the consent value has changed', () => {
-            const tests: Array<{
+            const tests: {
                 lastConsent: boolean;
                 storedConsent: boolean;
                 event: string;
                 optOutEnabled: boolean;
                 optOutRecorded: boolean;
                 isGdprEnabled: boolean;
-            }> = [{
+            }[] = [{
                 lastConsent: false,
                 storedConsent: true,
                 event: 'consent',
@@ -210,13 +210,13 @@ describe('GdprManagerTest', () => {
         });
 
         describe('and consent has changed', () => {
-            const tests: Array<{
+            const tests: {
                 lastConsent: boolean | string;
                 storedConsent: boolean;
                 event: string;
                 optOutEnabled: boolean;
                 optOutRecorded: boolean;
-            }> = [{
+            }[] = [{
                 lastConsent: false,
                 storedConsent: true,
                 event: 'consent',
@@ -418,11 +418,11 @@ describe('GdprManagerTest', () => {
     });
 
     describe('Sending gdpr events', () => {
-        const tests: Array<{
+        const tests: {
             action: GDPREventAction;
             source: GDPREventSource | undefined;
             infoJson: any;
-        }> = [{
+        }[] = [{
             action: GDPREventAction.SKIP,
             source: undefined,
             infoJson: {

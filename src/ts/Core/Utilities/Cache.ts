@@ -31,7 +31,7 @@ export interface ICacheCampaignsResponse {
 type ICallbackResolveFunction = (value?: [CacheStatus, string]) => void;
 type ICallbackRejectFunction = (reason?: any) => void;
 
-export type HeadersType = Array<[string, string]>;
+export type HeadersType = [string, string][];
 
 interface ICallbackObject {
     fileId: string;

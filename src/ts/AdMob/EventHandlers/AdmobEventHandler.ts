@@ -87,7 +87,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
 
     public onAttribution(url: string, touchInfo: ITouchInfo): Promise<void> {
         const userAgent = this.getUserAgentHeader();
-        const headers: Array<[string, string]> = [
+        const headers: [string, string][] = [
             ['User-Agent', userAgent]
         ];
         const isMsPresent = Url.getQueryParameter(url, 'ms');

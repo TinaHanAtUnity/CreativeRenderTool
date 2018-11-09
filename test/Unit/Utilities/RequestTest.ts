@@ -13,7 +13,7 @@ class TestRequestApi extends RequestApi {
     private _retryCount: number = 0;
     private _toggleUrl: boolean = false;
 
-    public get(id: string, url: string, headers: Array<[string, string]>): Promise<string> {
+    public get(id: string, url: string, headers: [string, string][]): Promise<string> {
         if(url.indexOf('/auth') !== -1) {
             const header = headers.find((x) => x[0] === 'Authorization');
             const auth = header === undefined ? '' : header[1];
@@ -63,7 +63,7 @@ class TestRequestApi extends RequestApi {
         return Promise.resolve(id);
     }
 
-    public post(id: string, url: string, body: string, headers: Array<[string, string]>): Promise<string> {
+    public post(id: string, url: string, body: string, headers: [string, string][]): Promise<string> {
         if(url.indexOf('/auth') !== -1) {
             const header = headers.find((x) => x[0] === 'Authorization');
             const auth = header === undefined ? '' : header[1];
@@ -93,7 +93,7 @@ class TestRequestApi extends RequestApi {
         return Promise.resolve(id);
     }
 
-    public head(id: string, url: string, headers: Array<[string, string]>): Promise<string> {
+    public head(id: string, url: string, headers: [string, string][]): Promise<string> {
         if (url.indexOf('/responsecode') !== -1) {
             const responseCodes = url.match(/3[0-9]{2}/);
             if (responseCodes && responseCodes.length > 0) {
@@ -112,7 +112,7 @@ class TestRequestApi extends RequestApi {
         this._toggleUrl = status;
     }
 
-    private sendSuccessResponse(id: string, url: string, body: string, responseCode: number, headers: Array<[string, string]>) {
+    private sendSuccessResponse(id: string, url: string, body: string, responseCode: number, headers: [string, string][]) {
         setTimeout(() => {
             this._nativeBridge.handleEvent(['REQUEST', 'COMPLETE', id, url, body, responseCode, headers]);
         }, 0);
