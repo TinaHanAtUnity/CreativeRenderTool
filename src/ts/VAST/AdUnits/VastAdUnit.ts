@@ -18,7 +18,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _moat?: MOAT;
     private _volume: number;
     private _muted: boolean = false;
-    private _events: Array<[number, string]> = [[0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
+    private _events: [number, string][] = [[0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
 
     constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
@@ -89,7 +89,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return this._events;
     }
 
-    public setEvents(events: Array<[number, string]>) {
+    public setEvents(events: [number, string][]) {
         this._events = events;
     }
 
