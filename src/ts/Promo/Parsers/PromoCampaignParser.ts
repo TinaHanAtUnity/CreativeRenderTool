@@ -32,11 +32,11 @@ export class PromoCampaignParser extends CampaignParser {
             seatId: undefined,
             meta: promoJson.meta,
             session: session,
-            mediaId: response.getMediaId()
+            mediaId: response.getMediaId(),
+            trackingUrls: response.getTrackingUrls() || {}
         };
         const promoCampaignParams: IPromoCampaign = {
             ... baseCampaignParams,
-            additionalTrackingEvents: response.getTrackingUrls() ? response.getTrackingUrls() : undefined,
             dynamicMarkup: promoJson.dynamicMarkup,
             creativeAsset: promoJson.creativeUrl ? new HTML(promoJson.creativeUrl, session) : undefined,
             rewardedPromo: promoJson.rewardedPromo || false,
