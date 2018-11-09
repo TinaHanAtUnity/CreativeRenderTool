@@ -13,7 +13,7 @@
   "seatId": 900,
   "trackingUrls": {
     "start": [
-      "https://fake-ads-backend.applifier.info/ack/333?event=vast-tracking-url"
+      "https://fake-ads-backend.unityads.unity3d.com/ack/333?event=vast-tracking-url"
     ]
   },
   "cacheTTL": 123,
