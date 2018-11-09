@@ -150,16 +150,14 @@ describe('MraidIframeEventBridge', () => {
             });
         });
 
-        describe(`${MRAIDEvents.CLOSE} MRAID event`, () => {
+        xdescribe(`${MRAIDEvents.CLOSE} MRAID event`, () => {
             const sendEvent = (e: string, data?: any) => {
                 return () => {
-                    return Promise.resolve().then(() => {
+                    return new Promise((res) => {
                         window.postMessage({
                             type: e
                         }, '*');
-                        return new Promise((resolve) => {
-                            setTimeout(resolve);
-                        });
+                        setTimeout(res);
                     });
                 };
             };
@@ -169,17 +167,15 @@ describe('MraidIframeEventBridge', () => {
             });
         });
 
-        describe(`landscape ${MRAIDEvents.ORIENTATION} MRAID event`, () => {
+        xdescribe(`landscape ${MRAIDEvents.ORIENTATION} MRAID event`, () => {
             const sendEvent = (e: string, data?: any) => {
                 return () => {
-                    return Promise.resolve().then(() => {
+                    return new Promise((res) => {
                         window.postMessage({
                             type: e,
                             properties: data
                         }, '*');
-                        return new Promise((resolve) => {
-                            setTimeout(resolve);
-                        });
+                        setTimeout(res);
                     });
                 };
             };
