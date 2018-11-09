@@ -132,7 +132,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this.setupElementReferences();
         this.choosePrivacyShown();
 
-        if (this._country === 'CN') {
+        if (this._country === 'FI') {
             const chinaAdTag = <HTMLElement>this._container.querySelector('.china-advertisement');
             if (chinaAdTag) {
                 chinaAdTag.innerText = '广告';
