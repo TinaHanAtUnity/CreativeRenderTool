@@ -68,8 +68,8 @@ export class FailedOperativeEventManager {
         });
     }
 
-    protected getPromisesForFailedEvents(nativeBridge: NativeBridge, request: Request, storageBridge: StorageBridge, keys: string[]): Array<Promise<any>> {
-        const promises: Array<Promise<any>> = [];
+    protected getPromisesForFailedEvents(nativeBridge: NativeBridge, request: Request, storageBridge: StorageBridge, keys: string[]): Promise<any>[] {
+        const promises: Promise<any>[] = [];
         keys.map(eventId => {
             const manager = new FailedOperativeEventManager(this._sessionId, eventId);
             promises.push(manager.sendFailedEvent(nativeBridge, request, storageBridge));

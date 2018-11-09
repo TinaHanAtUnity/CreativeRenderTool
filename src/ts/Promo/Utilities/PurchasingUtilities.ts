@@ -181,7 +181,7 @@ export class PurchasingUtilities {
         try {
             this._catalog = new PurchasingCatalog(products);
         } catch(e) {
-            this._nativeBridge.Sdk.logInfo('Error, cannot create catalog: '+ JSON.stringify(e));
+            this._nativeBridge.Sdk.logInfo('Error, cannot create catalog: ' + JSON.stringify(e));
         }
     }
 }
