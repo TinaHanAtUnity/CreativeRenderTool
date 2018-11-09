@@ -170,6 +170,12 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
             gameIcon = gameIconObject.getDTO();
         }
 
+        let squareImage: any;
+        const squareImageObject = this.getSquare();
+        if (squareImageObject) {
+            squareImage = squareImageObject.getDTO();
+        }
+
         let landscapeImage: any;
         const landscapeImageObject = this.getLandscape();
         if (landscapeImageObject) {
@@ -202,6 +208,7 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
             'gameIcon': gameIcon,
             'rating': this.getRating(),
             'ratingCount': this.getRatingCount(),
+            'squareImage': squareImage,
             'landscapeImage': landscapeImage,
             'portraitImage': portraitImage,
             'video': video,
