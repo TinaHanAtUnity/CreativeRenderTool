@@ -165,7 +165,7 @@ export class TestFixtures {
         return parameters;
     }
 
-    public static getPlayableMRAIDCampaignParams(json: any, storeName: StoreName): IMRAIDCampaign {
+    public static getExtendedMRAIDCampaignParams(json: any, storeName: StoreName): IMRAIDCampaign {
         const mraidContentJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         const session = this.getSession();
@@ -417,14 +417,14 @@ export class TestFixtures {
         return new XPromoCampaign(this.getXPromoCampaignParams(xPromoJson, StoreName.GOOGLE, creativeId));
     }
 
-    public static getPlayableMRAIDCampaignFollowsRedirects(): MRAIDCampaign {
+    public static getExtendedMRAIDCampaignFollowsRedirects(): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaignFollowsRedirects);
-        return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(json, StoreName.GOOGLE));
+        return new MRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE));
     }
 
-    public static getPlayableMRAIDCampaign(): MRAIDCampaign {
+    public static getExtendedMRAIDCampaign(): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaign);
-        return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(json, StoreName.GOOGLE));
+        return new MRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE));
     }
 
     public static getProgrammaticMRAIDCampaign(customParams: Partial<ICampaign> = {}): MRAIDCampaign {

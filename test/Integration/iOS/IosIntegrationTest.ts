@@ -47,9 +47,9 @@ describe('IosIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(647);
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('+0200');
 
-        ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
-        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
         UnityAds.initialize(Platform.IOS, '456', listener, true);
     });

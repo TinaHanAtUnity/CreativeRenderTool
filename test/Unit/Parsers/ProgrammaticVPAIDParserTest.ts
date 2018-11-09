@@ -59,7 +59,7 @@ describe('ProgrammaticVPAIDParser', () => {
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
-                assert.equal(campaign.getVPAID().getScriptUrl(), 'https://fake-ads-backend.applifier.info/get_file/js/vpaid_sample.js', 'Script URL is not equal');
+                assert.equal(campaign.getVPAID().getScriptUrl(), 'https://fake-ads-backend.unityads.unity3d.com/get_file/js/vpaid_sample.js', 'Script URL is not equal');
             });
         });
     });
