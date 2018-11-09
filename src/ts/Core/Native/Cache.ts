@@ -37,10 +37,10 @@ export class CacheApi extends NativeApi {
     public Android: AndroidCacheApi;
     public Ios: IosCacheApi;
 
-    public readonly onDownloadStarted = new Observable5<string, number, number, number, Array<[string, string]>>();
+    public readonly onDownloadStarted = new Observable5<string, number, number, number, [string, string][]>();
     public readonly onDownloadProgress = new Observable3<string, number, number>();
-    public readonly onDownloadEnd = new Observable6<string, number, number, number, number, Array<[string, string]>>();
-    public readonly onDownloadStopped = new Observable6<string, number, number, number, number, Array<[string, string]>>();
+    public readonly onDownloadEnd = new Observable6<string, number, number, number, number, [string, string][]>();
+    public readonly onDownloadStopped = new Observable6<string, number, number, number, number, [string, string][]>();
     public readonly onDownloadError = new Observable3<string, string, string>();
 
     constructor(nativeBridge: NativeBridge) {
@@ -53,7 +53,7 @@ export class CacheApi extends NativeApi {
         }
     }
 
-    public download(url: string, fileId: string, headers: Array<[string, string]>, append: boolean): Promise<void> {
+    public download(url: string, fileId: string, headers: [string, string][], append: boolean): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'download', [url, fileId, headers, append]);
     }
 

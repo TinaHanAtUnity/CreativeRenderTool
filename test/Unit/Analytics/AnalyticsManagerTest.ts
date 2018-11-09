@@ -50,7 +50,7 @@ class FakeRequestApi extends RequestApi {
         this._postCallback = postCallback;
     }
 
-    public post(id: string, url: string, requestBody: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
+    public post(id: string, url: string, requestBody: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
         this._postCallback(url, requestBody);
         return Promise.resolve(id);
     }

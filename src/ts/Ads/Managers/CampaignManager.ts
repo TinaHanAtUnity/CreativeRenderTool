@@ -149,7 +149,7 @@ export class CampaignManager {
                         headers: []
                     });
                 }
-                const headers: Array<[string, string]> = [];
+                const headers: [string, string][] = [];
                 if (this._jaegerManager.isJaegerTracingEnabled()) {
                     headers.push(this._jaegerManager.getTraceId(jaegerSpan));
                 }
@@ -288,7 +288,7 @@ export class CampaignManager {
             }
 
             let refreshDelay: number = 0;
-            const promises: Array<Promise<void>> = [];
+            const promises: Promise<void>[] = [];
 
             for(const placement of noFill) {
                 promises.push(this.handleNoFill(placement));
@@ -557,7 +557,7 @@ export class CampaignManager {
             });
         }
 
-        const promises: Array<Promise<any>> = [];
+        const promises: Promise<any>[] = [];
         promises.push(this._deviceInfo.getScreenWidth());
         promises.push(this._deviceInfo.getScreenHeight());
         promises.push(this._deviceInfo.getConnectionType());
@@ -607,7 +607,7 @@ export class CampaignManager {
         }
         this._realtimeBody = undefined;
 
-        const promises: Array<Promise<any>> = [];
+        const promises: Promise<any>[] = [];
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
@@ -662,7 +662,7 @@ export class CampaignManager {
                 body.versionCode = versionCode;
             }
 
-            const metaDataPromises: Array<Promise<any>> = [];
+            const metaDataPromises: Promise<any>[] = [];
             metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
             metaDataPromises.push(this._metaDataManager.fetch(FrameworkMetaData));
 

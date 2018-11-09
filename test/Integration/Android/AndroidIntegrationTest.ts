@@ -47,9 +47,9 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
 
-        ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
-        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
         UnityAds.initialize(Platform.ANDROID, '456', listener, true);
     });

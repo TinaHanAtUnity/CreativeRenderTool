@@ -19,10 +19,10 @@ describe('CustomPurchasingApi', () => {
 
         describe('TRANSACTION_ERROR', () => {
 
-            const tests: Array<{
+            const tests: {
                 input: ITransactionErrorDetails;
                 output: ITransactionErrorDetails;
-            }> = [
+            }[] = [
                 {
                     input: {
                         transactionError: 'SERVER_ERROR',

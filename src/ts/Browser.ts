@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const JS_FUNC_NAME_GET_HEADLESS = 'getHeadless';
 
     const setClientInfo = () => {
-        const fields: Array<[string, string, ((element: HTMLInputElement) => any) | undefined]> = [
+        const fields: [string, string, ((element: HTMLInputElement) => any) | undefined][] = [
             ['appName', 'setAppName', undefined],
             ['appVersion', 'setAppVersion', undefined],
             ['sdkVersion', 'setSdkVersion', toInt],
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const setAndroidDeviceInfo = () => {
-        const fields: Array<[string, ((element: HTMLInputElement) => any) | undefined]> = [
+        const fields: [string, ((element: HTMLInputElement) => any) | undefined][] = [
             ['AdvertisingTrackingId', undefined],
             ['LimitAdTrackingFlag', toBoolean],
             ['AndroidId', undefined],
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const setIosDeviceInfo = () => {
-        const fields: Array<[string, ((element: HTMLInputElement) => any) | undefined]> = [
+        const fields: [string, ((element: HTMLInputElement) => any) | undefined][] = [
             ['AdvertisingTrackingId', undefined],
             ['LimitAdTrackingFlag', toBoolean],
             ['Manufacturer', undefined],
