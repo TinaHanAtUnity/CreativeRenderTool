@@ -1,31 +1,16 @@
 import { AdMobAdUnitFactory } from 'AdMob/AdUnits/AdMobAdUnitFactory';
 import { ProgrammaticAdMobParser } from 'AdMob/Parsers/ProgrammaticAdMobParser';
-import { IParserModule } from 'Ads/Modules/IParserModule';
+import { AbstractParserModule, IContentTypeHandler } from 'Ads/Modules/AbstractParserModule';
 
-export class AdMob implements IParserModule {
-
-    private readonly _parser: ProgrammaticAdMobParser;
-    private readonly _adUnitFactory: AdMobAdUnitFactory;
+export class AdMob extends AbstractParserModule {
 
     constructor() {
-        this._parser = new ProgrammaticAdMobParser();
-        this._adUnitFactory = new AdMobAdUnitFactory();
-    }
-
-    public canParse(contentType: string): boolean {
-        return contentType === ProgrammaticAdMobParser.ContentType;
-    }
-
-    public getParser() {
-        return this._parser;
-    }
-
-    public getParsers() {
-        return [this._parser];
-    }
-
-    public getAdUnitFactory() {
-        return this._adUnitFactory;
+        const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
+        contentTypeHandlerMap[ProgrammaticAdMobParser.ContentType] = {
+            parser: new ProgrammaticAdMobParser(),
+            adUnitFactory: new AdMobAdUnitFactory()
+        };
+        super(contentTypeHandlerMap);
     }
 
 }

@@ -1,31 +1,22 @@
-import { IParserModule } from 'Ads/Modules/IParserModule';
+import { AbstractParserModule, IContentTypeHandler } from 'Ads/Modules/AbstractParserModule';
 import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
+import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
 
-export class Performance implements IParserModule {
-
-    private readonly _parser: CometCampaignParser;
-    private readonly _adUnitFactory: PerformanceAdUnitFactory;
+export class Performance extends AbstractParserModule {
 
     constructor() {
-        this._parser = new CometCampaignParser();
-        this._adUnitFactory = new PerformanceAdUnitFactory();
-    }
-
-    public canParse(contentType: string) {
-        return contentType === CometCampaignParser.ContentType || contentType === CometCampaignParser.ContentTypeVideo || contentType === CometCampaignParser.ContentTypeMRAID;
-    }
-
-    public getParser(contentType: string) {
-        return this._parser;
-    }
-
-    public getParsers() {
-        return [this._parser];
-    }
-
-    public getAdUnitFactory() {
-        return this._adUnitFactory;
+        const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
+        const parser = new CometCampaignParser();
+        contentTypeHandlerMap[CometCampaignParser.ContentType] = {
+            parser,
+            adUnitFactory: new PerformanceAdUnitFactory()
+        };
+        contentTypeHandlerMap[CometCampaignParser.ContentTypeMRAID] = {
+            parser,
+            adUnitFactory: new MRAIDAdUnitFactory()
+        };
+        super(contentTypeHandlerMap);
     }
 
 }

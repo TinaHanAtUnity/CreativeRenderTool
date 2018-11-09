@@ -5,7 +5,7 @@ import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { CampaignParserManager } from 'Ads/Managers/CampaignParserManager';
+import { ContentTypeHandlerManager } from 'ContentTypeHandlerManager.ts';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
@@ -115,7 +115,7 @@ describe('CampaignManager', () => {
     let programmaticTrackingService: ProgrammaticTrackingService;
     let placementManager: PlacementManager;
     let backupCampaignManager: BackupCampaignManager;
-    let campaignParserManager: CampaignParserManager;
+    let campaignParserManager: ContentTypeHandlerManager;
 
     beforeEach(() => {
         coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
@@ -148,7 +148,7 @@ describe('CampaignManager', () => {
         placementManager = sinon.createStubInstance(PlacementManager);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         backupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig);
-        campaignParserManager = new CampaignParserManager();
+        campaignParserManager = new ContentTypeHandlerManager();
     });
 
     describe('on VAST campaign', () => {
@@ -871,7 +871,7 @@ describe('CampaignManager', () => {
 
         beforeEach(() => {
             assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            campaignParserManager = new CampaignParserManager();
+            campaignParserManager = new ContentTypeHandlerManager();
             campaignParserManager.addParsers([
                 new CometCampaignParser(),
                 new XPromoCampaignParser(),

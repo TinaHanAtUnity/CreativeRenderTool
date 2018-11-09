@@ -3,7 +3,7 @@ import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { CampaignParserManager } from 'Ads/Managers/CampaignParserManager';
+import { ContentTypeHandlerManager } from 'ContentTypeHandlerManager.ts';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
@@ -199,7 +199,7 @@ describe('Event parameters should match specifications', () => {
             const sessionManager = new SessionManager(core, request, storageBridge);
             const focusManager = new FocusManager(platform, core);
             const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
-            const campaignParserManager = new CampaignParserManager();
+            const campaignParserManager = new ContentTypeHandlerManager();
             const jaegerManager = sinon.createStubInstance(JaegerManager);
             jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
             sinon.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
@@ -236,7 +236,7 @@ describe('Event parameters should match specifications', () => {
             const sessionManager = new SessionManager(core, request, storageBridge);
             const focusManager = new FocusManager(platform, core);
             const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
-            const campaignParserManager = new CampaignParserManager();
+            const campaignParserManager = new ContentTypeHandlerManager();
             const jaegerManager = sinon.createStubInstance(JaegerManager);
             jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
             sinon.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
@@ -567,7 +567,7 @@ describe('Event parameters should match specifications', () => {
             const sessionManager = new SessionManager(core, request, storageBridge);
             const focusManager = new FocusManager(platform, core);
             const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
-            const campaignParserManager = new CampaignParserManager();
+            const campaignParserManager = new ContentTypeHandlerManager();
             const jaegerManager = sinon.createStubInstance(JaegerManager);
             jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
             sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
@@ -605,7 +605,7 @@ describe('Event parameters should match specifications', () => {
             const sessionManager = new SessionManager(core, request, storageBridge);
             const focusManager = new FocusManager(platform, core);
             const adMobSignalFactory = new AdMobSignalFactory(platform, core, ads, clientInfo, deviceInfo, focusManager);
-            const campaignParserManager = new CampaignParserManager();
+            const campaignParserManager = new ContentTypeHandlerManager();
             const jaegerManager = sinon.createStubInstance(JaegerManager);
             jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
             sinon.stub(core.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));

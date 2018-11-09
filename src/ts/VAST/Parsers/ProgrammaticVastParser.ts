@@ -29,10 +29,6 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     protected _vastParser: VastParser = new VastParser();
 
-    public getContentTypes() {
-        return [ProgrammaticVastParser.ContentType];
-    }
-
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
         if(response.isMediaExperiment() && response.isMediaExperiment() === true) {

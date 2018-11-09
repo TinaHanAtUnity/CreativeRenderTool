@@ -9,7 +9,7 @@ import { IAds, IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { CampaignParserManager } from 'Ads/Managers/CampaignParserManager';
+import { ContentTypeHandlerManager } from 'ContentTypeHandlerManager.ts';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
@@ -81,7 +81,7 @@ export class Ads implements IAds {
     public readonly MissedImpressionManager: MissedImpressionManager;
     public readonly BackupCampaignManager: BackupCampaignManager;
     public readonly ProgrammaticTrackingService: ProgrammaticTrackingService;
-    public readonly CampaignParserManager: CampaignParserManager;
+    public readonly ContentTypeHandlerManager: ContentTypeHandlerManager;
 
     public Config: AdsConfiguration;
     public Container: Activity | ViewController;
@@ -145,7 +145,7 @@ export class Ads implements IAds {
         this.MissedImpressionManager = new MissedImpressionManager(this._core.Api);
         this.BackupCampaignManager = new BackupCampaignManager(this._core.Api, this._core.StorageBridge, this._core.Config);
         this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this._core.NativeBridge.getPlatform(), this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo);
-        this.CampaignParserManager = new CampaignParserManager();
+        this.ContentTypeHandlerManager = new ContentTypeHandlerManager();
     }
 
     public initialize(jaegerInitSpan: JaegerSpan) {
@@ -178,7 +178,7 @@ export class Ads implements IAds {
                 this.CampaignParserManager.addParsers(parsers);
                 parsers.forEach(parser => {
                     parser.getContentTypes().forEach(contentType => {
-                        this._adUnitFactories[contentType] = module.getAdUnitFactory();
+                        this._adUnitFactories[contentType] = module.getAdUnitFactory(contentType);
                     });
                 });
             });
@@ -188,7 +188,7 @@ export class Ads implements IAds {
             this.CampaignParserManager.addParsers(promoParsers);
             promoParsers.forEach(parser => {
                 parser.getContentTypes().forEach(contentType => {
-                    this._adUnitFactories[contentType] = promo.getAdUnitFactory();
+                    this._adUnitFactories[contentType] = promo.getAdUnitFactory(contentType);
                 });
             });
 

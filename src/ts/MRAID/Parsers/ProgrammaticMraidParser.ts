@@ -12,10 +12,6 @@ export class ProgrammaticMraidParser extends CampaignParser {
 
     public static ContentType = 'programmatic/mraid';
 
-    public getContentTypes() {
-        return [ProgrammaticMraidParser.ContentType];
-    }
-
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraid = response.getJsonContent();
 

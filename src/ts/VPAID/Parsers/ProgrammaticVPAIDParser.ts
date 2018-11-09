@@ -17,10 +17,6 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
 
     private _vpaidParser: VPAIDParser = new VPAIDParser();
 
-    public getContentTypes() {
-        return [ProgrammaticVPAIDParser.ContentType];
-    }
-
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
         return this._vastParser.retrieveVast(decodedVast, core, request).then((vast): Promise<Campaign> => {

@@ -16,10 +16,6 @@ export class ProgrammaticAdMobParser extends CampaignParser {
 
     public static ContentType = 'programmatic/admob-video';
 
-    public getContentTypes() {
-        return [ProgrammaticAdMobParser.ContentType];
-    }
-
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();

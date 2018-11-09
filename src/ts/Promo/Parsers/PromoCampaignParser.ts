@@ -16,10 +16,6 @@ export class PromoCampaignParser extends CampaignParser {
 
     public static ContentType = 'purchasing/iap';
 
-    public getContentTypes() {
-        return [PromoCampaignParser.ContentType];
-    }
-
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const promoJson = JsonParser.parse(response.getContent());
 

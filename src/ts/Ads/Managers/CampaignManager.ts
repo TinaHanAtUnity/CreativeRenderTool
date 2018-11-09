@@ -41,7 +41,7 @@ import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCam
 import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
 import { CampaignError } from 'Ads/Errors/CampaignError';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { CampaignParserManager } from 'Ads/Managers/CampaignParserManager';
+import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 
 export class CampaignManager {
 
@@ -89,7 +89,7 @@ export class CampaignManager {
     protected _adsConfig: AdsConfiguration;
     protected _clientInfo: ClientInfo;
     protected _cacheBookkeeping: CacheBookkeepingManager;
-    private _campaignParserManager: CampaignParserManager;
+    private _campaignParserManager: ContentTypeHandlerManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
@@ -103,7 +103,7 @@ export class CampaignManager {
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, campaignParserManager: CampaignParserManager, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, campaignParserManager: ContentTypeHandlerManager, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;

@@ -4,7 +4,7 @@ import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { CampaignParserManager } from 'Ads/Managers/CampaignParserManager';
+import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
@@ -50,7 +50,7 @@ export interface IAds extends IApiModule {
     MissedImpressionManager: MissedImpressionManager;
     BackupCampaignManager: BackupCampaignManager;
     ProgrammaticTrackingService: ProgrammaticTrackingService;
-    CampaignParserManager: CampaignParserManager;
+    ContentTypeHandlerManager: ContentTypeHandlerManager;
     Config: AdsConfiguration;
     Container: Activity | ViewController;
     GdprManager: GdprManager;

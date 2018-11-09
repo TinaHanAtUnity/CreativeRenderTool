@@ -1,5 +1,5 @@
 import { IAds } from 'Ads/IAds';
-import { IParserModule } from 'Ads/Modules/IParserModule';
+import { AbstractParserModule, IContentTypeHandler } from 'Ads/Modules/AbstractParserModule';
 import { IAnalytics } from 'Analytics/IAnalytics';
 import { ICore } from 'Core/ICore';
 import { PromoAdUnitFactory } from 'Promo/AdUnits/PromoAdUnitFactory';
@@ -10,7 +10,7 @@ import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IPurchasing } from 'Purchasing/IPurchasing';
 
-export class Promo implements IParserModule, IPromo {
+export class Promo extends AbstractParserModule implements IPromo {
 
     public readonly Api: IPromoApi;
 
@@ -21,10 +21,14 @@ export class Promo implements IParserModule, IPromo {
     private readonly _purchasing: IPurchasing;
     private readonly _analytics: IAnalytics;
 
-    private readonly _parser: PromoCampaignParser;
-    private readonly _adUnitFactory: PromoAdUnitFactory;
-
     constructor(core: ICore, ads: IAds, purchasing: IPurchasing, analytics: IAnalytics) {
+        const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
+        contentTypeHandlerMap[PromoCampaignParser.ContentType] = {
+            parser: new PromoCampaignParser(),
+            adUnitFactory: new PromoAdUnitFactory()
+        };
+        super(contentTypeHandlerMap);
+
         this._core = core;
         this._ads = ads;
         this._purchasing = purchasing;
@@ -34,30 +38,11 @@ export class Promo implements IParserModule, IPromo {
             Purchasing: new PurchasingApi(this._core.NativeBridge)
         };
 
-        this._parser = new PromoCampaignParser();
-        this._adUnitFactory = new PromoAdUnitFactory();
-
         this.PromoEvents = new PromoEvents(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ClientInfo, core.DeviceInfo, analytics.AnalyticsStorage);
     }
 
     public initialize() {
         PurchasingUtilities.initialize(this._core.Api, this.Api, this._purchasing.Api, this._core.ClientInfo, this._core.Config, this._ads.Config, this._ads.PlacementManager, this._ads.CampaignManager, this.PromoEvents, this._core.RequestManager, this._analytics.AnalyticsManager);
-    }
-
-    public canParse(contentType: string) {
-        return contentType === PromoCampaignParser.ContentType;
-    }
-
-    public getParser(contentType: string) {
-        return this._parser;
-    }
-
-    public getParsers() {
-        return [this._parser];
-    }
-
-    public getAdUnitFactory() {
-        return this._adUnitFactory;
     }
 
 }

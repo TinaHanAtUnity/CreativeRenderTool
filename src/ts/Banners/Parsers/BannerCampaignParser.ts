@@ -18,13 +18,6 @@ export class BannerCampaignParser extends CampaignParser {
         this._wrapJS = wrapJS;
     }
 
-    public getContentTypes() {
-        return [
-            BannerCampaignParser.ContentTypeJS,
-            BannerCampaignParser.ContentTypeHTML
-        ];
-    }
-
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const markup = this._wrapJS ? this.getJSContent(response) : this.getHTMLContent(response);
         const campaign = <IBannerCampaign>{

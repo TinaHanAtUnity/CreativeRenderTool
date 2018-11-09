@@ -1,31 +1,16 @@
-import { IParserModule } from 'Ads/Modules/IParserModule';
+import { AbstractParserModule, IContentTypeHandler } from 'Ads/Modules/AbstractParserModule';
 import { XPromoAdUnitFactory } from 'XPromo/AdUnits/XPromoAdUnitFactory';
 import { XPromoCampaignParser } from 'XPromo/Parsers/XPromoCampaignParser';
 
-export class XPromo implements IParserModule {
-
-    private readonly _parser: XPromoCampaignParser;
-    private readonly _adUnitFactory: XPromoAdUnitFactory;
+export class XPromo extends AbstractParserModule {
 
     constructor() {
-        this._parser = new XPromoCampaignParser();
-        this._adUnitFactory = new XPromoAdUnitFactory();
-    }
-
-    public canParse(contentType: string) {
-        return contentType === XPromoCampaignParser.ContentType;
-    }
-
-    public getParser(contentType: string) {
-        return this._parser;
-    }
-
-    public getParsers() {
-        return [this._parser];
-    }
-
-    public getAdUnitFactory() {
-        return this._adUnitFactory;
+        const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
+        contentTypeHandlerMap[XPromoCampaignParser.ContentType] = {
+            parser: new XPromoCampaignParser(),
+            adUnitFactory: new XPromoAdUnitFactory()
+        };
+        super(contentTypeHandlerMap);
     }
 
 }

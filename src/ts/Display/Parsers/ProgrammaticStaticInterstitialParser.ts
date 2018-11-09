@@ -19,13 +19,6 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
         this._wrapWithScriptTag = wrapWithScriptTag;
     }
 
-    public getContentTypes() {
-        if(this._wrapWithScriptTag) {
-            return [ProgrammaticStaticInterstitialParser.ContentTypeJs];
-        }
-        return [ProgrammaticStaticInterstitialParser.ContentTypeHtml];
-    }
-
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         let dynamicMarkup = decodeURIComponent(response.getContent());
         if (this._wrapWithScriptTag) {

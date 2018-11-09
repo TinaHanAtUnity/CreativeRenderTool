@@ -1,43 +1,21 @@
-import { IParserModule } from 'Ads/Modules/IParserModule';
+import { AbstractParserModule, IContentTypeHandler } from 'Ads/Modules/AbstractParserModule';
 import { DisplayInterstitialAdUnitFactory } from 'Display/AdUnits/DisplayInterstitialAdUnitFactory';
 import { ProgrammaticStaticInterstitialParser } from 'Display/Parsers/ProgrammaticStaticInterstitialParser';
 
-export class Display implements IParserModule {
-
-    private readonly _htmlParser: ProgrammaticStaticInterstitialParser;
-    private readonly _jsParser: ProgrammaticStaticInterstitialParser;
-    private readonly _adUnitFactory: DisplayInterstitialAdUnitFactory;
+export class Display extends AbstractParserModule {
 
     constructor() {
-        this._htmlParser = new ProgrammaticStaticInterstitialParser(false);
-        this._jsParser = new ProgrammaticStaticInterstitialParser(true);
-        this._adUnitFactory = new DisplayInterstitialAdUnitFactory();
-    }
-
-    public canParse(contentType: string): boolean {
-        return contentType === ProgrammaticStaticInterstitialParser.ContentTypeHtml || contentType === ProgrammaticStaticInterstitialParser.ContentTypeJs;
-    }
-
-    public getParser(contentType: string) {
-        switch(contentType) {
-            case ProgrammaticStaticInterstitialParser.ContentTypeHtml:
-                return this._htmlParser;
-            case ProgrammaticStaticInterstitialParser.ContentTypeJs:
-                return this._jsParser;
-            default:
-                throw new Error('Display module cannot handle content type: ' + contentType);
-        }
-    }
-
-    public getParsers() {
-        return [
-            this._htmlParser,
-            this._jsParser
-        ];
-    }
-
-    public getAdUnitFactory() {
-        return this._adUnitFactory;
+        const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
+        const adUnitFactory = new DisplayInterstitialAdUnitFactory();
+        contentTypeHandlerMap[ProgrammaticStaticInterstitialParser.ContentTypeHtml] = {
+            parser: new ProgrammaticStaticInterstitialParser(false),
+            adUnitFactory
+        };
+        contentTypeHandlerMap[ProgrammaticStaticInterstitialParser.ContentTypeJs] = {
+            parser: new ProgrammaticStaticInterstitialParser(true),
+            adUnitFactory
+        };
+        super(contentTypeHandlerMap);
     }
 
 }

@@ -7,7 +7,7 @@ import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { CampaignParserManager } from 'Ads/Managers/CampaignParserManager';
+import { ContentTypeHandlerManager } from 'ContentTypeHandlerManager.ts';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -135,7 +135,7 @@ describe('CampaignRefreshManager', () => {
     let programmaticTrackingService: ProgrammaticTrackingService;
     let placementManager: PlacementManager;
     let backupCampaignManager: BackupCampaignManager;
-    let campaignParserManager: CampaignParserManager;
+    let campaignParserManager: ContentTypeHandlerManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -161,7 +161,7 @@ describe('CampaignRefreshManager', () => {
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
         backupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig);
-        campaignParserManager = new CampaignParserManager();
+        campaignParserManager = new ContentTypeHandlerManager();
         assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
         container = new TestContainer();
         const campaign = TestFixtures.getCampaign();
