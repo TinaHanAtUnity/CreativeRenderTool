@@ -3,7 +3,6 @@ import { Session } from 'Ads/Models/Session';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { BannerCampaignParser } from 'Banners/Parsers/BannerCampaignParser';
 import { assert } from 'chai';
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 
@@ -17,7 +16,6 @@ describe('BannerCampaignParser', () => {
     const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = ABGroupBuilder.getAbGroup(99);
 
     let parser: BannerCampaignParser;
     let nativeBridge: NativeBridge;

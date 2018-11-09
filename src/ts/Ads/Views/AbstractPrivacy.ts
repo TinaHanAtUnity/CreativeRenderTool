@@ -47,7 +47,7 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
             platform: clientInfo.getPlatform() === Platform.IOS ? 'iOS' : 'Android',
             campaign: campaign.getId(),
             apiLevel: nativeBridge.getApiLevel(),
-            group: configuration.getAbGroup().toNumber(),
+            group: configuration.getAbGroup(),
             sdk: clientInfo.getSdkVersionName(),
             webview: clientInfo.getWebviewVersion(),
             webviewHash: clientInfo.getWebviewHash(),

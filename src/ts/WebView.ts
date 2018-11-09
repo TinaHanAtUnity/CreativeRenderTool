@@ -48,7 +48,7 @@ import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { toAbGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -686,8 +686,7 @@ export class WebView {
                 // needed in both due to placement level control support
                 const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
                 if (!isNaN(abGroupNumber)) { // if it is a number get the group
-                    const abGroup = ABGroupBuilder.getAbGroup(abGroupNumber);
-                    ConfigManager.setAbGroup(abGroup);
+                    ConfigManager.setAbGroup(toAbGroup(abGroupNumber));
                 }
             }
 

@@ -90,7 +90,7 @@ export class ConfigManager {
 
         let abGroup;
         if (ConfigManager.AbGroup) {
-            abGroup = ConfigManager.AbGroup.toNumber();
+            abGroup = ConfigManager.AbGroup;
         }
 
         url = Url.addParameters(url, {

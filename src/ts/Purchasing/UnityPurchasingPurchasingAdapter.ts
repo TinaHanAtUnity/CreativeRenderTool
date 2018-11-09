@@ -89,7 +89,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
             trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
             iapPromo: true,
             gameId: this._clientInfo.getGameId() + '|' + this._coreConfiguration.getToken(),
-            abGroup: this._coreConfiguration.getAbGroup().toNumber(),
+            abGroup: this._coreConfiguration.getAbGroup(),
             request: IPromoRequest.CLOSE,
             purchaseTrackingUrls: modifiedPurchaseUrls
         };
@@ -126,7 +126,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
     private getInitializationPayload(): IPromoPayload {
         return <IPromoPayload>{
             iapPromo: true,
-            abGroup: this._coreConfiguration.getAbGroup().toNumber(),
+            abGroup: this._coreConfiguration.getAbGroup(),
             gameId: this._clientInfo.getGameId() + '|' + this._coreConfiguration.getToken(),
             trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
             gamerToken: this._coreConfiguration.getToken(),

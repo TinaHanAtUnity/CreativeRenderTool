@@ -1,93 +1,59 @@
 import { assert } from 'chai';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
-
-import { ABGroupBuilder, FakeEnabledABTest, FakeDisabledABTest } from 'Core/Models/ABGroup';
+import { toAbGroup, FakeEnabledABTest, FakeDisabledABTest } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import 'mocha';
 import * as sinon from 'sinon';
 import { WebView } from 'WebView';
 
-describe('ABGroupBuilder tests', () => {
-    describe('getAbGroup', () => {
-        it('should give a valid group for numbers between 0-19', () => {
-            for(let i = 0; i < 20; i++) {
-                const abGroup = ABGroupBuilder.getAbGroup(i);
-                assert.notEqual(abGroup.toNumber(), -1);
-                assert.equal(abGroup.toNumber(), i);
+describe('ABGroupTests', () => {
+    const validGroups = [...Array(20).keys()];
+
+    describe('toAbGroup', () => {
+        it('should return test A/B group for number 99', () => {
+            assert.equal(toAbGroup(99), 99);
+        });
+
+        it('should return a valid group for numbers between 0-19', () => {
+            assert.equal(toAbGroup(validGroups[0]), 0);
+            for (const i of validGroups) {
+                assert.equal(toAbGroup(i), i);
+            }
+            assert.equal(toAbGroup(validGroups[validGroups.length - 1]), 19);
+        });
+
+        it('should return invalid group', () => {
+            assert.equal(toAbGroup(-1), -1);
+            assert.equal(toAbGroup(20), -1);
+        });
+    });
+
+    describe('FakeEnabledABTest', () => {
+        it('should return true for A/B groups 16 and 17', () => {
+            assert.isTrue(FakeEnabledABTest.isValid(toAbGroup(16)));
+            assert.isTrue(FakeEnabledABTest.isValid(toAbGroup(17)));
+        });
+
+        it('should return false for other A/B groups', () => {
+            const invalidGroups = validGroups.filter(v => v !== 16 && v !== 17);
+            for (const i of invalidGroups) {
+                assert.isFalse(FakeEnabledABTest.isValid(toAbGroup(i)));
             }
         });
-
-        it('should give a valid group for 99', () => {
-            const abGroup = ABGroupBuilder.getAbGroup(99);
-            assert.notEqual(abGroup.toNumber(), -1);
-            assert.equal(abGroup.toNumber(), 99);
-        });
-
-        it('should give group none when not valid', () => {
-            const abGroup = ABGroupBuilder.getAbGroup(20);
-            assert.equal(abGroup.toNumber(), -1);
-        });
-    });
-});
-
-describe('FakeEnabledABTest tests', () => {
-    for(let i = 0; i < 20; i++) {
-        if (i === 16 || i === 17) {
-            continue;
-        }
-
-        it(`should return false for AB group ${i}`, () => {
-            const abGroup = ABGroupBuilder.getAbGroup(i);
-            assert.isFalse(FakeDisabledABTest.isValid(abGroup));
-        });
-    }
-
-    it(`should return true for AB group 16`, () => {
-        const abGroup = ABGroupBuilder.getAbGroup(16);
-        assert.isFalse(FakeDisabledABTest.isValid(abGroup));
     });
 
-    it(`should return true for AB group 17`, () => {
-        const abGroup = ABGroupBuilder.getAbGroup(17);
-        assert.isFalse(FakeDisabledABTest.isValid(abGroup));
-    });
-});
-
-describe('FakeDisabledABTest tests', () => {
-    for(let i = 0; i < 20; i++) {
-        it(`should return false for AB group ${i}`, () => {
-            const abGroup = ABGroupBuilder.getAbGroup(i);
-            assert.isFalse(FakeDisabledABTest.isValid(abGroup));
+    describe('FakeDisabledABTest tests', () => {
+        it('should return false for all A/B groups', () => {
+            for (const i of validGroups) {
+                assert.isFalse(FakeDisabledABTest.isValid(toAbGroup(i)));
+            }
+            assert.isFalse(FakeDisabledABTest.isValid(99));
+            assert.isFalse(FakeDisabledABTest.isValid(-1));
         });
-    }
-});
+    });
 
-describe('ABGroup tests', () => {
-
-    // Example test of ABTest
-    // describe('GdprBaseAbTest.isValid', () => {
-    //     it('should return true for group 16', () => {
-    //         const abGroup = ABGroupBuilder.getAbGroup(16);
-    //         assert.isTrue(GdprBaseAbTest.isValid(abGroup));
-    //     });
-
-    //     it('should return true for group 17', () => {
-    //         const abGroup = ABGroupBuilder.getAbGroup(17);
-    //         assert.isTrue(GdprBaseAbTest.isValid(abGroup));
-    //     });
-
-    //     it('should return false for all groups not 16 and 17', () => {
-    //         for (let i = -1; i < 100; i++) {
-    //             if (i !== 16 && i !== 17) {
-    //                 const abGroup = ABGroupBuilder.getAbGroup(i);
-    //                 assert.isFalse(GdprBaseAbTest.isValid(abGroup));
-    //             }
-    //         }
-    //     });
-    // });
-
-    describe('setupTestEnvironment in webview should set AbGroup on ConfigManager and CampaignManager', () => {
+    describe('setupTestEnvironment in WebView should set AbGroup on ConfigManager and CampaignManager', () => {
         const tests: Array<{
             metaDataGroup: any;
             expectedGroup: number | undefined;
@@ -104,18 +70,18 @@ describe('ABGroup tests', () => {
         tests.forEach((t) => {
             it(`expected group is ${t.expectedGroup} and the metadata group is ${t.metaDataGroup}`, () => {
                 const nativeBridge: NativeBridge = sinon.createStubInstance(NativeBridge);
-                const webview: any = new WebView(nativeBridge);
+                const webView: any = new WebView(nativeBridge);
                 const setupStub: sinon.SinonStub = sinon.stub(TestEnvironment, 'setup').resolves();
                 const getStub: sinon.SinonStub = sinon.stub(TestEnvironment, 'get');
                 getStub.withArgs('abGroup').returns(t.metaDataGroup);
-                const promise = webview.setupTestEnvironment();
+                const promise = webView.setupTestEnvironment();
                 return promise.then(() => {
                     sinon.assert.calledWith(getStub, 'abGroup');
                     let configAbGroupNumber: number | undefined;
                     const configManager = <any>ConfigManager;
                     const maybeGroup = configManager.AbGroup;
                     if (maybeGroup) {
-                        configAbGroupNumber = maybeGroup.toNumber();
+                        configAbGroupNumber = maybeGroup;
                     }
                     assert.equal(configAbGroupNumber, t.expectedGroup);
                     configManager.AbGroup = undefined;
