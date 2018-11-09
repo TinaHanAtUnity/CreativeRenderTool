@@ -9,6 +9,9 @@ export enum PlacementState {
     NO_FILL
 }
 
+export type PlacementAuctionType = 'cpm' | 'ltv';
+export const DefaultPlacementAuctionType = 'cpm';
+
 interface IPlacement {
     id: string;
     name: string;
@@ -33,6 +36,7 @@ interface IPlacement {
     currentCampaign: Campaign | undefined;
     refreshDelay: number | undefined;
     position: string | undefined;
+    auctionType: PlacementAuctionType;
 }
 
 export class Placement extends Model<IPlacement> {
@@ -55,7 +59,8 @@ export class Placement extends Model<IPlacement> {
             placementStateChanged: ['boolean'],
             currentCampaign: ['object', 'undefined'],
             refreshDelay: ['number', 'undefined'],
-            position: ['string', 'undefined']
+            position: ['string', 'undefined'],
+            auctionType: ['string']
         });
 
         this.set('id', data.id);
@@ -82,6 +87,7 @@ export class Placement extends Model<IPlacement> {
         this.set('state', PlacementState.NOT_AVAILABLE);
         this.set('refreshDelay', data.refreshDelay);
         this.set('position', data.position || 'bottomcenter');
+        this.set('auctionType', data.auctionType || DefaultPlacementAuctionType);
     }
 
     public getId(): string {
@@ -126,6 +132,10 @@ export class Placement extends Model<IPlacement> {
 
     public getState(): PlacementState {
         return this.get('state');
+    }
+
+    public getAuctionType(): PlacementAuctionType {
+        return this.get('auctionType');
     }
 
     public setState(state: PlacementState): void {
