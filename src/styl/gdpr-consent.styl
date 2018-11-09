@@ -23,7 +23,7 @@
   }
 
   .item {
-    padding: $default-size;
+    padding: 0.5 * $default-size $default-size;
   }
 
   .title,
@@ -31,19 +31,27 @@
   .show-options {
     text-align: center;
   }
-
+  .title {
+    padding-top: $default-size;
+    font-weight: 500;
+  }
   .description {
     font-size: $default-size * .65;
     text-align: justify;
+    color: $privacy-text-color;
+    font-weight: 300;
   }
 
   .agree {
-    background-color: forestgreen;
+    background-color: $blue;
+    color: $white;
+    margin-bottom: .25 * $default-size
   }
 
-  .logo-container {
-    border-top: 1px solid $light-gray
-    padding: $default-size;
+  .consent-button {
+    border-radius: $default-size * .25;
+    border: 1px solid $light-gray;
+    font-size: $default-size * .65;
   }
 
   .unityads-logo {

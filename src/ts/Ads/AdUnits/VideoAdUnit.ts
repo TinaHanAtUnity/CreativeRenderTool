@@ -115,9 +115,13 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public showAd(): void {
-        this.prepareOverlay();
-
         this.setShowingAd(true);
+
+        const overlay = this.getOverlay();
+        if(overlay) {
+            overlay.show();
+        }
+
         if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
             if(this.getVideo().isCached()) {
                 this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
@@ -298,6 +302,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                 overlay.setSkipEnabled(true);
                 overlay.setSkipDuration(this._placement.allowSkipInSeconds());
             }
+            overlay.hide();
         }
     }
 
