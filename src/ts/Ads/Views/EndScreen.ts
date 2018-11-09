@@ -4,7 +4,10 @@ import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { ABGroup } from 'Core/Models/ABGroup';
+import {
+    ABGroup,
+    GreenEndScreenButtonColorTest
+} from 'Core/Models/ABGroup';
 import { Localization } from 'Core/Utilities/Localization';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
@@ -94,14 +97,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     public render(): void {
         super.render();
-
         if (this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
-        }
-
-        const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
-        if (ctaButtonColor) {
-            (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
         }
 
         const endScreenAlt = this.getEndscreenAlt();
@@ -114,10 +111,25 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             this._container.classList.add('show-gdpr-banner');
         }
 
-        // Android <= 4.4.4
-        if (this._platform === Platform.ANDROID && this._apiLevel! <= 19) {
-            this._container.classList.add('old-androids');
+        let ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
+
+        if (this._platform === Platform.ANDROID) {
+            if (this._apiLevel! <= 19) {   // Android <= 4.4.4
+                this._container.classList.add('old-androids');
+            }
+            ctaButtonColor = this.overrideButtonColor(ctaButtonColor);
         }
+
+        if (ctaButtonColor) {
+            (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
+        }
+    }
+
+    private overrideButtonColor(ctaButtonColor: string | undefined): string | undefined {
+        if (GreenEndScreenButtonColorTest.isValid(this._abGroup)) {
+            return '#83CD0C';
+        }
+        return ctaButtonColor;
     }
 
     public show(): void {

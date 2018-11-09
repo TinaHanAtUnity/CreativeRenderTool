@@ -463,56 +463,54 @@ export class Ads implements IAds {
         }
     }
 
-    private setupTestEnvironment(): Promise<void> {
-        return TestEnvironment.setup(new MetaData(this._core.Api)).then(() => {
-            if(TestEnvironment.get('serverUrl')) {
-                ProgrammaticOperativeEventManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
-                CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));
-                AuctionRequest.setBaseUrl(TestEnvironment.get('serverUrl'));
-            }
+    private setupTestEnvironment(): void {
+        if(TestEnvironment.get('serverUrl')) {
+            ProgrammaticOperativeEventManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
+            CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));
+            AuctionRequest.setBaseUrl(TestEnvironment.get('serverUrl'));
+        }
 
-            if(TestEnvironment.get('campaignId')) {
-                CampaignManager.setCampaignId(TestEnvironment.get('campaignId'));
-            }
+        if(TestEnvironment.get('campaignId')) {
+            CampaignManager.setCampaignId(TestEnvironment.get('campaignId'));
+        }
 
-            if(TestEnvironment.get('sessionId')) {
-                CampaignManager.setSessionId(TestEnvironment.get('sessionId'));
-            }
+        if(TestEnvironment.get('sessionId')) {
+            CampaignManager.setSessionId(TestEnvironment.get('sessionId'));
+        }
 
-            if(TestEnvironment.get('country')) {
-                CampaignManager.setCountry(TestEnvironment.get('country'));
-            }
+        if(TestEnvironment.get('country')) {
+            CampaignManager.setCountry(TestEnvironment.get('country'));
+        }
 
-            if(TestEnvironment.get('autoSkip')) {
-                Overlay.setAutoSkip(TestEnvironment.get('autoSkip'));
-            }
+        if(TestEnvironment.get('autoSkip')) {
+            Overlay.setAutoSkip(TestEnvironment.get('autoSkip'));
+        }
 
-            if(TestEnvironment.get('autoClose')) {
-                AbstractAdUnit.setAutoClose(TestEnvironment.get('autoClose'));
-            }
+        if(TestEnvironment.get('autoClose')) {
+            AbstractAdUnit.setAutoClose(TestEnvironment.get('autoClose'));
+        }
 
-            if(TestEnvironment.get('autoCloseDelay')) {
-                AbstractAdUnit.setAutoCloseDelay(TestEnvironment.get('autoCloseDelay'));
-            }
+        if(TestEnvironment.get('autoCloseDelay')) {
+            AbstractAdUnit.setAutoCloseDelay(TestEnvironment.get('autoCloseDelay'));
+        }
 
-            if(TestEnvironment.get('forcedOrientation')) {
-                AdUnitContainer.setForcedOrientation(TestEnvironment.get('forcedOrientation'));
-            }
+        if(TestEnvironment.get('forcedOrientation')) {
+            AdUnitContainer.setForcedOrientation(TestEnvironment.get('forcedOrientation'));
+        }
 
-            if(TestEnvironment.get('forcedPlayableMRAID')) {
-                MRAIDAdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
-            }
+        if(TestEnvironment.get('forcedPlayableMRAID')) {
+            MRAIDAdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
+        }
 
-            if(TestEnvironment.get('forcedGDPRBanner')) {
-                AbstractAdUnitFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
-            }
+        if(TestEnvironment.get('forcedGDPRBanner')) {
+            AbstractAdUnitFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
+        }
 
-            let forcedARMRAID = false;
-            if (TestEnvironment.get('forcedARMRAID')) {
-                forcedARMRAID = TestEnvironment.get('forcedARMRAID');
-                MRAIDAdUnitFactory.setForcedARMRAID(forcedARMRAID);
-            }
-        });
+        let forcedARMRAID = false;
+        if (TestEnvironment.get('forcedARMRAID')) {
+            forcedARMRAID = TestEnvironment.get('forcedARMRAID');
+            MRAIDAdUnitFactory.setForcedARMRAID(forcedARMRAID);
+        }
     }
 
 }

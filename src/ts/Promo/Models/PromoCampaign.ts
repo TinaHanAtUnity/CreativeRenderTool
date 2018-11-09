@@ -5,7 +5,6 @@ import { ProductInfo } from 'Promo/Models/ProductInfo';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
 export interface IPromoCampaign extends ICampaign {
-    additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
     dynamicMarkup: string | undefined;
     creativeAsset: HTML | undefined;
     rewardedPromo: boolean;
@@ -19,7 +18,6 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
     constructor(campaign: IPromoCampaign) {
         super('PromoCampaign', {
             ... Campaign.Schema,
-            additionalTrackingEvents: ['object', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
             creativeAsset: ['object', 'undefined'],
             rewardedPromo: ['boolean'],
@@ -41,13 +39,13 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
     }
 
     private createTrackingEventUrlsWithProductType(productType: string): { [url: string]: string[] } {
-        const additionalTrackingEvents = this.get('additionalTrackingEvents');
+        const trackingUrls = this.get('trackingUrls');
         const result: { [url: string]: string[] } = { };
-        if (additionalTrackingEvents !== undefined) {
-            for (const key in additionalTrackingEvents) {
-                if(additionalTrackingEvents.hasOwnProperty(key)) {
+        if (trackingUrls !== undefined) {
+            for (const key in trackingUrls) {
+                if(trackingUrls.hasOwnProperty(key)) {
                     result[key] = [];
-                    const trackingURLs = additionalTrackingEvents[key];
+                    const trackingURLs = trackingUrls[key];
                     for(const trackingURL of trackingURLs) {
                         if(trackingURL) {
                             const isStagingURL = trackingURL.indexOf('events-iap.staging.unityads.unity3d.com') !== -1;
@@ -69,15 +67,15 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         const productId = this.getIapProductId();
         const productType = PurchasingUtilities.getProductType(productId);
         if (productType === undefined) {
-            return this.get('additionalTrackingEvents');
+            return this.get('trackingUrls');
         }
         return this.createTrackingEventUrlsWithProductType(productType);
     }
 
-    public getTrackingUrlsForEvent(eventName: string): string[] {
-        const trackingUrls = this.getTrackingEventUrls();
-        if (trackingUrls) {
-            return trackingUrls[eventName] || [];
+    public getTrackingUrlsForEvent(event: string): string[] {
+        const urls = this.getTrackingEventUrls();
+        if (urls) {
+            return urls[event] || [];
         }
         return [];
     }
