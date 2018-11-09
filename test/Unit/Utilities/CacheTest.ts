@@ -25,7 +25,7 @@ class TestCacheApi extends CacheApi {
         super(nativeBridge);
     }
 
-    public download(url: string, fileId: string, headers: Array<[string, string]>, append: boolean): Promise<void> {
+    public download(url: string, fileId: string, headers: [string, string][], append: boolean): Promise<void> {
         const byteCount: number = 12345;
         const duration: number = 6789;
         const responseCode: number = 200;
