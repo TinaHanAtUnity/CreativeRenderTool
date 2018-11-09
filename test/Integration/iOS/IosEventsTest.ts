@@ -80,11 +80,13 @@ describe('IosEventsTest', () => {
         let startCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if(++readyCount === 1) {
-                    UnityAds.show(placement);
-                }
-                if(startCount === 1) {
-                    UnityAds.show(placement);
+                if(placement === 'video') {
+                    if(++readyCount === 1) {
+                        UnityAds.show(placement);
+                    }
+                    if(startCount === 1) {
+                        UnityAds.show(placement);
+                    }
                 }
             },
             onUnityAdsStart: (placement: string) => {
