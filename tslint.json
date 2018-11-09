@@ -8,7 +8,7 @@
     "no-bitwise": false,
     "no-any": false,
     "no-typeof-undefined": false,
-    "whitespace": [false, "check-branch", "check-decl", "check-operator", "check-separator", "check-type"],
+    "whitespace": [true, "check-decl", "check-operator", "check-separator", "check-type"],
     "prefer-template": false,
     "no-increment-decrement": false,
     "no-implicit-dependencies": false,

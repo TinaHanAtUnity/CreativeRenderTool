@@ -87,7 +87,7 @@ describe('OperativeEventManagerFactoryTest', () => {
         });
 
         it('with MRAIDCampaign', () => {
-            const campaign = TestFixtures.getPlayableMRAIDCampaign();
+            const campaign = TestFixtures.getExtendedMRAIDCampaign();
             const manager = OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
                 request: request,

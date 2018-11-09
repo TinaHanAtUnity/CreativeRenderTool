@@ -32,6 +32,7 @@ import OnCometVideoPlcCampaignStandaloneAndroid from 'json/OnCometVideoPlcCampai
 import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaignFollowsRedirects.json';
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import OnXPromoPlcCampaign from 'json/OnXPromoPlcCampaign.json';
+import OnCometVideoPlcCampaignWithSquareEndScreenAsset from 'json/OnCometVideoPlcCampaignWithSquareEndScreenAsset.json';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
@@ -104,8 +105,9 @@ export class TestFixtures {
             gameIcon: new Image(json.gameIcon, session),
             rating: json.rating,
             ratingCount: json.ratingCount,
-            landscapeImage: new Image(json.endScreenLandscape, session),
-            portraitImage: new Image(json.endScreenPortrait, session),
+            landscapeImage: json.endScreenLandscape ? new Image(json.endScreenLandscape, session) : undefined,
+            portraitImage: json.endScreenPortrait ? new Image(json.endScreenPortrait, session) : undefined,
+            squareImage: json.endScreen ? new Image(json.endScreen, session) : undefined,
             clickAttributionUrl: json.clickAttributionUrl,
             clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
             clickUrl: json.clickUrl,
@@ -163,7 +165,7 @@ export class TestFixtures {
         return parameters;
     }
 
-    public static getPlayableMRAIDCampaignParams(json: any, storeName: StoreName): IMRAIDCampaign {
+    public static getExtendedMRAIDCampaignParams(json: any, storeName: StoreName): IMRAIDCampaign {
         const mraidContentJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         const session = this.getSession();
@@ -402,6 +404,12 @@ export class TestFixtures {
         return new PerformanceCampaign(this.getPerformanceCampaignParams(performanceJson, StoreName.GOOGLE));
     }
 
+    public static getCampaignWithSquareEndScreenAsset(): PerformanceCampaign {
+        const json = JSON.parse(OnCometVideoPlcCampaignWithSquareEndScreenAsset);
+        const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+        return new PerformanceCampaign(this.getPerformanceCampaignParams(performanceJson, StoreName.GOOGLE));
+    }
+
     public static getXPromoCampaign(): XPromoCampaign {
         const json = JSON.parse(OnXPromoPlcCampaign);
         const xPromoJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
@@ -409,14 +417,14 @@ export class TestFixtures {
         return new XPromoCampaign(this.getXPromoCampaignParams(xPromoJson, StoreName.GOOGLE, creativeId));
     }
 
-    public static getPlayableMRAIDCampaignFollowsRedirects(): MRAIDCampaign {
+    public static getExtendedMRAIDCampaignFollowsRedirects(): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaignFollowsRedirects);
-        return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(json, StoreName.GOOGLE));
+        return new MRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE));
     }
 
-    public static getPlayableMRAIDCampaign(): MRAIDCampaign {
+    public static getExtendedMRAIDCampaign(): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaign);
-        return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(json, StoreName.GOOGLE));
+        return new MRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE));
     }
 
     public static getProgrammaticMRAIDCampaign(customParams: Partial<ICampaign> = {}): MRAIDCampaign {
