@@ -157,7 +157,9 @@ describe('MraidIframeEventBridge', () => {
                         window.postMessage({
                             type: e
                         }, '*');
-                        return Promise.resolve();
+                        return new Promise((resolve) => {
+                            setTimeout(resolve);
+                        });
                     });
                 };
             };
@@ -175,7 +177,9 @@ describe('MraidIframeEventBridge', () => {
                             type: e,
                             properties: data
                         }, '*');
-                        return Promise.resolve();
+                        return new Promise((resolve) => {
+                            setTimeout(resolve);
+                        });
                     });
                 };
             };
