@@ -34,6 +34,13 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       $unityads-logo-default($scale-size);
     }
 
+    .china-advertisement {
+      $china-overlay($default-scale-size);
+      bottom: 0;
+      padding: $default-size * $scale-size * .5;
+      color: $black;
+    }
+
     .name-container {
       $name-container-default($scale-size);
     }

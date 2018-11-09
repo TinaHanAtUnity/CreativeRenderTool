@@ -29,7 +29,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
             campaignId: parameters.campaign.getId(),
             osVersion: parameters.deviceInfo.getOsVersion()
         };
-        const endScreen = new PerformanceEndScreen(endScreenParameters, parameters.campaign);
+        const endScreen = new PerformanceEndScreen(endScreenParameters, parameters.campaign, parameters.coreConfig.getCountry());
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
