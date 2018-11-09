@@ -266,7 +266,7 @@ describe('OperativeEventManagerTest', () => {
             });
 
             it('MRAIDCampaign specific', () => {
-                campaign = TestFixtures.getPlayableMRAIDCampaign();
+                campaign = TestFixtures.getExtendedMRAIDCampaign();
                 const params = {
                     ... operativeEventManagerParams,
                     campaign: campaign

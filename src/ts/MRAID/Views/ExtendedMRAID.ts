@@ -9,12 +9,12 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import MRAIDPerfContainer from 'html/mraid/container-perf.html';
 import MRAIDContainer from 'html/mraid/container.html';
-import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
+import ExtendedMRAIDTemplate from 'html/ExtendedMRAID.html';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
-export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
+export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _loadingScreen: HTMLElement;
     private _loadingScreenTimeout: any;
@@ -29,14 +29,14 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _messageListener: any;
 
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: PerformanceMRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
-        super(platform, core, deviceInfo, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
+        super(platform, core, deviceInfo, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
         this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
         this._localization = new Localization(language, 'loadingscreen');
 
-        this._template = new Template(PlayableMRAIDTemplate, this._localization);
+        this._template = new Template(ExtendedMRAIDTemplate, this._localization);
 
         if(campaign) {
             this._templateData = {

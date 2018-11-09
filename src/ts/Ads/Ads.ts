@@ -494,7 +494,7 @@ export class Ads implements IAds {
         }
 
         if(TestEnvironment.get('forcedPlayableMRAID')) {
-            MRAIDAdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
+            MRAIDAdUnitFactory.setForcedExtendedMRAID(TestEnvironment.get('forcedPlayableMRAID'));
         }
 
         if(TestEnvironment.get('forcedGDPRBanner')) {

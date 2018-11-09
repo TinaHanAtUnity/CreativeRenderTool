@@ -309,7 +309,7 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('get campaign should return a campaign (MRAID)', () => {
-            const mraid = TestFixtures.getPlayableMRAIDCampaign();
+            const mraid = TestFixtures.getExtendedMRAIDCampaign();
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', mraid);
@@ -342,7 +342,7 @@ describe('CampaignRefreshManager', () => {
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', campaign);
-                campaign = TestFixtures.getPlayableMRAIDCampaign();
+                campaign = TestFixtures.getExtendedMRAIDCampaign();
                 return Promise.resolve();
             });
 
@@ -433,7 +433,7 @@ describe('CampaignRefreshManager', () => {
 
         it ('should set campaign status to ready after close', () => {
             let campaign: Campaign = TestFixtures.getCampaign();
-            const campaign2 = TestFixtures.getPlayableMRAIDCampaign();
+            const campaign2 = TestFixtures.getExtendedMRAIDCampaign();
             const placement: Placement = adsConfig.getPlacement('premium');
             adUnitParams.campaign = campaign;
             adUnitParams.placement = placement;

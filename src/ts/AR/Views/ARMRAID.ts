@@ -13,7 +13,7 @@ import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilit
 import { Template } from 'Core/Utilities/Template';
 import MRAIDContainer from 'html/mraid/container.html';
 import WebARScript from 'html/mraid/webar.html';
-import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
+import ExtendedMRAIDTemplate from 'html/ExtendedMRAID.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
@@ -53,7 +53,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _permissionResultObserver: IObserver2<string, boolean>;
 
     constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
-        super(platform, core, deviceInfo, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
+        super(platform, core, deviceInfo, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
         this._ar = ar;
         this._deviceInfo = deviceInfo;
@@ -61,7 +61,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._campaign = campaign;
         this._localization = new Localization(language, 'loadingscreen');
 
-        this._template = new Template(PlayableMRAIDTemplate, this._localization);
+        this._template = new Template(ExtendedMRAIDTemplate, this._localization);
 
         this._bindings = this._bindings.concat([
             {
