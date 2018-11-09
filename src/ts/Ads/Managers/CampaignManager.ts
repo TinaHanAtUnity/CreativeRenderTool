@@ -462,10 +462,8 @@ export class CampaignManager {
     }
 
     private handleParseCampaignError(contentType: string, campaignError: CampaignError, placementIds: string[], session?: Session): Promise<void> {
-
         const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._nativeBridge, this._request);
         campaignErrorHandler.handleCampaignError(campaignError);
-
         return this.handleError(campaignError, placementIds, `parse_campaign_${contentType.replace(/[\/-]/g, '_')}_error`, session);
     }
 
