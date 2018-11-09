@@ -26,10 +26,6 @@ export class NoFillError extends Error {
 }
 
 export class BannerCampaignManager {
-
-    private static CreativeId: string | undefined;
-    private static SeatId: number | undefined;
-
     private _nativeBridge: NativeBridge;
     private _assetManager: AssetManager;
     private _coreConfig: CoreConfiguration;
@@ -57,14 +53,6 @@ export class BannerCampaignManager {
         this._metaDataManager = metaDataManager;
         this._adMobSignalFactory = adMobSignalFactory;
         this._jaegerManager = jaegerManager;
-    }
-
-    public static setSeatId(seatId: number) {
-        BannerCampaignManager.SeatId = seatId;
-    }
-
-    public static setCreativeId(creativeId: string) {
-        BannerCampaignManager.CreativeId = creativeId;
     }
 
     public request(placement: Placement, nofillRetry?: boolean): Promise<Campaign> {
