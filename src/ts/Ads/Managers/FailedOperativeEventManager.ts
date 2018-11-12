@@ -70,8 +70,8 @@ export class FailedOperativeEventManager {
         });
     }
 
-    protected getPromisesForFailedEvents(request: RequestManager, storageBridge: StorageBridge, keys: string[]): Array<Promise<any>> {
-        const promises: Array<Promise<any>> = [];
+    protected getPromisesForFailedEvents(request: RequestManager, storageBridge: StorageBridge, keys: string[]): Promise<any>[] {
+        const promises: Promise<any>[] = [];
         keys.map(eventId => {
             const manager = new FailedOperativeEventManager(this._core, this._sessionId, eventId);
             promises.push(manager.sendFailedEvent(request, storageBridge));

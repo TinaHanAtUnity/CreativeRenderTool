@@ -64,7 +64,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
 
-        this._afmaBridge = new AFMABridge(core,{
+        this._afmaBridge = new AFMABridge(core, {
             onAFMAClose: () => this.onClose(),
             onAFMAOpenURL: (url: string) => this.onOpenURL(url),
             onAFMADisableBackButton: () => { /**/ },

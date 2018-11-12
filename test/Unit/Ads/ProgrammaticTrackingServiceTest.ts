@@ -69,10 +69,10 @@ describe('Ads/Utilities', () => {
     });
 
     describe('reportMetric', () => {
-        const tests: Array<{
+        const tests: {
             input: ProgrammaticTrackingMetric;
             expected: IProgrammaticTrackingMetricData;
-        }> = [{
+        }[] = [{
             input: ProgrammaticTrackingMetric.AdmobUsedCachedVideo,
             expected: {
                 event: ProgrammaticTrackingMetric.AdmobUsedCachedVideo

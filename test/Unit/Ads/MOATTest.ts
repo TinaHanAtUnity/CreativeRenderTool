@@ -26,10 +26,10 @@ describe('MOAT', () => {
 
         type IAssertionFunction = () => void;
 
-        const tests: Array<{
+        const tests: {
             event: any;
             assertions: IAssertionFunction;
-        }> = [{
+        }[] = [{
             event: {data: {type: 'MOATVideoError', error: 'test error'}},
             assertions: () => {
                 sinon.assert.calledWithExactly(diagnosticsTriggerStub, 'moat_video_error', 'test error');

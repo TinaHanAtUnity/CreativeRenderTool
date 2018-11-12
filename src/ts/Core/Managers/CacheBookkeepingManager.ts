@@ -46,7 +46,7 @@ export class CacheBookkeepingManager {
 
             return this.cleanCacheBookKeeping().then(() => {
                 // clean files older than three weeks and limit cache size to 50 megabytes
-                const promises: Array<Promise<any>> = [];
+                const promises: Promise<any>[] = [];
                 const timeThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
                 const sizeThreshold: number = 50 * 1024 * 1024;
 
@@ -207,7 +207,7 @@ export class CacheBookkeepingManager {
 
     private cleanCacheBookKeeping(): Promise<void> {
         return this.getKeys().then((cacheKeys) => {
-            const promises: Array<Promise<any>> = cacheKeys
+            const promises: Promise<any>[] = cacheKeys
                 .filter(cacheKey => cacheKey && !(cacheKey.toUpperCase() in CacheKey))
                 .map(cacheKey => this._core.Storage.delete(StorageType.PRIVATE, this._rootKey + '.' + cacheKey));
 

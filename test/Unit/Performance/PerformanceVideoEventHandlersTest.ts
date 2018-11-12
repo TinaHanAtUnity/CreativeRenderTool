@@ -13,6 +13,7 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Overlay } from 'Ads/Views/Overlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -41,7 +42,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
     let ads: IAdsApi;
     let ar: IARApi;
     let purchasing: IPurchasingApi;
-    let overlay: Overlay;
+    let overlay: NewVideoOverlay;
     let endScreen: PerformanceEndScreen;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
@@ -102,7 +103,17 @@ describe('PerformanceVideoEventHandlersTest', () => {
             targetGameName: campaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, campaign);
-        overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
+
+        const overlayParams: IVideoOverlayParameters<PerformanceCampaign> = {
+            platform,
+            ads,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            campaign: campaign,
+            coreConfig: coreConfig,
+            placement: TestFixtures.getPlacement()
+        };
+        overlay = new NewVideoOverlay(overlayParams, privacy, false);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         performanceAdUnitParameters = {
@@ -169,6 +180,14 @@ describe('PerformanceVideoEventHandlersTest', () => {
             // Cause an error by giving too large duration
             performanceVideoEventHandler.onPrepared(video.getUrl(), 50000, 1024, 768);
             sinon.assert.called(<sinon.SinonSpy>endScreen.show);
+        });
+    });
+
+    describe('with onPrepared', () => {
+        it('should show set overlay call button visible ', () => {
+            sinon.spy(overlay, 'setCallButtonVisible');
+            performanceVideoEventHandler.onPrepared(video.getUrl(), 5, 1024, 768);
+            sinon.assert.calledWith(<sinon.SinonSpy>overlay.setCallButtonVisible, true);
         });
     });
 });

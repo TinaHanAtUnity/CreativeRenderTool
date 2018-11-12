@@ -6,10 +6,12 @@ import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManager
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
+import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Overlay } from 'Ads/Views/Overlay';
 import { Privacy } from 'Ads/Views/Privacy';
+import { IARApi } from 'AR/AR';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -28,10 +30,9 @@ import 'mocha';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('PerformanceOverlayEventHandlerTest', () => {
 
@@ -53,6 +54,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
     let request: RequestManager;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
+    let downloadHelper: AppStoreDownloadHelper;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -107,6 +109,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         endScreen = new PerformanceEndScreen(endScreenParams, campaign);
         overlay = new Overlay(platform, ads, <AndroidDeviceInfo>deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        const placement = TestFixtures.getPlacement();
 
         performanceAdUnitParameters = {
             platform,
@@ -121,7 +124,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            placement: TestFixtures.getPlacement(),
+            placement: placement,
             campaign: campaign,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
@@ -136,7 +139,23 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         };
 
         performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
-        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, performanceAdUnitParameters);
+
+        const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+            platform,
+            core,
+            ads,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            placement: placement,
+            adUnit: performanceAdUnit,
+            campaign: campaign,
+            coreConfig: coreConfig
+        };
+        downloadHelper = new AppStoreDownloadHelper(downloadHelperParameters);
+
+        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
     });
 
     describe('with onSkip', () => {

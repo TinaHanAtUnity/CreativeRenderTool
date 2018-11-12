@@ -11,6 +11,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
+import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 
 export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -32,9 +33,26 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
         };
 
         const xPromoAdUnit = new XPromoAdUnit(xPromoAdUnitParameters);
-        const xPromoOverlayEventHandler = new XPromoOverlayEventHandler(xPromoAdUnit, xPromoAdUnitParameters);
+
+        const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+            platform: parameters.platform,
+            core: parameters.core,
+            ads: parameters.ads,
+            thirdPartyEventManager: parameters.thirdPartyEventManager,
+            operativeEventManager: parameters.operativeEventManager,
+            deviceInfo: parameters.deviceInfo,
+            clientInfo: parameters.clientInfo,
+            placement: parameters.placement,
+            adUnit: xPromoAdUnit,
+            campaign: parameters.campaign,
+            coreConfig: parameters.coreConfig
+        };
+
+        const downloadHelper = new AppStoreDownloadHelper(downloadHelperParameters);
+
+        const xPromoOverlayEventHandler = new XPromoOverlayEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadHelper);
         overlay.addEventHandler(xPromoOverlayEventHandler);
-        const endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters);
+        const endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadHelper);
         endScreen.addEventHandler(endScreenEventHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(xPromoAdUnit, video, undefined, xPromoAdUnitParameters);

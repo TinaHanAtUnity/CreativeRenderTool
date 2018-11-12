@@ -12,6 +12,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
+import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -52,10 +53,24 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
         let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
 
-        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, performanceAdUnitParameters);
+        const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+            platform: parameters.platform,
+            core: parameters.core,
+            ads: parameters.ads,
+            thirdPartyEventManager: parameters.thirdPartyEventManager,
+            operativeEventManager: parameters.operativeEventManager,
+            deviceInfo: parameters.deviceInfo,
+            clientInfo: parameters.clientInfo,
+            placement: parameters.placement,
+            adUnit: performanceAdUnit,
+            campaign: parameters.campaign,
+            coreConfig: parameters.coreConfig
+        };
+        const downloadHelper = new AppStoreDownloadHelper(downloadHelperParameters);
 
+        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
         overlay.addEventHandler(performanceOverlayEventHandler);
-        const endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters);
+        const endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
         endScreen.addEventHandler(endScreenEventHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(performanceAdUnit, video, performanceAdUnitParameters.adUnitStyle, performanceAdUnitParameters);

@@ -96,7 +96,7 @@ export abstract class AbstractAdUnitFactory {
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(parameters.platform, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            overlay = new NewVideoOverlay(parameters.platform, parameters.ads, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), showPrivacyDuringVideo, parameters.campaign.getSeatId());
+            overlay = new NewVideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {

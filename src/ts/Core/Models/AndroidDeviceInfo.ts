@@ -79,7 +79,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
 
     public fetch(): Promise<any[]> {
         return super.fetch().then(() => {
-            const promises: Array<Promise<any>> = [];
+            const promises: Promise<any>[] = [];
 
             promises.push(this._core.DeviceInfo.Android!.getAndroidId().then(androidId => this.set('androidId', androidId)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Android!.getApiLevel().then(apiLevel => this.set('apiLevel', apiLevel)).catch(err => this.handleDeviceInfoError(err)));

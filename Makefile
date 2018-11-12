@@ -247,6 +247,10 @@ lint:
 		"$(STYLINT) $(SOURCE_DIR)/styl -c stylintrc.json" \
 		"$(TSLINT) --project tsconfig.json $(TS_SOURCES) $(TESTS)"
 
+lint-fix:
+	$(TSLINT) --project tsconfig.json --fix $(TS_SOURCES) $(TESTS)
+
+
 setup: clean
 	rm -rf node_modules
 	npm install

@@ -78,7 +78,7 @@ export class PromoCampaignParser extends CampaignParser {
     }
 
     private getProductInfoList(promoProductInfoJson: [any]): ProductInfo[] {
-        const productInfoList = new Array<ProductInfo>();
+        const productInfoList: ProductInfo[] = [];
         if (promoProductInfoJson === undefined) {
             return productInfoList;
         }

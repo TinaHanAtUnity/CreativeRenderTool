@@ -25,7 +25,7 @@ describe('StorageBridgeTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         storageSetSpy = sinon.spy(core.Storage, 'set');
-        storageDeleteSpy = sinon.spy(core.Storage,'delete');
+        storageDeleteSpy = sinon.spy(core.Storage, 'delete');
         storageWriteSpy = sinon.spy(core.Storage, 'write');
         storageBridge = new StorageBridge(core, 1);
     });

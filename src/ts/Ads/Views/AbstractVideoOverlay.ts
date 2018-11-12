@@ -1,6 +1,7 @@
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Platform } from 'Core/Constants/Platform';
 import { View } from 'Core/Views/View';
+import { IVideoOverlayDownloadParameters } from 'Ads/EventHandlers/OverlayEventHandlerWithDownloadSupport';
 
 export interface IOverlayHandler extends IGDPREventHandler {
     onOverlaySkip(position: number): void;
@@ -8,6 +9,7 @@ export interface IOverlayHandler extends IGDPREventHandler {
     onOverlayPauseForTesting(paused: boolean): void;
     onOverlayCallButton(): void;
     onOverlayClose(): void;
+    onOverlayDownload?(parameters: IVideoOverlayDownloadParameters): void;
 }
 
 export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
