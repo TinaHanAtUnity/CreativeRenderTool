@@ -27,7 +27,7 @@ import { CallbackStatus, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 interface IInvocation {
     className: string;
     method: string;
-    parameters: Array<[string | number]>;
+    parameters: [string | number][];
     callbackId: number;
 }
 
