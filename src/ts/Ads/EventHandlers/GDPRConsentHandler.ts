@@ -12,9 +12,12 @@ export class GDPRConsentHandler<T extends Campaign> implements IGDPRConsentHandl
     }
 
     public onConsent(consent: boolean): void {
-        console.log('onConsent');
         // todo: send events
         this.adUnit.showAd();
+    }
+
+    public onShowOptions(): void {
+        // todo: show dialog
     }
 
 }

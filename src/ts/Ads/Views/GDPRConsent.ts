@@ -9,6 +9,7 @@ export interface IGDPRConsentViewParameters {
 
 export interface IGDPRConsentHandler {
     onConsent(consent: boolean): void;
+    onShowOptions(): void;
 }
 
 export class GDPRConsent extends View<IGDPRConsentHandler> {
@@ -23,6 +24,11 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
                 event: 'click',
                 listener: (event: Event) => this.onAgreeEvent(event),
                 selector: '.agree'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onAgreeEvent(event),
+                selector: '.show-options'
             }
         ];
     }
@@ -30,6 +36,12 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
     private onAgreeEvent(event: Event) {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onConsent(true));
+        this.hide();
+    }
+
+    private onOptionsEvent(event: Event) {
+        event.preventDefault();
+        this._handlers.forEach(handler => handler.onShowOptions());
         this.hide();
     }
 }
