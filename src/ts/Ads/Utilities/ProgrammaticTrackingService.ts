@@ -45,7 +45,7 @@ export class ProgrammaticTrackingService {
         const data: string = JSON.stringify(<IProgrammaticTrackingMetricData>{
             event: event
         });
-        const headers: Array<[string, string]> = [];
+        const headers: [string, string][] = [];
 
         headers.push(['Content-Type', 'application/json']);
 
@@ -55,7 +55,7 @@ export class ProgrammaticTrackingService {
     public reportError(errorData: IProgrammaticTrackingErrorData): Promise<INativeResponse> {
         const url: string = ProgrammaticTrackingService.productionErrorServiceUrl;
         const data: string = JSON.stringify(errorData);
-        const headers: Array<[string, string]> = [];
+        const headers: [string, string][] = [];
 
         headers.push(['Content-Type', 'application/json']);
 
