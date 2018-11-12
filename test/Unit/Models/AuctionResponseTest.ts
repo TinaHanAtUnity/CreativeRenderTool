@@ -12,7 +12,7 @@ describe('AuctionResponse', () => {
             const mediaId: string = 'UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85';
             const campaignObject: any = json.media[mediaId];
             const correlationId = json.correlationId;
-            const placements: Array<AuctionPlacement> = [];
+            const placements: AuctionPlacement[] = [];
 
             for(const placement in json.placements) {
                 if(json.placements.hasOwnProperty(placement)) {

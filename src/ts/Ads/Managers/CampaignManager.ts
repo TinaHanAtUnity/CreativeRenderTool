@@ -269,7 +269,7 @@ export class CampaignManager {
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
 
         if('placements' in json) {
-            const fill: { [mediaId: string]: Array<AuctionPlacement> } = {};
+            const fill: { [mediaId: string]: AuctionPlacement[] } = {};
             const noFill: string[] = [];
 
             const placements = this._adsConfig.getPlacements();
@@ -376,7 +376,7 @@ export class CampaignManager {
             throw new Error('No placements found');
         }
 
-        const campaigns: { [mediaId: string]: Array<AuctionPlacement> } = {};
+        const campaigns: { [mediaId: string]: AuctionPlacement[] } = {};
         const noFill: string[] = [];
 
         const placements = this._adsConfig.getPlacements();
@@ -424,7 +424,7 @@ export class CampaignManager {
         }
 
         let refreshDelay: number = 0;
-        const promises: Array<Promise<void>> = [];
+        const promises: Promise<void>[] = [];
 
         for(const placement of noFill) {
             promises.push(this.handleNoFill(placement));
@@ -528,7 +528,7 @@ export class CampaignManager {
         });
     }
 
-    private setupCampaignAssets(placements: Array<AuctionPlacement>, campaign: Campaign, contentType: string, session: Session): Promise<void> {
+    private setupCampaignAssets(placements: AuctionPlacement[], campaign: Campaign, contentType: string, session: Session): Promise<void> {
         const cachingTimestamp = Date.now();
         return this._assetManager.setup(campaign).then(() => {
             if(this._sessionManager.getGameSessionId() % 1000 === 99) {
@@ -593,7 +593,7 @@ export class CampaignManager {
     }
 
     // todo: figure out better way to handle errors without silly wrappers like this
-    private handleErrorWrapper(error: any, placements: Array<AuctionPlacement>, diagnosticsType: string, session?: Session): Promise<void> {
+    private handleErrorWrapper(error: any, placements: AuctionPlacement[], diagnosticsType: string, session?: Session): Promise<void> {
         const placementIds: string[] = [];
         for(const placement of placements) {
             placementIds.push(placement.getPlacementId());
@@ -602,7 +602,7 @@ export class CampaignManager {
         return this.handleError(error, placementIds, diagnosticsType, session);
     }
 
-    private handleParseCampaignError(contentType: string, campaignError: CampaignError, placements: Array<AuctionPlacement>, session?: Session): Promise<void> {
+    private handleParseCampaignError(contentType: string, campaignError: CampaignError, placements: AuctionPlacement[], session?: Session): Promise<void> {
         const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._nativeBridge, this._request);
         campaignErrorHandler.handleCampaignError(campaignError);
         return this.handleErrorWrapper(campaignError, placements, `parse_campaign_${contentType.replace(/[\/-]/g, '_')}_error`, session);

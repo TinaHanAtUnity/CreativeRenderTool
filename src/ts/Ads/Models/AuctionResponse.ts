@@ -3,7 +3,7 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 
 export interface IAuctionResponse {
-    placements: Array<AuctionPlacement>;
+    placements: AuctionPlacement[];
     contentType: string;
     content: string;
     cacheTTL: number | undefined;
@@ -27,7 +27,7 @@ export interface IAuctionResponse {
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
-    constructor(placements: Array<AuctionPlacement>, data: any, mediaId: string, correlationId: string) {
+    constructor(placements: AuctionPlacement[], data: any, mediaId: string, correlationId: string) {
         super('AuctionResponse', {
             placements: ['array'],
             contentType: ['string'],
@@ -75,7 +75,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('isMediaExperiment', data.isMediaExperiment);
     }
 
-    public getPlacements(): Array<AuctionPlacement> {
+    public getPlacements(): AuctionPlacement[] {
         return this.get('placements');
     }
 
