@@ -170,11 +170,11 @@ export class CampaignManager {
 
                     if(AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
                         return this.parseAuctionV5Campaigns(response).catch((e) => {
-                            this.handleError(e, this._adsConfig.getPlacementIds(), 'parse_auction_v5_campaigns_error');
+                            this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
                         });
                     } else {
                         return this.parseCampaigns(response).catch((e) => {
-                            this.handleError(e, this._adsConfig.getPlacementIds(), 'parse_campaigns_error');
+                            this.handleGeneralError(e, 'parse_campaigns_error');
                         });
                     }
                 }
@@ -189,7 +189,7 @@ export class CampaignManager {
                         return Promise.resolve();
                     }
                 }
-                return this.handleError(error, this._adsConfig.getPlacementIds(), 'auction_request_failed');
+                return this.handleGeneralError(error, 'auction_request_failed');
             });
         }).then((resp) => {
             this._jaegerManager.stop(jaegerSpan);
@@ -329,16 +329,16 @@ export class CampaignManager {
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
                             } else if(error === CacheStatus.FAILED) {
-                                return this.handleErrorWrapper(new WebViewError('Caching failed', 'CacheStatusFailed'), fill[mediaId], 'campaign_caching_failed', session);
+                                return this.handlePlacementError(new WebViewError('Caching failed', 'CacheStatusFailed'), fill[mediaId], 'campaign_caching_failed', session);
                             } else if(error === CacheError[CacheError.FILE_NOT_FOUND]) {
                                 // handle native API Cache.getFilePath failure (related to Android cache directory problems?)
-                                return this.handleErrorWrapper(new WebViewError('Getting file path failed', 'GetFilePathFailed'), fill[mediaId], 'campaign_caching_get_file_path_failed', session);
+                                return this.handlePlacementError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), fill[mediaId], 'campaign_caching_get_file_path_failed', session);
                             }
 
                             return this.handleParseCampaignError(auctionResponse.getContentType(), error, fill[mediaId], session);
                         }));
                     } catch(error) {
-                        this.handleErrorWrapper(error, fill[mediaId], 'error_creating_handle_campaign_chain', session);
+                        this.handlePlacementError(error, fill[mediaId], 'error_creating_handle_campaign_chain', session);
                     }
                 }
             }
@@ -456,16 +456,16 @@ export class CampaignManager {
                         if(error === CacheStatus.STOPPED) {
                             return Promise.resolve();
                         } else if(error === CacheStatus.FAILED) {
-                            return this.handleErrorWrapper(new WebViewError('Caching failed', 'CacheStatusFailed'), campaigns[mediaId], 'campaign_caching_failed', session);
+                            return this.handlePlacementError(new WebViewError('Caching failed', 'CacheStatusFailed'), campaigns[mediaId], 'campaign_caching_failed', session);
                         } else if(error === CacheError[CacheError.FILE_NOT_FOUND]) {
                             // handle native API Cache.getFilePath failure (related to Android cache directory problems?)
-                            return this.handleErrorWrapper(new WebViewError('Getting file path failed', 'GetFilePathFailed'), campaigns[mediaId], 'campaign_caching_get_file_path_failed', session);
+                            return this.handlePlacementError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), campaigns[mediaId], 'campaign_caching_get_file_path_failed', session);
                         }
 
-                        return this.handleErrorWrapper(error, campaigns[mediaId], 'handle_auction_v5_campaign_error', session);
+                        return this.handlePlacementError(error, campaigns[mediaId], 'handle_auction_v5_campaign_error', session);
                     }));
                 } catch(error) {
-                    this.handleErrorWrapper(error, campaigns[mediaId], 'error_creating_auction_v5_handle_campaign_chain', session);
+                    this.handlePlacementError(error, campaigns[mediaId], 'error_creating_auction_v5_handle_campaign_chain', session);
                 }
             }
         }
@@ -586,14 +586,11 @@ export class CampaignManager {
         return Promise.resolve();
     }
 
-    private handleError(error: any, placementIds: string[], diagnosticsType: string, session?: Session): Promise<void> {
-        this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        this.onError.trigger(error, placementIds, diagnosticsType, session);
-        return Promise.resolve();
+    private handleGeneralError(error: any, diagnosticsType: string, session?: Session): Promise<void> {
+        return this.handleError(error, this._adsConfig.getPlacementIds(), diagnosticsType, session);
     }
 
-    // todo: figure out better way to handle errors without silly wrappers like this
-    private handleErrorWrapper(error: any, placements: AuctionPlacement[], diagnosticsType: string, session?: Session): Promise<void> {
+    private handlePlacementError(error: any, placements: AuctionPlacement[], diagnosticsType: string, session?: Session): Promise<void> {
         const placementIds: string[] = [];
         for(const placement of placements) {
             placementIds.push(placement.getPlacementId());
@@ -602,10 +599,16 @@ export class CampaignManager {
         return this.handleError(error, placementIds, diagnosticsType, session);
     }
 
+    private handleError(error: any, placementIds: string[], diagnosticsType: string, session?: Session): Promise<void> {
+        this._nativeBridge.Sdk.logDebug('PLC error ' + error);
+        this.onError.trigger(error, placementIds, diagnosticsType, session);
+        return Promise.resolve();
+    }
+
     private handleParseCampaignError(contentType: string, campaignError: CampaignError, placements: AuctionPlacement[], session?: Session): Promise<void> {
         const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._nativeBridge, this._request);
         campaignErrorHandler.handleCampaignError(campaignError);
-        return this.handleErrorWrapper(campaignError, placements, `parse_campaign_${contentType.replace(/[\/-]/g, '_')}_error`, session);
+        return this.handlePlacementError(campaignError, placements, `parse_campaign_${contentType.replace(/[\/-]/g, '_')}_error`, session);
     }
 
     private getBaseUrl(): string {
