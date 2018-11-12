@@ -13,6 +13,7 @@ import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandle
 import { Platform } from 'Core/Constants/Platform';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
+import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -44,12 +45,22 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
         let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
-        const skipAllowed = parameters.placement.allowSkip();
 
-        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
+        const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+            thirdPartyEventManager: parameters.thirdPartyEventManager,
+            operativeEventManager: parameters.operativeEventManager,
+            deviceInfo: parameters.deviceInfo,
+            clientInfo: parameters.clientInfo,
+            placement: parameters.placement,
+            adUnit: performanceAdUnit,
+            campaign: parameters.campaign,
+            coreConfig: parameters.coreConfig
+        };
+        const downloadHelper = new AppStoreDownloadHelper(nativeBridge, downloadHelperParameters);
 
+        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters, downloadHelper);
         overlay.addEventHandler(performanceOverlayEventHandler);
-        const endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
+        const endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
         endScreen.addEventHandler(endScreenEventHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, performanceAdUnit, video, performanceAdUnitParameters.adUnitStyle, performanceAdUnitParameters);

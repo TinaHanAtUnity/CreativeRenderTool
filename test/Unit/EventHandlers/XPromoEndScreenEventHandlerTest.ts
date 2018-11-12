@@ -31,6 +31,7 @@ import { StoreName, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { IAppStoreDownloadHelperParameters, AppStoreDownloadHelper } from 'Ads/Utilities/AppStoreDownloadHelper';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -57,6 +58,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
+        let downloadHelper: AppStoreDownloadHelper;
 
         beforeEach(() => {
             nativeBridge = new NativeBridge({
@@ -136,7 +138,34 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             };
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
-            endScreenEventHandler = new XPromoEndScreenEventHandler(nativeBridge, xPromoAdUnit, xPromoAdUnitParameters);
+
+            const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+                thirdPartyEventManager: thirdPartyEventManager,
+                operativeEventManager: operativeEventManager,
+                deviceInfo: deviceInfo,
+                clientInfo: clientInfo,
+                placement: placement,
+                adUnit: xPromoAdUnit,
+                campaign: campaign,
+                coreConfig: coreConfig
+            };
+            downloadHelper = new AppStoreDownloadHelper(nativeBridge, downloadHelperParameters);
+
+            endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadHelper);
+        });
+
+        it('should call onDownload on AppStoreDownloadHelper', () => {
+            sinon.spy(downloadHelper, 'onDownload');
+
+            endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
+                bypassAppSheet: xPromoAdUnitParameters.campaign.getBypassAppSheet(),
+                store: xPromoAdUnitParameters.campaign.getStore(),
+                clickAttributionUrlFollowsRedirects: xPromoAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
+            });
+
+            sinon.assert.called(<sinon.SinonSpy>downloadHelper.onDownload);
         });
 
         it('should send a click to HttpKafka', () => {
@@ -155,10 +184,28 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', params);
         });
 
+        it('should send a xpromo click', () => {
+            const trackingUrl = 'http://fake-tracking-url.unity3d.com/';
+            sinon.spy(thirdPartyEventManager, 'sendWithGet');
+            sinon.stub(campaign, 'getTrackingUrlsForEvent').returns([trackingUrl]);
+
+            endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
+                bypassAppSheet: xPromoAdUnitParameters.campaign.getBypassAppSheet(),
+                store: xPromoAdUnitParameters.campaign.getStore(),
+                clickAttributionUrlFollowsRedirects: xPromoAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
+            });
+
+            sinon.assert.called(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet);
+            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'xpromo click', campaign.getSession().getId(), trackingUrl);
+        });
+
     });
 
     describe('with onDownloadIos', () => {
         let resolvedPromise: Promise<INativeResponse>;
+        let downloadHelper: AppStoreDownloadHelper;
 
         beforeEach(() => {
             nativeBridge = new NativeBridge({
@@ -236,7 +283,34 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             };
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
-            endScreenEventHandler = new XPromoEndScreenEventHandler(nativeBridge, xPromoAdUnit, xPromoAdUnitParameters);
+
+            const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+                thirdPartyEventManager: thirdPartyEventManager,
+                operativeEventManager: operativeEventManager,
+                deviceInfo: deviceInfo,
+                clientInfo: clientInfo,
+                placement: placement,
+                adUnit: xPromoAdUnit,
+                campaign: campaign,
+                coreConfig: coreConfig
+            };
+            downloadHelper = new AppStoreDownloadHelper(nativeBridge, downloadHelperParameters);
+
+            endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadHelper);
+        });
+
+        it('should call onDownload on AppStoreDownloadHelper', () => {
+            sinon.spy(downloadHelper, 'onDownload');
+
+            endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
+                bypassAppSheet: xPromoAdUnitParameters.campaign.getBypassAppSheet(),
+                store: xPromoAdUnitParameters.campaign.getStore(),
+                clickAttributionUrlFollowsRedirects: xPromoAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
+            });
+
+            sinon.assert.called(<sinon.SinonSpy>downloadHelper.onDownload);
         });
 
         it('should send a click to HttpKafka', () => {
