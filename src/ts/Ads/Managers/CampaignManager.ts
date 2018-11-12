@@ -591,12 +591,7 @@ export class CampaignManager {
     }
 
     private handlePlacementError(error: any, placements: AuctionPlacement[], diagnosticsType: string, session?: Session): Promise<void> {
-        const placementIds: string[] = [];
-        for(const placement of placements) {
-            placementIds.push(placement.getPlacementId());
-        }
-
-        return this.handleError(error, placementIds, diagnosticsType, session);
+        return this.handleError(error, placements.map(placement => placement.getPlacementId()), diagnosticsType, session);
     }
 
     private handleError(error: any, placementIds: string[], diagnosticsType: string, session?: Session): Promise<void> {
