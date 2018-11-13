@@ -44,7 +44,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         this._adsConfiguration = adsConfiguration;
         this._coreConfiguration = coreConfiguration;
         this._clientInfo = clientInfo;
-        this._nativeBridge.Purchasing.onIAPSendEvent.subscribe((eventJSON) => this.handleSendIAPEvent(eventJSON));
+        nativeBridge.Purchasing.onIAPSendEvent.subscribe((eventJSON) => this.handleSendIAPEvent(eventJSON));
     }
 
     public initialize(): Promise<void> {
