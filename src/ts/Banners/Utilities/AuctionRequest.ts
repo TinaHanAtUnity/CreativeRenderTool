@@ -120,7 +120,7 @@ export class AuctionRequest {
     private _session: Session;
     private _url: string | null;
     private _body: any | null;
-    private _headers: Array<[string, string]> = [];
+    private _headers: [string, string][] = [];
 
     private _requestStart: number;
     private _requestDuration: number = 0;
@@ -301,7 +301,7 @@ export class AuctionRequest {
             });
         }
 
-        const promises: Array<Promise<any>> = [];
+        const promises: Promise<any>[] = [];
         promises.push(this._deviceInfo.getScreenWidth());
         promises.push(this._deviceInfo.getScreenHeight());
         promises.push(this._deviceInfo.getConnectionType());
@@ -353,7 +353,7 @@ export class AuctionRequest {
         if (this._body) {
             return Promise.resolve(this._body);
         }
-        const promises: Array<Promise<any>> = [];
+        const promises: Promise<any>[] = [];
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
@@ -408,7 +408,7 @@ export class AuctionRequest {
                 body.versionCode = versionCode;
             }
 
-            const metaDataPromises: Array<Promise<any>> = [];
+            const metaDataPromises: Promise<any>[] = [];
             metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
             metaDataPromises.push(this._metaDataManager.fetch(FrameworkMetaData));
 

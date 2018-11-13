@@ -1172,7 +1172,7 @@ describe('CampaignManager', () => {
         let campaignManager: CampaignManager;
 
         beforeEach(() => {
-            sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: Array<[string, string]> = [], options?: any) => {
+            sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: [string, string][] = [], options?: any) => {
                 requestData = data;
                 return Promise.resolve();
             });

@@ -428,6 +428,11 @@ export class WebView {
             return;
         }
 
+        const trackingUrls = placement.getCurrentTrackingUrls();
+        if(trackingUrls) {
+            campaign.setTrackingUrls(trackingUrls);
+        }
+
         if (placement.getRealtimeData()) {
             this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
             const start = Date.now();
@@ -719,8 +724,8 @@ export class WebView {
                 AdUnitContainer.setForcedOrientation(TestEnvironment.get('forcedOrientation'));
             }
 
-            if(TestEnvironment.get('forcedPlayableMRAID')) {
-                MRAIDAdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
+            if(TestEnvironment.get('forcedExtendedMRAID')) {
+                MRAIDAdUnitFactory.setForcedExtendedMRAID(TestEnvironment.get('forcedExtendedMRAID'));
             }
 
             if(TestEnvironment.get('forceAuthorization')) {

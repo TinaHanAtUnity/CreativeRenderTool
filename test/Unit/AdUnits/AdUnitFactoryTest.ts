@@ -34,7 +34,7 @@ import 'mocha';
 import { MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
-import { PlayableMRAID } from 'MRAID/Views/PlayableMRAID';
+import { ExtendedMRAID } from 'MRAID/Views/ExtendedMRAID';
 import { ARMRAID } from 'AR/Views/ARMRAID';
 import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
@@ -160,7 +160,7 @@ describe('AdUnitFactoryTest', () => {
             });
 
             afterEach(() => {
-                MRAIDAdUnitFactory.setForcedPlayableMRAID(false);
+                MRAIDAdUnitFactory.setForcedExtendedMRAID(false);
                 MRAIDAdUnitFactory.setForcedARMRAID(false);
             });
 
@@ -170,8 +170,8 @@ describe('AdUnitFactoryTest', () => {
                 assert.isTrue(adUnit.getMRAIDView() instanceof MRAID, 'view should be MRAID');
             });
 
-            it('should create PlayableMRAID view', () => {
-                MRAIDAdUnitFactory.setForcedPlayableMRAID(false);
+            it('should create ExtendedMRAID view', () => {
+                MRAIDAdUnitFactory.setForcedExtendedMRAID(false);
 
                 const resourceUrl = campaign.getResourceUrl();
                 if (resourceUrl) {
@@ -180,14 +180,14 @@ describe('AdUnitFactoryTest', () => {
 
                 const adUnitFactory = new MRAIDAdUnitFactory();
                 const adUnit = adUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>adUnitParameters);
-                assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
+                assert.isTrue(adUnit.getMRAIDView() instanceof ExtendedMRAID, 'view should be ExtendedMRAID');
             });
 
-            it('should be forced to create PlayableMRAID view', () => {
-                MRAIDAdUnitFactory.setForcedPlayableMRAID(true);
+            it('should be forced to create ExtendedMRAID view', () => {
+                MRAIDAdUnitFactory.setForcedExtendedMRAID(true);
                 const adUnitFactory = new MRAIDAdUnitFactory();
                 const adUnit = adUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>adUnitParameters);
-                assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
+                assert.isTrue(adUnit.getMRAIDView() instanceof ExtendedMRAID, 'view should be ExtendedMRAID');
             });
 
             it('should be forced to create ARMRAID view', () => {

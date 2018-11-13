@@ -75,7 +75,7 @@ export class AnalyticsManager {
 
     public init(): Promise<void> {
         if(this._clientInfo.isReinitialized()) {
-            const promises: Array<Promise<any>> = [];
+            const promises: Promise<any>[] = [];
             promises.push(this._storage.getUserId());
             promises.push(this._storage.getSessionId(this._clientInfo.isReinitialized()));
 
@@ -86,7 +86,7 @@ export class AnalyticsManager {
                 this.subscribeListeners();
             });
         } else {
-            const promises: Array<Promise<any>> = [];
+            const promises: Promise<any>[] = [];
             promises.push(this._storage.getUserId());
             promises.push(this._storage.getSessionId(this._clientInfo.isReinitialized()));
             promises.push(this._storage.getAppVersion());

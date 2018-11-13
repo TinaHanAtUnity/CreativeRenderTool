@@ -3,7 +3,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
-import { ICampaign } from 'Ads/Models/Campaign';
+import { ICampaign, Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
@@ -18,7 +18,7 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { IPackageInfo } from 'Core/Native/Android/AndroidDeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
-import { INativeResponse } from 'Core/Utilities/Request';
+import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
@@ -53,6 +53,28 @@ import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParamete
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 import { ProductInfo, IProductInfo, ProductInfoType } from 'Promo/Models/ProductInfo';
+import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
+import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
+import { Privacy } from 'Ads/Views/Privacy';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters, IAppStoreDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
+import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
+import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -169,7 +191,7 @@ export class TestFixtures {
         return parameters;
     }
 
-    public static getPlayableMRAIDCampaignParams(json: any, storeName: StoreName, session?: Session): IMRAIDCampaign {
+    public static getExtendedMRAIDCampaignParams(json: any, storeName: StoreName, session?: Session): IMRAIDCampaign {
         if (!session) {
             session = this.getSession();
         }
@@ -359,8 +381,8 @@ export class TestFixtures {
     public static getPromoCampaignParams(json: any, adType?: string, rewardedPromo?: boolean): IPromoCampaign {
         const session = this.getSession();
         const isRewardedPromo = (rewardedPromo !== undefined) ? rewardedPromo : false;
-        const costProductInfoList = new Array<ProductInfo>();
-        const payoutProductInfoList = new Array<ProductInfo>();
+        const costProductInfoList: ProductInfo[] = [];
+        const payoutProductInfoList: ProductInfo[] = [];
         const costProductInfo: IProductInfo = {
             productId: 'fakeProductID',
             type: ProductInfoType.PREMIUM,
@@ -427,14 +449,14 @@ export class TestFixtures {
         return new XPromoCampaign(this.getXPromoCampaignParams(xPromoJson, StoreName.GOOGLE, creativeId, session));
     }
 
-    public static getPlayableMRAIDCampaignFollowsRedirects(): MRAIDCampaign {
+    public static getExtendedMRAIDCampaignFollowsRedirects(): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaignFollowsRedirects);
-        return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(json, StoreName.GOOGLE));
+        return new MRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE));
     }
 
-    public static getPlayableMRAIDCampaign(session?: Session): MRAIDCampaign {
+    public static getExtendedMRAIDCampaign(session?: Session): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaign);
-        return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(json, StoreName.GOOGLE, session));
+        return new MRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE, session));
     }
 
     public static getProgrammaticMRAIDCampaign(customParams: Partial<ICampaign> = {}): MRAIDCampaign {
@@ -481,6 +503,167 @@ export class TestFixtures {
             dynamicMarkup: json.content
         };
         return new DisplayInterstitialCampaign(displayInterstitialParams);
+    }
+
+    public static getOperativeEventManager<T extends Campaign>(campaign: T) {
+        const nativeBridge = TestFixtures.getNativeBridge();
+        const wakeUpManager = new WakeUpManager(nativeBridge, new FocusManager(nativeBridge));
+        const storageBridge = new StorageBridge(nativeBridge);
+        const request = new Request(nativeBridge, wakeUpManager);
+        const resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
+
+        const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: new MetaDataManager(nativeBridge),
+            sessionManager: new SessionManager(nativeBridge, request, storageBridge),
+            deviceInfo: TestFixtures.getAndroidDeviceInfo(),
+            clientInfo: TestFixtures.getClientInfo(Platform.ANDROID),
+            coreConfig: TestFixtures.getCoreConfiguration(),
+            adsConfig: TestFixtures.getAdsConfiguration(),
+            storageBridge: storageBridge,
+            campaign: campaign
+        });
+
+        if (campaign instanceof XPromoCampaign) {
+            sinon.stub(<XPromoOperativeEventManager>operativeEventManager, 'sendHttpKafkaEvent').returns(resolvedPromise);
+        }
+
+        return operativeEventManager;
+    }
+
+    public static getPrivacy(campaign: Campaign): Privacy {
+        const nativeBridge = TestFixtures.getNativeBridge();
+        const gdprManager = sinon.createStubInstance(GdprManager);
+        return new Privacy(nativeBridge, campaign, gdprManager, TestFixtures.getAdsConfiguration().isGDPREnabled(), TestFixtures.getCoreConfiguration().isCoppaCompliant());
+    }
+
+    public static getEndScreenParameters(campaign: PerformanceCampaign|XPromoCampaign): IEndScreenParameters {
+        const deviceInfo = TestFixtures.getAndroidDeviceInfo();
+        const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+
+        return {
+            nativeBridge: TestFixtures.getNativeBridge(),
+            language: deviceInfo.getLanguage(),
+            gameId: clientInfo.getGameId(),
+            privacy: TestFixtures.getPrivacy(campaign),
+            showGDPRBanner: false,
+            abGroup: TestFixtures.getCoreConfiguration().getAbGroup(),
+            targetGameName: campaign.getGameName()
+        };
+    }
+
+    public static getPerformanceEndScreen(campaign: PerformanceCampaign): PerformanceEndScreen {
+        return new PerformanceEndScreen(this.getEndScreenParameters(campaign), campaign);
+    }
+
+    public static getXPromoEndScreen(campaign: XPromoCampaign): XPromoEndScreen {
+        return new XPromoEndScreen(this.getEndScreenParameters(campaign), campaign);
+    }
+
+    public static getVideoOverlay<T extends Campaign>(campaign: T): NewVideoOverlay {
+        const nativeBridge = TestFixtures.getNativeBridge();
+
+        const overlayParams: IVideoOverlayParameters<T> = {
+            deviceInfo: TestFixtures.getAndroidDeviceInfo(),
+            clientInfo: TestFixtures.getClientInfo(Platform.ANDROID),
+            campaign: campaign,
+            coreConfig: TestFixtures.getCoreConfiguration(),
+            placement: TestFixtures.getPlacement()
+        };
+        return new NewVideoOverlay(nativeBridge, overlayParams, TestFixtures.getPrivacy(campaign), false);
+    }
+
+    public static getXPromoAdUnitParameters(): IXPromoAdUnitParameters {
+        const nativeBridge = TestFixtures.getNativeBridge();
+        const wakeUpManager = new WakeUpManager(nativeBridge, new FocusManager(nativeBridge));
+        const request = new Request(nativeBridge, wakeUpManager);
+        const campaign = TestFixtures.getXPromoCampaign();
+
+        return {
+            forceOrientation: Orientation.LANDSCAPE,
+            focusManager: new FocusManager(nativeBridge),
+            container: new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo()),
+            deviceInfo: TestFixtures.getAndroidDeviceInfo(),
+            clientInfo: TestFixtures.getClientInfo(Platform.ANDROID),
+            thirdPartyEventManager: new ThirdPartyEventManager(nativeBridge, request),
+            operativeEventManager: <XPromoOperativeEventManager>TestFixtures.getOperativeEventManager(campaign),
+            placement: TestFixtures.getPlacement(),
+            campaign: TestFixtures.getXPromoCampaign(),
+            coreConfig: TestFixtures.getCoreConfiguration(),
+            adsConfig: TestFixtures.getAdsConfiguration(),
+            request: new Request(nativeBridge, wakeUpManager),
+            options: {},
+            endScreen: TestFixtures.getXPromoEndScreen(campaign),
+            overlay: TestFixtures.getVideoOverlay(campaign),
+            video: new Video('', TestFixtures.getSession()),
+            privacy: TestFixtures.getPrivacy(campaign),
+            gdprManager: sinon.createStubInstance(GdprManager),
+            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
+        };
+    }
+
+    public static getPerformanceAdUnitParameters(): IPerformanceAdUnitParameters {
+        const nativeBridge = TestFixtures.getNativeBridge();
+        const campaign = TestFixtures.getCampaign();
+        const wakeUpManager = new WakeUpManager(nativeBridge, new FocusManager(nativeBridge));
+        const request = new Request(nativeBridge, wakeUpManager);
+
+        return {
+            forceOrientation: Orientation.LANDSCAPE,
+            focusManager: new FocusManager(nativeBridge),
+            container: new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo()),
+            deviceInfo: TestFixtures.getAndroidDeviceInfo(),
+            clientInfo: TestFixtures.getClientInfo(Platform.ANDROID),
+            thirdPartyEventManager: new ThirdPartyEventManager(nativeBridge, request),
+            operativeEventManager: <PerformanceOperativeEventManager>TestFixtures.getOperativeEventManager(campaign),
+            placement: TestFixtures.getPlacement(),
+            campaign: campaign,
+            coreConfig: TestFixtures.getCoreConfiguration(),
+            adsConfig: TestFixtures.getAdsConfiguration(),
+            request: new Request(nativeBridge, wakeUpManager),
+            options: {},
+            endScreen: TestFixtures.getPerformanceEndScreen(campaign),
+            overlay: TestFixtures.getVideoOverlay(campaign),
+            video: new Video('', TestFixtures.getSession()),
+            privacy: TestFixtures.getPrivacy(campaign),
+            gdprManager: sinon.createStubInstance(GdprManager),
+            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
+        };
+    }
+
+    public static getXPromoAdUnit(): XPromoAdUnit {
+        const parameters: IXPromoAdUnitParameters = TestFixtures.getXPromoAdUnitParameters();
+        return new XPromoAdUnit(TestFixtures.getNativeBridge(), parameters);
+    }
+
+    public static getPerformanceAdUnit(nativeBridge?: NativeBridge): PerformanceAdUnit {
+        nativeBridge = nativeBridge || TestFixtures.getNativeBridge();
+        return new PerformanceAdUnit(nativeBridge, TestFixtures.getPerformanceAdUnitParameters());
+    }
+
+    public static getAppStoreDownloadParameters(campaign: PerformanceCampaign|XPromoCampaign): IAppStoreDownloadParameters {
+        return <IAppStoreDownloadParameters>{
+            clickAttributionUrl: campaign.getClickAttributionUrl(),
+            clickAttributionUrlFollowsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
+            bypassAppSheet: campaign.getBypassAppSheet(),
+            appStoreId: campaign.getAppStoreId(),
+            store: campaign.getStore()
+        };
+    }
+
+    public static getAppStoreDownloadHelper(campaign: Campaign, adUnit: VideoAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): AppStoreDownloadHelper {
+        const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: TestFixtures.getOperativeEventManager(campaign),
+            deviceInfo: TestFixtures.getAndroidDeviceInfo(),
+            clientInfo: TestFixtures.getClientInfo(Platform.ANDROID),
+            placement: TestFixtures.getPlacement(),
+            adUnit: adUnit,
+            campaign: campaign,
+            coreConfig: TestFixtures.getCoreConfiguration()
+        };
+        return new AppStoreDownloadHelper(nativeBridge, downloadHelperParameters);
     }
 
     public static getClientInfo(platform?: Platform, gameId?: string): ClientInfo {
@@ -664,6 +847,6 @@ export class TestFixtures {
             viewsPerCampaign: {},
             viewsPerTarget: {},
             latestCampaignsStarts: {}
-        }
+        };
     }
 }
