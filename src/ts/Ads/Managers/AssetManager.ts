@@ -15,7 +15,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 
 enum CacheType {
     REQUIRED,
@@ -407,15 +407,8 @@ export class AssetManager {
             this._pts.reportError(errorData);
         }
 
-        const creativeId = campaign.getCreativeId();
-        if (creativeId && seatId && totalSize > 0) {
-            const kafkaObject: any = {};
-            kafkaObject.type = 'too_large_file';
-            kafkaObject.creativeId = creativeId;
-            kafkaObject.seatId = seatId;
-            kafkaObject.fileSize = Math.floor(totalSize / (1024 * 1024));
-
-            HttpKafka.sendEvent('ads.creative.blocking', KafkaCommonObjectType.EMPTY, kafkaObject);
-        }
+        CreativeBlocking.report(campaign.getCreativeId(), seatId, BlockingReason.FILE_TOO_LARGE, {
+            fileSize: Math.floor(totalSize / (1024 * 1024))
+        });
     }
 }
