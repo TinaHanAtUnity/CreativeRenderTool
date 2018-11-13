@@ -16,8 +16,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
 
-        this._creativeID = response.getCreativeId();
-        this._seatID = response.getSeatId();
+        this.setIds(response);
 
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();

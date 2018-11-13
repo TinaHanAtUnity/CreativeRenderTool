@@ -12,8 +12,7 @@ export class ProgrammaticMraidParser extends CampaignParser {
     public static ContentType = CampaignContentTypes.ProgrammaticMraid;
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
 
-        this._creativeID = response.getCreativeId();
-        this._seatID = response.getSeatId();
+        this.setIds(response);
         const jsonMraid = response.getJsonContent();
 
         if(!jsonMraid) {

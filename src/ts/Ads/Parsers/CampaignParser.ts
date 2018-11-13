@@ -28,6 +28,11 @@ export abstract class CampaignParser {
         }
     }
 
+    protected setIds(response: AuctionResponse) {
+        this._creativeID = response.getCreativeId() || undefined;
+        this._seatID = response.getSeatId() || undefined;
+    }
+
     protected getProgrammaticCampaignId(nativeBridge: NativeBridge): string {
         switch (nativeBridge.getPlatform()) {
             case Platform.IOS:

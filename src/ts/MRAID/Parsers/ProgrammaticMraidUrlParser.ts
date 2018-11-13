@@ -13,8 +13,7 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
     public static ContentType = CampaignContentTypes.ProgrammaticMraidUrl;
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
 
-        this._creativeID = response.getCreativeId();
-        this._seatID = response.getSeatId();
+        this.setIds(response);
         const jsonMraidUrl = response.getJsonContent();
 
         if(!jsonMraidUrl) {

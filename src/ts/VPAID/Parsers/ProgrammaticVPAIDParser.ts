@@ -22,8 +22,7 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
             const campaignId = this.getProgrammaticCampaignId(nativeBridge);
             if (vpaidMediaFile) {
 
-                this._creativeID = response.getCreativeId();
-                this._seatID = response.getSeatId();
+                this.setIds(response);
 
                 const vpaid = this._vpaidParser.parseFromVast(vast, vpaidMediaFile);
 

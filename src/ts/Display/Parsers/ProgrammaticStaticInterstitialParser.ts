@@ -18,8 +18,7 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
 
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
 
-        this._creativeID = response.getCreativeId();
-        this._seatID = response.getSeatId();
+        this.setIds(response);
 
         let dynamicMarkup = decodeURIComponent(response.getContent());
         if (this._wrapWithScriptTag) {

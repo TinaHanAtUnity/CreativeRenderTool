@@ -37,8 +37,7 @@ export class CometCampaignParser extends CampaignParser {
 
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
 
-        this._creativeID = response.getCreativeId();
-        this._seatID = response.getSeatId();
+        this.setIds(response);
 
         const json = response.getJsonContent();
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';

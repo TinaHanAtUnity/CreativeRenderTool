@@ -14,8 +14,7 @@ export class PromoCampaignParser extends CampaignParser {
     public static ContentType = 'purchasing/iap';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
 
-        this._creativeID = response.getCreativeId();
-        this._seatID = response.getSeatId();
+        this.setIds(response);
 
         const promoJson = response.getJsonContent();
         let willExpireAt: number | undefined;
