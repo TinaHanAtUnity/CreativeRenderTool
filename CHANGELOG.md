@@ -1,3 +1,36 @@
+# Pending
+
+* Fix Integration Test Exit Code [#7095](https://github.com/Applifier/unity-ads-webview/pull/7095)
+* Rename PlayableMRAID to ExtendedMRAID [#6942](https://github.com/Applifier/unity-ads-webview/pull/6942)
+* Add TSLint Whitespace [#7097](https://github.com/Applifier/unity-ads-webview/pull/7097)
+* Reduce font size for ExtendedMRAID permission text [#7099](https://github.com/Applifier/unity-ads-webview/pull/7099)
+* Add TSLint array-type [#7096](https://github.com/Applifier/unity-ads-webview/pull/7096)
+* Add 'Install Now' button to All Performance and XPromo Videos [#6947](https://github.com/Applifier/unity-ads-webview/pull/6947)
+* Add Disabled Auction V5 Protocol Test [#6896](https://github.com/Applifier/unity-ads-webview/pull/6896)
+* Fix Backup Campaign Loading Promise chain [#7106](https://github.com/Applifier/unity-ads-webview/pull/7106)
+
+# Thu Nov  8 14:32:20 UTC 2018
+
+* Load square asset when constructing backup campaign [#7074](https://github.com/Applifier/unity-ads-webview/pull/7074)
+
+# Thu Nov  8 11:34:51 UTC 2018
+
+* Move trackingUrls to base Campaign model [#7053](https://github.com/Applifier/unity-ads-webview/pull/7053)
+* Fix OrganizationID Description [#6941](https://github.com/Applifier/unity-ads-webview/pull/6941)
+
+# Wed Nov  7 18:30:55 UTC 2018
+
+* AB test for different green shades on Android CTA button [#6891](https://github.com/Applifier/unity-ads-webview/pull/6891)
+
+# Wed Nov  7 13:47:22 UTC 2018
+
+* Use proper keyname for WebPlayer returnValue [#7012](https://github.com/Applifier/unity-ads-webview/pull/7012)
+* Revert TSLint : no-parameter-reassignment [#6897](https://github.com/Applifier/unity-ads-webview/pull/6897)
+* Fix GDPR Banner for AR MRAID [#6943](https://github.com/Applifier/unity-ads-webview/pull/6943)
+* Log Promo error whenever no creatives detected [#6803](https://github.com/Applifier/unity-ads-webview/pull/6803)
+* Respect iPhone x safe areas for Admob [#6989](https://github.com/Applifier/unity-ads-webview/pull/6989)
+* Refactor Banner Ad Unit [#6889](https://github.com/Applifier/unity-ads-webview/pull/6889)
+
 # Tue Nov  6 21:05:41 UTC 2018
 
 * Exit skip button test [#6991](https://github.com/Applifier/unity-ads-webview/pull/6991)

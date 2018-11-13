@@ -126,11 +126,15 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
         let eventSettings: any;
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             eventSettings = {
-                'onPageFinished': { 'sendEvent': true }
+                onPageFinished: {
+                    sendEvent: true
+                }
             };
         } else {
             eventSettings = {
-                'onPageFinished': { 'sendEvent': true }
+                onPageFinished: {
+                    sendEvent: true
+                }
             };
         }
         return this.setEventSettings(eventSettings);
@@ -141,13 +145,13 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
         let webPlayerSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos;
         if (platform === Platform.ANDROID) {
             webPlayerSettings = {
-                'setJavaScriptCanOpenWindowsAutomatically': [true],
-                'setSupportMultipleWindows': [false]
+                setJavaScriptCanOpenWindowsAutomatically: [true],
+                setSupportMultipleWindows: [false]
             };
         } else {
             webPlayerSettings = {
-                'javaScriptCanOpenWindowsAutomatically': true,
-                'scalesPagesToFit': true
+                javaScriptCanOpenWindowsAutomatically: true,
+                scalesPagesToFit: true
             };
         }
         return this._webPlayerContainer.setSettings(webPlayerSettings, {});

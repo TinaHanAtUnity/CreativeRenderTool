@@ -485,7 +485,7 @@
   {
     "key": "organizationId",
     "type": "string",
-    "description": "Previously knows as 'developerID'",
+    "description": "Organization ID from Genesis'",
     "provider": "Server",
     "platforms": "all"
   },

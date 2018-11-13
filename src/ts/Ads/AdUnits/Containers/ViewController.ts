@@ -56,7 +56,6 @@ export class ViewController extends AdUnitContainer {
     }
 
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IIosOptions): Promise<void> {
-        let allowRotationInternal = allowRotation;
         this._options = options;
         this._showing = true;
 
@@ -67,7 +66,7 @@ export class ViewController extends AdUnitContainer {
 
         const forcedOrientation = AdUnitContainer.getForcedOrientation();
         if (forcedOrientation) {
-            allowRotationInternal = false;
+            allowRotation = false;
             this._lockedOrientation = forcedOrientation;
         } else {
             this._lockedOrientation = forceOrientation;
@@ -85,7 +84,7 @@ export class ViewController extends AdUnitContainer {
             hideStatusBar = options.statusBarHidden;
         }
 
-        return this._nativeBridge.IosAdUnit.open(nativeViews, this.getOrientation(options, allowRotationInternal, this._lockedOrientation), hideStatusBar, allowRotationInternal, isTransparent, withAnimation);
+        return this._nativeBridge.IosAdUnit.open(nativeViews, this.getOrientation(options, allowRotation, this._lockedOrientation), hideStatusBar, allowRotation, isTransparent, withAnimation);
     }
 
     public close(): Promise<void> {
@@ -104,7 +103,7 @@ export class ViewController extends AdUnitContainer {
     }
 
     public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
-        const promises: Array<Promise<any>> = [];
+        const promises: Promise<any>[] = [];
 
         return Promise.all([
             this._deviceInfo.getScreenWidth(),

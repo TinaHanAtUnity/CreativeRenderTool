@@ -381,7 +381,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                         productId: TestFixtures.getPromoCampaign().getIapProductId(),
                         iapPromo: true,
                         request: 'purchase',
-                        purchaseTrackingUrls: ['https://events.iap.unity3d.com/events/v1/purchase?native=false&iap_service=true','http://test.purchase.com/purchase'],
+                        purchaseTrackingUrls: ['https://events.iap.unity3d.com/events/v1/purchase?native=false&iap_service=true', 'http://test.purchase.com/purchase'],
                         native: false
                     }));
                 });
@@ -412,13 +412,13 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 purchasingAdapter.onPromoClosed(TestFixtures.getPromoCampaign(), '');
                 sinon.assert.called(<sinon.SinonStub>purchasing.initiatePurchasingCommand);
                 sinon.assert.calledWith((<sinon.SinonSpy>purchasing.initiatePurchasingCommand).getCall(1), JSON.stringify({
-                    'gamerToken':'abcd.1234.5678',
-                    'trackingOptOut':false,
-                    'iapPromo':true,
-                    'gameId':'undefined|abcd.1234.5678',
-                    'abGroup':99,
-                    'request':'close',
-                    'purchaseTrackingUrls':['https://events.iap.unity3d.com/events/v1/purchase','http://test.purchase.com/purchase']
+                    'gamerToken': 'abcd.1234.5678',
+                    'trackingOptOut': false,
+                    'iapPromo': true,
+                    'gameId': 'undefined|abcd.1234.5678',
+                    'abGroup': 99,
+                    'request': 'close',
+                    'purchaseTrackingUrls': ['https://events.iap.unity3d.com/events/v1/purchase', 'http://test.purchase.com/purchase']
                 }));
             };
 

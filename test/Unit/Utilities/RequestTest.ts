@@ -13,7 +13,7 @@ class TestRequestApi extends RequestApi {
     private _retryCount: number = 0;
     private _toggleUrl: boolean = false;
 
-    public get(id: string, url: string, headers: Array<[string, string]>): Promise<string> {
+    public get(id: string, url: string, headers: [string, string][]): Promise<string> {
         if(url.indexOf('/auth') !== -1) {
             const header = headers.find((x) => x[0] === 'Authorization');
             const auth = header === undefined ? '' : header[1];
@@ -63,7 +63,7 @@ class TestRequestApi extends RequestApi {
         return Promise.resolve(id);
     }
 
-    public post(id: string, url: string, body: string, headers: Array<[string, string]>): Promise<string> {
+    public post(id: string, url: string, body: string, headers: [string, string][]): Promise<string> {
         if(url.indexOf('/auth') !== -1) {
             const header = headers.find((x) => x[0] === 'Authorization');
             const auth = header === undefined ? '' : header[1];
@@ -93,7 +93,7 @@ class TestRequestApi extends RequestApi {
         return Promise.resolve(id);
     }
 
-    public head(id: string, url: string, headers: Array<[string, string]>): Promise<string> {
+    public head(id: string, url: string, headers: [string, string][]): Promise<string> {
         if (url.indexOf('/responsecode') !== -1) {
             const responseCodes = url.match(/3[0-9]{2}/);
             if (responseCodes && responseCodes.length > 0) {
@@ -112,7 +112,7 @@ class TestRequestApi extends RequestApi {
         this._toggleUrl = status;
     }
 
-    private sendSuccessResponse(id: string, url: string, body: string, responseCode: number, headers: Array<[string, string]>) {
+    private sendSuccessResponse(id: string, url: string, body: string, responseCode: number, headers: [string, string][]) {
         setTimeout(() => {
             this._nativeBridge.handleEvent(['REQUEST', 'COMPLETE', id, url, body, responseCode, headers]);
         }, 0);
@@ -155,6 +155,7 @@ describe('RequestTest', () => {
         return request.get(successUrl).then((response) => {
             assert.equal(successMessage, response.response, 'Did not receive correct response');
         }).catch(error => {
+            error = <RequestError>error;
             throw new Error('Get without headers failed: ' + error.message);
         });
     });
@@ -166,6 +167,7 @@ describe('RequestTest', () => {
         return request.get(failUrl).then(response => {
             throw new Error('Request should have failed but got response: ' + response);
         }).catch(error => {
+            error = <RequestError>error;
             assert.equal(failMessage, error.message, 'Did not receive correct error message');
         });
     });
@@ -178,6 +180,7 @@ describe('RequestTest', () => {
         return request.get(headerUrl, [[headerField, headerMessage]]).then(response => {
             assert.equal(headerMessage, response.response, 'Did not get correctly forwarded header response');
         }).catch(error => {
+            error = <RequestError>error;
             throw new Error('Get with header forwarding failed: ' + error);
         });
     });
@@ -196,6 +199,7 @@ describe('RequestTest', () => {
         }).then(response => {
             assert.equal(successMessage, response.response, 'Did not get success message when retrying');
         }).catch(error => {
+            error = <RequestError>error;
             throw new Error('Get with retrying failed: ' + error.message);
         });
     });
@@ -207,6 +211,7 @@ describe('RequestTest', () => {
         return request.post(successUrl, 'Test').then(response => {
             assert.equal(successMessage, response.response, 'Did not receive correct response');
         }).catch(error => {
+            error = <RequestError>error;
             throw new Error('Post without headers failed: ' + error.message);
         });
     });
@@ -218,6 +223,7 @@ describe('RequestTest', () => {
         return request.post(failUrl, 'Test').then(response => {
             throw new Error('Request should have failed but got response: ' + response);
         }).catch(error => {
+            error = <RequestError>error;
             assert.equal(failMessage, error.message, 'Did not receive correct error message');
         });
     });
@@ -230,6 +236,7 @@ describe('RequestTest', () => {
         return request.post(headerUrl, 'Test', [[headerField, headerMessage]]).then(response => {
             assert.equal(headerMessage, response.response, 'Did not get correctly forwarded header response');
         }).catch(error => {
+            error = <RequestError>error;
             throw new Error('Post with header forwarding failed: ' + error.message);
         });
     });
@@ -241,6 +248,7 @@ describe('RequestTest', () => {
         return request.post(testUrl, bodyMessage).then(response => {
             assert.equal(bodyMessage, response.response, 'Did not get correctly forwarded body');
         }).catch(error => {
+            error = <RequestError>error;
             throw new Error('Post with body forwarding failed: ' + error.message);
         });
     });
@@ -259,6 +267,7 @@ describe('RequestTest', () => {
         }).then(response => {
             assert.equal(successMessage, response.response, 'Did not get success message when retrying');
         }).catch(error => {
+            error = <RequestError>error;
             throw new Error('Post with retrying failed: ' + error.message);
         });
     });
@@ -276,6 +285,7 @@ describe('RequestTest', () => {
         }).then(response => {
             throw new Error('Should not have received a response');
         }).catch(error => {
+            error = <RequestError>error;
             assert.equal('This URL always fails', error.message, 'Error was not correct after retries');
         });
     });
@@ -295,6 +305,7 @@ describe('RequestTest', () => {
         }).then((response) => {
             assert.equal(successMessage, response.response, 'Did not receive correct response');
         }).catch(error => {
+            error = <RequestError>error;
             throw new Error('Get with connection event failed: ' + error.message);
         });
 
@@ -316,6 +327,7 @@ describe('RequestTest', () => {
                 return request.get(successUrl).then((response) => {
                     assert.equal(successMessage, response.response, 'Did not receive correct response');
                 }).catch(error => {
+                    error = <RequestError>error;
                     throw new Error('Get without headers failed: ' + error.message);
                 });
             });
@@ -332,12 +344,11 @@ describe('RequestTest', () => {
                 return request.get(failureUrl).then((response) => {
                     assert.fail('Should not resolve');
                 }).catch(error => {
-                    let modifiedError = error;
-                    assert.instanceOf(modifiedError, RequestError);
-                    modifiedError = <RequestError>modifiedError;
-                    assert.equal(modifiedError.message, reason);
-                    assert.equal(modifiedError.nativeResponse.responseCode, i);
-                    assert.equal(modifiedError.nativeResponse.response, failureResponse);
+                    assert.instanceOf(error, RequestError);
+                    error = <RequestError>error;
+                    assert.equal(error.message, reason);
+                    assert.equal(error.nativeResponse.responseCode, i);
+                    assert.equal(error.nativeResponse.response, failureResponse);
                 });
             });
         }
@@ -352,12 +363,11 @@ describe('RequestTest', () => {
             return request.get(failureUrl).then((response) => {
                 assert.fail('Should not resolve');
             }).catch(error => {
-                let modifiedError = error;
-                assert.instanceOf(modifiedError, RequestError);
-                modifiedError = <RequestError>modifiedError;
-                assert.equal(modifiedError.message, reason);
-                assert.equal(modifiedError.nativeResponse.responseCode, 600);
-                assert.equal(modifiedError.nativeResponse.response, failureResponse);
+                assert.instanceOf(error, RequestError);
+                error = <RequestError>error;
+                assert.equal(error.message, reason);
+                assert.equal(error.nativeResponse.responseCode, 600);
+                assert.equal(error.nativeResponse.response, failureResponse);
             });
         });
     });
@@ -369,6 +379,7 @@ describe('RequestTest', () => {
                 return request.followRedirectChain(redirectUrl).then((url) => {
                     assert.equal('http://www.example.org/endurl/', url);
                 }).catch(error => {
+                    error = <RequestError>error;
                     throw new Error('Head without headers failed: ' + error.message);
                 });
 
@@ -399,6 +410,7 @@ describe('RequestTest', () => {
             return request.get(successUrl).then((response) => {
                 assert.equal(expectedToken, response.response, 'Did not receive correct response');
             }).catch(error => {
+                error = <RequestError>error;
                 throw new Error('Get without headers failed: ' + error.message);
             });
         });
@@ -412,6 +424,7 @@ describe('RequestTest', () => {
             return request.post(successUrl).then((response) => {
                 assert.equal(expectedToken, response.response, 'Did not receive correct response');
             }).catch(error => {
+                error = <RequestError>error;
                 throw new Error('Get without headers failed: ' + error.message);
             });
         });
@@ -425,6 +438,7 @@ describe('RequestTest', () => {
             return request.get(successUrl).then((response) => {
                 assert.equal(expectedToken, response.response, 'Did not receive correct response');
             }).catch(error => {
+                error = <RequestError>error;
                 throw new Error('Get without headers failed: ' + error.message);
             });
         });
@@ -439,6 +453,7 @@ describe('RequestTest', () => {
             return request.get(successUrl).then((response) => {
                 assert.equal(expectedToken, response.response, 'Did not receive correct response');
             }).catch(error => {
+                error = <RequestError>error;
                 throw new Error('Get without headers failed: ' + error.message);
             });
         });
@@ -452,6 +467,7 @@ describe('RequestTest', () => {
             return request.get(successUrl).then((response) => {
                 assert.equal(expectedToken.trim(), response.response, 'Did not receive correct response');
             }).catch(error => {
+                error = <RequestError>error;
                 throw new Error('Get without headers failed: ' + error.message);
             });
         });
@@ -466,6 +482,7 @@ describe('RequestTest', () => {
             return request.get(successUrl).then((response) => {
                 assert.equal(expectedToken, response.response, 'Did not receive correct response');
             }).catch(error => {
+                error = <RequestError>error;
                 throw new Error('Get without headers failed: ' + error.message);
             });
         });
@@ -480,6 +497,7 @@ describe('RequestTest', () => {
             return request.get(successUrl).then((response) => {
                 assert.equal(expectedToken, response.response, 'Did not receive correct response');
             }).catch(error => {
+                error = <RequestError>error;
                 throw new Error('Get without headers failed: ' + error.message);
             });
         });

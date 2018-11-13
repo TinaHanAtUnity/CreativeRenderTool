@@ -36,7 +36,8 @@ export class ProgrammaticMraidParser extends CampaignParser {
             seatId: response.getSeatId() || undefined,
             meta: jsonMraid.meta,
             session: session,
-            mediaId: response.getMediaId()
+            mediaId: response.getMediaId(),
+            trackingUrls: response.getTrackingUrls() || {}
         };
 
         const parameters: IMRAIDCampaign = {
@@ -44,7 +45,6 @@ export class ProgrammaticMraidParser extends CampaignParser {
             resourceAsset: undefined,
             resource: markup,
             dynamicMarkup: jsonMraid.dynamicMarkup,
-            trackingUrls: response.getTrackingUrls(),
             clickAttributionUrl: jsonMraid.clickAttributionUrl ? this.validateAndEncodeUrl(jsonMraid.clickAttributionUrl, session) : undefined,
             clickAttributionUrlFollowsRedirects: jsonMraid.clickAttributionUrlFollowsRedirects,
             clickUrl: jsonMraid.clickUrl ? this.validateAndEncodeUrl(jsonMraid.clickUrl, session) : undefined,

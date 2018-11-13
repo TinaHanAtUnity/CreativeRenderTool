@@ -34,13 +34,13 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
                     seatId: response.getSeatId() || undefined,
                     meta: undefined,
                     session: session,
-                    mediaId: response.getMediaId()
+                    mediaId: response.getMediaId(),
+                    trackingUrls: response.getTrackingUrls() || {}
                 };
 
                 const vpaidCampaignParams: IVPAIDCampaign = {
                     ... baseCampaignParams,
                     vpaid: vpaid,
-                    trackingUrls: response.getTrackingUrls(),
                     appCategory: response.getCategory() || undefined,
                     appSubcategory: response.getSubCategory() || undefined,
                     advertiserDomain: response.getAdvertiserDomain() || undefined,

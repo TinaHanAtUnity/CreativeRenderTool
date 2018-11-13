@@ -1,4 +1,5 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { Session } from 'Ads/Models/Session';
 import { assert } from 'chai';
 
@@ -15,7 +16,7 @@ import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { VastParser } from 'VAST/Utilities/VastParser';
 
 describe('ProgrammaticVastParser', () => {
-    const placements = ['TestPlacement'];
+    const placementId = 'TestPlacement';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
     const impressionUrl = 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130';
@@ -40,7 +41,8 @@ describe('ProgrammaticVastParser', () => {
             let campaign: VastCampaign;
 
             const parse = (data: any) => {
-                const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                const auctionPlacement = new AuctionPlacement(placementId, mediaId);
+                const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                 return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <VastCampaign>parsedCampaign;
                 });

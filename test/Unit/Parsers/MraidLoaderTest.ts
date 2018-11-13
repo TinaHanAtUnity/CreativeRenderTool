@@ -7,7 +7,7 @@ import { MraidLoader } from 'MRAID/Parsers/MraidLoader';
 
 describe('MraidLoaderTest', () => {
     it('should reload playable MRAID campaign', () => {
-        const originalCampaign: MRAIDCampaign = TestFixtures.getPlayableMRAIDCampaign();
+        const originalCampaign: MRAIDCampaign = TestFixtures.getExtendedMRAIDCampaign();
 
         const serializedCampaign = originalCampaign.toJSON();
 
