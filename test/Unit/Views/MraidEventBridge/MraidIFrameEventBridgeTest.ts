@@ -150,7 +150,7 @@ describe('MraidIframeEventBridge', () => {
             });
         });
 
-        xdescribe(`${MRAIDEvents.CLOSE} MRAID event`, () => {
+        describe(`${MRAIDEvents.CLOSE} MRAID event`, () => {
             const sendEvent = (e: string, data?: any) => {
                 return () => {
                     return new Promise((res) => {
@@ -167,7 +167,7 @@ describe('MraidIframeEventBridge', () => {
             });
         });
 
-        xdescribe(`landscape ${MRAIDEvents.ORIENTATION} MRAID event`, () => {
+        describe(`landscape ${MRAIDEvents.ORIENTATION} MRAID event`, () => {
             const sendEvent = (e: string, data?: any) => {
                 return () => {
                     return new Promise((res) => {
