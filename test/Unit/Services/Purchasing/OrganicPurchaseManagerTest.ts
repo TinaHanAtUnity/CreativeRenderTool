@@ -62,7 +62,7 @@ describe('OrganicPurchaseManager', () => {
         });
     });
 
-    it('happy path with one purchase',() => {
+    it('happy path with one purchase', () => {
         getStub.resolves([{'productId': 'testId', 'price': 1234, 'currency': 'USD', 'receiptPurchaseData': 'test receipt data', 'signature': 'testSignature'}]);
         return organicPurchaseManager.initialize().then(() => {
             sinon.assert.calledOnce(getStub);
@@ -74,7 +74,7 @@ describe('OrganicPurchaseManager', () => {
         });
     });
 
-    it('happy path with two purchases',() => {
+    it('happy path with two purchases', () => {
         getStub.resolves([{'productId': 'testId', 'price': 1234, 'currency': 'USD', 'receiptPurchaseData': 'test receipt data', 'signature': 'testSignature'}, {'productId': 'testId', 'price': 1234, 'currency': 'USD', 'receiptPurchaseData': 'test receipt data', 'signature': 'testSignature'}]);
         return organicPurchaseManager.initialize().then(() => {
             sinon.assert.calledOnce(getStub);
