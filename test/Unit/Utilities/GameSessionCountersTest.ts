@@ -24,7 +24,9 @@ describe('GameSessionCountersTest', () => {
         GameSessionCounters.addAdRequest();
         GameSessionCounters.addStart(videoCampaign);
 
+        const countersObjStart = GameSessionCounters.getCurrentCounters();
         let countersObj = GameSessionCounters.getCurrentCounters();
+        assert.deepEqual(countersObjStart, countersObj, 'Counters should be identical when there are no changes between queries');
         let latestCampaignStartTimestamp: string;
 
         assert.equal(countersObj.starts, 1);
@@ -77,6 +79,16 @@ describe('GameSessionCountersTest', () => {
         assert.isNotEmpty(countersObj.latestCampaignsStarts[cometPlayableCampaign.getId()],'latestsCampaign has empty timestamp');
         assert.equal(latestCampaignStartTimestamp, '2018-07-24T10:00:00.000Z', 'Timestamp of latestCampaignsStart is incorrect');
 
+        assert.equal(countersObjStart.starts, 1, 'the queried counters should have changed');
+        assert.equal(countersObjStart.adRequests, 1, 'the queried counters should have changed');
+        assert.equal(countersObjStart.views, 0, 'the queried counters should have changed');
+        assert.equal(countersObjStart.startsPerCampaign[videoCampaign.getId()], 1, 'the queried counters should have changed');
+        assert.equal(countersObjStart.startsPerTarget[videoCampaign.getGameId()], 1, 'the queried counters should have changed');
+        assert.equal(countersObjStart.viewsPerCampaign[videoCampaign.getId()], undefined, 'the queried counters should have changed');
+        assert.equal(countersObjStart.viewsPerTarget[videoCampaign.getGameId()], undefined, 'the queried counters should have changed');
+        assert.equal(countersObjStart.startsPerCampaign[cometPlayableCampaign.getId()], undefined, 'the queried counters should have changed');
+        assert.equal(countersObjStart.viewsPerCampaign[cometPlayableCampaign.getId()], undefined, 'the queried counters should have changed');
+
         // Init
         GameSessionCounters.init();
         countersObj = GameSessionCounters.getCurrentCounters();
@@ -88,50 +100,5 @@ describe('GameSessionCountersTest', () => {
         assert.equal(Object.keys(countersObj.viewsPerCampaign).length, 0);
         assert.equal(Object.keys(countersObj.viewsPerTarget).length, 0);
         assert.equal(Object.keys(countersObj.latestCampaignsStarts).length, 0,'latestsCampaignsStarts was not initialized to 0 properly');
-    });
-
-    it('has the countersForOperativeEvent() stay static until a new start is sent', () => {
-        GameSessionCounters.init();
-        assert.deepEqual(GameSessionCounters.getCountersForOperativeEvent(), GameSessionCounters.getCurrentCounters());
-        let expectedCountersForOE = GameSessionCounters.getCountersForOperativeEvent();
-        assert.equal(expectedCountersForOE.starts, 0);
-        assert.equal(expectedCountersForOE.adRequests, 0);
-        assert.equal(expectedCountersForOE.views, 0);
-        assert.equal(Object.keys(expectedCountersForOE.startsPerCampaign).length, 0);
-        assert.equal(Object.keys(expectedCountersForOE.startsPerTarget).length, 0);
-        assert.equal(Object.keys(expectedCountersForOE.viewsPerCampaign).length, 0);
-        assert.equal(Object.keys(expectedCountersForOE.viewsPerTarget).length, 0);
-
-        GameSessionCounters.addAdRequest();
-        assert.deepEqual(GameSessionCounters.getCountersForOperativeEvent(), expectedCountersForOE);
-
-        expectedCountersForOE = GameSessionCounters.getCurrentCounters();
-
-        assert.equal(Object.keys(expectedCountersForOE.startsPerCampaign).length, 0, 'there should be no starts recorded before start is called');
-        GameSessionCounters.addStart(videoCampaign);
-        assert.equal(Object.keys(expectedCountersForOE.startsPerCampaign).length, 0, 'there should be no starts recorded after start is called, should have the state from adReq');
-        assert.equal(Object.keys(expectedCountersForOE.startsPerTarget).length, 0, 'there should be no starts recorded after start is called, should have the state from adReq');
-        assert.equal(Object.keys(expectedCountersForOE.viewsPerCampaign).length, 0, 'there should be no views recorded after start is called, should have the state from adReq');
-        assert.equal(Object.keys(expectedCountersForOE.viewsPerTarget).length, 0, 'there should be no views recorded after start is called, should have the state from adReq');
-        assert.deepEqual(GameSessionCounters.getCountersForOperativeEvent(), expectedCountersForOE, 'getCountersForOperativeEvent should NOT have been updated');
-        assert.notEqual(Object.keys(expectedCountersForOE.startsPerCampaign).length,
-            Object.keys(GameSessionCounters.getCurrentCounters().startsPerCampaign).length);
-        GameSessionCounters.addAdRequest();
-        const nextExpectedCountersForOE = GameSessionCounters.getCurrentCounters();
-
-        expectedCountersForOE = GameSessionCounters.getCountersForOperativeEvent();
-        assert.deepEqual(GameSessionCounters.getCountersForOperativeEvent(), expectedCountersForOE, 'getCountersForOperativeEvent should NOT have been updated');
-        GameSessionCounters.addView(videoCampaign);
-        assert.deepEqual(GameSessionCounters.getCountersForOperativeEvent(), expectedCountersForOE, 'getCountersForOperativeEvent should NOT have been updated');
-
-        GameSessionCounters.addStart(cometPlayableCampaign);
-        assert.deepEqual(GameSessionCounters.getCountersForOperativeEvent(), nextExpectedCountersForOE, 'getCountersForOperativeEvent should NOT have been updated');
-        GameSessionCounters.addAdRequest();
-        assert.deepEqual(GameSessionCounters.getCountersForOperativeEvent(), nextExpectedCountersForOE, 'getCountersForOperativeEvent should NOT have been updated');
-        GameSessionCounters.addView(cometPlayableCampaign);
-        assert.deepEqual(GameSessionCounters.getCountersForOperativeEvent(), nextExpectedCountersForOE, 'getCountersForOperativeEvent should NOT have been updated');
-
-        GameSessionCounters.init();
-        assert.deepEqual(GameSessionCounters.getCountersForOperativeEvent(), GameSessionCounters.getCurrentCounters());
     });
 });

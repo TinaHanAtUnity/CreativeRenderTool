@@ -384,6 +384,7 @@ describe('Event parameters should match specifications', () => {
                 campaign: campaign
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
+            campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
 
             const operativeEventParams: IOperativeEventParams = {
                 placement: TestFixtures.getPlacement(),
@@ -425,6 +426,8 @@ describe('Event parameters should match specifications', () => {
                 campaign: campaign
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
+            campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
+
             const operativeEventParams: IOperativeEventParams = {
                 placement: TestFixtures.getPlacement(),
                 videoOrientation: 'landscape',
@@ -476,6 +479,8 @@ describe('Event parameters should match specifications', () => {
                     campaign: campaign
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
+                campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
+
                 operativeEventParams = {
                     placement: TestFixtures.getPlacement(),
                     adUnitStyle: campaign.getAdUnitStyle(),
@@ -561,6 +566,8 @@ describe('Event parameters should match specifications', () => {
                     campaign: campaign
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
+                campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
+
             });
 
             it('with start event', () => {

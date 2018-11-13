@@ -9,7 +9,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
+import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
@@ -125,6 +125,7 @@ export class CampaignManager {
         }
 
         GameSessionCounters.addAdRequest();
+        const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
 
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
@@ -166,7 +167,7 @@ export class CampaignManager {
                 if(response) {
                     this.setSDKSignalValues(requestTimestamp);
 
-                    return this.parseCampaigns(response).catch((e) => {
+                    return this.parseCampaigns(response, countersForOperativeEvents).catch((e) => {
                         this.handleError(e, this._adsConfig.getPlacementIds(), 'parse_campaigns_error');
                     });
                 }
@@ -237,7 +238,7 @@ export class CampaignManager {
         });
     }
 
-    private parseCampaigns(response: INativeResponse): Promise<void[]> {
+    private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters): Promise<void[]> {
         let json;
         try {
             json = JsonParser.parse(response.response);
@@ -256,6 +257,7 @@ export class CampaignManager {
 
         const session: Session = this._sessionManager.create(json.auctionId);
         session.setAdPlan(response.response);
+        session.setGameSessionCounters(gameSessionCounters);
 
         this._backupCampaignManager.deleteBackupCampaigns();
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
