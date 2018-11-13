@@ -14,8 +14,8 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 // external fields
 export interface IPurchaseCommon {
     store: string;
-    productId: string | undefined;
-    storeSpecificId: string | undefined;
+    productId: string;
+    storeSpecificId: string;
     amount: number | undefined;
     currency: string | undefined;
     native: boolean;
@@ -59,7 +59,7 @@ interface IPurhcaseFailed {
 interface IPurchaseSuccess {
     productType: string | undefined;
     receipt: {
-        data: string | undefined;
+        data: string;
     };
 }
 
@@ -232,7 +232,7 @@ export class PromoEvents {
         });
     }
 
-    public onOrganicPurchaseSuccess(body: IPurchaseCommon, productType: string | undefined, receipt: string | undefined): Promise<IOrganicPurchaseSuccess> {
+    public onOrganicPurchaseSuccess(body: IPurchaseCommon, productType: string | undefined, receipt: string): Promise<IOrganicPurchaseSuccess> {
         return Promise.all([
             this.deviceInfo.getScreenWidth(),
             this.deviceInfo.getScreenHeight(),
@@ -290,7 +290,7 @@ export class PromoEvents {
 
     private getDeviceId(): string {
         const gdprEnabled: boolean = this.adsConfiguration.isOptOutEnabled() && this.adsConfiguration.isGDPREnabled();
-        if (!gdprEnabled) {
+        if (gdprEnabled) {
             if (this.deviceInfo instanceof AndroidDeviceInfo) {
                 return this.deviceInfo.getDevice();
             } else if (this.deviceInfo instanceof IosDeviceInfo) {
