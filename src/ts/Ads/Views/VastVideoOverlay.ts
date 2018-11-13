@@ -1,21 +1,21 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
-import { ABGroup } from 'Core/Models/ABGroup';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
-export class NewVastVideoOverlay extends NewVideoOverlay implements IPrivacyHandler {
+export class VastVideoOverlay extends NewVideoOverlay implements IPrivacyHandler {
 
     private _seatId: number | undefined;
     private _hasEndcard: boolean;
     private _gdprPopupClicked: boolean = false;
     private _showGDPRBanner: boolean;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, hasEndcard: boolean, seatId: number | undefined) {
-        super(nativeBridge, muted, language, gameId, privacy, abGroup, true);
+    constructor(nativeBridge: NativeBridge, parameters: IVideoOverlayParameters<VastCampaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+        super(nativeBridge, parameters, privacy, true);
 
-        this._seatId = seatId;
-        this._hasEndcard = hasEndcard;
+        this._seatId = parameters.campaign.getSeatId();
+        this._hasEndcard = parameters.campaign.hasEndscreen();
         this._showGDPRBanner = showGDPRBanner;
     }
 

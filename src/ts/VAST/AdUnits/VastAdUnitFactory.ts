@@ -14,13 +14,13 @@ import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandle
 import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
 import { StreamType } from 'Core/Constants/Android/StreamType';
 import { Privacy } from 'Ads/Views/Privacy';
-import { NewVastVideoOverlay } from 'Ads/Views/NewVastVideoOverlay';
+import { VastVideoOverlay } from 'Ads/Views/VastVideoOverlay';
 
 export class VastAdUnitFactory extends AbstractAdUnitFactory {
 
     public createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>): VastAdUnit {
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        const overlay = new NewVastVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, this.showGDPRBanner(parameters), parameters.coreConfig.getAbGroup(), parameters.campaign.hasEndscreen(), parameters.campaign.getSeatId());
+        const overlay = new VastVideoOverlay(nativeBridge, parameters, privacy, this.showGDPRBanner(parameters));
         let vastEndScreen: VastEndScreen | undefined;
 
         const vastAdUnitParameters: IVastAdUnitParameters = {

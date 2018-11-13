@@ -99,7 +99,7 @@ export abstract class AbstractAdUnitFactory {
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, parameters.coreConfig.getAbGroup(), showPrivacyDuringVideo);
+            overlay = new NewVideoOverlay(nativeBridge, parameters, privacy, showPrivacyDuringVideo);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
