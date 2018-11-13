@@ -137,7 +137,7 @@ export class CampaignManager {
         this.resetRealtimeDataForPlacements();
         const jaegerSpan = this._jaegerManager.startSpan('CampaignManagerRequest');
         jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
-        return Promise.all([this.createRequestUrl(false, nofillRetry), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(false, nofillRetry), this.createRequestBody(countersForOperativeEvents, nofillRetry, undefined)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
 
@@ -205,7 +205,7 @@ export class CampaignManager {
     }
 
     public requestRealtime(placement: Placement, session: Session): Promise<Campaign | void> {
-        return Promise.all([this.createRequestUrl(true, undefined, session), this.createRequestBody(false, placement)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(true, undefined, session), this.createRequestBody(session.getGameSessionCounters(), false, placement)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting realtime ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             return this._request.post(requestUrl, body, [], {
@@ -724,7 +724,7 @@ export class CampaignManager {
         });
     }
 
-    private createRequestBody(nofillRetry?: boolean, realtimePlacement?: Placement): Promise<any> {
+    private createRequestBody(gameSessionCounters: IGameSessionCounters, nofillRetry?: boolean, realtimePlacement?: Placement): Promise<any> {
         const placementRequest: any = {};
 
         if(realtimePlacement && this._realtimeBody) {
@@ -843,7 +843,7 @@ export class CampaignManager {
                 body.properties = this._coreConfig.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
                 body.projectId = this._coreConfig.getUnityProjectId();
-                body.gameSessionCounters = GameSessionCounters.getCurrentCounters();
+                body.gameSessionCounters = gameSessionCounters;
                 body.gdprEnabled = this._adsConfig.isGDPREnabled();
                 body.optOutEnabled = this._adsConfig.isOptOutEnabled();
                 body.optOutRecorded = this._adsConfig.isOptOutRecorded();
