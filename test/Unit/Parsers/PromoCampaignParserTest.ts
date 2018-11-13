@@ -1,4 +1,5 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { Session } from 'Ads/Models/Session';
 import { assert } from 'chai';
 
@@ -15,7 +16,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('PromoCampaignParser', () => {
-    const placements = ['TestPlacement'];
+    const placementId = 'TestPlacement';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
 
@@ -40,7 +41,8 @@ describe('PromoCampaignParser', () => {
             let sandbox: sinon.SinonSandbox;
 
             const parse = (data: any) => {
-                const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                const auctionPlacement = new AuctionPlacement(placementId, mediaId);
+                const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                 return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
@@ -79,7 +81,8 @@ describe('PromoCampaignParser', () => {
             let sandbox: sinon.SinonSandbox;
 
             const parse = (data: any) => {
-                const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                const auctionPlacement = new AuctionPlacement(placementId, mediaId);
+                const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                 return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
@@ -111,7 +114,8 @@ describe('PromoCampaignParser', () => {
             let sandbox: sinon.SinonSandbox;
 
             const parse = (data: any) => {
-                const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                const auctionPlacement = new AuctionPlacement(placementId, mediaId);
+                const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                 return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
@@ -141,7 +145,8 @@ describe('PromoCampaignParser', () => {
             let sandbox: sinon.SinonSandbox;
 
             const parse = (data: any) => {
-                const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                const auctionPlacement = new AuctionPlacement(placementId, mediaId);
+                const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                 return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
@@ -186,7 +191,8 @@ describe('PromoCampaignParser', () => {
                     sandbox.stub(PurchasingUtilities, 'isCatalogValid').returns(false);
 
                     const parse = (data: any) => {
-                        const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                        const auctionPlacement = new AuctionPlacement(placementId, mediaId);
+                        const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                         return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                             campaign = <PromoCampaign>parsedCampaign;
                             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
@@ -202,7 +208,8 @@ describe('PromoCampaignParser', () => {
                     sandbox.stub(PurchasingUtilities, 'isCatalogValid').returns(true);
 
                     const parse = (data: any) => {
-                        const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                        const auctionPlacement = new AuctionPlacement(placementId, mediaId);
+                        const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                         return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                             campaign = <PromoCampaign>parsedCampaign;
                             sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
@@ -230,7 +237,8 @@ describe('PromoCampaignParser', () => {
             it('should resolve campaign and not refresh catalog', () => {
                 sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
                 const parse = (data: any) => {
-                    const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                    const auctionPlacement = new AuctionPlacement(placementId, mediaId);
+                    const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                     return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                         campaign = <PromoCampaign>parsedCampaign;
                         sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);

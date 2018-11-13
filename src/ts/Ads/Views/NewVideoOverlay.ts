@@ -7,6 +7,21 @@ import { Template } from 'Core/Utilities/Template';
 
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
 import { ABGroup, ExitSkipIconTest } from 'Core/Models/ABGroup';
+import { Campaign } from 'Ads/Models/Campaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { Placement } from 'Ads/Models/Placement';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+
+export interface IVideoOverlayParameters<T extends Campaign> {
+    deviceInfo: DeviceInfo;
+    clientInfo: ClientInfo;
+    campaign: T;
+    coreConfig: CoreConfiguration;
+    placement: Placement;
+}
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _localization: Localization;
@@ -40,21 +55,27 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _gameId: string;
     private _seatId: number | undefined;
     private _abGroup: ABGroup;
+    private _campaign: Campaign;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, showPrivacyDuringVideo?: boolean, seatId?: number) {
-        super(nativeBridge, 'new-video-overlay', muted);
+    constructor(nativeBridge: NativeBridge, parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean) {
+        super(nativeBridge, 'new-video-overlay', parameters.placement.muteVideo());
 
-        this._localization = new Localization(language, 'overlay');
+        this._localization = new Localization(parameters.deviceInfo.getLanguage(), 'overlay');
         this._showGDPRBanner = showGDPRBanner;
         this._showPrivacyDuringVideo = showPrivacyDuringVideo;
-        this._gameId = gameId;
+        this._gameId = parameters.clientInfo.getGameId();
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
-        this._seatId = seatId;
-        this._abGroup = abGroup;
-
+        this._seatId = parameters.campaign.getSeatId();
+        this._abGroup = parameters.coreConfig.getAbGroup();
+        this._campaign = parameters.campaign;
         this._templateData = {
-            muted
+            muted: parameters.placement.muteVideo()
         };
+
+        if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
+            this._templateData.showInstallButton = true;
+            this._templateData.gameIcon = this._campaign.getGameIcon() ? this._campaign.getGameIcon().getUrl() : '';
+        }
 
         this._bindings = [
             {
@@ -93,7 +114,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             }
         ];
 
-        if (CustomFeatures.isTimehopApp(gameId)) {
+        if (CustomFeatures.isTimehopApp(this._gameId)) {
             this._bindings.push({
                 event: 'swipe',
                 listener: (event: Event) => this.onSkipEvent(event)
@@ -207,6 +228,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     public setCallButtonVisible(value: boolean) {
+        if ((this._campaign instanceof XPromoCampaign || this._campaign instanceof PerformanceCampaign) && !this._skipEnabled) {
+            return;
+        }
+
         if (this._callButtonVisible !== value) {
             this._callButtonElement.style.display = value ? 'block' : 'none';
         }
@@ -305,6 +330,23 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         event.stopPropagation();
         this.resetFadeTimer();
         this._handlers.forEach(handler => handler.onOverlayCallButton());
+
+        if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
+            const campaign = this._campaign;
+            this._handlers.filter(handler => typeof handler.onOverlayDownload === 'function')
+            .forEach((handler) => {
+                if (typeof handler.onOverlayDownload === 'function') {
+                    handler.onOverlayDownload({
+                        clickAttributionUrl: campaign.getClickAttributionUrl(),
+                        clickAttributionUrlFollowsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
+                        bypassAppSheet: campaign.getBypassAppSheet(),
+                        appStoreId: campaign.getAppStoreId(),
+                        store: campaign.getStore(),
+                        videoProgress: this._videoProgress
+                    });
+                }
+            });
+        }
     }
 
     private onPauseForTestingEvent(event: Event): void {
@@ -336,6 +378,9 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private showSkipButton() {
         if (this._skipEnabled) {
             this._skipButtonElement.classList.add('show-skip-button');
+            if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
+                this.showCallButton();
+            }
         }
     }
 
@@ -357,9 +402,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private fadeIn() {
         this._container.classList.add('fade-in');
         this._areControlsVisible = true;
-        setTimeout(() => {
-            this.showCallButton();
-        }, 500);
     }
 
     private fadeOut() {

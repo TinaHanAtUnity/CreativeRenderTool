@@ -2,12 +2,12 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { assert } from 'chai';
 import { FinishState } from 'Core/Constants/FinishState';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable';
+import { Observable0, Observable1, Observable3 } from 'Core/Utilities/Observable';
 import 'mocha';
 import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
 import { PlacementContentManager } from 'Monetization/Managers/PlacementContentManager';
@@ -42,7 +42,7 @@ describe('PlacementContentManager', () => {
         asStub(nativeBridge.Monetization.Listener.sendPlacementContentReady).resolves();
         asStub(nativeBridge.Monetization.Listener.sendPlacementContentStateChanged).resolves();
         campaignManager = sinon.createStubInstance(CampaignManager);
-        (<any>campaignManager).onCampaign = new Observable2<string, Campaign>();
+        (<any>campaignManager).onCampaign = new Observable3<string, Campaign, ICampaignTrackingUrls | undefined>();
         (<any>campaignManager).onNoFill = new Observable1<string>();
         (<any>nativeBridge.Purchasing).onIAPSendEvent = new Observable1<string>();
         placementManager = new PlacementManager(nativeBridge, configuration);
@@ -111,7 +111,7 @@ describe('PlacementContentManager', () => {
         t.forEach((tt, i) => {
 
             beforeEach(() => {
-                campaignManager.onCampaign.trigger(tt.placementId, tt.campaign);
+                campaignManager.onCampaign.trigger(tt.placementId, tt.campaign, undefined);
                 return new Promise(setTimeout);
             });
 
