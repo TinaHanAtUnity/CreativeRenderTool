@@ -26,7 +26,6 @@ import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Request } from 'Core/Utilities/Request';
-import { StorageApi } from 'Core/Native/Storage';
 
 describe('PurchasingUtilitiesTest', () => {
     let nativeBridge: NativeBridge;
@@ -58,10 +57,6 @@ describe('PurchasingUtilitiesTest', () => {
         analyticsManager = sinon.createStubInstance(AnalyticsManager);
         promoEvents = sinon.createStubInstance(PromoEvents);
         request = sinon.createStubInstance(Request);
-        nativeBridge.Storage = sinon.createStubInstance(StorageApi);
-        (<any>nativeBridge.Storage).onSet = new Observable2<string, object>();
-        sinon.stub(nativeBridge.Storage.onSet, 'subscribe').returns(Promise.resolve());
-        (<sinon.SinonStub>nativeBridge.Storage.get).returns(Promise.resolve());
 
         monetization = {
             Listener: monetizationListenerApi,

@@ -49,7 +49,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
         return new Promise<ITransactionDetails>((resolve, reject) => {
             let onError: IObserver1<ITransactionErrorDetails>;
             let onSuccess: IObserver1<ITransactionDetails>;
-
             onSuccess = this._nativeBridge.Monetization.CustomPurchasing.onTransactionComplete.subscribe((details) => {
                 this._nativeBridge.Monetization.CustomPurchasing.onTransactionError.unsubscribe(onError);
                 this._nativeBridge.Monetization.CustomPurchasing.onTransactionComplete.unsubscribe(onSuccess);
