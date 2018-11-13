@@ -382,13 +382,13 @@ describe('GdprManagerTest', () => {
         });
 
         it('should call request.get', () => {
-            return gdprManager.retrievePersonalInformation().then(() => {
-                sinon.assert.calledWith(getRequestStub, `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=${gameId}&adid=${adId}&projectId=${projectId}&storeId=${stores}`);
+            return gdprManager.retrieveUserSummary().then(() => {
+                sinon.assert.calledWith(getRequestStub, `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=${gameId}&adid=${adId}&projectId=${projectId}&storeId=${stores}`);
             });
         });
 
         it('verify response has personal payload', () => {
-            return gdprManager.retrievePersonalInformation().then((response) => {
+            return gdprManager.retrieveUserSummary().then((response) => {
                 assert.equal(response.deviceModel, model);
                 assert.equal(response.country, countryCode);
             });
@@ -397,18 +397,18 @@ describe('GdprManagerTest', () => {
         it('should call diagnostics on error', () => {
             getRequestStub.reset();
             getRequestStub.rejects('Test Error');
-            return gdprManager.retrievePersonalInformation().then(() => {
+            return gdprManager.retrieveUserSummary().then(() => {
                 assert.fail('Should throw error');
             }).catch((error) => {
                 assert.equal(error, 'Test Error');
-                sinon.assert.calledWith(diagnosticTriggerStub, 'gdpr_request_failed', {url: `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=${gameId}&adid=${adId}&projectId=${projectId}&storeId=${stores}`});
+                sinon.assert.calledWith(diagnosticTriggerStub, 'gdpr_request_failed', {url: `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=${gameId}&adid=${adId}&projectId=${projectId}&storeId=${stores}`});
             });
         });
 
         it('should call logError on error', () => {
             getRequestStub.reset();
             getRequestStub.rejects('Test Error');
-            return gdprManager.retrievePersonalInformation().then(() => {
+            return gdprManager.retrieveUserSummary().then(() => {
                 assert.fail('Should throw error');
             }).catch((error) => {
                 assert.equal(error, 'Test Error');

@@ -11,7 +11,7 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Request } from 'Core/Utilities/Request';
 import { ITemplateData } from 'Core/Views/View';
 
-export interface IGdprPersonalProperties extends ITemplateData {
+interface IUserSummary extends ITemplateData {
     deviceModel: string;
     country: string;
     gamePlaysThisWeek: number;
@@ -90,8 +90,8 @@ export class GdprManager {
         }
     }
 
-    public retrievePersonalInformation(): Promise<IGdprPersonalProperties> {
-        const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._coreConfig.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
+    public retrieveUserSummary(): Promise<IUserSummary> {
+        const url = `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._coreConfig.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
 
         // Test url which should respond with : {"adsSeenInGameThisWeek":27,"gamePlaysThisWeek":39,"installsFromAds":0}
         // const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=1501434&adid=BC5BAF66-713E-44A5-BE8E-56497B6B6E0A&projectId=567&storeId=google`;
