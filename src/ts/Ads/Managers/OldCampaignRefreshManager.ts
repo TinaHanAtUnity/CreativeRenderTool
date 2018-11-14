@@ -137,6 +137,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
                         this.setPlacementReady(placement, campaign, trackingUrls);
                     }
                 });
+                promises.push(promise);
             }
         }
 

@@ -1,3 +1,14 @@
+# Pending
+
+* Fix Integration Test Exit Code [#7095](https://github.com/Applifier/unity-ads-webview/pull/7095)
+* Rename PlayableMRAID to ExtendedMRAID [#6942](https://github.com/Applifier/unity-ads-webview/pull/6942)
+* Add TSLint Whitespace [#7097](https://github.com/Applifier/unity-ads-webview/pull/7097)
+* Reduce font size for ExtendedMRAID permission text [#7099](https://github.com/Applifier/unity-ads-webview/pull/7099)
+* Add TSLint array-type [#7096](https://github.com/Applifier/unity-ads-webview/pull/7096)
+* Add 'Install Now' button to All Performance and XPromo Videos [#6947](https://github.com/Applifier/unity-ads-webview/pull/6947)
+* Add Disabled Auction V5 Protocol Test [#6896](https://github.com/Applifier/unity-ads-webview/pull/6896)
+* Fix Backup Campaign Loading Promise chain [#7106](https://github.com/Applifier/unity-ads-webview/pull/7106)
+
 # Thu Nov  8 14:32:20 UTC 2018
 
 * Load square asset when constructing backup campaign [#7074](https://github.com/Applifier/unity-ads-webview/pull/7074)
