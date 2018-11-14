@@ -216,6 +216,7 @@ describe('AdUnitFactoryTest', () => {
                 const adUnit = adUnitFactory.createAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>adUnitParameters);
                 adUnit.show();
                 assert.isFalse(httpKafkaStub.called);
+                adUnit.hide();
             });
 
             it('should send onPlayableAnalyticsEvent on show if ad is Sonic Playable', () => {
@@ -226,6 +227,7 @@ describe('AdUnitFactoryTest', () => {
                 adUnit.show();
                 sinon.assert.calledWith(<sinon.SinonSpy>httpKafkaStub, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, sinon.match.has('type', 'playable_show'));
                 sinon.assert.calledOnce(httpKafkaStub);
+                adUnit.hide();
             });
 
             it('should send onPlayableAnalyticsEvent for PerformanceMRAIDCampaign', () => {
@@ -236,6 +238,7 @@ describe('AdUnitFactoryTest', () => {
                 adUnit.show();
                 sinon.assert.calledWith(<sinon.SinonSpy>httpKafkaStub, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, sinon.match.has('type', 'playable_show'));
                 sinon.assert.calledOnce(httpKafkaStub);
+                adUnit.hide();
             });
         });
     });
@@ -437,6 +440,7 @@ describe('AdUnitFactoryTest', () => {
         describe('on show', () => {
             it('should trigger onStart', (done) => {
                 promoAdUnit.onStart.subscribe(() => {
+                    promoAdUnit.hide();
                     done();
                 });
                 promoAdUnit.show();

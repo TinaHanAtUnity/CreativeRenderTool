@@ -9,7 +9,6 @@ addons:
 env:
   global:
     - CLOUDSDK_CORE_DISABLE_PROMPTS=1
-    - TEST_FILTER=MraidI
 install:
 - ". $HOME/.nvm/nvm.sh"
 - nvm install 10
