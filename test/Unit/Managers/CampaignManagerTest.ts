@@ -1218,7 +1218,7 @@ describe('CampaignManager', () => {
             let mraidTrackingUrls: ICampaignTrackingUrls;
             let rewardedCampaign: Campaign;
             let rewardedTrackingUrls: ICampaignTrackingUrls;
-            let noFillPlacements: string[] = [];
+            const noFillPlacements: string[] = [];
             let triggeredError: any;
             let triggeredRefreshDelay: number;
             let triggeredCampaignCount: number;
@@ -1278,13 +1278,15 @@ describe('CampaignManager', () => {
 
                 assert.deepEqual(noFillPlacements, ['mraid'], 'mraid placement did not properly receive no fill event');
 
-                assert.deepEqual(premiumTrackingUrls['start'],['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0','https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0'], 'incorrect premium placement start tracking URLs');
-                assert.deepEqual(videoTrackingUrls['start'],['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=2','https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=2'], 'incorrect video placement start tracking URLs');
-                assert.deepEqual(rewardedTrackingUrls['start'],['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=1','https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=1'], 'incorrect rewardedVideoZone placement start tracking URLs');
+                const startEvent: string = 'start';
+                assert.deepEqual(premiumTrackingUrls[startEvent], ['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0', 'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0'], 'incorrect premium placement start tracking URLs');
+                assert.deepEqual(videoTrackingUrls[startEvent], ['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=2', 'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=2'], 'incorrect video placement start tracking URLs');
+                assert.deepEqual(rewardedTrackingUrls[startEvent], ['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=1', 'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=1'], 'incorrect rewardedVideoZone placement start tracking URLs');
 
-                assert.deepEqual(premiumTrackingUrls['click'], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0'], 'incorrect premium placement click tracking URL');
-                assert.deepEqual(videoTrackingUrls['click'], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=2'], 'incorrect video placement click tracking URL');
-                assert.deepEqual(rewardedTrackingUrls['click'], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=1'], 'incorrect rewarded placement click tracking URL');
+                const clickEvent: string = 'click';
+                assert.deepEqual(premiumTrackingUrls[clickEvent], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0'], 'incorrect premium placement click tracking URL');
+                assert.deepEqual(videoTrackingUrls[clickEvent], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=2'], 'incorrect video placement click tracking URL');
+                assert.deepEqual(rewardedTrackingUrls[clickEvent], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=1'], 'incorrect rewarded placement click tracking URL');
             });
         });
     });
