@@ -118,7 +118,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             t.forEach((tt, i) => {
 
                 beforeEach(() => {
-                    campaignManager.onCampaign.trigger(tt.placementId, tt.campaign);
+                    campaignManager.onCampaign.trigger(tt.placementId, tt.campaign, undefined);
                     return new Promise(setTimeout);
                 });
 

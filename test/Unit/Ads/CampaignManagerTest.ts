@@ -11,7 +11,7 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { HTML } from 'Ads/Models/Assets/HTML';
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Backend } from 'Backend/Backend';
@@ -27,7 +27,7 @@ import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { ABGroupBuilder, AuctionV5Test } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -94,6 +94,7 @@ import { DisplayInterstitialAdUnitFactory } from 'Display/AdUnits/DisplayInterst
 import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
 import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { XPromoAdUnitFactory } from 'XPromo/AdUnits/XPromoAdUnitFactory';
+import AuctionV5Response from 'json/AuctionV5Response.json';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -1136,4 +1137,98 @@ describe('CampaignManager', () => {
         });
     });
 
+    describe('auction v5', () => {
+        let assetManager;
+        let campaignManager: any;
+        let mockRequest: any;
+        const ConfigurationAuctionPlcJson = JSON.parse(ConfigurationAuctionPlc);
+
+        beforeEach(() => {
+            contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(), factory: new PerformanceAdUnitFactory() });
+            assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
+            campaignManager = new CampaignManager(platform, core, CoreConfigurationParser.parse(ConfigurationAuctionPlcJson), AdsConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
+            mockRequest = sinon.mock(request);
+        });
+
+        it('should handle auction v5 ad response', () => {
+            let premiumCampaign: Campaign;
+            let premiumTrackingUrls: ICampaignTrackingUrls;
+            let videoCampaign: Campaign;
+            let videoTrackingUrls: ICampaignTrackingUrls;
+            let mraidCampaign: Campaign;
+            let mraidTrackingUrls: ICampaignTrackingUrls;
+            let rewardedCampaign: Campaign;
+            let rewardedTrackingUrls: ICampaignTrackingUrls;
+            const noFillPlacements: string[] = [];
+            let triggeredError: any;
+            let triggeredRefreshDelay: number;
+            let triggeredCampaignCount: number;
+
+            mockRequest.expects('post').returns(Promise.resolve({
+                response: AuctionV5Response
+            }));
+
+            sinon.stub(AuctionV5Test, 'isValid').returns(true);
+
+            campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign, trackingUrls: ICampaignTrackingUrls) => {
+                if(placement === 'premium') {
+                    premiumCampaign = campaign;
+                    premiumTrackingUrls = trackingUrls;
+                } else if(placement === 'video') {
+                    videoCampaign = campaign;
+                    videoTrackingUrls = trackingUrls;
+                } else if(placement === 'mraid') {
+                    mraidCampaign = campaign;
+                    mraidTrackingUrls = trackingUrls;
+                } else if(placement === 'rewardedVideoZone') {
+                    rewardedCampaign = campaign;
+                    rewardedTrackingUrls = trackingUrls;
+                }
+            });
+
+            campaignManager.onNoFill.subscribe((placement: string) => {
+                noFillPlacements.push(placement);
+            });
+
+            campaignManager.onError.subscribe((error: any) => {
+                triggeredError = error;
+            });
+
+            campaignManager.onAdPlanReceived.subscribe((refreshDelay: number, campaignCount: number) => {
+                triggeredRefreshDelay = refreshDelay;
+                triggeredCampaignCount = campaignCount;
+            });
+
+            return campaignManager.request().then(() => {
+                if(triggeredError) {
+                    throw triggeredError;
+                }
+
+                mockRequest.verify();
+
+                assert.equal(triggeredRefreshDelay, 3600, 'refresh delay was incorrectly calculated, one placement with no fill should have one hour (3600 seconds) delay');
+                assert.equal(triggeredCampaignCount, 1, 'incorrect campaign count for ad plan with one comet campaign');
+
+                assert.isDefined(premiumCampaign, 'premium placement did not receive campaign');
+                assert.isDefined(videoCampaign, 'video placement did not receive campaign');
+                assert.isDefined(rewardedCampaign, 'rewardedVideoZone placement did not receive campaign');
+
+                assert.isDefined(premiumTrackingUrls, 'premium placement did not receive tracking URLs');
+                assert.isDefined(videoTrackingUrls, 'video placement did not receive tracking URLs');
+                assert.isDefined(rewardedTrackingUrls, 'rewardedVideoZone placement did not receive tracking URLs');
+
+                assert.deepEqual(noFillPlacements, ['mraid'], 'mraid placement did not properly receive no fill event');
+
+                const startEvent: string = 'start';
+                assert.deepEqual(premiumTrackingUrls[startEvent], ['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0', 'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0'], 'incorrect premium placement start tracking URLs');
+                assert.deepEqual(videoTrackingUrls[startEvent], ['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=2', 'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=2'], 'incorrect video placement start tracking URLs');
+                assert.deepEqual(rewardedTrackingUrls[startEvent], ['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=1', 'https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=1'], 'incorrect rewardedVideoZone placement start tracking URLs');
+
+                const clickEvent: string = 'click';
+                assert.deepEqual(premiumTrackingUrls[clickEvent], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0'], 'incorrect premium placement click tracking URL');
+                assert.deepEqual(videoTrackingUrls[clickEvent], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=2'], 'incorrect video placement click tracking URL');
+                assert.deepEqual(rewardedTrackingUrls[clickEvent], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=1'], 'incorrect rewarded placement click tracking URL');
+            });
+        });
+    });
 });

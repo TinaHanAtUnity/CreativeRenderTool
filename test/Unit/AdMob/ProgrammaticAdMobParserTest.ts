@@ -14,10 +14,11 @@ import ValidAdMobCampaign from 'json/campaigns/admob/ValidAdMobCampaign.json';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('ProgrammaticAdMobParser', () => {
-        const placements = ['TestPlacement'];
+        const placementId = 'TestPlacement';
         const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
         const correlationId = '583dfda0d933a3630a53249c';
         const url = 'https://r2---sn-n4v7knll.googlevideo.com/videoplayback?id=a6e915b5b0f41a1c&itag=22&source=youtube&requiressl=yes&mm=31&mn=sn-n4v7knll&ms=au&mv=m&pl=19&ei=eo3rWuGXD8-KuAL6oLvQAQ&susc=yti&mime=video/mp4&lmt=1518153041357987&mt=1525386488&ip=4.14.109.2&ipbits=0&expire=1525415418&sparams=ip,ipbits,expire,id,itag,source,requiressl,mm,mn,ms,mv,pl,ei,susc,mime,lmt&signature=4834094C1C09F34DE9D6473658D0B1EE75DB3E10.830B2F45714128B27549A3B15E8BE3CB8EFCBE19&key=ck2';
@@ -35,7 +36,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             let campaign: AdMobCampaign;
 
             const parse = (data: any) => {
-                const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                const auctionPlacement = new AuctionPlacement(placementId, mediaId);
+                const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                 return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
                     campaign = <AdMobCampaign>parsedCampaign;
                 });

@@ -21,6 +21,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
+import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 
 export class NoFillError extends Error {
 }
@@ -135,7 +136,8 @@ export class BannerCampaignManager {
             const mediaId: string = json.placements[placement.getId()];
 
             if(mediaId) {
-                const auctionResponse = new AuctionResponse([placement.getId()], json.media[mediaId], mediaId, json.correlationId);
+                const auctionPlacement = new AuctionPlacement(placement.getId(), mediaId);
+                const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId);
                 return this.handleBannerCampaign(auctionResponse, session);
             } else {
                 return Promise.reject(new NoFillError(`No fill for placement ${placement.getId()}`));

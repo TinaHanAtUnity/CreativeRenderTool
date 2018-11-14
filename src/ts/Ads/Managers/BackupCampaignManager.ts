@@ -1,7 +1,7 @@
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { ProgrammaticAdMobLoader } from 'AdMob/Parsers/ProgrammaticAdMobLoader';
 import { Asset } from 'Ads/Models/Assets/Asset';
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { CampaignLoader } from 'Ads/Parsers/CampaignLoader';
 import { ICoreApi } from 'Core/ICore';
@@ -29,7 +29,8 @@ export class BackupCampaignManager {
         this._coreConfiguration = coreConfiguration;
     }
 
-    public storePlacement(placement: Placement, mediaId: string) {
+    // todo: once auction v5 is unconditionally adopoted, trackingUrls should not be optional
+    public storePlacement(placement: Placement, mediaId: string, trackingUrls?: ICampaignTrackingUrls) {
         // never store data when in test mode
         if(this._coreConfiguration.getTestMode()) {
             return;
@@ -40,6 +41,11 @@ export class BackupCampaignManager {
         const operation = new StorageOperation(StorageType.PRIVATE);
         operation.set(rootKey + '.mediaid', mediaId);
         operation.set(rootKey + '.adtypes', JSON.stringify(placement.getAdTypes()));
+
+        if(trackingUrls) {
+            operation.set(rootKey + '.trackingurls', JSON.stringify(trackingUrls));
+        }
+
         this._storageBridge.queue(operation);
     }
 
@@ -101,6 +107,14 @@ export class BackupCampaignManager {
             } else {
                 return undefined;
             }
+        }).catch(() => {
+            return undefined;
+        });
+    }
+
+    public loadTrackingUrls(placement: Placement): Promise<ICampaignTrackingUrls | undefined> {
+        return this.getString('backupcampaign.placement.' + placement.getId() + '.trackingurls').then(rawTrackingUrls => {
+            return JSON.parse(rawTrackingUrls);
         }).catch(() => {
             return undefined;
         });

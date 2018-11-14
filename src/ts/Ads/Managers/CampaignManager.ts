@@ -4,7 +4,7 @@ import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
@@ -21,8 +21,7 @@ import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheStatus } from 'Core/Managers/CacheManager';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
-import { ABGroup } from 'Core/Models/ABGroup';
+import { ABGroup, AuctionV5Test } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -35,11 +34,13 @@ import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
+import { Observable1, Observable2, Observable3, Observable4 } from 'Core/Utilities/Observable';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
 import { CampaignError } from 'Ads/Errors/CampaignError';
+import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 
@@ -70,12 +71,13 @@ export class CampaignManager {
     protected static AbGroup: ABGroup | undefined;
 
     private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
+    private static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
 
     private static CampaignId: string | undefined;
     private static SessionId: string | undefined;
     private static Country: string | undefined;
 
-    public readonly onCampaign = new Observable2<string, Campaign>();
+    public readonly onCampaign = new Observable3<string, Campaign, ICampaignTrackingUrls | undefined>();
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable4<WebViewError, string[], string, Session | undefined>();
     public readonly onConnectivityError = new Observable1<string[]>();
@@ -170,9 +172,15 @@ export class CampaignManager {
                 if(response) {
                     this.setSDKSignalValues(requestTimestamp);
 
-                    return this.parseCampaigns(response).catch((e) => {
-                        this.handleError(e, this._adsConfig.getPlacementIds(), 'parse_campaigns_error');
-                    });
+                    if(AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
+                        return this.parseAuctionV5Campaigns(response).catch((e) => {
+                            this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
+                        });
+                    } else {
+                        return this.parseCampaigns(response).catch((e) => {
+                            this.handleGeneralError(e, 'parse_campaigns_error');
+                        });
+                    }
                 }
                 throw new WebViewError('Empty campaign response', 'CampaignRequestError');
             }).then(() => {
@@ -185,7 +193,7 @@ export class CampaignManager {
                         return Promise.resolve();
                     }
                 }
-                return this.handleError(error, this._adsConfig.getPlacementIds(), 'auction_request_failed');
+                return this.handleGeneralError(error, 'auction_request_failed');
             });
         }).then((resp) => {
             this._jaegerManager.stop(jaegerSpan);
@@ -265,7 +273,7 @@ export class CampaignManager {
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
 
         if('placements' in json) {
-            const fill: { [mediaId: string]: string[] } = {};
+            const fill: { [mediaId: string]: AuctionPlacement[] } = {};
             const noFill: string[] = [];
 
             const placements = this._adsConfig.getPlacements();
@@ -274,10 +282,11 @@ export class CampaignManager {
                     const mediaId: string = json.placements[placement];
 
                     if(mediaId) {
+                        const auctionPlacement: AuctionPlacement = new AuctionPlacement(placement, mediaId);
                         if(fill[mediaId]) {
-                            fill[mediaId].push(placement);
+                            fill[mediaId].push(auctionPlacement);
                         } else {
-                            fill[mediaId] = [placement];
+                            fill[mediaId] = [auctionPlacement];
                         }
 
                         this._backupCampaignManager.storePlacement(this._adsConfig.getPlacement(placement), mediaId);
@@ -324,16 +333,16 @@ export class CampaignManager {
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
                             } else if(error === CacheStatus.FAILED) {
-                                return this.handleError(new WebViewError('Caching failed', 'CacheStatusFailed'), fill[mediaId], 'campaign_caching_failed', session);
+                                return this.handlePlacementError(new WebViewError('Caching failed', 'CacheStatusFailed'), fill[mediaId], 'campaign_caching_failed', session);
                             } else if(error === CacheError[CacheError.FILE_NOT_FOUND]) {
                                 // handle native API Cache.getFilePath failure (related to Android cache directory problems?)
-                                return this.handleError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), fill[mediaId], 'campaign_caching_get_file_path_failed', session);
+                                return this.handlePlacementError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), fill[mediaId], 'campaign_caching_get_file_path_failed', session);
                             }
 
                             return this.handleParseCampaignError(auctionResponse.getContentType(), error, fill[mediaId], session);
                         }));
                     } catch(error) {
-                        this.handleError(error, fill[mediaId], 'error_creating_handle_campaign_chain', session);
+                        this.handlePlacementError(error, fill[mediaId], 'error_creating_handle_campaign_chain', session);
                     }
                 }
             }
@@ -342,6 +351,130 @@ export class CampaignManager {
         } else {
             throw new Error('No placements found');
         }
+    }
+
+    private parseAuctionV5Campaigns(response: INativeResponse): Promise<void[]> {
+        let json;
+        try {
+            json = JsonParser.parse(response.response);
+        } catch (e) {
+            Diagnostics.trigger('invalid_auction_v5_json', {
+                response: response.response
+            });
+            return Promise.reject(new Error('Could not parse campaign JSON: ' + e.message));
+        }
+
+        if(!json.auctionId) {
+            throw new Error('No auction ID found');
+        } else {
+            this._lastAuctionId = json.auctionId;
+        }
+
+        const session: Session = this._sessionManager.create(json.auctionId);
+        session.setAdPlan(response.response);
+
+        this._backupCampaignManager.deleteBackupCampaigns();
+        this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
+
+        if(!('placements' in json)) {
+            throw new Error('No placements found');
+        }
+
+        const campaigns: { [mediaId: string]: AuctionPlacement[] } = {};
+        const noFill: string[] = [];
+
+        const placements = this._adsConfig.getPlacements();
+        for(const placement in placements) {
+            if(placements.hasOwnProperty(placement)) {
+                const mediaId = json.placements[placement].mediaId;
+
+                if(mediaId) {
+                    const trackingId: string = json.placements[placement].trackingId;
+                    let trackingUrls: ICampaignTrackingUrls | undefined;
+                    if(trackingId) {
+                        if(json.tracking[trackingId]) {
+                            trackingUrls = json.tracking[trackingId];
+                        } else {
+                            SessionDiagnostics.trigger('invalid_auction_v5_tracking_id', {
+                                mediaId: mediaId,
+                                trackingId: trackingId
+                            }, session);
+                            throw new Error('Invalid tracking ID ' + trackingId);
+                        }
+                    } else {
+                        SessionDiagnostics.trigger('missing_auction_v5_tracking_id', {
+                            mediaId: mediaId
+                        }, session);
+                        throw new Error('Missing tracking ID');
+                    }
+
+                    this._backupCampaignManager.storePlacement(this._adsConfig.getPlacement(placement), mediaId, trackingUrls);
+
+                    const auctionPlacement: AuctionPlacement = new AuctionPlacement(placement, mediaId, trackingUrls);
+
+                    if(campaigns[mediaId]) {
+                        campaigns[mediaId].push(auctionPlacement);
+                    } else {
+                        campaigns[mediaId] = [auctionPlacement];
+                    }
+                } else {
+                    noFill.push(placement);
+                }
+
+                if(json.realtimeData && json.realtimeData[placement]) {
+                    this._adsConfig.getPlacement(placement).setRealtimeData(json.realtimeData[placement]);
+                }
+            }
+        }
+
+        let refreshDelay: number = 0;
+        const promises: Promise<void>[] = [];
+
+        for(const placement of noFill) {
+            promises.push(this.handleNoFill(placement));
+            refreshDelay = RefreshManager.NoFillDelay;
+        }
+
+        let campaignCount: number = 0;
+        for(const mediaId in campaigns) {
+            if(campaigns.hasOwnProperty(mediaId)) {
+                campaignCount++;
+
+                const contentType = json.media[mediaId].contentType;
+                const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
+                if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
+                    refreshDelay = cacheTTL;
+                }
+            }
+        }
+
+        this._core.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
+        this.onAdPlanReceived.trigger(refreshDelay, campaignCount);
+
+        for(const mediaId in campaigns) {
+            if(campaigns.hasOwnProperty(mediaId)) {
+                let auctionResponse: AuctionResponse;
+                try {
+                    auctionResponse = new AuctionResponse(campaigns[mediaId], json.media[mediaId], mediaId, json.correlationId);
+                    promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
+                        if(error === CacheStatus.STOPPED) {
+                            return Promise.resolve();
+                        } else if(error === CacheStatus.FAILED) {
+                            return this.handlePlacementError(new WebViewError('Caching failed', 'CacheStatusFailed'), campaigns[mediaId], 'campaign_caching_failed', session);
+                        } else if(error === CacheError[CacheError.FILE_NOT_FOUND]) {
+                            // handle native API Cache.getFilePath failure (related to Android cache directory problems?)
+                            return this.handlePlacementError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), campaigns[mediaId], 'campaign_caching_get_file_path_failed', session);
+                        }
+
+                        return this.handlePlacementError(error, campaigns[mediaId], 'handle_auction_v5_campaign_error', session);
+                    }));
+                } catch(error) {
+                    this.handlePlacementError(error, campaigns[mediaId], 'error_creating_auction_v5_handle_campaign_chain', session);
+                }
+            }
+        }
+
+        return Promise.all(promises);
     }
 
     private parseRealtimeCampaign(response: INativeResponse, session: Session, placement: Placement): Promise<Campaign | void> {
@@ -357,7 +490,8 @@ export class CampaignManager {
                     return Promise.resolve(oldCampaign);
                 }
 
-                const auctionResponse = new AuctionResponse([placement.getId()], json.media[mediaId], mediaId, json.correlationId);
+                const auctionPlacement: AuctionPlacement = new AuctionPlacement(placement.getId(), mediaId);
+                const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId);
 
                 return this.handleRealtimeCampaign(auctionResponse, session);
             } else {
@@ -389,7 +523,7 @@ export class CampaignManager {
         return parser.parse(this._platform, this._core, this._request, response, session, this._deviceInfo.getOsVersion(), this._clientInfo.getGameId(), this._deviceConnectionType).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
-                SdkStats.setParseDuration(placement, parseDuration);
+                SdkStats.setParseDuration(placement.getPlacementId(), parseDuration);
             }
 
             campaign.setMediaId(response.getMediaId());
@@ -398,7 +532,7 @@ export class CampaignManager {
         });
     }
 
-    private setupCampaignAssets(placements: string[], campaign: Campaign, contentType: string, session: Session): Promise<void> {
+    private setupCampaignAssets(placements: AuctionPlacement[], campaign: Campaign, contentType: string, session: Session): Promise<void> {
         const cachingTimestamp = Date.now();
         return this._assetManager.setup(campaign).then(() => {
             if(this._sessionManager.getGameSessionId() % 1000 === 99) {
@@ -429,7 +563,7 @@ export class CampaignManager {
             }
 
             for(const placement of placements) {
-                this.onCampaign.trigger(placement, campaign);
+                this.onCampaign.trigger(placement.getPlacementId(), campaign, placement.getTrackingUrls());
             }
         });
     }
@@ -456,24 +590,40 @@ export class CampaignManager {
         return Promise.resolve();
     }
 
+    private handleGeneralError(error: any, diagnosticsType: string, session?: Session): Promise<void> {
+        return this.handleError(error, this._adsConfig.getPlacementIds(), diagnosticsType, session);
+    }
+
+    private handlePlacementError(error: any, placements: AuctionPlacement[], diagnosticsType: string, session?: Session): Promise<void> {
+        return this.handleError(error, placements.map(placement => placement.getPlacementId()), diagnosticsType, session);
+    }
+
     private handleError(error: any, placementIds: string[], diagnosticsType: string, session?: Session): Promise<void> {
         this._core.Sdk.logDebug('PLC error ' + error);
         this.onError.trigger(error, placementIds, diagnosticsType, session);
         return Promise.resolve();
     }
 
-    private handleParseCampaignError(contentType: string, campaignError: CampaignError, placementIds: string[], session?: Session): Promise<void> {
+    private handleParseCampaignError(contentType: string, campaignError: CampaignError, placements: AuctionPlacement[], session?: Session): Promise<void> {
         const campaignErrorHandler = CampaignErrorHandlerFactory.getCampaignErrorHandler(contentType, this._core, this._request);
         campaignErrorHandler.handleCampaignError(campaignError);
-        return this.handleError(campaignError, placementIds, `parse_campaign_${contentType.replace(/[\/-]/g, '_')}_error`, session);
+        return this.handlePlacementError(campaignError, placements, `parse_campaign_${contentType.replace(/[\/-]/g, '_')}_error`, session);
     }
 
     private getBaseUrl(): string {
-        return [
-            CampaignManager.BaseUrl,
-            this._clientInfo.getGameId(),
-            'requests'
-        ].join('/');
+        if(AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
+            return [
+                CampaignManager.AuctionV5BaseUrl,
+                this._clientInfo.getGameId(),
+                'requests'
+            ].join('/');
+        } else {
+            return [
+                CampaignManager.BaseUrl,
+                this._clientInfo.getGameId(),
+                'requests'
+            ].join('/');
+        }
     }
 
     private createRequestUrl(realtime: boolean, nofillRetry?: boolean, session?: Session): Promise<string> {
