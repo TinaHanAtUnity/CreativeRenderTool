@@ -97,7 +97,7 @@ export class Activity extends AdUnitContainer {
     }
 
     public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
-        const promises: Array<Promise<any>> = [];
+        const promises: Promise<any>[] = [];
 
         return Promise.all([
             this._deviceInfo.getScreenWidth(),

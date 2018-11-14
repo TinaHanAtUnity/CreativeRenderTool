@@ -277,7 +277,7 @@ describe('CampaignRefreshManager', () => {
 
         it('get campaign should return a campaign (Performance)', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign());
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
                 return Promise.resolve();
             });
 
@@ -294,7 +294,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
-                campaignManager.onCampaign.trigger('video', TestFixtures.getCampaign());
+                campaignManager.onCampaign.trigger('video', TestFixtures.getCampaign(), undefined);
                 assert.notEqual(campaignRefreshManager.getCampaign('video'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof PerformanceCampaign);
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
@@ -304,7 +304,7 @@ describe('CampaignRefreshManager', () => {
 
         it('get campaign should return a campaign (XPromo)', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('premium', TestFixtures.getXPromoCampaign());
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getXPromoCampaign(), undefined);
                 return Promise.resolve();
             });
 
@@ -321,7 +321,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
-                campaignManager.onCampaign.trigger('video', TestFixtures.getXPromoCampaign());
+                campaignManager.onCampaign.trigger('video', TestFixtures.getXPromoCampaign(), undefined);
                 assert.notEqual(campaignRefreshManager.getCampaign('video'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof XPromoCampaign);
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
@@ -331,7 +331,7 @@ describe('CampaignRefreshManager', () => {
 
         it('get campaign should return a campaign (Vast)', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('premium', TestFixtures.getCompanionVastCampaign());
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getCompanionVastCampaign(), undefined);
                 return Promise.resolve();
             });
 
@@ -348,7 +348,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
-                campaignManager.onCampaign.trigger('video', TestFixtures.getCompanionVastCampaign());
+                campaignManager.onCampaign.trigger('video', TestFixtures.getCompanionVastCampaign(), undefined);
 
                 assert.isDefined(campaignRefreshManager.getCampaign('video'));
                 assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof VastCampaign);
@@ -358,10 +358,10 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('get campaign should return a campaign (MRAID)', () => {
-            const mraid = TestFixtures.getPlayableMRAIDCampaign();
+            const mraid = TestFixtures.getExtendedMRAIDCampaign();
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('premium', mraid);
+                campaignManager.onCampaign.trigger('premium', mraid, undefined);
                 return Promise.resolve();
             });
 
@@ -378,7 +378,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
-                campaignManager.onCampaign.trigger('video', mraid);
+                campaignManager.onCampaign.trigger('video', mraid, undefined);
                 assert.isDefined(campaignRefreshManager.getCampaign('video'));
                 assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof MRAIDCampaign);
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
@@ -390,8 +390,8 @@ describe('CampaignRefreshManager', () => {
             let campaign: Campaign = TestFixtures.getCampaign();
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('premium', campaign);
-                campaign = TestFixtures.getPlayableMRAIDCampaign();
+                campaignManager.onCampaign.trigger('premium', campaign, undefined);
+                campaign = TestFixtures.getExtendedMRAIDCampaign();
                 return Promise.resolve();
             });
 
@@ -426,7 +426,7 @@ describe('CampaignRefreshManager', () => {
 
         it('placement states should end up with NO_FILL', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign());
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
                 campaignManager.onNoFill.trigger('premium');
                 return Promise.resolve();
             });
@@ -453,7 +453,7 @@ describe('CampaignRefreshManager', () => {
             const currentAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign());
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign(), undefined);
                 return Promise.resolve();
             });
 
@@ -467,7 +467,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
-                campaignManager.onCampaign.trigger('video', TestFixtures.getCampaign());
+                campaignManager.onCampaign.trigger('video', TestFixtures.getCampaign(), undefined);
 
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.READY);
@@ -482,14 +482,14 @@ describe('CampaignRefreshManager', () => {
 
         it ('should set campaign status to ready after close', () => {
             let campaign: Campaign = TestFixtures.getCampaign();
-            const campaign2 = TestFixtures.getPlayableMRAIDCampaign();
+            const campaign2 = TestFixtures.getExtendedMRAIDCampaign();
             const placement: Placement = adsConfig.getPlacement('premium');
             adUnitParams.campaign = campaign;
             adUnitParams.placement = placement;
             const currentAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('premium', campaign);
+                campaignManager.onCampaign.trigger('premium', campaign, undefined);
                 campaign = campaign2;
                 return Promise.resolve();
             });
@@ -504,7 +504,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
-                campaignManager.onCampaign.trigger('video', campaign);
+                campaignManager.onCampaign.trigger('video', campaign, undefined);
 
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.READY);
@@ -530,7 +530,7 @@ describe('CampaignRefreshManager', () => {
                     assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                     assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.WAITING);
 
-                    campaignManager.onCampaign.trigger('video', campaign);
+                    campaignManager.onCampaign.trigger('video', campaign, undefined);
                     currentAdUnit.onClose.trigger();
 
                     assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
@@ -679,7 +679,7 @@ describe('CampaignRefreshManager', () => {
         it('should mark a placement for a promo campaign as ready', () => {
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'));
+                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'), undefined);
                 return Promise.resolve();
             });
 
@@ -701,7 +701,7 @@ describe('CampaignRefreshManager', () => {
         it('should mark a placement for a promo campaign as nofill if product is not available', () => {
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'));
+                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'), undefined);
                 return Promise.resolve();
             });
 
