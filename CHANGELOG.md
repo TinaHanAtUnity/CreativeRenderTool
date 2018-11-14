@@ -1,4 +1,4 @@
-# Pending
+# Wed Nov 14 19:05:17 UTC 2018
 
 * Enable auction v5 A/B test for one group [#7130](https://github.com/Applifier/unity-ads-webview/pull/7130)
 
