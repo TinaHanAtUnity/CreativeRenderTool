@@ -19,7 +19,7 @@ import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { ABGroupBuilder, AuctionV5Test } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -1227,8 +1227,9 @@ describe('CampaignManager', () => {
                 response: AuctionV5Response
             }));
 
+            sinon.stub(AuctionV5Test, 'isValid').returns(true);
+
             campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign, trackingUrls: ICampaignTrackingUrls) => {
-                console.log('JNIDEBUG onCampaign ' + placement);
                 if(placement === 'premium') {
                     premiumCampaign = campaign;
                     premiumTrackingUrls = trackingUrls;
@@ -1245,17 +1246,14 @@ describe('CampaignManager', () => {
             });
 
             campaignManager.onNoFill.subscribe((placement: string) => {
-                console.log('JNIDEBUG onNoFill ' + placement);
                 noFillPlacements.push(placement);
             });
 
             campaignManager.onError.subscribe((error: any) => {
-                console.log('JNIDEBUG onError ' + JSON.stringify(error));
                 triggeredError = error;
             });
 
             campaignManager.onAdPlanReceived.subscribe((refreshDelay: number, campaignCount: number) => {
-                console.log('JNIDEBUG onAdPlanReceived ' + refreshDelay + ' ' + campaignCount);
                 triggeredRefreshDelay = refreshDelay;
                 triggeredCampaignCount = campaignCount;
             });
@@ -1267,7 +1265,26 @@ describe('CampaignManager', () => {
 
                 mockRequest.verify();
 
-                assert.isDefined(premiumCampaign, 'premium campaign was not triggered');
+                assert.equal(triggeredRefreshDelay, 3600, 'refresh delay was incorrectly calculated, one placement with no fill should have one hour (3600 seconds) delay');
+                assert.equal(triggeredCampaignCount, 1, 'incorrect campaign count for ad plan with one comet campaign');
+
+                assert.isDefined(premiumCampaign, 'premium placement did not receive campaign');
+                assert.isDefined(videoCampaign, 'video placement did not receive campaign');
+                assert.isDefined(rewardedCampaign, 'rewardedVideoZone placement did not receive campaign');
+
+                assert.isDefined(premiumTrackingUrls, 'premium placement did not receive tracking URLs');
+                assert.isDefined(videoTrackingUrls, 'video placement did not receive tracking URLs');
+                assert.isDefined(rewardedTrackingUrls, 'rewardedVideoZone placement did not receive tracking URLs');
+
+                assert.deepEqual(noFillPlacements, ['mraid'], 'mraid placement did not properly receive no fill event');
+
+                assert.deepEqual(premiumTrackingUrls['start'],['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=0','https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=0'], 'incorrect premium placement start tracking URLs');
+                assert.deepEqual(videoTrackingUrls['start'],['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=2','https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=2'], 'incorrect video placement start tracking URLs');
+                assert.deepEqual(rewardedTrackingUrls['start'],['https://tracking.prd.mz.internal.unity3d.com/impression/%ZONE%?data=randomData&test=1','https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=start&test=1'], 'incorrect rewardedVideoZone placement start tracking URLs');
+
+                assert.deepEqual(premiumTrackingUrls['click'], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=0'], 'incorrect premium placement click tracking URL');
+                assert.deepEqual(videoTrackingUrls['click'], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=2'], 'incorrect video placement click tracking URL');
+                assert.deepEqual(rewardedTrackingUrls['click'], ['https://tracking.prd.mz.internal.unity3d.com/operative/%ZONE%?eventType=click&test=1'], 'incorrect rewarded placement click tracking URL');
             });
         });
     });
