@@ -8,7 +8,7 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { HTML } from 'Ads/Models/Assets/HTML';
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
@@ -84,6 +84,7 @@ import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { Url } from 'Core/Utilities/Url';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
+import AuctionV5Response from 'json/AuctionV5Response.json';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -1192,6 +1193,81 @@ describe('CampaignManager', () => {
             return campaignManager.request().then(() => {
                 const requestBody = JSON.parse(requestData);
                 assert.isUndefined(requestBody.organizationId, 'organizationId should NOT be in ad request body when it was NOT defined in the config response');
+            });
+        });
+    });
+
+    describe('auction v5', () => {
+        let assetManager;
+        let campaignManager: any;
+        let mockRequest: any;
+        const ConfigurationAuctionPlcJson = JSON.parse(ConfigurationAuctionPlc);
+
+        beforeEach(() => {
+            assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, nativeBridge, backupCampaignManager);
+            campaignManager = new CampaignManager(nativeBridge, CoreConfigurationParser.parse(ConfigurationAuctionPlcJson), AdsConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
+            mockRequest = sinon.mock(request);
+        });
+
+        it('should handle auction v5 ad response', () => {
+            let premiumCampaign: Campaign;
+            let premiumTrackingUrls: ICampaignTrackingUrls;
+            let videoCampaign: Campaign;
+            let videoTrackingUrls: ICampaignTrackingUrls;
+            let mraidCampaign: Campaign;
+            let mraidTrackingUrls: ICampaignTrackingUrls;
+            let rewardedCampaign: Campaign;
+            let rewardedTrackingUrls: ICampaignTrackingUrls;
+            let noFillPlacements: string[] = [];
+            let triggeredError: any;
+            let triggeredRefreshDelay: number;
+            let triggeredCampaignCount: number;
+
+            mockRequest.expects('post').returns(Promise.resolve({
+                response: AuctionV5Response
+            }));
+
+            campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign, trackingUrls: ICampaignTrackingUrls) => {
+                console.log('JNIDEBUG onCampaign ' + placement);
+                if(placement === 'premium') {
+                    premiumCampaign = campaign;
+                    premiumTrackingUrls = trackingUrls;
+                } else if(placement === 'video') {
+                    videoCampaign = campaign;
+                    videoTrackingUrls = trackingUrls;
+                } else if(placement === 'mraid') {
+                    mraidCampaign = campaign;
+                    mraidTrackingUrls = trackingUrls;
+                } else if(placement === 'rewardedVideoZone') {
+                    rewardedCampaign = campaign;
+                    rewardedTrackingUrls = trackingUrls;
+                }
+            });
+
+            campaignManager.onNoFill.subscribe((placement: string) => {
+                console.log('JNIDEBUG onNoFill ' + placement);
+                noFillPlacements.push(placement);
+            });
+
+            campaignManager.onError.subscribe((error: any) => {
+                console.log('JNIDEBUG onError ' + JSON.stringify(error));
+                triggeredError = error;
+            });
+
+            campaignManager.onAdPlanReceived.subscribe((refreshDelay: number, campaignCount: number) => {
+                console.log('JNIDEBUG onAdPlanReceived ' + refreshDelay + ' ' + campaignCount);
+                triggeredRefreshDelay = refreshDelay;
+                triggeredCampaignCount = campaignCount;
+            });
+
+            return campaignManager.request().then(() => {
+                if(triggeredError) {
+                    throw triggeredError;
+                }
+
+                mockRequest.verify();
+
+                assert.isDefined(premiumCampaign, 'premium campaign was not triggered');
             });
         });
     });
