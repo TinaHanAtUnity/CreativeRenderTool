@@ -2,6 +2,7 @@ import { View } from 'Core/Views/View';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import GDPRConsentTemplate from 'html/consent/gdpr-consent.html';
 import { Template } from 'Core/Utilities/Template';
+import { PrivacyInfoContainer } from "./Consent/PrivacyInfoContainer";
 
 export interface IGDPRConsentViewParameters {
     nativeBridge: NativeBridge;
@@ -31,6 +32,14 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
                 selector: '.show-options'
             }
         ];
+    }
+
+    public render() {
+        super.render();
+
+        const testView = new PrivacyInfoContainer(this._nativeBridge);
+        testView.render();
+        (<HTMLElement>this._container.querySelector('.button-container')).appendChild(testView.container());
     }
 
     private onAgreeEvent(event: Event) {
