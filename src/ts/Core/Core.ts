@@ -198,13 +198,15 @@ export class Core implements ICore {
             HttpKafka.setConfiguration(this.Config);
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
 
-            if (!this.Config.isEnabled()) {
-                const error = new Error('Game with ID ' + this.ClientInfo.getGameId() +  ' is not enabled');
+            if(!this.Config.isEnabled()) {
+                const error = new Error('Game with ID ' + this.ClientInfo.getGameId() + ' is not enabled');
                 error.name = 'DisabledGame';
                 throw error;
             }
 
             this.Analytics = new Analytics(this);
+            return Promise.all([configJson, this.Analytics.initialize()]);
+        }).then(([configJson]) => {
             this.Ads = new Ads(configJson, this);
             this.Purchasing = new Purchasing(this);
             return this.Ads.initialize(jaegerInitSpan);

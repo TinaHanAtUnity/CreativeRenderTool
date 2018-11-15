@@ -13,15 +13,26 @@ export class Analytics implements IAnalytics, IApiModule {
     public AnalyticsManager: AnalyticsManager;
     public AnalyticsStorage: AnalyticsStorage;
 
+    private _core: ICore;
+
     constructor(core: ICore) {
+        this._core = core;
+
         this.Api = {
             Analytics: new AnalyticsApi(core.NativeBridge)
         };
 
-        if(core.Config.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(core.ClientInfo.getGameId())) {
-            this.AnalyticsStorage = new AnalyticsStorage(core.Api);
-            this.AnalyticsManager = new AnalyticsManager(core.NativeBridge.getPlatform(), core.Api, this.Api, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.Config, core.FocusManager, this.AnalyticsStorage);
-            this.AnalyticsManager.init();
+        this.AnalyticsStorage = new AnalyticsStorage(core.Api);
+        this.AnalyticsManager = new AnalyticsManager(core.NativeBridge.getPlatform(), core.Api, this.Api, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.Config, core.FocusManager, this.AnalyticsStorage);
+    }
+
+    public initialize() {
+        if(this._core.Config.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._core.ClientInfo.getGameId())) {
+            return this.AnalyticsManager.init();
+        } else {
+            return this.AnalyticsStorage.getSessionId(this._core.ClientInfo.isReinitialized()).then(gameSessionId => {
+                this.AnalyticsStorage.setSessionId(gameSessionId);
+            });
         }
     }
 
