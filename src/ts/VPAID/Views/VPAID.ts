@@ -1,8 +1,7 @@
 import { Placement } from 'Ads/Models/Placement';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Platform } from 'Core/Constants/Platform';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/ICore';
 import { IObserver1 } from 'Core/Utilities/IObserver';
 import { Template } from 'Core/Utilities/Template';
 import { Timer } from 'Core/Utilities/Timer';
@@ -41,6 +40,8 @@ interface IVPAIDTemplateData {
 export class VPAID extends View<IVPAIDHandler> {
     private static stuckDelay = 5 * 1000;
 
+    private _core: ICoreApi;
+
     private vpaidSrcTag = '{{VPAID_SRC_URL}}';
     private _campaign: VPAIDCampaign;
     private _placement: Placement;
@@ -52,10 +53,11 @@ export class VPAID extends View<IVPAIDHandler> {
     private _isCoppaCompliant: boolean;
     private _webPlayerContainer: WebPlayerContainer;
 
-    constructor(nativeBridge: NativeBridge, webPlayerContainer: WebPlayerContainer, campaign: VPAIDCampaign, placement: Placement) {
-        super(nativeBridge, 'vpaid');
+    constructor(platform: Platform, core: ICoreApi, webPlayerContainer: WebPlayerContainer, campaign: VPAIDCampaign, placement: Placement) {
+        super(platform, 'vpaid');
 
         this._template = new Template(VPAIDTemplate);
+        this._core = core;
         this._webPlayerContainer = webPlayerContainer;
         this._campaign = campaign;
         this._placement = placement;
@@ -79,7 +81,7 @@ export class VPAID extends View<IVPAIDHandler> {
         let iframeSrcDoc = new Template(VPAIDContainerTemplate).render(templateData);
 
         this._webplayerEventObserver = this._webPlayerContainer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));
-        iframeSrcDoc = this._nativeBridge.getPlatform() === Platform.ANDROID ? encodeURIComponent(iframeSrcDoc) : iframeSrcDoc;
+        iframeSrcDoc = this._platform === Platform.ANDROID ? encodeURIComponent(iframeSrcDoc) : iframeSrcDoc;
         this._isLoaded = true;
         return this._webPlayerContainer.setData(iframeSrcDoc, 'text/html', 'UTF-8');
     }
@@ -126,8 +128,10 @@ export class VPAID extends View<IVPAIDHandler> {
     }
 
     private getInitAdOptions(): Promise<InitAdOptions> {
-        return Promise.all([this._nativeBridge.DeviceInfo.getScreenWidth(),
-            this._nativeBridge.DeviceInfo.getScreenHeight()]).then(([width, height]) => {
+        return Promise.all([
+            this._core.DeviceInfo.getScreenWidth(),
+            this._core.DeviceInfo.getScreenHeight()
+        ]).then(([width, height]) => {
                 return <InitAdOptions>{
                     width: width,
                     height: height,
@@ -172,7 +176,7 @@ export class VPAID extends View<IVPAIDHandler> {
                 this.onVPAIDContainerReady();
                 break;
             default:
-                this._nativeBridge.Sdk.logWarning(`VPAID Unknown message type ${eventType}`);
+                this._core.Sdk.logWarning(`VPAID Unknown message type ${eventType}`);
         }
     }
 }

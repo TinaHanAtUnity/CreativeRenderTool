@@ -1,16 +1,18 @@
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { StorageType } from 'Core/Native/Storage';
-import { Request } from 'Core/Utilities/Request';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { StorageOperation } from 'Core/Utilities/StorageOperation';
+import { ICoreApi } from 'Core/ICore';
 
 export class FailedOperativeEventManager {
 
+    protected _core: ICoreApi;
     protected _sessionId: string;
     protected _eventId: string | undefined;
 
-    constructor(sessionId: string, eventId?: string) {
+    constructor(core: ICoreApi, sessionId: string, eventId?: string) {
+        this._core = core;
         this._sessionId = sessionId;
         this._eventId = eventId;
     }
@@ -43,9 +45,9 @@ export class FailedOperativeEventManager {
         return Promise.resolve();
     }
 
-    public sendFailedEvent(nativeBridge: NativeBridge, request: Request, storageBridge: StorageBridge): Promise<void> {
+    public sendFailedEvent(request: RequestManager, storageBridge: StorageBridge): Promise<void> {
         if(this._eventId) {
-            return nativeBridge.Storage.get<{ [key: string]: any }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
+            return this._core.Storage.get<{ [key: string]: any }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
                 const url = eventData.url;
                 const data = eventData.data;
                 return request.post(url, data);
@@ -59,20 +61,20 @@ export class FailedOperativeEventManager {
         return Promise.resolve();
     }
 
-    public sendFailedEvents(nativeBridge: NativeBridge, request: Request, storageBridge: StorageBridge): Promise<any[]> {
-        return nativeBridge.Storage.getKeys(StorageType.PRIVATE, this.getEventsStorageKey(), false).then(keys => {
-            return Promise.all(this.getPromisesForFailedEvents(nativeBridge, request, storageBridge, keys));
+    public sendFailedEvents(request: RequestManager, storageBridge: StorageBridge): Promise<any[]> {
+        return this._core.Storage.getKeys(StorageType.PRIVATE, this.getEventsStorageKey(), false).then(keys => {
+            return Promise.all(this.getPromisesForFailedEvents(request, storageBridge, keys));
         }).catch(() => {
             // Ignore errors, if events fail to be sent, they will be retried later
             return Promise.resolve([]);
         });
     }
 
-    protected getPromisesForFailedEvents(nativeBridge: NativeBridge, request: Request, storageBridge: StorageBridge, keys: string[]): Promise<any>[] {
+    protected getPromisesForFailedEvents(request: RequestManager, storageBridge: StorageBridge, keys: string[]): Promise<any>[] {
         const promises: Promise<any>[] = [];
         keys.map(eventId => {
-            const manager = new FailedOperativeEventManager(this._sessionId, eventId);
-            promises.push(manager.sendFailedEvent(nativeBridge, request, storageBridge));
+            const manager = new FailedOperativeEventManager(this._core, this._sessionId, eventId);
+            promises.push(manager.sendFailedEvent(request, storageBridge));
         });
 
         return promises;

@@ -1,5 +1,4 @@
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
@@ -19,12 +18,17 @@ import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
+import { ICoreApi } from 'Core/ICore';
+import { IAdsApi } from 'Ads/IAds';
 
 export interface IAppStoreDownloadHelper {
     onDownload(parameters: IAppStoreDownloadParameters): void;
 }
 
 export interface IAppStoreDownloadHelperParameters {
+    platform: Platform;
+    core: ICoreApi;
+    ads: IAdsApi;
     thirdPartyEventManager: ThirdPartyEventManager;
     operativeEventManager: OperativeEventManager;
     deviceInfo: DeviceInfo;
@@ -47,10 +51,12 @@ export interface IAppStoreDownloadParameters {
 
 export class AppStoreDownloadHelper  {
 
+    private _platform: Platform;
+    private _core: ICoreApi;
+    private _ads: IAdsApi;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _placement: Placement;
-    private _nativeBridge: NativeBridge;
     private _campaign: Campaign;
     private _operativeEventManager: OperativeEventManager;
     private _adUnit: VideoAdUnit;
@@ -58,8 +64,10 @@ export class AppStoreDownloadHelper  {
 
     protected _thirdPartyEventManager: ThirdPartyEventManager;
 
-    constructor(nativeBridge: NativeBridge, parameters: IAppStoreDownloadHelperParameters) {
-        this._nativeBridge = nativeBridge;
+    constructor(parameters: IAppStoreDownloadHelperParameters) {
+        this._platform = parameters.platform;
+        this._core = parameters.core;
+        this._ads = parameters.ads;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._operativeEventManager = parameters.operativeEventManager;
         this._clientInfo = parameters.clientInfo;
@@ -71,7 +79,7 @@ export class AppStoreDownloadHelper  {
     }
 
     public onDownload(parameters: IAppStoreDownloadParameters): void {
-        this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
+        this._ads.Listener.sendClickEvent(this._placement.getId());
         const operativeEventParameters = this.getOperativeEventParams(parameters);
         this._operativeEventManager.sendClick(operativeEventParameters);
         if (this._campaign instanceof XPromoCampaign) {
@@ -81,9 +89,9 @@ export class AppStoreDownloadHelper  {
             }
         }
 
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._platform === Platform.IOS) {
             this.onDownloadIos(parameters);
-        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        } else if (this._platform === Platform.ANDROID) {
             this.onDownloadAndroid(parameters);
         }
     }
@@ -108,7 +116,7 @@ export class AppStoreDownloadHelper  {
     private handleAppDownloadUrl(appDownloadUrl: string) {
         appDownloadUrl = decodeURIComponent(appDownloadUrl);
 
-        this._nativeBridge.Intent.launch({
+        this._core.Android!.Intent.launch({
             'action': 'android.intent.action.VIEW',
             'uri': appDownloadUrl
         });
@@ -157,18 +165,18 @@ export class AppStoreDownloadHelper  {
     }
 
     private handleClickAttributionWithRedirects(clickAttributionUrl: string) {
-        const platform = this._nativeBridge.getPlatform();
+        const platform = this._platform;
 
         this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
-            const location = Request.getHeader(response.headers, 'location');
+            const location = RequestManager.getHeader(response.headers, 'location');
             if (location) {
                 if (platform === Platform.ANDROID) {
-                    this._nativeBridge.Intent.launch({
+                    this._core.Android!.Intent.launch({
                         'action': 'android.intent.action.VIEW',
                         'uri': location
                     });
                 } else if (platform === Platform.IOS) {
-                    this._nativeBridge.UrlScheme.open(location);
+                    this._core.iOS!.UrlScheme.open(location);
                 }
             } else {
                 Diagnostics.trigger('click_attribution_misconfigured', {
@@ -197,7 +205,7 @@ export class AppStoreDownloadHelper  {
     }
 
     private openAppStore(parameters: IAppStoreDownloadParameters, isAppSheetBroken?: boolean) {
-        const platform = this._nativeBridge.getPlatform();
+        const platform = this._platform;
         let packageName: string | undefined;
 
         if (platform === Platform.ANDROID) {
@@ -213,15 +221,15 @@ export class AppStoreDownloadHelper  {
         }
 
         if (platform === Platform.ANDROID) {
-            this._nativeBridge.Intent.launch({
+            this._core.Android!.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': appStoreUrl
             });
         } else if (platform === Platform.IOS) {
             if (isAppSheetBroken || parameters.bypassAppSheet) {
-                this._nativeBridge.UrlScheme.open(appStoreUrl);
+                this._core.iOS!.UrlScheme.open(appStoreUrl);
             } else {
-                this._nativeBridge.AppSheet.canOpen().then(canOpenAppSheet => {
+                this._ads.iOS!.AppSheet.canOpen().then(canOpenAppSheet => {
                     if (canOpenAppSheet) {
                         if (!parameters.appStoreId) {
                             Diagnostics.trigger('no_appstore_id', {
@@ -232,15 +240,15 @@ export class AppStoreDownloadHelper  {
                         const options = {
                             id: parseInt(parameters.appStoreId, 10)
                         };
-                        this._nativeBridge.AppSheet.present(options).then(() => {
-                            this._nativeBridge.AppSheet.destroy(options);
+                        this._ads.iOS!.AppSheet.present(options).then(() => {
+                            this._ads.iOS!.AppSheet.destroy(options);
                         }).catch(([error]) => {
                             if (error === 'APPSHEET_NOT_FOUND') {
-                                this._nativeBridge.UrlScheme.open(appStoreUrl);
+                                this._core.iOS!.UrlScheme.open(appStoreUrl);
                             }
                         });
                     } else {
-                        this._nativeBridge.UrlScheme.open(appStoreUrl);
+                        this._core.iOS!.UrlScheme.open(appStoreUrl);
                     }
                 });
             }

@@ -1,8 +1,8 @@
 import { Platform } from 'Core/Constants/Platform';
-import { AndroidSensorInfoApi } from 'Core/Native/Android/AndroidSensorInfo';
+import { AndroidSensorInfoApi } from 'Core/Native/Android/SensorInfo';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { IosSensorInfoApi } from 'Core/Native/iOS/IosSensorInfo';
+import { IosSensorInfoApi } from 'Core/Native/iOS/SensorInfo';
 
 export interface IAccelerometerData {
     x: number;
@@ -11,8 +11,8 @@ export interface IAccelerometerData {
 }
 
 export class SensorInfoApi extends NativeApi {
-    public Android: AndroidSensorInfoApi;
-    public Ios: IosSensorInfoApi;
+    public readonly Android?: AndroidSensorInfoApi;
+    public readonly Ios?: IosSensorInfoApi;
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'SensorInfo', ApiPackage.CORE);

@@ -1,12 +1,27 @@
-import { AnalyticsProtocol, IAnalyticsObject, IAnalyticsCommonObject, AnalyticsItemAcquiredEvent, AnalyticsGenericEvent, AnalyticsItemSpentEvent, AnalyticsLevelUpEvent, AnalyticsLevelFailedEvent, AnalyticsAdCompleteEvent, AnalyticsIapTransactionEvent, IAnalyticsEvent, IAnalyticsMonetizationExtras, AnalyticsIapPurchaseFailedEvent } from 'Analytics/AnalyticsProtocol';
+import {
+    AnalyticsAdCompleteEvent,
+    AnalyticsGenericEvent,
+    AnalyticsIapPurchaseFailedEvent,
+    AnalyticsIapTransactionEvent,
+    AnalyticsItemAcquiredEvent,
+    AnalyticsItemSpentEvent,
+    AnalyticsLevelFailedEvent,
+    AnalyticsLevelUpEvent,
+    AnalyticsProtocol,
+    IAnalyticsCommonObject,
+    IAnalyticsMonetizationExtras,
+    IAnalyticsObject
+} from 'Analytics/AnalyticsProtocol';
+import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
+import { IAnalyticsApi } from 'Analytics/IAnalytics';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { FocusManager } from 'Core/Managers/FocusManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
-import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
-import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
 
 interface IAnalyticsEventWrapper {
@@ -19,8 +34,10 @@ export class AnalyticsManager {
 
     private static storageAnalyticsQueueKey: string = 'analytics.event.queue';
 
-    private _nativeBridge: NativeBridge;
-    private _request: Request;
+    private _platform: Platform;
+    private _core: ICoreApi;
+    private _analytics: IAnalyticsApi;
+    private _request: RequestManager;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _configuration: CoreConfiguration;
@@ -54,21 +71,23 @@ export class AnalyticsManager {
         }
     }
 
-    constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, focusManager: FocusManager) {
-        this._nativeBridge = nativeBridge;
+    constructor(platform: Platform, core: ICoreApi, analytics: IAnalyticsApi, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, focusManager: FocusManager, analyticsStorage: AnalyticsStorage) {
+        this._platform = platform;
+        this._core = core;
+        this._analytics = analytics;
         this._focusManager = focusManager;
         this._request = request;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._configuration = configuration;
-        this._storage = new AnalyticsStorage(nativeBridge);
+        this._storage = analyticsStorage;
 
         this._endpoint = 'https://prd-lender.cdp.internal.unity3d.com/v1/events';
         this._cdpEndpoint = 'https://cdp.cloud.unity3d.com/v1/events';
 
         this._analyticsEventQueue = {};
-        this._nativeBridge.Analytics.onPostEvent.subscribe((eventData) => this.onPostEvent(eventData));
-        this._nativeBridge.Analytics.addExtras({
+        this._analytics.Analytics.onPostEvent.subscribe((eventData) => this.onPostEvent(eventData));
+        this._analytics.Analytics.addExtras({
             'unity_monetization_extras': JSON.stringify(this.buildMonetizationExtras())
         });
     }
@@ -142,7 +161,7 @@ export class AnalyticsManager {
             this._analyticsEventQueue[analyticsEvent.identifier] = analyticsEvent;
             return this.flushEvents();
         } else {
-            this._nativeBridge.Sdk.logError(`AnalyticsManager: Unable to create AnalyticsIapTransactionEvent with fields : productId: ${productId} : receipt: ${receipt} : currency: ${currency} : price: ${price}`);
+            this._core.Sdk.logError(`AnalyticsManager: Unable to create AnalyticsIapTransactionEvent with fields : productId: ${productId} : receipt: ${receipt} : currency: ${currency} : price: ${price}`);
             return Promise.reject(new Error(`AnalyticsManager: Unable to create AnalyticsIapTransactionEvent with fields : productId: ${productId} : receipt: ${receipt} : currency: ${currency} : price: ${price}`));
         }
     }
@@ -159,7 +178,7 @@ export class AnalyticsManager {
             this._analyticsEventQueue[analyticsEvent.identifier] = analyticsEvent;
             this.flushEvents();
         } else {
-            this._nativeBridge.Sdk.logError(`AnalyticsManager: Unable to create AnalyticsIapFailedEvent with fields : productId: ${productId} : reason: ${reason} : currency: ${currency} : price: ${price}`);
+            this._core.Sdk.logError(`AnalyticsManager: Unable to create AnalyticsIapFailedEvent with fields : productId: ${productId} : reason: ${reason} : currency: ${currency} : price: ${price}`);
         }
     }
 
@@ -228,7 +247,7 @@ export class AnalyticsManager {
     }
 
     private sendDeviceInfo(): void {
-        AnalyticsProtocol.getDeviceInfoObject(this._nativeBridge, this._clientInfo, this._deviceInfo).then(deviceInfoObject => {
+        AnalyticsProtocol.getDeviceInfoObject(this._platform, this._core, this._clientInfo, this._deviceInfo).then(deviceInfoObject => {
             this.send(deviceInfoObject);
         });
     }
@@ -295,14 +314,14 @@ export class AnalyticsManager {
     }
 
     private send(event: IAnalyticsObject): Promise<INativeResponse> {
-        const common: IAnalyticsCommonObject = AnalyticsProtocol.getCommonObject(this._nativeBridge.getPlatform(), this._userId, this._sessionId, this._clientInfo, this._deviceInfo, this._configuration);
+        const common: IAnalyticsCommonObject = AnalyticsProtocol.getCommonObject(this._platform, this._userId, this._sessionId, this._clientInfo, this._deviceInfo, this._configuration);
         const data: string = JSON.stringify(common) + '\n' + JSON.stringify(event) + '\n';
 
         return this._request.post(this._endpoint, data);
     }
 
     private sendEvents(events: IAnalyticsEventWrapper[]): Promise<void> {
-        const common: IAnalyticsCommonObject = AnalyticsProtocol.getCommonObject(this._nativeBridge.getPlatform(), this._userId, this._sessionId, this._clientInfo, this._deviceInfo, this._configuration);
+        const common: IAnalyticsCommonObject = AnalyticsProtocol.getCommonObject(this._platform, this._userId, this._sessionId, this._clientInfo, this._deviceInfo, this._configuration);
         const data: string = JSON.stringify(common) + '\n' + events.map((event: IAnalyticsEventWrapper) => {
             return JSON.stringify(event.event);
         }).join('\n');
@@ -316,7 +335,7 @@ export class AnalyticsManager {
             events.map((value: IAnalyticsEventWrapper) => {
                 value.posting = false;
             });
-            this._nativeBridge.Sdk.logError(error.message);
+            this._core.Sdk.logError(error.message);
             throw error;
         });
     }
@@ -365,11 +384,11 @@ export class AnalyticsManager {
             } else if (this.isIapTransaction(<AnalyticsIapTransactionEvent> event)) {
                 return this.buildIapTransaction(<AnalyticsIapTransactionEvent> event);
             } else {
-                this._nativeBridge.Sdk.logError('parseAnalyticsEvent was not able to parse event');
+                this._core.Sdk.logError('parseAnalyticsEvent was not able to parse event');
                 return Promise.resolve(null);
             }
         } catch(error) {
-            this._nativeBridge.Sdk.logError(error);
+            this._core.Sdk.logError(error);
             return Promise.resolve(null);
         }
     }

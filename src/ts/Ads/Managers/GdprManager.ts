@@ -1,14 +1,14 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Request } from 'Core/Utilities/Request';
 import { ITemplateData } from 'Core/Views/View';
 
 export interface IGdprPersonalProperties extends ITemplateData {
@@ -36,22 +36,23 @@ export class GdprManager {
     private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
     private static GdprConsentStorageKey = 'gdpr.consent.value';
 
-    private _nativeBridge: NativeBridge;
-    private _deviceInfo: DeviceInfo;
-    private _clientInfo: ClientInfo;
-    private _coreConfig: CoreConfiguration;
-    private _adsConfig: AdsConfiguration;
-    private _request: Request;
+    private readonly _platform: Platform;
+    private readonly _core: ICoreApi;
+    private readonly _coreConfig: CoreConfiguration;
+    private readonly _adsConfig: AdsConfiguration;
+    private readonly _clientInfo: ClientInfo;
+    private readonly _deviceInfo: DeviceInfo;
+    private readonly _request: RequestManager;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, request: Request) {
-        this._nativeBridge = nativeBridge;
-        this._deviceInfo = deviceInfo;
-        this._clientInfo = clientInfo;
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager) {
+        this._platform = platform;
+        this._core = core;
         this._coreConfig = coreConfig;
         this._adsConfig = adsConfig;
+        this._clientInfo = clientInfo;
+        this._deviceInfo = deviceInfo;
         this._request = request;
-
-        this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
+        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
@@ -59,7 +60,7 @@ export class GdprManager {
             'adid': this._deviceInfo.getAdvertisingIdentifier(),
             'action': action,
             'projectId': this._coreConfig.getUnityProjectId(),
-            'platform': Platform[this._clientInfo.getPlatform()].toLowerCase(),
+            'platform': Platform[this._platform].toLowerCase(),
             'gameId': this._clientInfo.getGameId()
         };
         if (source) {
@@ -109,7 +110,7 @@ export class GdprManager {
             Diagnostics.trigger('gdpr_request_failed', {
                 url: url
             });
-            this._nativeBridge.Sdk.logError('Gdpr request failed' + error);
+            this._core.Sdk.logError('Gdpr request failed' + error);
             throw error;
         });
     }
@@ -120,7 +121,7 @@ export class GdprManager {
 
     private pushConsent(consent: boolean): Promise<void> {
         // get last state of gdpr consent
-        return this._nativeBridge.Storage.get(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
+        return this._core.Storage.get(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
             // only if consent has changed push to kafka
             if (consentLastSentToKafka !== consent) {
                 return this.sendGdprConsentEvent(consent);
@@ -134,7 +135,7 @@ export class GdprManager {
     }
 
     private getConsent(): Promise<boolean> {
-        return this._nativeBridge.Storage.get(StorageType.PUBLIC, GdprManager.GdprConsentStorageKey).then((data: any) => {
+        return this._core.Storage.get(StorageType.PUBLIC, GdprManager.GdprConsentStorageKey).then((data: any) => {
             const value: boolean | undefined = this.getConsentTypeHack(data);
             if(typeof(value) !== 'undefined') {
                 return Promise.resolve(value);
@@ -189,8 +190,8 @@ export class GdprManager {
             sendEvent = this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.METADATA);
         }
         return sendEvent.then(() => {
-            return this._nativeBridge.Storage.set(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey, consent).then(() => {
-                return this._nativeBridge.Storage.write(StorageType.PRIVATE);
+            return this._core.Storage.set(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey, consent).then(() => {
+                return this._core.Storage.write(StorageType.PRIVATE);
             });
         });
     }

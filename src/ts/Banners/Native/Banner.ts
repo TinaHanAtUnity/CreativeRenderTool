@@ -1,3 +1,5 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
+import { WebViewError } from 'Core/Errors/WebViewError';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0, Observable1 } from 'Core/Utilities/Observable';
@@ -47,7 +49,7 @@ export class BannerApi extends NativeApi {
     public readonly onBannerDestroyed = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Banner', ApiPackage.BANNER);
+        super(nativeBridge, 'Banner', ApiPackage.BANNER, EventCategory.BANNER);
     }
 
     public load(views: BannerViewType[], style: string, width: number, height: number): Promise<void> {
@@ -128,7 +130,7 @@ export class BannerApi extends NativeApi {
 
     private handleBannerAttachedStateEvent(parameters: any[]) {
         if (parameters.length !== 1) {
-            this._nativeBridge.Sdk.logWarning('Banner attached state event with no attached state parameter');
+            throw new WebViewError('Banner attached state event with no attached state parameter');
         } else {
             const attached = parameters[0];
             this.onBannerAttachedState.trigger(attached);
