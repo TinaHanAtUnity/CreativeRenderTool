@@ -14,7 +14,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
-import { GDPRConsent } from 'Ads/Views/GDPRConsent';
+import { GDPRConsent } from 'Ads/Views/Consent/GDPRConsent';
 import { GDPRConsentHandler } from 'Ads/EventHandlers/GDPRConsentHandler';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {

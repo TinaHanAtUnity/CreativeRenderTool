@@ -1,0 +1,23 @@
+#privacy-info-container {
+  .row-item-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+  }
+
+  .description {
+    display: none;
+    font-size: $default-size * .65;
+    text-align: justify;
+    color: $privacy-text-color;
+    font-weight: 300;
+  }
+
+  .row-item.show-description {
+    .description {
+      display: block;
+    }
+  }
+}

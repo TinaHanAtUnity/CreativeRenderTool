@@ -2,7 +2,7 @@ import { View } from 'Core/Views/View';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import GDPRConsentTemplate from 'html/consent/gdpr-consent.html';
 import { Template } from 'Core/Utilities/Template';
-import { PrivacyInfoContainer } from "./Consent/PrivacyInfoContainer";
+import { GDPRConsentSettings } from "./GDPRConsentSettings";
 
 export interface IGDPRConsentViewParameters {
     nativeBridge: NativeBridge;
@@ -14,6 +14,8 @@ export interface IGDPRConsentHandler {
 }
 
 export class GDPRConsent extends View<IGDPRConsentHandler> {
+
+    private _consentSettingsView: GDPRConsentSettings;
 
     constructor(parameters: IGDPRConsentViewParameters) {
         super(parameters.nativeBridge, 'gdpr-consent');
@@ -28,18 +30,21 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onAgreeEvent(event),
+                listener: (event: Event) => this.onOptionsEvent(event),
                 selector: '.show-options'
             }
         ];
     }
 
-    public render() {
-        super.render();
+    public hide(): void {
+        super.hide();
 
-        const testView = new PrivacyInfoContainer(this._nativeBridge);
-        testView.render();
-        (<HTMLElement>this._container.querySelector('.button-container')).appendChild(testView.container());
+        if (this._consentSettingsView) {
+            this._consentSettingsView.hide();
+            document.body.removeChild(this._consentSettingsView.container());
+            delete this._consentSettingsView;
+        }
+
     }
 
     private onAgreeEvent(event: Event) {
@@ -50,7 +55,14 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
 
     private onOptionsEvent(event: Event) {
         event.preventDefault();
-        this._handlers.forEach(handler => handler.onShowOptions());
-        this.hide();
+
+        if (!this._consentSettingsView) {
+            this._consentSettingsView = new GDPRConsentSettings(this._nativeBridge);
+            this._consentSettingsView.render();
+
+            document.body.appendChild(this._consentSettingsView.container());
+        }
+
+        this._consentSettingsView.show();
     }
 }

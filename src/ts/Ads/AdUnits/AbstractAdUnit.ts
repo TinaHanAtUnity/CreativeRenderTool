@@ -17,7 +17,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Utilities/Request';
-import { GDPRConsent } from 'Ads/Views/GDPRConsent';
+import { GDPRConsent } from 'Ads/Views/Consent/GDPRConsent';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;

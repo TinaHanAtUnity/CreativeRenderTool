@@ -1,6 +1,6 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
-import { IGDPRConsentHandler } from 'Ads/Views/GDPRConsent';
+import { IGDPRConsentHandler } from 'Ads/Views/Consent/GDPRConsent';
 
 export class GDPRConsentHandler<T extends Campaign> implements IGDPRConsentHandler {
 
