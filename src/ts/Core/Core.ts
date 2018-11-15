@@ -214,8 +214,9 @@ export class Core implements ICore {
 
             this.Analytics = new Analytics(this);
             return Promise.all([configJson, this.Analytics.initialize()]);
-        }).then(([configJson]) => {
+        }).then(([configJson, gameSessionId]) => {
             this.Ads = new Ads(configJson, this);
+            this.Ads.SessionManager.setGameSessionId(gameSessionId);
             this.Purchasing = new Purchasing(this);
             return this.Ads.initialize(jaegerInitSpan);
         }).then(() => {

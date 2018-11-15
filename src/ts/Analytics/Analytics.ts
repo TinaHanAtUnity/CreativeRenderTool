@@ -25,12 +25,15 @@ export class Analytics implements IAnalytics {
         this.AnalyticsManager = new AnalyticsManager(core.NativeBridge.getPlatform(), core.Api, this.Api, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.Config, core.FocusManager, this.AnalyticsStorage);
     }
 
-    public initialize() {
+    public initialize(): Promise<number> {
         if(this._core.Config.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._core.ClientInfo.getGameId())) {
-            return this.AnalyticsManager.init();
+            return this.AnalyticsManager.init().then(() => {
+                return this.AnalyticsManager.getGameSessionId();
+            });
         } else {
             return this.AnalyticsStorage.getSessionId(this._core.ClientInfo.isReinitialized()).then(gameSessionId => {
                 this.AnalyticsStorage.setSessionId(gameSessionId);
+                return gameSessionId;
             });
         }
     }
