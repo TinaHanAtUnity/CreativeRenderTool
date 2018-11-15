@@ -38,12 +38,14 @@
   .privacy-button {
     $privacy-button-default($default-scale-size);
     position: fixed;
-    top: 0;
+    bottom: 0;
     left: 0;
-    margin: $default-size * $default-scale-size * .25 0 0 $default-size * $default-scale-size * .25;
+    margin: 0 0 $default-size * $default-scale-size * 1 0;
+    color: white;
 
     .icon-gdpr {
-      color: white;
+      background-color: white;
+      color: $admob-privacy-blue;
     }
   }
 }
