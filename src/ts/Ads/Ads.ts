@@ -68,6 +68,8 @@ import { VPAID } from 'VPAID/VPAID';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromo } from 'XPromo/XPromo';
 import { AR } from 'AR/AR';
+import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
+import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 
 export class Ads implements IAds {
 
@@ -507,6 +509,25 @@ export class Ads implements IAds {
         if (TestEnvironment.get('forcedARMRAID')) {
             forcedARMRAID = TestEnvironment.get('forcedARMRAID');
             MRAIDAdUnitFactory.setForcedARMRAID(forcedARMRAID);
+        }
+
+        if(TestEnvironment.get('creativeUrl')) {
+            const creativeUrl = this._creativeUrl = TestEnvironment.get('creativeUrl');
+            let response: string = '';
+            const platform = this._core.NativeBridge.getPlatform();
+            if(platform === Platform.ANDROID) {
+                response = CreativeUrlResponseAndroid.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl);
+            } else if(platform === Platform.IOS) {
+                response = CreativeUrlResponseIos.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl);
+            }
+
+            if (forcedARMRAID) {
+                response = response.replace('{AD_TYPE_PLACEHOLDER}', 'MRAID_AR');
+            } else {
+                response = response.replace('{AD_TYPE_PLACEHOLDER}', 'MRAID');
+            }
+
+            CampaignManager.setCampaignResponse(response);
         }
     }
 

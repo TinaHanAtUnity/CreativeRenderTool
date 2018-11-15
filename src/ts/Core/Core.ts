@@ -46,6 +46,8 @@ import { MetaData } from 'Core/Utilities/MetaData';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Purchasing } from 'Purchasing/Purchasing';
+import { JsonParser } from 'Core/Utilities/JsonParser';
+import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 
 export class Core implements ICore {
 
@@ -163,7 +165,13 @@ export class Core implements ICore {
 
             const configSpan = this.JaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
             this.ConfigManager = new ConfigManager(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo, this.DeviceInfo, this.RequestManager);
-            let configPromise = this.ConfigManager.getConfig(configSpan);
+
+            let configPromise;
+            if(TestEnvironment.get('creativeUrl')) {
+                configPromise = Promise.resolve(JsonParser.parse(CreativeUrlConfiguration));
+            } else {
+                configPromise = this.ConfigManager.getConfig(configSpan);
+            }
 
             configPromise.then(() => {
                 this.JaegerManager.stop(configSpan);
@@ -260,6 +268,17 @@ export class Core implements ICore {
                 if (!isNaN(abGroupNumber)) { // if it is a number get the group
                     const abGroup = ABGroupBuilder.getAbGroup(abGroupNumber);
                     ConfigManager.setAbGroup(abGroup);
+                }
+            }
+
+            if(TestEnvironment.get('forceAuthorization')) {
+                const value = TestEnvironment.get('forceAuthorization');
+                const params = value.split('|');
+
+                if (params.length % 2 === 0) {
+                    for (let i = 0; i < params.length; i += 2) {
+                        RequestManager.setAuthorizationHeaderForHost(params[i], params[i + 1]);
+                    }
                 }
             }
         });
