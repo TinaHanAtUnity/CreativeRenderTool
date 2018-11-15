@@ -205,8 +205,7 @@ export class Ads implements IAds {
 
             const refreshSpan = this._core.JaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._core.NativeBridge.getPlatform()]);
-            const refreshPromise = this.RefreshManager.refresh();
-            return refreshPromise.then((resp) => {
+            return this.RefreshManager.refreshWithBackupCampaigns(this.BackupCampaignManager).then((resp) => {
                 this._core.JaegerManager.stop(refreshSpan);
                 return resp;
             }).catch((error) => {
@@ -431,6 +430,8 @@ export class Ads implements IAds {
                 } else {
                     this._core.Api.Request.setConcurrentRequestCount(8);
                 }
+
+                this.BackupCampaignManager.deleteBackupCampaigns();
             });
         });
     }
