@@ -2,7 +2,7 @@ import { View } from 'Core/Views/View';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import GDPRConsentTemplate from 'html/consent/gdpr-consent.html';
 import { Template } from 'Core/Utilities/Template';
-import { GDPRConsentSettings } from "./GDPRConsentSettings";
+import { GDPRConsentSettings } from 'Ads/Views/Consent/GDPRConsentSettings';
 
 export interface IGDPRConsentViewParameters {
     nativeBridge: NativeBridge;

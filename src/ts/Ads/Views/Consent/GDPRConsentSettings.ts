@@ -2,7 +2,7 @@ import { View } from 'Core/Views/View';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import GDPRConsentSettingsTemplate from 'html/consent/gdpr-consent-settings.html';
 import { Template } from 'Core/Utilities/Template';
-import { PrivacyInfoContainer } from 'Ads/Views/Consent/PrivacyInfoContainer';
+import { PrivacyRowItemContainer } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 
 export interface IConsentSettings {
     personalized: boolean;
@@ -15,7 +15,7 @@ export interface IGDPRConsentSettingsHandler {
 
 export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
 
-    private _infoContainer: PrivacyInfoContainer;
+    private _infoContainer: PrivacyRowItemContainer;
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'gdpr-consent-settings');
@@ -31,7 +31,7 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
             }
         ];
 
-        this._infoContainer = new PrivacyInfoContainer(nativeBridge);
+        this._infoContainer = new PrivacyRowItemContainer(nativeBridge);
     }
 
     public render(): void {
