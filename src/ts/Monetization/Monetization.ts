@@ -1,7 +1,7 @@
 import { IAds } from 'Ads/IAds';
 import { ICore } from 'Core/ICore';
 import { IApiModule } from 'Core/Modules/IApiModule';
-import { IMonetizationApi } from 'Monetization/IMonetization';
+import { IMonetization, IMonetizationApi } from 'Monetization/IMonetization';
 import { NativePromoPlacementContentEventManager } from 'Monetization/Managers/NativePromoPlacementContentManager';
 import { PlacementContentManager } from 'Monetization/Managers/PlacementContentManager';
 import { MonetizationListenerApi } from 'Monetization/Native/MonetizationListener';
@@ -10,7 +10,7 @@ import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHan
 import { IPromo } from 'Promo/IPromo';
 import { IPurchasing } from 'Purchasing/IPurchasing';
 
-export class Monetization implements IApiModule {
+export class Monetization implements IApiModule, IMonetization {
 
     public readonly Api: Readonly<IMonetizationApi>;
 

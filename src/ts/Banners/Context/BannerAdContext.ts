@@ -1,7 +1,7 @@
 import { Placement } from 'Ads/Models/Placement';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
-import { IBannersApi } from 'Banners/Banners';
+import { IBannersApi } from 'Banners/IBanners';
 import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampaignManager';
 import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';

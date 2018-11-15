@@ -5,7 +5,7 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Backend } from 'Backend/Backend';
 
 import { DisplayHTMLBannerAdUnit } from 'Banners/AdUnits/DisplayHTMLBannerAdUnit';
-import { IBannersApi } from 'Banners/Banners';
+import { IBannersApi } from 'Banners/IBanners';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';

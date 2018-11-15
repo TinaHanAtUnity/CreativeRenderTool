@@ -4,9 +4,8 @@ import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { IAnalytics, IAnalyticsApi } from 'Analytics/IAnalytics';
 import { AnalyticsApi } from 'Analytics/Native/Analytics';
 import { ICore } from 'Core/ICore';
-import { IApiModule } from 'Core/Modules/IApiModule';
 
-export class Analytics implements IAnalytics, IApiModule {
+export class Analytics implements IAnalytics {
 
     public readonly Api: Readonly<IAnalyticsApi>;
 

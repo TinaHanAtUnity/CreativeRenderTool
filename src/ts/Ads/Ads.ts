@@ -188,7 +188,7 @@ export class Ads implements IAds {
                 }
             }
 
-            this.Banners = new Banners(this._core, this, this._core.Analytics);
+            this.Banners = new Banners(this._core, this);
             this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
             this.AR = new AR(this._core);
 

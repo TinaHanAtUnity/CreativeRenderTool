@@ -22,7 +22,7 @@ import { ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
 import { IAnalyticsApi } from 'Analytics/IAnalytics';
 import { AnalyticsApi } from 'Analytics/Native/Analytics';
 import { Backend } from 'Backend/Backend';
-import { IBannersApi } from 'Banners/Banners';
+import { IBannersApi } from 'Banners/IBanners';
 import { BannerApi } from 'Banners/Native/Banner';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
