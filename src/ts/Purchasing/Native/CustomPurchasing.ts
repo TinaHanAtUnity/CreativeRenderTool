@@ -1,7 +1,8 @@
-import { NativeApi, ApiPackage } from 'Core/Native/Bridge/NativeApi';
-import { Observable1, Observable2 } from 'Core/Utilities/Observable';
-import { ITransactionDetails, IProduct, ITransactionErrorDetails } from 'Purchasing/PurchasingAdapter';
+import { EventCategory } from 'Core/Constants/EventCategory';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable1 } from 'Core/Utilities/Observable';
+import { IProduct, ITransactionDetails, ITransactionErrorDetails } from 'Purchasing/PurchasingAdapter';
 
 export enum CustomPurchasingEvent {
     PRODUCTS_RETRIEVED,
@@ -15,7 +16,7 @@ export class CustomPurchasingApi extends NativeApi {
     public readonly onTransactionError = new Observable1<ITransactionErrorDetails>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'CustomPurchasing', ApiPackage.PURCHASING_CORE);
+        super(nativeBridge, 'CustomPurchasing', ApiPackage.PURCHASING_CORE, EventCategory.CUSTOM_PURCHASING);
     }
 
     public available(): Promise<boolean> {

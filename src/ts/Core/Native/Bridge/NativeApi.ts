@@ -1,3 +1,4 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
@@ -12,6 +13,7 @@ export enum ApiPackage {
 }
 
 export abstract class NativeApi {
+
     private static _apiPackageMapping = {
         [ApiPackage.CORE]: {android: 'com.unity3d.services.core.api', ios: 'USRVApi'},
         [ApiPackage.ADS]: {android: 'com.unity3d.services.ads.api', ios: 'UADSApi'},
@@ -27,11 +29,14 @@ export abstract class NativeApi {
     protected _apiPackage: ApiPackage;
     protected _fullApiClassName: string;
 
-    constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage) {
+    protected constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage, eventCategory?: EventCategory) {
         this._nativeBridge = nativeBridge;
         this._apiClass = apiClass;
         this._apiPackage = apiPackage;
         this._fullApiClassName = this.getFullApiClassName();
+        if(eventCategory) {
+            nativeBridge.addEventHandler(eventCategory, this);
+        }
     }
 
     public handleEvent(event: string, parameters: any[]) {

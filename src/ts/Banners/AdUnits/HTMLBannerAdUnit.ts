@@ -1,5 +1,4 @@
 import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { Placement } from 'Ads/Models/Placement';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -8,10 +7,13 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Template } from 'Core/Utilities/Template';
 import { BannerViewType } from 'Banners/Native/Banner';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { Promises } from 'Core/Utilities/Promises';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos, IWebPlayerEventSettings } from 'Ads/Native/WebPlayer';
 
 export interface IBannerAdUnitParameters {
+    platform: Platform;
+    core: ICoreApi;
     placement: Placement;
     campaign: BannerCampaign;
     clientInfo: ClientInfo;
@@ -21,8 +23,9 @@ export interface IBannerAdUnitParameters {
 
 export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
     protected abstract _template: Template;
-    protected _nativeBridge: NativeBridge;
     protected _campaign: BannerCampaign;
+    protected _platform: Platform;
+    protected _core: ICoreApi;
     private _placement: Placement;
     private _clientInfo: ClientInfo;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -31,8 +34,9 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
     private _clickEventsSent = false;
     private _impressionEventsSent = false;
 
-    constructor(nativeBridge: NativeBridge, parameters: IBannerAdUnitParameters) {
-        this._nativeBridge = nativeBridge;
+    constructor(parameters: IBannerAdUnitParameters) {
+        this._platform = parameters.platform;
+        this._core = parameters.core;
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
         this._clientInfo = parameters.clientInfo;
@@ -91,10 +95,10 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
                 this._clickEventsSent = true;
                 this.sendTrackingEvent('click');
             }
-            if (this._nativeBridge.getPlatform() === Platform.IOS) {
-                this._nativeBridge.UrlScheme.open(url);
-            } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                this._nativeBridge.Intent.launch({
+            if (this._platform === Platform.IOS) {
+                this._core.iOS!.UrlScheme.open(url);
+            } else if (this._platform === Platform.ANDROID) {
+                this._core.Android!.Intent.launch({
                     'action': 'android.intent.action.VIEW',
                     'uri': url
                 });
@@ -124,7 +128,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
 
     private setUpBannerPlayerEvents(): Promise<void> {
         let eventSettings: any;
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (this._platform === Platform.ANDROID) {
             eventSettings = {
                 onPageFinished: {
                     sendEvent: true
@@ -141,7 +145,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
     }
 
     private setUpBannerPlayerSettings(): Promise<void> {
-        const platform = this._nativeBridge.getPlatform();
+        const platform = this._platform;
         let webPlayerSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos;
         if (platform === Platform.ANDROID) {
             webPlayerSettings = {
@@ -161,4 +165,5 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
         this.sendTrackingEvent('impression');
         this._impressionEventsSent = true;
     }
+
 }
