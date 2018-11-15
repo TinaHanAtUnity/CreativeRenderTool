@@ -1,7 +1,8 @@
+import { IAdsApi } from 'Ads/IAds';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 
@@ -16,6 +17,8 @@ import { Placement } from 'Ads/Models/Placement';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export interface IVideoOverlayParameters<T extends Campaign> {
+    platform: Platform;
+    ads: IAdsApi;
     deviceInfo: DeviceInfo;
     clientInfo: ClientInfo;
     campaign: T;
@@ -24,6 +27,8 @@ export interface IVideoOverlayParameters<T extends Campaign> {
 }
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
+
+    private _ads: IAdsApi;
     private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
@@ -57,9 +62,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _abGroup: ABGroup;
     private _campaign: Campaign;
 
-    constructor(nativeBridge: NativeBridge, parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean) {
-        super(nativeBridge, 'new-video-overlay', parameters.placement.muteVideo());
+    constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean) {
+        super(parameters.platform, 'new-video-overlay', parameters.placement.muteVideo());
 
+        this._ads = parameters.ads;
         this._localization = new Localization(parameters.deviceInfo.getLanguage(), 'overlay');
         this._showGDPRBanner = showGDPRBanner;
         this._showPrivacyDuringVideo = showPrivacyDuringVideo;
@@ -256,7 +262,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             this._privacy.hide();
         }
         this._isPrivacyShowing = false;
-        this._nativeBridge.VideoPlayer.play();
+        this._ads.VideoPlayer.play();
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
@@ -284,7 +290,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             this._gdprPopupClicked = true;
             this.choosePrivacyShown();
         }
-        this._nativeBridge.VideoPlayer.pause();
+        this._ads.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();
         }
@@ -294,7 +300,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._isPrivacyShowing = true;
         event.preventDefault();
         event.stopPropagation();
-        this._nativeBridge.VideoPlayer.pause();
+        this._ads.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();
         }

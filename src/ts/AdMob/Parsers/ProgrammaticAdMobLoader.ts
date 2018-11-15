@@ -1,5 +1,5 @@
-import { CampaignLoader } from 'Ads/Parsers/CampaignLoader';
 import { AdMobCampaign, AdMobVideo } from 'AdMob/Models/AdMobCampaign';
+import { CampaignLoader } from 'Ads/Parsers/CampaignLoader';
 
 export class ProgrammaticAdMobLoader extends CampaignLoader {
     public load(data: string): AdMobCampaign | undefined {
