@@ -29,7 +29,7 @@ export class Slider {
     constructor(urls: string[], size: { width: number; height: number } = {width: 0, height: 0}) {
         const {width, height} = size;
 
-        /* TODO: Maybe do configurable */
+        // TODO: Maybe do configurable
         urls.length = 3;
 
         this._rootEl = this.createElement('div', 'slider-root-container', [], {
@@ -61,7 +61,7 @@ export class Slider {
             });
         });
 
-        /* Only when all images are loaded */
+        // Only when all images are loaded
         // TODO: Handle if images are not loaded in time
         this._ready = Promise.all(allSlidesCreatedPromise).then(() => {
             this._rootEl.appendChild(this.createPagination());

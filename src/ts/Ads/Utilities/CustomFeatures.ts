@@ -79,7 +79,7 @@ export class CustomFeatures {
         return cachedGameAllowsEarlySkip;
     }
 
-    /* Following 2 functions could be merged at some point later */
+    // Following 2 functions could be merged at some point later
     public static isSliderEndScreenEnabled(campaignId: string): boolean {
         const targetCampaignIds = [
             'TBD',
@@ -90,15 +90,14 @@ export class CustomFeatures {
     }
 
     public static getScreenshotsUrls(campaignId: string, appdownloadurl: string | undefined): string[] {
-        campaignId = 'test';
 
         // Create a request variable and assign a new XMLHttpRequest object to it.
-        let request = new XMLHttpRequest();
-        let apptopiaurl = 'http://apptopia-gateway.applifier.info:80/api/1/app/'+appdownloadurl+'?raw=1';
+        const request = new XMLHttpRequest();
+        const apptopiaurl = 'http://apptopia-gateway.applifier.info:80/api/1/app/'+appdownloadurl+'?raw=1';
         // Open a new connection, using the GET request on the URL endpoint
         request.open('GET', apptopiaurl, true);
         request.onload = function () {
-            let data = JSON.parse(this.response);
+            const data = JSON.parse(this.response);
             screenshoturls = data.screenshot_urls;
             const screenshots_downloaded: { [key: string]: string[] } = {
                 'test': [
@@ -109,7 +108,7 @@ export class CustomFeatures {
                 ]
             };
             return screenshoturls;
-        }
+        };
 
         // Send request
         request.send();

@@ -3,7 +3,7 @@ import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceC
 import { Slider } from 'Performance/Views/Slider';
 import SliderEndScreenTemplate from 'html/SliderEndScreen.html';
 import { detectOrientation } from 'Device';
-import {Template} from "../../Core/Utilities/Template";
+import {Template} from '../../Core/Utilities/Template';
 
 export class SliderPerformanceEndScreen extends EndScreen {
     private _campaign: SliderPerformanceCampaign;
