@@ -23,7 +23,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
     private _analyticsManager?: AnalyticsManager;
     private _promoEvents: PromoEvents;
     private _products: {[productId: string]: IProduct};
-    private _thirdPartyEventManager: ThirdPartyEventManager;
 
     private static purchasePathRegex = new RegExp('events\/v1\/purchase');
     private static purchaseHostnameRegex = new RegExp('events\.iap\.unity3d\.com');
@@ -34,8 +33,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
         this._analyticsManager = analyticsManager;
         this._promoEvents = promoEvents;
         this._products = {};
-
-        this._thirdPartyEventManager = new ThirdPartyEventManager(core, request, {});
     }
 
     public initialize() {
@@ -57,7 +54,7 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
         });
     }
 
-    public purchaseItem(productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails> {
+    public purchaseItem(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails> {
         return new Promise<ITransactionDetails>((resolve, reject) => {
             let onError: IObserver1<ITransactionErrorDetails>;
             let onSuccess: IObserver1<ITransactionDetails>;
@@ -70,7 +67,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                     this._analyticsManager.onIapTransaction(details.productId, details.receipt, details.currency, details.price);
                 }
                 // send iap transaction event
-                this._thirdPartyEventManager.setTemplateValue('%ZONE%', placementId);
                 const product: IProduct | undefined = this._products[productId];
                 if (product) {
                     const events = campaign.getTrackingEventUrls();
@@ -90,10 +86,10 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                                     native: isNative
                                 }, product.productType, details.receipt)
                                 .then((body) => {
-                                    this._thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, Url.addParameters(url, {'native': isNative, 'iap_service': false}), JSON.stringify(body));
+                                    thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, Url.addParameters(url, {'native': isNative, 'iap_service': false}), JSON.stringify(body));
                                 });
                             } else {
-                                this._thirdPartyEventManager.sendWithGet(purchaseKey, sessionId, url);
+                                thirdPartyEventManager.sendWithGet(purchaseKey, sessionId, url);
                             }
                         }
                     }
@@ -111,7 +107,6 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                         this._analyticsManager.onPurchaseFailed(productId, details.transactionError, product.localizedPrice, product.isoCurrencyCode);
                     }
                     // send iap transaction event
-                    this._thirdPartyEventManager.setTemplateValue('%ZONE%', placementId);
                     const events = campaign.getTrackingEventUrls();
                     if (events) {
                         const purchaseKey = 'purchase';
@@ -129,10 +124,10 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                                     native: isNative
                                 }, this._promoEvents.failureJson(details.storeSpecificErrorCode, details.exceptionMessage, AnalyticsManager.getPurchasingFailureReason(details.transactionError), productId))
                                 .then((body) => {
-                                    this._thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, Url.addParameters(url, {'native': isNative, 'iap_service': false}), JSON.stringify(body));
+                                    thirdPartyEventManager.sendWithPost(purchaseKey, sessionId, Url.addParameters(url, {'native': isNative, 'iap_service': false}), JSON.stringify(body));
                                 });
                             } else {
-                                this._thirdPartyEventManager.sendWithGet(purchaseKey, sessionId, url);
+                                thirdPartyEventManager.sendWithGet(purchaseKey, sessionId, url);
                             }
                         }
                     }
@@ -143,7 +138,7 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
         });
     }
 
-    public onPromoClosed(campaign: PromoCampaign) {
+    public onPromoClosed(thirdPartyEventManager: ThirdPartyEventManager, campaign: PromoCampaign) {
         // does nothing
     }
 }

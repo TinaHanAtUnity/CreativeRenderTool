@@ -106,7 +106,8 @@ describe('EndScreenEventHandlerTest', () => {
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
-                campaign: campaign
+                campaign: campaign,
+                playerMetadataServerId: 'test-gamerSid'
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -362,7 +363,8 @@ describe('EndScreenEventHandlerTest', () => {
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
-                campaign: campaign
+                campaign: campaign,
+                playerMetadataServerId: 'test-gamerSid'
             });
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);

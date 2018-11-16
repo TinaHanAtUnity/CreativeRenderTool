@@ -282,7 +282,8 @@ describe('Event parameters should match specifications', () => {
                 coreConfig: TestFixtures.getCoreConfiguration(),
                 adsConfig: TestFixtures.getAdsConfiguration(),
                 storageBridge: storageBridge,
-                campaign: campaign
+                campaign: campaign,
+                playerMetadataServerId: 'test-gamerSid'
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
 
@@ -328,7 +329,8 @@ describe('Event parameters should match specifications', () => {
                 coreConfig: TestFixtures.getCoreConfiguration(),
                 adsConfig: TestFixtures.getAdsConfiguration(),
                 storageBridge: storageBridge,
-                campaign: campaign
+                campaign: campaign,
+                playerMetadataServerId: 'test-gamerSid'
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
             const operativeEventParams: IOperativeEventParams = {
@@ -380,7 +382,8 @@ describe('Event parameters should match specifications', () => {
                     coreConfig: TestFixtures.getCoreConfiguration(),
                     adsConfig: TestFixtures.getAdsConfiguration(),
                     storageBridge: storageBridge,
-                    campaign: campaign
+                    campaign: campaign,
+                    playerMetadataServerId: 'test-gamerSid'
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
                 operativeEventParams = {
@@ -470,7 +473,8 @@ describe('Event parameters should match specifications', () => {
                     coreConfig: TestFixtures.getCoreConfiguration(),
                     adsConfig: TestFixtures.getAdsConfiguration(),
                     storageBridge: storageBridge,
-                    campaign: campaign
+                    campaign: campaign,
+                    playerMetadataServerId: 'test-gamerSid'
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
             });

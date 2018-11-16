@@ -104,7 +104,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
-                campaign: campaign
+                campaign: campaign,
+                playerMetadataServerId: 'test-gamerSid'
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -264,7 +265,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
-                campaign: campaign
+                campaign: campaign,
+                playerMetadataServerId: 'test-gamerSid'
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 

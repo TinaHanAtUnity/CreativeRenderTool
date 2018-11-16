@@ -7,6 +7,8 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 
 export class BannerAdUnitParametersFactory {
 
@@ -15,27 +17,36 @@ export class BannerAdUnitParametersFactory {
     private _request: RequestManager;
     private _clientInfo: ClientInfo;
     private _webPlayerContainer: WebPlayerContainer;
+    private _metadataManager: MetaDataManager;
 
-    constructor(platform: Platform, core: ICoreApi, request: RequestManager, clientInfo: ClientInfo, webPlayerContainer: WebPlayerContainer) {
+    constructor(platform: Platform, core: ICoreApi, request: RequestManager, clientInfo: ClientInfo, webPlayerContainer: WebPlayerContainer, metadataManager: MetaDataManager) {
         this._platform = platform;
         this._core = core;
         this._request = request;
         this._clientInfo = clientInfo;
         this._webPlayerContainer = webPlayerContainer;
+        this._metadataManager = metadataManager;
     }
 
     public create(campaign: BannerCampaign, placement: Placement, options: any): Promise<IBannerAdUnitParameters> {
-        return Promise.resolve({
-            platform: this._platform,
-            core: this._core,
-            placement,
-            campaign,
-            clientInfo: this._clientInfo,
-            thirdPartyEventManager: new ThirdPartyEventManager(this._core, this._request, {
-                '%ZONE%': placement.getId(),
-                '%SDK_VERSION%': this._clientInfo.getSdkVersion().toString()
-            }),
-            webPlayerContainer: this._webPlayerContainer
+        return this._metadataManager.fetch(PlayerMetaData, false).then((playerMetadata) => {
+            let playerMetadataServerId: string | undefined;
+            if (playerMetadata) {
+                playerMetadataServerId = playerMetadata.getServerId();
+            }
+            return {
+                platform: this._platform,
+                core: this._core,
+                placement: placement,
+                campaign: campaign,
+                clientInfo: this._clientInfo,
+                thirdPartyEventManager: new ThirdPartyEventManager(this._core, this._request, [
+                    [ThirdPartyEventManager.zoneMacro, placement.getId()],
+                    [ThirdPartyEventManager.sdkVersionMacro, this._clientInfo.getSdkVersion().toString()],
+                    [ThirdPartyEventManager.gamerSidMacro, playerMetadataServerId || '']
+                ]),
+                webPlayerContainer: this._webPlayerContainer
+            };
         });
     }
 }

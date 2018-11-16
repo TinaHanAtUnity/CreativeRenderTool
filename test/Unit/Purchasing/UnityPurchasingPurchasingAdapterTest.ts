@@ -18,6 +18,8 @@ import { IPurchasingAdapter } from 'Purchasing/PurchasingAdapter';
 import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurchasingAdapter';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 describe('UnityPurchasingPurchasingAdapter', () => {
     let platform: Platform;
@@ -27,7 +29,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
     let promo: IPromoApi;
     let sandbox: sinon.SinonSandbox;
     let clientInfo: ClientInfo;
-    let sdk: SdkApi;
+    let thirdPartyEventManager: ThirdPartyEventManager;
 
     let purchasingAdapter: IPurchasingAdapter;
     const iapPayloadPurchase: IPromoPayload = {
@@ -80,8 +82,9 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         promo = TestFixtures.getPromoApi(nativeBridge);
         clientInfo = sinon.createStubInstance(ClientInfo);
-        sdk = sinon.createStubInstance(SdkApi);
         sandbox = sinon.createSandbox();
+        const request = sinon.createStubInstance(RequestManager);
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request);
 
         sinon.stub(promo.Purchasing, 'getPromoCatalog').returns(Promise.resolve());
         sinon.stub(promo.Purchasing, 'getPromoVersion').returns(Promise.resolve());
@@ -378,7 +381,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         it('should send the promo payload with Purchase request value', () => {
 
             const callPurchase = () => {
-                return purchasingAdapter.purchaseItem('com.example.iap.product1', TestFixtures.getPromoCampaign(), 'testId', false)
+                return purchasingAdapter.purchaseItem(thirdPartyEventManager, 'com.example.iap.product1', TestFixtures.getPromoCampaign(), 'testId', false)
                 .then(() => triggerPurchasingCommand(true))
                 .then(() => {
                     sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
@@ -414,7 +417,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         it('should send the promo payload with Close request value', () => {
 
             const callPromoClosed = () => {
-                purchasingAdapter.onPromoClosed(TestFixtures.getPromoCampaign(), '');
+                purchasingAdapter.onPromoClosed(thirdPartyEventManager, TestFixtures.getPromoCampaign(), '');
                 sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
                 sinon.assert.calledWith((<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand).getCall(1), JSON.stringify({
                     'gamerToken': 'abcd.1234.5678',

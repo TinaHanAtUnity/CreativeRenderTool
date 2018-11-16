@@ -9,23 +9,28 @@ import { Url } from 'Core/Utilities/Url';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 
 export class NativePromoEventHandler {
 
     public readonly onClose = new Observable0();
 
-    private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _thirdPartyEventManager: Promise<ThirdPartyEventManager>;
     private _core: ICoreApi;
     private _ads: IAdsApi;
     private _purchasing: IPurchasingApi;
+    private _metadataManager: MetaDataManager;
+    private _clientInfo: ClientInfo;
+    private _request: RequestManager;
 
-    constructor(core: ICoreApi, ads: IAdsApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, request: RequestManager) {
+    constructor(core: ICoreApi, ads: IAdsApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, request: RequestManager, metadataManager: MetaDataManager) {
         this._core = core;
         this._ads = ads;
         this._purchasing = purchasing;
-        this._thirdPartyEventManager = new ThirdPartyEventManager(core, request, {
-            '%SDK_VERSION%': clientInfo.getSdkVersion().toString()
-        });
+        this._clientInfo = clientInfo;
+        this._request = request;
+        this._metadataManager = metadataManager;
     }
 
     public onPlacementContentIgnored(campaign: PromoCampaign) {
@@ -33,7 +38,18 @@ export class NativePromoEventHandler {
     }
 
     public onImpression(campaign: PromoCampaign, placementId: string): Promise<void> {
-        this._thirdPartyEventManager.setTemplateValue('%ZONE%', placementId);
+        // reset thirdParteEventManager on each impression
+        this._thirdPartyEventManager = this._metadataManager.fetch(PlayerMetaData, false).then((playerMetadata) => {
+            let playerMetadataServerId: string | undefined;
+            if (playerMetadata) {
+                playerMetadataServerId = playerMetadata.getServerId();
+            }
+            return this.createThirdPartyEventManager([
+                [ThirdPartyEventManager.zoneMacro, placementId],
+                [ThirdPartyEventManager.sdkVersionMacro, this._clientInfo.getSdkVersion().toString()],
+                [ThirdPartyEventManager.gamerSidMacro, playerMetadataServerId || '']
+            ]);
+        });
         return this.sendTrackingEvent('impression', campaign);
     }
 
@@ -49,8 +65,9 @@ export class NativePromoEventHandler {
 
     private sendClick(productId: string, placementId: string, campaign: PromoCampaign) {
         this._ads.Listener.sendClickEvent(placementId);
-        this._thirdPartyEventManager.setTemplateValue('%ZONE%', placementId);
-        PurchasingUtilities.onPurchase(productId, campaign, placementId, true);
+        this._thirdPartyEventManager.then((thirdPartyEventManager) => {
+            PurchasingUtilities.onPurchase(thirdPartyEventManager, productId, campaign, placementId, true);
+        });
         return this.sendTrackingEvent('click', campaign);
     }
 
@@ -67,8 +84,15 @@ export class NativePromoEventHandler {
                 return value;
             });
             for (const url of trackingEventUrls) {
-                this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
+                this._thirdPartyEventManager.then((thirdPartyEventManager) => {
+                    thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
+                });
             }
         });
+    }
+
+    // exists for stubbing in tests
+    private createThirdPartyEventManager(templateValues: [string, string][]): ThirdPartyEventManager {
+        return new ThirdPartyEventManager(this._core, this._request, templateValues);
     }
 }

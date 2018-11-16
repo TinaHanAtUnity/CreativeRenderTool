@@ -96,7 +96,8 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
-                campaign: campaign
+                campaign: campaign,
+                playerMetadataServerId: 'test-gamerSid'
             });
             const gdprManager = sinon.createStubInstance(GdprManager);
             const privacy = new Privacy(platform, campaign, gdprManager, false, false);

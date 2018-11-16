@@ -80,7 +80,8 @@ describe('SessionManagerTest', () => {
             coreConfig: TestFixtures.getCoreConfiguration(),
             adsConfig: TestFixtures.getAdsConfiguration(),
             storageBridge: storageBridge,
-            campaign: TestFixtures.getCampaign()
+            campaign: TestFixtures.getCampaign(),
+            playerMetadataServerId: 'test-gamerSid'
         });
     });
 

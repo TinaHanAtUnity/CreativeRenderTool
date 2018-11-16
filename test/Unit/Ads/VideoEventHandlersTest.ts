@@ -131,7 +131,8 @@ describe('VideoEventHandlersTest', () => {
             coreConfig: coreConfig,
             adsConfig: adsConfig,
             storageBridge: storageBridge,
-            campaign: performanceCampaign
+            campaign: performanceCampaign,
+            playerMetadataServerId: 'test-gamerSid'
         };
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);

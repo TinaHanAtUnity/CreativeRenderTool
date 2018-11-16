@@ -23,8 +23,8 @@ export class PerformanceOperativeEventManager extends OperativeEventManager {
         return Url.addParameters(this._performanceCampaign.getClickUrl(), { redirect: false });
     }
 
-    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, any]> {
-        return super.getInfoJson(params, eventId, gameSession, gamerSid, previousPlacementId).then(([id, infoJson]) => {
+    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, previousPlacementId?: string): Promise<[string, any]> {
+        return super.getInfoJson(params, eventId, gameSession, previousPlacementId).then(([id, infoJson]) => {
             if(params.asset) {
                 infoJson.unityCreativeId = params.asset.getCreativeId();
             }

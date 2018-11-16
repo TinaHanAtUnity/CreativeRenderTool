@@ -115,7 +115,8 @@ describe('VastAdUnitTest', () => {
             coreConfig: coreConfig,
             adsConfig: adsConfig,
             storageBridge: storageBridge,
-            campaign: vastCampaign
+            campaign: vastCampaign,
+            playerMetadataServerId: 'test-gamerSid'
         });
 
         const gdprManager = sinon.createStubInstance(GdprManager);

@@ -19,28 +19,25 @@ export class ThirdPartyEventManager {
     private _request: RequestManager;
     private _templateValues: { [id: string]: string } = {};
 
-    public static replaceUrlTemplateValues(urls: string[], templateValues: { [id: string]: string }): string[] {
-        const modifiedUrls: string[] = [];
-        for (const url of urls) {
-            if(url) {
-                for(const key in templateValues) {
-                    if(templateValues.hasOwnProperty(key)) {
-                        const modifiedUrl = url.replace(key, templateValues[key]);
-                        modifiedUrls.push(modifiedUrl);
-                    }
-                }
-            }
-        }
-        return modifiedUrls;
-    }
+    public static zoneMacro: string = '%ZONE%';
+    public static sdkVersionMacro: string = '%SDK_VERSION%';
+    public static gamerSidMacro: string = '%GAMER_SID%';
 
-    constructor(core: ICoreApi, request: RequestManager, templateValues?: { [id: string]: string }) {
+    constructor(core: ICoreApi, request: RequestManager, templateValues?: [string, string][]) {
         this._core = core;
         this._request = request;
 
         if(templateValues) {
             this.setTemplateValues(templateValues);
         }
+
+        this._core.Sdk.logDebug('Initializing ThirdPartEventManager');
+    }
+
+    public replaceUrlTemplateValues(urls: string[]): string[] {
+        return urls.map((url) => {
+            return this.getUrl(url);
+        });
     }
 
     public clickAttributionEvent(url: string, redirects: boolean, useWebViewUA?: boolean): Promise<INativeResponse> {
@@ -107,8 +104,12 @@ export class ThirdPartyEventManager {
         });
     }
 
-    public setTemplateValues(templateValues: { [id: string]: string }): void {
-        this._templateValues = templateValues;
+    public setTemplateValues(templateValues: [string, string][]): void {
+        const newTemplateValues: { [id: string]: string } = {};
+        templateValues.map(([key, value]) => {
+            newTemplateValues[key] = value;
+        });
+        this._templateValues = newTemplateValues;
     }
 
     public setTemplateValue(key: string, value: string): void {

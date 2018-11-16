@@ -30,8 +30,8 @@ export class MRAIDOperativeEventManager extends ProgrammaticOperativeEventManage
         return super.createClickEventUrl();
     }
 
-    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, any]> {
-        return super.getInfoJson(params, eventId, gameSession, gamerSid, previousPlacementId).then(([id, infoJson]) => {
+    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, previousPlacementId?: string): Promise<[string, any]> {
+        return super.getInfoJson(params, eventId, gameSession, previousPlacementId).then(([id, infoJson]) => {
             if(params.asset) {
                 infoJson.unityCreativeId = params.asset.getCreativeId();
             }

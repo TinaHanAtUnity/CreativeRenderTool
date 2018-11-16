@@ -70,6 +70,7 @@ import { XPromo } from 'XPromo/XPromo';
 import { AR } from 'AR/AR';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 
 export class Ads implements IAds {
 
@@ -323,8 +324,14 @@ export class Ads implements IAds {
         Promise.all([
             this._core.DeviceInfo.getScreenWidth(),
             this._core.DeviceInfo.getScreenHeight(),
-            this._core.DeviceInfo.getConnectionType()
-        ]).then(([screenWidth, screenHeight, connectionType]) => {
+            this._core.DeviceInfo.getConnectionType(),
+            this._core.MetaDataManager.fetch(PlayerMetaData, false)
+        ]).then(([screenWidth, screenHeight, connectionType, playerMetadata]) => {
+            let playerMetadataServerId: string | undefined;
+            if (playerMetadata) {
+                playerMetadataServerId = playerMetadata.getServerId();
+            }
+
             if(campaign.isConnectionNeeded() && connectionType === 'none') {
                 this._showing = false;
                 this.showError(true, placement.getId(), 'No connection');
@@ -348,10 +355,11 @@ export class Ads implements IAds {
                 container: this.Container,
                 deviceInfo: this._core.DeviceInfo,
                 clientInfo: this._core.ClientInfo,
-                thirdPartyEventManager: new ThirdPartyEventManager(this._core.Api, this._core.RequestManager, {
-                    '%ZONE%': placement.getId(),
-                    '%SDK_VERSION%': this._core.ClientInfo.getSdkVersion().toString()
-                }),
+                thirdPartyEventManager: new ThirdPartyEventManager(this._core.Api, this._core.RequestManager, [
+                    [ThirdPartyEventManager.zoneMacro, placement.getId()],
+                    [ThirdPartyEventManager.sdkVersionMacro, this._core.ClientInfo.getSdkVersion().toString()],
+                    [ThirdPartyEventManager.gamerSidMacro, playerMetadataServerId || '']
+                ]),
                 operativeEventManager: OperativeEventManagerFactory.createOperativeEventManager({
                     platform: this._core.NativeBridge.getPlatform(),
                     core: this._core.Api,
@@ -364,7 +372,8 @@ export class Ads implements IAds {
                     coreConfig: this._core.Config,
                     adsConfig: this.Config,
                     storageBridge: this._core.StorageBridge,
-                    campaign: campaign
+                    campaign: campaign,
+                    playerMetadataServerId: playerMetadataServerId
                 }),
                 placement: placement,
                 campaign: campaign,

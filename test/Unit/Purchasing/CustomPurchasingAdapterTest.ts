@@ -14,6 +14,7 @@ import { IProduct, ITransactionDetails, ITransactionErrorDetails } from 'Purchas
 import * as sinon from 'sinon';
 import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 describe('CustomPurchasingAdapter', () => {
     let platform: Platform;
@@ -26,6 +27,7 @@ describe('CustomPurchasingAdapter', () => {
     let request: RequestManager;
     let sandbox: sinon.SinonSandbox;
     let purchasingAdapter: CustomPurchasingAdapter;
+    let thirdPartyEventManager: ThirdPartyEventManager;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -41,9 +43,8 @@ describe('CustomPurchasingAdapter', () => {
         sinon.stub(purchasing.CustomPurchasing, 'refreshCatalog').returns(Promise.resolve());
         sinon.stub(purchasing.CustomPurchasing, 'purchaseItem').returns(Promise.resolve());
 
+        thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
         purchasingAdapter = new CustomPurchasingAdapter(core, purchasing, promoEvents, request, analyticsManager);
-        sandbox.stub((<any>purchasingAdapter)._thirdPartyEventManager, 'sendWithGet');
-        sandbox.stub((<any>purchasingAdapter)._thirdPartyEventManager, 'sendWithPost');
     });
 
     const triggerRefreshCatalog = (value: IProduct[]) => {
@@ -125,7 +126,7 @@ describe('CustomPurchasingAdapter', () => {
             }];
 
             it('should send iap transaction analytics event if analytics is enabled', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
+                const purchaseItemPromise = purchasingAdapter.purchaseItem(thirdPartyEventManager, 'productId', TestFixtures.getPromoCampaign(), 'placementId', false);
 
                 return triggerTransactionComplete(transactionDetails)
                     .then(() => {
@@ -137,7 +138,7 @@ describe('CustomPurchasingAdapter', () => {
             });
 
             it('should not send the purchase success event if given productId is not in the catalog', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
+                const purchaseItemPromise = purchasingAdapter.purchaseItem(thirdPartyEventManager, 'productId', TestFixtures.getPromoCampaign(), 'placementId', false);
 
                 return triggerTransactionComplete(transactionDetails)
                     .then(() => {
@@ -149,7 +150,7 @@ describe('CustomPurchasingAdapter', () => {
             });
 
             it('should send the purchase success event and thirdpartyEvent post for purchase path url', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
+                const purchaseItemPromise = purchasingAdapter.purchaseItem(thirdPartyEventManager, 'productId', TestFixtures.getPromoCampaign(), 'placementId', false);
                 const refreshCatalogPromise = purchasingAdapter.refreshCatalog();
 
                 asStub(promoEvents.onPurchaseSuccess).returns(Promise.resolve());
@@ -161,7 +162,7 @@ describe('CustomPurchasingAdapter', () => {
                                 .then(() => {
                                     return purchaseItemPromise.then((transactionDets) => {
                                         sinon.assert.calledOnce(<sinon.SinonStub>promoEvents.onPurchaseSuccess);
-                                        sinon.assert.calledOnce((<any>purchasingAdapter)._thirdPartyEventManager.sendWithPost);
+                                        sinon.assert.calledOnce(<sinon.SinonStub>thirdPartyEventManager.sendWithPost); 
                                         assert.deepEqual(transactionDets, transactionDetails);
                                     });
                             });
@@ -170,7 +171,7 @@ describe('CustomPurchasingAdapter', () => {
             });
 
             it('should send the thirdParty get of non purhcase path or hostname url', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
+                const purchaseItemPromise = purchasingAdapter.purchaseItem(thirdPartyEventManager, 'productId', TestFixtures.getPromoCampaign(), 'placementId', false);
                 const refreshCatalogPromise = purchasingAdapter.refreshCatalog();
 
                 asStub(promoEvents.onPurchaseSuccess).returns(Promise.resolve());
@@ -182,7 +183,7 @@ describe('CustomPurchasingAdapter', () => {
                                 .then(() => {
                                     return purchaseItemPromise.then((transactionDets) => {
                                         sinon.assert.calledOnce(<sinon.SinonStub>promoEvents.onPurchaseSuccess);
-                                        sinon.assert.calledOnce((<any>purchasingAdapter)._thirdPartyEventManager.sendWithGet);
+                                        sinon.assert.calledOnce(<sinon.SinonStub>thirdPartyEventManager.sendWithGet); 
                                         assert.deepEqual(transactionDets, transactionDetails);
                                     });
                             });
@@ -211,7 +212,7 @@ describe('CustomPurchasingAdapter', () => {
             }];
 
             it('should reject with error and not send iap purchase failed event product doesnt exist', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
+                const purchaseItemPromise = purchasingAdapter.purchaseItem(thirdPartyEventManager, 'productId', TestFixtures.getPromoCampaign(), 'placementId', false);
 
                 return triggerTransactionError(transactionErrorDetails)
                     .then(() => {
@@ -225,7 +226,7 @@ describe('CustomPurchasingAdapter', () => {
             });
 
             it('should reject with error and send iap purchase failed event if analytics is enabled and product does exist', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
+                const purchaseItemPromise = purchasingAdapter.purchaseItem(thirdPartyEventManager, 'productId', TestFixtures.getPromoCampaign(), 'placementId', false);
                 const refreshCatalogPromise = purchasingAdapter.refreshCatalog();
 
                 asStub(promoEvents.onPurchaseFailed).returns(Promise.resolve());
@@ -247,7 +248,7 @@ describe('CustomPurchasingAdapter', () => {
             });
 
             it('should send the purchase failed event and thirdpartyEvent post for purchase path url', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
+                const purchaseItemPromise = purchasingAdapter.purchaseItem(thirdPartyEventManager, 'productId', TestFixtures.getPromoCampaign(), 'placementId', false);
                 const refreshCatalogPromise = purchasingAdapter.refreshCatalog();
 
                 asStub(promoEvents.onPurchaseFailed).returns(Promise.resolve());
@@ -261,7 +262,7 @@ describe('CustomPurchasingAdapter', () => {
                                         assert.fail('purchaseItem worked when it shouldn\'t\'ve');
                                     }).catch((e) => {
                                         sinon.assert.calledOnce(<sinon.SinonStub>analyticsManager.onPurchaseFailed);
-                                        sinon.assert.calledOnce((<any>purchasingAdapter)._thirdPartyEventManager.sendWithPost);
+                                        sinon.assert.calledOnce(<sinon.SinonStub>thirdPartyEventManager.sendWithPost);
                                         assert.equal(e.message, 'Did not complete transaction due to error:twas a problem');
                                     });
                             });
@@ -270,7 +271,7 @@ describe('CustomPurchasingAdapter', () => {
             });
 
             it('should send the thirdParty get of non purhcase path or hostname url', () => {
-                const purchaseItemPromise = purchasingAdapter.purchaseItem('productId', TestFixtures.getPromoCampaign(), 'placementId', false);
+                const purchaseItemPromise = purchasingAdapter.purchaseItem(thirdPartyEventManager, 'productId', TestFixtures.getPromoCampaign(), 'placementId', false);
                 const refreshCatalogPromise = purchasingAdapter.refreshCatalog();
 
                 asStub(promoEvents.onPurchaseFailed).returns(Promise.resolve());
@@ -284,7 +285,7 @@ describe('CustomPurchasingAdapter', () => {
                                         assert.fail('purchaseItem worked when it shouldn\'t\'ve');
                                     }).catch((e) => {
                                         sinon.assert.calledOnce(<sinon.SinonStub>analyticsManager.onPurchaseFailed);
-                                        sinon.assert.calledWith((<any>purchasingAdapter)._thirdPartyEventManager.sendWithGet, 'purchase', '12345', 'http://test.purchase.com/purchase');
+                                        sinon.assert.calledWith(<sinon.SinonStub>thirdPartyEventManager.sendWithGet, 'purchase', '12345', 'http://test.purchase.com/purchase');
                                         assert.equal(e.message, 'Did not complete transaction due to error:twas a problem');
                                     });
                             });

@@ -111,7 +111,8 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                     coreConfig: coreConfig,
                     adsConfig: adsConfig,
                     storageBridge: storageBridge,
-                    campaign: campaign
+                    campaign: campaign,
+                    playerMetadataServerId: 'test-gamerSid'
                 });
 
                 const privacy = new Privacy(platform, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
