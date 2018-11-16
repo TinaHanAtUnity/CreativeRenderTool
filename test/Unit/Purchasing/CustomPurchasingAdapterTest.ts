@@ -162,7 +162,7 @@ describe('CustomPurchasingAdapter', () => {
                                 .then(() => {
                                     return purchaseItemPromise.then((transactionDets) => {
                                         sinon.assert.calledOnce(<sinon.SinonStub>promoEvents.onPurchaseSuccess);
-                                        sinon.assert.calledOnce(<sinon.SinonStub>thirdPartyEventManager.sendWithPost); 
+                                        sinon.assert.calledOnce(<sinon.SinonStub>thirdPartyEventManager.sendWithPost);
                                         assert.deepEqual(transactionDets, transactionDetails);
                                     });
                             });
@@ -183,7 +183,7 @@ describe('CustomPurchasingAdapter', () => {
                                 .then(() => {
                                     return purchaseItemPromise.then((transactionDets) => {
                                         sinon.assert.calledOnce(<sinon.SinonStub>promoEvents.onPurchaseSuccess);
-                                        sinon.assert.calledOnce(<sinon.SinonStub>thirdPartyEventManager.sendWithGet); 
+                                        sinon.assert.calledOnce(<sinon.SinonStub>thirdPartyEventManager.sendWithGet);
                                         assert.deepEqual(transactionDets, transactionDetails);
                                     });
                             });
