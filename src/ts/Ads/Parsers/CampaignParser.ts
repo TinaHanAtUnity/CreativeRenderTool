@@ -3,16 +3,17 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 
 export abstract class CampaignParser {
-    public abstract parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign>;
 
     protected _creativeID: string | undefined;
     protected _seatID: number | undefined;
+
+    public abstract parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign>;
 
     public alertCreativeService(error: any) {
         CreativeBlocking.report(this._creativeID, this._seatID, BlockingReason.VIDEO_PARSE_FAILURE, {
@@ -26,8 +27,8 @@ export abstract class CampaignParser {
         this._seatID = response.getSeatId() || undefined;
     }
 
-    protected getProgrammaticCampaignId(nativeBridge: NativeBridge): string {
-        switch (nativeBridge.getPlatform()) {
+    protected getProgrammaticCampaignId(platform: Platform): string {
+        switch (platform) {
             case Platform.IOS:
                 return '00005472656d6f7220694f53';
             case Platform.ANDROID:

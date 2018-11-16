@@ -1,9 +1,9 @@
-import { Campaign } from 'Ads/Models/Campaign';
-import { Session } from 'Ads/Models/Session';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { HTML } from 'Ads/Models/Assets/HTML';
 import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
-import { HTML } from 'Ads/Models/Assets/HTML';
+import { Campaign } from 'Ads/Models/Campaign';
+import { Session } from 'Ads/Models/Session';
 
 export abstract class CampaignLoader {
     public abstract load(data: string): Campaign | undefined;

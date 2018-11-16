@@ -1,15 +1,15 @@
+import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
+import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
+import { BlockingReason, CreativeBlocking } from 'Core/Utilities/CreativeBlocking';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import PrivacyTemplate from 'html/Privacy.html';
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { FinishState } from 'Core/Constants/FinishState';
-import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 
 enum PrivacyCardState {
     INITIAL,
@@ -37,11 +37,11 @@ export class Privacy extends AbstractPrivacy {
     private _gdprEnabled: boolean = false;
     private _personalInfoObtained: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: Campaign,
+    constructor(platform: Platform, campaign: Campaign,
                 gdprManager: GdprManager, gdprEnabled: boolean,
                 isCoppaCompliant: boolean) {
 
-        super(nativeBridge, isCoppaCompliant, gdprEnabled, 'privacy');
+        super(platform, isCoppaCompliant, gdprEnabled, 'privacy');
         this._templateData.badAdKeys = Object.keys(ReportReason);
         this._templateData.badAdReasons = (<string[]>(<any>Object).values(ReportReason));
 

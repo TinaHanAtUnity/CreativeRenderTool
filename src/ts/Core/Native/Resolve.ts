@@ -1,3 +1,4 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable3, Observable4 } from 'Core/Utilities/Observable';
@@ -13,7 +14,7 @@ export class ResolveApi extends NativeApi {
     public readonly onFailed = new Observable4<string, string, string, string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Resolve', ApiPackage.CORE);
+        super(nativeBridge, 'Resolve', ApiPackage.CORE, EventCategory.RESOLVE);
     }
 
     public resolve(id: string, host: string): Promise<string> {

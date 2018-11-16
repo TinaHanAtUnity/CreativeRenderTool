@@ -51,7 +51,7 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
             this._thirdPartyEventManager.sendWithGet('xpromo start', this._xpromoCampaign.getSession().getId(), url);
         }
 
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
+        this._ads.Listener.sendStartEvent(this._placement.getId());
     }
 
     protected handleFirstQuartileEvent(progress: number): void {

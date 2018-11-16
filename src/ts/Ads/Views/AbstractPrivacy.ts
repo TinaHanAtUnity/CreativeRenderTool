@@ -1,8 +1,8 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { Platform } from 'Core/Constants/Platform';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { ITemplateData, View } from 'Core/Views/View';
 
 export interface IPrivacyHandler {
@@ -31,8 +31,8 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
 
     private static buildInformation: IBuildInformation;
 
-    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, isGDPREnabled: boolean, id: string) {
-        super(nativeBridge, id);
+    constructor(platform: Platform, isCoppaCompliant: boolean, isGDPREnabled: boolean, id: string) {
+        super(platform, id);
         this._templateData = {
             'isCoppaCompliant': isCoppaCompliant,
             'isGDPREnabled': isGDPREnabled,
@@ -40,13 +40,13 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
         };
     }
 
-    public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge, configuration: CoreConfiguration) {
+    public static createBuildInformation(platform: Platform, clientInfo: ClientInfo, deviceInfo: AndroidDeviceInfo, campaign: Campaign, configuration: CoreConfiguration) {
         const date = new Date();
         AbstractPrivacy.buildInformation = {
             userAgent: window.navigator.userAgent,
-            platform: clientInfo.getPlatform() === Platform.IOS ? 'iOS' : 'Android',
+            platform: platform === Platform.IOS ? 'iOS' : 'Android',
             campaign: campaign.getId(),
-            apiLevel: nativeBridge.getApiLevel(),
+            apiLevel: deviceInfo.getApiLevel(),
             group: configuration.getAbGroup().toNumber(),
             sdk: clientInfo.getSdkVersionName(),
             webview: clientInfo.getWebviewVersion(),

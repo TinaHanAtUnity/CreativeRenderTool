@@ -3,16 +3,20 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
+import { JsonParser } from 'Core/Utilities/JsonParser';
+import { ILimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
+import { IProductInfo, ProductInfo, ProductInfoType } from 'Promo/Models/ProductInfo';
 import { IPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { LimitedTimeOffer, ILimitedTimeOfferData } from 'Promo/Models/LimitedTimeOffer';
-import { ProductInfo, ProductInfoType, IProductInfo } from 'Promo/Models/ProductInfo';
 
 export class PromoCampaignParser extends CampaignParser {
+
     public static ContentType = 'purchasing/iap';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
 
         this.setIds(response);
 
@@ -26,6 +30,7 @@ export class PromoCampaignParser extends CampaignParser {
 
         const premiumProduct: ProductInfo = this.getProductInfo(promoJson);
         const baseCampaignParams: ICampaign = {
+            contentType: PromoCampaignParser.ContentType,
             id: premiumProduct.getId(),
             willExpireAt: willExpireAt ? Date.now() + (willExpireAt * 1000) : undefined,
             adType: promoJson.contentType || response.getContentType(),

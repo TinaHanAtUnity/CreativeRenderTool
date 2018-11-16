@@ -1,21 +1,21 @@
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/ICore';
 import { StorageType } from 'Core/Native/Storage';
-import { StorageOperation, IStorageBatch, IStorageCommand, StorageCommandType } from 'Core/Utilities/StorageOperation';
 import { Observable0 } from 'Core/Utilities/Observable';
+import { IStorageBatch, IStorageCommand, StorageCommandType, StorageOperation } from 'Core/Utilities/StorageOperation';
 
 export class StorageBridge {
     public onPublicStorageWrite = new Observable0();
     public onPrivateStorageWrite = new Observable0();
 
-    private _nativeBridge: NativeBridge;
+    private _core: ICoreApi;
     private _publicStorageQueue: IStorageBatch; // queue for storage operations to public storage
     private _privateStorageQueue: IStorageBatch; // queue for storage operations to private storage
     private _storageBatchTimer: number;
 
     private _storageBatchInterval: number = 1000; // default value is 1000 milliseconds
 
-    constructor(nativeBridge: NativeBridge, interval?: number) {
-        this._nativeBridge = nativeBridge;
+    constructor(core: ICoreApi, interval?: number) {
+        this._core = core;
         this._publicStorageQueue = {
             commands: []
         };
@@ -64,13 +64,13 @@ export class StorageBridge {
         let command: IStorageCommand;
         for(command of batch.commands) {
             if(command.type === StorageCommandType.SET) {
-                this._nativeBridge.Storage.set(type, command.key, command.value);
+                this._core.Storage.set(type, command.key, command.value);
             } else if(command.type === StorageCommandType.DELETE) {
-                this._nativeBridge.Storage.delete(type, command.key);
+                this._core.Storage.delete(type, command.key);
             }
         }
 
-        this._nativeBridge.Storage.write(type);
+        this._core.Storage.write(type);
 
         if(type === StorageType.PUBLIC) {
             this._publicStorageQueue = {
