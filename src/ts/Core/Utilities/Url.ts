@@ -132,7 +132,6 @@ export class Url {
         if(url && (url.match(/^http:./i) || url.match(/^https:./i) && url.match(/^([\!\$\#\&-\;\=\?-\[\]_a-z~{}|\\^`]|[\u00A1-\uFFFF]|%[0-9a-fA-F]{2})+$/i))) {
             return true;
         }
-
         return false;
     }
 

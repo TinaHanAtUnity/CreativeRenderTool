@@ -3,6 +3,7 @@ import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceC
 import { Slider } from 'Performance/Views/Slider';
 import SliderEndScreenTemplate from 'html/SliderEndScreen.html';
 import { detectOrientation } from 'Device';
+import {Template} from "../../Core/Utilities/Template";
 
 export class SliderPerformanceEndScreen extends EndScreen {
     private _campaign: SliderPerformanceCampaign;
@@ -10,6 +11,9 @@ export class SliderPerformanceEndScreen extends EndScreen {
 
     constructor(parameters: IEndScreenParameters, campaign: SliderPerformanceCampaign) {
         super(parameters);
+        this._campaign = campaign;
+
+        this._template = new Template(this.getTemplate(), this._localization);
 
         const adjustedRating: number = campaign.getRating() * 20;
 
@@ -29,8 +33,6 @@ export class SliderPerformanceEndScreen extends EndScreen {
             'endscreenAlt': this.getEndscreenAlt(),
             'screenshots': screenshots
         };
-
-        this._campaign = campaign;
 
         this._slider = new Slider(screenshots);
     }

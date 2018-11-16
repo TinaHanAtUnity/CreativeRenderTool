@@ -33,8 +33,8 @@ export class Slider {
         urls.length = 3;
 
         this._rootEl = this.createElement('div', 'slider-root-container', [], {
-            'height': '100%',
-            'width': '100%'
+            'min-height': '100%',
+            'min-width': '100%'
         });
 
         this._sliderScrollableContainer = this.createElement('div', 'slider-scrollable-container', [], {
@@ -64,7 +64,6 @@ export class Slider {
         /* Only when all images are loaded */
         // TODO: Handle if images are not loaded in time
         this._ready = Promise.all(allSlidesCreatedPromise).then(() => {
-
             this._rootEl.appendChild(this.createPagination());
 
             if (this._infiniteScrolling) {
