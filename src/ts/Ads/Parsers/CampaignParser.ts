@@ -15,8 +15,8 @@ export abstract class CampaignParser {
     public abstract parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign>;
 
     public setIds(response: AuctionResponse) {
-        this._creativeID = response.getCreativeId() || undefined;
-        this._seatID = response.getSeatId() || undefined;
+        this._creativeID = response.getCreativeId();
+        this._seatID = response.getSeatId();
     }
 
     protected getProgrammaticCampaignId(platform: Platform): string {
