@@ -13,6 +13,7 @@ import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { MraidIFrameEventBridge, IMRAIDHandler } from 'Ads/Views/MraidIFrameEventBridge';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -40,7 +41,7 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onMraidShowEndScreen(): void;
 }
 
-export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler {
+export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler, IMRAIDHandler {
 
     protected _core: ICoreApi;
     protected _placement: Placement;
@@ -75,6 +76,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _playableStartTimestamp: number;
     protected _backgroundTime: number = 0;
     protected _backgroundTimestamp: number;
+
+    protected _mraidBridge: MraidIFrameEventBridge;
 
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(platform, id);
@@ -155,6 +158,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         if (this._stats !== undefined) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(this._stats.averageFps, this._stats.averagePlayFps, 0, 'playable_performance_stats', this._stats));
         }
+    }
+
+    public setMraidEventBridge(mraidBridge: MraidIFrameEventBridge) {
+        this._mraidBridge = mraidBridge;
     }
 
     public createMRAID(container: any): Promise<string> {
@@ -381,36 +388,48 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._privacy.show();
     }
 
-    protected onSetOrientationProperties(allowOrientationChange: boolean, orientation: string) {
-        let forceOrientation = Orientation.NONE;
-            switch(orientation) {
-                case 'portrait':
-                    forceOrientation = Orientation.PORTRAIT;
-                    break;
-
-                case 'landscape':
-                    forceOrientation = Orientation.LANDSCAPE;
-                    break;
-
-                default:
-        }
+    protected onSetOrientationProperties(allowOrientationChange: boolean, orientation: Orientation) {
         this._handlers.forEach(handler => handler.onMraidOrientationProperties({
             allowOrientationChange: allowOrientationChange,
-            forceOrientation: forceOrientation
+            forceOrientation: orientation
         }));
     }
-
-    protected abstract sendMraidAnalyticsEvent(eventName: string, eventData?: any): void;
 
     protected onOpen(url: string) {
         this._handlers.forEach(handler => handler.onMraidClick(url));
     }
 
-    protected onClose() {
+    protected onLoadedEvent(): void {
+        // do nothing by default except for MRAID
+    }
+
+    protected onAREvent(msg: MessageEvent): Promise<void> {
+        return Promise.resolve();
+    }
+
+    protected abstract sendMraidAnalyticsEvent(eventName: string, eventData?: any): void;
+
+    public onBridgeSetOrientationProperties(allowOrientationChange: boolean, forceOrientation: Orientation) {
+        this.onSetOrientationProperties(allowOrientationChange, forceOrientation);
+    }
+
+    public onBridgeOpen(url: string) {
+        this.onOpen(encodeURI(url));
+    }
+
+    public onBridgeLoad() {
+        this.onLoadedEvent();
+    }
+
+    public onBridgeAnalyticsEvent(event: string, eventData: string) {
+        this.sendMraidAnalyticsEvent(event, eventData);
+    }
+
+    public onBridgeClose() {
         this._handlers.forEach(handler => handler.onMraidClose());
     }
 
-    protected onCustomState(customState: string) {
+    public onBridgeStateChange(customState: string) {
         if(customState === 'completed') {
             if(!this._placement.allowSkip() && this._closeRemaining > 5) {
                 this._closeRemaining = 5;
@@ -418,7 +437,20 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    protected onResizeWebview() {
+    public onBridgeResizeWebview() {
+        // This will be used to handle rotation changes for webplayer-based mraid
         // this._handlers.forEach(handler => handler.onWebViewResize(false));
+    }
+
+    public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {
+        this.updateStats({
+            totalTime: totalTime,
+            playTime: playTime,
+            frameCount: frameCount
+        });
+    }
+
+    public onBridgeAREvent(msg: MessageEvent) {
+        this.onAREvent(msg).catch((reason) => this._core.Sdk.logError('AR message error: ' + reason.toString()));
     }
 }
