@@ -2,9 +2,9 @@ import { Placement } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { ABGroup, FPSCollectionTest } from 'Core/Models/ABGroup';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import MRAIDPerfContainer from 'html/mraid/container-perf.html';
@@ -12,7 +12,7 @@ import MRAIDContainer from 'html/mraid/container.html';
 import ExtendedMRAIDTemplate from 'html/ExtendedMRAID.html';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -28,9 +28,10 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
     protected _campaign: PerformanceMRAIDCampaign;
     private _messageListener: any;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: PerformanceMRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
-        super(nativeBridge, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: PerformanceMRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
+        super(platform, core, deviceInfo, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
+        this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
         this._localization = new Localization(language, 'loadingscreen');
@@ -61,6 +62,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
         super.render();
 
         this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
+
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
         window.addEventListener('message', this._messageListener, false);
         this.loadIframe();
@@ -109,7 +111,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
         this.createMRAID(container).then(mraid => {
             iframe.onload = () => this.onIframeLoaded();
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
-            this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
+            this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
         });
     }
@@ -142,7 +144,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
 
         const frameLoadDuration = (Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId())) / 1000;
-        this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' s');
+        this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' s');
 
         if (this.isKPIDataValid({frameLoadDuration}, 'playable_mraid_playable_loading_time')) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, 0, 0, 'playable_loading_time', {}));

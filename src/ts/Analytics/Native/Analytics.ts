@@ -1,6 +1,7 @@
-import { NativeApi, ApiPackage } from 'Core/Native/Bridge/NativeApi';
-import { Observable1 } from 'Core/Utilities/Observable';
+import { EventCategory } from 'Core/Constants/EventCategory';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable1 } from 'Core/Utilities/Observable';
 
 export enum AnalyticsEvent {
     POSTEVENT
@@ -11,7 +12,7 @@ export class AnalyticsApi extends NativeApi {
     public onPostEvent: Observable1<any[]> = new Observable1();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Analytics', ApiPackage.ANALYTICS);
+        super(nativeBridge, 'Analytics', ApiPackage.ANALYTICS, EventCategory.ANALYTICS);
     }
 
     public addExtras(extras: {[key: string]: any}): Promise<void> {
@@ -26,7 +27,7 @@ export class AnalyticsApi extends NativeApi {
                 break;
 
             default:
-                this._nativeBridge.Sdk.logError(`AnaltyicsApi no known event : "${event}"`);
+                throw new Error(`AnalyticsApi no known event : "${event}"`);
         }
     }
 }
