@@ -4,13 +4,15 @@ import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
+import { ICoreApi } from 'Core/ICore';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { DOMUtils } from 'Core/Utilities/DOMUtils';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -40,7 +42,9 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
 
 export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler {
 
+    protected _core: ICoreApi;
     protected _placement: Placement;
+    protected _deviceInfo: DeviceInfo;
     protected _campaign: MRAIDCampaign;
     protected _privacy: AbstractPrivacy;
     protected _showGDPRBanner = false;
@@ -72,10 +76,12 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _backgroundTime: number = 0;
     protected _backgroundTimestamp: number;
 
-    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
-        super(nativeBridge, id);
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
+        super(platform, id);
 
+        this._core = core;
         this._placement = placement;
+        this._deviceInfo = deviceInfo;
         this._campaign = campaign;
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
@@ -282,7 +288,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
+        if(this._platform === Platform.ANDROID && (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
             this._container.style.display = 'none';
             /* tslint:disable:no-unused-expression */
@@ -321,13 +327,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         // documentElement which throws an exception.
 
         let dom: Document;
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._platform === Platform.IOS) {
             dom = DOMUtils.parseFromString(mraid, 'text/html');
         } else {
             dom = new DOMParser().parseFromString(mraid, 'text/html');
         }
         if(!dom) {
-            this._nativeBridge.Sdk.logWarning(`Could not parse markup for campaign ${this._campaign.getId()}`);
+            this._core.Sdk.logWarning(`Could not parse markup for campaign ${this._campaign.getId()}`);
             return mraid;
         }
 
@@ -342,12 +348,12 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     private fetchMRAID(): Promise<string | undefined> {
         const resourceUrl = this._campaign.getResourceUrl();
         if(resourceUrl) {
-            if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            if (this._platform === Platform.ANDROID) {
                 return XHRequest.get(resourceUrl.getUrl());
             } else {
                 const fileId = resourceUrl.getFileId();
                 if(fileId) {
-                    return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
+                    return this._core.Cache.getFileContent(fileId, 'UTF-8');
                 } else {
                     return XHRequest.get(resourceUrl.getOriginalUrl());
                 }

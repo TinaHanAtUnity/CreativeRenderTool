@@ -1,11 +1,13 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { ICoreApi } from 'Core/ICore';
+import { Template } from 'Core/Utilities/Template';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
-import { Template } from 'Core/Utilities/Template';
 
 const SQUARE_END_SCREEN = 'square-end-screen';
 
 export class PerformanceEndScreen extends EndScreen {
+    private _core: ICoreApi;
     private _campaign: PerformanceCampaign;
 
     constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign) {
@@ -30,6 +32,9 @@ export class PerformanceEndScreen extends EndScreen {
             'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
             'endscreenAlt': this.getEndscreenAlt()
         };
+
+        this._core = parameters.core;
+        this._campaign = campaign;
     }
 
     protected onDownloadEvent(event: Event): void {
@@ -59,4 +64,5 @@ export class PerformanceEndScreen extends EndScreen {
         }
         return super.getTemplate();
     }
+
 }

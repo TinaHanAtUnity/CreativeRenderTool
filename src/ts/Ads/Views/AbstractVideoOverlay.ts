@@ -1,5 +1,5 @@
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { View } from 'Core/Views/View';
 import { IVideoOverlayDownloadParameters } from 'Ads/EventHandlers/OverlayEventHandlerWithDownloadSupport';
 
@@ -30,8 +30,8 @@ export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
     protected _fadeEnabled: boolean = true;
     protected _isPrivacyShowing: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, containerId: string, muted: boolean) {
-        super(nativeBridge, containerId);
+    constructor(platform: Platform, containerId: string, muted: boolean) {
+        super(platform, containerId);
         this._muted = muted;
     }
 

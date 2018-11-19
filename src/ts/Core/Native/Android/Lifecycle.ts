@@ -1,3 +1,4 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1 } from 'Core/Utilities/Observable';
@@ -29,7 +30,7 @@ export class LifecycleApi extends NativeApi {
     public readonly onActivityDestroyed = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Lifecycle', ApiPackage.CORE);
+        super(nativeBridge, 'Lifecycle', ApiPackage.CORE, EventCategory.LIFECYCLE);
     }
 
     public register(events: string[]): Promise<void> {

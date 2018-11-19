@@ -1,74 +1,22 @@
 import { Platform } from 'Core/Constants/Platform';
 import { ConfigError } from 'Core/Errors/ConfigError';
 import { RequestError } from 'Core/Errors/RequestError';
+import { ICoreApi } from 'Core/ICore';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AdapterMetaData } from 'Core/Models/MetaData/AdapterMetaData';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 
 export class ConfigManager {
-
-    public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerSpan: JaegerSpan): Promise<any> {
-        return Promise.all([
-            metaDataManager.fetch(FrameworkMetaData),
-            metaDataManager.fetch(AdapterMetaData),
-            ConfigManager.fetchGamerToken(nativeBridge)
-        ]).then(([framework, adapter, storedGamerToken]) => {
-            let gamerToken: string | undefined;
-
-            if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {
-                // only use stored gamerToken for iOS when ad tracking is limited
-                gamerToken = storedGamerToken;
-            } else if(storedGamerToken) {
-                // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
-                ConfigManager.deleteGamerToken(nativeBridge);
-            }
-
-            const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gamerToken);
-            jaegerSpan.addTag(JaegerTags.DeviceType, Platform[nativeBridge.getPlatform()]);
-            nativeBridge.Sdk.logInfo('Requesting configuration from ' + url);
-            return request.get(url, [], {
-                retries: 2,
-                retryDelay: 10000,
-                followRedirects: false,
-                retryWithConnectionEvents: true
-            }).then(response => {
-                jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
-                try {
-                    return JsonParser.parse(response.response);
-                } catch(error) {
-                    Diagnostics.trigger('config_parsing_failed', {
-                        configUrl: url,
-                        configResponse: response.response
-                    });
-                    nativeBridge.Sdk.logError('Config request failed ' + error.message);
-                    throw new Error(error);
-                }
-            }).catch(error => {
-                if (error instanceof RequestError) {
-                    const requestError = error;
-                    if (requestError.nativeResponse && requestError.nativeResponse.responseCode) {
-                        jaegerSpan.addTag(JaegerTags.StatusCode, requestError.nativeResponse.responseCode.toString());
-                    }
-                    if (requestError.nativeResponse && requestError.nativeResponse.response) {
-                        const responseObj = JsonParser.parse(requestError.nativeResponse.response);
-                        error = new ConfigError((new Error(responseObj.error)));
-                    }
-                }
-                throw error;
-            });
-        });
-    }
 
     public static setTestBaseUrl(baseUrl: string): void {
         ConfigManager.ConfigBaseUrl = baseUrl + '/games';
@@ -81,10 +29,86 @@ export class ConfigManager {
     private static ConfigBaseUrl: string = 'https://publisher-config.unityads.unity3d.com/games';
     private static AbGroup: ABGroup | undefined;
 
-    private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): string {
+    private _platform: Platform;
+    private _core: ICoreApi;
+    private _metaDataManager: MetaDataManager;
+    private _clientInfo: ClientInfo;
+    private _deviceInfo: DeviceInfo;
+    private _request: RequestManager;
+
+    private _rawConfig?: any;
+
+    constructor(platform: Platform, core: ICoreApi, metaDataManager: MetaDataManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager) {
+        this._platform = platform;
+        this._core = core;
+        this._metaDataManager = metaDataManager;
+        this._clientInfo = clientInfo;
+        this._deviceInfo = deviceInfo;
+        this._request = request;
+    }
+
+    public getConfig(jaegerSpan: JaegerSpan): any | Promise<any> {
+        if(this._rawConfig) {
+            return this._rawConfig;
+        } else {
+            return Promise.all([
+                this._metaDataManager.fetch(FrameworkMetaData),
+                this._metaDataManager.fetch(AdapterMetaData),
+                this.fetchGamerToken()
+            ]).then(([framework, adapter, storedGamerToken]) => {
+                let gamerToken: string | undefined;
+
+                if(this._platform === Platform.IOS && this._core.DeviceInfo.getLimitAdTrackingFlag()) {
+                    // only use stored gamerToken for iOS when ad tracking is limited
+                    gamerToken = storedGamerToken;
+                } else if(storedGamerToken) {
+                    // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
+                    this.deleteGamerToken();
+                }
+
+                const url: string = this.createConfigUrl(framework, adapter, gamerToken);
+                jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._platform]);
+                this._core.Sdk.logInfo('Requesting configuration from ' + url);
+                return this._request.get(url, [], {
+                    retries: 2,
+                    retryDelay: 10000,
+                    followRedirects: false,
+                    retryWithConnectionEvents: true
+                }).then(response => {
+                    jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
+                    try {
+                        this._rawConfig = JsonParser.parse(response.response);
+                        return this._rawConfig;
+                    } catch(error) {
+                        Diagnostics.trigger('config_parsing_failed', {
+                            configUrl: url,
+                            configResponse: response.response
+                        });
+                        this._core.Sdk.logError('Config request failed ' + JSON.stringify(error));
+                        throw new Error(error);
+                    }
+                }).catch(error => {
+                    let modifiedError = error;
+                    if(modifiedError instanceof RequestError) {
+                        const requestError = modifiedError;
+                        if(requestError.nativeResponse && requestError.nativeResponse.responseCode) {
+                            jaegerSpan.addTag(JaegerTags.StatusCode, requestError.nativeResponse.responseCode.toString());
+                        }
+                        if(requestError.nativeResponse && requestError.nativeResponse.response) {
+                            const responseObj = JsonParser.parse(requestError.nativeResponse.response);
+                            modifiedError = new ConfigError((new Error(responseObj.error)));
+                        }
+                    }
+                    throw modifiedError;
+                });
+            });
+        }
+    }
+
+    private createConfigUrl(framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
-            clientInfo.getGameId(),
+            this._clientInfo.getGameId(),
             'configuration'
         ].join('/');
 
@@ -94,33 +118,33 @@ export class ConfigManager {
         }
 
         url = Url.addParameters(url, {
-            bundleId: clientInfo.getApplicationName(),
-            encrypted: !clientInfo.isDebuggable(),
-            rooted: deviceInfo.isRooted(),
-            platform: Platform[clientInfo.getPlatform()].toLowerCase(),
-            sdkVersion: clientInfo.getSdkVersion(),
-            osVersion: deviceInfo.getOsVersion(),
-            deviceModel: deviceInfo.getModel(),
-            language: deviceInfo.getLanguage(),
-            test: clientInfo.getTestMode(),
+            bundleId: this._clientInfo.getApplicationName(),
+            encrypted: !this._clientInfo.isDebuggable(),
+            rooted: this._deviceInfo.isRooted(),
+            platform: Platform[this._platform].toLowerCase(),
+            sdkVersion: this._clientInfo.getSdkVersion(),
+            osVersion: this._deviceInfo.getOsVersion(),
+            deviceModel: this._deviceInfo.getModel(),
+            language: this._deviceInfo.getLanguage(),
+            test: this._clientInfo.getTestMode(),
             gamerToken: gamerToken,
             forceAbGroup: abGroup
         });
 
-        if(clientInfo.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
+        if(this._platform === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                deviceMake: deviceInfo.getManufacturer()
+                deviceMake: (<AndroidDeviceInfo>this._deviceInfo).getManufacturer()
             });
         }
 
-        if(deviceInfo.getAdvertisingIdentifier()) {
+        if(this._deviceInfo.getAdvertisingIdentifier()) {
             url = Url.addParameters(url, {
-                advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
-                limitAdTracking: deviceInfo.getLimitAdTracking()
+                advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
+                limitAdTracking: this._deviceInfo.getLimitAdTracking()
             });
-        } else if(clientInfo.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
+        } else if(this._platform === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                androidId: deviceInfo.getAndroidId()
+                androidId: (<AndroidDeviceInfo>this._deviceInfo).getAndroidId()
             });
         }
 
@@ -135,37 +159,37 @@ export class ConfigManager {
         return url;
     }
 
-    private static fetchValue(nativeBridge: NativeBridge, key: string): Promise<string | undefined> {
-        return nativeBridge.Storage.get<string>(StorageType.PRIVATE, key).then(value => {
+    private fetchValue(key: string): Promise<string | undefined> {
+        return this._core.Storage.get<string>(StorageType.PRIVATE, key).then(value => {
             return value;
         }).catch(error => {
             return undefined;
         });
     }
 
-    private static storeValue(nativeBridge: NativeBridge, key: string, value: string): Promise<void[]> {
+    private storeValue(key: string, value: string): Promise<void[]> {
         return Promise.all([
-            nativeBridge.Storage.set(StorageType.PRIVATE, key, value),
-            nativeBridge.Storage.write(StorageType.PRIVATE)
+            this._core.Storage.set(StorageType.PRIVATE, key, value),
+            this._core.Storage.write(StorageType.PRIVATE)
         ]);
     }
 
-    private static deleteValue(nativeBridge: NativeBridge, key: string): Promise<void[]> {
+    private deleteValue(key: string): Promise<void[]> {
         return Promise.all([
-            nativeBridge.Storage.delete(StorageType.PRIVATE, key),
-            nativeBridge.Storage.write(StorageType.PRIVATE)
+            this._core.Storage.delete(StorageType.PRIVATE, key),
+            this._core.Storage.write(StorageType.PRIVATE)
         ]);
     }
 
-    private static fetchGamerToken(nativeBridge: NativeBridge): Promise<string | undefined> {
-        return this.fetchValue(nativeBridge, 'gamerToken');
+    private fetchGamerToken(): Promise<string | undefined> {
+        return this.fetchValue('gamerToken');
     }
 
-    public static storeGamerToken(nativeBridge: NativeBridge, gamerToken: string): Promise<void[]> {
-        return this.storeValue(nativeBridge, 'gamerToken', gamerToken);
+    public storeGamerToken(gamerToken: string): Promise<void[]> {
+        return this.storeValue('gamerToken', gamerToken);
     }
 
-    private static deleteGamerToken(nativeBridge: NativeBridge): Promise<void[]> {
-        return this.deleteValue(nativeBridge, 'gamerToken');
+    private deleteGamerToken(): Promise<void[]> {
+        return this.deleteValue('gamerToken');
     }
 }

@@ -22,19 +22,19 @@ import { WebViewError } from 'Core/Errors/WebViewError';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export abstract class AbstractAdUnitFactory {
-
     private static _forceGDPRBanner: boolean = false;
 
-    public abstract createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit;
+    public abstract createAdUnit(parameters: IAdUnitParameters<Campaign>): AbstractAdUnit;
 
     public static setForcedGDPRBanner(value: boolean) {
         AbstractAdUnitFactory._forceGDPRBanner = value;
     }
 
-    protected createEndScreenParameters(nativeBridge: NativeBridge, privacy: AbstractPrivacy, targetGameName: string | undefined, parameters: IAdUnitParameters<Campaign>): IEndScreenParameters {
+    protected createEndScreenParameters(privacy: AbstractPrivacy, targetGameName: string | undefined, parameters: IAdUnitParameters<Campaign>): IEndScreenParameters {
         const showGDPRBanner = this.showGDPRBanner(parameters);
         return {
-            nativeBridge: nativeBridge,
+            platform: parameters.platform,
+            core: parameters.core,
             language: parameters.deviceInfo.getLanguage(),
             gameId: parameters.clientInfo.getGameId(),
             targetGameName: targetGameName,
@@ -48,19 +48,18 @@ export abstract class AbstractAdUnitFactory {
     }
 
     protected prepareVideoPlayer<T extends VideoEventHandler, T2 extends VideoAdUnit, T3 extends Campaign, T4 extends OperativeEventManager, ParamsType extends IVideoEventHandlerParams<T2, T3, T4>>(VideoEventHandlerConstructor: { new(p: ParamsType): T }, params: ParamsType): T {
-        const nativeBridge = params.nativeBrige;
         const adUnit = params.adUnit;
         const videoEventHandler = new VideoEventHandlerConstructor(params);
 
-        nativeBridge.VideoPlayer.addEventHandler(videoEventHandler);
+        params.ads.VideoPlayer.addEventHandler(videoEventHandler);
 
         adUnit.onClose.subscribe(() => {
-            nativeBridge.VideoPlayer.removeEventHandler(videoEventHandler);
+            params.ads.VideoPlayer.removeEventHandler(videoEventHandler);
         });
 
-        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (params.platform === Platform.ANDROID) {
             this.prepareAndroidVideoPlayer(params);
-        } else if(nativeBridge.getPlatform() === Platform.IOS) {
+        } else if(params.platform === Platform.IOS) {
             this.prepareIosVideoPlayer(params);
         }
 
@@ -68,38 +67,36 @@ export abstract class AbstractAdUnitFactory {
     }
 
     protected prepareAndroidVideoPlayer(params: IVideoEventHandlerParams) {
-        const nativeBridge = params.nativeBrige;
         const adUnit = params.adUnit;
         const androidVideoEventHandler = new AndroidVideoEventHandler(params);
 
-        nativeBridge.VideoPlayer.Android.addEventHandler(androidVideoEventHandler);
+        params.ads.VideoPlayer.Android!.addEventHandler(androidVideoEventHandler);
 
         adUnit.onClose.subscribe(() => {
-            nativeBridge.VideoPlayer.Android.removeEventHandler(androidVideoEventHandler);
+            params.ads.VideoPlayer.Android!.removeEventHandler(androidVideoEventHandler);
         });
     }
 
     protected prepareIosVideoPlayer(params: IVideoEventHandlerParams) {
-        const nativeBridge = params.nativeBrige;
         const adUnit = params.adUnit;
         const iosVideoEventHandler = new IosVideoEventHandler(params);
 
-        nativeBridge.VideoPlayer.Ios.addEventHandler(iosVideoEventHandler);
+        params.ads.VideoPlayer.iOS!.addEventHandler(iosVideoEventHandler);
 
         adUnit.onClose.subscribe(() => {
-            nativeBridge.VideoPlayer.Ios.removeEventHandler(iosVideoEventHandler);
+            params.ads.VideoPlayer.iOS!.removeEventHandler(iosVideoEventHandler);
         });
     }
 
-    protected createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean | undefined): AbstractVideoOverlay {
+    protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
 
         let overlay: AbstractVideoOverlay;
 
         const skipAllowed = parameters.placement.allowSkip();
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
-            overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            overlay = new ClosableVideoOverlay(parameters.platform, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            overlay = new NewVideoOverlay(nativeBridge, parameters, privacy, showPrivacyDuringVideo);
+            overlay = new NewVideoOverlay(parameters, privacy, showPrivacyDuringVideo);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
@@ -109,9 +106,9 @@ export abstract class AbstractAdUnitFactory {
         return overlay;
     }
 
-    protected getVideoEventHandlerParams(nativeBridge: NativeBridge, adUnit: VideoAdUnit, video: Video, adUnitStyle: AdUnitStyle | undefined, params: IAdUnitParameters<Campaign>): IVideoEventHandlerParams {
+    protected getVideoEventHandlerParams(adUnit: VideoAdUnit, video: Video, adUnitStyle: AdUnitStyle | undefined, params: IAdUnitParameters<Campaign>): IVideoEventHandlerParams {
         return {
-            nativeBrige: nativeBridge,
+            platform: params.platform,
             adUnit: adUnit,
             campaign: params.campaign,
             operativeEventManager: params.operativeEventManager,
@@ -121,7 +118,9 @@ export abstract class AbstractAdUnitFactory {
             placement: params.placement,
             video: video,
             adUnitStyle: adUnitStyle,
-            clientInfo: params.clientInfo
+            clientInfo: params.clientInfo,
+            core: params.core,
+            ads: params.ads
         };
     }
 
@@ -130,13 +129,13 @@ export abstract class AbstractAdUnitFactory {
         if(!video) {
             throw new WebViewError('Unable to select an oriented video');
         }
-
         return video;
     }
 
-    protected createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): Privacy {
-        const privacy = new Privacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
-        const privacyEventHandler = new PrivacyEventHandler(nativeBridge, parameters);
+    protected createPrivacy(parameters: IAdUnitParameters<Campaign>): Privacy {
+        const privacy = new Privacy(parameters.platform, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
+        const privacyEventHandler = new PrivacyEventHandler(parameters);
+
         privacy.addEventHandler(privacyEventHandler);
         return privacy;
     }
@@ -145,7 +144,7 @@ export abstract class AbstractAdUnitFactory {
         if (AbstractAdUnitFactory._forceGDPRBanner) {
             return true;
         }
-
         return parameters.adsConfig.isGDPREnabled() ? !parameters.adsConfig.isOptOutRecorded() : false;
     }
+
 }

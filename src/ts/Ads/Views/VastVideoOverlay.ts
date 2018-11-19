@@ -1,7 +1,6 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export class VastVideoOverlay extends NewVideoOverlay implements IPrivacyHandler {
@@ -11,8 +10,8 @@ export class VastVideoOverlay extends NewVideoOverlay implements IPrivacyHandler
     private _gdprPopupClicked: boolean = false;
     private _showGDPRBanner: boolean;
 
-    constructor(nativeBridge: NativeBridge, parameters: IVideoOverlayParameters<VastCampaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
-        super(nativeBridge, parameters, privacy, true);
+    constructor(parameters: IVideoOverlayParameters<VastCampaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+        super(parameters, privacy, showGDPRBanner, true);
 
         this._seatId = parameters.campaign.getSeatId();
         this._hasEndcard = parameters.campaign.hasEndscreen();
