@@ -7,6 +7,8 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
@@ -34,7 +36,12 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         if (clickThroughURL) {
             return this._request.followRedirectChain(clickThroughURL).then((url: string) => {
                 return this.openUrlOnCallButton(url);
-            }, () => {
+            }, () => { // on request Rejected - 4xx
+                const error = new DiagnosticError(new Error('VAST endscreen clickThroughURL error'), {
+                    clickUrl: clickThroughURL,
+                    creativeId: this._campaign.getCreativeId()
+                });
+                Diagnostics.trigger('vast_click_request_head_rejected', error);
                 return this.openUrlOnCallButton(clickThroughURL);
             });
         }

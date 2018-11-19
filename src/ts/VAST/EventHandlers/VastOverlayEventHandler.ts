@@ -8,6 +8,8 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -69,6 +71,11 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             return this._request.followRedirectChain(clickThroughURL, true).then((url: string) => {
                 return this.openUrlOnCallButton(url);
             }, () => {   // on request Rejected - 4xx
+                const error = new DiagnosticError(new Error('VAST overlay clickThroughURL error'), {
+                    clickUrl: clickThroughURL,
+                    creativeId: this._vastCampaign.getCreativeId()
+                });
+                Diagnostics.trigger('vast_click_request_head_rejected', error);
                 return this.openUrlOnCallButton(clickThroughURL);
             });
         } else {
