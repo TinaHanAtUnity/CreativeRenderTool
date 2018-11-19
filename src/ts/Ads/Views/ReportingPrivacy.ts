@@ -1,5 +1,5 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
@@ -27,7 +27,7 @@ enum BadAdReason {
 export class ReportingPrivacy extends AbstractPrivacy {
 
     private _onReport: Observable0 = new Observable0();
-    private _gdprManager: GdprManager;
+    private _privacyManager: UserPrivacyManager;
     private _dataDeletionConfirmation: boolean = false;
     private _currentState : number = -1;
     private _campaign: Campaign;
@@ -35,7 +35,7 @@ export class ReportingPrivacy extends AbstractPrivacy {
     private _gdprEnabled: boolean = false;
 
     constructor(platform: Platform, campaign: Campaign,
-                gdprManager: GdprManager, gdprEnabled: boolean,
+                privacyManager: UserPrivacyManager, gdprEnabled: boolean,
                 isCoppaCompliant: boolean) {
 
         super(platform, isCoppaCompliant, gdprEnabled, 'reporting-privacy');
@@ -45,7 +45,7 @@ export class ReportingPrivacy extends AbstractPrivacy {
         this._template = new Template(ReportingPrivacyTemplate);
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
-        this._gdprManager = gdprManager;
+        this._privacyManager = privacyManager;
 
         this._bindings = [
             {
@@ -89,7 +89,7 @@ export class ReportingPrivacy extends AbstractPrivacy {
     public show(): void {
         super.show();
         if (this._gdprEnabled) {
-            const elId = this._gdprManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
+            const elId = this._privacyManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
             const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
             activeRadioButton.checked = true;

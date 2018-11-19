@@ -23,7 +23,7 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
     private _adUnitStyle?: AdUnitStyle;
 
     constructor(adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
-        super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
+        super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig);
         this._ads = parameters.ads;
         this._operativeEventManager = parameters.operativeEventManager;
         this._adUnit = adUnit;

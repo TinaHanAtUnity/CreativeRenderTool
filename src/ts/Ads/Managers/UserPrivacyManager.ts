@@ -31,7 +31,7 @@ export enum GDPREventAction {
     OPTIN = 'optin'
 }
 
-export class GdprManager {
+export class UserPrivacyManager {
 
     private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
     private static GdprConsentStorageKey = 'gdpr.consent.value';
@@ -121,7 +121,7 @@ export class GdprManager {
 
     private pushConsent(consent: boolean): Promise<void> {
         // get last state of gdpr consent
-        return this._core.Storage.get(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
+        return this._core.Storage.get(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
             // only if consent has changed push to kafka
             if (consentLastSentToKafka !== consent) {
                 return this.sendGdprConsentEvent(consent);
@@ -135,7 +135,7 @@ export class GdprManager {
     }
 
     private getConsent(): Promise<boolean> {
-        return this._core.Storage.get(StorageType.PUBLIC, GdprManager.GdprConsentStorageKey).then((data: any) => {
+        return this._core.Storage.get(StorageType.PUBLIC, UserPrivacyManager.GdprConsentStorageKey).then((data: any) => {
             const value: boolean | undefined = this.getConsentTypeHack(data);
             if(typeof(value) !== 'undefined') {
                 return Promise.resolve(value);
@@ -190,7 +190,7 @@ export class GdprManager {
             sendEvent = this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.METADATA);
         }
         return sendEvent.then(() => {
-            return this._core.Storage.set(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey, consent).then(() => {
+            return this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey, consent).then(() => {
                 return this._core.Storage.write(StorageType.PRIVATE);
             });
         });

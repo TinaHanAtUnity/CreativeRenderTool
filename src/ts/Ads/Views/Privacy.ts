@@ -1,5 +1,5 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
@@ -28,7 +28,7 @@ enum ReportReason {
 export class Privacy extends AbstractPrivacy {
 
     private _onReport: Observable2<Campaign, string> = new Observable2();
-    private _gdprManager: GdprManager;
+    private _privacyManager: UserPrivacyManager;
     private _dataDeletionConfirmation: boolean = false;
     private _currentState : number = -1;
     private _campaign: Campaign;
@@ -37,7 +37,7 @@ export class Privacy extends AbstractPrivacy {
     private _userSummaryObtained: boolean = false;
 
     constructor(platform: Platform, campaign: Campaign,
-                gdprManager: GdprManager, gdprEnabled: boolean,
+                privacyManager: UserPrivacyManager, gdprEnabled: boolean,
                 isCoppaCompliant: boolean) {
 
         super(platform, isCoppaCompliant, gdprEnabled, 'privacy');
@@ -47,7 +47,7 @@ export class Privacy extends AbstractPrivacy {
         this._template = new Template(PrivacyTemplate);
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
-        this._gdprManager = gdprManager;
+        this._privacyManager = privacyManager;
 
         this._bindings = [
             {
@@ -94,7 +94,7 @@ export class Privacy extends AbstractPrivacy {
         this.populateUserSummary();
 
         if (this._gdprEnabled) {
-            const elId = this._gdprManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
+            const elId = this._privacyManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
             const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
             activeRadioButton.checked = true;
@@ -257,7 +257,7 @@ export class Privacy extends AbstractPrivacy {
 
     private populateUserSummary() {
         if (!this._userSummaryObtained) {
-            this._gdprManager.retrieveUserSummary().then((userSummary) => {
+            this._privacyManager.retrieveUserSummary().then((userSummary) => {
                 this._userSummaryObtained = true;
                 document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
                 document.getElementById('phone-type')!.innerHTML = ` - Using ${userSummary.deviceModel}`;

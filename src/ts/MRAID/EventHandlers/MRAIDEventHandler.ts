@@ -33,7 +33,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     protected _campaign: MRAIDCampaign;
 
     constructor(adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
-        super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
+        super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig);
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._adUnit = adUnit;
