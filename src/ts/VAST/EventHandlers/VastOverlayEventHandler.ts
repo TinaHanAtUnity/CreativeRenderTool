@@ -66,19 +66,23 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
-            return this._request.followRedirectChain(clickThroughURL).then(
-                (url: string) => {
-                    return this.openUrl(url).then(() => {
-                        this.setCallButtonEnabled(true);
-                        this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
-                    }).catch((e) => {
-                        this.setCallButtonEnabled(true);
-                    });
-                }
-            );
+            return this._request.followRedirectChain(clickThroughURL, true).then((url: string) => {
+                return this.openUrlOnCallButton(url);
+            }, () => {   // on request Rejected - 4xx
+                return this.openUrlOnCallButton(clickThroughURL);
+            });
         } else {
             return Promise.reject(new Error('No clickThroughURL was defined'));
         }
+    }
+
+    private openUrlOnCallButton(url: string): Promise<void> {
+        return this.openUrl(url).then(() => {
+            this.setCallButtonEnabled(true);
+            this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+        }).catch((e) => {
+            this.setCallButtonEnabled(true);
+        });
     }
 
     private openUrl(url: string): Promise<void> {

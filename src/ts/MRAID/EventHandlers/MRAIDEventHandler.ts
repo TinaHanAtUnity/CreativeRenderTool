@@ -62,13 +62,9 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         } else {    // DSP MRAID
             this.setCallButtonEnabled(false);
             return this._request.followRedirectChain(url).then((storeUrl) => {
-                return this.openUrl(storeUrl).then(() => {
-                    this.setCallButtonEnabled(true);
-                    this.sendTrackingEvents();
-                }).catch((e) => {
-                    this.setCallButtonEnabled(true);
-                    this.sendTrackingEvents();
-                });
+                return this.openUrlOnCallButton(storeUrl);
+            }, () => {  // on request Rejected - 4xx
+                return this.openUrlOnCallButton(url);
             });
         }
         return Promise.resolve();
@@ -159,6 +155,16 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         }
 
         this._adUnit.sendClick();
+    }
+
+    private openUrlOnCallButton(url: string): Promise<void> {
+        return this.openUrl(url).then(() => {
+            this.setCallButtonEnabled(true);
+            this.sendTrackingEvents();
+        }).catch((e) => {
+            this.setCallButtonEnabled(true);
+            this.sendTrackingEvents();
+        });
     }
 
     private openUrl(url: string): Promise<void> {

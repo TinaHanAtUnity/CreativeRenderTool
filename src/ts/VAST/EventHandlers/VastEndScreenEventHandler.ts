@@ -33,12 +33,9 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
         if (clickThroughURL) {
             return this._request.followRedirectChain(clickThroughURL).then((url: string) => {
-                return this.onOpenUrl(url).then(() => {
-                    this.setCallButtonEnabled(true);
-                    this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._campaign.getSession().getId());
-                }).catch((e) => {
-                    this.setCallButtonEnabled(true);
-                });
+                return this.openUrlOnCallButton(url);
+            }, () => {
+                return this.openUrlOnCallButton(clickThroughURL);
             });
         }
         return Promise.reject(new Error('There is no clickthrough URL for video or companion'));
@@ -58,7 +55,16 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._vastAdUnit.sendCompanionTrackingEvent(this._campaign.getSession().getId());
     }
 
-    public onOpenUrl(url: string): Promise<void> {
+    private openUrlOnCallButton(url: string): Promise<void> {
+        return this.onOpenUrl(url).then(() => {
+            this.setCallButtonEnabled(true);
+            this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._campaign.getSession().getId());
+        }).catch((e) => {
+            this.setCallButtonEnabled(true);
+        });
+    }
+
+    private onOpenUrl(url: string): Promise<void> {
         if (this._platform === Platform.IOS) {
             return this._core.iOS!.UrlScheme.open(url);
         } else {

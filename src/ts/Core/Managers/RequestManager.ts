@@ -242,7 +242,11 @@ export class RequestManager {
                                 reject(new Error(`Request to ${requestUrl} failed with status ${response.responseCode}`));
                             }
                         }
-                    }).catch(reject);
+                    }, (rejectedReason: any) => {
+                        return reject(rejectedReason);
+                    }).catch((e) => {
+                        return reject;
+                    });
                 }
             };
             makeRequest(url);
