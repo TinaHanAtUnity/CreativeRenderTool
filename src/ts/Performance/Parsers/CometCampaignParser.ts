@@ -38,8 +38,6 @@ export class CometCampaignParser extends CampaignParser {
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
 
-        this.setIds(response);
-
         const json = response.getJsonContent();
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;
@@ -66,8 +64,8 @@ export class CometCampaignParser extends CampaignParser {
             contentType: CometCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,
-            creativeId: this._creativeID,
-            seatId: this._seatID,
+            creativeId: response.getCreativeId(),
+            seatId: response.getSeatId(),
             meta: json.meta,
             session: session,
             mediaId: response.getMediaId(),

@@ -21,8 +21,6 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
 
-        this.setIds(response);
-
         let dynamicMarkup = decodeURIComponent(response.getContent());
         if (this._wrapWithScriptTag) {
             dynamicMarkup = '<script>' + dynamicMarkup + '</script>';
@@ -35,8 +33,8 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
             contentType: this._wrapWithScriptTag ? ProgrammaticStaticInterstitialParser.ContentTypeJs : ProgrammaticStaticInterstitialParser.ContentTypeHtml,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
-            creativeId: this._creativeID,
-            seatId: this._seatID,
+            creativeId: response.getCreativeId(),
+            seatId: response.getSeatId(),
             meta: undefined,
             session: session,
             mediaId: response.getMediaId(),

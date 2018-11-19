@@ -18,8 +18,6 @@ export class PromoCampaignParser extends CampaignParser {
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
 
-        this.setIds(response);
-
         const promoJson = response.getJsonContent();
         let willExpireAt: number | undefined;
         if (promoJson.expiry) {
@@ -35,8 +33,8 @@ export class PromoCampaignParser extends CampaignParser {
             willExpireAt: willExpireAt ? Date.now() + (willExpireAt * 1000) : undefined,
             adType: promoJson.contentType || response.getContentType(),
             correlationId: undefined,
-            creativeId: this._creativeID,
-            seatId: this._seatID,
+            creativeId: response.getCreativeId(),
+            seatId: response.getSeatId(),
             meta: promoJson.meta,
             session: session,
             mediaId: response.getMediaId(),

@@ -43,6 +43,7 @@ import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
+import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 
 export class CampaignManager {
 
@@ -515,6 +516,7 @@ export class CampaignManager {
 
         try {
             parser = this.getCampaignParser(response.getContentType());
+            parser.setIds(response);
         } catch (e) {
             return Promise.reject(e);
         }
@@ -530,7 +532,10 @@ export class CampaignManager {
 
             return this.setupCampaignAssets(response.getPlacements(), campaign, response.getContentType(), session);
         }).catch((error) => {
-            parser.alertCreativeService(error);
+            CreativeBlocking.report(parser._creativeID, parser._seatID, BlockingReason.VIDEO_PARSE_FAILURE, {
+                errorCode: error.errorCode || undefined,
+                message: error.message || undefined
+            });
             throw error;
         });
     }

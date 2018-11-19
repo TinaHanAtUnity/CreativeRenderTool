@@ -6,23 +6,15 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
-import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 
 export abstract class CampaignParser {
 
-    protected _creativeID: string | undefined;
-    protected _seatID: number | undefined;
+    public _creativeID: string | undefined;
+    public _seatID: number | undefined;
 
     public abstract parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign>;
 
-    public alertCreativeService(error: any) {
-        CreativeBlocking.report(this._creativeID, this._seatID, BlockingReason.VIDEO_PARSE_FAILURE, {
-            errorCode: error.errorCode || undefined,
-            message: error.message || undefined
-        });
-    }
-
-    protected setIds(response: AuctionResponse) {
+    public setIds(response: AuctionResponse) {
         this._creativeID = response.getCreativeId() || undefined;
         this._seatID = response.getSeatId() || undefined;
     }

@@ -17,7 +17,6 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
-        this.setIds(response);
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
         const videoPromise = this.getVideoFromMarkup(markup, request, session, platform).catch((e) => {
@@ -35,8 +34,8 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 contentType: ProgrammaticAdMobParser.ContentType,
                 adType: response.getAdType() || undefined,
                 correlationId: response.getCorrelationId() || undefined,
-                creativeId: this._creativeID,
-                seatId: this._seatID,
+                creativeId: response.getCreativeId(),
+                seatId: response.getSeatId(),
                 meta: undefined,
                 session: session,
                 mediaId: response.getMediaId(),

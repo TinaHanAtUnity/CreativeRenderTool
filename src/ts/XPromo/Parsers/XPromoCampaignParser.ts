@@ -16,8 +16,6 @@ export class XPromoCampaignParser extends CampaignParser {
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
 
-        this.setIds(response);
-
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
@@ -44,8 +42,8 @@ export class XPromoCampaignParser extends CampaignParser {
             contentType: XPromoCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,
-            creativeId: this._creativeID,
-            seatId: this._seatID,
+            creativeId: response.getCreativeId(),
+            seatId: response.getSeatId(),
             meta: json.meta,
             session: session,
             mediaId: response.getMediaId(),
