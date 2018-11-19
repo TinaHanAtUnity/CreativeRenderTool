@@ -525,7 +525,8 @@ export class CampaignManager {
 
         if(this._sessionManager.getGameSessionId() % 1000 === 99) {
             SessionDiagnostics.trigger('ad_received', {
-                contentType: response.getContentType()
+                contentType: response.getContentType(),
+                auctionProtocol: AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? 5 : 4
             }, session);
         }
 
@@ -553,7 +554,8 @@ export class CampaignManager {
         return this._assetManager.setup(campaign).then(() => {
             if(this._sessionManager.getGameSessionId() % 1000 === 99) {
                 SessionDiagnostics.trigger('ad_ready', {
-                    contentType: contentType
+                    contentType: contentType,
+                    auctionProtocol: AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? 5 : 4
                 }, session);
             }
 
