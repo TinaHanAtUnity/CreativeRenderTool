@@ -265,20 +265,22 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             });
         });
 
-        describe('Request followRedirectChain should redirect for all status codes in the 3xx range', () => {
-            for (let i = 300; i <= 308; i++) {
-                it('should redirect for response ' + i.toString(), () => {
-                    const redirectUrl: string = 'http://www.example.org/responsecode/' + i.toString();
-                    return request.followRedirectChain(redirectUrl).then((url) => {
-                        assert.equal('http://www.example.org/endurl/', url);
-                    }).catch(error => {
-                        // tslint:disable-next-line
-                        error = <RequestError>error;
-                        throw new Error('Head without headers failed: ' + error.message);
-                    });
+        describe('Request followRedirectChain test', () => {
+            it('should redirect for all status codes in the 3xx range', () => {
+                for (let i = 300; i <= 308; i++) {
+                    it('should redirect for response ' + i.toString(), () => {
+                        const redirectUrl: string = 'http://www.example.org/responsecode/' + i.toString();
+                        return request.followRedirectChain(redirectUrl).then((url) => {
+                            assert.equal('http://www.example.org/endurl/', url);
+                        }).catch(error => {
+                            // tslint:disable-next-line
+                            error = <RequestError>error;
+                            throw new Error('Head without headers failed: ' + error.message);
+                        });
 
-                });
-            }
+                    });
+                }
+            });
 
             it('should reject when redirect limit has been reached', () => {
                 const redirectUrl: string = 'http://www.example.org/recursiveResponseCode/';
@@ -286,6 +288,16 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     assert.fail('Should not resolve');
                 }).catch(error => {
                     assert.equal(error.message, 'redirect limit reached');
+                });
+            });
+
+            it('Request followRedirectChain should reject when HEAD request is not accepted', () => {
+                // don't accept HEAD request
+                const redirectUrl: string = 'https://www.example.org/rejectedResponseCode/';
+                return request.followRedirectChain(redirectUrl).then((url) => {
+                    assert.fail(`${redirectUrl} should not success on HEAD request`);
+                }, (e) => {
+                    assert.equal('Fail response', `${e.message}`);
                 });
             });
         });
