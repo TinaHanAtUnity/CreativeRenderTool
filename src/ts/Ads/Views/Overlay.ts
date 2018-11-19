@@ -1,15 +1,18 @@
+import { IAdsApi } from 'Ads/IAds';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { Platform } from 'Core/Constants/Platform';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import OverlayTemplate from 'html/Overlay.html';
 
 export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
+    private _ads: IAdsApi;
+    private _deviceInfo: DeviceInfo;
     private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
@@ -46,9 +49,10 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _gameId: string;
     private _country: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, country?: string) {
-        super(nativeBridge, 'overlay', muted);
+    constructor(platform: Platform, ads: IAdsApi, deviceInfo: DeviceInfo, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, country?: string) {
+        super(platform, 'overlay', muted);
 
+        this._deviceInfo = deviceInfo;
         this._localization = new Localization(language, 'overlay');
         this._showGDPRBanner = showGDPRBanner;
         this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
@@ -242,7 +246,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
             this._privacy.hide();
         }
         this._isPrivacyShowing = false;
-        this._nativeBridge.VideoPlayer.play();
+        this._ads.VideoPlayer.play();
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
@@ -273,7 +277,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
             this._gdprPopupClicked = true;
             this.choosePrivacyShown();
         }
-        this._nativeBridge.VideoPlayer.pause();
+        this._ads.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();
         }
@@ -282,7 +286,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private onPrivacyEvent(event: Event) {
         this._isPrivacyShowing = true;
         event.preventDefault();
-        this._nativeBridge.VideoPlayer.pause();
+        this._ads.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();
         }
@@ -340,7 +344,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
+        if(this._platform === Platform.ANDROID && (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
             this._container.style.display = 'none';
             /* tslint:disable:no-unused-expression */

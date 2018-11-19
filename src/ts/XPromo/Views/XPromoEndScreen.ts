@@ -1,6 +1,6 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { Template } from 'Core/Utilities/Template';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
 
 const SQUARE_END_SCREEN = 'square-end-screen';
