@@ -4,7 +4,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { ITemplateData, View } from 'Core/Views/View';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;

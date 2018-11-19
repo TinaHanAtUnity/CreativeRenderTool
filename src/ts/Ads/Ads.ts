@@ -70,7 +70,7 @@ import { XPromo } from 'XPromo/XPromo';
 import { AR } from 'AR/AR';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { AbstractPrivacy } from './Views/AbstractPrivacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export class Ads implements IAds {
 
