@@ -41,8 +41,8 @@ export class Privacy extends AbstractPrivacy {
                 isCoppaCompliant: boolean) {
 
         super(platform, isCoppaCompliant, gdprEnabled, 'privacy');
-        this._templateData.badAdKeys = Object.keys(ReportReason);
-        this._templateData.badAdReasons = (<string[]>(<any>Object).values(ReportReason));
+        this._templateData.reportKeys = Object.keys(ReportReason);
+        this._templateData.reportReasons = Object.keys(ReportReason).map((reason: any) => ReportReason[reason]);
 
         this._template = new Template(PrivacyTemplate);
         this._campaign = campaign;
