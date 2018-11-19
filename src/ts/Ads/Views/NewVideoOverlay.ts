@@ -29,6 +29,7 @@ export interface IVideoOverlayParameters<T extends Campaign> {
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
     protected _privacy: AbstractPrivacy;
+    protected _showGDPRBanner: boolean;
 
     private _ads: IAdsApi;
     private _localization: Localization;
@@ -68,6 +69,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
         this._abGroup = parameters.coreConfig.getAbGroup();
         this._campaign = parameters.campaign;
+        this._showGDPRBanner = showGDPRBanner;
         this._templateData = {
             muted: parameters.placement.muteVideo()
         };
@@ -137,6 +139,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     public hide() {
         super.hide();
         this.cleanUpPrivacy();
+
+        if (this._showGDPRBanner) {
+            this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
+        }
     }
 
     public render(): void {
@@ -246,10 +252,22 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         // do nothing
     }
 
+    protected choosePrivacyShown(): void {
+        if (this._showGDPRBanner) {
+            this._container.classList.add('show-gdpr-banner');
+            this._container.classList.remove('show-gdpr-button');
+        } else {
+            this._container.classList.remove('show-gdpr-banner');
+            this._container.classList.add('show-gdpr-button');
+        }
+    }
+
     protected onGDPRPopupEvent(event: Event) {
         event.preventDefault();
         event.stopPropagation();
         this._isPrivacyShowing = true;
+        this._showGDPRBanner = false;
+        this.choosePrivacyShown();
 
         this._ads.VideoPlayer.pause();
         if (this._privacy) {
