@@ -1,4 +1,4 @@
-# Pending
+# Tue Nov 20 12:53:13 UTC 2018
 
 * Fix broken build info screen [#7178](https://github.com/Applifier/unity-ads-webview/pull/7178)
 * Harden Auction V5 Parser Against No fill Parse Failures [#7177](https://github.com/Applifier/unity-ads-webview/pull/7177)
