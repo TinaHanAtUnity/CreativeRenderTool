@@ -37,7 +37,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         if (clickThroughURL) {
             return this._request.followRedirectChain(clickThroughURL).then((url: string) => {
                 return this.openUrlOnCallButton(url);
-            }).catch((e) => {
+            }).catch(() => {
                 const urlParts = Url.parse(clickThroughURL);
                 const error = new DiagnosticError(new Error('VAST endscreen clickThroughURL error'), {
                     contentType: 'vast_endscreen',

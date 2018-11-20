@@ -296,7 +296,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 return request.followRedirectChain(redirectUrl).then((url) => {
                     assert.fail(`${redirectUrl} should not success on HEAD request`);
                 }).catch((e) => {
-                    assert.equal('Fail response', `${e.message}`);
+                    assert.equal(e.message, 'Fail response');
                 });
             });
         });
