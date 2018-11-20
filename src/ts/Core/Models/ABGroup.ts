@@ -103,5 +103,5 @@ class ABTest {
 // Example : export const GdprBaseAbTest = new ABTest(GroupSixteen, GroupSeventeen);
 export const NativeGreenEndScreenButtonColorTest = new ABTest(GroupSeven, GroupEight);
 export const FPSCollectionTest = new ABTest(GroupSixteen);
-export const ExitSkipIconTest = new ABTest(GroupSixteen, GroupSeventeen);
+export const NextSkipIconTest = new ABTest(GroupFive, GroupSix);
 export const AuctionV5Test = new ABTest(GroupFifteen);
