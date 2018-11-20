@@ -43,11 +43,11 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
 
     public hide(): void {
         super.hide();
-
-        this._infoContainer.hide();
-        if(this._infoContainer.container().parentElement) {
-            this._infoContainer.container().parentElement!.removeChild(this._infoContainer.container());
-        }
+        //
+        // this._infoContainer.hide();
+        // if(this._infoContainer.container().parentElement) {
+        //     this._infoContainer.container().parentElement!.removeChild(this._infoContainer.container());
+        // }
     }
 
     private onBackButtonEvent(event: Event): void {
