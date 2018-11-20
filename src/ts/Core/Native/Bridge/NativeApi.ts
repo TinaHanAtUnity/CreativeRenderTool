@@ -34,7 +34,7 @@ export abstract class NativeApi {
         this._apiClass = apiClass;
         this._apiPackage = apiPackage;
         this._fullApiClassName = this.getFullApiClassName();
-        if(eventCategory) {
+        if(typeof eventCategory !== 'undefined') {
             nativeBridge.addEventHandler(eventCategory, this);
         }
     }

@@ -2,6 +2,7 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Platform } from 'Core/Constants/Platform';
 
 export enum KafkaCommonObjectType {
     EMPTY,
@@ -12,6 +13,10 @@ export enum KafkaCommonObjectType {
 export class HttpKafka {
     public static setRequest(request?: RequestManager) {
         HttpKafka._request = request;
+    }
+
+    public static setPlatform(platform?: Platform) {
+        HttpKafka._platform = platform;
     }
 
     public static setClientInfo(clientInfo?: ClientInfo) {
@@ -33,7 +38,7 @@ export class HttpKafka {
             'msg': data
         });
 
-        return HttpKafka.createCommonObject(objectType, this._clientInfo, this._deviceInfo, this._configuration).then(commonObject => {
+        return HttpKafka.createCommonObject(objectType, this._platform, this._clientInfo, this._deviceInfo, this._configuration).then(commonObject => {
             if(commonObject) {
                 messages.unshift(commonObject);
             }
@@ -56,12 +61,13 @@ export class HttpKafka {
 
     private static KafkaBaseUrl: string = 'https://httpkafka.unityads.unity3d.com/v1/events';
     private static _request: RequestManager | undefined;
+    private static _platform: Platform | undefined;
     private static _clientInfo: ClientInfo | undefined;
     private static _deviceInfo: DeviceInfo | undefined;
     private static _configuration: CoreConfiguration | undefined;
     private static _deviceInfoUpdating: boolean = false;
 
-    private static createCommonObject(objectType: KafkaCommonObjectType, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: CoreConfiguration): Promise<any> {
+    private static createCommonObject(objectType: KafkaCommonObjectType, platform?: Platform, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: CoreConfiguration): Promise<any> {
         if(objectType === KafkaCommonObjectType.EMPTY) {
             const emptyCommon: any = {
                 'common': {
@@ -79,6 +85,10 @@ export class HttpKafka {
                     'country': configuration ? configuration.getCountry() : null
                 }
             };
+
+            if(common.common.client) {
+                common.common.client.platform = typeof platform !== 'undefined' ? Platform[platform].toLowerCase() : null;
+            }
 
             if(deviceInfo && !HttpKafka._deviceInfoUpdating) {
                 HttpKafka._deviceInfoUpdating = true;

@@ -138,6 +138,7 @@ export class Core implements ICore {
             this.JaegerManager.addOpenSpan(jaegerInitSpan);
 
             HttpKafka.setRequest(this.RequestManager);
+            HttpKafka.setPlatform(this.NativeBridge.getPlatform());
             HttpKafka.setClientInfo(this.ClientInfo);
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
