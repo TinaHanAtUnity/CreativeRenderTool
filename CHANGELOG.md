@@ -1,3 +1,7 @@
+# Pending
+
+* VAST media selector rollout [#7225](https://github.com/Applifier/unity-ads-webview/pull/7225)
+
 # Staged
 
 * Set tracking URLs before showing (auction v5 fix) [#7223](https://github.com/Applifier/unity-ads-webview/pull/7223)
