@@ -1,3 +1,8 @@
+# Staged
+
+* Show the call button in fadeIn for other than performance and xpromo campaigns [#7182](https://github.com/Applifier/unity-ads-webview/pull/7182)
+* Fix scrollable overlay with MOAT [#7183](https://github.com/Applifier/unity-ads-webview/pull/7183)
+
 # Tue Nov 20 13:57:19 UTC 2018
 
 * Stop auction v5 in group 15 [#7203](https://github.com/Applifier/unity-ads-webview/pull/7203)
