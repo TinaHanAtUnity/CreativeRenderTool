@@ -7,7 +7,7 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
-import { ABGroup, ExitSkipIconTest } from 'Core/Models/ABGroup';
+import { ABGroup, NextSkipIconTest } from 'Core/Models/ABGroup';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -168,8 +168,8 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         if (CustomFeatures.isCheetahGame(this._gameId)) {
             this._skipButtonElement.classList.add('close-icon-skip');
-        } else if (ExitSkipIconTest.isValid(this._abGroup)) {
-            this._skipButtonElement.classList.add('exit-icon-skip');
+        } else if (NextSkipIconTest.isValid(this._abGroup)) {
+            this._skipButtonElement.classList.add('next-icon-skip');
         }
     }
 
