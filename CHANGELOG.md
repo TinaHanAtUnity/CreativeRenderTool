@@ -1,8 +1,20 @@
-# Pending
+# Staged
+
+* Set tracking URLs before showing (auction v5 fix) [#7223](https://github.com/Applifier/unity-ads-webview/pull/7223)
+* Show the call button in fadeIn for other than performance and xpromo campaigns [#7182](https://github.com/Applifier/unity-ads-webview/pull/7182)
+* Fix scrollable overlay with MOAT [#7183](https://github.com/Applifier/unity-ads-webview/pull/7183)
+
+# Tue Nov 20 13:57:19 UTC 2018
+
+* Stop auction v5 in group 15 [#7203](https://github.com/Applifier/unity-ads-webview/pull/7203)
+
+# Tue Nov 20 12:53:13 UTC 2018
 
 * Fix broken build info screen [#7178](https://github.com/Applifier/unity-ads-webview/pull/7178)
 * Harden Auction V5 Parser Against No fill Parse Failures [#7177](https://github.com/Applifier/unity-ads-webview/pull/7177)
 * IFrame Event Bridge for MRAID Views [#7013](https://github.com/Applifier/unity-ads-webview/pull/7013)
+* Switch the skip icon test to use 'next' icon [#7180](https://github.com/Applifier/unity-ads-webview/pull/7180)
+* Second experiment on different green colors on Android [#7181](https://github.com/Applifier/unity-ads-webview/pull/7181)
 
 # Mon Nov 19 2018
 
