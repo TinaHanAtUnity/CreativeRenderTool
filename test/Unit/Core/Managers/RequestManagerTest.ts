@@ -296,7 +296,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 const redirectUrl: string = 'https://www.example.org/rejectedResponseCode/';
                 return request.followRedirectChain(redirectUrl).then((url) => {
                     assert.fail(`${redirectUrl} should not success on HEAD request`);
-                }, (e) => {
+                }).catch((e) => {
                     assert.equal('Fail response', `${e.message}`);
                 });
             });
