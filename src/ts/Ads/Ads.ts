@@ -257,7 +257,10 @@ export class Ads implements IAds {
             return;
         }
 
-        this._core.CacheBookkeeping.deleteCachedCampaignResponse();
+        const trackingUrls = placement.getCurrentTrackingUrls();
+        if(trackingUrls) {
+            campaign.setTrackingUrls(trackingUrls);
+        }
 
         if (placement.getRealtimeData()) {
             this._core.Api.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
