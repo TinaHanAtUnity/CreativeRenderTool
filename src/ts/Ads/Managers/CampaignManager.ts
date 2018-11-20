@@ -386,43 +386,59 @@ export class CampaignManager {
         const placements = this._adsConfig.getPlacements();
         for(const placement in placements) {
             if(placements.hasOwnProperty(placement)) {
-                const mediaId = json.placements[placement].mediaId;
+                if(!this._adsConfig.getPlacement(placement).isBannerPlacement()) {
+                    let mediaId: string | undefined;
 
-                if(mediaId) {
-                    const trackingId: string = json.placements[placement].trackingId;
-                    let trackingUrls: ICampaignTrackingUrls | undefined;
-                    if(trackingId) {
-                        if(json.tracking[trackingId]) {
-                            trackingUrls = json.tracking[trackingId];
+                    if(json.placements.hasOwnProperty(placement)) {
+                        if(json.placements[placement].hasOwnProperty('mediaId')) {
+                            mediaId = json.placements[placement].mediaId;
                         } else {
-                            SessionDiagnostics.trigger('invalid_auction_v5_tracking_id', {
-                                mediaId: mediaId,
-                                trackingId: trackingId
+                            SessionDiagnostics.trigger('mission_auction_v5_mediaid', {
+                                placementId: placement
                             }, session);
-                            throw new Error('Invalid tracking ID ' + trackingId);
                         }
                     } else {
-                        SessionDiagnostics.trigger('missing_auction_v5_tracking_id', {
-                            mediaId: mediaId
+                        SessionDiagnostics.trigger('missing_auction_v5_placement', {
+                            placementId: placement
                         }, session);
-                        throw new Error('Missing tracking ID');
                     }
 
-                    this._backupCampaignManager.storePlacement(this._adsConfig.getPlacement(placement), mediaId, trackingUrls);
+                    if(mediaId) {
+                        let trackingUrls: ICampaignTrackingUrls | undefined;
+                        if(json.placements[placement].hasOwnProperty('trackingId')) {
+                            const trackingId: string = json.placements[placement].trackingId;
+                            if(json.tracking[trackingId]) {
+                                trackingUrls = json.tracking[trackingId];
+                            } else {
+                                SessionDiagnostics.trigger('invalid_auction_v5_tracking_id', {
+                                    mediaId: mediaId,
+                                    trackingId: trackingId
+                                }, session);
+                                throw new Error('Invalid tracking ID ' + trackingId);
+                            }
+                        } else {
+                            SessionDiagnostics.trigger('missing_auction_v5_tracking_id', {
+                                mediaId: mediaId
+                            }, session);
+                            throw new Error('Missing tracking ID');
+                        }
 
-                    const auctionPlacement: AuctionPlacement = new AuctionPlacement(placement, mediaId, trackingUrls);
+                        this._backupCampaignManager.storePlacement(this._adsConfig.getPlacement(placement), mediaId, trackingUrls);
 
-                    if(campaigns[mediaId]) {
-                        campaigns[mediaId].push(auctionPlacement);
+                        const auctionPlacement: AuctionPlacement = new AuctionPlacement(placement, mediaId, trackingUrls);
+
+                        if(campaigns[mediaId]) {
+                            campaigns[mediaId].push(auctionPlacement);
+                        } else {
+                            campaigns[mediaId] = [auctionPlacement];
+                        }
                     } else {
-                        campaigns[mediaId] = [auctionPlacement];
+                        noFill.push(placement);
                     }
-                } else {
-                    noFill.push(placement);
-                }
 
-                if(json.realtimeData && json.realtimeData[placement]) {
-                    this._adsConfig.getPlacement(placement).setRealtimeData(json.realtimeData[placement]);
+                    if(json.realtimeData && json.realtimeData[placement]) {
+                        this._adsConfig.getPlacement(placement).setRealtimeData(json.realtimeData[placement]);
+                    }
                 }
             }
         }
@@ -509,7 +525,8 @@ export class CampaignManager {
 
         if(this._sessionManager.getGameSessionId() % 1000 === 99) {
             SessionDiagnostics.trigger('ad_received', {
-                contentType: response.getContentType()
+                contentType: response.getContentType(),
+                auctionProtocol: AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? 5 : 4
             }, session);
         }
 
@@ -537,7 +554,8 @@ export class CampaignManager {
         return this._assetManager.setup(campaign).then(() => {
             if(this._sessionManager.getGameSessionId() % 1000 === 99) {
                 SessionDiagnostics.trigger('ad_ready', {
-                    contentType: contentType
+                    contentType: contentType,
+                    auctionProtocol: AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? 5 : 4
                 }, session);
             }
 
