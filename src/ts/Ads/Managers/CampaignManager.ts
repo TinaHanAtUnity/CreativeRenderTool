@@ -516,7 +516,7 @@ export class CampaignManager {
 
         try {
             parser = this.getCampaignParser(response.getContentType());
-            parser.setIds(response);
+            parser.setCreativeIdentification(response);
         } catch (e) {
             return Promise.reject(e);
         }
