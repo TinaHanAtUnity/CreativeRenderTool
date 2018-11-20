@@ -70,6 +70,7 @@ import { XPromo } from 'XPromo/XPromo';
 import { AR } from 'AR/AR';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export class Ads implements IAds {
 
@@ -337,6 +338,7 @@ export class Ads implements IAds {
             }
 
             const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
+            AbstractPrivacy.createBuildInformation(this._core.NativeBridge.getPlatform(), this._core.ClientInfo, this._core.DeviceInfo, campaign, this._core.Config);
             this._currentAdUnit = this.getAdUnitFactory(campaign).createAdUnit({
                 platform: this._core.NativeBridge.getPlatform(),
                 core: this._core.Api,
