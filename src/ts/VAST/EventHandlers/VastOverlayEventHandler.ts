@@ -10,6 +10,7 @@ import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { Url } from 'Core/Utilities/Url';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -70,10 +71,13 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if(clickThroughURL) {
             return this._request.followRedirectChain(clickThroughURL, true).then((url: string) => {
                 return this.openUrlOnCallButton(url);
-            }).catch((e) => {   // on request Rejected - 4xx
+            }).catch((e) => {
+                const urlParts = Url.parse(clickThroughURL);
                 const error = new DiagnosticError(new Error('VAST overlay clickThroughURL error'), {
                     contentType: 'vast_overlay',
                     clickUrl: clickThroughURL,
+                    host: urlParts.host,
+                    protocol: urlParts.protocol,
                     creativeId: this._vastCampaign.getCreativeId()
                 });
                 Diagnostics.trigger('click_request_head_rejected', error);

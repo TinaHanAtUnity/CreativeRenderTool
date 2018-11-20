@@ -9,6 +9,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { Url } from 'Core/Utilities/Url';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
@@ -36,10 +37,13 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         if (clickThroughURL) {
             return this._request.followRedirectChain(clickThroughURL).then((url: string) => {
                 return this.openUrlOnCallButton(url);
-            }).catch((e) => { // on request Rejected - 4xx
+            }).catch((e) => {
+                const urlParts = Url.parse(clickThroughURL);
                 const error = new DiagnosticError(new Error('VAST endscreen clickThroughURL error'), {
                     contentType: 'vast_endscreen',
                     clickUrl: clickThroughURL,
+                    host: urlParts.host,
+                    protocol: urlParts.protocol,
                     creativeId: this._campaign.getCreativeId()
                 });
                 Diagnostics.trigger('click_request_head_rejected', error);

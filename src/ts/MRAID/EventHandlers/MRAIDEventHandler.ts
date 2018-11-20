@@ -16,6 +16,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { Url } from 'Core/Utilities/Url';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -63,10 +64,13 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             this.setCallButtonEnabled(false);
             return this._request.followRedirectChain(url).then((storeUrl) => {
                 return this.openUrlOnCallButton(storeUrl);
-            }).catch((e) => {  // on request Rejected - 4xx
+            }).catch((e) => {
+                const urlParts = Url.parse(url);
                 const error = new DiagnosticError(new Error('MRAID clickThroughURL error'), {
                     contentType: 'mraid',
                     clickUrl: url,
+                    host: urlParts.host,
+                    protocol: urlParts.protocol,
                     creativeId: this._campaign.getCreativeId()
                 });
                 Diagnostics.trigger('click_request_head_rejected', error);
