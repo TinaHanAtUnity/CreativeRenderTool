@@ -18,6 +18,7 @@ import { MRAID } from 'MRAID/Views/MRAID';
 
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { MraidIFrameEventBridge } from 'Ads/Views/MraidIFrameEventBridge';
 
 describe('MRAID', () => {
     let platform: Platform;
@@ -56,6 +57,7 @@ describe('MRAID', () => {
     it('should render', (done) => {
         const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
         const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
+        mraid.setMraidEventBridge(new MraidIFrameEventBridge(core, mraid));
 
         mraid.render();
 

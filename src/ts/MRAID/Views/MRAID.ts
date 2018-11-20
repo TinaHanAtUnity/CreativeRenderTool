@@ -24,7 +24,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _creativeId: string | undefined;
 
     private _iframe: HTMLIFrameElement;
-    private _messageListener: any;
 
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(platform, core, deviceInfo, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
@@ -39,10 +38,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public render(): void {
         super.render();
-
-        this._messageListener = (event: MessageEvent) => this.onMessage(event);
-        window.addEventListener('message', this._messageListener, false);
-
         this.loadIframe();
     }
 
@@ -65,18 +60,12 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public hide() {
         super.hide();
-        if(this._messageListener) {
-            window.removeEventListener('message', this._messageListener, false);
-            this._messageListener = undefined;
-        }
+        this._mraidBridge.disconnect();
     }
 
     public setViewableState(viewable: boolean) {
         if(this._domContentLoaded) {
-            this._iframe.contentWindow!.postMessage({
-                type: 'viewable',
-                value: viewable
-            }, '*');
+            this._mraidBridge.sendViewableEvent(viewable);
         }
         this.setAnalyticsBackgroundTime(viewable);
     }
@@ -106,6 +95,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private loadIframe(): void {
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        this._mraidBridge.connect(iframe);
 
         this.createMRAID(
             FPSCollectionTest.isValid(this._abGroup) ? MRAIDPerfContainer : MRAIDContainer
@@ -127,7 +117,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         });
     }
 
-    private onLoadedEvent(): void {
+    protected onLoadedEvent(): void {
         this._domContentLoaded = true;
         this.onLoaded.trigger();
 
@@ -142,47 +132,10 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this.sendMraidAnalyticsEvent('playable_start');
     }
 
-    private onMessage(event: MessageEvent) {
-        switch(event.data.type) {
-            case 'loaded':
-                this.onLoadedEvent();
-                break;
-
-            case 'open':
-                this.onMessageOpen(event.data.url);
-                break;
-
-            case 'sendStats':
-                this.updateStats({
-                    totalTime: event.data.totalTime,
-                    playTime: event.data.playTime,
-                    frameCount: event.data.frameCount
-                });
-                break;
-
-            case 'close':
-                this.onClose();
-                break;
-
-            case 'orientation':
-                this.onSetOrientationProperties(event.data.properties.allowOrientationChange, event.data.properties.forceOrientation);
-                break;
-            case 'analyticsEvent':
-                this.sendMraidAnalyticsEvent(event.data.event, event.data.eventData);
-                break;
-
-            case 'customMraidState':
-                this.onCustomState(event.data.state);
-                break;
-
-            default:
-        }
-    }
-
-    private onMessageOpen(url: string) {
+    protected onOpen(url: string) {
         if (!this._callButtonEnabled) {
             return;
         }
-        this.onOpen(url);
+        this._handlers.forEach(handler => handler.onMraidClick(url));
     }
 }
