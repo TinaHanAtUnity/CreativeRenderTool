@@ -171,7 +171,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         return this.openUrl(url).then(() => {
             this.setCallButtonEnabled(true);
             this.sendTrackingEvents();
-        }).catch((e) => {
+        }).catch(() => {
             this.setCallButtonEnabled(true);
             this.sendTrackingEvents();
         });

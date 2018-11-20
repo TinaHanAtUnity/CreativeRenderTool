@@ -92,7 +92,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         return this.openUrl(url).then(() => {
             this.setCallButtonEnabled(true);
             this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
-        }).catch((e) => {
+        }).catch(() => {
             this.setCallButtonEnabled(true);
         });
     }
