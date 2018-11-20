@@ -71,6 +71,7 @@ import { AR } from 'AR/AR';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export class Ads implements IAds {
 
@@ -257,7 +258,10 @@ export class Ads implements IAds {
             return;
         }
 
-        this._core.CacheBookkeeping.deleteCachedCampaignResponse();
+        const trackingUrls = placement.getCurrentTrackingUrls();
+        if(trackingUrls) {
+            campaign.setTrackingUrls(trackingUrls);
+        }
 
         if (placement.getRealtimeData()) {
             this._core.Api.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
@@ -344,6 +348,7 @@ export class Ads implements IAds {
             }
 
             const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
+            AbstractPrivacy.createBuildInformation(this._core.NativeBridge.getPlatform(), this._core.ClientInfo, this._core.DeviceInfo, campaign, this._core.Config);
             this._currentAdUnit = this.getAdUnitFactory(campaign).createAdUnit({
                 platform: this._core.NativeBridge.getPlatform(),
                 core: this._core.Api,
