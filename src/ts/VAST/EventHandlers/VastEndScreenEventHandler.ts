@@ -38,7 +38,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
                 return this.openUrlOnCallButton(url);
             }, () => { // on request Rejected - 4xx
                 const error = new DiagnosticError(new Error('VAST endscreen clickThroughURL error'), {
-                    contentType: 'vast_endscreen'
+                    contentType: 'vast_endscreen',
                     clickUrl: clickThroughURL,
                     creativeId: this._campaign.getCreativeId()
                 });
