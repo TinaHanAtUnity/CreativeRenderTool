@@ -592,7 +592,7 @@ export class WebView {
             }
             this._wasRealtimePlacement = false;
 
-            this._currentAdUnit.open().then(() => {
+            this._currentAdUnit.show().then(() => {
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                     this._nativeBridge.setAutoBatchEnabled(true);
                     this._nativeBridge.Request.Android.setMaximumPoolSize(8);

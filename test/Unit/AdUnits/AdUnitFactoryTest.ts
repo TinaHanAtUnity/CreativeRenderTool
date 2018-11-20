@@ -282,9 +282,9 @@ describe('AdUnitFactoryTest', () => {
 
         describe('on hide', () => {
             it('should trigger onClose when hide is called', (done) => {
-                adUnit.setShowingAd(true);
+                adUnit.setShowing(true);
                 adUnit.onClose.subscribe(() => {
-                    assert.equal(adUnit.isShowingAd(), false);
+                    assert.equal(adUnit.isShowing(), false);
                     done();
                 });
 
@@ -292,7 +292,7 @@ describe('AdUnitFactoryTest', () => {
             });
 
             it('should trigger onFinish when hide is called', (done) => {
-                adUnit.setShowingAd(true);
+                adUnit.setShowing(true);
                 adUnit.onFinish.subscribe(() => {
                     done();
                 });
@@ -301,7 +301,7 @@ describe('AdUnitFactoryTest', () => {
             });
 
             it('should call trackers on on finish state completed', () => {
-                adUnit.setShowingAd(true);
+                adUnit.setShowing(true);
                 adUnit.setFinishState(FinishState.COMPLETED);
 
                 adUnit.hide();
@@ -312,7 +312,7 @@ describe('AdUnitFactoryTest', () => {
             });
 
             it('should call sendSkip on finish state skipped', () => {
-                adUnit.setShowingAd(true);
+                adUnit.setShowing(true);
                 adUnit.setFinishState(FinishState.SKIPPED);
 
                 adUnit.hide();
@@ -444,9 +444,9 @@ describe('AdUnitFactoryTest', () => {
         });
         describe('on hide', () => {
             it('should trigger onClose when hide is called', (done) => {
-                promoAdUnit.setShowingAd(true);
+                promoAdUnit.setShowing(true);
                 promoAdUnit.onClose.subscribe(() => {
-                    assert.equal(promoAdUnit.isShowingAd(), false);
+                    assert.equal(promoAdUnit.isShowing(), false);
                     done();
                 });
 
@@ -487,9 +487,9 @@ describe('AdUnitFactoryTest', () => {
 
         describe('on hide', () => {
             it('should trigger onClose when hide is called', (done) => {
-                adUnit.setShowingAd(true);
+                adUnit.setShowing(true);
                 adUnit.onClose.subscribe(() => {
-                    assert.equal(adUnit.isShowingAd(), false);
+                    assert.equal(adUnit.isShowing(), false);
                     done();
                 });
 

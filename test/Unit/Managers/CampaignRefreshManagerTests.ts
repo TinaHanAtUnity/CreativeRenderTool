@@ -89,13 +89,10 @@ export class TestAdUnit extends AbstractAdUnit {
     public hide(): Promise<void> {
         return Promise.resolve();
     }
-    public showAd(): void {
-
-    }
     public description(): string {
         return 'TestAdUnit';
     }
-    public isShowingAd() {
+    public isShowing() {
         return true;
     }
     public isCached() {

@@ -20,7 +20,7 @@ export class TestAdUnit extends AbstractAdUnit {
         return Promise.resolve();
     }
 
-    public isShowingAd(): boolean {
+    public isShowing(): boolean {
         return false;
     }
 
@@ -30,9 +30,5 @@ export class TestAdUnit extends AbstractAdUnit {
 
     public isCached(): boolean {
         return false;
-    }
-
-    public showAd(): void {
-        // todo
     }
 }

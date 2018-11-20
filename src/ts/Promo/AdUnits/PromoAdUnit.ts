@@ -50,7 +50,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public show(): Promise<void> {
-        this.setShowingAd(true);
+        this.setShowing(true);
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._promoView.show();
         this.sendTrackingEvent('impression');
@@ -67,10 +67,10 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public hide(): Promise<void> {
-        if(!this.isShowingAd()) {
+        if(!this.isShowing()) {
             return Promise.resolve();
         }
-        this.setShowingAd(false);
+        this.setShowing(false);
 
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._keyDownListener);
@@ -95,10 +95,6 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         return this._container.close();
     }
 
-    public showAd(): void {
-        // todo
-    }
-
     public sendClick(): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
         this.sendTrackingEvent('click');
@@ -113,7 +109,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerDestroy(): void {
-        if(this.isShowingAd()) {
+        if(this.isShowing()) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }

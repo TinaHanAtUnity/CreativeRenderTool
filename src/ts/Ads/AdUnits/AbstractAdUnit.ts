@@ -72,7 +72,7 @@ export abstract class AbstractAdUnit {
     protected readonly _forceOrientation: Orientation;
     protected readonly _container: AdUnitContainer;
 
-    private _showingAd: boolean;
+    private _showing: boolean;
     private _finishState: FinishState;
     private _baseCampaign: Campaign;
     private _gdprConsent: GDPRConsent | undefined;
@@ -81,7 +81,7 @@ export abstract class AbstractAdUnit {
         this._nativeBridge = nativeBridge;
         this._forceOrientation = parameters.forceOrientation;
         this._container = parameters.container;
-        this._showingAd = false;
+        this._showing = false;
         this._finishState = FinishState.ERROR;
         this._baseCampaign = parameters.campaign;
         this._gdprConsent = parameters.gdprConsentView;
@@ -89,23 +89,19 @@ export abstract class AbstractAdUnit {
 
     protected openContainer(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: any): Promise<void> {
         if (this._gdprConsent) {
-            this.setShowingAd(false);
+            this.setShowing(false);
             this._gdprConsent.render();
             document.body.appendChild(this._gdprConsent.container());
             this._gdprConsent.show();
         } else {
-            this.setShowingAd(true);
+            this.setShowing(true);
         }
         return this._container.open(this, views, allowRotation, forceOrientation, disableBackbutton, isTransparent, withAnimation, allowStatusBar, options);
     }
 
-    public abstract open(): Promise<void>;
-
     public abstract show(): Promise<void>;
 
     public abstract hide(): Promise<void>;
-
-    public abstract showAd(): void;
 
     public abstract description(): string;
 
@@ -113,12 +109,12 @@ export abstract class AbstractAdUnit {
         return CampaignAssetInfo.isCached(this._baseCampaign);
     }
 
-    public isShowingAd() {
-        return this._showingAd;
+    public isShowing() {
+        return this._showing;
     }
 
-    public setShowingAd(showing: boolean) {
-        this._showingAd = showing;
+    public setShowing(showing: boolean) {
+        this._showing = showing;
     }
 
     public getContainer(): AdUnitContainer {

@@ -202,7 +202,7 @@ describe('OverlayEventHandlerTest', () => {
             sinon.spy(overlayEventHandler, 'onOverlaySkip');
             sinon.spy(overlayEventHandler, 'onOverlayClose');
             sinon.stub(placement, 'allowSkipInSeconds').returns(3);
-            sinon.stub(performanceAdUnit, 'isShowingAd').returns(true);
+            sinon.stub(performanceAdUnit, 'isShowing').returns(true);
             sinon.stub(performanceAdUnit, 'canPlayVideo').returns(true);
 
         });

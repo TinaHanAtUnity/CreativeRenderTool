@@ -84,7 +84,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     public onMraidOrientationProperties(orientationProperties: IOrientationProperties): void {
-        if(this._adUnit.isShowingAd()) {
+        if(this._adUnit.isShowing()) {
             if(this._nativeBridge.getPlatform() === Platform.IOS) {
                 this._adUnit.getContainer().reorient(true, orientationProperties.forceOrientation);
             } else {

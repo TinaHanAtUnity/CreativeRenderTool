@@ -57,7 +57,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public show() {
         return super.show().then(() => {
-            if (this.isShowingAd() && this.canShowVideo() && this._moat) {
+            if (this.isShowing() && this.canShowVideo() && this._moat) {
                 this._moat.play(this.getVolume());
             }
         });
@@ -168,14 +168,14 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public onContainerBackground(): void {
         super.onContainerBackground();
-        if (this.isShowingAd() && this.canShowVideo() && this._moat) {
+        if (this.isShowing() && this.canShowVideo() && this._moat) {
             this._moat.pause(this.getVolume());
         }
     }
 
     public onContainerForeground(): void {
         super.onContainerForeground();
-        if (this.isShowingAd() && this.canShowVideo() && this._moat) {
+        if (this.isShowing() && this.canShowVideo() && this._moat) {
             this._moat.play(this.getVolume());
         }
     }

@@ -67,7 +67,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         };
 
         this._options = parameters.options;
-        this.setShowingAd(false);
+        this.setShowing(false);
     }
 
     public open(): Promise<void> {
@@ -75,7 +75,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public show(): Promise<void> {
-        this.setShowingAd(true);
+        this.setShowing(true);
         this.setShowingMRAID(true);
         this._mraid.show();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
@@ -103,10 +103,10 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public hide(): Promise<void> {
-        if(!this.isShowingAd()) {
+        if(!this.isShowing()) {
             return Promise.resolve();
         }
-        this.setShowingAd(false);
+        this.setShowing(false);
         this.setShowingMRAID(false);
 
         this._mraid.hide();
@@ -144,10 +144,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         return this._container.close().then(() => {
             this.onClose.trigger();
         });
-    }
-
-    public showAd(): void {
-        // todo
     }
 
     public setOrientationProperties(properties: IOrientationProperties): void {
@@ -190,14 +186,14 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerDestroy(): void {
-        if(this.isShowingAd()) {
+        if(this.isShowing()) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
     }
 
     public onContainerBackground(): void {
-        if(this.isShowingAd()) {
+        if(this.isShowing()) {
             this._mraid.setViewableState(false);
 
             if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
@@ -208,7 +204,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerForeground(): void {
-        if(this.isShowingAd()) {
+        if(this.isShowing()) {
             this._mraid.setViewableState(true);
         }
     }

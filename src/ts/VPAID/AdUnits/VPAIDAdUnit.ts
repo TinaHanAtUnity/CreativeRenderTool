@@ -96,10 +96,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         });
     }
 
-    public showAd(): void {
-        // todo
-    }
-
     public hide(): Promise<void> {
         this.onHide();
         this.hideView();
@@ -156,7 +152,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerShow(): void {
-        this.setShowingAd(true);
+        this.setShowing(true);
         this.onContainerForeground();
     }
 
@@ -167,7 +163,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public onContainerBackground(): void {
         this._view.pauseAd();
 
-        if (this.isShowingAd() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+        if (this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
             this.hide();
         }
     }
@@ -272,7 +268,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private onShow() {
         this._timer.start();
-        this.setShowingAd(true);
+        this.setShowing(true);
 
         this._container.addEventHandler(this);
     }
@@ -283,7 +279,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
 
         this._timer.stop();
-        this.setShowingAd(false);
+        this.setShowing(false);
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
         this._webPlayerContainer.shouldOverrideUrlLoading.unsubscribe(this._urlLoadingObserver);

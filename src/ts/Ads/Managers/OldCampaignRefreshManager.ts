@@ -259,7 +259,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
             this._nativeBridge.Sdk.logDebug('Unity Ads will refresh ads in ' + RefreshManager.ErrorRefillDelay + ' seconds');
         }
 
-        if(this._currentAdUnit && this._currentAdUnit.isShowingAd()) {
+        if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                 this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                 this.setPlacementStates(PlacementState.NO_FILL, placementIds);
@@ -291,7 +291,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
         this._nativeBridge.Sdk.logDebug('Unity Ads failed to contact server, retrying after next system event');
 
-        if(this._currentAdUnit && this._currentAdUnit.isShowingAd()) {
+        if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                 this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                 this.setPlacementStates(PlacementState.NO_FILL, placementIds);
@@ -345,7 +345,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     private handlePlacementState(placementId: string, placementState: PlacementState) {
-        if(this._currentAdUnit && this._currentAdUnit.isShowingAd()) {
+        if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                 this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                 this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
@@ -412,7 +412,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
      */
 
     private onNetworkConnected() {
-        if(this._currentAdUnit && this._currentAdUnit.isShowingAd()) {
+        if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             return;
         }
 
