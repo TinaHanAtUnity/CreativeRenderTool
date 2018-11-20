@@ -91,10 +91,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
         super.render();
 
         if (this._country === 'CN') {
-            const chinaAdTag = <HTMLElement>this._container.querySelector('.china-advertisement');
-            if (chinaAdTag) {
-                chinaAdTag.innerText = '广告';
-            }
+            (<HTMLElement>this._container.querySelector('.china-advertisement')).style.display = 'block';
         }
 
         if (!this._showPrivacyDuringEndscreen) {

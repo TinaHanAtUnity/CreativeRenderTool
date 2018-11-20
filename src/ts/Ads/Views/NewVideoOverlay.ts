@@ -50,6 +50,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
     private _timerElement: HTMLElement;
+    private _chinaAdvertisementElement: HTMLElement;
 
     private _fadeTimer: any;
     private _areControlsVisible: boolean = false;
@@ -61,7 +62,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _country: string | undefined;
     private _abGroup: ABGroup;
     private _campaign: Campaign;
-
 
     constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean) {
         super(parameters.platform, 'new-video-overlay', parameters.placement.muteVideo());
@@ -161,10 +161,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this.choosePrivacyShown();
 
         if (this._country === 'CN') {
-            const chinaAdTag = <HTMLElement>this._container.querySelector('.china-advertisement');
-            if (chinaAdTag) {
-                chinaAdTag.innerText = '广告';
-            }
+            this._chinaAdvertisementElement.style.display = 'block';
         }
 
         if (CustomFeatures.isCheetahGame(this._gameId)) {
@@ -214,6 +211,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         if (this._skipRemaining <= 0) {
             this.showSkipButton();
+            this._chinaAdvertisementElement.classList.add('with-skip-button');
         }
     }
 
@@ -380,6 +378,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._timerElement = <HTMLElement>this._container.querySelector('.timer');
+        this._chinaAdvertisementElement = <HTMLLIElement>this._container.querySelector('.china-advertisement');
     }
 
     private showSkipButton() {
