@@ -18,7 +18,7 @@ import { MRAID } from 'MRAID/Views/MRAID';
 
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { MraidIFrameEventBridge } from 'Ads/Views/MraidIFrameEventBridge';
+import { MraidIFrameEventBridge } from 'MRAID/Views/MraidIFrameEventBridge';
 
 describe('MRAID', () => {
     let platform: Platform;
