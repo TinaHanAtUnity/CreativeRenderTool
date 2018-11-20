@@ -1,9 +1,12 @@
+# Pending
+
+* VAST media selector rollout [#7225](https://github.com/Applifier/unity-ads-webview/pull/7225)
+
 # Staged
 
 * Set tracking URLs before showing (auction v5 fix) [#7223](https://github.com/Applifier/unity-ads-webview/pull/7223)
 * Show the call button in fadeIn for other than performance and xpromo campaigns [#7182](https://github.com/Applifier/unity-ads-webview/pull/7182)
 * Fix scrollable overlay with MOAT [#7183](https://github.com/Applifier/unity-ads-webview/pull/7183)
-* VAST media selector rollout [#7225](https://github.com/Applifier/unity-ads-webview/pull/7225)
 
 # Tue Nov 20 13:57:19 UTC 2018
 
