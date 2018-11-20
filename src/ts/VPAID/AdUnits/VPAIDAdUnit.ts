@@ -14,7 +14,6 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IObserver2 } from 'Core/Utilities/IObserver';
 import { Timer } from 'Core/Utilities/Timer';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
@@ -52,8 +51,8 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _topWebViewAreaHeight: number;
     private readonly _topWebViewAreaMinHeight = 70;
 
-    constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters) {
-        super(nativeBridge, parameters);
+    constructor(parameters: IVPAIDAdUnitParameters) {
+        super(parameters);
 
         this._vpaidCampaign = parameters.campaign;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
@@ -71,7 +70,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             this._endScreen.render();
         }
 
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (parameters.platform === Platform.ANDROID) {
             this._topWebViewAreaHeight = Math.floor(this.getAndroidViewSize(this._topWebViewAreaMinHeight, this.getScreenDensity()));
         } else {
             this._topWebViewAreaHeight = this._topWebViewAreaMinHeight;
@@ -108,10 +107,10 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public openUrl(url: string | null) {
         if (url) {
-            if (this._nativeBridge.getPlatform() === Platform.IOS) {
-                this._nativeBridge.UrlScheme.open(url);
-            } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                this._nativeBridge.Intent.launch({
+            if (this._platform === Platform.IOS) {
+                this._core.iOS!.UrlScheme.open(url);
+            } else if (this._platform === Platform.ANDROID) {
+                this._core.Android!.Intent.launch({
                     'action': 'android.intent.action.VIEW',
                     'uri': url
                 });
@@ -211,7 +210,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private setupWebPlayer(): Promise<any> {
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (this._platform === Platform.ANDROID) {
             return this.setupAndroidWebPlayer();
         } else {
             return this.setupIosWebPlayer();
@@ -280,7 +279,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         this._timer.stop();
         this.setShowing(false);
-        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
         this._webPlayerContainer.shouldOverrideUrlLoading.unsubscribe(this._urlLoadingObserver);
         this._container.removeEventHandler(this);
@@ -313,7 +312,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private getScreenDensity(): number {
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (this._platform === Platform.ANDROID) {
             return (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity();
         }
         return 0;

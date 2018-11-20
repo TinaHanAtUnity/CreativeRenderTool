@@ -1,5 +1,19 @@
 # Pending
 
+* Fix broken build info screen [#7178](https://github.com/Applifier/unity-ads-webview/pull/7178)
+* Harden Auction V5 Parser Against No fill Parse Failures [#7177](https://github.com/Applifier/unity-ads-webview/pull/7177)
+* IFrame Event Bridge for MRAID Views [#7013](https://github.com/Applifier/unity-ads-webview/pull/7013)
+
+# Mon Nov 19 2018
+
+* Modularize restructured codebase [#6892](https://github.com/Applifier/unity-ads-webview/pull/6892)
+
+# Wed Nov 14 19:05:17 UTC 2018
+
+* Enable auction v5 A/B test for one group [#7130](https://github.com/Applifier/unity-ads-webview/pull/7130)
+
+# Tue Nov 13 23:39:14 UTC 2018
+
 * Fix Integration Test Exit Code [#7095](https://github.com/Applifier/unity-ads-webview/pull/7095)
 * Rename PlayableMRAID to ExtendedMRAID [#6942](https://github.com/Applifier/unity-ads-webview/pull/6942)
 * Add TSLint Whitespace [#7097](https://github.com/Applifier/unity-ads-webview/pull/7097)

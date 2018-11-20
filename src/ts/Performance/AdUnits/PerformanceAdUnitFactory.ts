@@ -1,34 +1,42 @@
-import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
+import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
-import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 import { PerformanceEndScreenEventHandler } from 'Performance/EventHandlers/PerformanceEndScreenEventHandler';
+import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
-import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
-import { Platform } from 'Core/Constants/Platform';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
+import { Platform } from 'Core/Constants/Platform';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 import { GDPRConsent } from 'Ads/Views/Consent/GDPRConsent';
 import { GDPRConsentHandler } from 'Ads/EventHandlers/GDPRConsentHandler';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
-    public createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
+    public static ContentType = 'comet/campaign';
+    public static ContentTypeVideo = 'comet/video';
+    public static ContentTypeMRAID = 'comet/mraid-url';
+
+    public canCreateAdUnit(contentType: string) {
+        return contentType === PerformanceAdUnitFactory.ContentType || contentType === PerformanceAdUnitFactory.ContentTypeVideo || contentType === PerformanceAdUnitFactory.ContentTypeMRAID;
+    }
+
+    public createAdUnit(parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
         const gdprConsent = new GDPRConsent({nativeBridge: nativeBridge});
-        const privacy = this.createPrivacy(nativeBridge, parameters);
+
+        const privacy = this.createPrivacy(parameters);
         const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose();
-        const overlay = this.createOverlay(nativeBridge, parameters, privacy, showPrivacyDuringVideo);
+        const overlay = this.createOverlay(parameters, privacy, showPrivacyDuringVideo);
 
         const adUnitStyle: AdUnitStyle = parameters.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
 
         const endScreenParameters: IEndScreenParameters = {
-            ... this.createEndScreenParameters(nativeBridge, privacy, parameters.campaign.getGameName(), parameters),
+            ... this.createEndScreenParameters(privacy, parameters.campaign.getGameName(), parameters),
             adUnitStyle: adUnitStyle,
             campaignId: parameters.campaign.getId(),
             osVersion: parameters.deviceInfo.getOsVersion()
@@ -46,11 +54,14 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
             gdprConsentView: gdprConsent
         };
 
-        const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+        const performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
 
         let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
 
         const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+            platform: parameters.platform,
+            core: parameters.core,
+            ads: parameters.ads,
             thirdPartyEventManager: parameters.thirdPartyEventManager,
             operativeEventManager: parameters.operativeEventManager,
             deviceInfo: parameters.deviceInfo,
@@ -60,18 +71,18 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
             campaign: parameters.campaign,
             coreConfig: parameters.coreConfig
         };
-        const downloadHelper = new AppStoreDownloadHelper(nativeBridge, downloadHelperParameters);
+        const downloadHelper = new AppStoreDownloadHelper(downloadHelperParameters);
 
-        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters, downloadHelper);
+        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
         overlay.addEventHandler(performanceOverlayEventHandler);
         const endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
         endScreen.addEventHandler(endScreenEventHandler);
 
-        const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, performanceAdUnit, video, performanceAdUnitParameters.adUnitStyle, performanceAdUnitParameters);
+        const videoEventHandlerParams = this.getVideoEventHandlerParams(performanceAdUnit, video, performanceAdUnitParameters.adUnitStyle, performanceAdUnitParameters);
         this.prepareVideoPlayer(PerformanceVideoEventHandler, <IVideoEventHandlerParams<PerformanceAdUnit>>videoEventHandlerParams);
 
-        if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
+        if (parameters.platform === Platform.ANDROID) {
+            const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
                 endScreenEventHandler.onKeyEvent(keyCode);
 
                 if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
@@ -80,7 +91,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
             });
             performanceAdUnit.onClose.subscribe(() => {
                 if(onBackKeyObserver) {
-                    nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
+                    parameters.ads.Android!.AdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
                 }
             });
         }

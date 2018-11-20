@@ -1,5 +1,6 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { IAdsApi } from 'Ads/IAds';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
@@ -10,13 +11,16 @@ import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { FocusManager } from 'Core/Managers/FocusManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0 } from 'Core/Utilities/Observable';
-import { Request } from 'Core/Utilities/Request';
+import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { GDPRConsent } from 'Ads/Views/Consent/GDPRConsent';
 
 export interface IAdUnitParameters<T extends Campaign> {
@@ -29,9 +33,14 @@ export interface IAdUnitParameters<T extends Campaign> {
     operativeEventManager: OperativeEventManager;
     placement: Placement;
     campaign: T;
+    platform: Platform;
+    core: ICoreApi;
+    ads: IAdsApi;
+    ar: IARApi;
+    purchasing: IPurchasingApi;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
-    request: Request;
+    request: RequestManager;
     options: any;
     gdprManager: GdprManager;
     adMobSignalFactory?: AdMobSignalFactory;
@@ -68,17 +77,22 @@ export abstract class AbstractAdUnit {
     public readonly onClose = new Observable0();
     public readonly onError = new Observable0();
 
-    protected readonly _nativeBridge: NativeBridge;
     protected readonly _forceOrientation: Orientation;
     protected readonly _container: AdUnitContainer;
+
+    protected readonly _platform: Platform;
+    protected readonly _core: ICoreApi;
+    protected readonly _ads: IAdsApi;
 
     private _showing: boolean;
     private _finishState: FinishState;
     private _baseCampaign: Campaign;
     private _gdprConsent: GDPRConsent | undefined;
 
-    constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
-        this._nativeBridge = nativeBridge;
+    constructor(parameters: IAdUnitParameters<Campaign>) {
+        this._platform = parameters.platform;
+        this._core = parameters.core;
+        this._ads = parameters.ads;
         this._forceOrientation = parameters.forceOrientation;
         this._container = parameters.container;
         this._showing = false;

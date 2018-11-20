@@ -6,9 +6,9 @@ export class Swipe {
     private _startX: number;
     private _startY: number;
 
-    private _onTouchEndListener: ((event: TouchEvent) => any);
-    private _onTouchCancelListener: ((event: TouchEvent) => any);
-    private _onTouchMoveListener: ((event: TouchEvent) => any);
+    private _onTouchEndListener?: ((event: TouchEvent) => any);
+    private _onTouchCancelListener?: ((event: TouchEvent) => any);
+    private _onTouchMoveListener?: ((event: TouchEvent) => any);
 
     constructor(element: HTMLElement) {
         this._element = element;
@@ -29,9 +29,9 @@ export class Swipe {
     }
 
     private onTouchEnd(event: TouchEvent) {
-        this._element.removeEventListener('touchend', this._onTouchEndListener, false);
-        this._element.removeEventListener('touchcancel', this._onTouchCancelListener, false);
-        this._element.removeEventListener('touchmove', this._onTouchCancelListener, false);
+        this._element.removeEventListener('touchend', this._onTouchEndListener!, false);
+        this._element.removeEventListener('touchcancel', this._onTouchCancelListener!, false);
+        this._element.removeEventListener('touchmove', this._onTouchMoveListener!, false);
 
         const endX = event.changedTouches[0].clientX;
         const endY = event.changedTouches[0].clientY;

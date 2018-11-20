@@ -1,25 +1,28 @@
-import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
-import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'Display/AdUnits/DisplayInterstitialAdUnit';
-import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
-import { DisplayInterstitialEventHandler } from 'Display/EventHandlers/DisplayInterstitialEventHandler';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { Privacy } from 'Ads/Views/Privacy';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import {
+    DisplayInterstitialAdUnit,
+    IDisplayInterstitialAdUnitParameters
+} from 'Display/AdUnits/DisplayInterstitialAdUnit';
+import { DisplayInterstitialEventHandler } from 'Display/EventHandlers/DisplayInterstitialEventHandler';
+import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
 
 export class DisplayInterstitialAdUnitFactory extends AbstractAdUnitFactory {
 
-    public createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<DisplayInterstitialCampaign>): DisplayInterstitialAdUnit {
-        const privacy = this.createPrivacy(nativeBridge, parameters);
+    public createAdUnit(parameters: IAdUnitParameters<DisplayInterstitialCampaign>): DisplayInterstitialAdUnit {
+        const privacy = this.createPrivacy(parameters);
 
-        const view = new DisplayInterstitial(nativeBridge, parameters.placement, parameters.campaign, privacy, this.showGDPRBanner(parameters));
+        const view = new DisplayInterstitial(parameters.platform, parameters.core, parameters.deviceInfo, parameters.placement, parameters.campaign, privacy, this.showGDPRBanner(parameters));
         const displayInterstitialParameters: IDisplayInterstitialAdUnitParameters = {
             ... parameters,
             view: view
         };
 
-        const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialParameters);
-        const displayInterstitialEventHandler = new DisplayInterstitialEventHandler(nativeBridge, displayInterstitialAdUnit, displayInterstitialParameters);
+        const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(displayInterstitialParameters);
+        const displayInterstitialEventHandler = new DisplayInterstitialEventHandler(displayInterstitialAdUnit, displayInterstitialParameters);
         view.addEventHandler(displayInterstitialEventHandler);
         Privacy.setupReportListener(privacy, displayInterstitialAdUnit);
 
