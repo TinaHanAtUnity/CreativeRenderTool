@@ -38,10 +38,11 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
                 return this.openUrlOnCallButton(url);
             }, () => { // on request Rejected - 4xx
                 const error = new DiagnosticError(new Error('VAST endscreen clickThroughURL error'), {
+                    contentType: 'vast_endscreen'
                     clickUrl: clickThroughURL,
                     creativeId: this._campaign.getCreativeId()
                 });
-                Diagnostics.trigger('vast_click_request_head_rejected', error);
+                Diagnostics.trigger('click_request_head_rejected', error);
                 return this.openUrlOnCallButton(clickThroughURL);
             });
         }

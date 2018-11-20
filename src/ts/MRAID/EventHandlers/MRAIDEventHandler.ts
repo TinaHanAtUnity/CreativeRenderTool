@@ -65,10 +65,11 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
                 return this.openUrlOnCallButton(storeUrl);
             }, () => {  // on request Rejected - 4xx
                 const error = new DiagnosticError(new Error('MRAID clickThroughURL error'), {
+                    contentType: 'mraid',
                     clickUrl: url,
                     creativeId: this._campaign.getCreativeId()
                 });
-                Diagnostics.trigger('mraid_click_request_head_rejected', error);
+                Diagnostics.trigger('click_request_head_rejected', error);
                 return this.openUrlOnCallButton(url);
             });
         }

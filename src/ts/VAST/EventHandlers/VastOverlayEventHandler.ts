@@ -72,10 +72,11 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                 return this.openUrlOnCallButton(url);
             }, () => {   // on request Rejected - 4xx
                 const error = new DiagnosticError(new Error('VAST overlay clickThroughURL error'), {
+                    contentType: 'vast_overlay',
                     clickUrl: clickThroughURL,
                     creativeId: this._vastCampaign.getCreativeId()
                 });
-                Diagnostics.trigger('vast_click_request_head_rejected', error);
+                Diagnostics.trigger('click_request_head_rejected', error);
                 return this.openUrlOnCallButton(clickThroughURL);
             });
         } else {
