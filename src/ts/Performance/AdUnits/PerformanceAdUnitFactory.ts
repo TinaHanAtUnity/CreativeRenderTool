@@ -27,7 +27,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
     }
 
     public createAdUnit(parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
-        const gdprConsent = new GDPRConsent({nativeBridge: nativeBridge});
+        const gdprConsent = new GDPRConsent({platform: parameters.platform});
 
         const privacy = this.createPrivacy(parameters);
         const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose();

@@ -110,14 +110,13 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             overlay.show();
         }
 
-        if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
+        if(this._platform === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
             if(this.getVideo().isCached()) {
-                this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
+                this._ads.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
             } else {
-                this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
+                this._ads.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
             }
         }
-
         this.prepareVideo();
     }
 

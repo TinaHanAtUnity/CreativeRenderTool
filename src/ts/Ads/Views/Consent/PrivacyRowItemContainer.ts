@@ -1,15 +1,15 @@
 import { View } from 'Core/Views/View';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import PrivacyRowItemContainerTemplate from 'html/consent/privacy-row-item-container.html';
 import { Template } from 'Core/Utilities/Template';
+import { Platform } from 'Core/Constants/Platform';
 
 interface IPrivacyInfoContainerHandler {
 }
 
 export class PrivacyRowItemContainer extends View<IPrivacyInfoContainerHandler> {
 
-    constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'privacy-row-item-container');
+    constructor(platform: Platform) {
+        super(platform, 'privacy-row-item-container');
 
         this._template = new Template(PrivacyRowItemContainerTemplate);
 
