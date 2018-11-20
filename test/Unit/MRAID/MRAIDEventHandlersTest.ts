@@ -36,7 +36,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
-import { MraidIFrameEventBridge } from 'MRAID/Views/MraidIFrameEventBridge';
+import { MraidIFrameEventBridge } from 'MRAID/EventBridge/MraidIFrameEventBridge';
 
 describe('MRAIDEventHandlersTest', () => {
 

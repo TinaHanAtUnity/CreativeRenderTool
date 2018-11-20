@@ -4,10 +4,11 @@ import * as sinon from 'sinon';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { IMRAIDHandler, MraidIFrameEventBridge, MRAIDEvents } from 'MRAID/Views/MraidIFrameEventBridge';
+import { MraidIFrameEventBridge } from 'MRAID/EventBridge/MraidIFrameEventBridge';
 import { Platform } from 'Core/Constants/Platform';
 import { Backend } from 'Backend/Backend';
 import { ICoreApi } from 'Core/ICore';
+import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/AbstractMraidEventBridge';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('MraidIframeEventBridge', () => {

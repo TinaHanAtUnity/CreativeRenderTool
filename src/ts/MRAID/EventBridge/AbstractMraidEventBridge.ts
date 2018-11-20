@@ -1,17 +1,21 @@
-
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { ICoreApi } from 'Core/ICore';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
-export enum MRAIDEvents {
-    ORIENTATION         = 'orientation',
-    OPEN                = 'open',
-    LOADED              = 'loaded',
-    ANALYTICS_EVENT     = 'analyticsEvent',
-    CLOSE               = 'close',
-    STATE_CHANGE        = 'customMraidState',
-    RESIZE_WEBVIEW      = 'resizeWebview',
-    SEND_STATS          = 'sendStats',
-    AR                  = 'ar'
+export interface IExpandProperties {
+    width: number;
+    height: number;
+    useCustomClose: boolean;
+    isModal: boolean;
+}
+
+export interface IMRAIDDiagnostic {
+    type: string;
+    message: string;
+}
+
+export interface IMRAIDOrientationProperties {
+    allowOrientationChange: boolean;
+    forceOrientation: string;
 }
 
 export interface IMRAIDHandler {
@@ -26,24 +30,32 @@ export interface IMRAIDHandler {
     onBridgeAREvent(event: MessageEvent): void;
 }
 
-export interface IMRAIDOrientationProperties {
-    allowOrientationChange: boolean;
-    forceOrientation: string;
+export interface IMRAIDBridge {
+    connect(connector: HTMLIFrameElement | WebPlayerContainer): void;
+    disconnect(): void;
+    setHandler(handler: IMRAIDHandler): void;
+    sendViewableEvent(viewable: boolean): void;
 }
 
-export class MraidIFrameEventBridge {
-    private _iframe: HTMLIFrameElement;
-    private _core: ICoreApi;
-    private _handler: IMRAIDHandler;
+export enum MRAIDEvents {
+    ORIENTATION         = 'orientation',
+    OPEN                = 'open',
+    LOADED              = 'loaded',
+    ANALYTICS_EVENT     = 'analyticsEvent',
+    CLOSE               = 'close',
+    STATE_CHANGE        = 'customMraidState',
+    RESIZE_WEBVIEW      = 'resizeWebview',
+    SEND_STATS          = 'sendStats',
+    AR                  = 'ar'
+}
 
-    private _messageListener: (e: Event) => void;
-    private _mraidHandlers: { [event: string]: (msg: any) => void };
+export abstract class AbstractMRAIDEventBridge implements IMRAIDBridge {
+    protected _handler: IMRAIDHandler;
+    protected _mraidHandlers: { [event: string]: (msg: any) => void };
 
-    constructor(core: ICoreApi, handler: IMRAIDHandler) {
-        this._core = core;
+    constructor(handler: IMRAIDHandler) {
         this._handler = handler;
 
-        this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
         this._mraidHandlers = {};
         this._mraidHandlers[MRAIDEvents.ORIENTATION] = (msg: any) => this.handleSetOrientationProperties(<IMRAIDOrientationProperties>msg.properties);
         this._mraidHandlers[MRAIDEvents.OPEN] = (msg: any) => this.handleOpen(msg.url);
@@ -55,27 +67,15 @@ export class MraidIFrameEventBridge {
         this._mraidHandlers[MRAIDEvents.AR] = (msg: any) => this.handleAr(msg);
     }
 
-    public connect(iframe: HTMLIFrameElement) {
-        this._iframe = iframe;
-        window.addEventListener('message', this._messageListener, false);
+    public setHandler(handler: IMRAIDHandler) {
+        this._handler = handler;
     }
 
-    public disconnect() {
-        window.removeEventListener('message', this._messageListener);
-    }
+    public abstract connect(connector: HTMLIFrameElement | WebPlayerContainer): void;
 
-    public sendViewableEvent(viewable: boolean) {
-        this.postMessage('viewable', viewable);
-    }
+    public abstract disconnect(): void;
 
-    private onMessage(e: MessageEvent) {
-        const message = e.data;
-        this._core.Sdk.logDebug(`mraid: event=${message.type}, data=${message}`);
-        if (message.type in this._mraidHandlers) {
-            const handler = this._mraidHandlers[message.type];
-            handler(message);
-        }
-    }
+    public abstract sendViewableEvent(viewable: boolean): void;
 
     private handleSetOrientationProperties(properties: IMRAIDOrientationProperties) {
         let forceOrientation = Orientation.NONE;
@@ -122,12 +122,5 @@ export class MraidIFrameEventBridge {
 
     private handleAr(event: MessageEvent) {
         this._handler.onBridgeAREvent(event);
-    }
-
-    private postMessage(event: string, data?: any) {
-        this._iframe.contentWindow!.postMessage({
-            type: event,
-            value: data
-        }, '*');
     }
 }
