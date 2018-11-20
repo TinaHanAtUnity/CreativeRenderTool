@@ -1,3 +1,5 @@
+@import "components.styl";
+
 #gdpr-consent-settings {
   position: absolute;
   top: 0;
@@ -23,7 +25,7 @@
     }
 
     .privacy-info-description {
-      font-size: $default-size * .65;
+      font-size: $default-font-size * .65;
       text-align: justify;
       color: $privacy-text-color;
       font-weight: 300;
@@ -58,10 +60,18 @@
   .consent-button {
     border-radius: $default-size * .25;
     border: 1px solid $light-gray;
-    font-size: $default-size * .65;
+    font-size: $default-font-size * .65;
   }
   .item {
     text-align: center;
     padding: .75 * $default-size $default-size;
+  }
+
+  .checkbox-group-container {
+    $checkbox-group-container($default-scale-size, $default-font-size * .65);
+
+    .checkbox-item-container {
+      margin: $default-size 0 $default-size 0;
+    }
   }
 }
