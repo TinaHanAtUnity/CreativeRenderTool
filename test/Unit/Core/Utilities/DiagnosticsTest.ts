@@ -33,6 +33,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             HttpKafka.setClientInfo(undefined);
             HttpKafka.setDeviceInfo(undefined);
             HttpKafka.setRequest(undefined);
+            HttpKafka.setPlatform(undefined);
         });
 
         it('should not allow primitives as root values', () => {
@@ -109,13 +110,14 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             const configuration = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
 
             HttpKafka.setRequest(request);
+            HttpKafka.setPlatform(platform);
             HttpKafka.setClientInfo(clientInfo);
             HttpKafka.setConfiguration(configuration);
             Diagnostics.trigger('test', {'test': true});
 
             return resolvedPromise.then(() => {
                 sinon.assert.calledWith(<sinon.SinonStub>request.post,
-                    'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":2000,"sdkVersionName":"2.0.0-alpha2","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null,"webviewVersion":"2.0.0-webview-test","initTimestamp":0,"reinitialized":false,"monetizationInUse":false},"device":null,"country":"FI"}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"test":true},"timestamp":123456}}');
+                    'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":{"gameId":"12345","testMode":false,"bundleId":"com.unity3d.ads.example","bundleVersion":"2.0.0-test2","sdkVersion":2000,"sdkVersionName":"2.0.0-alpha2","encrypted":false,"configUrl":"http://example.com/config.json","webviewUrl":"http://example.com/index.html","webviewHash":null,"webviewVersion":"2.0.0-webview-test","initTimestamp":0,"reinitialized":false,"monetizationInUse":false,"platform":"' + Platform[platform].toLowerCase() + '"},"device":null,"country":"FI"}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"test":true},"timestamp":123456}}');
             });
         });
     });
