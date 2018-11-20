@@ -292,7 +292,6 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             });
 
             it('Request followRedirectChain should reject when HEAD request is not accepted', () => {
-                // don't accept HEAD request
                 const redirectUrl: string = 'https://www.example.org/rejectedResponseCode/';
                 return request.followRedirectChain(redirectUrl).then((url) => {
                     assert.fail(`${redirectUrl} should not success on HEAD request`);
