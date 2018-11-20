@@ -70,7 +70,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if(clickThroughURL) {
             return this._request.followRedirectChain(clickThroughURL, true).then((url: string) => {
                 return this.openUrlOnCallButton(url);
-            }, () => {   // on request Rejected - 4xx
+            }).catch((e) => {   // on request Rejected - 4xx
                 const error = new DiagnosticError(new Error('VAST overlay clickThroughURL error'), {
                     contentType: 'vast_overlay',
                     clickUrl: clickThroughURL,
