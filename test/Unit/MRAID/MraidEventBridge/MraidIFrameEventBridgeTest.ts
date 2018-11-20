@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { IMRAIDHandler, MraidIFrameEventBridge, MRAIDEvents } from 'Ads/Views/MraidIFrameEventBridge';
+import { IMRAIDHandler, MraidIFrameEventBridge, MRAIDEvents } from 'MRAID/Views/MraidIFrameEventBridge';
 import { Platform } from 'Core/Constants/Platform';
 import { Backend } from 'Backend/Backend';
 import { ICoreApi } from 'Core/ICore';
