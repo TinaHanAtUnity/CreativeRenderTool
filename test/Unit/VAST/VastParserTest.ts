@@ -45,7 +45,7 @@ describe('VastParser', () => {
             assert.isNull(TestFixtures.getVastParser().parseVast(
                 '<?xml version="1.0" encoding="UTF-8" standalone="no"?><foo></foo>'
             ));
-        });
+        }, 'VAST xml data is missing');
     });
 
     it('should have correct data given url encoded data string and additional tracking events', () => {
@@ -93,7 +93,7 @@ describe('VastParser', () => {
         ]);
     });
 
-    it('should have correct click trough url', () => {
+    it('should have correct click through url', () => {
         const vast = TestFixtures.getVastParser().parseVast(vastRaw);
         assert.equal(vast.getVideoClickThroughURL(), 'www.tremorvideo.com');
     });

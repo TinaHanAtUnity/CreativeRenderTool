@@ -12,7 +12,11 @@ interface IVastCreativeCompanionAd {
 }
 
 export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
-    constructor(id: string, creativeType: string, height: number, width: number, staticResourceURL: string, companionClickThroughURLTemplate: string, trackingEvents?: { [eventName: string]: string[] }) {
+
+    private static _supportedCreativeTypes = ['image/jpg'];
+
+    // constructor(id: string, creativeType: string, height: number, width: number, staticResourceURL: string, companionClickThroughURLTemplate: string, trackingEvents?: {});
+    constructor(id: string | null, height: number | null, width: number | null, creativeType?: string, staticResourceURL?: string, companionClickThroughURLTemplate?: string, trackingEvents?: { [eventName: string]: string[] }) {
         super('VastCreativeCompanionAd', {
             id: ['string', 'null'],
             width: ['number'],
@@ -32,6 +36,27 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
         this.set('staticResourceURL', staticResourceURL || null);
         this.set('companionClickThroughURLTemplate', companionClickThroughURLTemplate || null);
         this.set('trackingEvents', trackingEvents || {});
+    }
+
+    public setCompanionClickThroughURLTemplate(url: string | null) {
+        this.set('companionClickThroughURLTemplate', url);
+    }
+
+    public setStaticResourceURL(url: string | null) {
+        this.set('staticResourceURL', url);
+    }
+
+    public setCreativeType(type: string | null) {
+        this.set('creativeType', type);
+    }
+
+    public addTrackingEvent(eventName: string, trackingURLTemplate: string) {
+        const trackingEvents = this.get('trackingEvents');
+        if (trackingEvents[eventName]) {
+            trackingEvents[eventName].push(trackingURLTemplate);
+        } else {
+            trackingEvents[eventName] = [trackingURLTemplate];
+        }
     }
 
     public getId(): string | null {
@@ -84,5 +109,23 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
             return trackingEvents[eventType] || [];
         }
         return [];
+    }
+
+    public validate(): Error[] {
+        const errors: Error[] = [];
+        if (this.getStaticResourceURL() === null) {
+            errors.push(new Error('VAST Companion ad is missing required StaticResource Element!'));
+        }
+        const creativeType = this.getCreativeType();
+        if (creativeType === null) {
+            errors.push(new Error('VAST Companion ad "StaticResource" is missing required "creativeType" attribute!'));
+        }
+        if (creativeType && VastCreativeCompanionAd._supportedCreativeTypes.indexOf(creativeType) !== -1) {
+            errors.push(new Error(`VAST Companion ad "StaticResource" attribute "creativeType=${creativeType}" is not supported!`));
+        }
+        if (this.getCompanionClickThroughURLTemplate === null) {
+            errors.push(new Error('VAST Companion ad is missing required CompanionClickThrough Element!'));
+        }
+        return errors;
     }
 }

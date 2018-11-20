@@ -109,4 +109,13 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
             'adParameters': this.getAdParameters()
         };
     }
+
+    public validate(): Error[] {
+        const errors: Error[] = [];
+        if (this.getDuration() === -1) {
+            errors.push(new Error('Missing valid duration'));
+        }
+
+        return errors;
+    }
 }

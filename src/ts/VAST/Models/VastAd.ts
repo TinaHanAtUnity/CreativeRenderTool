@@ -170,4 +170,8 @@ export class VastAd extends Model<IVastAd> {
 
         return urls;
     }
+
+    public validate(): boolean {
+        return true;
+    }
 }
