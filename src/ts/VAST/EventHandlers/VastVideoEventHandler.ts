@@ -162,7 +162,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
     }
 
     private sendThirdPartyTrackingEvent(eventName: string): void {
-        const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
+        const trackingEventUrls = this._vastCampaign.getTrackingUrlsForEvent(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {
                 this.sendThirdPartyEvent(`vast ${eventName}`, url);
