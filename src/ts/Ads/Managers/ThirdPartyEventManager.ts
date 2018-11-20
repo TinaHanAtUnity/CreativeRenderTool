@@ -13,25 +13,47 @@ enum ThirdPartyEventMethod {
     POST,
     GET
 }
+
+export enum ThirdPartyEventMacro {
+    ZONE = '%ZONE%',
+    SDK_VERSION = '%SDK_VERSION%',
+    GAMER_SID = '%GAMER_SID%'
+}
+
+export type TemplateValueMap = { [id: string]: string };
+
+export interface IThirdPartyEventManagerFactory {
+    create(templateValues: TemplateValueMap): ThirdPartyEventManager;
+}
+
+export class ThirdPartyEventManagerFactory implements IThirdPartyEventManagerFactory {
+
+    private _core: ICoreApi;
+    private _requestManager: RequestManager;
+
+    constructor(core: ICoreApi, requestManager: RequestManager) {
+        this._core = core;
+        this._requestManager = requestManager;
+    }
+
+    public create(templateValues: TemplateValueMap): ThirdPartyEventManager {
+        return new ThirdPartyEventManager(this._core, this._requestManager, templateValues);
+    }
+}
+
 export class ThirdPartyEventManager {
 
     private _core: ICoreApi;
     private _request: RequestManager;
     private _templateValues: { [id: string]: string } = {};
 
-    public static zoneMacro: string = '%ZONE%';
-    public static sdkVersionMacro: string = '%SDK_VERSION%';
-    public static gamerSidMacro: string = '%GAMER_SID%';
-
-    constructor(core: ICoreApi, request: RequestManager, templateValues?: [string, string][]) {
+    constructor(core: ICoreApi, request: RequestManager, templateValues?: TemplateValueMap) {
         this._core = core;
         this._request = request;
 
         if(templateValues) {
             this.setTemplateValues(templateValues);
         }
-
-        this._core.Sdk.logDebug('Initializing ThirdPartEventManager');
     }
 
     public replaceUrlTemplateValues(urls: string[]): string[] {
@@ -104,15 +126,11 @@ export class ThirdPartyEventManager {
         });
     }
 
-    public setTemplateValues(templateValues: [string, string][]): void {
-        const newTemplateValues: { [id: string]: string } = {};
-        templateValues.map(([key, value]) => {
-            newTemplateValues[key] = value;
-        });
-        this._templateValues = newTemplateValues;
+    public setTemplateValues(templateValues: TemplateValueMap): void {
+        this._templateValues = templateValues;
     }
 
-    public setTemplateValue(key: string, value: string): void {
+    public setTemplateValue(key: ThirdPartyEventMacro, value: string): void {
         this._templateValues[key] = value;
     }
 

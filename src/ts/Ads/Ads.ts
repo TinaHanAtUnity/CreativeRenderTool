@@ -18,7 +18,7 @@ import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManager
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventMacro, ThirdPartyEventManagerFactory, IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
@@ -85,6 +85,7 @@ export class Ads implements IAds {
     public readonly BackupCampaignManager: BackupCampaignManager;
     public readonly ProgrammaticTrackingService: ProgrammaticTrackingService;
     public readonly ContentTypeHandlerManager: ContentTypeHandlerManager;
+    public readonly ThirdParyEventManagerFactory: IThirdPartyEventManagerFactory;
 
     public Config: AdsConfiguration;
     public Container: Activity | ViewController;
@@ -147,6 +148,7 @@ export class Ads implements IAds {
         this.BackupCampaignManager = new BackupCampaignManager(this._core.Api, this._core.StorageBridge, this._core.Config);
         this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this._core.NativeBridge.getPlatform(), this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo);
         this.ContentTypeHandlerManager = new ContentTypeHandlerManager();
+        this.ThirdParyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
     }
 
     public initialize(jaegerInitSpan: JaegerSpan) {
@@ -360,11 +362,11 @@ export class Ads implements IAds {
                 container: this.Container,
                 deviceInfo: this._core.DeviceInfo,
                 clientInfo: this._core.ClientInfo,
-                thirdPartyEventManager: new ThirdPartyEventManager(this._core.Api, this._core.RequestManager, [
-                    [ThirdPartyEventManager.zoneMacro, placement.getId()],
-                    [ThirdPartyEventManager.sdkVersionMacro, this._core.ClientInfo.getSdkVersion().toString()],
-                    [ThirdPartyEventManager.gamerSidMacro, playerMetadataServerId || '']
-                ]),
+                thirdPartyEventManager: this.ThirdParyEventManagerFactory.create({
+                    [ThirdPartyEventMacro.ZONE]: placement.getId(),
+                    [ThirdPartyEventMacro.SDK_VERSION]: this._core.ClientInfo.getSdkVersion().toString(),
+                    [ThirdPartyEventMacro.GAMER_SID]: playerMetadataServerId || ''
+                }),
                 operativeEventManager: OperativeEventManagerFactory.createOperativeEventManager({
                     platform: this._core.NativeBridge.getPlatform(),
                     core: this._core.Api,

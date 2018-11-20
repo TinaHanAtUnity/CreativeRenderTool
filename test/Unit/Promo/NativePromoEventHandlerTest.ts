@@ -14,7 +14,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, ThirdPartyEventMacro, TemplateValueMap } from 'Ads/Managers/ThirdPartyEventManager';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 
 describe('NativePromoEventHandlerTest', () => {
@@ -31,7 +31,7 @@ describe('NativePromoEventHandlerTest', () => {
     let wakeUpManager: WakeUpManager;
     let metadataManager: MetaDataManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
-    let templateValues: [string, string][];
+    let templateValues: TemplateValueMap;
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
@@ -44,7 +44,7 @@ describe('NativePromoEventHandlerTest', () => {
         sinon.stub(purchasing.CustomPurchasing, 'available').resolves(false);
         clientInfo = sinon.createStubInstance(ClientInfo);
         wakeUpManager = new WakeUpManager(core);
-        request = new RequestManager(platform, core, wakeUpManager);
+        request = sinon.createStubInstance(RequestManager);
         (<sinon.SinonStub>clientInfo.getSdkVersion).returns(3000);
         sandbox.stub(PurchasingUtilities, 'onPurchase');
         metadataManager = sinon.createStubInstance(MetaDataManager);
@@ -52,13 +52,14 @@ describe('NativePromoEventHandlerTest', () => {
         (<sinon.SinonStub>playerMetaData.getServerId).returns('test-serverId');
         (<sinon.SinonStub>metadataManager.fetch).resolves(playerMetaData);
 
-        nativePromoEventHandler = new NativePromoEventHandler(core, ads, purchasing, clientInfo, request, metadataManager);
-        (<any>nativePromoEventHandler).createThirdPartyEventManager = (_templateValues: [string, string][]) => {
-            templateValues = _templateValues;
-            thirdPartyEventManager = new ThirdPartyEventManager(core, request, _templateValues);
-            sinon.stub(thirdPartyEventManager, 'sendWithGet');
-            return thirdPartyEventManager;
-        };
+        nativePromoEventHandler = new NativePromoEventHandler(core, ads, purchasing, clientInfo, {
+            create: (_templateValues: TemplateValueMap) => {
+                templateValues = _templateValues;
+                thirdPartyEventManager = new ThirdPartyEventManager(core, request, _templateValues);
+                sinon.stub(thirdPartyEventManager, 'sendWithGet');
+                return thirdPartyEventManager;
+            }
+        }, metadataManager);
         sandbox.stub(nativePromoEventHandler.onClose, 'trigger');
     });
 
@@ -71,11 +72,11 @@ describe('NativePromoEventHandlerTest', () => {
         it('should replace %ZONE% template value and fire tracking urls for impression', () => {
 
             return nativePromoEventHandler.onImpression(TestFixtures.getPromoCampaign(), 'test').then(() => {
-                assert.deepEqual(templateValues, [
-                    [ThirdPartyEventManager.zoneMacro, 'test'],
-                    [ThirdPartyEventManager.sdkVersionMacro, '3000'],
-                    [ThirdPartyEventManager.gamerSidMacro, 'test-serverId']
-                ]);
+                assert.deepEqual(templateValues, {
+                    [ThirdPartyEventMacro.ZONE]: 'test',
+                    [ThirdPartyEventMacro.SDK_VERSION]: '3000',
+                    [ThirdPartyEventMacro.GAMER_SID]: 'test-serverId'
+                });
                 sinon.assert.calledThrice(<sinon.SinonStub>thirdPartyEventManager.sendWithGet);
                 sinon.assert.calledWith(<sinon.SinonStub>thirdPartyEventManager.sendWithGet, 'impression', '12345', 'http://test.impression.com/blah1');
                 sinon.assert.calledWith(<sinon.SinonStub>thirdPartyEventManager.sendWithGet, 'impression', '12345', 'http://test.impression.com/blah2');

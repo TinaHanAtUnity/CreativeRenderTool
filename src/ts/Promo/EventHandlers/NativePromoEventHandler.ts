@@ -1,7 +1,6 @@
 import { IAdsApi } from 'Ads/IAds';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, ThirdPartyEventMacro, IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
 import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { Observable0 } from 'Core/Utilities/Observable';
@@ -22,14 +21,14 @@ export class NativePromoEventHandler {
     private _purchasing: IPurchasingApi;
     private _metadataManager: MetaDataManager;
     private _clientInfo: ClientInfo;
-    private _request: RequestManager;
+    private _thirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
 
-    constructor(core: ICoreApi, ads: IAdsApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, request: RequestManager, metadataManager: MetaDataManager) {
+    constructor(core: ICoreApi, ads: IAdsApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, thirdPartyEventManagerFactory: IThirdPartyEventManagerFactory, metadataManager: MetaDataManager) {
         this._core = core;
         this._ads = ads;
         this._purchasing = purchasing;
         this._clientInfo = clientInfo;
-        this._request = request;
+        this._thirdPartyEventManagerFactory = thirdPartyEventManagerFactory;
         this._metadataManager = metadataManager;
     }
 
@@ -44,11 +43,11 @@ export class NativePromoEventHandler {
             if (playerMetadata) {
                 playerMetadataServerId = playerMetadata.getServerId();
             }
-            return this.createThirdPartyEventManager([
-                [ThirdPartyEventManager.zoneMacro, placementId],
-                [ThirdPartyEventManager.sdkVersionMacro, this._clientInfo.getSdkVersion().toString()],
-                [ThirdPartyEventManager.gamerSidMacro, playerMetadataServerId || '']
-            ]);
+            return this._thirdPartyEventManagerFactory.create({
+                [ThirdPartyEventMacro.ZONE]: placementId,
+                [ThirdPartyEventMacro.SDK_VERSION]: this._clientInfo.getSdkVersion().toString(),
+                [ThirdPartyEventMacro.GAMER_SID]: playerMetadataServerId || ''
+            });
         });
         return this.sendTrackingEvent('impression', campaign);
     }
@@ -91,8 +90,4 @@ export class NativePromoEventHandler {
         });
     }
 
-    // exists for stubbing in tests
-    private createThirdPartyEventManager(templateValues: [string, string][]): ThirdPartyEventManager {
-        return new ThirdPartyEventManager(this._core, this._request, templateValues);
-    }
 }
