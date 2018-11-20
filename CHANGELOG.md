@@ -1,3 +1,7 @@
+# Tue Nov 20 13:57:19 UTC 2018
+
+* Stop auction v5 in group 15 [#7203](https://github.com/Applifier/unity-ads-webview/pull/7203)
+
 # Tue Nov 20 12:53:13 UTC 2018
 
 * Fix broken build info screen [#7178](https://github.com/Applifier/unity-ads-webview/pull/7178)
