@@ -1,4 +1,4 @@
-# Staged
+# Wed Nov 21 15:11:04 UTC 2018
 
 * VAST media selector rollout [#7225](https://github.com/Applifier/unity-ads-webview/pull/7225)
 * Fix broken AR events [#7227](https://github.com/Applifier/unity-ads-webview/pull/7227)
