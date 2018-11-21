@@ -1,7 +1,6 @@
 import { IWebPlayerEventSettings } from 'Ads/Native/WebPlayer';
 import { BannerViewType } from 'Banners/Native/Banner';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { Template } from 'Core/Utilities/Template';
 import { HTMLBannerAdUnit, IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
@@ -12,8 +11,8 @@ export class DisplayHTMLBannerAdUnit extends HTMLBannerAdUnit {
     private _onCreateWebViewObserver: IObserver1<string>;
     protected _template: Template;
 
-    constructor(nativeBridge: NativeBridge, parameters: IBannerAdUnitParameters) {
-        super(nativeBridge, parameters);
+    constructor(parameters: IBannerAdUnitParameters) {
+        super(parameters);
         this._template = new Template(BannerContainer);
     }
 
@@ -28,7 +27,7 @@ export class DisplayHTMLBannerAdUnit extends HTMLBannerAdUnit {
     }
 
     protected onDomContentLoaded() {
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (this._platform === Platform.ANDROID) {
             this._urlLoadingObserver = this._webPlayerContainer.shouldOverrideUrlLoading.subscribe((url) => {
                 this.onOpenURL(url);
             });
@@ -46,7 +45,7 @@ export class DisplayHTMLBannerAdUnit extends HTMLBannerAdUnit {
     }
 
     private getEventSettings(): IWebPlayerEventSettings {
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (this._platform === Platform.ANDROID) {
             return {
                 shouldOverrideUrlLoading: {
                     sendEvent: true,

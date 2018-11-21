@@ -2,29 +2,29 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { VideoAdUnit, VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
+import { IAdsApi } from 'Ads/IAds';
 import { IOperativeSkipEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { IOverlayHandler } from 'Ads/Views/AbstractVideoOverlay';
+import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { FinishState } from 'Core/Constants/FinishState';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
-import { KeyCode } from 'Core/Constants/Android/KeyCode';
 
 export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler implements IOverlayHandler {
     protected _placement: Placement;
-    protected _nativeBridge: NativeBridge;
     protected _campaign: T;
     protected _operativeEventManager: OperativeEventManager;
     protected _adUnit: VideoAdUnit<T>;
+    protected _ads: IAdsApi;
 
     private _adUnitStyle?: AdUnitStyle;
 
-    constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
+    constructor(adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
         super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
-        this._nativeBridge = nativeBridge;
+        this._ads = parameters.ads;
         this._operativeEventManager = parameters.operativeEventManager;
         this._adUnit = adUnit;
         this._campaign = parameters.campaign;
@@ -33,7 +33,7 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
     }
 
     public onOverlaySkip(position: number): void {
-        this._nativeBridge.VideoPlayer.pause();
+        this._ads.VideoPlayer.pause();
         this._adUnit.setVideoState(VideoState.SKIPPED);
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._operativeEventManager.sendSkip(this.getOperativeSkipEventParams());
@@ -49,7 +49,7 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
     }
 
     public onOverlayMute(isMuted: boolean): void {
-        this._nativeBridge.VideoPlayer.setVolume(new Double(isMuted ? 0 : 1));
+        this._ads.VideoPlayer.setVolume(new Double(isMuted ? 0 : 1));
     }
 
     public onOverlayCallButton(): void {
@@ -61,7 +61,7 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
     }
 
     public onOverlayClose(): void {
-        this._nativeBridge.VideoPlayer.pause();
+        this._ads.VideoPlayer.pause();
         this._adUnit.setActive(false);
         this._adUnit.setVideoState(VideoState.SKIPPED);
         this._adUnit.setFinishState(FinishState.SKIPPED);

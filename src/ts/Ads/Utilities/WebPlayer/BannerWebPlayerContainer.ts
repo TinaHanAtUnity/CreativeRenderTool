@@ -1,9 +1,10 @@
+import { IAdsApi } from 'Ads/IAds';
 import { WebPlayerViewId } from 'Ads/Native/WebPlayer';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 
 export class BannerWebPlayerContainer extends WebPlayerContainer {
-    constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, WebPlayerViewId.BannerPlayer);
+    constructor(platform: Platform, ads: IAdsApi) {
+        super(platform, ads, WebPlayerViewId.BannerPlayer);
     }
 }

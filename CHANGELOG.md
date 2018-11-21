@@ -1,3 +1,45 @@
+# Pending
+
+* VAST media selector rollout [#7225](https://github.com/Applifier/unity-ads-webview/pull/7225)
+
+# Wed Nov 21 00:12:25 UTC 2018
+
+* Auction V5 Test Disabled for Thanksgiving (No PR)
+* Set tracking URLs before showing (auction v5 fix) [#7223](https://github.com/Applifier/unity-ads-webview/pull/7223)
+* Show the call button in fadeIn for other than performance and xpromo campaigns [#7182](https://github.com/Applifier/unity-ads-webview/pull/7182)
+* Fix scrollable overlay with MOAT [#7183](https://github.com/Applifier/unity-ads-webview/pull/7183)
+
+# Tue Nov 20 13:57:19 UTC 2018
+
+* Stop auction v5 in group 15 [#7203](https://github.com/Applifier/unity-ads-webview/pull/7203)
+
+# Tue Nov 20 12:53:13 UTC 2018
+
+* Fix broken build info screen [#7178](https://github.com/Applifier/unity-ads-webview/pull/7178)
+* Harden Auction V5 Parser Against No fill Parse Failures [#7177](https://github.com/Applifier/unity-ads-webview/pull/7177)
+* IFrame Event Bridge for MRAID Views [#7013](https://github.com/Applifier/unity-ads-webview/pull/7013)
+* Switch the skip icon test to use 'next' icon [#7180](https://github.com/Applifier/unity-ads-webview/pull/7180)
+* Second experiment on different green colors on Android [#7181](https://github.com/Applifier/unity-ads-webview/pull/7181)
+
+# Mon Nov 19 2018
+
+* Modularize restructured codebase [#6892](https://github.com/Applifier/unity-ads-webview/pull/6892)
+
+# Wed Nov 14 19:05:17 UTC 2018
+
+* Enable auction v5 A/B test for one group [#7130](https://github.com/Applifier/unity-ads-webview/pull/7130)
+
+# Tue Nov 13 23:39:14 UTC 2018
+
+* Fix Integration Test Exit Code [#7095](https://github.com/Applifier/unity-ads-webview/pull/7095)
+* Rename PlayableMRAID to ExtendedMRAID [#6942](https://github.com/Applifier/unity-ads-webview/pull/6942)
+* Add TSLint Whitespace [#7097](https://github.com/Applifier/unity-ads-webview/pull/7097)
+* Reduce font size for ExtendedMRAID permission text [#7099](https://github.com/Applifier/unity-ads-webview/pull/7099)
+* Add TSLint array-type [#7096](https://github.com/Applifier/unity-ads-webview/pull/7096)
+* Add 'Install Now' button to All Performance and XPromo Videos [#6947](https://github.com/Applifier/unity-ads-webview/pull/6947)
+* Add Disabled Auction V5 Protocol Test [#6896](https://github.com/Applifier/unity-ads-webview/pull/6896)
+* Fix Backup Campaign Loading Promise chain [#7106](https://github.com/Applifier/unity-ads-webview/pull/7106)
+
 # Thu Nov  8 14:32:20 UTC 2018
 
 * Load square asset when constructing backup campaign [#7074](https://github.com/Applifier/unity-ads-webview/pull/7074)

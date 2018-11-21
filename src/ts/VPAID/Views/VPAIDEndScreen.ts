@@ -1,6 +1,6 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { Template } from 'Core/Utilities/Template';
 
 import { View } from 'Core/Views/View';
@@ -16,8 +16,8 @@ export interface IVPAIDEndScreenHandler {
 export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
     private _isSwipeToCloseEnabled: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, gameId: string) {
-        super(nativeBridge, 'end-screen');
+    constructor(platform: Platform, campaign: VPAIDCampaign, gameId: string) {
+        super(platform, 'end-screen');
 
         this._template = new Template(VastEndScreenTemplate);
 

@@ -1,35 +1,36 @@
-import { Campaign } from 'Ads/Models/Campaign';
-import { Placement } from 'Ads/Models/Placement';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { StorageType } from 'Core/Native/Storage';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
-import { CometCampaignLoader } from 'Performance/Parsers/CometCampaignLoader';
 import { ProgrammaticAdMobLoader } from 'AdMob/Parsers/ProgrammaticAdMobLoader';
-import { CampaignLoader } from 'Ads/Parsers/CampaignLoader';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Asset } from 'Ads/Models/Assets/Asset';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
+import { Placement } from 'Ads/Models/Placement';
+import { CampaignLoader } from 'Ads/Parsers/CampaignLoader';
+import { ICoreApi } from 'Core/ICore';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { IFileInfo } from 'Core/Native/Cache';
-import { MraidLoader } from 'MRAID/Parsers/MraidLoader';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { StorageOperation } from 'Core/Utilities/StorageOperation';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { MraidLoader } from 'MRAID/Parsers/MraidLoader';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { CometCampaignLoader } from 'Performance/Parsers/CometCampaignLoader';
 
 export class BackupCampaignManager {
     private static _maxExpiryDelay: number = 7 * 24 * 3600 * 1000; // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
 
-    private _nativeBridge: NativeBridge;
+    private _core: ICoreApi;
     private _storageBridge: StorageBridge;
     private _coreConfiguration: CoreConfiguration;
 
-    constructor(nativeBridge: NativeBridge, storageBridge: StorageBridge, coreConfiguration: CoreConfiguration) {
-        this._nativeBridge = nativeBridge;
+    constructor(core: ICoreApi, storageBridge: StorageBridge, coreConfiguration: CoreConfiguration) {
+        this._core = core;
         this._storageBridge = storageBridge;
         this._coreConfiguration = coreConfiguration;
     }
 
-    public storePlacement(placement: Placement, mediaId: string) {
+    // todo: once auction v5 is unconditionally adopoted, trackingUrls should not be optional
+    public storePlacement(placement: Placement, mediaId: string, trackingUrls?: ICampaignTrackingUrls) {
         // never store data when in test mode
         if(this._coreConfiguration.getTestMode()) {
             return;
@@ -40,6 +41,11 @@ export class BackupCampaignManager {
         const operation = new StorageOperation(StorageType.PRIVATE);
         operation.set(rootKey + '.mediaid', mediaId);
         operation.set(rootKey + '.adtypes', JSON.stringify(placement.getAdTypes()));
+
+        if(trackingUrls) {
+            operation.set(rootKey + '.trackingurls', JSON.stringify(trackingUrls));
+        }
+
         this._storageBridge.queue(operation);
     }
 
@@ -106,6 +112,14 @@ export class BackupCampaignManager {
         });
     }
 
+    public loadTrackingUrls(placement: Placement): Promise<ICampaignTrackingUrls | undefined> {
+        return this.getString('backupcampaign.placement.' + placement.getId() + '.trackingurls').then(rawTrackingUrls => {
+            return JSON.parse(rawTrackingUrls);
+        }).catch(() => {
+            return undefined;
+        });
+    }
+
     public deleteBackupCampaigns() {
         const operation = new StorageOperation(StorageType.PRIVATE);
         operation.delete('backupcampaign');
@@ -137,11 +151,11 @@ export class BackupCampaignManager {
     }
 
     private getString(key: string): Promise<string> {
-        return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, key);
+        return this._core.Storage.get<string>(StorageType.PRIVATE, key);
     }
 
     private getNumber(key: string): Promise<number> {
-        return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, key);
+        return this._core.Storage.get<number>(StorageType.PRIVATE, key);
     }
 
     private verifyCachedFiles(campaign: Campaign): Promise<Campaign> {
@@ -185,7 +199,7 @@ export class BackupCampaignManager {
         const fileId = asset.getFileId();
 
         if(asset.isCached() && fileId) {
-            return this._nativeBridge.Cache.getFileInfo(fileId).then((fileInfo: IFileInfo) => {
+            return this._core.Cache.getFileInfo(fileId).then((fileInfo: IFileInfo) => {
                 if(fileInfo.found && fileInfo.size > 0) {
                     return;
                 } else {

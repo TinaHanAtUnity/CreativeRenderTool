@@ -1,4 +1,4 @@
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Model } from 'Core/Models/Model';
 
 export enum PlacementState {
@@ -34,6 +34,7 @@ interface IPlacement {
     previousState: PlacementState;
     placementStateChanged: boolean;
     currentCampaign: Campaign | undefined;
+    currentTrackingUrls: ICampaignTrackingUrls | undefined;
     refreshDelay: number | undefined;
     position: string | undefined;
     auctionType: PlacementAuctionType;
@@ -58,6 +59,7 @@ export class Placement extends Model<IPlacement> {
             previousState: ['number'],
             placementStateChanged: ['boolean'],
             currentCampaign: ['object', 'undefined'],
+            currentTrackingUrls: ['object', 'undefined'],
             refreshDelay: ['number', 'undefined'],
             position: ['string', 'undefined'],
             auctionType: ['string']
@@ -164,6 +166,14 @@ export class Placement extends Model<IPlacement> {
 
     public setCurrentCampaign(campaign: Campaign | undefined): void {
         this.set('currentCampaign', campaign);
+    }
+
+    public getCurrentTrackingUrls(): ICampaignTrackingUrls | undefined {
+        return this.get('currentTrackingUrls');
+    }
+
+    public setCurrentTrackingUrls(trackingUrls: ICampaignTrackingUrls | undefined) {
+        this.set('currentTrackingUrls', trackingUrls);
     }
 
     public getRealtimeData(): string | undefined {
