@@ -30,7 +30,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 const spy = sinon.spy(core.Android!.Broadcast, 'addBroadcastListener');
                 return focusManager.setListenScreen(true).then(() => {
                     sinon.assert.calledOnce(spy);
-                    assert.deepEqual(spy.getCall(0).args[1], ['android.intent.action.SCREEN_ON', 'android.intent.action.SCREEN_OFF']);
+                    assert.deepEqual(spy.getCall(0).args[1], ['android.intent.action.SCREEN_ON']);
                 });
             });
 
@@ -120,14 +120,6 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 focusManager.onScreenOn.subscribe(spy);
 
                 core.Android!.Broadcast.handleEvent('ACTION', ['screenListener', 'android.intent.action.SCREEN_ON', '', {}]);
-                sinon.assert.calledOnce(spy);
-            });
-
-            it('should trigger onScreenOff', () => {
-                const spy = sinon.spy();
-                focusManager.onScreenOff.subscribe(spy);
-
-                core.Android!.Broadcast.handleEvent('ACTION', ['screenListener', 'android.intent.action.SCREEN_OFF', '', {}]);
                 sinon.assert.calledOnce(spy);
             });
         }

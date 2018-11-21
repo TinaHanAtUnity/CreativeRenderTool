@@ -27,6 +27,18 @@ export abstract class CampaignLoader {
             session.setAdPlan(rawSession.adPlan);
         }
 
+        // Set all GameSessionCounters to zero, this will make evaluation service ignore these Counters for the model
+        session.setGameSessionCounters({
+            adRequests: 0,
+            starts: 0,
+            views: 0,
+            startsPerCampaign: {},
+            startsPerTarget: {},
+            viewsPerCampaign: {},
+            viewsPerTarget: {},
+            latestCampaignsStarts: {}
+        });
+
         return session;
     }
 
