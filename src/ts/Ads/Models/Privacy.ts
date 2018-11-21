@@ -7,6 +7,13 @@ export enum PrivacyMethod {
     DEVELOPER_CONSENT = 'developer_consent'
 }
 
+export interface IUnityConsentPermissions {
+    gameExp: boolean;
+    ads: boolean;
+    external: boolean;
+}
+
+
 const CurrentUnityConsentVersion = 20181106;
 
 interface IGamePrivacy {
