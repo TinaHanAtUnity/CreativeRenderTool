@@ -354,9 +354,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             return Promise.resolve();
         }
 
-        const { data } = event.data;
-        const functionName = data.functionName;
-        const args = data.args;
+        const functionName = event.data.functionName;
+        const args = event.data.args;
 
         switch (functionName) {
             case 'resetPose':

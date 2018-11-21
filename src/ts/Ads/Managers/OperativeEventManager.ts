@@ -303,9 +303,10 @@ export class OperativeEventManager {
     }
 
     protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, any]> {
+        const session = this._campaign.getSession();
         let infoJson: any = {
             'eventId': eventId,
-            'auctionId': this._campaign.getSession().getId(),
+            'auctionId': session.getId(),
             'gameSessionId': gameSession,
             'campaignId': this._campaign.getId(),
             'adType': this._campaign.getAdType(),
@@ -329,7 +330,7 @@ export class OperativeEventManager {
             'gdprEnabled': this._adsConfig.isGDPREnabled(),
             'optOutEnabled': this._adsConfig.isOptOutEnabled(),
             'optOutRecorded': this._adsConfig.isOptOutRecorded(),
-            'gameSessionCounters': GameSessionCounters.getDTO()
+            'gameSessionCounters': session.getGameSessionCounters()
         };
 
         if(this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
