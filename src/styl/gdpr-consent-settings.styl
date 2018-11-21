@@ -11,16 +11,23 @@
   background: $white;
   overflow: hidden;
 
-  .container {
+  .back-button {
+    font-size: $default-font-size * .65
+    color: $black;
+    opacity: .5;
+    width: 2 * $default-size;
     padding: $default-size;
   }
 
+  .container {
+    padding: 0 $default-size 0 $default-size;
+  }
+
   .personalization-container {
-    height: 50%;
+    height: 40%;
     overflow: auto;
 
     .privacy-info-title {
-      padding-top: $default-size;
       font-weight: 500;
     }
 
