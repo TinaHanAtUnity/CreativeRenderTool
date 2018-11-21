@@ -48,10 +48,6 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._purchasing = parameters.purchasing;
     }
 
-    public open(): Promise<void> {
-        return Promise.resolve();
-    }
-
     public show(): Promise<void> {
         this.setShowing(true);
         this._ads.Listener.sendStartEvent(this._placement.getId());

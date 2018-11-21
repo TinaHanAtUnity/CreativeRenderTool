@@ -68,6 +68,7 @@ import { VPAID } from 'VPAID/VPAID';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromo } from 'XPromo/XPromo';
 import { AR } from 'AR/AR';
+import { GDPRConsent } from 'Ads/Views/Consent/GDPRConsent';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
@@ -221,8 +222,33 @@ export class Ads implements IAds {
         });
     }
 
+    public showConsent(placementId: string, options: any, callback: INativeCallback): Promise<void> {
+        return (<AdUnitContainer>this.Container).open('Consent', ['webview'], false, Orientation.NONE, true, true, true, false, options).then(() => {
+            const consentView = new GDPRConsent({ platform: this._core.NativeBridge.getPlatform() });
+            consentView.setDoneCallback(() => {
+                this.consentDone(placementId, options, callback);
+            });
+            this._core.Api.Sdk.logDebug('showConsent, about to render view');
+            consentView.render();
+            this._core.Api.Sdk.logDebug('showConsent, rendered, about to append');
+            document.body.appendChild(consentView.container());
+            this._core.Api.Sdk.logDebug('showConsent, appended, about to show');
+            return consentView.show();
+        }).catch((e: Error) => {
+            this._core.Api.Sdk.logWarning('Error opening Consent view ' + e);
+            this.consentDone(placementId, options, callback);
+        });
+    }
+
+    public consentDone(placementId: string, options: any, callback: INativeCallback): void {
+        this._core.Api.Sdk.logDebug('consentDone, Consent stuff is done, showing ad');
+        (<AdUnitContainer>this.Container).close().then(() => {
+            this.show(placementId, options, callback);
+        });
+    }
+
     public show(placementId: string, options: any, callback: INativeCallback): void {
-        callback(CallbackStatus.OK);
+        // callback(CallbackStatus.OK);
 
         if(this._showing) {
             // do not send finish event because there will be a finish event from currently open ad unit

@@ -77,10 +77,11 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     public abstract onVideoError(): void;
 
     public show(): Promise<void> {
+        this.setShowing(true);
         this.setActive(true);
 
         this._container.addEventHandler(this);
-        return this.openContainer(this, ['videoplayer', 'webview'], true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options).then(() => {
+        return this._container.open(this, ['videoplayer', 'webview'], true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options).then(() => {
             this.onStart.trigger();
         });
     }
@@ -100,24 +101,6 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         return this._container.close().then(() => {
             this.onClose.trigger();
         });
-    }
-
-    public showAd(): void {
-        this.setShowing(true);
-
-        const overlay = this.getOverlay();
-        if(overlay) {
-            overlay.show();
-        }
-
-        if(this._platform === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
-            if(this.getVideo().isCached()) {
-                this._ads.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
-            } else {
-                this._ads.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
-            }
-        }
-        this.prepareVideo();
     }
 
     public setVideoState(videoState: VideoState): void {
@@ -289,7 +272,6 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                 overlay.setSkipEnabled(true);
                 overlay.setSkipDuration(this._placement.allowSkipInSeconds());
             }
-            overlay.hide();
         }
     }
 

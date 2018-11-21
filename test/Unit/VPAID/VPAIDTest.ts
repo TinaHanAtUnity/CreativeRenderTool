@@ -98,6 +98,13 @@ describe('VPAID View', () => {
         it('should send the "destroy" event', verifyEventSent('destroy'));
     });
 
+    describe('showAd', () => {
+        beforeEach(() => {
+            view.showAd();
+        });
+        it('should send the "show" event', verifyEventSent('show'));
+    });
+
     describe('pauseAd', () => {
         beforeEach(() => {
             view.pauseAd();

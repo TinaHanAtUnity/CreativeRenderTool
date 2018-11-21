@@ -80,10 +80,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._closer.choosePrivacyShown();
     }
 
-    public open(): Promise<void> {
-        return Promise.resolve();
-    }
-
     public show(): Promise<void> {
         this.onShow();
         return this.setupWebPlayer().then(() => {

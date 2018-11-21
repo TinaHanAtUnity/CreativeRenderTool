@@ -13,8 +13,6 @@ import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
-import { GDPRConsent } from 'Ads/Views/Consent/GDPRConsent';
-import { GDPRConsentHandler } from 'Ads/EventHandlers/GDPRConsentHandler';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -27,8 +25,6 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
     }
 
     public createAdUnit(parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
-        const gdprConsent = new GDPRConsent({platform: parameters.platform});
-
         const privacy = this.createPrivacy(parameters);
         const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose();
         const overlay = this.createOverlay(parameters, privacy, showPrivacyDuringVideo);
@@ -50,8 +46,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
             overlay: overlay,
             endScreen: endScreen,
             adUnitStyle: adUnitStyle,
-            privacy: privacy,
-            gdprConsentView: gdprConsent
+            privacy: privacy
         };
 
         const performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
@@ -96,8 +91,6 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
             });
         }
         Privacy.setupReportListener(privacy, performanceAdUnit);
-
-        gdprConsent.addEventHandler(new GDPRConsentHandler(performanceAdUnit, parameters));
 
         return performanceAdUnit;
     }

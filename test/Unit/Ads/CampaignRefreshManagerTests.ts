@@ -85,9 +85,6 @@ export class TestContainer extends AdUnitContainer {
 
 export class TestAdUnit extends AbstractAdUnit {
 
-    public open(): Promise<void> {
-        return Promise.resolve();
-    }
     public show(): Promise<void> {
         return Promise.resolve();
     }

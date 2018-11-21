@@ -69,10 +69,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         }
     }
 
-    public open(): Promise<void> {
-        return Promise.resolve();
-    }
-
     public show(): Promise<void> {
         this.setShowing(true);
         this._onPageStartedObserver = this._webPlayerContainer.onPageStarted.subscribe((url) => this.onPageStarted(url));

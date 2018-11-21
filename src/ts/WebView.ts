@@ -1,10 +1,11 @@
 import { Core } from 'Core/Core';
-import { INativeCallback, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { INativeCallback, NativeBridge, CallbackStatus } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export class WebView {
 
     private readonly _core: Core;
+    private _showConsent: boolean = true;
 
     constructor(nativeBridge: NativeBridge) {
         if(window && window.addEventListener) {
@@ -19,7 +20,13 @@ export class WebView {
     }
 
     public show(placementId: string, options: any, callback: INativeCallback): void {
-        this._core.Ads.show(placementId, options, callback);
+        callback(CallbackStatus.OK);
+        if (this._showConsent) {
+            this._core.Ads.showConsent(placementId, options, callback);
+            this._showConsent = false;
+        } else {
+            this._core.Ads.show(placementId, options, callback);
+        }
     }
 
     public showBanner(placementId: string, callback: INativeCallback) {
@@ -28,6 +35,10 @@ export class WebView {
 
     public hideBanner(callback: INativeCallback) {
         this._core.Ads.hideBanner(callback);
+    }
+
+    public setShowConsent(val: boolean) {
+        this._showConsent = val;
     }
 
     private onError(event: ErrorEvent): boolean {

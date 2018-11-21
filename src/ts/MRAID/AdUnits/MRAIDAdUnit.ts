@@ -73,10 +73,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowing(false);
     }
 
-    public open(): Promise<void> {
-        return Promise.resolve();
-    }
-
     public show(): Promise<void> {
         this.setShowing(true);
         this.setShowingMRAID(true);

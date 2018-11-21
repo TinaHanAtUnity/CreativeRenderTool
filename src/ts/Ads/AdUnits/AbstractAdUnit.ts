@@ -21,7 +21,6 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
-import { GDPRConsent } from 'Ads/Views/Consent/GDPRConsent';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -47,7 +46,6 @@ export interface IAdUnitParameters<T extends Campaign> {
     webPlayerContainer?: WebPlayerContainer;
     programmaticTrackingService: ProgrammaticTrackingService;
     gameSessionId?: number;
-    gdprConsentView?: GDPRConsent;
 }
 
 export abstract class AbstractAdUnit {
@@ -87,7 +85,6 @@ export abstract class AbstractAdUnit {
     private _showing: boolean;
     private _finishState: FinishState;
     private _baseCampaign: Campaign;
-    private _gdprConsent: GDPRConsent | undefined;
 
     constructor(parameters: IAdUnitParameters<Campaign>) {
         this._platform = parameters.platform;
@@ -98,19 +95,6 @@ export abstract class AbstractAdUnit {
         this._showing = false;
         this._finishState = FinishState.ERROR;
         this._baseCampaign = parameters.campaign;
-        this._gdprConsent = parameters.gdprConsentView;
-    }
-
-    protected openContainer(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: any): Promise<void> {
-        if (this._gdprConsent) {
-            this.setShowing(false);
-            this._gdprConsent.render();
-            document.body.appendChild(this._gdprConsent.container());
-            this._gdprConsent.show();
-        } else {
-            this.setShowing(true);
-        }
-        return this._container.open(this, views, allowRotation, forceOrientation, disableBackbutton, isTransparent, withAnimation, allowStatusBar, options);
     }
 
     public abstract show(): Promise<void>;

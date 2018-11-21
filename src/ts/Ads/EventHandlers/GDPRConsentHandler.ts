@@ -14,7 +14,6 @@ export class GDPRConsentHandler<T extends Campaign> implements IGDPRConsentHandl
 
     public onConsent(consent: boolean): void {
         // todo: send events
-        (<VideoAdUnit>this.adUnit).showAd();
     }
 
     public onShowOptions(): void {

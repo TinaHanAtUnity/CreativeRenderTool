@@ -14,9 +14,9 @@ export interface IGDPRConsentHandler {
 }
 
 export class GDPRConsent extends View<IGDPRConsentHandler> {
-
     private _parameters: IGDPRConsentViewParameters;
     private _consentSettingsView: GDPRConsentSettings;
+    private _doneCallback: () => void;
 
     constructor(parameters: IGDPRConsentViewParameters) {
         super(parameters.platform, 'gdpr-consent');
@@ -49,10 +49,16 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
 
     }
 
+    // TODO: I feel this could be done neater
+    public setDoneCallback(callback: () => void): void {
+        this._doneCallback = callback;
+    }
+
     private onAgreeEvent(event: Event) {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onConsent(true));
         this.hide();
+        this._doneCallback();
     }
 
     private onOptionsEvent(event: Event) {
