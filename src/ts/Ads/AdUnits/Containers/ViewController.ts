@@ -58,7 +58,7 @@ export class ViewController extends AdUnitContainer {
         this._onNotificationObserver = this._core.iOS!.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
     }
 
-    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IIosOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit | string, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IIosOptions): Promise<void> {
         this._options = options;
         this._showing = true;
 
@@ -80,7 +80,13 @@ export class ViewController extends AdUnitContainer {
         this._core.iOS!.Notification.addAVNotificationObserver(ViewController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
         this._core.iOS!.Notification.addAVNotificationObserver(ViewController._audioSessionRouteChange, ['AVAudioSessionRouteChangeReasonKey']);
 
-        this._core.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + Orientation[this._lockedOrientation]);
+        let adUnitString;
+        if (typeof adUnit === 'string') {
+            adUnitString = adUnit;
+        } else {
+            adUnitString = adUnit.description();
+        }
+        this._core.Sdk.logInfo('Opening ' + adUnitString + ' ad with orientation ' + Orientation[this._lockedOrientation]);
 
         let hideStatusBar = true;
         if (allowStatusBar) {

@@ -56,7 +56,7 @@ export class Activity extends AdUnitContainer {
         this._onRestoreObserver = this._ads.Android!.AdUnit.onRestore.subscribe((activityId) => this.onRestore(activityId));
     }
 
-    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IAndroidOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit | string, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IAndroidOptions): Promise<void> {
         this._activityId++;
         this._currentActivityFinished = false;
         this._androidOptions = options;
@@ -79,8 +79,13 @@ export class Activity extends AdUnitContainer {
         }
 
         const hardwareAccel: boolean = this.isHardwareAccelerationAllowed();
-
-        this._core.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + Orientation[this._lockedOrientation] + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
+        let adUnitString;
+        if (typeof adUnit === 'string') {
+            adUnitString = adUnit;
+        } else {
+            adUnitString = adUnit.description();
+        }
+        this._core.Sdk.logInfo('Opening ' + adUnitString + ' ad unit with orientation ' + Orientation[this._lockedOrientation] + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
         this._onFocusGainedObserver = this._ads.Android!.AdUnit.onFocusGained.subscribe(() => this.onFocusGained());
         this._onFocusLostObserver = this._ads.Android!.AdUnit.onFocusLost.subscribe(() => this.onFocusLost());

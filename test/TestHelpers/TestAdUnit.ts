@@ -7,10 +7,6 @@ export class TestAdUnit extends AbstractAdUnit {
         super(parameters);
     }
 
-    public open(): Promise<void> {
-        return Promise.resolve();
-    }
-
     public show(): Promise<void> {
         return Promise.resolve();
     }

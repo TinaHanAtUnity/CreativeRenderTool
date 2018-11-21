@@ -19,19 +19,17 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
 
     constructor(platform: Platform) {
         super(platform, 'gdpr-consent-settings');
-
         this._template = new Template(GDPRConsentSettingsTemplate);
 
         this._bindings = [
             {
-            event: 'click',
-            listener: (event: Event) => this.onBackButtonEvent(event),
-            selector: '.back-button'
-
+                event: 'click',
+                listener: (event: Event) => this.onBackButtonEvent(event),
+                selector: '.back-button'
             }
         ];
 
-        this._infoContainer = new PrivacyRowItemContainer(this._platform);
+        this._infoContainer = new PrivacyRowItemContainer(platform);
     }
 
     public render(): void {
@@ -39,15 +37,6 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
 
         this._infoContainer.render();
         (<HTMLElement>this._container.querySelector('.info-container')).appendChild(this._infoContainer.container());
-    }
-
-    public hide(): void {
-        super.hide();
-        //
-        // this._infoContainer.hide();
-        // if(this._infoContainer.container().parentElement) {
-        //     this._infoContainer.container().parentElement!.removeChild(this._infoContainer.container());
-        // }
     }
 
     private onBackButtonEvent(event: Event): void {
