@@ -15,7 +15,6 @@ export class FocusManager {
     public readonly onActivityPaused = new Observable1<string>();
     public readonly onActivityDestroyed = new Observable1<string>();
     public readonly onScreenOn = new Observable0();
-    public readonly onScreenOff = new Observable0();
 
     private readonly _core: ICoreApi;
 
@@ -23,7 +22,6 @@ export class FocusManager {
     private _topActivity?: string;
     private _screenListener: string = 'screenListener';
     private ACTION_SCREEN_ON: string = 'android.intent.action.SCREEN_ON';
-    private ACTION_SCREEN_OFF: string = 'android.intent.action.SCREEN_OFF';
 
     constructor(platform: Platform, core: ICoreApi) {
         this._appForeground = true;
@@ -64,7 +62,7 @@ export class FocusManager {
 
     public setListenScreen(status: boolean): Promise<void> {
         if(status) {
-            return this._core.Android!.Broadcast.addBroadcastListener(this._screenListener, [this.ACTION_SCREEN_ON, this.ACTION_SCREEN_OFF]);
+            return this._core.Android!.Broadcast.addBroadcastListener(this._screenListener, [this.ACTION_SCREEN_ON]);
         } else {
             return this._core.Android!.Broadcast.removeBroadcastListener(this._screenListener);
         }
@@ -110,10 +108,6 @@ export class FocusManager {
         switch(action) {
             case this.ACTION_SCREEN_ON:
                 this.onScreenOn.trigger();
-                break;
-
-            case this.ACTION_SCREEN_OFF:
-                this.onScreenOff.trigger();
                 break;
 
             default:

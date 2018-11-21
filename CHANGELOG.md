@@ -1,6 +1,13 @@
-# Pending
+# Staged
 
 * VAST media selector rollout [#7225](https://github.com/Applifier/unity-ads-webview/pull/7225)
+* Fix broken AR events [#7227](https://github.com/Applifier/unity-ads-webview/pull/7227)
+* Fix firing VAST tracking events from Auction [#7226](https://github.com/Applifier/unity-ads-webview/pull/7226)
+* Add auctionType for placements from config service [#7098](https://github.com/Applifier/unity-ads-webview/pull/7098)
+* Fix rejected HEAD request for followRedirectChain [#7179](https://github.com/Applifier/unity-ads-webview/pull/7179)
+* Game session counters: send state of last adrequest [#7107](https://github.com/Applifier/unity-ads-webview/pull/7107)
+* Test new Travis VM based infra [#7228](https://github.com/Applifier/unity-ads-webview/pull/7228)
+* Remove SCREEN_OFF broadcast [#7229](https://github.com/Applifier/unity-ads-webview/pull/7229)
 
 # Wed Nov 21 00:12:25 UTC 2018
 
