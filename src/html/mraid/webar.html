@@ -109,6 +109,32 @@
             callNativeFunction('log', message);
         }
 
+        /**
+         * Nonexistent potential of getting same value with ID's created at the
+         * same millisecond:
+         * https://stackoverflow.com/questions/28199100/probability-of-getting-the-same-value-using-math-random/28220928#28220928
+         * @returns {number} A unique ID.
+         */
+        function createID() {
+            return Date.now() + Math.floor(Math.random() * 1000.0);
+        }
+
+        /**
+         * Checks whether or not an ID exists within an array.
+         * @param {number} id The ID to search for.
+         * @param {any[]} arr The array to search in.
+         * @returns {boolean} If the ID exists in the array.
+         */
+        function idExistsInArray(id, arr) {
+            var len = arr.length;
+            for (var i = 0; i < len; i++) {
+                if (arr[i] === id) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         var nextDisplayId = 1000;
 
         var pixels = null;
@@ -1239,6 +1265,8 @@
         // If at some point the original raf is performant enough, remove this.
         var oldRequestAnimationFrame = window.requestAnimationFrame;
         var rafCallbacks = [];
+        var rafIds = [];
+        var rafID = -1;
         var newRequestAnimationFrame = function(callback) {
             if (typeof callback !== "function") {
                 throw new TypeError(
@@ -1246,10 +1274,19 @@
                     "The callback provided as parameter 1 is not a function."
                 );
             }
+            rafID = createID();
             rafCallbacks.push(callback);
+            rafIds.push(rafID);
+            return rafID;
         };
 
-
+        var oldCancelAnimationFrame = window.cancelAnimationFrame;
+        var rafCancels = [];
+        var newCancelAnimationFrame = function(id) {
+            if (idExistsInArray(id, rafCancels)) {
+                rafCancels.push(id);
+            }
+        };
 
         function forceRedraw() {
             // Modify the DOM trivially to force a redraw.
@@ -1272,6 +1309,7 @@
             }
             console.log = newConsoleLog;
             window.requestAnimationFrame = newRequestAnimationFrame;
+            window.cancelAnimationFrame = newCancelAnimationFrame;
             windowHooksInstalled = true;
         };
 
@@ -1281,6 +1319,7 @@
             }
             console.log = oldConsoleLog;
             window.requestAnimationFrame = oldRequestAnimationFrame;
+            window.cancelAnimationFrame = oldCancelAnimationFrame;
             windowHooksInstalled = false;
         };
 
@@ -1314,7 +1353,7 @@
             return WebARonARKitVRDisplay.androidEnums;
         };
 
-        function raf() {
+        function raf(now) {
             var frameStr = nativeGetFrame();
             var frame = JSON.parse(frameStr);
             if (frame.data) {
@@ -1324,7 +1363,7 @@
                     window.WebARonARKitDispatchARDisplayEvent(frame.planes);
                 }
 
-                callRafCallbacks();
+                callRafCallbacks(now);
 
                 // Only on Android!
                 if (window.ARCore) {
@@ -1345,15 +1384,23 @@
          * Call all update functions - called when native sets device data to achieve
          * synchronization between device pose and rendering.
          */
-        function callRafCallbacks() {
-            var rafCallbacksCopy = new Array(rafCallbacks.length);
-            for (var i = 0; i < rafCallbacks.length; i++) {
-                rafCallbacksCopy[i] = rafCallbacks[i];
-            }
-            rafCallbacks = [];
+        function callRafCallbacks(now) {
+            var len = rafCallbacks.length;
+            var cancelLen = rafCancels.length;
 
-            for (var i = 0; i < rafCallbacksCopy.length; i++) {
-                rafCallbacksCopy[i](performance.now());
+            // copy & reset the arrays
+            var rafCallbacksCopy = rafCallbacks.slice(0);
+            var rafIdsCopy = rafIds.slice(0);
+            var rafCancelsCopy = rafCancels.slice(0);
+            rafCallbacks = [];
+            rafIds = [];
+            rafCancels = [];
+
+            for (var i = 0; i < len; i++) {
+                if (cancelLen > 0 && idExistsInArray(rafIdsCopy[i], rafCancelsCopy)) {
+                    continue;
+                }
+                rafCallbacksCopy[i](now);
             }
         }
 
