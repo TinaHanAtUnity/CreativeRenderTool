@@ -2,7 +2,7 @@
 
 * VAST media selector rollout [#7225](https://github.com/Applifier/unity-ads-webview/pull/7225)
 
-# Staged
+# Wed Nov 21 00:12:25 UTC 2018
 
 * Auction V5 Test Disabled for Thanksgiving (No PR)
 * Set tracking URLs before showing (auction v5 fix) [#7223](https://github.com/Applifier/unity-ads-webview/pull/7223)
