@@ -16,6 +16,7 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
 // @stylint on
 
 #new-video-overlay {
+  position: fixed;
   width: 100%;
   height: 100%;
   background-color: transparent;
@@ -68,26 +69,26 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     }
   }
 
-  .skip-button:not(.close-icon-skip):not(.exit-icon-skip) {
+  .skip-button:not(.close-icon-skip):not(.next-icon-skip) {
     .icon-skip {
       display: block;
     }
     .icon-close {
       display: none;
     }
-    .test-icon-exit {
+    .test-icon-next {
       display: none;
     }
   }
 
-  .skip-button.exit-icon-skip {
+  .skip-button.next-icon-skip {
     .icon-skip {
       display: none;
     }
     .icon-close {
       display: none;
     }
-    .test-icon-exit {
+    .test-icon-next {
       display: block;
     }
   }
@@ -99,7 +100,7 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     .icon-close {
       display: block;
     }
-    .test-icon-exit {
+    .test-icon-next {
       display: none;
     }
   }
@@ -434,6 +435,11 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     &.show-gdpr-banner {
       .bottom-container {
         height: $new-video-overlay-styles.touchable-area-height * 2;
+
+        .left-corner,
+        .right-corner {
+          bottom: auto;
+        }
 
         .center {
           bottom: 0;

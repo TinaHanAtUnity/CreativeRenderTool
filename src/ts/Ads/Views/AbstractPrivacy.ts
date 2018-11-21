@@ -1,9 +1,9 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { Platform } from 'Core/Constants/Platform';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { ITemplateData, View } from 'Core/Views/View';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
@@ -15,7 +15,7 @@ export interface IBuildInformation extends ITemplateData {
     userAgent: string;
     platform: string;
     campaign: string;
-    apiLevel: number;
+    osVersion: string;
     group: number;
     sdk: string;
     webview: string | null;
@@ -40,13 +40,13 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
         };
     }
 
-    public static createBuildInformation(platform: Platform, clientInfo: ClientInfo, deviceInfo: AndroidDeviceInfo, campaign: Campaign, configuration: CoreConfiguration) {
+    public static createBuildInformation(platform: Platform, clientInfo: ClientInfo, deviceInfo: DeviceInfo, campaign: Campaign, configuration: CoreConfiguration) {
         const date = new Date();
         AbstractPrivacy.buildInformation = {
             userAgent: window.navigator.userAgent,
             platform: platform === Platform.IOS ? 'iOS' : 'Android',
             campaign: campaign.getId(),
-            apiLevel: deviceInfo.getApiLevel(),
+            osVersion: deviceInfo.getOsVersion(),
             group: configuration.getAbGroup().toNumber(),
             sdk: clientInfo.getSdkVersionName(),
             webview: clientInfo.getWebviewVersion(),
