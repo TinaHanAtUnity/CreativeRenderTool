@@ -60,7 +60,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _abGroup: ABGroup;
     private _campaign: Campaign;
 
-    constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean) {
+    constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
         super(parameters.platform, 'new-video-overlay', parameters.placement.muteVideo());
 
         this._ads = parameters.ads;

@@ -629,7 +629,7 @@ export class TestFixtures {
             coreConfig: TestFixtures.getCoreConfiguration(),
             placement: TestFixtures.getPlacement()
         };
-        return new NewVideoOverlay(overlayParams, TestFixtures.getPrivacy(platform, campaign), false);
+        return new NewVideoOverlay(overlayParams, TestFixtures.getPrivacy(platform, campaign), false, false);
     }
 
     public static getXPromoAdUnitParameters(platform: Platform, core: ICoreApi, ads: IAdsApi, ar: IARApi, purchasing: IPurchasingApi): IXPromoAdUnitParameters {

@@ -58,7 +58,7 @@ describe('VideoOverlayTest', () => {
     });
 
     it('should render', () => {
-        const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false);
+        const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
         overlay.render();
         assert.isNotNull(overlay.container().innerHTML);
         assert.isNotNull(overlay.container().querySelector('.skip-button'));
@@ -73,14 +73,14 @@ describe('VideoOverlayTest', () => {
 
     it('should render with translations', () => {
         videoOverlayParameters.deviceInfo.getLanguage = () => 'fi';
-        const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false);
+        const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
         overlay.render();
         const callToActionElement = overlay.container().querySelectorAll('.call-button .download-text')[0];
         assert.equal(callToActionElement.innerHTML, 'Asenna nyt');
     });
 
     it('should render PerformanceCampaign with install button', () => {
-        const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false);
+        const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
         overlay.render();
         assert.isNotNull(overlay.container().querySelector('.install-button'));
         assert.isNull(overlay.container().querySelector('.vast-button'));
@@ -88,7 +88,7 @@ describe('VideoOverlayTest', () => {
 
     it('should render VastCampaign with VAST call to action button', () => {
         videoOverlayParameters.campaign = TestFixtures.getCompanionVastCampaign();
-        const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false);
+        const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
         overlay.render();
         assert.isNotNull(overlay.container().querySelector('.vast-button'));
         assert.isNull(overlay.container().querySelector('.install-button'));
