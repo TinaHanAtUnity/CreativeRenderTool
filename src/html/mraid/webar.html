@@ -110,16 +110,6 @@
         }
 
         /**
-         * Nonexistent potential of getting same value with ID's created at the
-         * same millisecond:
-         * https://stackoverflow.com/questions/28199100/probability-of-getting-the-same-value-using-math-random/28220928#28220928
-         * @returns {number} A unique ID.
-         */
-        function createID() {
-            return Date.now() + Math.floor(Math.random() * 1000.0);
-        }
-
-        /**
          * Checks whether or not an ID exists within an array.
          * @param {number} id The ID to search for.
          * @param {any[]} arr The array to search in.
@@ -1266,7 +1256,7 @@
         var oldRequestAnimationFrame = window.requestAnimationFrame;
         var rafCallbacks = [];
         var rafIds = [];
-        var rafID = -1;
+        var rafID = 1;
         var newRequestAnimationFrame = function(callback) {
             if (typeof callback !== "function") {
                 throw new TypeError(
@@ -1274,7 +1264,7 @@
                     "The callback provided as parameter 1 is not a function."
                 );
             }
-            rafID = createID();
+            rafID += 1;
             rafCallbacks.push(callback);
             rafIds.push(rafID);
             return rafID;
