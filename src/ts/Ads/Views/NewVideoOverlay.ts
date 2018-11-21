@@ -42,6 +42,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _videoProgress: number;
 
     private _muteEnabled: boolean = false;
+    private _showPrivacyDuringVideo: boolean = false;
 
     private _debugMessageVisible: boolean = false;
     private _callButtonVisible: boolean = false;
@@ -70,6 +71,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._abGroup = parameters.coreConfig.getAbGroup();
         this._campaign = parameters.campaign;
         this._showGDPRBanner = showGDPRBanner;
+        this._showPrivacyDuringVideo = showPrivacyDuringVideo;
         this._templateData = {
             muted: parameters.placement.muteVideo()
         };
@@ -253,7 +255,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     protected choosePrivacyShown(): void {
-        if (this._showGDPRBanner) {
+        if (!this._showPrivacyDuringVideo) {
+            this._container.classList.remove('show-gdpr-banner');
+            this._container.classList.remove('show-gdpr-button');
+        } else if (this._showGDPRBanner) {
             this._container.classList.add('show-gdpr-banner');
             this._container.classList.remove('show-gdpr-button');
         } else {
