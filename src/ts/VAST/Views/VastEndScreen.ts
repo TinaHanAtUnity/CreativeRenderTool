@@ -13,7 +13,6 @@ export interface IVastEndScreenHandler {
     onVastEndScreenClose(): void;
     onVastEndScreenShow(): void;
     onKeyEvent(keyCode: number): void;
-    onOpenUrl(url: string): Promise<void>;
 }
 
 export interface IVastEndscreenParameters {

@@ -8,6 +8,9 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { Url } from 'Core/Utilities/Url';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -66,19 +69,32 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
-            return this._request.followRedirectChain(clickThroughURL).then(
-                (url: string) => {
-                    return this.openUrl(url).then(() => {
-                        this.setCallButtonEnabled(true);
-                        this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
-                    }).catch((e) => {
-                        this.setCallButtonEnabled(true);
-                    });
-                }
-            );
+            return this._request.followRedirectChain(clickThroughURL, true).then((url: string) => {
+                return this.openUrlOnCallButton(url);
+            }).catch(() => {
+                const urlParts = Url.parse(clickThroughURL);
+                const error = new DiagnosticError(new Error('VAST overlay clickThroughURL error'), {
+                    contentType: 'vast_overlay',
+                    clickUrl: clickThroughURL,
+                    host: urlParts.host,
+                    protocol: urlParts.protocol,
+                    creativeId: this._vastCampaign.getCreativeId()
+                });
+                Diagnostics.trigger('click_request_head_rejected', error);
+                return this.openUrlOnCallButton(clickThroughURL);
+            });
         } else {
             return Promise.reject(new Error('No clickThroughURL was defined'));
         }
+    }
+
+    private openUrlOnCallButton(url: string): Promise<void> {
+        return this.openUrl(url).then(() => {
+            this.setCallButtonEnabled(true);
+            this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+        }).catch(() => {
+            this.setCallButtonEnabled(true);
+        });
     }
 
     private openUrl(url: string): Promise<void> {

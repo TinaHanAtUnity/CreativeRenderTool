@@ -3,6 +3,8 @@ import { Platform } from 'Core/Constants/Platform';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import InterstitialOverlayTemplate from 'html/InterstitialOverlay.html';
+import { Campaign } from 'Ads/Models/Campaign';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export class ClosableVideoOverlay extends AbstractVideoOverlay {
 
@@ -24,8 +26,9 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
 
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
+    private _campaign: Campaign;
 
-    constructor(platform: Platform, muted: boolean, language: string, gameId: string) {
+    constructor(platform: Platform, campaign: Campaign, muted: boolean, language: string, gameId: string) {
         super(platform, 'closable-video-overlay', muted);
 
         const localization = new Localization(language, 'overlay');
@@ -34,6 +37,7 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
         this._templateData = {
             muted: muted
         };
+        this._campaign = campaign;
 
         this._bindings = [
             {
@@ -130,6 +134,9 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
     }
 
     public setCallButtonVisible(value: boolean) {
+        if (!(this._campaign instanceof VastCampaign)) {
+            return;
+        }
         if(this._callButtonVisible !== value) {
             this._callButtonElement.style.display = value ? 'block' : 'none';
         }
