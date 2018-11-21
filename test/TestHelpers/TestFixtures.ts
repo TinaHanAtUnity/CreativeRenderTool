@@ -170,8 +170,10 @@ export class TestFixtures {
         };
     }
 
-    public static getPerformanceCampaignParams(json: any, storeName: StoreName): IPerformanceCampaign {
-        const session = this.getSession();
+    public static getPerformanceCampaignParams(json: any, storeName: StoreName, session?: Session): IPerformanceCampaign {
+        if (!session) {
+            session = this.getSession();
+        }
         const parameters: IPerformanceCampaign = {
             ... this.getCometCampaignBaseParams(session, json.id, undefined),
             appStoreId: json.appStoreId,
@@ -206,8 +208,10 @@ export class TestFixtures {
         return parameters;
     }
 
-    public static getXPromoCampaignParams(json: any, storeName: StoreName, creativeId: string): IXPromoCampaign {
-        const session = this.getSession();
+    public static getXPromoCampaignParams(json: any, storeName: StoreName, creativeId: string, session?: Session): IXPromoCampaign {
+        if (!session) {
+            session = this.getSession();
+        }
         const baseParams = this.getCometCampaignBaseParams(session, json.id, undefined);
         baseParams.creativeId = creativeId;
         const parameters: IXPromoCampaign = {
@@ -240,10 +244,12 @@ export class TestFixtures {
         return parameters;
     }
 
-    public static getExtendedMRAIDCampaignParams(json: any, storeName: StoreName): IMRAIDCampaign {
+    public static getExtendedMRAIDCampaignParams(json: any, storeName: StoreName, session?: Session): IMRAIDCampaign {
+        if (!session) {
+            session = this.getSession();
+        }
         const mraidContentJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
-        const session = this.getSession();
         return {
             ... this.getCometCampaignBaseParams(session, mraidContentJson.id, undefined, 'PLAYABLE'),
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
@@ -332,8 +338,10 @@ export class TestFixtures {
         };
     }
 
-    public static getVastCampaignParams(vast: Vast, cacheTTL: number, campaignId: string): IVastCampaign {
-        const session = this.getSession();
+    public static getVastCampaignParams(vast: Vast, cacheTTL: number, campaignId: string, session?: Session): IVastCampaign {
+        if (!session) {
+            session = this.getSession();
+        }
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
         if(portraitUrl) {
@@ -367,8 +375,10 @@ export class TestFixtures {
         };
     }
 
-    public static getDisplayInterstitialCampaignBaseParams(json: any, storeName: StoreName, campaignId: string): IDisplayInterstitialCampaign {
-        const session = this.getSession();
+    public static getDisplayInterstitialCampaignBaseParams(json: any, storeName: StoreName, campaignId: string, session?: Session): IDisplayInterstitialCampaign {
+        if (!session) {
+            session = this.getSession();
+        }
         const baseCampaignParams: ICampaign = {
             id: campaignId,
             willExpireAt: json.cacheTTL ? Date.now() + json.cacheTTL * 1000 : undefined,
@@ -477,10 +487,10 @@ export class TestFixtures {
         return new PerformanceCampaign(this.getPerformanceCampaignParams(performanceJson, StoreName.STANDALONE_ANDROID));
     }
 
-    public static getCampaign(): PerformanceCampaign {
+    public static getCampaign(session?: Session): PerformanceCampaign {
         const json = JSON.parse(OnCometVideoPlcCampaign);
         const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-        return new PerformanceCampaign(this.getPerformanceCampaignParams(performanceJson, StoreName.GOOGLE));
+        return new PerformanceCampaign(this.getPerformanceCampaignParams(performanceJson, StoreName.GOOGLE, session));
     }
 
     public static getCampaignWithSquareEndScreenAsset(): PerformanceCampaign {
@@ -489,11 +499,11 @@ export class TestFixtures {
         return new PerformanceCampaign(this.getPerformanceCampaignParams(performanceJson, StoreName.GOOGLE));
     }
 
-    public static getXPromoCampaign(): XPromoCampaign {
+    public static getXPromoCampaign(session?: Session): XPromoCampaign {
         const json = JSON.parse(OnXPromoPlcCampaign);
         const xPromoJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         const creativeId = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].creativeId;
-        return new XPromoCampaign(this.getXPromoCampaignParams(xPromoJson, StoreName.GOOGLE, creativeId));
+        return new XPromoCampaign(this.getXPromoCampaignParams(xPromoJson, StoreName.GOOGLE, creativeId, session));
     }
 
     public static getExtendedMRAIDCampaignFollowsRedirects(): MRAIDCampaign {
@@ -501,9 +511,9 @@ export class TestFixtures {
         return new MRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE));
     }
 
-    public static getExtendedMRAIDCampaign(): MRAIDCampaign {
+    public static getExtendedMRAIDCampaign(session?: Session): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaign);
-        return new MRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE));
+        return new MRAIDCampaign(this.getExtendedMRAIDCampaignParams(json, StoreName.GOOGLE, session));
     }
 
     public static getProgrammaticMRAIDCampaign(customParams: Partial<ICampaign> = {}): MRAIDCampaign {
@@ -529,11 +539,11 @@ export class TestFixtures {
         return new VPAIDCampaign(this.getVPAIDCampaignParams(json, vpaid));
     }
 
-    public static getEventVastCampaign(): VastCampaign {
+    public static getEventVastCampaign(session?: Session): VastCampaign {
         const vastParser = TestFixtures.getVastParser();
         const vastXml = EventTestVast;
         const vast = vastParser.parseVast(vastXml);
-        return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
+        return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345', session));
     }
 
     public static getCompanionVastCampaignWihoutImages(): VastCampaign {
@@ -543,10 +553,10 @@ export class TestFixtures {
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
     }
 
-    public static getDisplayInterstitialCampaign(): DisplayInterstitialCampaign {
+    public static getDisplayInterstitialCampaign(session?: Session): DisplayInterstitialCampaign {
         const json = JSON.parse(DummyDisplayInterstitialCampaign);
         const displayInterstitialParams: IDisplayInterstitialCampaign = {
-            ... this.getDisplayInterstitialCampaignBaseParams(json, StoreName.GOOGLE, '12345'),
+            ... this.getDisplayInterstitialCampaignBaseParams(json, StoreName.GOOGLE, '12345', session),
             dynamicMarkup: json.content
         };
         return new DisplayInterstitialCampaign(displayInterstitialParams);
@@ -978,4 +988,16 @@ export class TestFixtures {
         };
     }
 
+    public static getGameSessionCounters(): any {
+        return {
+            adRequests: 1,
+            starts: 0,
+            views: 0,
+            startsPerCampaign: {},
+            startsPerTarget: {},
+            viewsPerCampaign: {},
+            viewsPerTarget: {},
+            latestCampaignsStarts: {}
+        };
+    }
 }

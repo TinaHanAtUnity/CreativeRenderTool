@@ -91,6 +91,8 @@ export class Request extends BackendApi {
             }
         } else if (url.indexOf('/recursiveResponseCode') !== -1) {
             this.sendSuccessResponse(id, url, 'Recursive redirect response', 301, [['location', 'http://www.example.org/recursiveResponseCode/']]);
+        } else if (url.indexOf('/rejectedResponseCode') !== -1) {
+            this.sendFailResponse(id, url, 'Fail response');
         } else {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
         }

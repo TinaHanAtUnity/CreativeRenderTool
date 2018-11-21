@@ -93,8 +93,9 @@ export abstract class AbstractAdUnitFactory {
         let overlay: AbstractVideoOverlay;
 
         const skipAllowed = parameters.placement.allowSkip();
+
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
-            overlay = new ClosableVideoOverlay(parameters.platform, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            overlay = new ClosableVideoOverlay(parameters.platform, parameters.campaign, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
             overlay = new NewVideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
         }
