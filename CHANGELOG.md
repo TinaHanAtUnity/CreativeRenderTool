@@ -1,5 +1,10 @@
-# Staged
+# Pending
 
+* VAST media selector rollout [#7225](https://github.com/Applifier/unity-ads-webview/pull/7225)
+
+# Wed Nov 21 00:12:25 UTC 2018
+
+* Auction V5 Test Disabled for Thanksgiving (No PR)
 * Set tracking URLs before showing (auction v5 fix) [#7223](https://github.com/Applifier/unity-ads-webview/pull/7223)
 * Show the call button in fadeIn for other than performance and xpromo campaigns [#7182](https://github.com/Applifier/unity-ads-webview/pull/7182)
 * Fix scrollable overlay with MOAT [#7183](https://github.com/Applifier/unity-ads-webview/pull/7183)
