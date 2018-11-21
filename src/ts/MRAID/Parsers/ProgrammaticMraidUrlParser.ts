@@ -14,7 +14,6 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
     public static ContentType = 'programmatic/mraid-url';
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
-
         const jsonMraidUrl = response.getJsonContent();
 
         if(!jsonMraidUrl) {
@@ -36,8 +35,8 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             contentType: ProgrammaticMraidUrlParser.ContentType,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
-            creativeId: response.getCreativeId(),
-            seatId: response.getSeatId(),
+            creativeId: response.getCreativeId() || undefined,
+            seatId: response.getSeatId() || undefined,
             meta: jsonMraidUrl.meta,
             session: session,
             mediaId: response.getMediaId(),

@@ -37,8 +37,8 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeMRAID = 'comet/mraid-url';
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
-
         const json = response.getJsonContent();
+
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;
         switch(campaignStore) {
@@ -64,8 +64,8 @@ export class CometCampaignParser extends CampaignParser {
             contentType: CometCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,
-            creativeId: response.getCreativeId(),
-            seatId: response.getSeatId(),
+            creativeId: response.getCreativeId() || undefined,
+            seatId: response.getSeatId() || undefined,
             meta: json.meta,
             session: session,
             mediaId: response.getMediaId(),

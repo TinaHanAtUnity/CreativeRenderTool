@@ -17,8 +17,8 @@ export class PromoCampaignParser extends CampaignParser {
     public static ContentType = 'purchasing/iap';
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
+        const promoJson = JsonParser.parse(response.getContent());
 
-        const promoJson = response.getJsonContent();
         let willExpireAt: number | undefined;
         if (promoJson.expiry) {
             willExpireAt = parseInt(promoJson.expiry, 10);
@@ -33,8 +33,8 @@ export class PromoCampaignParser extends CampaignParser {
             willExpireAt: willExpireAt ? Date.now() + (willExpireAt * 1000) : undefined,
             adType: promoJson.contentType || response.getContentType(),
             correlationId: undefined,
-            creativeId: response.getCreativeId(),
-            seatId: response.getSeatId(),
+            creativeId: response.getCreativeId() || undefined,
+            seatId: response.getSeatId() || undefined,
             meta: promoJson.meta,
             session: session,
             mediaId: response.getMediaId(),

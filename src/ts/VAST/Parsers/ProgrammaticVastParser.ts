@@ -45,16 +45,16 @@ export class ProgrammaticVastParser extends CampaignParser {
     }
 
     protected parseVastToCampaign(vast: Vast, platform: Platform, campaignId: string, session: Session, response: AuctionResponse, connectionType?: string): Promise<Campaign> {
-
         const cacheTTL = response.getCacheTTL();
+
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(platform),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             contentType: ProgrammaticVastParser.ContentType,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
-            creativeId: response.getCreativeId(),
-            seatId: response.getSeatId(),
+            creativeId: response.getCreativeId() || undefined,
+            seatId: response.getSeatId() || undefined,
             meta: undefined,
             session: session,
             mediaId: response.getMediaId(),

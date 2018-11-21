@@ -15,7 +15,6 @@ export class XPromoCampaignParser extends CampaignParser {
     public static ContentType = 'xpromo/video';
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
-
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
@@ -42,8 +41,8 @@ export class XPromoCampaignParser extends CampaignParser {
             contentType: XPromoCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,
-            creativeId: response.getCreativeId(),
-            seatId: response.getSeatId(),
+            creativeId: response.getCreativeId() || undefined,
+            seatId: response.getSeatId() || undefined,
             meta: json.meta,
             session: session,
             mediaId: response.getMediaId(),

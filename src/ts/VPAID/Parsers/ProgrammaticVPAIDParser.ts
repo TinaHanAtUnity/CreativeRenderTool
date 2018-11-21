@@ -23,7 +23,6 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
             const vpaidMediaFile = this.getVPAIDMediaFile(vast);
             const campaignId = this.getProgrammaticCampaignId(platform);
             if (vpaidMediaFile) {
-
                 const vpaid = this._vpaidParser.parseFromVast(vast, vpaidMediaFile);
 
                 const cacheTTL = response.getCacheTTL();
@@ -34,8 +33,8 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
                     contentType: ProgrammaticVPAIDParser.ContentType,
                     adType: response.getAdType() || undefined,
                     correlationId: response.getCorrelationId() || undefined,
-                    creativeId: response.getCreativeId(),
-                    seatId: response.getSeatId(),
+                    creativeId: response.getCreativeId() || undefined,
+                    seatId: response.getSeatId() || undefined,
                     meta: undefined,
                     session: session,
                     mediaId: response.getMediaId(),
