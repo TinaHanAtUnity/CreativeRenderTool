@@ -854,7 +854,8 @@ export class CampaignManager {
                     if (!placement.isBannerPlacement()) {
                         placementRequest[placementId] = {
                             adTypes: placement.getAdTypes(),
-                            allowSkip: placement.allowSkip()
+                            allowSkip: placement.allowSkip(),
+                            auctionType: placement.getAuctionType()
                         };
                     }
                 });
