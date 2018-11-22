@@ -37,7 +37,6 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
         super.render();
 
         this._infoContainer.render();
-        this._infoContainer.show();
         (<HTMLElement>this._container.querySelector('.info-container')).appendChild(this._infoContainer.container());
     }
 

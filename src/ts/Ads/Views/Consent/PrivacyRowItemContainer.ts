@@ -47,9 +47,8 @@ export class PrivacyRowItemContainer extends View<IPrivacyInfoContainerHandler> 
         ];
     }
 
-    public show(): void {
-        super.show();
-
+    public render(): void {
+        super.render();
         this.fillPersonalInfoFields();
     }
 
