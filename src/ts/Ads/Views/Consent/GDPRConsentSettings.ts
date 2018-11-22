@@ -3,6 +3,7 @@ import GDPRConsentSettingsTemplate from 'html/consent/gdpr-consent-settings.html
 import { Template } from 'Core/Utilities/Template';
 import { PrivacyRowItemContainer } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { Platform } from 'Core/Constants/Platform';
+import { GdprManager } from 'Ads/Managers/GdprManager';
 
 export interface IConsentSettings {
     personalized: boolean;
@@ -17,7 +18,7 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
 
     private _infoContainer: PrivacyRowItemContainer;
 
-    constructor(platform: Platform) {
+    constructor(platform: Platform, gdprManager: GdprManager) {
         super(platform, 'gdpr-consent-settings');
         this._template = new Template(GDPRConsentSettingsTemplate);
 
@@ -29,13 +30,14 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
             }
         ];
 
-        this._infoContainer = new PrivacyRowItemContainer(platform);
+        this._infoContainer = new PrivacyRowItemContainer({ platform: platform, gdprManager: gdprManager });
     }
 
     public render(): void {
         super.render();
 
         this._infoContainer.render();
+        this._infoContainer.show();
         (<HTMLElement>this._container.querySelector('.info-container')).appendChild(this._infoContainer.container());
     }
 
