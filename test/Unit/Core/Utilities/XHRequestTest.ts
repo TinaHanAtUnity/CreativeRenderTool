@@ -103,7 +103,7 @@ describe('XHRequestTest', () => {
         assert.equal(server.requests.length, 1, 'XHRequestTest should create one XMLHttpRequest instance');
 
         // Calling abort on our XMLHttpRequest
-        const xhr: any = server.requests[0];
+        const xhr: unknown = server.requests[0];
         xhr.abort();
 
         try {
@@ -120,7 +120,7 @@ describe('XHRequestTest', () => {
     it('should fail from timeout error', async () => {
         const promise = XHRequest.get('https://api.unity3d.com/test');
 
-        const xhr: any = server.requests[0];
+        const xhr: unknown = server.requests[0];
         xhr.timedOut = true; // Accessing internal sinon variable to trigger timeout. HACK!
         xhr.respond(200, {}, '');
 

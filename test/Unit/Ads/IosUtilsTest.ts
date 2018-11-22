@@ -15,7 +15,7 @@ describe('IosUtilsTest', () => {
         assert.isTrue(IosUtils.isAppSheetBroken('8.01', 'iPhone8,1'), 'Should return true with string 8.01');
     });
 
-    it('isAppSheetBroken should return true with any OS Version 7.x string', () => {
+    it('isAppSheetBroken should return true with unknown OS Version 7.x string', () => {
         assert.isTrue(IosUtils.isAppSheetBroken('7.0', 'iPhone7,1'), 'Should return true with string 7.0');
         assert.isTrue(IosUtils.isAppSheetBroken('7.0.5', 'iPhone7,1'), 'Should return true with string 7.0.5');
         assert.isTrue(IosUtils.isAppSheetBroken('7.1', 'iPad7,1'), 'Should return true with string 7.1');

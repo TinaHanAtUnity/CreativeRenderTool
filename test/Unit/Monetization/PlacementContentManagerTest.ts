@@ -48,9 +48,9 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             sinon.stub(monetization.Listener, 'sendPlacementContentReady').resolves();
             sinon.stub(monetization.Listener, 'sendPlacementContentStateChanged').resolves();
             campaignManager = sinon.createStubInstance(CampaignManager);
-            (<any>campaignManager).onCampaign = new Observable2<string, Campaign>();
-            (<any>campaignManager).onNoFill = new Observable1<string>();
-            (<any>promo.Purchasing).onIAPSendEvent = new Observable1<string>();
+            (<unknown>campaignManager).onCampaign = new Observable2<string, Campaign>();
+            (<unknown>campaignManager).onNoFill = new Observable1<string>();
+            (<unknown>promo.Purchasing).onIAPSendEvent = new Observable1<string>();
             placementManager = new PlacementManager(ads, configuration);
 
             sinon.stub(placementManager, 'getPlacementCampaignMap').returns({
@@ -167,8 +167,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
             beforeEach(() => {
                 adUnit = sinon.createStubInstance(AbstractAdUnit);
-                (<any>adUnit).onStart = new Observable0();
-                (<any>adUnit).onClose = new Observable0();
+                (<unknown>adUnit).onStart = new Observable0();
+                (<unknown>adUnit).onClose = new Observable0();
                 manager.setCurrentAdUnit(placementId, adUnit);
             });
 
@@ -177,7 +177,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
                 beforeEach(() => {
                     // Normally, I wouldn't advocate for this type of inspection into private members.
-                    (<any>manager)._placementContentMap[otherPlacementId] = {
+                    (<unknown>manager)._placementContentMap[otherPlacementId] = {
                         type: IPlacementContentType.SHOW_AD,
                         state: PlacementContentState.READY
                     };

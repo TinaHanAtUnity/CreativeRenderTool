@@ -58,12 +58,12 @@ export class ParamsTestData {
         return ParamsTestData.getEventSpec(RealtimeAdsRequestSpec);
     }
 
-    private static getEventSpec(rawData: any): IEventSpec {
+    private static getEventSpec(rawData: unknown): IEventSpec {
         const spec: IEventSpec = {};
         const parsedSpec: IRawEventJson = JSON.parse(rawData);
         const parsedParams: IRawParamDesc[] = JSON.parse(ParameterSpec);
         const params: IRawEventParameter[] = parsedSpec.parameters;
-        const types: { [key: string]: any } = {};
+        const types: { [key: string]: unknown } = {};
 
         for(const parsedParam of parsedParams) {
             types[parsedParam.key] = parsedParam.type;

@@ -15,7 +15,7 @@ describe('CustomFeatures', () => {
             assert.isTrue(value);
         });
 
-        it('should return false if gameId is anything besides 14850 and 14851', () => {
+        it('should return false if gameId is unknownthing besides 14850 and 14851', () => {
             const value = CustomFeatures.isExampleGameId('14852');
             assert.isFalse(value);
         });
@@ -32,7 +32,7 @@ describe('CustomFeatures', () => {
             assert.isTrue(value);
         });
 
-        it('should return false if gameId is anything besides 1300023 and 1300024', () => {
+        it('should return false if gameId is unknownthing besides 1300023 and 1300024', () => {
             const value = CustomFeatures.isTimehopApp('1300025');
             assert.isFalse(value);
         });

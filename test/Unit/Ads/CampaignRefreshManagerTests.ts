@@ -60,16 +60,16 @@ import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 export class TestContainer extends AdUnitContainer {
-    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
+    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: unknown): Promise<void> {
         return Promise.resolve();
     }
     public close(): Promise<void> {
         return Promise.resolve();
     }
-    public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
+    public reconfigure(configuration: ViewConfiguration): Promise<unknown[]> {
         return Promise.all([]);
     }
-    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any[]> {
+    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<unknown[]> {
         return Promise.all([]);
     }
     public isPaused(): boolean {
@@ -515,7 +515,7 @@ describe('CampaignRefreshManager', () => {
             });
 
             let receivedErrorType: string;
-            let receivedError: any;
+            let receivedError: unknown;
 
             const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
                 receivedErrorType = type;
@@ -539,7 +539,7 @@ describe('CampaignRefreshManager', () => {
 
         it('should send diagnostics when campaign request fails', () => {
             let receivedErrorType: string;
-            let receivedError: any;
+            let receivedError: unknown;
 
             const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
                 receivedErrorType = type;
@@ -559,7 +559,7 @@ describe('CampaignRefreshManager', () => {
 
         it('should send diagnostics when campaign response content type is wrong', () => {
             let receivedErrorType: string;
-            let receivedError: any;
+            let receivedError: unknown;
 
             const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
                 receivedErrorType = type;
@@ -586,7 +586,7 @@ describe('CampaignRefreshManager', () => {
 
         it('should send diagnostics when campaign response parsing fails because of wrong types', () => {
             let receivedErrorType: string;
-            let receivedError: any;
+            let receivedError: unknown;
 
             const diagnosticsStub = sinon.stub(Diagnostics, 'trigger').callsFake((type: string, error: {}) => {
                 receivedErrorType = type;

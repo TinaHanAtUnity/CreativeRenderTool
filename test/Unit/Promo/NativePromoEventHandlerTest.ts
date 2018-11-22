@@ -42,8 +42,8 @@ describe('NativePromoEventHandlerTest', () => {
         sandbox.stub(PurchasingUtilities, 'onPurchase');
 
         nativePromoEventHandler = new NativePromoEventHandler(core, ads, purchasing, clientInfo, request);
-        sandbox.stub((<any>nativePromoEventHandler)._thirdPartyEventManager, 'sendWithGet');
-        sandbox.stub((<any>nativePromoEventHandler)._thirdPartyEventManager, 'setTemplateValue');
+        sandbox.stub((<unknown>nativePromoEventHandler)._thirdPartyEventManager, 'sendWithGet');
+        sandbox.stub((<unknown>nativePromoEventHandler)._thirdPartyEventManager, 'setTemplateValue');
         sandbox.stub(nativePromoEventHandler.onClose, 'trigger');
     });
 
@@ -56,8 +56,8 @@ describe('NativePromoEventHandlerTest', () => {
         it('should replace %ZONE% template value and fire tracking urls for impression', () => {
 
             return nativePromoEventHandler.onImpression(TestFixtures.getPromoCampaign(), 'test').then(() => {
-                sinon.assert.calledWith((<any>nativePromoEventHandler)._thirdPartyEventManager.setTemplateValue, '%ZONE%', 'test');
-                sinon.assert.calledThrice((<any>nativePromoEventHandler)._thirdPartyEventManager.sendWithGet);
+                sinon.assert.calledWith((<unknown>nativePromoEventHandler)._thirdPartyEventManager.setTemplateValue, '%ZONE%', 'test');
+                sinon.assert.calledThrice((<unknown>nativePromoEventHandler)._thirdPartyEventManager.sendWithGet);
             });
         });
     });
@@ -65,7 +65,7 @@ describe('NativePromoEventHandlerTest', () => {
     describe('onPromoClosed', () => {
         it('should fire tracking urls', () => {
             return nativePromoEventHandler.onPromoClosed(TestFixtures.getPromoCampaign()).then(() => {
-                sinon.assert.calledOnce((<any>nativePromoEventHandler)._thirdPartyEventManager.sendWithGet);
+                sinon.assert.calledOnce((<unknown>nativePromoEventHandler)._thirdPartyEventManager.sendWithGet);
             });
         });
 
@@ -79,8 +79,8 @@ describe('NativePromoEventHandlerTest', () => {
     describe('onClick', () => {
         it('should fire click tracking urls', () => {
             return nativePromoEventHandler.onClick('test', TestFixtures.getPromoCampaign(), 'test').then(() => {
-                sinon.assert.calledWith((<any>nativePromoEventHandler)._thirdPartyEventManager.setTemplateValue, '%ZONE%', 'test');
-                sinon.assert.calledOnce((<any>nativePromoEventHandler)._thirdPartyEventManager.sendWithGet);
+                sinon.assert.calledWith((<unknown>nativePromoEventHandler)._thirdPartyEventManager.setTemplateValue, '%ZONE%', 'test');
+                sinon.assert.calledOnce((<unknown>nativePromoEventHandler)._thirdPartyEventManager.sendWithGet);
                 sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.onPurchase);
             });
         });

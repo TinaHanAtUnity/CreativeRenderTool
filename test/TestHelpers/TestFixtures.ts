@@ -170,7 +170,7 @@ export class TestFixtures {
         };
     }
 
-    public static getPerformanceCampaignParams(json: any, storeName: StoreName, session?: Session): IPerformanceCampaign {
+    public static getPerformanceCampaignParams(json: unknown, storeName: StoreName, session?: Session): IPerformanceCampaign {
         if (!session) {
             session = this.getSession();
         }
@@ -208,7 +208,7 @@ export class TestFixtures {
         return parameters;
     }
 
-    public static getXPromoCampaignParams(json: any, storeName: StoreName, creativeId: string, session?: Session): IXPromoCampaign {
+    public static getXPromoCampaignParams(json: unknown, storeName: StoreName, creativeId: string, session?: Session): IXPromoCampaign {
         if (!session) {
             session = this.getSession();
         }
@@ -244,7 +244,7 @@ export class TestFixtures {
         return parameters;
     }
 
-    public static getExtendedMRAIDCampaignParams(json: any, storeName: StoreName, session?: Session): IMRAIDCampaign {
+    public static getExtendedMRAIDCampaignParams(json: unknown, storeName: StoreName, session?: Session): IMRAIDCampaign {
         if (!session) {
             session = this.getSession();
         }
@@ -274,7 +274,7 @@ export class TestFixtures {
         };
     }
 
-    public static getProgrammaticMRAIDCampaignBaseParams(session: Session, campaignId: string, json: any): ICampaign {
+    public static getProgrammaticMRAIDCampaignBaseParams(session: Session, campaignId: string, json: unknown): ICampaign {
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         return {
             id: campaignId,
@@ -291,7 +291,7 @@ export class TestFixtures {
         };
     }
 
-    public static getProgrammaticMRAIDCampaignParams(json: any, cacheTTL: number, campaignId: string, customParams: Partial<ICampaign> = {}): IMRAIDCampaign {
+    public static getProgrammaticMRAIDCampaignParams(json: unknown, cacheTTL: number, campaignId: string, customParams: Partial<ICampaign> = {}): IMRAIDCampaign {
         const mraidContentJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         const session = this.getSession();
@@ -375,7 +375,7 @@ export class TestFixtures {
         };
     }
 
-    public static getDisplayInterstitialCampaignBaseParams(json: any, storeName: StoreName, campaignId: string, session?: Session): IDisplayInterstitialCampaign {
+    public static getDisplayInterstitialCampaignBaseParams(json: unknown, storeName: StoreName, campaignId: string, session?: Session): IDisplayInterstitialCampaign {
         if (!session) {
             session = this.getSession();
         }
@@ -403,7 +403,7 @@ export class TestFixtures {
         };
     }
 
-    public static getVPAIDCampaignBaseParams(json: any): ICampaign {
+    public static getVPAIDCampaignBaseParams(json: unknown): ICampaign {
         const session = this.getSession();
         return {
             id: json.campaignId,
@@ -420,7 +420,7 @@ export class TestFixtures {
         };
     }
 
-    public static getVPAIDCampaignParams(json: any, vpaid: VPAID): IVPAIDCampaign {
+    public static getVPAIDCampaignParams(json: unknown, vpaid: VPAID): IVPAIDCampaign {
         return {
             ... this.getVPAIDCampaignBaseParams(json),
             vpaid: vpaid,
@@ -435,7 +435,7 @@ export class TestFixtures {
         };
     }
 
-    public static getPromoCampaignParams(json: any, adType?: string, rewardedPromo?: boolean): IPromoCampaign {
+    public static getPromoCampaignParams(json: unknown, adType?: string, rewardedPromo?: boolean): IPromoCampaign {
         const session = this.getSession();
         const isRewardedPromo = (rewardedPromo !== undefined) ? rewardedPromo : false;
         const costProductInfoList: ProductInfo[] = [];
@@ -916,7 +916,7 @@ export class TestFixtures {
         return decodeURIComponent(json.display.markup);
     }
 
-    public static getFakeNativeDeviceInfo(): any {
+    public static getFakeNativeDeviceInfo(): unknown {
         return {
             getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
             getNetworkType: sinon.stub().returns(Promise.resolve(0)),
@@ -942,7 +942,7 @@ export class TestFixtures {
         };
     }
 
-    public static getFakeNativeAndroidDeviceInfo(): any {
+    public static getFakeNativeAndroidDeviceInfo(): unknown {
         return {
             getAndroidId: sinon.stub().returns(Promise.resolve('17')),
             getApiLevel: sinon.stub().returns(Promise.resolve(16)),
@@ -973,7 +973,7 @@ export class TestFixtures {
         };
     }
 
-    public static getFakeNativeIosDeviceInfo(): any {
+    public static getFakeNativeIosDeviceInfo(): unknown {
         return {
             getUserInterfaceIdiom: sinon.stub().returns(Promise.resolve(UIUserInterfaceIdiom.UIUserInterfaceIdiomPad)),
             getScreenScale: sinon.stub().returns(Promise.resolve(2)),
@@ -988,7 +988,7 @@ export class TestFixtures {
         };
     }
 
-    public static getGameSessionCounters(): any {
+    public static getGameSessionCounters(): unknown {
         return {
             adRequests: 1,
             starts: 0,

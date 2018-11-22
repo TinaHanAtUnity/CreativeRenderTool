@@ -45,7 +45,7 @@ describe('IosAdUnitTest', () => {
     let focusManager: FocusManager;
     let adUnitParams: IAdUnitParameters<PerformanceCampaign>;
 
-    const defaultOptions: any = {
+    const defaultOptions: unknown = {
         supportedOrientations: UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL,
         supportedOrientationsPlist: UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL,
         shouldAutorotate: true,
@@ -116,7 +116,7 @@ describe('IosAdUnitTest', () => {
     });
 
     describe('should open ad unit', () => {
-        let stub: any;
+        let stub: unknown;
 
         beforeEach(() => {
             testAdUnit = new TestAdUnit(adUnitParams);

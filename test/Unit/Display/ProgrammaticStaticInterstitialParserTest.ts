@@ -37,7 +37,7 @@ describe('ProgrammaticVPAIDParser', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
 
-        (<any>core.Sdk) = sinon.createStubInstance(SdkApi);
+        (<unknown>core.Sdk) = sinon.createStubInstance(SdkApi);
 
         request = sinon.createStubInstance(RequestManager);
         session = TestFixtures.getSession();
@@ -51,7 +51,7 @@ describe('ProgrammaticVPAIDParser', () => {
 
         describe('with proper HTML payload', () => {
             let campaign: DisplayInterstitialCampaign;
-            const parse = (data: any) => {
+            const parse = (data: unknown) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                 return parser.parse(Platform.ANDROID, core, request, response, session).then((parsedCampaign) => {
@@ -83,7 +83,7 @@ describe('ProgrammaticVPAIDParser', () => {
 
         describe('with proper JS payload', () => {
             let campaign: DisplayInterstitialCampaign;
-            const parse = (data: any) => {
+            const parse = (data: unknown) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                 return parser.parse(Platform.ANDROID, core, request, response, session).then((parsedCampaign) => {

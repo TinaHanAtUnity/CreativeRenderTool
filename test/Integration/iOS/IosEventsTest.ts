@@ -46,7 +46,7 @@ describe('IosEventsTest', () => {
         const xhr = new XMLHttpRequest();
         xhr.timeout = 10000;
         xhr.onload = (event: Event) => {
-            const responseObj: any = JSON.parse(xhr.responseText);
+            const responseObj: unknown = JSON.parse(xhr.responseText);
             currentGameId = responseObj.game_id;
             done();
         };

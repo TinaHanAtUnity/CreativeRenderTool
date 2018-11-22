@@ -164,7 +164,7 @@ describe('OperativeEventManagerTest', () => {
     describe('sending clicks', () => {
         let placement: Placement;
         let session: Session;
-        let requestSpy: any;
+        let requestSpy: unknown;
         const uniqueEventID = '42';
         const gamerSid = 'foobar';
         const previousPlacementId = 'foobar1';

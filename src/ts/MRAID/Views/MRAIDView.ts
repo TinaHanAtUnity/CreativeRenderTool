@@ -68,7 +68,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected _closeElement: HTMLElement;
     protected _didReward = false;
-    protected _updateInterval: any;
+    protected _updateInterval: unknown;
     protected _closeRemaining: number;
     protected _CLOSE_LENGTH = 30;
 
@@ -407,7 +407,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         return Promise.resolve();
     }
 
-    protected abstract sendMraidAnalyticsEvent(eventName: string, eventData?: any): void;
+    protected abstract sendMraidAnalyticsEvent(eventName: string, eventData?: unknown): void;
 
     public onBridgeSetOrientationProperties(allowOrientationChange: boolean, forceOrientation: Orientation) {
         this.onSetOrientationProperties(allowOrientationChange, forceOrientation);

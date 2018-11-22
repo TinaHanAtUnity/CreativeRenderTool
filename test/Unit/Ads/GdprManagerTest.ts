@@ -41,9 +41,9 @@ describe('GdprManagerTest', () => {
     let httpKafkaStub: sinon.SinonSpy;
 
     let consentlastsent: boolean | string = false;
-    let consent: any = false;
+    let consent: unknown = false;
     let isGDPREnabled: boolean = false;
-    let storageTrigger: (eventType: string, data: any) => void;
+    let storageTrigger: (eventType: string, data: unknown) => void;
 
     beforeEach(() => {
         consentlastsent = false;
@@ -53,7 +53,7 @@ describe('GdprManagerTest', () => {
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
-        (<any>core.Storage).onSet = new Observable2<string, object>();
+        (<unknown>core.Storage).onSet = new Observable2<string, object>();
 
         clientInfo = sinon.createStubInstance(ClientInfo);
         deviceInfo = sinon.createStubInstance(AndroidDeviceInfo);
@@ -152,7 +152,7 @@ describe('GdprManagerTest', () => {
         });
 
         describe('and configuration isGDPREnabled is false', () => {
-            it('should not do anything', () => {
+            it('should not do unknownthing', () => {
                 isGDPREnabled = false;
                 consentlastsent = false;
                 storageTrigger('', { gdpr: { consent: { value: true } } });
@@ -168,7 +168,7 @@ describe('GdprManagerTest', () => {
         });
 
         describe('and the stored consent is undefined', () => {
-            it('should not do anything', () => {
+            it('should not do unknownthing', () => {
                 storageTrigger('', {});
                 sinon.assert.calledOnce(onSetStub);
                 sinon.assert.notCalled(getStub);
@@ -183,7 +183,7 @@ describe('GdprManagerTest', () => {
 
         describe('and the stored consent has not changed', () => {
             [true, false].forEach((b) => {
-                it(`should not send anything for value "${b}"`, () => {
+                it(`should not send unknownthing for value "${b}"`, () => {
                     isGDPREnabled = true;
                     consentlastsent = b;
                     storageTrigger('', {gdpr: {consent: {value: b}}});
@@ -278,7 +278,7 @@ describe('GdprManagerTest', () => {
             });
 
             describe('and configuration isGDPREnabled is set to false during getConsentAndUpdateConfiguration', () => {
-                it('should not do anything', () => {
+                it('should not do unknownthing', () => {
                     isGDPREnabled = true;
                     consentlastsent = false;
                     consent = true;
@@ -300,7 +300,7 @@ describe('GdprManagerTest', () => {
             });
 
             describe('and configuration isGDPREnabled is false', () => {
-                it('should not do anything', () => {
+                it('should not do unknownthing', () => {
                     isGDPREnabled = false;
                     consentlastsent = false;
                     const writePromise = new Promise<void>((resolve) => {
@@ -426,7 +426,7 @@ describe('GdprManagerTest', () => {
         const tests: {
             action: GDPREventAction;
             source: GDPREventSource | undefined;
-            infoJson: any;
+            infoJson: unknown;
         }[] = [{
             action: GDPREventAction.SKIP,
             source: undefined,
@@ -494,7 +494,7 @@ describe('GdprManagerTest', () => {
         tests.forEach((t) => {
             it(`should send matching payload when action is "${t.action}"`, () => {
                 httpKafkaStub.resetHistory();
-                const comparison = (value: any): boolean => {
+                const comparison = (value: unknown): boolean => {
                     if (Object.keys(value).length !== Object.keys(t.infoJson).length) {
                         return false;
                     }

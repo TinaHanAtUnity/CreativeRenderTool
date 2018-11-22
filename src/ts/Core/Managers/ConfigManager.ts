@@ -36,7 +36,7 @@ export class ConfigManager {
     private _deviceInfo: DeviceInfo;
     private _request: RequestManager;
 
-    private _rawConfig?: any;
+    private _rawConfig?: unknown;
 
     constructor(platform: Platform, core: ICoreApi, metaDataManager: MetaDataManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager) {
         this._platform = platform;

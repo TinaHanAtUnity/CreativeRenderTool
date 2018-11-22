@@ -553,7 +553,7 @@ describe('VideoEventHandlersTest', () => {
         it('should set call button visibility to true if the ad unit is VAST and has a click trough URL', () => {
             sinon.stub(overlay, 'setCallButtonVisible');
 
-            vastCampaign = <VastCampaign><any>{
+            vastCampaign = <VastCampaign><unknown>{
                 getVideo: () => video
             };
             vastAdUnitParameters.campaign = vastCampaign;
@@ -574,7 +574,7 @@ describe('VideoEventHandlersTest', () => {
         it('should not set call button visibility to true if the ad unit is VAST but there is no click trough URL', () => {
             sinon.stub(overlay, 'setCallButtonVisible');
 
-            vastCampaign = <VastCampaign><any>{
+            vastCampaign = <VastCampaign><unknown>{
                 getVideo: () => video
             };
             vastAdUnitParameters.campaign = vastCampaign;
@@ -595,7 +595,7 @@ describe('VideoEventHandlersTest', () => {
         it('should set fade enabled to false if the ad unit is VAST and has a click trough URL', () => {
             sinon.stub(overlay, 'setFadeEnabled');
 
-            vastCampaign = <VastCampaign><any>{
+            vastCampaign = <VastCampaign><unknown>{
                 getVideo: () => video
             };
             vastAdUnitParameters.campaign = vastCampaign;
@@ -616,7 +616,7 @@ describe('VideoEventHandlersTest', () => {
         it('should not set fade enabled to false if the ad unit is VAST but there is no click trough URL', () => {
             sinon.stub(overlay, 'setFadeEnabled');
 
-            vastCampaign = <VastCampaign><any>{
+            vastCampaign = <VastCampaign><unknown>{
                 getVideo: () => video
             };
             vastAdUnitParameters.campaign = vastCampaign;

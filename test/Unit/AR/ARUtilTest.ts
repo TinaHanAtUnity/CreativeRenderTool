@@ -8,7 +8,7 @@ import * as sinon from 'sinon';
 
 describe('ARUtil Test', () => {
     const ANDROID_AR_SUPPORTED_RETRY_COUNT = 5;
-    let nativeBridge: any;
+    let nativeBridge: unknown;
 
     it('Android Supported (transient first)', () => {
         nativeBridge = sinon.createStubInstance(NativeBridge);

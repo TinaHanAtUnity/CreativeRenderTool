@@ -41,7 +41,7 @@ describe('CometCampaignParser', () => {
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
-        (<any>core.Sdk) = sinon.createStubInstance(SdkApi);
+        (<unknown>core.Sdk) = sinon.createStubInstance(SdkApi);
 
         request = sinon.createStubInstance(RequestManager);
         (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve('http://s3-us-west-1.amazonaws.com/ads-load-testing/AssetPack1/b30-400.mp4'));
@@ -55,7 +55,7 @@ describe('CometCampaignParser', () => {
 
         let campaign: MRAIDCampaign | PerformanceCampaign;
 
-        const parse = (data: any) => {
+        const parse = (data: unknown) => {
             const auctionPlacement = new AuctionPlacement(placementId, mediaId);
             const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
             return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
@@ -85,7 +85,7 @@ describe('CometCampaignParser', () => {
             }, {});
         };
 
-        const assertBaseCampaign = (content: any) => {
+        const assertBaseCampaign = (content: unknown) => {
             assert.equal(campaign.getSession(), session, 'Session is not equal');
             assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');
             assert.equal(campaign.getId(), content.id, 'ID is not equal');
@@ -158,7 +158,7 @@ describe('CometCampaignParser', () => {
                 const fafafa = '#FAFAFA';
 
                 let sandbox: sinon.SinonSandbox;
-                let campaignJSON: any;
+                let campaignJSON: unknown;
 
                 beforeEach(() => {
                     sandbox = sinon.sandbox.create();

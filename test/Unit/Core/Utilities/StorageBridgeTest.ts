@@ -16,9 +16,9 @@ describe('StorageBridgeTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let storageBridge: StorageBridge;
-    let storageSetSpy: any;
-    let storageDeleteSpy: any;
-    let storageWriteSpy: any;
+    let storageSetSpy: unknown;
+    let storageDeleteSpy: unknown;
+    let storageWriteSpy: unknown;
 
     beforeEach(() => {
         backend = TestFixtures.getBackend(Platform.ANDROID);

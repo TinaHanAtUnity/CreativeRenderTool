@@ -105,7 +105,7 @@ export class Ads implements IAds {
     public Monetization: Monetization;
     public AR: AR;
 
-    constructor(config: any, core: ICore) {
+    constructor(config: unknown, core: ICore) {
         this.Config = AdsConfigurationParser.parse(config, core.ClientInfo);
         this._core = core;
 
@@ -221,7 +221,7 @@ export class Ads implements IAds {
         });
     }
 
-    public show(placementId: string, options: any, callback: INativeCallback): void {
+    public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
 
         if(this._showing) {
@@ -314,7 +314,7 @@ export class Ads implements IAds {
         context.hide();
     }
 
-    private showAd(placement: Placement, campaign: Campaign, options: any) {
+    private showAd(placement: Placement, campaign: Campaign, options: unknown) {
         const testGroup = this._core.Config.getAbGroup();
         const start = Date.now();
 

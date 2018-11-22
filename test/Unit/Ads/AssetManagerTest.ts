@@ -78,7 +78,7 @@ describe('AssetManagerTest', () => {
         backupCampaignManager = new BackupCampaignManager(core, storageBridge, TestFixtures.getCoreConfiguration());
     });
 
-    it('should not cache anything when cache mode is disabled', () => {
+    it('should not cache unknownthing when cache mode is disabled', () => {
         const cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
         const assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());

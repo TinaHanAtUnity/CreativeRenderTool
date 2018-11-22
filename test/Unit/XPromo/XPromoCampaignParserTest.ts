@@ -37,7 +37,7 @@ describe('XPromoCampaignParser', () => {
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
-        (<any>core.Sdk) = sinon.createStubInstance(SdkApi);
+        (<unknown>core.Sdk) = sinon.createStubInstance(SdkApi);
 
         request = sinon.createStubInstance(RequestManager);
         session = TestFixtures.getSession();
@@ -49,7 +49,7 @@ describe('XPromoCampaignParser', () => {
         describe('with a proper JSON payload', () => {
             let campaign: XPromoCampaign;
 
-            const parse = (data: any) => {
+            const parse = (data: unknown) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                 return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {

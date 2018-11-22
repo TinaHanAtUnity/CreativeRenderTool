@@ -53,7 +53,7 @@ export abstract class Model<T extends object> {
         throw error;
     }
 
-    protected serializeFilter(key: string, value: any): any {
+    protected serializeFilter(key: string, value: unknown): unknown {
         return value;
     }
 

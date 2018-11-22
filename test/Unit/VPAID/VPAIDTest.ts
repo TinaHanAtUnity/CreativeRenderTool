@@ -33,10 +33,10 @@ describe('VPAID View', () => {
         const deviceInfo = sinon.createStubInstance(DeviceInfoApi);
         deviceInfo.getScreenWidth.returns(Promise.resolve(320));
         deviceInfo.getScreenHeight.returns(Promise.resolve(480));
-        (<any>core).DeviceInfo = deviceInfo;
+        (<unknown>core).DeviceInfo = deviceInfo;
 
         webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
-        (<any>webPlayerContainer).onWebPlayerEvent = new Observable1<string>();
+        (<unknown>webPlayerContainer).onWebPlayerEvent = new Observable1<string>();
         (<sinon.SinonStub>webPlayerContainer.setData).resolves();
         (<sinon.SinonStub>webPlayerContainer.sendEvent).resolves();
 
@@ -67,9 +67,9 @@ describe('VPAID View', () => {
         });
     });
 
-    const verifyEventSent = (event: string, parameters?: any[]) => {
+    const verifyEventSent = (event: string, parameters?: unknown[]) => {
         return () => {
-            const webPlayerParams: any[] = [event];
+            const webPlayerParams: unknown[] = [event];
             if (parameters) {
                 webPlayerParams.push(parameters);
             }
@@ -77,7 +77,7 @@ describe('VPAID View', () => {
         };
     };
 
-    const sendWebPlayerEvent = (event: string, ...parameters: any[]) => {
+    const sendWebPlayerEvent = (event: string, ...parameters: unknown[]) => {
         return () => {
             let args = [];
             if (parameters.length > 0) {

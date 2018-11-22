@@ -17,12 +17,12 @@ export enum PlacementContentEvent {
 }
 
 export interface IPlacementContentParams {
-    [key: string]: any;
+    [key: string]: unknown;
     type: IPlacementContentType;
 }
 
 export class PlacementContentsApi extends NativeApi {
-    public readonly onPlacementContentCustomEvent = new Observable2<string, any>();
+    public readonly onPlacementContentCustomEvent = new Observable2<string, unknown>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'PlacementContents', ApiPackage.MONETIZATION_CORE, EventCategory.PLACEMENT_CONTENT);
@@ -47,7 +47,7 @@ export class PlacementContentsApi extends NativeApi {
         return this._nativeBridge.invoke(this._fullApiClassName, 'sendAdStarted', [placementId]);
     }
 
-    public handleEvent(event: string, parameters: any[]) {
+    public handleEvent(event: string, parameters: unknown[]) {
         switch (event) {
         case PlacementContentEvent[PlacementContentEvent.CUSTOM]:
             this.onPlacementContentCustomEvent.trigger(parameters[0], parameters[1]);

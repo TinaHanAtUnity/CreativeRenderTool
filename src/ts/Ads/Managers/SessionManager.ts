@@ -86,7 +86,7 @@ export class SessionManager {
     }
 
     private sendUnsentEvents(sessionId: string): Promise<unknown[]> {
-        const promises: Promise<any>[] = [];
+        const promises: Promise<unknown>[] = [];
         const failedOperativeEventManager = new FailedOperativeEventManager(this._core, sessionId);
         promises.push(failedOperativeEventManager.sendFailedEvents(this._request, this._storageBridge));
         const failedXpromoOperativeEventManager = new FailedXpromoOperativeEventManager(this._core, sessionId);

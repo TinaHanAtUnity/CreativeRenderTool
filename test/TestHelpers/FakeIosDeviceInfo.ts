@@ -7,15 +7,15 @@ import IosDefaults from 'json/FakeIosDeviceInfo.json';
 
 export class FakeIosDeviceInfo extends IosDeviceInfo {
 
-    private _fakeDevice: any;
+    private _fakeDevice: unknown;
 
     constructor(core: ICoreApi) {
         super(core);
         this._fakeDevice = JSON.parse(IosDefaults);
     }
 
-    public fetch(): Promise<any[]> {
-        return Promise.resolve(<any>void(0));
+    public fetch(): Promise<unknown[]> {
+        return Promise.resolve(<unknown>void(0));
     }
 
     public getStores(): string {
@@ -122,7 +122,7 @@ export class FakeIosDeviceInfo extends IosDeviceInfo {
         return this._fakeDevice.totalMemory;
     }
 
-    public getDTO(): Promise<any> {
+    public getDTO(): Promise<unknown> {
         return Promise.resolve(this._fakeDevice);
     }
 }

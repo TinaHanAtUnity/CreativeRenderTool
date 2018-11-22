@@ -48,7 +48,7 @@ describe('AndroidAdUnitTest', () => {
     let container: Activity;
     let testAdUnit: TestAdUnit;
     let adUnitParams: IAdUnitParameters<PerformanceCampaign>;
-    const testDisplay: any = {
+    const testDisplay: unknown = {
         rotation: Rotation.ROTATION_0,
         width: 800,
         height: 600
@@ -116,7 +116,7 @@ describe('AndroidAdUnitTest', () => {
     });
 
     describe('should open ad unit', () => {
-        let stub: any;
+        let stub: unknown;
 
         beforeEach(() => {
             testAdUnit = new TestAdUnit(adUnitParams);
@@ -165,7 +165,7 @@ describe('AndroidAdUnitTest', () => {
     });
 
     describe('should handle Android lifecycle', () => {
-        let options: any;
+        let options: unknown;
 
         beforeEach(() => {
             testAdUnit = new TestAdUnit(adUnitParams);

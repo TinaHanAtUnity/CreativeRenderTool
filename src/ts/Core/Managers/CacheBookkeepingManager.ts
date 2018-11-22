@@ -188,7 +188,7 @@ export class CacheBookkeepingManager {
         this._core.Storage.write(StorageType.PRIVATE);
     }
 
-    public deleteCachedCampaignResponse(): Promise<any> {
+    public deleteCachedCampaignResponse(): Promise<unknown> {
         const cacheCampaignUrlPromise = this._core.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'));
         const cachedCampaignResponsePromise = this._core.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'));
 

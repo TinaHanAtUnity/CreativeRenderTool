@@ -170,7 +170,7 @@ describe('CampaignManager', () => {
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: Campaign;
-            let triggeredError: any;
+            let triggeredError: unknown;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
                 triggeredCampaign = campaign;
             });
@@ -405,7 +405,7 @@ describe('CampaignManager', () => {
             campaignManager.request();
         });
 
-        const verifyErrorForResponse = (response: any, expectedErrorMessage: string): Promise<void> => {
+        const verifyErrorForResponse = (response: unknown, expectedErrorMessage: string): Promise<void> => {
             // given a VAST placement with invalid XML
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
@@ -413,7 +413,7 @@ describe('CampaignManager', () => {
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
-            let triggeredError: any;
+            let triggeredError: unknown;
             campaignManager.onError.subscribe((error: WebViewError) => {
                 triggeredError = error;
             });
@@ -426,7 +426,7 @@ describe('CampaignManager', () => {
             });
         };
 
-        const verifyErrorForWrappedResponse = (response: any, wrappedUrl: string, wrappedResponse: Promise<any>, expectedErrorMessage: string, errorURL?: string, done?: () => void): void => {
+        const verifyErrorForWrappedResponse = (response: unknown, wrappedUrl: string, wrappedResponse: Promise<unknown>, expectedErrorMessage: string, errorURL?: string, done?: () => void): void => {
             // given a VAST placement that wraps another VAST
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
@@ -533,7 +533,7 @@ describe('CampaignManager', () => {
                 const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
                 const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
                 let noFillTriggered = false;
-                let triggeredError: any;
+                let triggeredError: unknown;
                 campaignManager.onNoFill.subscribe(() => {
                     noFillTriggered = true;
                 });
@@ -564,7 +564,7 @@ describe('CampaignManager', () => {
             });
         });
 
-        const verifyCampaignForResponse = (response: {response: any}) => {
+        const verifyCampaignForResponse = (response: {response: unknown}) => {
             // given a valid VAST placement
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
@@ -573,7 +573,7 @@ describe('CampaignManager', () => {
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: VastCampaign;
-            let triggeredError: any;
+            let triggeredError: unknown;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
                 triggeredCampaign = <VastCampaign>campaign;
             });
@@ -604,7 +604,7 @@ describe('CampaignManager', () => {
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: VastCampaign;
-            let triggeredError: any;
+            let triggeredError: unknown;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
                 triggeredCampaign = <VastCampaign>campaign;
             });
@@ -657,7 +657,7 @@ describe('CampaignManager', () => {
             contentTypeHandlerManager.addHandler(ProgrammaticMraidUrlParser.ContentType, { parser: new ProgrammaticMraidUrlParser(), factory: new MRAIDAdUnitFactory() });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: MRAIDCampaign;
-            let triggeredError: any;
+            let triggeredError: unknown;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
                 triggeredCampaign = <MRAIDCampaign>campaign;
             });
@@ -702,7 +702,7 @@ describe('CampaignManager', () => {
             contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(), factory: new MRAIDAdUnitFactory() });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: MRAIDCampaign;
-            let triggeredError: any;
+            let triggeredError: unknown;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
                 triggeredCampaign = <MRAIDCampaign>campaign;
             });
@@ -742,7 +742,7 @@ describe('CampaignManager', () => {
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(), factory: new MRAIDAdUnitFactory() });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
-            let triggeredError: any;
+            let triggeredError: unknown;
             campaignManager.onNoFill.subscribe(() => {
                 if (!doneCalled) {
                     doneCalled = true;
@@ -770,7 +770,7 @@ describe('CampaignManager', () => {
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(), factory: new MRAIDAdUnitFactory() });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
-            let triggeredError: any;
+            let triggeredError: unknown;
 
             campaignManager.onError.subscribe(error => {
                 triggeredError = error;
@@ -793,7 +793,7 @@ describe('CampaignManager', () => {
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             contentTypeHandlerManager.addHandler(ProgrammaticMraidUrlParser.ContentType, { parser: new ProgrammaticMraidUrlParser(), factory: new MRAIDAdUnitFactory() });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
-            let triggeredError: any;
+            let triggeredError: unknown;
 
             campaignManager.onError.subscribe(error => {
                 triggeredError = error;
@@ -817,7 +817,7 @@ describe('CampaignManager', () => {
             contentTypeHandlerManager.addHandler(ProgrammaticStaticInterstitialParser.ContentTypeHtml, { parser: new ProgrammaticStaticInterstitialParser(false), factory: new DisplayInterstitialAdUnitFactory() });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: DisplayInterstitialCampaign;
-            let triggeredError: any;
+            let triggeredError: unknown;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
                 triggeredCampaign = <DisplayInterstitialCampaign>campaign;
             });
@@ -847,7 +847,7 @@ describe('CampaignManager', () => {
             contentTypeHandlerManager.addHandler(ProgrammaticStaticInterstitialParser.ContentTypeJs, { parser: new ProgrammaticStaticInterstitialParser(true), factory: new DisplayInterstitialAdUnitFactory() });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: DisplayInterstitialCampaign;
-            let triggeredError: any;
+            let triggeredError: unknown;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
                 triggeredCampaign = <DisplayInterstitialCampaign>campaign;
             });
@@ -868,11 +868,11 @@ describe('CampaignManager', () => {
 
     describe('on PLC', () => {
         let assetManager;
-        let campaignManager: any;
+        let campaignManager: unknown;
         let triggeredCampaign: Campaign;
-        let triggeredError: any;
+        let triggeredError: unknown;
         let triggeredPlacement: string;
-        let mockRequest: any;
+        let mockRequest: unknown;
         const ConfigurationAuctionPlcJson = JSON.parse(ConfigurationAuctionPlc);
 
         beforeEach(() => {
@@ -889,7 +889,7 @@ describe('CampaignManager', () => {
                 triggeredCampaign = campaign;
                 triggeredPlacement = placement;
             });
-            campaignManager.onError.subscribe((error: any) => {
+            campaignManager.onError.subscribe((error: unknown) => {
                 triggeredError = error;
             });
             mockRequest = sinon.mock(request);
@@ -1043,7 +1043,7 @@ describe('CampaignManager', () => {
                     triggeredCampaign = campaign;
                     triggeredPlacement = placement;
                 });
-                campaignManager.onError.subscribe((error: any) => {
+                campaignManager.onError.subscribe((error: unknown) => {
                     triggeredError = error;
                 });
 
@@ -1074,7 +1074,7 @@ describe('CampaignManager', () => {
                     triggeredCampaign = campaign;
                     triggeredPlacement = placement;
                 });
-                campaignManager.onError.subscribe((error: any) => {
+                campaignManager.onError.subscribe((error: unknown) => {
                     triggeredError = error;
                 });
 
@@ -1113,7 +1113,7 @@ describe('CampaignManager', () => {
         let campaignManager: CampaignManager;
 
         beforeEach(() => {
-            sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: [string, string][] = [], options?: any) => {
+            sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: [string, string][] = [], options?: unknown) => {
                 requestData = data;
                 return Promise.resolve();
             });
@@ -1139,8 +1139,8 @@ describe('CampaignManager', () => {
 
     describe('auction v5', () => {
         let assetManager;
-        let campaignManager: any;
-        let mockRequest: any;
+        let campaignManager: unknown;
+        let mockRequest: unknown;
         const ConfigurationAuctionPlcJson = JSON.parse(ConfigurationAuctionPlc);
 
         beforeEach(() => {
@@ -1160,7 +1160,7 @@ describe('CampaignManager', () => {
             let rewardedCampaign: Campaign;
             let rewardedTrackingUrls: ICampaignTrackingUrls;
             const noFillPlacements: string[] = [];
-            let triggeredError: any;
+            let triggeredError: unknown;
             let triggeredRefreshDelay: number;
             let triggeredCampaignCount: number;
 
@@ -1190,7 +1190,7 @@ describe('CampaignManager', () => {
                 noFillPlacements.push(placement);
             });
 
-            campaignManager.onError.subscribe((error: any) => {
+            campaignManager.onError.subscribe((error: unknown) => {
                 triggeredError = error;
             });
 

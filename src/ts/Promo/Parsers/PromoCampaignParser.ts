@@ -59,7 +59,7 @@ export class PromoCampaignParser extends CampaignParser {
 
     }
 
-    private getLimitedTimeOffer(promoJson: any): LimitedTimeOffer | undefined {
+    private getLimitedTimeOffer(promoJson: unknown): LimitedTimeOffer | undefined {
         let limitedTimeOffer: LimitedTimeOffer | undefined;
         if (promoJson.limitedTimeOffer) {
             const firstImpressionEpoch = promoJson.limitedTimeOffer.firstImpression;
@@ -77,7 +77,7 @@ export class PromoCampaignParser extends CampaignParser {
         return limitedTimeOffer;
     }
 
-    private getProductInfoList(promoProductInfoJson: [any]): ProductInfo[] {
+    private getProductInfoList(promoProductInfoJson: [unknown]): ProductInfo[] {
         const productInfoList: ProductInfo[] = [];
         if (promoProductInfoJson === undefined) {
             return productInfoList;
@@ -88,7 +88,7 @@ export class PromoCampaignParser extends CampaignParser {
         return productInfoList;
     }
 
-    private getProductInfo(promoJson: any) {
+    private getProductInfo(promoJson: unknown) {
         let productInfo: IProductInfo;
         if (promoJson.premiumProduct) {
             const promoProductJson = promoJson.premiumProduct;

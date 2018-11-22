@@ -3,7 +3,7 @@ import { StorageType } from 'Core/Native/Storage';
 
 export class Storage extends BackendApi {
 
-    private _storage: any = {};
+    private _storage: unknown = {};
     private _dirty: boolean = false;
 
     public set<T>(storageType: StorageType, key: string, value: T): Promise<void> {
@@ -39,7 +39,7 @@ export class Storage extends BackendApi {
         return this._dirty;
     }
 
-    private setInMemoryValue(storage: { [key: string]: any }, key: string, value: any): {} {
+    private setInMemoryValue(storage: { [key: string]: unknown }, key: string, value: unknown): {} {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -55,7 +55,7 @@ export class Storage extends BackendApi {
         }
     }
 
-    private getInMemoryValue(storage: { [key: string]: any }, key: string): any {
+    private getInMemoryValue(storage: { [key: string]: unknown }, key: string): unknown {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -69,7 +69,7 @@ export class Storage extends BackendApi {
         }
     }
 
-    private getInMemoryKeys(storage: { [key: string]: any }, key: string): string[] {
+    private getInMemoryKeys(storage: { [key: string]: unknown }, key: string): string[] {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -127,7 +127,7 @@ export class Storage extends BackendApi {
         return false;
     }
 
-    public setStorageContents(contents: any): void {
+    public setStorageContents(contents: unknown): void {
         this._storage = contents;
     }
 

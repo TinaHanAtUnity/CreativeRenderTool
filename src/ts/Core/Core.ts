@@ -180,14 +180,14 @@ export class Core implements ICore {
                 this.JaegerManager.stop(configSpan);
             });
 
-            configPromise = configPromise.then((configJson: any): [any, CoreConfiguration] => {
+            configPromise = configPromise.then((configJson: unknown): [unknown, CoreConfiguration] => {
                 const coreConfig = CoreConfigurationParser.parse(configJson);
                 this.Api.Sdk.logInfo('Received configuration for token ' + coreConfig.getToken() + ' (A/B group ' + JSON.stringify(coreConfig.getAbGroup()) + ')');
                 if(this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo.getLimitAdTracking()) {
                     this.ConfigManager.storeGamerToken(configJson.token);
                 }
                 return [configJson, coreConfig];
-            }).catch((error: any) => {
+            }).catch((error: unknown) => {
                 configSpan.addTag(JaegerTags.Error, 'true');
                 configSpan.addTag(JaegerTags.ErrorMessage, error.message);
                 configSpan.addAnnotation(error.message);

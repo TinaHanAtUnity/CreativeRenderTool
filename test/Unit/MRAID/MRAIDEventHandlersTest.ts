@@ -248,7 +248,7 @@ describe('MRAIDEventHandlersTest', () => {
 
                     mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 0, 'win_screen', {'level': 2});
 
-                    const kafkaObject: any = {};
+                    const kafkaObject: unknown = {};
                     kafkaObject.type = 'win_screen';
                     kafkaObject.eventData = {'level': 2};
                     kafkaObject.timeFromShow = 15;
@@ -271,7 +271,7 @@ describe('MRAIDEventHandlersTest', () => {
 
                     mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 5, 'win_screen', undefined);
 
-                    const kafkaObject: any = {};
+                    const kafkaObject: unknown = {};
                     kafkaObject.type = 'win_screen';
                     kafkaObject.eventData = undefined;
                     kafkaObject.timeFromShow = 15;

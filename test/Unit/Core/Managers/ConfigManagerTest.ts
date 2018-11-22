@@ -81,7 +81,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), platform === Platform.ANDROID ? TestFixtures.getAndroidDeviceInfo(core) : TestFixtures.getIosDeviceInfo(core), request);
                 return configManager.getConfig(span).then(() => {
                     assert.fail('should not resolve');
-                }).catch((error: any) => {
+                }).catch((error: unknown) => {
                     assert.instanceOf(error, Error);
                 });
             });
@@ -105,7 +105,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), platform === Platform.ANDROID ? TestFixtures.getAndroidDeviceInfo(core) : TestFixtures.getIosDeviceInfo(core), request);
                 return configManager.getConfig(span).then(() => {
                     assert.fail('should not resolve');
-                }).catch((error: any) => {
+                }).catch((error: unknown) => {
                     assert.instanceOf(error, ConfigError);
                     assert.equal(error.message, 'Error message from backend');
                 });
@@ -129,7 +129,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), platform === Platform.ANDROID ? TestFixtures.getAndroidDeviceInfo(core) : TestFixtures.getIosDeviceInfo(core), request);
                 return configManager.getConfig(span).then(() => {
                     assert.fail('should not resolve');
-                }).catch((error: any) => {
+                }).catch((error: unknown) => {
                     assert.instanceOf(error, DiagnosticError);
                 });
             });

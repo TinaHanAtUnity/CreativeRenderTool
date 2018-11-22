@@ -87,11 +87,11 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         sinon.stub(promo.Purchasing, 'getPromoVersion').returns(Promise.resolve());
         sinon.stub(promo.Purchasing, 'initiatePurchasingCommand').returns(Promise.resolve());
         sinon.stub(promo.Purchasing, 'initializePurchasing').returns(Promise.resolve());
-        (<any>promo.Purchasing).onInitialize = new Observable1<string>();
-        (<any>promo.Purchasing).onGetPromoVersion = new Observable1<string>();
-        (<any>promo.Purchasing).onCommandResult = new Observable1<string>();
-        (<any>promo.Purchasing).onIAPSendEvent = new Observable1<string>();
-        (<any>promo.Purchasing).onGetPromoCatalog = new Observable1<string>();
+        (<unknown>promo.Purchasing).onInitialize = new Observable1<string>();
+        (<unknown>promo.Purchasing).onGetPromoVersion = new Observable1<string>();
+        (<unknown>promo.Purchasing).onCommandResult = new Observable1<string>();
+        (<unknown>promo.Purchasing).onIAPSendEvent = new Observable1<string>();
+        (<unknown>promo.Purchasing).onGetPromoCatalog = new Observable1<string>();
     });
 
     afterEach(() => {
@@ -191,7 +191,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo);
 
             (<sinon.SinonStub>promo.Purchasing.initializePurchasing).rejects();
-            return purchasingAdapter.initialize().catch((e: any) => {
+            return purchasingAdapter.initialize().catch((e: unknown) => {
                 assert.equal(e.message, 'Purchase initialization failed');
                 sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
             });
@@ -291,7 +291,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         it('should fail when onGetPromoCatalog rejects', () => {
             (<sinon.SinonStub>promo.Purchasing.getPromoCatalog).rejects();
 
-            return purchasingAdapter.refreshCatalog().catch((e: any) => {
+            return purchasingAdapter.refreshCatalog().catch((e: unknown) => {
                 assert.equal(e.message, 'Purchasing Catalog failed to refresh');
             });
         });

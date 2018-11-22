@@ -37,7 +37,7 @@ class SpecVerifier {
     private _platform: Platform;
     private _spec: IEventSpec;
     private _queryParams: string[];
-    private _bodyParams: any;
+    private _bodyParams: unknown;
 
     constructor(platform: Platform, spec: IEventSpec, url: string, body?: string) {
         this._platform = platform;
@@ -60,7 +60,7 @@ class SpecVerifier {
         if(this._queryParams) {
             for(const queryParam of this._queryParams) {
                 const paramName: string = queryParam.split('=')[0];
-                const paramValue: any = queryParam.split('=')[1];
+                const paramValue: unknown = queryParam.split('=')[1];
 
                 assert.isDefined(this._spec[paramName], 'Unspecified query parameter: ' + paramName);
                 assert.isTrue(this._spec[paramName].queryString, 'Parameter should not be in query string: ' + paramName);
@@ -118,7 +118,7 @@ class SpecVerifier {
         }
     }
 
-    private assertBodyParamType(name: string, value: any): void {
+    private assertBodyParamType(name: string, value: unknown): void {
         assert.equal(this._spec[name].type, typeof value, 'Body parameter type mismatch: ' + name);
     }
 
@@ -188,7 +188,7 @@ describe('Event parameters should match specifications', () => {
             const storageBridge = new StorageBridge(core);
             const metaDataManager = new MetaDataManager(core);
             const request = new RequestManager(platform, core, new WakeUpManager(core));
-            const requestSpy: any = sinon.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
+            const requestSpy: unknown = sinon.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
             const clientInfo = TestFixtures.getClientInfo(platform);
             const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             const cacheBookkeeping = new CacheBookkeepingManager(core);
@@ -225,7 +225,7 @@ describe('Event parameters should match specifications', () => {
             const storageBridge = new StorageBridge(core);
             const metaDataManager = new MetaDataManager(core);
             const request = new RequestManager(platform, core, new WakeUpManager(core));
-            const requestSpy: any = sinon.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
+            const requestSpy: unknown = sinon.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
             const clientInfo = TestFixtures.getClientInfo(platform);
             const deviceInfo = TestFixtures.getIosDeviceInfo(core);
             const cacheBookkeeping = new CacheBookkeepingManager(core);
@@ -264,7 +264,7 @@ describe('Event parameters should match specifications', () => {
             const storageBridge = new StorageBridge(core);
             const metaDataManager = new MetaDataManager(core);
             const request = new RequestManager(platform, core, new WakeUpManager(core));
-            const requestSpy: any = sinon.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
+            const requestSpy: unknown = sinon.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
             const clientInfo = TestFixtures.getClientInfo(platform);
             const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             const sessionManager = new SessionManager(core, request, storageBridge);
@@ -311,7 +311,7 @@ describe('Event parameters should match specifications', () => {
             const storageBridge = new StorageBridge(core);
             const metaDataManager = new MetaDataManager(core);
             const request = new RequestManager(platform, core, new WakeUpManager(core));
-            const requestSpy: any = sinon.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
+            const requestSpy: unknown = sinon.stub(request, 'post').returns(Promise.resolve(TestFixtures.getOkNativeResponse()));
             const clientInfo = TestFixtures.getClientInfo(platform);
             const deviceInfo = TestFixtures.getIosDeviceInfo(core);
             const sessionManager = new SessionManager(core, request, storageBridge);
@@ -353,7 +353,7 @@ describe('Event parameters should match specifications', () => {
     describe('with video events', () => {
         let operativeEventManager: OperativeEventManager;
         let operativeEventParams: IOperativeEventParams;
-        let requestSpy: any;
+        let requestSpy: unknown;
 
         describe('on Android', () => {
             beforeEach(() => {
@@ -583,7 +583,7 @@ describe('Event parameters should match specifications', () => {
             sessionManager.setGameSessionId(1234);
             const campaignManager: CampaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
             campaignManager.request().then(() => {
-                const requestSpy: any = sinon.spy(request, 'post');
+                const requestSpy: unknown = sinon.spy(request, 'post');
                 return campaignManager.requestRealtime(realtimePlacement, session).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
@@ -621,7 +621,7 @@ describe('Event parameters should match specifications', () => {
             sessionManager.setGameSessionId(1234);
             const campaignManager: CampaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
             campaignManager.request().then(() => {
-                const requestSpy: any = sinon.spy(request, 'post');
+                const requestSpy: unknown = sinon.spy(request, 'post');
                 return campaignManager.requestRealtime(realtimePlacement, session).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];

@@ -17,13 +17,13 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _loadingScreen: HTMLElement;
-    private _loadingScreenTimeout: any;
-    private _prepareTimeout: any;
+    private _loadingScreenTimeout: unknown;
+    private _prepareTimeout: unknown;
 
     private _iframe: HTMLIFrameElement;
 
     private _localization: Localization;
-    private _configuration: any;
+    private _configuration: unknown;
 
     protected _campaign: PerformanceMRAIDCampaign;
 
@@ -94,7 +94,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private loadIframe(): void {
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        const iframe: unknown = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
         this._mraidBridge.connect(iframe);
 
         const container = this.setUpMraidContainer();
@@ -202,7 +202,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    protected sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
+    protected sendMraidAnalyticsEvent(eventName: string, eventData?: unknown) {
         const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
         const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;

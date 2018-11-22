@@ -23,7 +23,7 @@ export class CustomPurchasingApi extends NativeApi {
         return this._nativeBridge.invoke(this._fullApiClassName, 'available', []);
     }
 
-    public purchaseItem(productId: string, extras: any) {
+    public purchaseItem(productId: string, extras: unknown) {
         return this._nativeBridge.invoke(this._fullApiClassName, 'purchaseItem', [productId, extras]);
     }
 
@@ -31,7 +31,7 @@ export class CustomPurchasingApi extends NativeApi {
         return this._nativeBridge.invoke(this._fullApiClassName, 'refreshCatalog', []);
     }
 
-    public handleEvent(event: string, parameters: any[]) {
+    public handleEvent(event: string, parameters: unknown[]) {
         switch (event) {
         case CustomPurchasingEvent[CustomPurchasingEvent.PRODUCTS_RETRIEVED]:
             this.onProductsRetrieved.trigger(parameters[0]);

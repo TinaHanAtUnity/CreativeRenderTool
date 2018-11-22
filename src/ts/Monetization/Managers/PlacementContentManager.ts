@@ -86,7 +86,7 @@ export class PlacementContentManager {
             };
         }
         const productId = campaign.getIapProductId();
-        const result: any = {
+        const result: unknown = {
             type: IPlacementContentType.PROMO_AD,
             product: {
                 productId: productId
@@ -129,7 +129,7 @@ export class PlacementContentManager {
     }
 
     private transformProductInfosToJSON(productInfoList: ProductInfo[]) {
-        const result: any = [];
+        const result: unknown = [];
         if (productInfoList.length > 0) {
             for (const productInfo of productInfoList) {
                 result.push(productInfo.getDTO());

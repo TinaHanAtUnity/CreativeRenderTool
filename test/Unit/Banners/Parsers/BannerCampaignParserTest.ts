@@ -41,7 +41,7 @@ describe('BannerCampaignParser', () => {
         describe('with a proper JSON payload', () => {
             let campaign: BannerCampaign;
 
-            const parse = (data: any) => {
+            const parse = (data: unknown) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                 return parser.parse(Platform.ANDROID, core, request, response, session).then((parsedCampaign) => {

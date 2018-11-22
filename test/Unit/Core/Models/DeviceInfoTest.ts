@@ -48,7 +48,7 @@ describe('DeviceInfoTest', () => {
 
         deviceInfo = new AndroidDeviceInfo(core);
 
-        Promise.all<any>([
+        Promise.all<unknown>([
             deviceInfo.getScreenHeight(),
             deviceInfo.getScreenWidth()
         ]).then(([
@@ -99,7 +99,7 @@ describe('DeviceInfoTest Android', () => {
         };
         deviceInfo = new AndroidDeviceInfo(core);
 
-        return deviceInfo.fetch().then(() => deviceInfo.getDTO()).then((dto: any) => {
+        return deviceInfo.fetch().then(() => deviceInfo.getDTO()).then((dto: unknown) => {
             assert.equal(dto.androidId, undefined);
             assert.equal(dto.apiLevel, 16);
             assert.equal(dto.deviceMake, 'N');
@@ -126,7 +126,7 @@ describe('DeviceInfoTest Android', () => {
         backend.Api.DeviceInfo.getAdvertisingTrackingId = sinon.stub().returns(Promise.resolve(undefined));
         deviceInfo = new AndroidDeviceInfo(core);
 
-        return deviceInfo.fetch().then(() => deviceInfo.getDTO()).then((dto: any) => {
+        return deviceInfo.fetch().then(() => deviceInfo.getDTO()).then((dto: unknown) => {
             assert.equal(dto.androidId, '17');
         });
     });

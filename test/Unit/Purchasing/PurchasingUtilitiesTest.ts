@@ -65,17 +65,17 @@ describe('PurchasingUtilitiesTest', () => {
         sandbox = sinon.createSandbox();
 
         promoCatalog = JSON.stringify(JSON.parse(IapPromoCatalog));
-        (<any>purchasing).onInitialize = new Observable1<string>();
-        (<any>purchasing).onCommandResult = new Observable1<string>();
-        (<any>purchasing).onGetPromoVersion = new Observable1<string>();
-        (<any>purchasing).onGetPromoCatalog = new Observable1<string>();
+        (<unknown>purchasing).onInitialize = new Observable1<string>();
+        (<unknown>purchasing).onCommandResult = new Observable1<string>();
+        (<unknown>purchasing).onGetPromoVersion = new Observable1<string>();
+        (<unknown>purchasing).onGetPromoCatalog = new Observable1<string>();
 
-        (<any>campaignManager).onAdPlanReceived = new Observable2<number, number>();
-        (<any>campaignManager).onCampaign = new Observable2<number, Campaign>();
+        (<unknown>campaignManager).onAdPlanReceived = new Observable2<number, number>();
+        (<unknown>campaignManager).onCampaign = new Observable2<number, Campaign>();
 
-        (<any>purchasing).CustomPurchasing.onProductsRetrieved = new Observable1<IProduct[]>();
-        (<any>purchasing).CustomPurchasing.onTransactionComplete = new Observable1<ITransactionDetails>();
-        (<any>purchasing).CustomPurchasing.onTransactionError = new Observable2<string, string>();
+        (<unknown>purchasing).CustomPurchasing.onProductsRetrieved = new Observable1<IProduct[]>();
+        (<unknown>purchasing).CustomPurchasing.onTransactionComplete = new Observable1<ITransactionDetails>();
+        (<unknown>purchasing).CustomPurchasing.onTransactionError = new Observable2<string, string>();
 
         sinon.stub(promo.Purchasing, 'getPromoCatalog').returns(Promise.resolve());
         sinon.stub(promo.Purchasing, 'getPromoVersion').returns(Promise.resolve());
@@ -99,7 +99,7 @@ describe('PurchasingUtilitiesTest', () => {
 
     describe('initialize', () => {
         it('should set purchasing adapter and set isInitialized to true', () => {
-            expect((<any>PurchasingUtilities)._purchasingAdapter).to.be.an.instanceof(CustomPurchasingAdapter);
+            expect((<unknown>PurchasingUtilities)._purchasingAdapter).to.be.an.instanceof(CustomPurchasingAdapter);
             assert.isTrue(PurchasingUtilities.isInitialized());
         });
         xit('should not set purchasing adapter if getAdapter fails', () => {
@@ -198,7 +198,7 @@ describe('PurchasingUtilitiesTest', () => {
             it('should fail when get promo catalog fetch over api fails', () => {
                 (<sinon.SinonStub>purchasing.CustomPurchasing.refreshCatalog).returns(Promise.reject('fail'));
                 PurchasingUtilities.refreshCatalog().catch((e) => {
-                    assert.equal((<any>PurchasingUtilities)._refreshPromise, null);
+                    assert.equal((<unknown>PurchasingUtilities)._refreshPromise, null);
                     assert.equal(e.message, undefined);
                 });
             });
@@ -207,9 +207,9 @@ describe('PurchasingUtilitiesTest', () => {
 
     describe('onPromoClosed', () => {
         it('should resolve and do nothing for CustomPurchasingAdapter', () => {
-            sandbox.stub(((<any>PurchasingUtilities)._purchasingAdapter), 'onPromoClosed');
+            sandbox.stub(((<unknown>PurchasingUtilities)._purchasingAdapter), 'onPromoClosed');
             PurchasingUtilities.onPromoClosed(TestFixtures.getPromoCampaign(), 'myCoolPlacement');
-            sinon.assert.called(((<any>PurchasingUtilities)._purchasingAdapter).onPromoClosed);
+            sinon.assert.called(((<unknown>PurchasingUtilities)._purchasingAdapter).onPromoClosed);
         });
     });
 

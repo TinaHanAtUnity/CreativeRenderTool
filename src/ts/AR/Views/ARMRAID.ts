@@ -299,7 +299,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    protected sendMraidAnalyticsEvent(eventName: string, eventData?: any): void {
+    protected sendMraidAnalyticsEvent(eventName: string, eventData?: unknown): void {
         const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
         const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;

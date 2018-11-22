@@ -117,8 +117,8 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 const privacy = new Privacy(platform, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
 
                 webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
-                (<any>webPlayerContainer).onPageStarted = new Observable1<string>();
-                (<any>webPlayerContainer).shouldOverrideUrlLoading = new Observable2<string, string>();
+                (<unknown>webPlayerContainer).onPageStarted = new Observable1<string>();
+                (<unknown>webPlayerContainer).shouldOverrideUrlLoading = new Observable2<string, string>();
                 asStub(webPlayerContainer.setSettings).resolves();
                 asStub(webPlayerContainer.clearSettings).resolves();
 

@@ -61,7 +61,7 @@ export class FailedOperativeEventManager {
         return Promise.resolve();
     }
 
-    public sendFailedEvents(request: RequestManager, storageBridge: StorageBridge): Promise<any[]> {
+    public sendFailedEvents(request: RequestManager, storageBridge: StorageBridge): Promise<unknown[]> {
         return this._core.Storage.getKeys(StorageType.PRIVATE, this.getEventsStorageKey(), false).then(keys => {
             return Promise.all(this.getPromisesForFailedEvents(request, storageBridge, keys));
         }).catch(() => {
@@ -71,7 +71,7 @@ export class FailedOperativeEventManager {
     }
 
     protected getPromisesForFailedEvents(request: RequestManager, storageBridge: StorageBridge, keys: string[]): Promise<unknown>[] {
-        const promises: Promise<any>[] = [];
+        const promises: Promise<unknown>[] = [];
         keys.map(eventId => {
             const manager = new FailedOperativeEventManager(this._core, this._sessionId, eventId);
             promises.push(manager.sendFailedEvent(request, storageBridge));

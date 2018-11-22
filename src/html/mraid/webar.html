@@ -32,7 +32,7 @@
 
         /* Copyright (c) 2015, Brandon Jones, Colin MacKenzie IV.
 
-         Permission is hereby granted, free of charge, to any person obtaining a copy
+         Permission is hereby granted, free of charge, to unknown person obtaining a copy
          of this software and associated documentation files (the "Software"), to deal
          in the Software without restriction, including without limitation the rights
          to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -694,7 +694,7 @@
              * Important events are "planesadded", "planesupdated", and "planesremoved".
              * @param {string} type The type of event to listen for.
              * @param {function<Object>} callback The callback to call, which must take an event object parameter,
-             *     which will have the attribute "type" in addition to any event-specific attributes.
+             *     which will have the attribute "type" in addition to unknown event-specific attributes.
              */
             this.addEventListener = function(type, callback) {
                 if (!(type in this.listeners_)) {
@@ -727,7 +727,7 @@
 
             /**
              * Fire an event to all listeners.
-             * @param {Object} event The event to fire, which must have a "type" attribute in addition to any
+             * @param {Object} event The event to fire, which must have a "type" attribute in addition to unknown
              *     event-specific attributes.
              */
             this.dispatchEvent = function(event) {
@@ -1176,7 +1176,7 @@
                     event.anchors = updatedAnchors;
                 }
 
-                // Dispatch the event to any listeners.
+                // Dispatch the event to unknown listeners.
                 WebARonARKitVRDisplay.dispatchEvent(event);
             }
         };
@@ -1224,7 +1224,7 @@
 
         var windowHooksInstalled = false;
 
-        // TODO: iOS 11 Safari requires MacOS Safari 11 or higher to debug a WKWebVew (or any iOS Safari page).
+        // TODO: iOS 11 Safari requires MacOS Safari 11 or higher to debug a WKWebVew (or unknown iOS Safari page).
         // Reimplementing console.log allows for logs to be shown in older versions of MacOS Safari.
         // This could be removed once MacOS Safari 11.0 is released (currently available as Safari Technology Preview)
         var oldConsoleLog = console.log;

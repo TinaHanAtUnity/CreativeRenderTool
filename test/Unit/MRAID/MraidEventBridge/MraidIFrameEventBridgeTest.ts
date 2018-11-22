@@ -46,7 +46,7 @@ import { ICoreApi } from 'Core/ICore';
 
         describe('receiving MRAID events', () => {
             describe(`${MRAIDEvents.OPEN} MRAID event`, () => {
-                const sendEvent = (e: string, data?: any) => {
+                const sendEvent = (e: string, data?: unknown) => {
                     return () => {
                         return new Promise((res) => {
                             window.postMessage({
@@ -64,7 +64,7 @@ import { ICoreApi } from 'Core/ICore';
             });
 
             describe(`${MRAIDEvents.LOADED} MRAID event`, () => {
-                const sendEvent = (e: string, data?: any) => {
+                const sendEvent = (e: string, data?: unknown) => {
                     return () => {
                         return new Promise((res) => {
                             window.postMessage({
@@ -81,7 +81,7 @@ import { ICoreApi } from 'Core/ICore';
             });
 
             describe(`${MRAIDEvents.ANALYTICS_EVENT} MRAID event`, () => {
-                const sendEvent = (e: string, event: any, eventData: any) => {
+                const sendEvent = (e: string, event: unknown, eventData: unknown) => {
                     return () => {
                         return new Promise((res) => {
                             window.postMessage({
@@ -100,7 +100,7 @@ import { ICoreApi } from 'Core/ICore';
             });
 
             describe(`${MRAIDEvents.STATE_CHANGE} MRAID event`, () => {
-                const sendEvent = (e: string, data?: any) => {
+                const sendEvent = (e: string, data?: unknown) => {
                     return () => {
                         return new Promise((res) => {
                             window.postMessage({
@@ -118,7 +118,7 @@ import { ICoreApi } from 'Core/ICore';
             });
 
             describe(`${MRAIDEvents.SEND_STATS} MRAID event`, () => {
-                const sendEvent = (e: string, totalTime: any, playTime: any, frameCount: any) => {
+                const sendEvent = (e: string, totalTime: unknown, playTime: unknown, frameCount: unknown) => {
                     return () => {
                         return new Promise((res) => {
                             window.postMessage({
@@ -138,7 +138,7 @@ import { ICoreApi } from 'Core/ICore';
             });
 
             describe(`${MRAIDEvents.AR} MRAID event`, () => {
-                const sendEvent = (e: string, functionName: string, args?: any) => {
+                const sendEvent = (e: string, functionName: string, args?: unknown) => {
                     return () => {
                         return new Promise((res) => {
                             window.postMessage({
@@ -159,7 +159,7 @@ import { ICoreApi } from 'Core/ICore';
             });
 
             describe(`${MRAIDEvents.CLOSE} MRAID event`, () => {
-                const sendEvent = (e: string, data?: any) => {
+                const sendEvent = (e: string, data?: unknown) => {
                     return () => {
                         return new Promise((res) => {
                             window.postMessage({
@@ -176,7 +176,7 @@ import { ICoreApi } from 'Core/ICore';
             });
 
             describe(`landscape ${MRAIDEvents.ORIENTATION} MRAID event`, () => {
-                const sendEvent = (e: string, data?: any) => {
+                const sendEvent = (e: string, data?: unknown) => {
                     return () => {
                         return new Promise((res) => {
                             window.postMessage({

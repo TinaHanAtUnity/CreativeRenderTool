@@ -611,15 +611,15 @@ export class CampaignManager {
         return Promise.resolve();
     }
 
-    private handleGeneralError(error: any, diagnosticsType: string, session?: Session): Promise<void> {
+    private handleGeneralError(error: unknown, diagnosticsType: string, session?: Session): Promise<void> {
         return this.handleError(error, this._adsConfig.getPlacementIds(), diagnosticsType, session);
     }
 
-    private handlePlacementError(error: any, placements: AuctionPlacement[], diagnosticsType: string, session?: Session): Promise<void> {
+    private handlePlacementError(error: unknown, placements: AuctionPlacement[], diagnosticsType: string, session?: Session): Promise<void> {
         return this.handleError(error, placements.map(placement => placement.getPlacementId()), diagnosticsType, session);
     }
 
-    private handleError(error: any, placementIds: string[], diagnosticsType: string, session?: Session): Promise<void> {
+    private handleError(error: unknown, placementIds: string[], diagnosticsType: string, session?: Session): Promise<void> {
         this._core.Sdk.logDebug('PLC error ' + error);
         this.onError.trigger(error, placementIds, diagnosticsType, session);
         return Promise.resolve();
@@ -747,7 +747,7 @@ export class CampaignManager {
     }
 
     private createRequestBody(gameSessionCounters: IGameSessionCounters, nofillRetry?: boolean, realtimePlacement?: Placement): Promise<unknown> {
-        const placementRequest: any = {};
+        const placementRequest: unknown = {};
 
         if(realtimePlacement && this._realtimeBody) {
 
