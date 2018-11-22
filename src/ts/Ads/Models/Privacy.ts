@@ -13,7 +13,6 @@ export interface IUnityConsentPermissions {
     external: boolean;
 }
 
-
 const CurrentUnityConsentVersion = 20181106;
 
 interface IGamePrivacy {
