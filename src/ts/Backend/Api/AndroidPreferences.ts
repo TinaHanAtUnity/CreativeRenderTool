@@ -7,15 +7,15 @@ export class AndroidPreferences extends BackendApi {
         this._unityEngineRunning = running;
     }
 
-    public getString(name: string, key: string): Promise<string> {
+    public getString(name: string, key: string): string {
         if(this._unityEngineRunning) {
             if(key === 'unity.cloud_userid') {
-                return Promise.resolve('123456acbdef');
+                return '123456acbdef';
             } else if(key === 'unity.player_sessionid') {
-                return Promise.resolve('12345');
+                return '12345';
             }
         }
 
-        return Promise.reject(['COULDNT_GET_VALUE', name, key]);
+        throw ['COULDNT_GET_VALUE', name, key];
     }
 }
