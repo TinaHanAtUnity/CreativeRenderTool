@@ -1,4 +1,9 @@
-# Staged
+# Wed Nov 21 20:44:19 UTC 2018
+
+* Don't show mute and CTA button on top of GDPR banner in video overlay [#7252](https://github.com/Applifier/unity-ads-webview/pull/7252)
+* Fix CTA button logic in closable video overlay [#7251](https://github.com/Applifier/unity-ads-webview/pull/7251)
+
+# Wed Nov 21 15:11:04 UTC 2018
 
 * VAST media selector rollout [#7225](https://github.com/Applifier/unity-ads-webview/pull/7225)
 * Fix broken AR events [#7227](https://github.com/Applifier/unity-ads-webview/pull/7227)
