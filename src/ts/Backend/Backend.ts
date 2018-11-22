@@ -23,6 +23,8 @@ import { VideoPlayer } from 'Backend/Api/VideoPlayer';
 import { BackendApi } from 'Backend/BackendApi';
 import { Platform } from 'Core/Constants/Platform';
 import { CallbackStatus, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IosPreferences } from 'Backend/Api/IosPreferences';
+import { AndroidPreferences } from 'Backend/Api/AndroidPreferences';
 
 interface IInvocation {
     className: string;
@@ -84,6 +86,7 @@ export class Backend implements IWebViewBridge {
             Notification: new Notification(this),
             Placement: new Placement(this),
             PlacementContents: new PlacementContents(this),
+            Preferences: platform === Platform.IOS ? new IosPreferences(this) : new AndroidPreferences(this),
             Purchasing: new Purchasing(this),
             Request: new Request(this),
             Resolve: new Resolve(this),
