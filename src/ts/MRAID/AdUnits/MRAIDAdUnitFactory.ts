@@ -13,6 +13,7 @@ import { MRAID } from 'MRAID/Views/MRAID';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { MraidIFrameEventBridge } from 'MRAID/Views/MraidIFrameEventBridge';
+import { ARMRAIDEventHandler } from 'AR/EventHandlers/ARMRAIDEventHandler';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -56,8 +57,10 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
 
         // NOTE: When content type is correct for playables we want to change this to content type check.
         const isPlayable: boolean = parameters.campaign instanceof PerformanceMRAIDCampaign;
+        const isAR: boolean = mraid instanceof ARMRAID;
         const isSonicPlayable: boolean = CustomFeatures.isSonicPlayable(parameters.campaign.getCreativeId());
-        const EventHandler =  (isSonicPlayable || isPlayable) ? PlayableEventHandler : MRAIDEventHandler;
+        const EventHandler = (isSonicPlayable || isPlayable) ? PlayableEventHandler :
+            isAR ? ARMRAIDEventHandler : MRAIDEventHandler;
         const mraidEventHandler: IMRAIDViewHandler = new EventHandler(mraidAdUnit, mraidAdUnitParameters);
         mraid.addEventHandler(mraidEventHandler);
         Privacy.setupReportListener(privacy, mraidAdUnit);
