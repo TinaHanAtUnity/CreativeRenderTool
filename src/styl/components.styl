@@ -394,6 +394,7 @@ $checkbox-group-container($scale-size = $default-scale-size, $context-font-size 
     position: relative;
     cursor: pointer;
     padding: 0;
+    display: inline-block;
   }
 
   // Box
@@ -434,4 +435,53 @@ $checkbox-group-container($scale-size = $default-scale-size, $context-font-size 
   }
 
 }
-
+//
+//$checkbox-group-container($scale-size = $default-scale-size, $context-font-size = 1rem) {
+//  $radio-group-default-size = $scale-size * $default-size;
+//
+//  padding: $radio-group-default-size * .5;
+//  font-size: $context-font-size;
+//
+//  [type="checkbox"]:checked,
+//  [type="checkbox"]:not(:checked) {
+//    position: absolute;
+//    visibility: hidden;
+//  }
+//
+//  // label texts
+//  [type="checkbox"]:checked + label,
+//  [type="checkbox"]:not(:checked) + label {
+//    position: relative;
+//    padding-left: $radio-group-default-size * 1.5;
+//    cursor: pointer;
+//    line-height: $context-font-size * 1.5;
+//    display: inline-block;
+//  }
+//
+//  // box
+//  [type="checkbox"]:checked + label:before,
+//  [type="checkbox"]:not(:checked) + label:before {
+//    content: '';
+//    position: absolute;
+//    left: 0;
+//    top: 0;
+//    width: $radio-group-default-size * .75;
+//    height: @width;
+//    background-size: cover;
+//    background-repeat: no-repeat;
+//    background-position: center;
+//  }
+//
+//  [type="checkbox"]:checked + label:before {
+//    background-image: url('./../img/radio_on.png');
+//  }
+//
+//  [type="checkbox"]:not(:checked) + label:before {
+//    background-image: url('./../img/radio_off.png');
+//  }
+//
+//  [type="checkbox"]:checked + label {
+//    font-weight: 500;
+//  }
+//
+//}
