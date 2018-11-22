@@ -53,6 +53,7 @@ interface IBackendApi {
     Notification: Notification;
     Placement: Placement;
     Purchasing: Purchasing;
+    Preferences: AndroidPreferences | IosPreferences;
     Request: Request;
     Sdk: Sdk;
     Storage: Storage;
