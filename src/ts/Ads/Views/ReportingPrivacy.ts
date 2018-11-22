@@ -1,13 +1,13 @@
+import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
+import { Platform } from 'Core/Constants/Platform';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import ReportingPrivacyTemplate from 'html/Reporting-privacy.html';
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 enum PrivacyCardState {
     INITIAL,
@@ -34,11 +34,11 @@ export class ReportingPrivacy extends AbstractPrivacy {
     private _reportSent: boolean = false;
     private _gdprEnabled: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: Campaign,
+    constructor(platform: Platform, campaign: Campaign,
                 gdprManager: GdprManager, gdprEnabled: boolean,
                 isCoppaCompliant: boolean) {
 
-        super(nativeBridge, isCoppaCompliant, gdprEnabled, 'reporting-privacy');
+        super(platform, isCoppaCompliant, gdprEnabled, 'reporting-privacy');
         this._templateData.badAdKeys = Object.keys(BadAdReason);
         this._templateData.badAdReasons = (<string[]>(<unknown>Object).values(BadAdReason));
 

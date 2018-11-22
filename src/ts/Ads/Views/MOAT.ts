@@ -1,7 +1,6 @@
 import { IMoatData, IMoatIds } from 'Ads/Utilities/MoatViewabilityService';
 import { Platform } from 'Core/Constants/Platform';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/ICore';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
@@ -17,6 +16,8 @@ export enum MoatState {
 }
 
 export class MOAT extends View<VastCampaign> {
+
+    private _core: ICoreApi;
     private _iframe: HTMLIFrameElement;
     private _resizeHandler: unknown;
     private _resizeDelayer: unknown;
@@ -25,9 +26,10 @@ export class MOAT extends View<VastCampaign> {
     private _messageListener: (e: MessageEvent) => void;
     private _state: MoatState = MoatState.STOPPED;
 
-    constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'moat');
+    constructor(platform: Platform, core: ICoreApi) {
+        super(platform, 'moat');
         this._template = new Template(MOATTemplate);
+        this._core = core;
         this._bindings = [];
         this._messageListener = (e: MessageEvent) => this.onMessage(e);
     }
@@ -94,13 +96,13 @@ export class MOAT extends View<VastCampaign> {
                 }
             };
 
-            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            if(this._platform === Platform.IOS) {
                 window.addEventListener('resize', this._resizeDelayer, false);
             } else {
                 window.addEventListener('resize', this._resizeHandler, false);
             }
 
-            this._nativeBridge.Sdk.logDebug('Calling MOAT init with: ' + JSON.stringify(ids) + ' duration: ' + duration + ' url: ' + url);
+            this._core.Sdk.logDebug('Calling MOAT init with: ' + JSON.stringify(ids) + ' duration: ' + duration + ' url: ' + url);
             this._iframe.contentWindow!.postMessage({
                 type: 'init',
                 data: {
@@ -116,7 +118,7 @@ export class MOAT extends View<VastCampaign> {
                 height: window.innerHeight
             }, '*');
         } else {
-            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            if(this._platform === Platform.ANDROID) {
                 this.play(volume);
             }
         }
@@ -131,7 +133,7 @@ export class MOAT extends View<VastCampaign> {
     }
 
     public triggerVideoEvent(type: string, volume: number) {
-        this._nativeBridge.Sdk.logDebug('Calling MOAT video event "' + type + '" with volume: ' + volume);
+        this._core.Sdk.logDebug('Calling MOAT video event "' + type + '" with volume: ' + volume);
         if (this._iframe.contentWindow) {
             this._iframe.contentWindow.postMessage({
                 type: 'videoEvent',
@@ -144,7 +146,7 @@ export class MOAT extends View<VastCampaign> {
     }
 
     public triggerViewabilityEvent(type: string, payload: unknown) {
-        this._nativeBridge.Sdk.logDebug('Calling MOAT viewability event "' + type + '" with payload: ' + payload);
+        this._core.Sdk.logDebug('Calling MOAT viewability event "' + type + '" with payload: ' + payload);
         if (this._iframe.contentWindow) {
             this._iframe.contentWindow.postMessage({
                 type: type,
@@ -171,7 +173,7 @@ export class MOAT extends View<VastCampaign> {
                     // do nothing
                     break;
                 default:
-                    this._nativeBridge.Sdk.logWarning(`MOAT Unknown message type ${e.data.type}`);
+                    this._core.Sdk.logWarning(`MOAT Unknown message type ${e.data.type}`);
             }
         }
     }

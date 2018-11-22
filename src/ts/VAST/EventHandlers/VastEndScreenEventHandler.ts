@@ -1,23 +1,28 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { Url } from 'Core/Utilities/Url';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
-    private _nativeBridge: NativeBridge;
     private _vastAdUnit: VastAdUnit;
     private _clientInfo: ClientInfo;
-    private _request: Request;
+    private _request: RequestManager;
     private _campaign: VastCampaign;
     private _vastEndScreen: VastEndScreen | null;
+    private _platform: Platform;
+    private _core: ICoreApi;
 
-    constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
-        this._nativeBridge = nativeBridge;
+    constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
+        this._platform = parameters.platform;
+        this._core = parameters.core;
         this._vastAdUnit = adUnit;
         this._clientInfo = parameters.clientInfo;
         this._request = parameters.request;
@@ -29,15 +34,20 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this.setCallButtonEnabled(false);
 
         const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
-
         if (clickThroughURL) {
             return this._request.followRedirectChain(clickThroughURL).then((url: string) => {
-                return this.onOpenUrl(url).then(() => {
-                    this.setCallButtonEnabled(true);
-                    this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._campaign.getSession().getId());
-                }).catch((e) => {
-                    this.setCallButtonEnabled(true);
+                return this.openUrlOnCallButton(url);
+            }).catch(() => {
+                const urlParts = Url.parse(clickThroughURL);
+                const error = new DiagnosticError(new Error('VAST endscreen clickThroughURL error'), {
+                    contentType: 'vast_endscreen',
+                    clickUrl: clickThroughURL,
+                    host: urlParts.host,
+                    protocol: urlParts.protocol,
+                    creativeId: this._campaign.getCreativeId()
                 });
+                Diagnostics.trigger('click_request_head_rejected', error);
+                return this.openUrlOnCallButton(clickThroughURL);
             });
         }
         return Promise.reject(new Error('There is no clickthrough URL for video or companion'));
@@ -57,11 +67,20 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._vastAdUnit.sendCompanionTrackingEvent(this._campaign.getSession().getId());
     }
 
-    public onOpenUrl(url: string): Promise<void> {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.UrlScheme.open(url);
+    private openUrlOnCallButton(url: string): Promise<void> {
+        return this.onOpenUrl(url).then(() => {
+            this.setCallButtonEnabled(true);
+            this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._campaign.getSession().getId());
+        }).catch(() => {
+            this.setCallButtonEnabled(true);
+        });
+    }
+
+    private onOpenUrl(url: string): Promise<void> {
+        if (this._platform === Platform.IOS) {
+            return this._core.iOS!.UrlScheme.open(url);
         } else {
-            return this._nativeBridge.Intent.launch({
+            return this._core.Android!.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': url
             });

@@ -1,5 +1,5 @@
+import { INativeResponse } from 'Core/Managers/RequestManager';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { INativeResponse } from 'Core/Utilities/Request';
 
 export class Analytics {
     public static trigger(type: string, data: {}): Promise<INativeResponse> {

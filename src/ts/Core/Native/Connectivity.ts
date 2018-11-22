@@ -1,3 +1,4 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0, Observable2 } from 'Core/Utilities/Observable';
@@ -14,7 +15,7 @@ export class ConnectivityApi extends NativeApi {
     public readonly onDisconnected = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Connectivity', ApiPackage.CORE);
+        super(nativeBridge, 'Connectivity', ApiPackage.CORE, EventCategory.CONNECTIVITY);
     }
 
     public setListeningStatus(status: boolean): Promise<void> {

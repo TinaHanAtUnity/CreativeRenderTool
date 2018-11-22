@@ -1,8 +1,7 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
-import { DeviceInfo } from 'Backend/Api/DeviceInfo';
-import { Request } from 'Backend/Api/Request';
+import { Backend } from 'Backend/Backend';
 import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
 import { assert } from 'chai';
@@ -54,7 +53,7 @@ describe('IosEventsTest', () => {
         xhr.onerror = () => {
             throw new Error(xhr.statusText);
         };
-        xhr.open('GET', 'https://fake-ads-backend.applifier.info/setup/first_perf_then_vast?token=373a221f4df5c659f2df918f899fa403');
+        xhr.open('GET', 'https://fake-ads-backend.unityads.unity3d.com/setup/first_perf_then_vast?token=373a221f4df5c659f2df918f899fa403');
         xhr.send();
     });
 
@@ -70,7 +69,7 @@ describe('IosEventsTest', () => {
         xhr.onerror = () => {
             throw new Error(xhr.statusText);
         };
-        xhr.open('GET', 'https://fake-ads-backend.applifier.info/fabulous/' + currentGameId + '/remove?token=373a221f4df5c659f2df918f899fa403');
+        xhr.open('GET', 'https://fake-ads-backend.unityads.unity3d.com/fabulous/' + currentGameId + '/remove?token=373a221f4df5c659f2df918f899fa403');
         xhr.send();
     });
 
@@ -81,11 +80,13 @@ describe('IosEventsTest', () => {
         let startCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if(++readyCount === 1) {
-                    UnityAds.show(placement);
-                }
-                if(startCount === 1) {
-                    UnityAds.show(placement);
+                if(placement === 'video' || placement === 'defaultVideoAndPictureZone') {
+                    if(++readyCount === 1) {
+                        UnityAds.show(placement);
+                    }
+                    if(startCount === 1) {
+                        UnityAds.show(placement);
+                    }
                 }
             },
             onUnityAdsStart: (placement: string) => {
@@ -95,7 +96,7 @@ describe('IosEventsTest', () => {
                 if(state === FinishState[FinishState.COMPLETED]) {
                     if(startCount === 2) {
                         setTimeout(() => {
-                            validateRequestLog(Request.getLog(), validationRegexps);
+                            validateRequestLog(UnityAds.getBackend().Api.Request.getLog(), validationRegexps);
                             assert.equal(startCount, 2, 'onUnityAdsStart was not called exactly 2 times');
                             done();
                         }, 2500);
@@ -113,21 +114,24 @@ describe('IosEventsTest', () => {
             }
         };
 
-        Request.setLog([]);
+        UnityAds.setBackend(new Backend(Platform.IOS));
 
-        DeviceInfo.setAdvertisingTrackingId('DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21');
-        DeviceInfo.setManufacturer('Apple');
-        DeviceInfo.setModel('iPhone7,2');
-        DeviceInfo.setOsVersion('10.1.1');
-        DeviceInfo.setScreenWidth(647);
-        DeviceInfo.setScreenHeight(357);
-        DeviceInfo.setTimeZone('+0200');
+        UnityAds.getBackend().Api.Request.setPassthrough(true);
+        UnityAds.getBackend().Api.Request.setLog([]);
+
+        UnityAds.getBackend().Api.DeviceInfo.setAdvertisingTrackingId('DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21');
+        UnityAds.getBackend().Api.DeviceInfo.setManufacturer('Apple');
+        UnityAds.getBackend().Api.DeviceInfo.setModel('iPhone7,2');
+        UnityAds.getBackend().Api.DeviceInfo.setOsVersion('10.1.1');
+        UnityAds.getBackend().Api.DeviceInfo.setScreenWidth(647);
+        UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(357);
+        UnityAds.getBackend().Api.DeviceInfo.setTimeZone('+0200');
 
         AbstractAdUnit.setAutoClose(true);
 
-        ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
-        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
         UnityAds.initialize(Platform.IOS, currentGameId.toString(), listener, true);
     });

@@ -1,3 +1,4 @@
+import { IAdsApi } from 'Ads/IAds';
 import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -10,7 +11,9 @@ import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -18,20 +21,22 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
-    nativeBridge: NativeBridge;
-    request: Request;
+    request: RequestManager;
     metaDataManager: MetaDataManager;
     sessionManager: SessionManager;
     clientInfo: ClientInfo;
     deviceInfo: DeviceInfo;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
+    platform: Platform;
+    core: ICoreApi;
+    ads: IAdsApi;
+    storageBridge: StorageBridge;
     campaign: T;
 }
 
@@ -75,14 +80,17 @@ export class OperativeEventManager {
     protected _clientInfo: ClientInfo;
     protected _campaign: Campaign;
     protected _metaDataManager: MetaDataManager;
-    protected _nativeBridge: NativeBridge;
+    protected _storageBridge: StorageBridge;
     private _deviceInfo: DeviceInfo;
-    private _request: Request;
+    private _request: RequestManager;
     private _coreConfig: CoreConfiguration;
     private _adsConfig: AdsConfiguration;
+    protected _platform: Platform;
+    protected _core: ICoreApi;
+    protected _ads: IAdsApi;
 
     constructor(params: IOperativeEventManagerParams<Campaign>) {
-        this._nativeBridge = params.nativeBridge;
+        this._storageBridge = params.storageBridge;
         this._metaDataManager = params.metaDataManager;
         this._sessionManager = params.sessionManager;
         this._clientInfo = params.clientInfo;
@@ -91,6 +99,9 @@ export class OperativeEventManager {
         this._coreConfig = params.coreConfig;
         this._adsConfig = params.adsConfig;
         this._campaign = params.campaign;
+        this._platform = params.platform;
+        this._core = params.core;
+        this._ads = params.ads;
     }
 
     public sendStart(params: IOperativeEventParams): Promise<void> {
@@ -253,7 +264,7 @@ export class OperativeEventManager {
             return Promise.resolve();
         }
 
-        this._nativeBridge.Sdk.logInfo('Unity Ads event: sending ' + event + ' event to ' + url);
+        this._core.Sdk.logInfo('Unity Ads event: sending ' + event + ' event to ' + url);
 
         return this._request.post(url, data, [], {
             retries: 2,
@@ -261,7 +272,7 @@ export class OperativeEventManager {
             followRedirects: false,
             retryWithConnectionEvents: false
         }).catch(() => {
-            new FailedOperativeEventManager(sessionId, eventId).storeFailedEvent(this._nativeBridge, {
+            new FailedOperativeEventManager(this._core, sessionId, eventId).storeFailedEvent(this._storageBridge, {
                url: url,
                data: data
             });
@@ -286,15 +297,16 @@ export class OperativeEventManager {
     }
 
     protected createUniqueEventMetadata(params: IOperativeEventParams, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, unknown]> {
-        return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
+        return this._core.DeviceInfo.getUniqueEventId().then(id => {
             return this.getInfoJson(params, id, gameSession, gamerSid, previousPlacementId);
         });
     }
 
     protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, unknown]> {
+        const session = this._campaign.getSession();
         let infoJson: unknown = {
             'eventId': eventId,
-            'auctionId': this._campaign.getSession().getId(),
+            'auctionId': session.getId(),
             'gameSessionId': gameSession,
             'campaignId': this._campaign.getId(),
             'adType': this._campaign.getAdType(),
@@ -310,7 +322,7 @@ export class OperativeEventManager {
             'previousPlacementId': previousPlacementId,
             'bundleId': this._clientInfo.getApplicationName(),
             'meta': this._campaign.getMeta(),
-            'platform': Platform[this._clientInfo.getPlatform()].toLowerCase(),
+            'platform': Platform[this._platform].toLowerCase(),
             'language': this._deviceInfo.getLanguage(),
             'cached': CampaignAssetInfo.isCached(this._campaign),
             'cachedOrientation': CampaignAssetInfo.getCachedVideoOrientation(this._campaign),
@@ -318,10 +330,10 @@ export class OperativeEventManager {
             'gdprEnabled': this._adsConfig.isGDPREnabled(),
             'optOutEnabled': this._adsConfig.isOptOutEnabled(),
             'optOutRecorded': this._adsConfig.isOptOutRecorded(),
-            'gameSessionCounters': GameSessionCounters.getDTO()
+            'gameSessionCounters': session.getGameSessionCounters()
         };
 
-        if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
+        if(this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             infoJson = {
                 ... infoJson,
                 'apiLevel': this._deviceInfo.getApiLevel(),

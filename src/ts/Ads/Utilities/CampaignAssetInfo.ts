@@ -1,3 +1,4 @@
+import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
@@ -29,7 +30,15 @@ export class CampaignAssetInfo {
                 return true;
             }
         } else if(campaign instanceof PromoCampaign) {
-            return campaign.getCreativeResource().isCached();
+            const resource = campaign.getCreativeResource();
+            if (resource) {
+                return resource.isCached();
+            }
+        } else if(campaign instanceof AdMobCampaign) {
+            const video = campaign.getVideo();
+            if (video && video.getVideo() && video.getVideo().isCached()) {
+                return true;
+            }
         }
 
         return false;

@@ -1,14 +1,18 @@
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { StorageType } from 'Core/Native/Storage';
-import { Request } from 'Core/Utilities/Request';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { StorageOperation } from 'Core/Utilities/StorageOperation';
+import { ICoreApi } from 'Core/ICore';
 
 export class FailedOperativeEventManager {
 
+    protected _core: ICoreApi;
     protected _sessionId: string;
     protected _eventId: string | undefined;
 
-    constructor(sessionId: string, eventId?: string) {
+    constructor(core: ICoreApi, sessionId: string, eventId?: string) {
+        this._core = core;
         this._sessionId = sessionId;
         this._eventId = eventId;
     }
@@ -21,37 +25,34 @@ export class FailedOperativeEventManager {
         return SessionUtils.getSessionStorageKey(this._sessionId) + '.operative';
     }
 
-    public storeFailedEvent(nativeBridge: NativeBridge, data: { [key: string]: unknown }): Promise<void> {
+    public storeFailedEvent(storageBridge: StorageBridge, data: { [key: string]: unknown }): Promise<void> {
         if(this._eventId) {
-            nativeBridge.Storage.set(StorageType.PRIVATE, this.getEventStorageKey(), data);
-            this.writeStorage(nativeBridge);
+            const operation = new StorageOperation(StorageType.PRIVATE);
+            operation.set(this.getEventStorageKey(), data);
+            storageBridge.queue(operation);
         }
 
         return Promise.resolve();
     }
 
-    public deleteFailedEvent(nativeBridge: NativeBridge): Promise<void> {
+    public deleteFailedEvent(storageBridge: StorageBridge): Promise<void> {
         if(this._eventId) {
-            return nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventStorageKey()).catch(() => {
-                // Ignore errors, if events fail to be sent, they will be retried later
-            });
+            const operation = new StorageOperation(StorageType.PRIVATE);
+            operation.delete(this.getEventStorageKey());
+            storageBridge.queue(operation);
         }
 
         return Promise.resolve();
     }
 
-    public sendFailedEvent(nativeBridge: NativeBridge, request: Request, writeStorage?: boolean): Promise<void> {
+    public sendFailedEvent(request: RequestManager, storageBridge: StorageBridge): Promise<void> {
         if(this._eventId) {
-            return nativeBridge.Storage.get<{ [key: string]: unknown }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
+            return this._core.Storage.get<{ [key: string]: unknown }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
                 const url = eventData.url;
                 const data = eventData.data;
                 return request.post(url, data);
             }).then(() => {
-                return this.deleteFailedEvent(nativeBridge).then(() => {
-                    if(writeStorage) {
-                        this.writeStorage(nativeBridge);
-                    }
-                });
+                return this.deleteFailedEvent(storageBridge);
             }).catch(() => {
                 // Ignore errors, if events fail to be sent, they will be retried later
             });
@@ -60,30 +61,22 @@ export class FailedOperativeEventManager {
         return Promise.resolve();
     }
 
-    public sendFailedEvents(nativeBridge: NativeBridge, request: Request): Promise<void> {
-        return nativeBridge.Storage.getKeys(StorageType.PRIVATE, this.getEventsStorageKey(), false).then(keys => {
-            const promises = this.getPromisesForFailedEvents(nativeBridge, request, keys);
-            return Promise.all(promises).then(() => {
-                return this.writeStorage(nativeBridge);
-            });
+    public sendFailedEvents(request: RequestManager, storageBridge: StorageBridge): Promise<any[]> {
+        return this._core.Storage.getKeys(StorageType.PRIVATE, this.getEventsStorageKey(), false).then(keys => {
+            return Promise.all(this.getPromisesForFailedEvents(request, storageBridge, keys));
         }).catch(() => {
             // Ignore errors, if events fail to be sent, they will be retried later
+            return Promise.resolve([]);
         });
     }
 
-    protected getPromisesForFailedEvents(nativeBridge: NativeBridge, request: Request, keys: string[]): Array<Promise<unknown>> {
-        const promises: Array<Promise<unknown>> = [];
+    protected getPromisesForFailedEvents(request: RequestManager, storageBridge: StorageBridge, keys: string[]): Promise<unknown>[] {
+        const promises: Promise<any>[] = [];
         keys.map(eventId => {
-            const manager = new FailedOperativeEventManager(this._sessionId, eventId);
-            promises.push(manager.sendFailedEvent(nativeBridge, request));
+            const manager = new FailedOperativeEventManager(this._core, this._sessionId, eventId);
+            promises.push(manager.sendFailedEvent(request, storageBridge));
         });
 
         return promises;
-    }
-
-    protected writeStorage(nativeBridge: NativeBridge): Promise<void> {
-        return nativeBridge.Storage.write(StorageType.PRIVATE).catch(() => {
-            // Ignore errors
-        });
     }
 }

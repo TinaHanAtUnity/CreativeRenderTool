@@ -26,7 +26,7 @@ let runningResizeEvent = false;
 
 const changeOrientation = () => {
 
-    /* Calculate orientation based on width and height by default */
+    // Calculate orientation based on width and height by default
     let orientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
 
     if (typeof window.orientation !== 'undefined' && platform === 'ios' && !isIOS7) {
@@ -111,6 +111,11 @@ if(typeof location !== 'undefined') {
     const extWindow = <IExtendedWindow> window;
     extWindow.nativebridge = nativeBridge;
     extWindow.webview = new WebView(nativeBridge);
+
+    // SafeDK garbage
+    (<any>extWindow.webview)._configuration = {
+        getPlacement: () => { return { getCurrentCampaign: () => 'SafeDK violates Unity Ads SDK internals, please disable your SafeDK integration.' }; }
+    };
 
     document.addEventListener('DOMContentLoaded', () => extWindow.webview.initialize(), false);
 }

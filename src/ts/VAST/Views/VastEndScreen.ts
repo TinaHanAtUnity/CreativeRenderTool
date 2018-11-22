@@ -1,19 +1,18 @@
-import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 
 export interface IVastEndScreenHandler {
     onVastEndScreenClick(): void;
     onVastEndScreenClose(): void;
     onVastEndScreenShow(): void;
     onKeyEvent(keyCode: number): void;
-    onOpenUrl(url: string): Promise<void>;
 }
 
 export interface IVastEndscreenParameters {
@@ -32,8 +31,8 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     private _seatId: number | undefined;
     private _showPrivacyDuringEndscreen: boolean;
 
-    constructor(nativeBridge: NativeBridge, parameters: IVastEndscreenParameters, privacy: AbstractPrivacy) {
-        super(nativeBridge, 'vast-end-screen');
+    constructor(platform: Platform, parameters: IVastEndscreenParameters, privacy: AbstractPrivacy) {
+        super(platform, 'vast-end-screen');
 
         this._campaign = parameters.campaign;
         this._template = new Template(VastEndScreenTemplate);

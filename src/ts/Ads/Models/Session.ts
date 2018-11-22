@@ -1,4 +1,5 @@
 import { Model } from 'Core/Models/Model';
+import { IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 
 export enum EventType {
     START,
@@ -16,6 +17,7 @@ export interface ISession {
     id: string;
     adPlan: string | undefined;
     eventSent: { [key: number]: boolean };
+    gameSessionCounters: IGameSessionCounters;
 }
 
 export class Session extends Model<ISession> {
@@ -24,7 +26,8 @@ export class Session extends Model<ISession> {
         super('Session', {
             id: ['string'],
             adPlan: ['string', 'undefined'],
-            eventSent: ['object']
+            eventSent: ['object'],
+            gameSessionCounters: ['object']
         });
 
         this.set('id', id);
@@ -57,6 +60,14 @@ export class Session extends Model<ISession> {
             eventSent[eventType] = true;
         }
         this.set('eventSent', eventSent);
+    }
+
+    public setGameSessionCounters(gameSessionCounters: IGameSessionCounters) {
+        this.set('gameSessionCounters', gameSessionCounters);
+    }
+
+    public getGameSessionCounters(): IGameSessionCounters {
+        return this.get('gameSessionCounters');
     }
 
     public getDTO(): { [key: string]: unknown } {

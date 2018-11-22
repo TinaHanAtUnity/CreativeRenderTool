@@ -1,10 +1,86 @@
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+
+export type IAnalyticsMessage = {};
+
+export interface IAnalyticsMonetizationExtras {
+    gamer_token: string;
+    game_id: string;
+}
+
+export interface IAnalyticsCustomParams {
+    unity_monetization_extras: string;
+}
+
+export interface IAnalyticsEvent<T extends IAnalyticsMessage> {
+    type: string;
+    msg: T;
+}
+
+interface IAnalyticsLevelUpEvent extends IAnalyticsCustomParams {
+    new_level_index: number;
+}
+
+interface IAnalyticsLevelFailedEvent extends IAnalyticsCustomParams {
+    level_index: number;
+}
+
+interface IAnalyticsItemEvent extends IAnalyticsCustomParams {
+    currency_type: string;
+    transaction_context: string;
+    amount: number;
+    item_id: string;
+    balance: number;
+    item_type: string;
+    level: string;
+    transaction_id: string;
+}
+
+interface IAnalyticsAdCompleteEvent extends IAnalyticsCustomParams {
+    rewarded: boolean;
+    network: string;
+    placement_id: string;
+}
+
+interface IIapTransactionEvent extends IAnalyticsMessage {
+    ts: number;
+    productid: string;
+    amount: number;
+    currency: string;
+    transactionid: number;
+    iap_service: boolean;
+    promo: boolean;
+    receipt: string;
+    unity_monetization_extras: string;
+}
+
+interface IIapPurchaseFailedEvent extends IAnalyticsCustomParams {
+    productID: string;
+    reason: string;
+    price: number;
+    currency: string;
+}
+
+interface IAnalyticsCustomEvent<G extends IAnalyticsCustomParams> extends IAnalyticsMessage {
+    ts: number;
+    t_since_start: number; // appended by webview
+    name: string;
+    custom_params: G;
+}
+
+export type AnalyticsItemAcquiredEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsItemEvent>>;
+export type AnalyticsItemSpentEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsItemEvent>>;
+export type AnalyticsLevelUpEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsLevelUpEvent>>;
+export type AnalyticsLevelFailedEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsLevelFailedEvent>>;
+export type AnalyticsGenericEvent = IAnalyticsEvent<IAnalyticsMessage>;
+export type AnalyticsAdCompleteEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IAnalyticsAdCompleteEvent>>;
+export type AnalyticsIapTransactionEvent = IAnalyticsEvent<IIapTransactionEvent>;
+export type AnalyticsIapPurchaseFailedEvent = IAnalyticsEvent<IAnalyticsCustomEvent<IIapPurchaseFailedEvent>>;
 
 export interface IAnalyticsObject {
     type: string;
@@ -27,6 +103,8 @@ interface IAnalyticsCommonObjectInternal {
     ads_coppa: boolean;
     ads_gameid: string;
     ads_sdk: boolean;
+    iap_ver: string; // BYOP?
+    gamer_token: string;
 }
 
 interface IAnalyticsDeviceInfoEvent {
@@ -76,24 +154,26 @@ export class AnalyticsProtocol {
             ads_tracking: deviceInfo.getLimitAdTracking() ? false : true, // intentionally inverted value
             ads_coppa: configuration.isCoppaCompliant(),
             ads_gameid: clientInfo.getGameId(),
-            ads_sdk: true
+            ads_sdk: true,
+            iap_ver: 'ads sdk',
+            gamer_token: configuration.getToken()
         };
         return {
             common: common
         };
     }
 
-    public static getDeviceInfoObject(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<IAnalyticsObject> {
+    public static getDeviceInfoObject(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<IAnalyticsObject> {
         return Promise.all([
-            AnalyticsProtocol.getScreen(nativeBridge, deviceInfo),
-            AnalyticsProtocol.getDeviceModel(nativeBridge, deviceInfo)
+            AnalyticsProtocol.getScreen(platform, core, deviceInfo),
+            AnalyticsProtocol.getDeviceModel(platform, core, deviceInfo)
         ]).then(([screen, model]) => {
             const event: IAnalyticsDeviceInfoEvent = {
                 ts: Date.now(),
                 app_ver: clientInfo.getApplicationVersion(),
                 adsid: deviceInfo.getAdvertisingIdentifier(),
                 ads_tracking: deviceInfo.getLimitAdTracking() ? false : true, // intentionally inverted value
-                os_ver: AnalyticsProtocol.getOsVersion(nativeBridge, deviceInfo),
+                os_ver: AnalyticsProtocol.getOsVersion(platform, deviceInfo),
                 model: model,
                 app_name: clientInfo.getApplicationName(),
                 ram: Math.round(deviceInfo.getTotalMemory() / 1024), // convert DeviceInfo kilobytes to analytics megabytes
@@ -153,6 +233,16 @@ export class AnalyticsProtocol {
         };
     }
 
+    public static getOsVersion(platform: Platform, deviceInfo: DeviceInfo): string {
+        if(platform === Platform.IOS) {
+            return 'iOS ' + deviceInfo.getOsVersion();
+        } else if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
+            return 'Android OS ' + deviceInfo.getOsVersion() + ' / API-' + deviceInfo.getApiLevel();
+        } else {
+            return '';
+        }
+    }
+
     private static getAdvertisingIdentifier(deviceInfo: DeviceInfo): string | undefined {
         const adsid: string | undefined | null = deviceInfo.getAdvertisingIdentifier();
 
@@ -163,13 +253,13 @@ export class AnalyticsProtocol {
         }
     }
 
-    private static getScreen(nativeBridge: NativeBridge, deviceInfo: DeviceInfo): Promise<string> {
-        if(nativeBridge.getPlatform() === Platform.IOS) {
+    private static getScreen(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo): Promise<string> {
+        if(platform === Platform.IOS) {
             return Promise.all([
                 deviceInfo.getScreenWidth(),
                 deviceInfo.getScreenHeight(),
-                nativeBridge.DeviceInfo.Ios.isStatusBarHidden(),
-                nativeBridge.DeviceInfo.Ios.getStatusBarHeight()
+                core.DeviceInfo.Ios!.isStatusBarHidden(),
+                core.DeviceInfo.Ios!.getStatusBarHeight()
             ]).then(([width, height, statusBarHidden, statusBarHeight]) => {
                 let screenWidth = width;
                 let screenHeight = height;
@@ -207,11 +297,11 @@ export class AnalyticsProtocol {
         }
     }
 
-    private static getDeviceModel(nativeBridge: NativeBridge, deviceInfo: DeviceInfo): Promise<string> {
-        if(nativeBridge.getPlatform() === Platform.IOS) {
+    private static getDeviceModel(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo): Promise<string> {
+        if(platform === Platform.IOS) {
             return Promise.resolve(deviceInfo.getModel());
-        } else if (nativeBridge.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
-            return nativeBridge.DeviceInfo.Android.getDevice().then(device => {
+        } else if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
+            return core.DeviceInfo.Android!.getDevice().then(device => {
                 return deviceInfo.getManufacturer() + '/' + deviceInfo.getModel() + '/' + device;
             });
         } else {
@@ -219,13 +309,4 @@ export class AnalyticsProtocol {
         }
     }
 
-    private static getOsVersion(nativeBridge: NativeBridge, deviceInfo: DeviceInfo): string {
-        if(nativeBridge.getPlatform() === Platform.IOS) {
-            return 'iOS ' + deviceInfo.getOsVersion();
-        } else if (nativeBridge.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
-            return 'Android OS ' + deviceInfo.getOsVersion() + ' / API-' + deviceInfo.getApiLevel();
-        } else {
-            return '';
-        }
-    }
 }

@@ -11,7 +11,8 @@ export class JaegerUtilities {
     // this should not be done over the native bridge else we end up with delay added to all network requests.
     public static uuidv4(): string {
         return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-            const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
           });
     }

@@ -5,27 +5,29 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/ICore';
 
 export class PrivacyEventHandler implements IPrivacyHandler {
 
-    private _nativeBridge: NativeBridge;
+    private _platform: Platform;
+    private _core: ICoreApi;
     private _gdprManager: GdprManager;
     private _configuration: AdsConfiguration;
     private _placement: Placement;
 
-    constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
-        this._nativeBridge = nativeBridge;
+    constructor(parameters: IAdUnitParameters<Campaign>) {
+        this._platform = parameters.platform;
+        this._core = parameters.core;
         this._gdprManager = parameters.gdprManager;
         this._configuration = parameters.adsConfig;
         this._placement = parameters.placement;
     }
 
     public onPrivacy(url: string): void {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._nativeBridge.UrlScheme.open(url);
-        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.Intent.launch({
+        if (this._platform === Platform.IOS) {
+            this._core.iOS!.UrlScheme.open(url);
+        } else if (this._platform === Platform.ANDROID) {
+            this._core.Android!.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': url
             });

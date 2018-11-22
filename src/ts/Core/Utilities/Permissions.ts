@@ -1,7 +1,7 @@
-import {Platform} from 'Core/Constants/Platform';
-import {NativeBridge} from 'Core/Native/Bridge/NativeBridge';
-import {AndroidPermission} from 'Core/Native/Android/AndroidPermissions';
-import {IosPermission} from 'Core/Native/iOS/IosPermissions';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { AndroidPermission } from 'Core/Native/Android/Permissions';
+import { IosBundleKeys, IosPermission } from 'Core/Native/iOS/Permissions';
 
 export enum CurrentPermission {
     UNKNOWN,
@@ -18,31 +18,39 @@ export enum PermissionTypes {
 export class PermissionsUtil {
     private static readonly ANDROID_PERMISSIONS_ASKED_KEY = 'unity-ads-permissions-asked';
 
-    public static checkPermissions(nativeBridge: NativeBridge, permission: PermissionTypes): Promise<CurrentPermission> {
-        const platform = nativeBridge.getPlatform();
+    public static checkPermissionInManifest(platform: Platform, core: ICoreApi, permission: PermissionTypes): Promise<boolean> {
+        const platformPermission = PermissionsUtil.getPlatformPermission(platform, permission);
         if (platform === Platform.ANDROID) {
-            return PermissionsUtil.checkAndroidPermission(nativeBridge, permission);
+            return PermissionsUtil.checkAndroidPermissionInManifest(core, platformPermission);
+        } else {
+            return PermissionsUtil.checkIosPermissionInManifest(core, platformPermission);
+        }
+        return Promise.resolve(false);
+    }
+
+    public static checkPermissions(platform: Platform, core: ICoreApi, permission: PermissionTypes): Promise<CurrentPermission> {
+        if (platform === Platform.ANDROID) {
+            return PermissionsUtil.checkAndroidPermission(core, permission);
         } else if (platform === Platform.IOS) {
-            return PermissionsUtil.checkIosPermission(nativeBridge, permission);
+            return PermissionsUtil.checkIosPermission(core, permission);
         }
 
         return Promise.resolve<CurrentPermission>(CurrentPermission.DENIED);
     }
 
-    public static requestPermission(nativeBridge: NativeBridge, permission: PermissionTypes): Promise<void> {
-        const platformPermission = PermissionsUtil.getPlatformPermission(nativeBridge.getPlatform(), permission);
+    public static requestPermission(platform: Platform, core: ICoreApi, permission: PermissionTypes): Promise<void> {
+        const platformPermission = PermissionsUtil.getPlatformPermission(platform, permission);
         if (platformPermission === PermissionTypes.INVALID) {
             return Promise.reject(PermissionTypes.INVALID);
         }
 
-        const platform = nativeBridge.getPlatform();
         if (platform === Platform.ANDROID) {
-            nativeBridge.Permissions.permissionRequestCode += 1;
-            return nativeBridge.AndroidPreferences.setBoolean(PermissionsUtil.ANDROID_PERMISSIONS_ASKED_KEY, permission.toString(), true).then(() => {
-                return nativeBridge.Permissions.Android.requestPermissions([platformPermission], nativeBridge.Permissions.permissionRequestCode);
+            core.Permissions.permissionRequestCode += 1;
+            return core.Android!.Preferences.setBoolean(PermissionsUtil.ANDROID_PERMISSIONS_ASKED_KEY, permission.toString(), true).then(() => {
+                return core.Permissions.Android!.requestPermissions([platformPermission], core.Permissions.permissionRequestCode);
             });
         } else if (platform === Platform.IOS) {
-            return nativeBridge.Permissions.Ios.requestPermission(platformPermission);
+            return core.Permissions.Ios!.requestPermission(platformPermission);
         }
 
         return Promise.resolve();
@@ -64,14 +72,34 @@ export class PermissionsUtil {
         return PermissionTypes.INVALID;
     }
 
-    private static checkAndroidPermission(nativeBridge: NativeBridge, permission: PermissionTypes): Promise<CurrentPermission> {
+    private static checkAndroidPermissionInManifest(core: ICoreApi, permission: string): Promise<boolean> {
+        return core.Permissions.Android!.getPermissions()
+            .then((permissions: string[]) => permissions.some((key: string) => key === permission))
+            .catch(() => false);
+    }
+
+    private static checkIosPermissionInManifest(core: ICoreApi, permission: string): Promise<boolean> {
+        let key = '';
+        if (permission === IosPermission.AVMediaTypeVideo) {
+            key = IosBundleKeys.Camera;
+        } else if (permission === IosPermission.AVMediaTypeAudio) {
+            key = IosBundleKeys.Audio;
+        } else {
+            return Promise.resolve(false);
+        }
+        return core.iOS!.MainBundle.getDataForKey(key)
+            .then((value: [string, any]) => value[0] !== '')
+            .catch(() => false);
+    }
+
+    private static checkAndroidPermission(core: ICoreApi, permission: PermissionTypes): Promise<CurrentPermission> {
         const androidPermission = PermissionsUtil.getPlatformPermission(Platform.ANDROID, permission);
         if (androidPermission === PermissionTypes.INVALID) {
             return Promise.reject(PermissionTypes.INVALID);
         }
 
         return new Promise<CurrentPermission>(resolve => {
-            nativeBridge.Permissions.Android.checkPermission(androidPermission).then(results => {
+            core.Permissions.Android!.checkPermission(androidPermission).then(results => {
                 if (results === 0) { // Granted = 0
                     resolve(CurrentPermission.ACCEPTED);
                     return;
@@ -79,7 +107,7 @@ export class PermissionsUtil {
 
                 // Emulate the behaviour on iOS because Android doesn't have an unknown state. We return UNKNOWN if we
                 // haven't asked for the permission already.
-                nativeBridge.AndroidPreferences.hasKey(PermissionsUtil.ANDROID_PERMISSIONS_ASKED_KEY, permission.toString()).then(asked => {
+                core.Android!.Preferences.hasKey(PermissionsUtil.ANDROID_PERMISSIONS_ASKED_KEY, permission.toString()).then(asked => {
                     if (asked) {
                         resolve(CurrentPermission.DENIED);
                     } else {
@@ -93,13 +121,13 @@ export class PermissionsUtil {
         });
     }
 
-    private static checkIosPermission(nativeBridge: NativeBridge, permission: PermissionTypes): Promise<CurrentPermission> {
+    private static checkIosPermission(core: ICoreApi, permission: PermissionTypes): Promise<CurrentPermission> {
         const iosPermission = PermissionsUtil.getPlatformPermission(Platform.IOS, permission);
         if (iosPermission === PermissionTypes.INVALID) {
             return Promise.reject(PermissionTypes.INVALID);
         }
 
-        return nativeBridge.Permissions.Ios.checkPermission(iosPermission).then((results: number) => {
+        return core.Permissions.Ios!.checkPermission(iosPermission).then((results: number) => {
             if (results === 3) { // Authorized = 3
                 return CurrentPermission.ACCEPTED;
             }

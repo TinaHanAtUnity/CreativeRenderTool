@@ -11,10 +11,10 @@ import { EventType } from 'Ads/Models/Session';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { EndScreen } from 'Ads/Views/EndScreen';
+import { IARApi } from 'AR/AR';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { FinishState } from 'Core/Constants/FinishState';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
 
@@ -22,6 +22,7 @@ export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign>
     mraid: MRAIDView<IMRAIDViewHandler>;
     endScreen?: EndScreen;
     privacy: AbstractPrivacy;
+    ar: IARApi;
 }
 
 export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
@@ -29,6 +30,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _mraid: MRAIDView<IMRAIDViewHandler>;
+    private _ar: IARApi;
     private _options: unknown;
     private _orientationProperties: IOrientationProperties;
     private _endScreen?: EndScreen;
@@ -39,8 +41,8 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _privacy: AbstractPrivacy;
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
 
-    constructor(nativeBridge: NativeBridge, parameters: IMRAIDAdUnitParameters) {
-        super(nativeBridge, parameters);
+    constructor(parameters: IMRAIDAdUnitParameters) {
+        super(parameters);
 
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
@@ -51,6 +53,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
         this._privacy = parameters.privacy;
+        this._ar = parameters.ar;
 
         this._mraid.render();
         document.body.appendChild(this._mraid.container());
@@ -74,7 +77,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowing(true);
         this.setShowingMRAID(true);
         this._mraid.show();
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
+        this._ads.Listener.sendStartEvent(this._placement.getId());
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });
@@ -85,7 +88,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         const views: string[] = ['webview'];
 
         const isARCreative = ARUtil.isARCreative(this._campaign);
-        const isARSupported = isARCreative ? ARUtil.isARSupported(this._nativeBridge) : Promise.resolve<boolean>(false);
+        const isARSupported = isARCreative ? ARUtil.isARSupported(this._ar) : Promise.resolve<boolean>(false);
 
         return isARSupported.then(arSupported => {
             if (arSupported) {
@@ -134,7 +137,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._mraid.container().parentElement!.removeChild(this._mraid.container());
         this.unsetReferences();
 
-        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this._container.removeEventHandler(this);
 
         return this._container.close().then(() => {
@@ -223,7 +226,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
             if(trackingEventUrls) {
                 for (const url of trackingEventUrls) {
-                    this._thirdPartyEventManager.sendEvent(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
+                    this._thirdPartyEventManager.sendWithGet(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
                 }
             }
         }

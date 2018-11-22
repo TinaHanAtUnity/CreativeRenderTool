@@ -153,7 +153,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
     }
 
     private sendThirdPartyImpressionEvent(): void {
-        const impressionUrls = this._vastCampaign.getImpressionUrls();
+        const impressionUrls = this._vastCampaign.getImpressionUrls().concat(this._vastCampaign.getTrackingUrlsForEvent('impression'));
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
                 this.sendThirdPartyEvent('vast impression', impressionUrl);
@@ -162,7 +162,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
     }
 
     private sendThirdPartyTrackingEvent(eventName: string): void {
-        const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
+        const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName).concat(this._vastCampaign.getTrackingUrlsForEvent(eventName));
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {
                 this.sendThirdPartyEvent(`vast ${eventName}`, url);
@@ -173,6 +173,6 @@ export class VastVideoEventHandler extends VideoEventHandler {
     private sendThirdPartyEvent(event: string, url: string): void {
         url = url.replace(/%ZONE%/, this._placement.getId());
         url = url.replace(/%SDK_VERSION%/, this._clientInfo.getSdkVersion().toString());
-        this._thirdPartyEventManager.sendEvent(event, this._campaign.getSession().getId(), url, this._vastCampaign.getUseWebViewUserAgentForTracking());
+        this._thirdPartyEventManager.sendWithGet(event, this._campaign.getSession().getId(), url, this._vastCampaign.getUseWebViewUserAgentForTracking());
     }
 }

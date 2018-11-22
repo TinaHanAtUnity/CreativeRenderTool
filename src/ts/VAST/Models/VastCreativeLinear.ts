@@ -13,6 +13,9 @@ interface IVastCreativeLinear extends IVastCreative {
 
 export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
     constructor();
+    constructor(duration: number, skipDelay: number, mediaFiles: unknown[],
+        videoClickThroughURLTemplate: string, videoClickTrackingURLTemplates: string[],
+        videoCustomClickURLTemplates: string[], adParameters: unknown);
     constructor(duration?: number, skipDelay?: number, mediaFiles?: unknown[],
                 videoClickThroughURLTemplate?: string, videoClickTrackingURLTemplates?: string[],
                 videoCustomClickURLTemplates?: string[], adParameters?: unknown) {

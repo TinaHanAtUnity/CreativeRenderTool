@@ -58,10 +58,10 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
         return this.get('vpaid');
     }
 
-    public getRequiredAssets(): Array<Asset> {
+    public getRequiredAssets(): Asset[] {
         return [];
     }
-    public getOptionalAssets(): Array<Asset> {
+    public getOptionalAssets(): Asset[] {
         return [];
     }
 

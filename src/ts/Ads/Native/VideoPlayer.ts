@@ -1,8 +1,9 @@
-import { AndroidVideoPlayerApi } from 'Ads/Native/Android/AndroidVideoPlayer';
-import { IosVideoPlayerApi } from 'Ads/Native/iOS/IosVideoPlayer';
+import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
+import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { Platform } from 'Core/Constants/Platform';
+import { EventedNativeApi } from 'Core/Native/Bridge/EventedNativeApi';
 import { ApiPackage } from 'Core/Native/Bridge/NativeApi';
-import { NativeApiWithEventHandlers } from 'Core/Native/Bridge/NativeApiWithEventHandlers';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
 
@@ -28,15 +29,15 @@ export interface IVideoEventHandler {
     onStop(url: string): void;
 }
 
-export class VideoPlayerApi extends NativeApiWithEventHandlers<IVideoEventHandler> {
+export class VideoPlayerApi extends EventedNativeApi<IVideoEventHandler> {
 
-    public Ios: IosVideoPlayerApi;
-    public Android: AndroidVideoPlayerApi;
+    public readonly iOS?: IosVideoPlayerApi;
+    public readonly Android?: AndroidVideoPlayerApi;
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS);
+        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS, EventCategory.VIDEOPLAYER);
         if(nativeBridge.getPlatform() === Platform.IOS) {
-            this.Ios = new IosVideoPlayerApi(nativeBridge);
+            this.iOS = new IosVideoPlayerApi(nativeBridge);
         } else if(nativeBridge.getPlatform() === Platform.ANDROID) {
             this.Android = new AndroidVideoPlayerApi(nativeBridge);
         }
@@ -122,9 +123,9 @@ export class VideoPlayerApi extends NativeApiWithEventHandlers<IVideoEventHandle
 
             default:
                 if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                    this.Ios.handleEvent(event, parameters);
+                    this.iOS!.handleEvent(event, parameters);
                 } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                    this.Android.handleEvent(event, parameters);
+                    this.Android!.handleEvent(event, parameters);
                 }
         }
     }

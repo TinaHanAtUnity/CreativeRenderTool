@@ -3,14 +3,17 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
+import { Platform } from 'Core/Constants/Platform';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 export class ProgrammaticMraidUrlParser extends CampaignParser {
+
     public static ContentType = 'programmatic/mraid-url';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraidUrl = response.getJsonContent();
 
         if(!jsonMraidUrl) {
@@ -27,15 +30,17 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
-            id: this.getProgrammaticCampaignId(nativeBridge),
+            id: this.getProgrammaticCampaignId(platform),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
+            contentType: ProgrammaticMraidUrlParser.ContentType,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
             creativeId: response.getCreativeId() || undefined,
             seatId: response.getSeatId() || undefined,
             meta: jsonMraidUrl.meta,
             session: session,
-            mediaId: response.getMediaId()
+            mediaId: response.getMediaId(),
+            trackingUrls: response.getTrackingUrls() || {}
         };
 
         const parameters: IMRAIDCampaign = {
@@ -43,7 +48,6 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             resourceAsset: jsonMraidUrl.inlinedUrl ? new HTML(this.validateAndEncodeUrl(jsonMraidUrl.inlinedUrl, session), session) : undefined,
             resource: undefined,
             dynamicMarkup: jsonMraidUrl.dynamicMarkup,
-            trackingUrls: response.getTrackingUrls(),
             clickAttributionUrl: jsonMraidUrl.clickAttributionUrl ? this.validateAndEncodeUrl(jsonMraidUrl.clickAttributionUrl, session) : undefined,
             clickAttributionUrlFollowsRedirects: jsonMraidUrl.clickAttributionUrlFollowsRedirects,
             clickUrl: jsonMraidUrl.clickUrl ? this.validateAndEncodeUrl(jsonMraidUrl.clickUrl, session) : undefined,

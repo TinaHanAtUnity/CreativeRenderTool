@@ -1,3 +1,5 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
+import { WebViewError } from 'Core/Errors/WebViewError';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0, Observable1 } from 'Core/Utilities/Observable';
@@ -47,23 +49,27 @@ export class BannerApi extends NativeApi {
     public readonly onBannerDestroyed = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Banner', ApiPackage.BANNER);
+        super(nativeBridge, 'Banner', ApiPackage.BANNER, EventCategory.BANNER);
     }
 
     public load(views: BannerViewType[], style: string, width: number, height: number): Promise<void> {
-        return this._nativeBridge.invoke(this._apiClass, 'load', [views, style, width, height]);
+        return this._nativeBridge.invoke(this._fullApiClassName, 'load', [views, style, width, height]);
     }
 
     public destroy(): Promise<void> {
-        return this._nativeBridge.invoke(this._apiClass, 'destroy');
+        return this._nativeBridge.invoke(this._fullApiClassName, 'destroy');
     }
 
     public setViewFrame(view: BannerViewType, x: number, y: number, width: number, height: number) {
-        return this._nativeBridge.invoke(this._apiClass, 'setViewFrame', [view, x, y, width, height]);
+        return this._nativeBridge.invoke(this._fullApiClassName, 'setViewFrame', [view, x, y, width, height]);
+    }
+
+    public setBannerFrame(style: string, width: number, height: number) {
+        return this._nativeBridge.invoke(this._fullApiClassName, 'setBannerFrame', [style, width, height]);
     }
 
     public setViews(views: BannerViewType[]) {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setViews', [views]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setViews', [views]);
     }
 
     public handleEvent(event: string, parameters: unknown[]) {
@@ -95,11 +101,11 @@ export class BannerApi extends NativeApi {
     }
 
     private handleBannerResized(parameters: unknown[]) {
-        const x = parameters[0],
-            y = parameters[1],
-            width = parameters[2],
-            height = parameters[3],
-            alpha = parameters[4];
+        const x = parameters[0];
+        const y = parameters[1];
+        const width = parameters[2];
+        const height = parameters[3];
+        const alpha = parameters[4];
         this.onBannerResized.trigger({x, y, width, height, alpha});
     }
 
@@ -124,7 +130,7 @@ export class BannerApi extends NativeApi {
 
     private handleBannerAttachedStateEvent(parameters: unknown[]) {
         if (parameters.length !== 1) {
-            this._nativeBridge.Sdk.logWarning('Banner attached state event with no attached state parameter');
+            throw new WebViewError('Banner attached state event with no attached state parameter');
         } else {
             const attached = parameters[0];
             this.onBannerAttachedState.trigger(attached);

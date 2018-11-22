@@ -1,20 +1,25 @@
 import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';
 import { Session } from 'Ads/Models/Session';
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Request } from 'Core/Utilities/Request';
+import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { StorageOperation } from 'Core/Utilities/StorageOperation';
 import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
+import { ICoreApi } from 'Core/ICore';
 
 export class SessionManager {
-    private _nativeBridge: NativeBridge;
-    private _request: Request;
+
+    private _core: ICoreApi;
+    private _request: RequestManager;
+    private _storageBridge: StorageBridge;
     private _gameSessionId: number;
 
-    constructor(nativeBridge: NativeBridge, request: Request) {
-        this._nativeBridge = nativeBridge;
+    constructor(core: ICoreApi, request: RequestManager, storageBridge: StorageBridge) {
+        this._core = core;
         this._request = request;
+        this._storageBridge = storageBridge;
     }
 
     public create(id: string): Session {
@@ -22,16 +27,13 @@ export class SessionManager {
         return new Session(id);
     }
 
-    public startNewSession(sessionId: string): Promise<unknown[]> {
+    public startNewSession(sessionId: string): void {
         const sessionTimestampKey = SessionUtils.getSessionStorageTimestampKey(sessionId);
         const timestamp = Date.now();
 
-        return Promise.all([
-            this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, sessionTimestampKey, timestamp),
-            this._nativeBridge.Storage.write(StorageType.PRIVATE)
-        ]).catch(error => {
-            return Promise.resolve([]);
-        });
+        const operation = new StorageOperation(StorageType.PRIVATE);
+        operation.set(sessionTimestampKey, timestamp);
+        this._storageBridge.queue(operation);
     }
 
     public sendUnsentSessions(): Promise<unknown[]> {
@@ -61,18 +63,19 @@ export class SessionManager {
     }
 
     private deleteSession(sessionId: string): Promise<unknown[]> {
-        return Promise.all([
-            this._nativeBridge.Storage.delete(StorageType.PRIVATE, SessionUtils.getSessionStorageKey(sessionId)),
-            this._nativeBridge.Storage.write(StorageType.PRIVATE)
-        ]);
+        const operation = new StorageOperation(StorageType.PRIVATE);
+        operation.delete(SessionUtils.getSessionStorageKey(sessionId));
+        this._storageBridge.queue(operation);
+
+        return Promise.resolve([]);
     }
 
     private getUnsentSessions(): Promise<string[]> {
-        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'session', false);
+        return this._core.Storage.getKeys(StorageType.PRIVATE, 'session', false);
     }
 
     private isSessionOutdated(sessionId: string): Promise<boolean> {
-        return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, SessionUtils.getSessionStorageTimestampKey(sessionId)).then(timestamp => {
+        return this._core.Storage.get<number>(StorageType.PRIVATE, SessionUtils.getSessionStorageTimestampKey(sessionId)).then(timestamp => {
             const timeThresholdMin: number = new Date().getTime() - 7 * 24 * 60 * 60 * 1000;
             const timeThresholdMax: number = new Date().getTime();
 
@@ -83,11 +86,11 @@ export class SessionManager {
     }
 
     private sendUnsentEvents(sessionId: string): Promise<unknown[]> {
-        const promises: Array<Promise<unknown>> = [];
-        const failedOperativeEventManager = new FailedOperativeEventManager(sessionId);
-        promises.push(failedOperativeEventManager.sendFailedEvents(this._nativeBridge, this._request));
-        const failedXpromoOperativeEventManager = new FailedXpromoOperativeEventManager(sessionId);
-        promises.push(failedXpromoOperativeEventManager.sendFailedEvents(this._nativeBridge, this._request));
+        const promises: Promise<any>[] = [];
+        const failedOperativeEventManager = new FailedOperativeEventManager(this._core, sessionId);
+        promises.push(failedOperativeEventManager.sendFailedEvents(this._request, this._storageBridge));
+        const failedXpromoOperativeEventManager = new FailedXpromoOperativeEventManager(this._core, sessionId);
+        promises.push(failedXpromoOperativeEventManager.sendFailedEvents(this._request, this._storageBridge));
         return Promise.all(promises);
     }
 }

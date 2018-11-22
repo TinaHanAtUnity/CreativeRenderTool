@@ -1,6 +1,7 @@
 import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
 import { IosARApi } from 'AR/Native/iOS/IosARApi';
 import { IARSize } from 'AR/Utilities/ARUtil';
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { Platform } from 'Core/Constants/Platform';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -57,7 +58,7 @@ export class ARApi extends NativeApi {
     public readonly onSessionInterruptionEnded = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AR', ApiPackage.AR);
+        super(nativeBridge, 'AR', ApiPackage.AR, EventCategory.AR);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             this.Android = new AndroidARApi(nativeBridge);
@@ -128,7 +129,7 @@ export class ARApi extends NativeApi {
                 this.onSessionInterruptionEnded.trigger();
                 break;
             default:
-                this._nativeBridge.Sdk.logError('Unknown AR event: ' + event);
+                super.handleEvent(event, parameters);
         }
     }
 }

@@ -1,9 +1,8 @@
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { DeviceInfo } from 'Backend/Api/DeviceInfo';
-import { Sdk } from 'Backend/Api/Sdk';
 import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
 import { Platform } from 'Core/Constants/Platform';
+import { Backend } from 'Backend/Backend';
 import 'Workarounds';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -27,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const JS_FUNC_NAME_GET_HEADLESS = 'getHeadless';
 
     const setClientInfo = () => {
-        const fields: Array<[string, string, ((element: HTMLInputElement) => unknown) | undefined]> = [
+        const fields: [string, string, ((element: HTMLInputElement) => unknown) | undefined][] = [
             ['appName', 'setAppName', undefined],
             ['appVersion', 'setAppVersion', undefined],
             ['sdkVersion', 'setSdkVersion', toInt],
@@ -42,12 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         fields.forEach(([field, setter, parser]: [string, string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById(field);
-            (<unknown>Sdk)[setter](parser ? parser(element) : element.value);
+            (<unknown>UnityAds.getBackend().Api.Sdk)[setter](parser ? parser(element) : element.value);
         });
     };
 
     const setAndroidDeviceInfo = () => {
-        const fields: Array<[string, ((element: HTMLInputElement) => unknown) | undefined]> = [
+        const fields: [string, ((element: HTMLInputElement) => unknown) | undefined][] = [
             ['AdvertisingTrackingId', undefined],
             ['LimitAdTrackingFlag', toBoolean],
             ['AndroidId', undefined],
@@ -79,12 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById('android' + field);
-            (<unknown>DeviceInfo)['set' + field](parser ? parser(element) : element.value);
+            (<unknown>UnityAds.getBackend().Api.DeviceInfo)['set' + field](parser ? parser(element) : element.value);
         });
     };
 
     const setIosDeviceInfo = () => {
-        const fields: Array<[string, ((element: HTMLInputElement) => unknown) | undefined]> = [
+        const fields: [string, ((element: HTMLInputElement) => unknown) | undefined][] = [
             ['AdvertisingTrackingId', undefined],
             ['LimitAdTrackingFlag', toBoolean],
             ['Manufacturer', undefined],
@@ -114,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById('ios' + field);
-            (<unknown>DeviceInfo)['set' + field](parser ? parser(element) : element.value);
+            (<unknown>UnityAds.getBackend().Api.DeviceInfo)['set' + field](parser ? parser(element) : element.value);
         });
     };
 
@@ -174,8 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.sessionStorage.clear();
             window.sessionStorage.setItem('PUBLIC', JSON.stringify(publicStorage));
 
-            setClientInfo();
-
             // tslint:disable:no-console
             const listener: IUnityAdsListener = {
                 onUnityAdsReady: (placement: string) => {
@@ -212,11 +209,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             switch(platformElement.value) {
                 case 'android':
+                    UnityAds.setBackend(new Backend(Platform.ANDROID));
+                    UnityAds.getBackend().Api.Request.setPassthrough(true);
+                    setClientInfo();
                     setAndroidDeviceInfo();
                     UnityAds.initialize(Platform.ANDROID, gameIdElement.value, listener, testModeElement.checked);
                     break;
 
                 case 'ios':
+                    UnityAds.setBackend(new Backend(Platform.IOS));
+                    UnityAds.getBackend().Api.Request.setPassthrough(true);
+                    setClientInfo();
                     setIosDeviceInfo();
                     UnityAds.initialize(Platform.IOS, gameIdElement.value, listener, testModeElement.checked);
                     break;

@@ -1,6 +1,5 @@
-import { Platform } from 'Core/Constants/Platform';
 import { Model } from 'Core/Models/Model';
-import { ClientInfoData } from '../Native/Sdk';
+import { ClientInfoData } from 'Core/Native/Sdk';
 
 interface IClientInfo {
     gameId: string;
@@ -9,7 +8,6 @@ interface IClientInfo {
     applicationVersion: string;
     sdkVersion: number;
     sdkVersionName: string;
-    platform: Platform;
     debuggable: boolean;
     configUrl: string;
     webviewUrl: string;
@@ -17,11 +15,12 @@ interface IClientInfo {
     webviewVersion: string | null;
     initTimestamp: number;
     reinitialized: boolean;
+    monetizationInUse: boolean;
 }
 
 export class ClientInfo extends Model<IClientInfo> {
 
-    constructor(platform: Platform, data: ClientInfoData) {
+    constructor(data: ClientInfoData) {
         super('ClientInfo', {
             gameId: ['string'],
             testMode: ['boolean'],
@@ -29,17 +28,15 @@ export class ClientInfo extends Model<IClientInfo> {
             applicationVersion: ['string'],
             sdkVersion: ['number'],
             sdkVersionName: ['string'],
-            platform: ['number'],
             debuggable: ['boolean'],
             configUrl: ['string'],
             webviewUrl: ['string'],
             webviewHash: ['string', 'null'],
             webviewVersion: ['string', 'null'],
             initTimestamp: ['number'],
-            reinitialized: ['boolean']
+            reinitialized: ['boolean'],
+            monetizationInUse: ['boolean']
         });
-
-        this.set('platform', platform);
 
         this.set('gameId', data[0]);
         this.set('testMode', data[1]);
@@ -54,6 +51,7 @@ export class ClientInfo extends Model<IClientInfo> {
         this.set('webviewVersion', data[10]);
         this.set('initTimestamp', data[11]);
         this.set('reinitialized', data[12]);
+        this.set('monetizationInUse', false);
     }
 
     public getGameId(): string {
@@ -78,10 +76,6 @@ export class ClientInfo extends Model<IClientInfo> {
 
     public getSdkVersionName(): string {
         return this.get('sdkVersionName');
-    }
-
-    public getPlatform(): Platform {
-        return this.get('platform');
     }
 
     public isDebuggable(): boolean {
@@ -112,6 +106,14 @@ export class ClientInfo extends Model<IClientInfo> {
         return this.get('reinitialized');
     }
 
+    public isMonetizationInUse(): boolean {
+        return this.get('monetizationInUse');
+    }
+
+    public setMonetizationInUse(using: boolean) {
+        this.set('monetizationInUse', using);
+    }
+
     public getDTO() {
         return {
             'gameId': this.getGameId(),
@@ -120,14 +122,14 @@ export class ClientInfo extends Model<IClientInfo> {
             'bundleVersion': this.getApplicationVersion(),
             'sdkVersion': this.getSdkVersion(),
             'sdkVersionName': this.getSdkVersionName(),
-            'platform': Platform[this.getPlatform()].toLowerCase(),
             'encrypted': !this.isDebuggable(),
             'configUrl': this.getConfigUrl(),
             'webviewUrl': this.getWebviewUrl(),
             'webviewHash': this.getWebviewHash(),
             'webviewVersion': this.getWebviewVersion(),
             'initTimestamp': this.getInitTimestamp(),
-            'reinitialized': this.isReinitialized()
+            'reinitialized': this.isReinitialized(),
+            'monetizationInUse': this.isMonetizationInUse()
         };
     }
 }

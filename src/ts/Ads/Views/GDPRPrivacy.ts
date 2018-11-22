@@ -1,6 +1,6 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
 
@@ -13,8 +13,8 @@ export class GDPRPrivacy extends AbstractPrivacy {
     private _personalInfoObtained: boolean = false;
     private _dataDeletionConfirmation: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, gdprManager: GdprManager, isCoppaCompliant: boolean) {
-        super(nativeBridge, isCoppaCompliant, true, 'gdpr-privacy');
+    constructor(platform: Platform, gdprManager: GdprManager, isCoppaCompliant: boolean) {
+        super(platform, isCoppaCompliant, true, 'gdpr-privacy');
 
         this._template = new Template(GDPRPrivacyTemplate);
         this._gdprManager = gdprManager;

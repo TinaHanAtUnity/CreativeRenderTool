@@ -5,9 +5,9 @@ import {
 } from 'Ads/Managers/OperativeEventManager';
 import { EventType } from 'Ads/Models/Session';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
+import { INativeResponse } from 'Core/Managers/RequestManager';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { INativeResponse } from 'Core/Utilities/Request';
 import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
@@ -96,8 +96,8 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
 
             return HttpKafka.sendEvent(kafkaType, KafkaCommonObjectType.PERSONAL, infoJson).catch(() => {
                 const sessionId = this._campaign.getSession().getId();
-                return this._nativeBridge.DeviceInfo.getUniqueEventId().then(eventId => {
-                    new FailedXpromoOperativeEventManager(sessionId, eventId).storeFailedEvent(this._nativeBridge, {
+                return this._core.DeviceInfo.getUniqueEventId().then(eventId => {
+                    new FailedXpromoOperativeEventManager(this._core, sessionId, eventId).storeFailedEvent(this._storageBridge, {
                         kafkaType: kafkaType,
                         data: JSON.stringify(infoJson)
                     });

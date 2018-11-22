@@ -11,8 +11,9 @@ import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitConta
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { ProgrammaticTrackingMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import AdMobContainer from 'html/admob/AdMobContainer.html';
@@ -37,6 +38,7 @@ const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
 const AFMADelayMacro = '{{AFMA_RDVT_PLACEHOLDER}}';
 
 export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandler {
+
     private _campaign: AdMobCampaign;
     private _iframe: HTMLIFrameElement;
     private _adMobSignalFactory: AdMobSignalFactory;
@@ -51,8 +53,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private _gdprPopupClicked: boolean = false;
     private _programmaticTrackingService: ProgrammaticTrackingService;
 
-    constructor(nativeBridge: NativeBridge, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService) {
-        super(nativeBridge, 'admob');
+    constructor(platform: Platform, core: ICoreApi, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService) {
+        super(platform, 'admob');
 
         this._campaign = campaign;
         this._template = new Template(AdMobContainer);
@@ -62,7 +64,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
 
-        this._afmaBridge = new AFMABridge(nativeBridge, {
+        this._afmaBridge = new AFMABridge(core, {
             onAFMAClose: () => this.onClose(),
             onAFMAOpenURL: (url: string) => this.onOpenURL(url),
             onAFMADisableBackButton: () => { /**/ },
@@ -78,7 +80,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             onAFMAClickSignalRequest: (touchInfo) => this.onClickSignalRequest(touchInfo),
             onAFMAUserSeeked: () => this.onUserSeeked()
         });
-        this._mraidBridge = new MRAIDBridge(nativeBridge, {
+        this._mraidBridge = new MRAIDBridge(core, {
             onSetOrientationProperties: (allowOrientation: boolean, forceOrientation: Orientation) => this.onSetOrientationProperties(allowOrientation, forceOrientation)
         });
 

@@ -2,6 +2,7 @@ import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 export class MRAIDEndScreen extends EndScreen {
+
     private _campaign: MRAIDCampaign;
 
     constructor(parameters: IEndScreenParameters, campaign: MRAIDCampaign) {
@@ -10,7 +11,7 @@ export class MRAIDEndScreen extends EndScreen {
 
         this._templateData = {
             'gameName': campaign.getGameName(),
-            'endscreenAlt': this.getEndscreenAlt(campaign)
+            'endscreenAlt': this.getEndscreenAlt()
         };
         const gameIcon = campaign.getGameIcon();
         if(gameIcon) {

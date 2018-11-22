@@ -1,27 +1,26 @@
 import { AdMobCampaign, AdMobVideo, IAdMobCampaign } from 'AdMob/Models/AdMobCampaign';
-import { CachedAdMobCampaign } from 'AdMob/Models/CachedAdMobCampaign';
 import { Video } from 'Ads/Models/Assets/Video';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { FileId } from 'Core/Utilities/FileId';
-import { Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { VastParser } from 'VAST/Utilities/VastParser';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
+
     public static ContentType = 'programmatic/admob-video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
+
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
-        const platform = nativeBridge.getPlatform();
         const videoPromise = this.getVideoFromMarkup(markup, request, session, platform).catch((e) => {
-            nativeBridge.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
+            core.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
             return null;
         });
 
@@ -30,35 +29,32 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 this.updateFileID(video);
             }
             const baseCampaignParams: ICampaign = {
-                id: this.getProgrammaticCampaignId(nativeBridge),
+                id: this.getProgrammaticCampaignId(platform),
                 willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
+                contentType: ProgrammaticAdMobParser.ContentType,
                 adType: response.getAdType() || undefined,
                 correlationId: response.getCorrelationId() || undefined,
                 creativeId: response.getCreativeId() || undefined,
                 seatId: response.getSeatId() || undefined,
                 meta: undefined,
                 session: session,
-                mediaId: response.getMediaId()
+                mediaId: response.getMediaId(),
+                trackingUrls: response.getTrackingUrls() || {}
             };
 
             const adMobCampaignParams: IAdMobCampaign = {
                 ... baseCampaignParams,
                 dynamicMarkup: markup,
-                trackingUrls: response.getTrackingUrls(),
                 useWebViewUserAgentForTracking: true,
                 video: video
             };
 
-            if (gameId && CustomFeatures.isAdmobCachedVideoGame(gameId)) {
-                return Promise.resolve(new CachedAdMobCampaign(adMobCampaignParams));
-            } else {
-                return Promise.resolve(new AdMobCampaign(adMobCampaignParams));
-            }
+            return Promise.resolve(new AdMobCampaign(adMobCampaignParams));
         });
 
     }
 
-    private getVideoFromMarkup(markup: string, request: Request, session: Session, platform: Platform): Promise<AdMobVideo> {
+    private getVideoFromMarkup(markup: string, request: RequestManager, session: Session, platform: Platform): Promise<AdMobVideo> {
         try {
             const dom = new DOMParser().parseFromString(markup, 'text/html');
             if (!dom) {
@@ -101,7 +97,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         }
     }
 
-    private getRealVideoURL(videoURL: string, request: Request): Promise<string> {
+    private getRealVideoURL(videoURL: string, request: RequestManager): Promise<string> {
         return request.followRedirectChain(videoURL);
     }
 
