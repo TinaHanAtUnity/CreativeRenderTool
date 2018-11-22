@@ -152,7 +152,7 @@ describe('GdprManagerTest', () => {
         });
 
         describe('and configuration isGDPREnabled is false', () => {
-            it('should not do unknownthing', () => {
+            it('should not do anything', () => {
                 isGDPREnabled = false;
                 consentlastsent = false;
                 storageTrigger('', { gdpr: { consent: { value: true } } });
@@ -168,7 +168,7 @@ describe('GdprManagerTest', () => {
         });
 
         describe('and the stored consent is undefined', () => {
-            it('should not do unknownthing', () => {
+            it('should not do anything', () => {
                 storageTrigger('', {});
                 sinon.assert.calledOnce(onSetStub);
                 sinon.assert.notCalled(getStub);
@@ -183,7 +183,7 @@ describe('GdprManagerTest', () => {
 
         describe('and the stored consent has not changed', () => {
             [true, false].forEach((b) => {
-                it(`should not send unknownthing for value "${b}"`, () => {
+                it(`should not send anything for value "${b}"`, () => {
                     isGDPREnabled = true;
                     consentlastsent = b;
                     storageTrigger('', {gdpr: {consent: {value: b}}});
@@ -278,7 +278,7 @@ describe('GdprManagerTest', () => {
             });
 
             describe('and configuration isGDPREnabled is set to false during getConsentAndUpdateConfiguration', () => {
-                it('should not do unknownthing', () => {
+                it('should not do anything', () => {
                     isGDPREnabled = true;
                     consentlastsent = false;
                     consent = true;
@@ -300,7 +300,7 @@ describe('GdprManagerTest', () => {
             });
 
             describe('and configuration isGDPREnabled is false', () => {
-                it('should not do unknownthing', () => {
+                it('should not do anything', () => {
                     isGDPREnabled = false;
                     consentlastsent = false;
                     const writePromise = new Promise<void>((resolve) => {

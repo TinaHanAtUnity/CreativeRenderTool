@@ -166,7 +166,7 @@ export class GdprManager {
 
     // Android C# layer will map boolean values to Java primitive boolean types and causes reflection failure
     // with Android Java native layer method that takes Object as value
-    // this hack allows unknownone use both booleans and string "true" and "false" values
+    // this hack allows anyone use both booleans and string "true" and "false" values
     private getConsentTypeHack(value: unknown): boolean | undefined {
         if(typeof(value) === 'boolean') {
             return value;

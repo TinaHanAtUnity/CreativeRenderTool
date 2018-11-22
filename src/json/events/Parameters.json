@@ -443,7 +443,7 @@
   {
     "key": "sessionDepth",
     "type": "number",
-    "description": "For a given session, how munknown ads have been delivered currently using adRequestOrdinal",
+    "description": "For a given session, how many ads have been delivered currently using adRequestOrdinal",
     "provider": "SDK",
     "platforms": "all"
   },

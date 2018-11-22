@@ -771,7 +771,7 @@ export class CampaignManager {
                 this._realtimeBody.deviceFreeSpace = freeSpace;
                 return this._realtimeBody;
             }).catch((e) => {
-                // Try the request with the original request value unknownways
+                // Try the request with the original request value anyways
                 return this._realtimeBody;
             });
         }

@@ -115,7 +115,7 @@ export class PermissionsUtil {
                     }
                 });
             }).catch(() => {
-                // If there are unknown errors, default to unknown
+                // If there are any errors, default to unknown
                 resolve(CurrentPermission.UNKNOWN);
             });
         });
