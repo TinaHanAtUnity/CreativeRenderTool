@@ -9,8 +9,8 @@ class TestHelper {
         const unityInfo = TestHelper.getUnityInfo(platform, true);
 
         return unityInfo.fetch(TestHelper._appId).then(() => {
-            assert.equal(unityInfo.getAnalyticsUserId(), TestHelper._userId, 'analytics user id was not successfully fetched (' + platform + ')');
-            assert.equal(unityInfo.getAnalyticsSessionId(), TestHelper._sessionId, 'analytics session id was not successfully fetched (' + platform + ')');
+            assert.equal(unityInfo.getAnalyticsUserId(), TestHelper._userId, 'analytics user id was not successfully fetched');
+            assert.equal(unityInfo.getAnalyticsSessionId(), TestHelper._sessionId, 'analytics session id was not successfully fetched');
         });
     }
 
@@ -18,8 +18,8 @@ class TestHelper {
         const unityInfo = TestHelper.getUnityInfo(platform, false);
 
         return unityInfo.fetch(TestHelper._appId).then(() => {
-            assert.isUndefined(unityInfo.getAnalyticsUserId(), 'analytics user id was defined when engine is not running (' + platform + ')');
-            assert.isUndefined(unityInfo.getAnalyticsSessionId(), 'analytics session id was defined when engine is not running (' + platform + ')');
+            assert.isUndefined(unityInfo.getAnalyticsUserId(), 'analytics user id was defined when engine is not running');
+            assert.isUndefined(unityInfo.getAnalyticsSessionId(), 'analytics session id was defined when engine is not running');
         });
     }
 
