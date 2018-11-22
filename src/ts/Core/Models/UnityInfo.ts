@@ -4,7 +4,7 @@ import { Platform } from 'Core/Constants/Platform';
 
 export interface IUnityInfo {
     analyticsUserId: string | undefined;
-    analyticsSessionId: number | undefined;
+    analyticsSessionId: string | undefined; // stored as a string to avoid problems with unsigned 64 bit integers going over js max safe number limit
 }
 
 export class UnityInfo extends Model<IUnityInfo> {
@@ -18,7 +18,7 @@ export class UnityInfo extends Model<IUnityInfo> {
     constructor(platform: Platform, core: ICoreApi) {
         super('UnityInfo', {
             analyticsUserId: ['string', 'undefined'],
-            analyticsSessionId: ['number', 'undefined']
+            analyticsSessionId: ['string', 'undefined']
         });
 
         this._platform = platform;
@@ -47,7 +47,7 @@ export class UnityInfo extends Model<IUnityInfo> {
         });
 
         const sessionIdPromise = nativeSessionIdPromise.then(sessionId => {
-            this.set('analyticsSessionId', parseInt(sessionId, 10));
+            this.set('analyticsSessionId', sessionId);
         }).catch(() => {
             // session id not found, do nothing
         });
@@ -59,7 +59,7 @@ export class UnityInfo extends Model<IUnityInfo> {
         return this.get('analyticsUserId');
     }
 
-    public getAnalyticsSessionId(): number | undefined {
+    public getAnalyticsSessionId(): string | undefined {
         return this.get('analyticsSessionId');
     }
 
