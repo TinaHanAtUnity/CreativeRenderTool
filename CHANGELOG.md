@@ -1,3 +1,8 @@
+# Pending
+
+* Type out IInfoJson & fix undefined sessionId [#7275](https://github.com/Applifier/unity-ads-webview/pull/7275)
+* Disable backup campaigns on pre-4.4. Androids [#7276](https://github.com/Applifier/unity-ads-webview/pull/7276)
+
 # Wed Nov 21 20:44:19 UTC 2018
 
 * Don't show mute and CTA button on top of GDPR banner in video overlay [#7252](https://github.com/Applifier/unity-ads-webview/pull/7252)
