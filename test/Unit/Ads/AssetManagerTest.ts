@@ -75,7 +75,7 @@ describe('AssetManagerTest', () => {
         cacheBookkeeping = new CacheBookkeepingManager(core);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         storageBridge = new StorageBridge(core);
-        backupCampaignManager = new BackupCampaignManager(core, storageBridge, TestFixtures.getCoreConfiguration());
+        backupCampaignManager = new BackupCampaignManager(core, storageBridge, TestFixtures.getCoreConfiguration(), deviceInfo);
     });
 
     it('should not cache anything when cache mode is disabled', () => {
