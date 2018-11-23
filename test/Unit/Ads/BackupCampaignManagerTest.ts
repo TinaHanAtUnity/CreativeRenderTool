@@ -103,6 +103,24 @@ describe('BackupCampaignManagerTest', () => {
         assert.isTrue(storageBridge.isEmpty(), 'placement data was queued to StorageBridge when test mode is active');
     });
 
+    it('should not store placement data for pre-4.4 Android device', () => {
+        const platform = Platform.ANDROID;
+        const backend = TestFixtures.getBackend(platform);
+        const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        const core = TestFixtures.getCoreApi(nativeBridge);
+        const storageBridge: StorageBridge = new StorageBridge(core, 1);
+
+        const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+        sinon.stub(deviceInfo, 'getApiLevel').returns(16); // Android 4.1
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, TestFixtures.getCoreConfiguration(), deviceInfo);
+        const placement: Placement = TestFixtures.getPlacement();
+        const testMediaId: string = '12345';
+
+        backupCampaignManager.storePlacement(placement, testMediaId);
+
+        assert.isTrue(storageBridge.isEmpty(), 'placement data was queued to StorageBridge for pre-4.4 Android device');
+    });
+
     it('should not store campaign data when test mode is active', () => {
         const platform = Platform.ANDROID;
         const backend = TestFixtures.getBackend(platform);
@@ -113,6 +131,23 @@ describe('BackupCampaignManagerTest', () => {
         const configuration = TestFixtures.getCoreConfiguration();
         sinon.stub(configuration, 'getTestMode').returns(true);
         const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, configuration, TestFixtures.getAndroidDeviceInfo(core));
+        const campaign: PerformanceCampaign = TestFixtures.getCampaign();
+
+        backupCampaignManager.storeCampaign(campaign);
+
+        assert.isTrue(storageBridge.isEmpty(), 'campaign data was queued to StorageBridge when test mode is active');
+    });
+
+    it('should not store campaign data for pre-4.4 Android device', () => {
+        const platform = Platform.ANDROID;
+        const backend = TestFixtures.getBackend(platform);
+        const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        const core = TestFixtures.getCoreApi(nativeBridge);
+        const storageBridge: StorageBridge = new StorageBridge(core, 1);
+
+        const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+        sinon.stub(deviceInfo, 'getApiLevel').returns(16); // Android 4.1
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, TestFixtures.getCoreConfiguration(), deviceInfo);
         const campaign: PerformanceCampaign = TestFixtures.getCampaign();
 
         backupCampaignManager.storeCampaign(campaign);
