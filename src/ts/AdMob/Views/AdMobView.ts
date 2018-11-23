@@ -175,7 +175,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private setupIFrame() {
-        const iframe: unknown = this._iframe = <HTMLIFrameElement>this._container.querySelector('#admob-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#admob-iframe');
         this._iframe = iframe;
         this.getIFrameSrcDoc().then((markup) => {
             iframe.srcdoc = markup;

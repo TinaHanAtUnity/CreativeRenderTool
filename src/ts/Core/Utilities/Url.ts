@@ -89,7 +89,7 @@ export class Url {
         const pairs: string[] = [];
         for(const key in parameters) {
             if(parameters.hasOwnProperty(key)) {
-                const value: string = parameters[key];
+                const value = <string>parameters[key];
                 if(value !== undefined) {
                     pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
                 }

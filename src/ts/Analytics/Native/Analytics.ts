@@ -2,6 +2,7 @@ import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1 } from 'Core/Utilities/Observable';
+import { AnalyticsGenericEvent } from 'Analytics/AnalyticsProtocol';
 
 export enum AnalyticsEvent {
     POSTEVENT
@@ -9,7 +10,7 @@ export enum AnalyticsEvent {
 
 export class AnalyticsApi extends NativeApi {
 
-    public onPostEvent: Observable1<unknown[]> = new Observable1();
+    public onPostEvent: Observable1<AnalyticsGenericEvent[]> = new Observable1();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Analytics', ApiPackage.ANALYTICS, EventCategory.ANALYTICS);

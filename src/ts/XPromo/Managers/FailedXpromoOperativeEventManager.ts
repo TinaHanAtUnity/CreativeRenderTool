@@ -13,8 +13,8 @@ export class FailedXpromoOperativeEventManager extends FailedOperativeEventManag
 
     public sendFailedEvent(request: RequestManager, storageBridge: StorageBridge): Promise<void> {
         return this._core.Storage.get<{ [key: string]: unknown }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
-            const kafkaType = eventData.kafkaType;
-            const data = eventData.data;
+            const kafkaType = <string>eventData.kafkaType;
+            const data = <string>eventData.data;
             return HttpKafka.sendEvent(kafkaType, KafkaCommonObjectType.PERSONAL, JSON.parse(data));
         }).then(() => {
             return this.deleteFailedEvent(storageBridge);

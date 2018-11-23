@@ -47,7 +47,7 @@ export abstract class AdUnitContainer {
     public abstract open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: unknown): Promise<void>;
     public abstract close(): Promise<void>;
     public abstract reconfigure(configuration: ViewConfiguration): Promise<unknown[]>;
-    public abstract reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<unknown[]>;
+    public abstract reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<void>;
     public abstract isPaused(): boolean;
     public abstract setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void>;
     public abstract getViews(): Promise<string[]>;

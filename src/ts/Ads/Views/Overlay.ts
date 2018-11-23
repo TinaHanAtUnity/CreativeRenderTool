@@ -40,7 +40,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _privacyButtonElement: HTMLElement;
     private _GDPRPopupElement: HTMLElement;
 
-    private _fadeTimer: unknown;
+    private _fadeTimer?: number;
     private _fadeStatus: boolean = true;
     private _privacy: AbstractPrivacy;
     private _gdprPopupClicked: boolean = false;
@@ -184,7 +184,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         }
 
         if(this._fadeEnabled && !this._fadeTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
-            this._fadeTimer = setTimeout(() => {
+            this._fadeTimer = window.setTimeout(() => {
                 this.fade(true);
                 this._fadeTimer = undefined;
             }, 3000);

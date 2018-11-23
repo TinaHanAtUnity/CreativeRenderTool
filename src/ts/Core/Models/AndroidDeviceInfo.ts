@@ -269,9 +269,9 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         });
     }
 
-    public getDTO(): Promise<unknown> {
+    public getDTO(): Promise<{ [key: string]: unknown }> {
         return super.getDTO().then(commonDTO => {
-            const dto: unknown = {
+            const dto: { [key: string]: unknown } = {
                 ... commonDTO,
                 'apiLevel': this.getApiLevel(),
                 'deviceMake': this.getManufacturer(),
@@ -299,9 +299,9 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         });
     }
 
-    public getAnonymousDTO(): Promise<unknown> {
+    public getAnonymousDTO(): Promise<{ [key: string]: unknown }> {
         return super.getAnonymousDTO().then((commonDTO) => {
-            const dto: unknown = {
+            const dto: { [key: string]: unknown } = {
                 ... commonDTO,
                 'apiLevel': this.getApiLevel(),
                 'deviceMake': this.getManufacturer(),
@@ -325,8 +325,8 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         });
     }
 
-    public getStaticDTO(): unknown {
-        const dto: unknown = {
+    public getStaticDTO(): { [key: string]: unknown } {
+        const dto: { [key: string]: unknown } = {
             ... super.getStaticDTO(),
             'apiLevel': this.getApiLevel(),
             'deviceMake': this.getManufacturer(),
@@ -342,7 +342,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         return dto;
     }
 
-    public getAnonymousStaticDTO(): unknown {
+    public getAnonymousStaticDTO(): { [key: string]: unknown } {
         return {
             ... super.getAnonymousStaticDTO(),
             'apiLevel': this.getApiLevel(),

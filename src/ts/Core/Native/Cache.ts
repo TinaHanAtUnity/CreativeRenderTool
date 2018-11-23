@@ -121,23 +121,23 @@ export class CacheApi extends NativeApi {
     public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case CacheEvent[CacheEvent.DOWNLOAD_STARTED]:
-                this.onDownloadStarted.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
+                this.onDownloadStarted.trigger(<string>parameters[0], <number>parameters[1], <number>parameters[2], <number>parameters[3], <[string, string][]>parameters[4]);
                 break;
 
             case CacheEvent[CacheEvent.DOWNLOAD_PROGRESS]:
-                this.onDownloadProgress.trigger(parameters[0], parameters[1], parameters[2]);
+                this.onDownloadProgress.trigger(<string>parameters[0], <number>parameters[1], <number>parameters[2]);
                 break;
 
             case CacheEvent[CacheEvent.DOWNLOAD_END]:
-                this.onDownloadEnd.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5]);
+                this.onDownloadEnd.trigger(<string>parameters[0], <number>parameters[1], <number>parameters[2], <number>parameters[3], <number>parameters[4], <[string, string][]>parameters[5]);
                 break;
 
             case CacheEvent[CacheEvent.DOWNLOAD_STOPPED]:
-                this.onDownloadStopped.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4], parameters[5]);
+                this.onDownloadStopped.trigger(<string>parameters[0], <number>parameters[1], <number>parameters[2], <number>parameters[3], <number>parameters[4], <[string, string][]>parameters[5]);
                 break;
 
             case CacheEvent[CacheEvent.DOWNLOAD_ERROR]:
-                this.onDownloadError.trigger(parameters[0], parameters[1], parameters[2]);
+                this.onDownloadError.trigger(<string>parameters[0], <string>parameters[1], <string>parameters[2]);
                 break;
 
             default:

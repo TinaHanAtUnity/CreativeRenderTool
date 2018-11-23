@@ -42,7 +42,7 @@ interface IPlacement {
 
 export class Placement extends Model<IPlacement> {
 
-    constructor(data: unknown) {
+    constructor(data: IPlacement) {
         super('Placement', {
             id: ['string'],
             name: ['string'],

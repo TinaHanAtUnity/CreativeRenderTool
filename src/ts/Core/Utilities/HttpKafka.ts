@@ -10,6 +10,14 @@ export enum KafkaCommonObjectType {
     PERSONAL
 }
 
+export interface ICommonObject {
+    common: {
+        client: { [key: string]: unknown } | null;
+        device: { [key: string]: unknown } | null;
+        country: string | null;
+    };
+}
+
 export class HttpKafka {
     public static setRequest(request?: RequestManager) {
         HttpKafka._request = request;
@@ -78,7 +86,7 @@ export class HttpKafka {
             };
             return Promise.resolve(emptyCommon);
         } else {
-            const common: unknown = {
+            const common: ICommonObject = {
                 'common': {
                     'client': clientInfo ? clientInfo.getDTO() : null,
                     'device': null,

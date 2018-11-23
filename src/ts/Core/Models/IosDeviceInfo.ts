@@ -89,7 +89,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         });
     }
 
-    public getDTO(): Promise<unknown> {
+    public getDTO(): Promise<{ [key: string]: unknown }> {
         return super.getDTO().then((commonDTO) => {
             return {
                 ...commonDTO,
@@ -100,7 +100,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         });
     }
 
-    public getAnonymousDTO(): Promise<unknown> {
+    public getAnonymousDTO(): Promise<{ [key: string]: unknown }> {
         return super.getAnonymousDTO().then((commonDTO) => {
             return {
                 ...commonDTO,
@@ -111,7 +111,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         });
     }
 
-    public getStaticDTO(): unknown {
+    public getStaticDTO(): { [key: string]: unknown } {
         return {
             ... super.getStaticDTO(),
             'screenScale': this.getScreenScale(),
@@ -120,7 +120,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         };
     }
 
-    public getAnonymousStaticDTO(): unknown {
+    public getAnonymousStaticDTO(): { [key: string]: unknown } {
         return {
             ... super.getAnonymousStaticDTO(),
             'screenScale': this.getScreenScale(),

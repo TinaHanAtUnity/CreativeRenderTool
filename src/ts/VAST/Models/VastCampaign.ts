@@ -134,7 +134,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
         };
     }
 
-    private processCustomTracking(tracking: unknown) {
+    private processCustomTracking(tracking: { [key: string]: string[] }) {
         if (tracking) {
             for (const trackingEventName in tracking) {
                 if (tracking.hasOwnProperty(trackingEventName)) {

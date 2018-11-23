@@ -22,7 +22,7 @@ export class Vast extends Model<IVast> {
         });
 
         this.set('ads', ads);
-        this.set('errorURLTemplates', errorURLTemplates);
+        this.set('errorURLTemplates', <string[]>errorURLTemplates);
         this.set('additionalTrackingEvents', {});
     }
 

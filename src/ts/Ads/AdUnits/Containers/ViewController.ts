@@ -14,6 +14,7 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { Double } from 'Core/Utilities/Double';
+import { IObserver0, IObserver2 } from 'Core/Utilities/IObserver';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -36,12 +37,12 @@ export class ViewController extends AdUnitContainer {
     private _options: IIosOptions;
     private _clientInfo: ClientInfo;
 
-    private _onViewControllerDidAppearObserver: unknown;
-    private _onViewControllerDidDisappearObserver: unknown;
-    private _onMemoryWarningObserver: unknown;
-    private _onNotificationObserver: unknown;
-    private _onAppBackgroundObserver: unknown;
-    private _onAppForegroundObserver: unknown;
+    private _onViewControllerDidAppearObserver: IObserver0;
+    private _onViewControllerDidDisappearObserver: IObserver0;
+    private _onMemoryWarningObserver: IObserver0;
+    private _onNotificationObserver: IObserver2<string, unknown>;
+    private _onAppBackgroundObserver: IObserver0;
+    private _onAppForegroundObserver: IObserver0;
 
     constructor(core: ICoreApi, ads: IAdsApi, deviceInfo: IosDeviceInfo, focusManager: FocusManager, clientInfo: ClientInfo) {
         super();
@@ -136,7 +137,7 @@ export class ViewController extends AdUnitContainer {
         });
     }
 
-    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<unknown> {
+    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<void> {
         return this._ads.iOS!.AdUnit.setShouldAutorotate(allowRotation).then(() => {
             if(this._options) {
                 return this._ads.iOS!.AdUnit.setSupportedOrientations(this.getOrientation(this._options, allowRotation, forceOrientation));
@@ -225,7 +226,7 @@ export class ViewController extends AdUnitContainer {
 
         switch(event) {
             case ViewController._audioSessionInterrupt:
-                const interruptData: { AVAudioSessionInterruptionTypeKey: number; AVAudioSessionInterruptionOptionKey: number } = parameters;
+                const interruptData = <{ AVAudioSessionInterruptionTypeKey: number; AVAudioSessionInterruptionOptionKey: number }>parameters;
 
                 if(interruptData.AVAudioSessionInterruptionTypeKey === 0) {
                     if(interruptData.AVAudioSessionInterruptionOptionKey === 1) {
@@ -237,7 +238,7 @@ export class ViewController extends AdUnitContainer {
                 break;
 
             case ViewController._audioSessionRouteChange:
-                const routeChangeData: { AVAudioSessionRouteChangeReasonKey: number } = parameters;
+                const routeChangeData = <{ AVAudioSessionRouteChangeReasonKey: number }>parameters;
                 if(routeChangeData.AVAudioSessionRouteChangeReasonKey !== 3) {
                     this._handlers.forEach(handler => handler.onContainerSystemMessage(AdUnitContainerSystemMessage.AUDIO_SESSION_ROUTE_CHANGED));
                 } else {

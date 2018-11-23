@@ -63,7 +63,7 @@ export abstract class Model<T extends object> {
             valueType = 'array';
         } else if (value === null) {
             valueType = 'null';
-        } else if(valueType === 'number' && Number.isInteger(value)) {
+        } else if(valueType === 'number' && Number.isInteger(<number>value)) {
             valueType = 'integer';
         }
 

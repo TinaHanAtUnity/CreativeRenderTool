@@ -43,7 +43,7 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
                 try {
-                    this.set(<unknown>key, data[key]);
+                    this.set(<keyof T>key, <T[keyof T]>data[key]);
                 } catch (e) {
                     return false;
                 }

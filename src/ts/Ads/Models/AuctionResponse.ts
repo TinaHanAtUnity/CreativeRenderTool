@@ -2,6 +2,29 @@ import { Model } from 'Core/Models/Model';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 
+export interface IRawAuctionResponse {
+    placements: AuctionPlacement[];
+    contentType: string;
+    content: string;
+    cacheTTL: number | undefined;
+    trackingUrls: { [eventName: string]: string[] };
+    adType: string;
+    creativeId: string | undefined;
+    seatId: number | undefined;
+    correlationId: string;
+    appCategory: string | undefined;
+    appSubCategory: string | undefined;
+    campaignId: string | undefined;
+    advDomain: string | undefined;
+    bundleId: string | undefined;
+    useWebViewUserAgentForTracking: boolean | undefined;
+    buyerId: string | undefined;
+    mediaId: string;
+    width: number | undefined;
+    height: number | undefined;
+    isMoatEnabled: boolean | undefined;
+}
+
 export interface IAuctionResponse {
     placements: AuctionPlacement[];
     contentType: string;
@@ -27,7 +50,7 @@ export interface IAuctionResponse {
 
 export class AuctionResponse extends Model<IAuctionResponse> {
 
-    constructor(placements: AuctionPlacement[], data: unknown, mediaId: string, correlationId: string) {
+    constructor(placements: AuctionPlacement[], data: IRawAuctionResponse, mediaId: string, correlationId: string) {
         super('AuctionResponse', {
             placements: ['array'],
             contentType: ['string'],

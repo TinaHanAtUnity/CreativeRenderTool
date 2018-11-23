@@ -31,6 +31,8 @@ export enum GDPREventAction {
     OPTIN = 'optin'
 }
 
+export type GdprStorageData = { gdpr: { consent: { value: unknown }}};
+
 export class GdprManager {
 
     private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
@@ -52,7 +54,7 @@ export class GdprManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
-        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
+        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <GdprStorageData>data));
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
@@ -103,7 +105,7 @@ export class GdprManager {
 
         return this._request.get(url).then((response) => {
             return {
-                ... JsonParser.parse(response.response),
+                ... JsonParser.parse<{ gamePlaysThisWeek: number, adsSeenInGameThisWeek: number, installsFromAds: number }>(response.response),
                 ... personalPayload
             };
         }).catch(error => {
@@ -150,7 +152,7 @@ export class GdprManager {
         this._adsConfig.setOptOutRecorded(true);
     }
 
-    private onStorageSet(eventType: string, data: unknown) {
+    private onStorageSet(eventType: string, data: GdprStorageData) {
         // should only use consent when gdpr is enabled in configuration
         if (this._adsConfig.isGDPREnabled()) {
             if(data && data.gdpr && data.gdpr.consent) {

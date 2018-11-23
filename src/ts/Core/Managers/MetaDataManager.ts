@@ -14,7 +14,7 @@ export class MetaDataManager {
         let metaData: T = new MetaDataConstructor();
 
         if (this._metaDataCache[metaData.getCategory()]) {
-            metaData = this._metaDataCache[metaData.getCategory()];
+            metaData = <T>this._metaDataCache[metaData.getCategory()];
             if(!keys) {
                 return Promise.resolve(metaData);
             }

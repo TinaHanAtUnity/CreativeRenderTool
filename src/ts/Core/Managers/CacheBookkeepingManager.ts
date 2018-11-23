@@ -120,7 +120,7 @@ export class CacheBookkeepingManager {
                     }));
                 });
 
-                return Promise.all([this._core.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]: [IFileInfo[], { [key: string]: unknown }]) => {
+                return Promise.all([this._core.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]: [IFileInfo[], ICacheCampaignsResponse]) => {
                     const cacheFilesLeftIds: string[] = [];
                     cacheFilesLeft.map(currentFile => {
                         cacheFilesLeftIds.push(FileId.getFileIdHash(currentFile.id));
@@ -252,7 +252,7 @@ export class CacheBookkeepingManager {
         return finalKey;
     }
 
-    private getCacheCampaigns(): Promise<object> {
+    private getCacheCampaigns(): Promise<ICacheCampaignsResponse> {
         return this._core.Storage.get<ICacheCampaignsResponse>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGNS)).then(campaigns => {
             return campaigns;
         }).catch(() => {

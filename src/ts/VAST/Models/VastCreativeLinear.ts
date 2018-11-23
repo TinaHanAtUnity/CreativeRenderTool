@@ -33,11 +33,11 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
 
         this.set('duration', duration || 0);
         this.set('skipDelay', skipDelay || null);
-        this.set('mediaFiles', mediaFiles || []);
+        this.set('mediaFiles', <VastMediaFile[]>mediaFiles || []);
         this.set('videoClickThroughURLTemplate', videoClickThroughURLTemplate || null);
         this.set('videoClickTrackingURLTemplates', videoClickTrackingURLTemplates || []);
         this.set('videoCustomClickURLTemplates', videoCustomClickURLTemplates || []);
-        this.set('adParameters', adParameters || null);
+        this.set('adParameters', <string>adParameters || null);
     }
 
     public setAdParameters(adParameters: string) {

@@ -9,7 +9,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ILimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
 import { IProductInfo, ProductInfo, ProductInfoType } from 'Promo/Models/ProductInfo';
-import { IPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { IPromoCampaign, IRawPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
 export class PromoCampaignParser extends CampaignParser {
@@ -17,7 +17,7 @@ export class PromoCampaignParser extends CampaignParser {
     public static ContentType = 'purchasing/iap';
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
-        const promoJson = JsonParser.parse(response.getContent());
+        const promoJson = JsonParser.parse<IRawPromoCampaign>(response.getContent());
 
         let willExpireAt: number | undefined;
         if (promoJson.expiry) {
@@ -59,7 +59,7 @@ export class PromoCampaignParser extends CampaignParser {
 
     }
 
-    private getLimitedTimeOffer(promoJson: unknown): LimitedTimeOffer | undefined {
+    private getLimitedTimeOffer(promoJson: IRawPromoCampaign): LimitedTimeOffer | undefined {
         let limitedTimeOffer: LimitedTimeOffer | undefined;
         if (promoJson.limitedTimeOffer) {
             const firstImpressionEpoch = promoJson.limitedTimeOffer.firstImpression;
@@ -77,7 +77,7 @@ export class PromoCampaignParser extends CampaignParser {
         return limitedTimeOffer;
     }
 
-    private getProductInfoList(promoProductInfoJson: [unknown]): ProductInfo[] {
+    private getProductInfoList(promoProductInfoJson?: IRawProductInfo[]): ProductInfo[] {
         const productInfoList: ProductInfo[] = [];
         if (promoProductInfoJson === undefined) {
             return productInfoList;
@@ -88,7 +88,7 @@ export class PromoCampaignParser extends CampaignParser {
         return productInfoList;
     }
 
-    private getProductInfo(promoJson: unknown) {
+    private getProductInfo(promoJson: IRawPromoCampaign) {
         let productInfo: IProductInfo;
         if (promoJson.premiumProduct) {
             const promoProductJson = promoJson.premiumProduct;
@@ -106,4 +106,13 @@ export class PromoCampaignParser extends CampaignParser {
         }
         return new ProductInfo(productInfo);
     }
+}
+
+export interface IRawProductInfo {
+    premiumProduct?: {
+        productId: string;
+        type: string;
+        quantity: number;
+    };
+    iapProductId: string;
 }

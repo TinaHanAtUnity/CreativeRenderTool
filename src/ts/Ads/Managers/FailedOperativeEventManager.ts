@@ -48,8 +48,8 @@ export class FailedOperativeEventManager {
     public sendFailedEvent(request: RequestManager, storageBridge: StorageBridge): Promise<void> {
         if(this._eventId) {
             return this._core.Storage.get<{ [key: string]: unknown }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
-                const url = eventData.url;
-                const data = eventData.data;
+                const url = <string>eventData.url;
+                const data = <string>eventData.data;
                 return request.post(url, data);
             }).then(() => {
                 return this.deleteFailedEvent(storageBridge);

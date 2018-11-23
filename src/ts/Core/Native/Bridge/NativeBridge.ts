@@ -79,8 +79,8 @@ export class NativeBridge implements INativeBridge {
 
     public handleCallback(results: unknown[][]): void {
         results.forEach((result: unknown[]): void => {
-            const id: number = parseInt(result.shift(), 10);
-            const status = NativeBridge.convertStatus(result.shift());
+            const id: number = parseInt(<string>result.shift(), 10);
+            const status = NativeBridge.convertStatus(<string>result.shift());
             let parameters = result.shift();
             const callbackObject = this._callbackTable[id];
             if(!callbackObject) {
@@ -110,8 +110,8 @@ export class NativeBridge implements INativeBridge {
     }
 
     public handleEvent(parameters: unknown[]): void {
-        const category: string = parameters.shift();
-        const event: string = parameters.shift();
+        const category = <string>parameters.shift();
+        const event = <string>parameters.shift();
         if(category && category in this._eventHandlers) {
             this._eventHandlers[category].handleEvent(event, parameters);
         } else {
@@ -120,9 +120,9 @@ export class NativeBridge implements INativeBridge {
     }
 
     public handleInvocation(parameters: unknown[]): void {
-        const className: string = parameters.shift();
-        const methodName: string = parameters.shift();
-        const callback: string = parameters.shift();
+        const className = <string>parameters.shift();
+        const methodName = <string>parameters.shift();
+        const callback = <string>parameters.shift();
         parameters.push((status: CallbackStatus, ...callbackParameters: unknown[]) => {
             this.invokeCallback(callback, CallbackStatus[status], ...callbackParameters);
         });

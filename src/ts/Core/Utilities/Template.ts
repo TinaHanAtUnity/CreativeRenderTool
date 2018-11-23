@@ -56,7 +56,7 @@ export class Template {
         }
     }
 
-    public render(data: unknown): string {
+    public render(data: { [key: string]: unknown }): string {
         if(this._localization) {
             data.t = (phrase: string) => this._localization!.translate(phrase);
         } else {

@@ -2,7 +2,7 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 
 export class JsonParser {
 
-    public static parse(text: string, reviver?: (key: unknown, value: unknown) => unknown): unknown {
+    public static parse<T extends { [key: string]: unknown }>(text: string, reviver?: (key: unknown, value: unknown) => unknown): T {
         try {
             return JSON.parse(text, reviver);
         } catch(e) {

@@ -231,7 +231,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         return this.get('totalMemory');
     }
 
-    public getDTO(): Promise<unknown> {
+    public getDTO(): Promise<{ [key: string]: unknown }> {
         return this.getAnonymousDTO().then(dto => {
             if(this.getAdvertisingIdentifier()) {
                 dto.advertisingTrackingId = this.getAdvertisingIdentifier();
@@ -242,7 +242,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         });
     }
 
-    public getAnonymousDTO(): Promise<unknown> {
+    public getAnonymousDTO(): Promise<{ [key: string]: unknown }> {
         return Promise.all<unknown>([
             this.getConnectionType().catch(err => this.handleDeviceInfoError(err)),
             this.getNetworkType().catch(err => this.handleDeviceInfoError(err)),
@@ -297,8 +297,8 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         });
     }
 
-    public getStaticDTO(): unknown {
-        const dto: unknown = this.getAnonymousStaticDTO();
+    public getStaticDTO(): { [key: string]: unknown } {
+        const dto = this.getAnonymousStaticDTO();
 
         if(this.getAdvertisingIdentifier()) {
             dto.advertisingTrackingId = this.getAdvertisingIdentifier();
@@ -308,7 +308,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         return dto;
     }
 
-    public getAnonymousStaticDTO(): unknown {
+    public getAnonymousStaticDTO(): { [key: string]: unknown } {
         return {
             'osVersion': this.getOsVersion(),
             'deviceModel': this.getModel(),
