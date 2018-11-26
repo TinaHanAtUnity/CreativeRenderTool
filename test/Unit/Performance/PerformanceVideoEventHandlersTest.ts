@@ -3,7 +3,7 @@ import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitConta
 import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
@@ -90,8 +90,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             campaign: campaign
         });
 
-        const gdprManager = sinon.createStubInstance(GdprManager);
-        const privacy = new Privacy(platform, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
+        const privacy = new Privacy(platform, campaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
         const endScreenParams : IEndScreenParameters = {
             platform,
             core,
@@ -139,7 +139,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             overlay: overlay,
             video: video,
             privacy: privacy,
-            gdprManager: gdprManager,
+            privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService
         };
 

@@ -1,5 +1,5 @@
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -38,7 +38,7 @@ describe('VideoOverlayTest', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
 
-        privacy = new Privacy(platform, TestFixtures.getCampaign(), sinon.createStubInstance(GdprManager), false, false);
+        privacy = new Privacy(platform, TestFixtures.getCampaign(), sinon.createStubInstance(UserPrivacyManager), false, false);
         deviceInfo = <DeviceInfo>{ getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false, getOsVersion: () => '8.0' };
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationJson));

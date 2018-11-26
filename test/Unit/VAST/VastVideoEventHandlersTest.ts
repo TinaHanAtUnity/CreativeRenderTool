@@ -3,7 +3,7 @@ import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitConta
 import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
@@ -68,7 +68,7 @@ describe('VastVideoEventHandler tests', () => {
     let sandbox: sinon.SinonSandbox;
     let vastVideoEventHandler: VastVideoEventHandler;
     let videoEventHandlerParams: IVideoEventHandlerParams;
-    let gdprManager: GdprManager;
+    let privacyManager: UserPrivacyManager;
     let privacy: AbstractPrivacy;
     let programmaticTrackingService: ProgrammaticTrackingService;
 
@@ -91,7 +91,7 @@ describe('VastVideoEventHandler tests', () => {
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
-        privacy = new Privacy(platform, campaign, gdprManager, false, false);
+        privacy = new Privacy(platform, campaign, privacyManager, false, false);
         overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
@@ -129,7 +129,7 @@ describe('VastVideoEventHandler tests', () => {
             campaign: campaign
         });
 
-        gdprManager = sinon.createStubInstance(GdprManager);
+        privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
         vastAdUnitParameters = {
             platform,
@@ -153,7 +153,7 @@ describe('VastVideoEventHandler tests', () => {
             endScreen: undefined,
             overlay: overlay,
             video: campaign.getVideo(),
-            gdprManager: gdprManager,
+            privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService
         };
 
