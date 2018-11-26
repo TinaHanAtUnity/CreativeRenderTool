@@ -109,45 +109,12 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowingMRAID(false);
 
         this._mraid.hide();
-        if(this._endScreen) {
-            this._endScreen.hide();
+        this.hideEndScreen();
+        this.hidePrivacy();
 
-            const endScreenContainer = this._endScreen.container();
-            if (endScreenContainer && endScreenContainer.parentElement) {
-                endScreenContainer.parentElement.removeChild(this._endScreen.container());
-            }
-        }
-
-        if(this._privacy) {
-            this._privacy.hide();
-
-            const privacyContainer = this._privacy.container();
-            if (privacyContainer && privacyContainer.parentElement) {
-                privacyContainer.parentElement.removeChild(this._privacy.container());
-            }
-        }
-
-        const operativeEventParams = this.getOperativeEventParams();
-        const finishState = this.getFinishState();
-        if(finishState === FinishState.COMPLETED) {
-            if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
-                this._operativeEventManager.sendThirdQuartile(operativeEventParams);
-            }
-            if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
-                this._operativeEventManager.sendView(operativeEventParams);
-            }
-            this.sendTrackingEvent('complete');
-        } else if(finishState === FinishState.SKIPPED) {
-            this._operativeEventManager.sendSkip(operativeEventParams);
-        }
-
+        this.sendFinishOperativeEvents();
         this.onFinish.trigger();
-
-        const mraidContainer = this._mraid.container();
-        if (mraidContainer && mraidContainer.parentElement) {
-            mraidContainer.parentElement.removeChild(this._mraid.container());
-        }
-
+        this.hideMraidContainer();
         this.unsetReferences();
 
         this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
@@ -250,5 +217,53 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             placement: this._placement,
             asset: this._campaign.getResourceUrl()
         };
+    }
+
+    private hideEndScreen() {
+        if(this._endScreen) {
+            this._endScreen.hide();
+
+            const endScreenContainer = this._endScreen.container();
+            if (endScreenContainer && endScreenContainer.parentElement) {
+                endScreenContainer.parentElement.removeChild(this._endScreen.container());
+            }
+        }
+    }
+
+    private hidePrivacy() {
+        if(this._privacy) {
+            this._privacy.hide();
+
+            const privacyContainer = this._privacy.container();
+            if (privacyContainer && privacyContainer.parentElement) {
+                privacyContainer.parentElement.removeChild(this._privacy.container());
+            }
+        }
+    }
+
+    private sendFinishOperativeEvents() {
+        const operativeEventParams = this.getOperativeEventParams();
+        const finishState = this.getFinishState();
+
+        if(finishState === FinishState.COMPLETED) {
+            if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+                this._operativeEventManager.sendThirdQuartile(operativeEventParams);
+            }
+
+            if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
+                this._operativeEventManager.sendView(operativeEventParams);
+            }
+
+            this.sendTrackingEvent('complete');
+        } else if(finishState === FinishState.SKIPPED) {
+            this._operativeEventManager.sendSkip(operativeEventParams);
+        }
+    }
+
+    private hideMraidContainer() {
+        const mraidContainer = this._mraid.container();
+        if (mraidContainer && mraidContainer.parentElement) {
+            mraidContainer.parentElement.removeChild(this._mraid.container());
+        }
     }
 }

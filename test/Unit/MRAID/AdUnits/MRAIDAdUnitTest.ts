@@ -28,7 +28,6 @@ import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { Placement } from 'Ads/Models/Placement';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Privacy } from 'Ads/Views/Privacy';
@@ -53,18 +52,6 @@ describe('MraidAdUnit', () => {
     let focusManager: FocusManager;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
-    let placement: Placement;
-
-    placement = new Placement({
-        id: '123',
-        name: 'test',
-        default: true,
-        allowSkip: true,
-        skipInSeconds: 5,
-        disableBackButton: true,
-        useDeviceOrientationForVideo: false,
-        muteVideo: false
-    });
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -101,7 +88,6 @@ describe('MraidAdUnit', () => {
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
         const mraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
-        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
@@ -125,14 +111,14 @@ describe('MraidAdUnit', () => {
             ar,
             purchasing,
             forceOrientation: Orientation.LANDSCAPE,
-            focusManager: sinon.createStubInstance(FocusManager),
+            focusManager: focusManager,
             container: sinon.createStubInstance(Activity),
             deviceInfo: sinon.createStubInstance(DeviceInfo),
             clientInfo: sinon.createStubInstance(ClientInfo),
-            thirdPartyEventManager: sinon.createStubInstance(ThirdPartyEventManager),
+            thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
-            campaign: TestFixtures.getExtendedMRAIDCampaign(),
+            campaign: mraidCampaign,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
             request: sinon.createStubInstance(Request),
@@ -172,10 +158,11 @@ describe('MraidAdUnit', () => {
                 sinon.assert.calledOnce(<sinon.SinonSpy>onStartObserver);
             });
 
-            // xit('should set up the web player', () => {
-            //     sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.WebPlayer.setSettings);
-            //     sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.WebPlayer.setEventSettings);
-            // });
+            xit('should set up the web player', () => {
+                // it will eventually
+                // sinon.assert.calledOnce(<sinon.SinonSpy>WebPlayer.setSettings);
+                // sinon.assert.calledOnce(<sinon.SinonSpy>WebPlayer.setEventSettings);
+            });
 
             it('should open the container', () => {
                 sinon.assert.calledOnce(<sinon.SinonSpy>mraidAdUnitParameters.container.open);
@@ -201,12 +188,15 @@ describe('MraidAdUnit', () => {
             mraidAdUnit.setFinishState(finishState);
         });
 
-        // it('should resolve when isShowing is false', () => {
-        //     return mraidAdUnit.hide().then(() => {
-        //         sinon.assert.notCalled(<sinon.SinonSpy>onCloseObserver);
-        //         sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Listener.sendFinishEvent);
-        //     });
-        // });
+        it('should resolve when isShowing is false', () => {
+            return mraidAdUnit.hide().then(() => {
+                sandbox.stub(mraidAdUnit, 'setShowing');
+                sandbox.stub(mraidAdUnit, 'setShowingMRAID');
+                sinon.assert.notCalled(<sinon.SinonSpy>onCloseObserver);
+                sinon.assert.notCalled(<sinon.SinonSpy>mraidAdUnit.setShowing);
+                sinon.assert.notCalled(<sinon.SinonSpy>mraidAdUnit.setShowingMRAID);
+            });
+        });
 
         it('should trigger on close', () => {
             return mraidAdUnit.show().then(() => mraidAdUnit.hide()).then(() => {
@@ -214,14 +204,18 @@ describe('MraidAdUnit', () => {
             });
         });
 
-        // it('should send the finish event', () => {
-        //     return mraidAdUnit.show().then(() => mraidAdUnit.hide()).then(() => {
-        //         sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendFinishEvent, mraidAdUnitParameters.placement.getId(), finishState);
-        //     });
-        // });
+        xit('should send the finish event', () => {
+            // return mraidAdUnit.show().then(() => mraidAdUnit.hide()).then(() => {
+            //     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendFinishEvent, mraidAdUnitParameters.placement.getId(), finishState);
+            // });
+        });
 
-        it('should hide the endscreen if endscreen exists', () => {
-            // need to set it as defined in constructor
+        xit('should hide the endscreen if endscreen exists', () => {
+            //
+        });
+
+        xit('should hide the privacy if privacy exists', () => {
+            //
         });
     });
 
@@ -235,10 +229,10 @@ describe('MraidAdUnit', () => {
             return mraidAdUnit.hide();
         });
 
-        xit('should change the orientation properties used by container open', () => {
+        it('should change the orientation properties used by container open', () => {
             mraidAdUnit.setOrientationProperties(properties);
             return mraidAdUnit.show().then(() => {
-                sinon.assert.calledWith(<sinon.SinonSpy>mraidAdUnitParameters.container.open, mraidAdUnit, ['webplayer', 'webview'], false, Orientation.NONE, true, false, true, false, {});
+                sinon.assert.calledWith(<sinon.SinonSpy>mraidAdUnitParameters.container.open, mraidAdUnit, ['webview'], false, Orientation.NONE, true, false, true, false, {});
             });
         });
     });
@@ -284,7 +278,13 @@ describe('MraidAdUnit', () => {
     });
 
     describe('onContainerShow', () => {
-        // TODO
+        xit('should set the viewable state to true', () => {
+            //
+        });
+
+        xit('should auto close after autoclose delay timer reached', () => {
+            //
+        });
     });
 
     describe('onContainerDestroy', () => {
@@ -331,6 +331,8 @@ describe('MraidAdUnit', () => {
     });
 
     describe('onContainerForeground', () => {
-        // TODO
+        xit ('should set the viewable state to true when the mraid is set as showing', () => {
+            //
+        });
     });
 });
