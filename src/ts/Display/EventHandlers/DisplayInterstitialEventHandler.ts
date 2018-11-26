@@ -15,7 +15,7 @@ export class DisplayInterstitialEventHandler extends GDPREventHandler implements
     private _placement: Placement;
 
     constructor(adUnit: DisplayInterstitialAdUnit, parameters: IDisplayInterstitialAdUnitParameters) {
-        super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
+        super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig);
         this._operativeEventManager = parameters.operativeEventManager;
         this._adUnit = adUnit;
         this._campaign = parameters.campaign;

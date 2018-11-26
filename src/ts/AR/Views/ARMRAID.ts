@@ -15,7 +15,6 @@ import MRAIDContainer from 'html/mraid/container.html';
 import WebARScript from 'html/mraid/webar.html';
 import ExtendedMRAIDTemplate from 'html/ExtendedMRAID.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
@@ -33,7 +32,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _iframeLoaded = false;
 
-    private _messageListener: any;
     private _deviceorientationListener: any;
     private _loadingScreenTimeout: any;
     private _prepareTimeout: any;
@@ -151,16 +149,12 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             });
         });
 
-        this._messageListener = (event: MessageEvent) => this.onMessage(event);
-        window.addEventListener('message', this._messageListener, false);
+        this._mraidBridge.connect(iframe);
     }
 
     public setViewableState(viewable: boolean): void {
         if(this._iframeLoaded && !this._loadingScreenTimeout) {
-            this._iframe.contentWindow!.postMessage({
-                type: 'viewable',
-                value: viewable
-            }, '*');
+            this._mraidBridge.sendViewableEvent(viewable);
         }
 
         this.setAnalyticsBackgroundTime(viewable);
@@ -210,11 +204,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
 
         super.hide();
-
-        if(this._messageListener) {
-            window.removeEventListener('message', this._messageListener, false);
-            this._messageListener = undefined;
-        }
+        this._mraidBridge.disconnect();
     }
 
     private showLoadingScreen() {
@@ -359,14 +349,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private onAREvent(event: MessageEvent): Promise<void> {
+    protected onAREvent(event: MessageEvent): Promise<void> {
         if (!this._hasCameraPermission) {
             return Promise.resolve();
         }
 
-        const { data } = event.data;
-        const functionName = data.functionName;
-        const args = data.args;
+        const functionName = event.data.functionName;
+        const args = event.data.args;
 
         switch (functionName) {
             case 'resetPose':
@@ -411,30 +400,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
             default:
                 throw new Error('Unknown AR message');
-        }
-    }
-
-    private onMessage(event: MessageEvent) {
-        switch(event.data.type) {
-            case 'open':
-                this.onOpen(encodeURI(event.data.url));
-                break;
-            case 'close':
-                this.onClose();
-                break;
-            case 'orientation':
-                this.onSetOrientationProperties(event.data.properties.allowOrientationChange, event.data.properties.forceOrientation);
-                break;
-            case 'analyticsEvent':
-                this.sendMraidAnalyticsEvent(event.data.event, event.data.eventData);
-                break;
-            case 'customMraidState':
-                this.onCustomState(event.data.state);
-                break;
-            case 'ar':
-                this.onAREvent(event).catch((reason) => this._core.Sdk.logError('AR message error: ' + reason.toString()));
-                break;
-            default:
         }
     }
 

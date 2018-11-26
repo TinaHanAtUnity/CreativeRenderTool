@@ -1,4 +1,4 @@
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Placement } from 'Ads/Models/Placement';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -47,9 +47,9 @@ describe('DisplayInterstitialTest', () => {
                 muteVideo: false
             });
             campaign = TestFixtures.getDisplayInterstitialCampaign();
-            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacyManager = sinon.createStubInstance(UserPrivacyManager);
             const coreConfig = TestFixtures.getCoreConfiguration();
-            const privacy = new Privacy(platform, campaign, gdprManager, false, coreConfig.isCoppaCompliant());
+            const privacy = new Privacy(platform, campaign, privacyManager, false, coreConfig.isCoppaCompliant());
 
             const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             view = new DisplayInterstitial(platform, core, deviceInfo, placement, campaign, privacy, false);

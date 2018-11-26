@@ -24,16 +24,12 @@ export class ProgrammaticVastParser extends CampaignParser {
     }
 
     private static VAST_PARSER_MAX_DEPTH: number;
-    private _isMediaExperiment: boolean = false;
-    private _isErrorTrackingExperiment: boolean = false;
 
     protected _vastParser: VastParser = new VastParser();
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
-        if(response.isMediaExperiment() && response.isMediaExperiment() === true) {
-            this._isMediaExperiment = true;
-        }
+
         if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
             this._vastParser.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
         }
@@ -84,11 +80,7 @@ export class ProgrammaticVastParser extends CampaignParser {
             landscapeAsset = new Image(Url.encode(landscapeUrl), session);
         }
 
-        let mediaVideoUrl = vast.getMediaVideoUrl();
-        if (this._isMediaExperiment) {
-            mediaVideoUrl = VastMediaSelector.getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
-        }
-
+        let mediaVideoUrl = VastMediaSelector.getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
         if (!mediaVideoUrl) {
             throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND);
         }

@@ -1,4 +1,4 @@
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Privacy } from 'Ads/Views/Privacy';
@@ -18,6 +18,7 @@ import { MRAID } from 'MRAID/Views/MRAID';
 
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { MraidIFrameEventBridge } from 'MRAID/Views/MraidIFrameEventBridge';
 
 describe('MRAID', () => {
     let platform: Platform;
@@ -27,7 +28,7 @@ describe('MRAID', () => {
     let placement: Placement;
     let configuration: CoreConfiguration;
     let privacy: Privacy;
-    let gdprManager: GdprManager;
+    let privacyManager: UserPrivacyManager;
     let fakeCampaign: Campaign;
 
     beforeEach(() => {
@@ -48,14 +49,15 @@ describe('MRAID', () => {
         });
 
         configuration = TestFixtures.getCoreConfiguration();
-        gdprManager = sinon.createStubInstance(GdprManager);
+        privacyManager = sinon.createStubInstance(UserPrivacyManager);
         fakeCampaign = sinon.createStubInstance(Campaign);
-        privacy = new Privacy(platform, fakeCampaign, gdprManager, false, false);
+        privacy = new Privacy(platform, fakeCampaign, privacyManager, false, false);
     });
 
     it('should render', (done) => {
         const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
         const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
+        mraid.setMraidEventBridge(new MraidIFrameEventBridge(core, mraid));
 
         mraid.render();
 
