@@ -105,3 +105,4 @@ export const NativeGreenEndScreenButtonColorTest = new ABTest(GroupSeven, GroupE
 export const FPSCollectionTest = new ABTest(GroupSixteen);
 export const NextSkipIconTest = new ABTest(GroupFive, GroupSix);
 export const AuctionV5Test = new ABTest(GroupFifteen);
+export const AndroidBackButtonSkipTest = new ABTest(GroupDisabled);
