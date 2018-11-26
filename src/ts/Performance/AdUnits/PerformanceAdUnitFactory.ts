@@ -26,7 +26,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
     public createAdUnit(parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
         const privacy = this.createPrivacy(parameters);
-        const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose();
+        const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose() || false;
         const overlay = this.createOverlay(parameters, privacy, showPrivacyDuringVideo);
 
         const adUnitStyle: AdUnitStyle = parameters.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();

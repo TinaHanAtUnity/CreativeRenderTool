@@ -193,7 +193,7 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             const cacheBookkeeping = new CacheBookkeepingManager(core);
             const programmaticTrackingService: ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-            const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig);
+            const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig, deviceInfo);
             const wakeUpManager = new WakeUpManager(core);
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             const sessionManager = new SessionManager(core, request, storageBridge);
@@ -230,7 +230,7 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo = TestFixtures.getIosDeviceInfo(core);
             const cacheBookkeeping = new CacheBookkeepingManager(core);
             const programmaticTrackingService: ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-            const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig);
+            const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig, deviceInfo);
             const wakeUpManager = new WakeUpManager(core);
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             const sessionManager = new SessionManager(core, request, storageBridge);
@@ -285,6 +285,7 @@ describe('Event parameters should match specifications', () => {
                 campaign: campaign
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
+            campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
 
             const operativeEventParams: IOperativeEventParams = {
                 placement: TestFixtures.getPlacement(),
@@ -331,6 +332,8 @@ describe('Event parameters should match specifications', () => {
                 campaign: campaign
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
+            campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
+
             const operativeEventParams: IOperativeEventParams = {
                 placement: TestFixtures.getPlacement(),
                 videoOrientation: 'landscape',
@@ -383,6 +386,8 @@ describe('Event parameters should match specifications', () => {
                     campaign: campaign
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
+                campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
+
                 operativeEventParams = {
                     placement: TestFixtures.getPlacement(),
                     adUnitStyle: campaign.getAdUnitStyle(),
@@ -473,6 +478,8 @@ describe('Event parameters should match specifications', () => {
                     campaign: campaign
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
+                campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
+
             });
 
             it('with start event', () => {
@@ -561,7 +568,7 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
             const cacheBookkeeping = new CacheBookkeepingManager(core);
             const programmaticTrackingService: ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-            const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig);
+            const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig, deviceInfo);
             const wakeUpManager = new WakeUpManager(core);
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             const sessionManager = new SessionManager(core, request, storageBridge);
@@ -599,7 +606,7 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo = TestFixtures.getIosDeviceInfo(core);
             const cacheBookkeeping = new CacheBookkeepingManager(core);
             const programmaticTrackingService: ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-            const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig);
+            const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig, deviceInfo);
             const wakeUpManager = new WakeUpManager(core);
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             const sessionManager = new SessionManager(core, request, storageBridge);

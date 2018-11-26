@@ -13,14 +13,12 @@ export interface IVastEndScreenHandler {
     onVastEndScreenClose(): void;
     onVastEndScreenShow(): void;
     onKeyEvent(keyCode: number): void;
-    onOpenUrl(url: string): Promise<void>;
 }
 
 export interface IVastEndscreenParameters {
     campaign: VastCampaign;
     clientInfo: ClientInfo;
     country: string | undefined;
-    showPrivacyDuringEndscreen: boolean;
 }
 
 export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandler {
@@ -30,7 +28,6 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     private _callButtonEnabled: boolean = true;
     private _campaign: VastCampaign;
     private _country: string | undefined;
-    private _showPrivacyDuringEndscreen: boolean;
 
     constructor(platform: Platform, parameters: IVastEndscreenParameters, privacy: AbstractPrivacy) {
         super(platform, 'vast-end-screen');
@@ -38,7 +35,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
         this._campaign = parameters.campaign;
         this._template = new Template(VastEndScreenTemplate);
         this._country = parameters.country;
-        this._showPrivacyDuringEndscreen = parameters.showPrivacyDuringEndscreen;
+        this._privacy = privacy;
 
         if(this._campaign) {
             const landscape = this._campaign.getLandscape();
@@ -77,14 +74,6 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
                 selector: '.campaign-container, .game-background'
             });
         }
-
-        if (this._showPrivacyDuringEndscreen) {
-            this._privacy = privacy;
-            this._privacy.render();
-            this._privacy.hide();
-            document.body.appendChild(this._privacy.container());
-            this._privacy.addEventHandler(this);
-        }
     }
 
     public render(): void {
@@ -92,10 +81,6 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
 
         if (this._country === 'CN') {
             (<HTMLElement>this._container.querySelector('.china-advertisement')).style.display = 'block';
-        }
-
-        if (!this._showPrivacyDuringEndscreen) {
-            (<HTMLElement>this._container.querySelector('.privacy-button')).style.display = 'none';
         }
 
         if(this._isSwipeToCloseEnabled) {
@@ -115,20 +100,11 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
         }
     }
 
-    public hide(): void {
-        super.hide();
-
-        if (this._privacy) {
-            this._privacy.hide();
-        }
-    }
-
     public remove(): void {
         if (this._privacy) {
-            this._privacy.removeEventHandler(this);
-            if (this._privacy.container().parentElement) {
-                this._privacy.container().parentElement!.removeChild(this._privacy.container());
-            }
+            this._privacy.hide();
+            document.body.removeChild(this._privacy.container());
+            delete this._privacy;
         }
 
         if (this.container().parentElement) {
