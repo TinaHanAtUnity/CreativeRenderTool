@@ -41,9 +41,9 @@ describe('GdprManagerTest', () => {
     let httpKafkaStub: sinon.SinonSpy;
 
     let consentlastsent: boolean | string = false;
-    let consent: unknown = false;
+    let consent: any = false;
     let isGDPREnabled: boolean = false;
-    let storageTrigger: (eventType: string, data: unknown) => void;
+    let storageTrigger: (eventType: string, data: any) => void;
 
     beforeEach(() => {
         consentlastsent = false;
@@ -53,7 +53,7 @@ describe('GdprManagerTest', () => {
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
-        (<unknown>core.Storage).onSet = new Observable2<string, object>();
+        (<any>core.Storage).onSet = new Observable2<string, object>();
 
         clientInfo = sinon.createStubInstance(ClientInfo);
         deviceInfo = sinon.createStubInstance(AndroidDeviceInfo);
@@ -426,7 +426,7 @@ describe('GdprManagerTest', () => {
         const tests: {
             action: GDPREventAction;
             source: GDPREventSource | undefined;
-            infoJson: unknown;
+            infoJson: any;
         }[] = [{
             action: GDPREventAction.SKIP,
             source: undefined,
@@ -494,7 +494,7 @@ describe('GdprManagerTest', () => {
         tests.forEach((t) => {
             it(`should send matching payload when action is "${t.action}"`, () => {
                 httpKafkaStub.resetHistory();
-                const comparison = (value: unknown): boolean => {
+                const comparison = (value: any): boolean => {
                     if (Object.keys(value).length !== Object.keys(t.infoJson).length) {
                         return false;
                     }

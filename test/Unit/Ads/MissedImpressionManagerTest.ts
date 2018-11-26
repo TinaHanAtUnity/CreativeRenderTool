@@ -17,7 +17,7 @@ describe('MissedImpressionManagerTest', () => {
     let backend: Backend;
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
-    let kafkaSpy: unknown;
+    let kafkaSpy: any;
 
     beforeEach(() => {
         platform = Platform.ANDROID;

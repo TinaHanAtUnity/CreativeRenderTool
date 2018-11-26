@@ -28,7 +28,7 @@ describe('ClientInfoTest', () => {
         ];
 
         clientInfo = new ClientInfo(data);
-        const dto: unknown = clientInfo.getDTO();
+        const dto: any = clientInfo.getDTO();
 
         assert.equal(dto.gameId, '11111');
         assert.equal(dto.testMode, true);
@@ -62,7 +62,7 @@ describe('ClientInfoTest', () => {
         ];
 
         clientInfo = new ClientInfo(data);
-        const dto: unknown = clientInfo.getDTO();
+        const dto: any = clientInfo.getDTO();
 
         assert.equal(dto.gameId, 'abc1111');
     });

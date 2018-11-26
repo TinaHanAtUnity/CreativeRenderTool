@@ -35,7 +35,7 @@ import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
         describe('parsing a campaign', () => {
             let campaign: AdMobCampaign;
 
-            const parse = (data: unknown) => {
+            const parse = (data: any) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                 return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
@@ -47,7 +47,7 @@ import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
                 backend = TestFixtures.getBackend(platform);
                 nativeBridge = TestFixtures.getNativeBridge(platform, backend);
                 core = TestFixtures.getCoreApi(nativeBridge);
-                (<unknown>core.Sdk) = sinon.createStubInstance(SdkApi);
+                (<any>core.Sdk) = sinon.createStubInstance(SdkApi);
 
                 request = sinon.createStubInstance(RequestManager);
 

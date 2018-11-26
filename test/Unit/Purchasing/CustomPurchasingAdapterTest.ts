@@ -42,8 +42,8 @@ describe('CustomPurchasingAdapter', () => {
         sinon.stub(purchasing.CustomPurchasing, 'purchaseItem').returns(Promise.resolve());
 
         purchasingAdapter = new CustomPurchasingAdapter(core, purchasing, promoEvents, request, analyticsManager);
-        sandbox.stub((<unknown>purchasingAdapter)._thirdPartyEventManager, 'sendWithGet');
-        sandbox.stub((<unknown>purchasingAdapter)._thirdPartyEventManager, 'sendWithPost');
+        sandbox.stub((<any>purchasingAdapter)._thirdPartyEventManager, 'sendWithGet');
+        sandbox.stub((<any>purchasingAdapter)._thirdPartyEventManager, 'sendWithPost');
     });
 
     const triggerRefreshCatalog = (value: IProduct[]) => {
@@ -97,7 +97,7 @@ describe('CustomPurchasingAdapter', () => {
             (<sinon.SinonStub>purchasing.CustomPurchasing.refreshCatalog).restore();
             sinon.stub(purchasing.CustomPurchasing, 'refreshCatalog').rejects();
 
-            return purchasingAdapter.refreshCatalog().catch((e: unknown) => {
+            return purchasingAdapter.refreshCatalog().catch((e: any) => {
                 assert.equal(e.message, 'Error');
             });
         });
@@ -161,7 +161,7 @@ describe('CustomPurchasingAdapter', () => {
                                 .then(() => {
                                     return purchaseItemPromise.then((transactionDets) => {
                                         sinon.assert.calledOnce(<sinon.SinonStub>promoEvents.onPurchaseSuccess);
-                                        sinon.assert.calledOnce((<unknown>purchasingAdapter)._thirdPartyEventManager.sendWithPost);
+                                        sinon.assert.calledOnce((<any>purchasingAdapter)._thirdPartyEventManager.sendWithPost);
                                         assert.deepEqual(transactionDets, transactionDetails);
                                     });
                             });
@@ -182,7 +182,7 @@ describe('CustomPurchasingAdapter', () => {
                                 .then(() => {
                                     return purchaseItemPromise.then((transactionDets) => {
                                         sinon.assert.calledOnce(<sinon.SinonStub>promoEvents.onPurchaseSuccess);
-                                        sinon.assert.calledOnce((<unknown>purchasingAdapter)._thirdPartyEventManager.sendWithGet);
+                                        sinon.assert.calledOnce((<any>purchasingAdapter)._thirdPartyEventManager.sendWithGet);
                                         assert.deepEqual(transactionDets, transactionDetails);
                                     });
                             });
@@ -261,7 +261,7 @@ describe('CustomPurchasingAdapter', () => {
                                         assert.fail('purchaseItem worked when it shouldn\'t\'ve');
                                     }).catch((e) => {
                                         sinon.assert.calledOnce(<sinon.SinonStub>analyticsManager.onPurchaseFailed);
-                                        sinon.assert.calledOnce((<unknown>purchasingAdapter)._thirdPartyEventManager.sendWithPost);
+                                        sinon.assert.calledOnce((<any>purchasingAdapter)._thirdPartyEventManager.sendWithPost);
                                         assert.equal(e.message, 'Did not complete transaction due to error:twas a problem');
                                     });
                             });
@@ -284,7 +284,7 @@ describe('CustomPurchasingAdapter', () => {
                                         assert.fail('purchaseItem worked when it shouldn\'t\'ve');
                                     }).catch((e) => {
                                         sinon.assert.calledOnce(<sinon.SinonStub>analyticsManager.onPurchaseFailed);
-                                        sinon.assert.calledWith((<unknown>purchasingAdapter)._thirdPartyEventManager.sendWithGet, 'purchase', '12345', 'http://test.purchase.com/purchase');
+                                        sinon.assert.calledWith((<any>purchasingAdapter)._thirdPartyEventManager.sendWithGet, 'purchase', '12345', 'http://test.purchase.com/purchase');
                                         assert.equal(e.message, 'Did not complete transaction due to error:twas a problem');
                                     });
                             });

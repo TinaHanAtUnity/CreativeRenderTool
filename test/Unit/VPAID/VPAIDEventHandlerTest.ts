@@ -87,7 +87,7 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
     });
 
     describe('VPAID events', () => {
-        const triggerVPAIDEvent = (eventType: string, ...args: unknown[]) => {
+        const triggerVPAIDEvent = (eventType: string, ...args: any[]) => {
             return () => {
                 eventHandler.onVPAIDEvent(eventType, args);
             };

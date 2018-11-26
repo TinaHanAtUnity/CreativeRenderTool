@@ -81,7 +81,7 @@ class TestHelper {
         it('should clear queue after event is sent', () => {
             // tslint:disable:no-string-literal
             return analyticsManager.init().then(() => {
-                const eventQueue: unknown = analyticsManager['_analyticsEventQueue'];
+                const eventQueue: any = analyticsManager['_analyticsEventQueue'];
                 const promise = analyticsManager.onIapTransaction('fakeProductId', 'fakeReceipt', 'USD', 1.99).then(() => {
                     assert.equal(Object.keys(eventQueue).length, 0);
                 });
@@ -94,7 +94,7 @@ class TestHelper {
         it('should clear queue after multiple events are sent', () => {
             // tslint:disable:no-string-literal
             return analyticsManager.init().then(() => {
-                const eventQueue: unknown = analyticsManager['_analyticsEventQueue'];
+                const eventQueue: any = analyticsManager['_analyticsEventQueue'];
                 const postStub = <sinon.SinonStub>request.post;
                 postStub.resetHistory();
                 const first = analyticsManager.onIapTransaction('fakeProductId', 'fakeReceipt', 'USD', 1.99).catch((error) => {
@@ -123,7 +123,7 @@ class TestHelper {
         it('should clear queue when first send fails and second succeeds', () => {
             // tslint:disable:no-string-literal
             return analyticsManager.init().then(() => {
-                const eventQueue: unknown = analyticsManager['_analyticsEventQueue'];
+                const eventQueue: any = analyticsManager['_analyticsEventQueue'];
                 const postStub = <sinon.SinonStub>request.post;
                 postStub.resetHistory();
                 postStub.rejects();

@@ -8,9 +8,9 @@ import 'mocha';
 describe('AuctionResponse', () => {
     describe('when created with response json', () => {
         it('should have correct data from the json', () => {
-            const json: unknown = JSON.parse(OnProgrammaticMraidPlcCampaign);
+            const json: any = JSON.parse(OnProgrammaticMraidPlcCampaign);
             const mediaId: string = 'UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85';
-            const campaignObject: unknown = json.media[mediaId];
+            const campaignObject: any = json.media[mediaId];
             const correlationId = json.correlationId;
             const placements: AuctionPlacement[] = [];
 

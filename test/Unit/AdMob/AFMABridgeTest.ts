@@ -49,7 +49,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             afmaBridge.disconnect();
         });
 
-        const sendEvent = (e: string, data?: unknown) => {
+        const sendEvent = (e: string, data?: any) => {
             return () => {
                 return new Promise((res) => {
                     window.postMessage({
@@ -68,31 +68,31 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 data: {
                     url: 'unityads.unity3d.com'
                 },
-                verify: (data?: unknown) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAOpenURL, data.url)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAOpenURL, data.url)
             }, {
                 event: AFMAEvents.CLOSE,
-                verify: (data?: unknown) => sinon.assert.called(<sinon.SinonSpy>handler.onAFMAClose)
+                verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>handler.onAFMAClose)
             }, {
                 event: AFMAEvents.FORCE_ORIENTATION,
                 data: {
                     orientation: 'portrait'
                 },
-                verify: (data?: unknown) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, Orientation.PORTRAIT)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, Orientation.PORTRAIT)
             }, {
                 event: AFMAEvents.FORCE_ORIENTATION,
                 data: {
                     orientation: 'landscape'
                 },
-                verify: (data?: unknown) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, Orientation.LANDSCAPE)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, Orientation.LANDSCAPE)
             }, {
                 event: AFMAEvents.VIDEO_START,
-                verify: (data?: unknown) => sinon.assert.called(<sinon.SinonSpy>handler.OnAFMAVideoStart)
+                verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>handler.OnAFMAVideoStart)
             }, {
                 event: AFMAEvents.CLICK,
                 data: {
                     url: 'unityads.unity3d.com'
                 },
-                verify: (data?: unknown) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAClick, data.url)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAClick, data.url)
             }, {
                 event: AFMAEvents.GRANT_REWARD,
                 verify: () => sinon.assert.called(<sinon.SinonSpy>handler.onAFMAGrantReward)
@@ -101,26 +101,26 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 data: {
                     disabled: true
                 },
-                verify: (data?: unknown) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMADisableBackButton, data.disabled)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMADisableBackButton, data.disabled)
             }, {
                 event: AFMAEvents.OPEN_STORE_OVERLAY,
                 data: {
                     url: 'itunes://com.unity3d.ads'
                 },
-                verify: (data?: unknown) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAOpenStoreOverlay, data.url)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAOpenStoreOverlay, data.url)
             }, {
                 event: AFMAEvents.OPEN_IN_APP_STORE,
                 data: {
                     productId: 'com.unity3d.ads',
                     url: 'itunes://com.unity3d.ads'
                 },
-                verify: (data?: unknown) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAOpenInAppStore, data.productId, data.url)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAOpenInAppStore, data.productId, data.url)
             }, {
                 event: AFMAEvents.FETCH_APP_STORE_OVERLAY,
                 data: {
                     productId: 'com.unity3d.ads'
                 },
-                verify: (data?: unknown) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAFetchAppStoreOverlay, data.productId)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAFetchAppStoreOverlay, data.productId)
             }, {
                 event: AFMAEvents.OPEN_INTENTS_REQUEST,
                 data: {
@@ -130,23 +130,23 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                         packageName: 'com.unity3d.ads.foo'
                     }]
                 },
-                verify: (data?: unknown) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAResolveOpenableIntents, data)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAResolveOpenableIntents, data)
             }, {
                 event: AFMAEvents.TRACKING,
                 data: {
                     event: 'foo'
                 },
-                verify: (data?: unknown) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMATrackingEvent, data.event)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMATrackingEvent, data.event)
             }, {
                 event: AFMAEvents.GET_CLICK_SIGNAL,
                 data: {
                     start: {x: 1, y: 1},
                     end: {x: 2, y: 2}
                 },
-                verify: (data?: unknown) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAClickSignalRequest, data)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAClickSignalRequest, data)
             }, {
                 event: AFMAEvents.USER_SEEKED,
-                verify: (data?: unknown) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAUserSeeked)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAUserSeeked)
             }];
 
             for(const test of tests) {

@@ -55,11 +55,11 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             }).then(() => {
                 sinon.assert.calledWith(<sinon.SinonStub>request.post,
                     'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"value":[]},"timestamp":123456}}');
-                return Diagnostics.trigger('test', <unknown>null);
+                return Diagnostics.trigger('test', <any>null);
             }).then(() => {
                 sinon.assert.calledWith(<sinon.SinonStub>request.post,
                     'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{"value":null},"timestamp":123456}}');
-                return Diagnostics.trigger('test', <unknown>undefined);
+                return Diagnostics.trigger('test', <any>undefined);
             }).then(() => {
                 sinon.assert.calledWith(<sinon.SinonStub>request.post,
                     'https://httpkafka.unityads.unity3d.com/v1/events', '{"common":{"client":null,"device":null,"country":null}}\n{"type":"ads.sdk2.diagnostics","msg":{"type":"test","test":{},"timestamp":123456}}');

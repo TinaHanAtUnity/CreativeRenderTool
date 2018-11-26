@@ -36,7 +36,7 @@ describe('ProgrammaticMraidUrlParser', () => {
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
-        (<unknown>core.Sdk) = sinon.createStubInstance(SdkApi);
+        (<any>core.Sdk) = sinon.createStubInstance(SdkApi);
 
         request = sinon.createStubInstance(RequestManager);
         session = TestFixtures.getSession();
@@ -48,7 +48,7 @@ describe('ProgrammaticMraidUrlParser', () => {
         describe('with a proper JSON payload', () => {
             let campaign: MRAIDCampaign;
 
-            const parse = (data: unknown) => {
+            const parse = (data: any) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
                 return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {

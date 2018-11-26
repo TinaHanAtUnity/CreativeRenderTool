@@ -63,9 +63,9 @@ import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
             }
 
             banners = TestFixtures.getBannersApi(nativeBridge);
-            (<unknown>banners.Banner).onBannerAttachedState = new Observable1<boolean>();
-            (<unknown>banners.Banner).onBannerLoaded = new Observable0();
-            (<unknown>banners.Banner).onBannerOpened = new Observable0();
+            (<any>banners.Banner).onBannerAttachedState = new Observable1<boolean>();
+            (<any>banners.Banner).onBannerLoaded = new Observable0();
+            (<any>banners.Banner).onBannerOpened = new Observable0();
             sinon.stub(banners.Banner, 'load').callsFake(() => {
                 return Promise.resolve().then(() => banners.Banner.onBannerLoaded.trigger());
             });
@@ -85,9 +85,9 @@ import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
             asStub(thirdPartyEventManager.sendWithGet).resolves();
 
             webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
-            (<unknown>webPlayerContainer).onPageFinished = new Observable1();
-            (<unknown>webPlayerContainer).shouldOverrideUrlLoading = new Observable2();
-            (<unknown>webPlayerContainer).onCreateWebView = new Observable2();
+            (<any>webPlayerContainer).onPageFinished = new Observable1();
+            (<any>webPlayerContainer).shouldOverrideUrlLoading = new Observable2();
+            (<any>webPlayerContainer).onCreateWebView = new Observable2();
             asStub(webPlayerContainer.setData).callsFake(() => {
                 return Promise.resolve().then(() => webPlayerContainer.onPageFinished.trigger('about:blank'));
             });
@@ -227,7 +227,7 @@ import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
                 return adUnit.onLoad()
                     .then(() => adUnit.onDestroy())
                     .then(() => {
-                        assert.equal((<unknown>webPlayerContainer.shouldOverrideUrlLoading)._observers.length, 0, 'Was still subscribed');
+                        assert.equal((<any>webPlayerContainer.shouldOverrideUrlLoading)._observers.length, 0, 'Was still subscribed');
                     });
             });
         });

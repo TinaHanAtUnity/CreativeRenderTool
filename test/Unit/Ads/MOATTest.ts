@@ -10,7 +10,7 @@ describe('MOAT', () => {
     describe('onMessage', () => {
         let diagnosticsTriggerStub: sinon.SinonStub;
         let logWarningStub: sinon.SinonStub;
-        let moat: unknown;
+        let moat: any;
         beforeEach(() => {
             const nativeBridge = sinon.createStubInstance(NativeBridge);
             const sdk: SdkApi = sinon.createStubInstance(SdkApi);
@@ -27,7 +27,7 @@ describe('MOAT', () => {
         type IAssertionFunction = () => void;
 
         const tests: {
-            event: unknown;
+            event: any;
             assertions: IAssertionFunction;
         }[] = [{
             event: {data: {type: 'MOATVideoError', error: 'test error'}},

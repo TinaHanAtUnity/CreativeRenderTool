@@ -58,7 +58,7 @@ describe('VPAIDAdUnit', () => {
         webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
         (<sinon.SinonStub>webPlayerContainer.setSettings).returns(Promise.resolve());
         (<sinon.SinonStub>webPlayerContainer.setEventSettings).returns(Promise.resolve());
-        (<unknown>webPlayerContainer).shouldOverrideUrlLoading = new Observable2<string, string>();
+        (<any>webPlayerContainer).shouldOverrideUrlLoading = new Observable2<string, string>();
 
         parameters = {
             platform,
@@ -88,12 +88,12 @@ describe('VPAIDAdUnit', () => {
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };
 
-        (<unknown>nativeBridge).Listener = sinon.createStubInstance(ListenerApi);
+        (<any>nativeBridge).Listener = sinon.createStubInstance(ListenerApi);
 
-        (<unknown>parameters.focusManager).onAppForeground = new Observable0();
-        (<unknown>parameters.focusManager).onAppBackground = new Observable0();
-        (<unknown>parameters.container).onShow = new Observable0();
-        (<unknown>parameters.container).onAndroidPause = new Observable0();
+        (<any>parameters.focusManager).onAppForeground = new Observable0();
+        (<any>parameters.focusManager).onAppBackground = new Observable0();
+        (<any>parameters.container).onShow = new Observable0();
+        (<any>parameters.container).onAndroidPause = new Observable0();
         (<sinon.SinonStub>parameters.container.open).returns(Promise.resolve());
         (<sinon.SinonStub>parameters.container.close).returns(Promise.resolve());
         (<sinon.SinonStub>parameters.container.setViewFrame).returns(Promise.resolve());
