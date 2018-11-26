@@ -1,5 +1,6 @@
 # Pending
 
+* Revert Tracking Urls Changes for VAST and Disable Auction V5 [#7317](https://github.com/Applifier/unity-ads-webview/pull/7317)
 * Turn on Auction V5 Test in GroupFifteen [#7297](https://github.com/Applifier/unity-ads-webview/pull/7297)
 * BYOP Promo Product Type Filtering [#7073](https://github.com/Applifier/unity-ads-webview/pull/7073)
 * Refactor Vast Overlay and Privacy [#6890](https://github.com/Applifier/unity-ads-webview/pull/6890)
