@@ -133,8 +133,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
             vastEndScreenParameters = {
                 campaign: vastAdUnitParameters.campaign,
                 clientInfo: vastAdUnitParameters.clientInfo,
-                seatId: vastAdUnitParameters.campaign.getSeatId(),
-                showPrivacyDuringEndscreen: false
+                seatId: vastAdUnitParameters.campaign.getSeatId()
             };
         });
 

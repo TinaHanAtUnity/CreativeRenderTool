@@ -113,7 +113,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             coreConfig: coreConfig,
             placement: TestFixtures.getPlacement()
         };
-        overlay = new NewVideoOverlay(overlayParams, privacy, false);
+        overlay = new NewVideoOverlay(overlayParams, privacy, false, false);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         performanceAdUnitParameters = {
