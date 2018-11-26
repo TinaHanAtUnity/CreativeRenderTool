@@ -139,6 +139,9 @@ export class TestFixtures {
             skipInSeconds: 0,
             disableBackButton: false,
             useDeviceOrientationForVideo: false,
+            skipEndCardOnClose: false,
+            disableVideoControlsFade: false,
+            refreshDelay: 1000,
             muteVideo: false,
             adTypes: ['TEST']
         });

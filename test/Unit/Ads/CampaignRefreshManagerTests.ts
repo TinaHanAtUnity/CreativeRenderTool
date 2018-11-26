@@ -66,11 +66,11 @@ export class TestContainer extends AdUnitContainer {
     public close(): Promise<void> {
         return Promise.resolve();
     }
-    public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
+    public reconfigure(configuration: ViewConfiguration): Promise<unknown[]> {
         return Promise.all([]);
     }
-    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any[]> {
-        return Promise.all([]);
+    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<void> {
+        return Promise.resolve(void 0);
     }
     public isPaused(): boolean {
         return false;

@@ -106,7 +106,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             iframe.srcdoc = mraid;
 
             if (CustomFeatures.isSonicPlayable(this._creativeId)) {
-                iframe.sandbox = 'allow-scripts allow-same-origin';
+                iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
             }
         }).catch(e => {
             this._core.Sdk.logError('failed to create mraid: ' + e.message);

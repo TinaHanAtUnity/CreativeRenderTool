@@ -12,6 +12,23 @@ export enum PlacementState {
 export type PlacementAuctionType = 'cpm' | 'ltv';
 export const DefaultPlacementAuctionType = 'cpm';
 
+export interface IRawPlacement {
+    id: string;
+    name: string;
+    default: boolean;
+    allowSkip: boolean;
+    skipEndCardOnClose: boolean;
+    disableVideoControlsFade: boolean;
+    disableBackButton: boolean;
+    muteVideo: boolean;
+    skipInSeconds: number;
+    useDeviceOrientationForVideo: boolean;
+    adTypes: string[];
+    refreshDelay: number;
+    position?: string;
+    auctionType?: string;
+}
+
 export interface IPlacement {
     id: string;
     name: string;
@@ -42,7 +59,7 @@ export interface IPlacement {
 
 export class Placement extends Model<IPlacement> {
 
-    constructor(data: IPlacement) {
+    constructor(data: IRawPlacement) {
         super('Placement', {
             id: ['string'],
             name: ['string'],
@@ -89,7 +106,7 @@ export class Placement extends Model<IPlacement> {
         this.set('state', PlacementState.NOT_AVAILABLE);
         this.set('refreshDelay', data.refreshDelay);
         this.set('position', data.position || 'bottomcenter');
-        this.set('auctionType', data.auctionType || DefaultPlacementAuctionType);
+        this.set('auctionType', <PlacementAuctionType>data.auctionType || DefaultPlacementAuctionType);
     }
 
     public getId(): string {

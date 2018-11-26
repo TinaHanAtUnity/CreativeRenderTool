@@ -1,10 +1,10 @@
-import { IPlacement, Placement } from 'Ads/Models/Placement';
+import { IPlacement, IRawPlacement, Placement } from 'Ads/Models/Placement';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
 
 export interface IRawAdsConfiguration {
     assetCaching: string;
-    placements: IPlacement[];
+    placements: IRawPlacement[];
     defaultPlacement: string;
     gdprEnabled: boolean;
     optOutRecorded: boolean;

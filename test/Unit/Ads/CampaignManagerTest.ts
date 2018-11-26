@@ -287,7 +287,7 @@ describe('CampaignManager', () => {
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: VastCampaign;
             campaignManager.onError.subscribe((error) => {
-                assert.equal(1, 2, error.message);
+                assert.equal(1, 2, (<{ message: string }>error).message);
             });
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
                 triggeredCampaign = <VastCampaign>campaign;
@@ -396,8 +396,8 @@ describe('CampaignManager', () => {
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
-            campaignManager.onError.subscribe((err: WebViewError) => {
-                assert.equal(err.message, VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
+            campaignManager.onError.subscribe((err) => {
+                assert.equal((<{ message: string }>err).message, VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
                 done();
             });
 
@@ -414,7 +414,7 @@ describe('CampaignManager', () => {
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredError: any;
-            campaignManager.onError.subscribe((error: WebViewError) => {
+            campaignManager.onError.subscribe((error) => {
                 triggeredError = error;
             });
 
@@ -451,8 +451,8 @@ describe('CampaignManager', () => {
                 }
             };
 
-            campaignManager.onError.subscribe((error: WebViewError) => {
-                triggeredError = error;
+            campaignManager.onError.subscribe((error) => {
+                triggeredError = <WebViewError | Error>error;
                 if (done) {
                     // then the onError observable is triggered with an appropriate error
                     verify();
