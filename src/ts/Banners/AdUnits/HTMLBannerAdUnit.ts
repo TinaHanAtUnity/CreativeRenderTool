@@ -127,7 +127,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
     }
 
     private setUpBannerPlayerEvents(): Promise<void> {
-        let eventSettings: unknown;
+        let eventSettings: IWebPlayerEventSettings;
         if (this._platform === Platform.ANDROID) {
             eventSettings = {
                 onPageFinished: {

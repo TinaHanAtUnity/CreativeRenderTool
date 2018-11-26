@@ -71,11 +71,11 @@ export class RequestApi extends NativeApi {
     public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case RequestEvent[RequestEvent.COMPLETE]:
-                this.onComplete.trigger(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
+                this.onComplete.trigger(<string>parameters[0], <string>parameters[1], <string>parameters[2], <number>parameters[3], <[string, string][]>parameters[4]);
                 break;
 
             case RequestEvent[RequestEvent.FAILED]:
-                this.onFailed.trigger(parameters[0], parameters[1], parameters[2]);
+                this.onFailed.trigger(<string>parameters[0], <string>parameters[1], <string>parameters[2]);
                 break;
 
             default:

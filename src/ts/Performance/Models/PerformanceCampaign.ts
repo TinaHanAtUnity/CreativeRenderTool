@@ -1,7 +1,7 @@
-import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { AdUnitStyle, IAdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
-import { Campaign, ICampaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaign, IRawCampaign } from 'Ads/Models/Campaign';
 import { Asset } from 'Ads/Models/Assets/Asset';
 
 export enum StoreName {
@@ -10,6 +10,35 @@ export enum StoreName {
     XIAOMI,
     // for APK campaigns
     STANDALONE_ANDROID
+}
+
+export interface IRawPerformanceCampaign extends IRawCampaign {
+    appStoreId: string;
+    gameId: number;
+    gameName: string;
+    gameIcon: string;
+    rating: number;
+    ratingCount: number;
+    endScreenLandscape?: string;
+    endScreenPortrait?: string;
+    endScreen?: string;
+    trailerDownloadable?: string;
+    trailerDownloadableSize?: number;
+    trailerStreaming?: string;
+    trailerPortraitDownloadable?: string;
+    trailerPortraitDownloadableSize?: number;
+    trailerPortraitStreaming?: string;
+    portraitCreativeId?: string;
+    clickAttributionUrl?: string;
+    clickAttributionUrlFollowsRedirects?: boolean;
+    clickUrl: string;
+    videoEventUrls: { [eventType: string]: string };
+    bypassAppSheet: boolean;
+    store: string;
+    adUnitStyle: IAdUnitStyle;
+    appDownloadUrl?: string;
+    mraidUrl?: string;
+    dynamicMarkup?: string;
 }
 
 export interface IPerformanceCampaign extends ICampaign {

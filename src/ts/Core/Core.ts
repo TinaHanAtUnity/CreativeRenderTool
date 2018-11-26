@@ -39,7 +39,7 @@ import { ResolveApi } from 'Core/Native/Resolve';
 import { SdkApi } from 'Core/Native/Sdk';
 import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
-import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
+import { CoreConfigurationParser, IRawCoreConfiguration } from 'Core/Parsers/CoreConfigurationParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
 import { MetaData } from 'Core/Utilities/MetaData';
@@ -167,7 +167,7 @@ export class Core implements ICore {
             const configSpan = this.JaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
             this.ConfigManager = new ConfigManager(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo, this.DeviceInfo, this.RequestManager);
 
-            let configPromise;
+            let configPromise: Promise<unknown>;
             if(TestEnvironment.get('creativeUrl')) {
                 configPromise = Promise.resolve(JsonParser.parse(CreativeUrlConfiguration));
             } else {
@@ -181,13 +181,13 @@ export class Core implements ICore {
             });
 
             configPromise = configPromise.then((configJson: unknown): [unknown, CoreConfiguration] => {
-                const coreConfig = CoreConfigurationParser.parse(configJson);
+                const coreConfig = CoreConfigurationParser.parse(<IRawCoreConfiguration>configJson);
                 this.Api.Sdk.logInfo('Received configuration for token ' + coreConfig.getToken() + ' (A/B group ' + JSON.stringify(coreConfig.getAbGroup()) + ')');
                 if(this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo.getLimitAdTracking()) {
-                    this.ConfigManager.storeGamerToken(configJson.token);
+                    this.ConfigManager.storeGamerToken(coreConfig.getToken());
                 }
                 return [configJson, coreConfig];
-            }).catch((error: unknown) => {
+            }).catch((error) => {
                 configSpan.addTag(JaegerTags.Error, 'true');
                 configSpan.addTag(JaegerTags.ErrorMessage, error.message);
                 configSpan.addAnnotation(error.message);
@@ -200,7 +200,7 @@ export class Core implements ICore {
                 Diagnostics.trigger('cleaning_cache_failed', error);
             });
 
-            return Promise.all([configPromise, cachePromise]);
+            return Promise.all([<Promise<[unknown, CoreConfiguration]>>configPromise, cachePromise]);
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
 
@@ -215,7 +215,7 @@ export class Core implements ICore {
 
             this.Analytics = new Analytics(this);
             return Promise.all([configJson, this.Analytics.initialize()]);
-        }).then(([configJson, gameSessionId]) => {
+        }).then(([configJson, gameSessionId]: [unknown, number]) => {
             this.Ads = new Ads(configJson, this);
             this.Ads.SessionManager.setGameSessionId(gameSessionId);
             this.Purchasing = new Purchasing(this);
@@ -229,7 +229,7 @@ export class Core implements ICore {
             } else {
                 this.Api.Request.setConcurrentRequestCount(1);
             }
-        }).catch(error => {
+        }).catch((error: { message: string, name: unknown }) => {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
             jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
@@ -274,7 +274,7 @@ export class Core implements ICore {
             }
 
             if(TestEnvironment.get('forceAuthorization')) {
-                const value = TestEnvironment.get('forceAuthorization');
+                const value = TestEnvironment.get<string>('forceAuthorization');
                 const params = value.split('|');
 
                 if (params.length % 2 === 0) {

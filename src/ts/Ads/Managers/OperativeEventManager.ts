@@ -188,7 +188,7 @@ export class OperativeEventManager {
 
         session.setEventSent(EventType.FIRST_QUARTILE);
 
-        const fulfilled = ([id, infoJson]: [string, unknown]) => {
+        const fulfilled = ([id, infoJson]: [string, IInfoJson]) => {
             this.sendEvent('first_quartile', id, session.getId(), this.createVideoEventUrl('first_quartile'), JSON.stringify(infoJson));
         };
 
@@ -204,7 +204,7 @@ export class OperativeEventManager {
 
         session.setEventSent(EventType.MIDPOINT);
 
-        const fulfilled = ([id, infoJson]: [string, unknown]) => {
+        const fulfilled = ([id, infoJson]: [string, IInfoJson]) => {
             this.sendEvent('midpoint', id, session.getId(), this.createVideoEventUrl('midpoint'), JSON.stringify(infoJson));
         };
 
@@ -292,7 +292,7 @@ export class OperativeEventManager {
         }
         session.setEventSent(EventType.CLICK);
 
-        const fulfilled = ([id, infoJson]: [string, unknown]) => {
+        const fulfilled = ([id, infoJson]: [string, IInfoJson]) => {
             this.sendEvent('click', id, session.getId(), this.createClickEventUrl(), JSON.stringify(infoJson));
         };
 

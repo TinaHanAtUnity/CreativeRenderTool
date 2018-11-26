@@ -28,7 +28,8 @@ export class NativeBridge implements INativeBridge {
     }
 
     private _callbackId: number = 1;
-    private _callbackTable: {[key: number]: CallbackContainer<unknown>} = {};
+    // tslint:disable-next-line
+    private _callbackTable: {[key: number]: CallbackContainer<any>} = {};
 
     private _platform: Platform;
     private _backend: IWebViewBridge;
@@ -81,12 +82,13 @@ export class NativeBridge implements INativeBridge {
         results.forEach((result: unknown[]): void => {
             const id: number = parseInt(<string>result.shift(), 10);
             const status = NativeBridge.convertStatus(<string>result.shift());
-            let parameters = result.shift();
+            let parameters = <unknown[]>result.shift();
             const callbackObject = this._callbackTable[id];
             if(!callbackObject) {
                 throw new Error('Unable to find matching callback object from callback id ' + id);
             }
             if(parameters.length === 1) {
+                // @ts-ignore
                 parameters = parameters[0];
             }
             switch(status) {
@@ -126,6 +128,7 @@ export class NativeBridge implements INativeBridge {
         parameters.push((status: CallbackStatus, ...callbackParameters: unknown[]) => {
             this.invokeCallback(callback, CallbackStatus[status], ...callbackParameters);
         });
+        // @ts-ignore
         (<unknown>window)[className][methodName].apply((<unknown>window)[className], parameters);
     }
 

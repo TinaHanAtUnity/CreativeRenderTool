@@ -12,7 +12,7 @@ export enum PlacementState {
 export type PlacementAuctionType = 'cpm' | 'ltv';
 export const DefaultPlacementAuctionType = 'cpm';
 
-interface IPlacement {
+export interface IPlacement {
     id: string;
     name: string;
     default: boolean;

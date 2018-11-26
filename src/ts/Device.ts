@@ -113,7 +113,7 @@ if(typeof location !== 'undefined') {
     extWindow.webview = new WebView(nativeBridge);
 
     // SafeDK garbage
-    (<unknown>extWindow.webview)._configuration = {
+    (<any>extWindow.webview)._configuration = {
         getPlacement: () => { return { getCurrentCampaign: () => 'SafeDK violates Unity Ads SDK internals, please disable your SafeDK integration.' }; }
     };
 

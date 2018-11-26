@@ -22,7 +22,7 @@ export interface IPlacementContentParams {
 }
 
 export class PlacementContentsApi extends NativeApi {
-    public readonly onPlacementContentCustomEvent = new Observable2<string, unknown>();
+    public readonly onPlacementContentCustomEvent = new Observable2<string, { type: string }>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'PlacementContents', ApiPackage.MONETIZATION_CORE, EventCategory.PLACEMENT_CONTENT);
@@ -50,7 +50,7 @@ export class PlacementContentsApi extends NativeApi {
     public handleEvent(event: string, parameters: unknown[]) {
         switch (event) {
         case PlacementContentEvent[PlacementContentEvent.CUSTOM]:
-            this.onPlacementContentCustomEvent.trigger(parameters[0], parameters[1]);
+            this.onPlacementContentCustomEvent.trigger(<string>parameters[0], <{ type: string }>parameters[1]);
             break;
         default:
             super.handleEvent(event, parameters);

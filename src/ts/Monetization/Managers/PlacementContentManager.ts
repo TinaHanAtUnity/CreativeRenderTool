@@ -12,6 +12,7 @@ import { IPromoApi } from 'Promo/IPromo';
 import { ProductInfo } from 'Promo/Models/ProductInfo';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { IProductData } from 'Promo/Models/Product';
 
 export interface IPlacementContent {
     state: PlacementContentState;
@@ -20,6 +21,15 @@ export interface IPlacementContent {
 
 export interface IPlacementContentMap {
     [id: string]: IPlacementContent;
+}
+
+export interface IPlacementContentParams {
+    type: IPlacementContentType;
+    product: IProductData;
+    payouts?: unknown[];
+    costs?: unknown[];
+    offerDuration?: number;
+    impressionDate?: Date;
 }
 
 export class PlacementContentManager {
@@ -86,9 +96,9 @@ export class PlacementContentManager {
             };
         }
         const productId = campaign.getIapProductId();
-        const result: unknown = {
+        const result: IPlacementContentParams = {
             type: IPlacementContentType.PROMO_AD,
-            product: {
+            product: <IProductData>{
                 productId: productId
             }
         };
@@ -129,7 +139,7 @@ export class PlacementContentManager {
     }
 
     private transformProductInfosToJSON(productInfoList: ProductInfo[]) {
-        const result: unknown = [];
+        const result: unknown[] = [];
         if (productInfoList.length > 0) {
             for (const productInfo of productInfoList) {
                 result.push(productInfo.getDTO());

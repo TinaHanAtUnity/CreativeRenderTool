@@ -25,7 +25,7 @@ export class ConnectivityApi extends NativeApi {
     public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case ConnectivityEvent[ConnectivityEvent.CONNECTED]:
-                this.onConnected.trigger(parameters[0], parameters[1]);
+                this.onConnected.trigger(<boolean>parameters[0], <number>parameters[1]);
                 break;
 
             case ConnectivityEvent[ConnectivityEvent.DISCONNECTED]:

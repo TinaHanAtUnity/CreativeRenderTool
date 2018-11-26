@@ -1,9 +1,14 @@
 import {
+    IInfoJson,
     IOperativeEventManagerParams,
     IOperativeEventParams,
     OperativeEventManager
 } from 'Ads/Managers/OperativeEventManager';
 import { Campaign } from 'Ads/Models/Campaign';
+
+export interface IProgrammaticInfoJson extends IInfoJson {
+    creativeId?: string;
+}
 
 export class ProgrammaticOperativeEventManager extends OperativeEventManager {
     public static setTestBaseUrl(baseUrl: string): void {
@@ -29,11 +34,11 @@ export class ProgrammaticOperativeEventManager extends OperativeEventManager {
         return undefined;
     }
 
-    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, unknown]> {
-        return super.getInfoJson(params, eventId, gameSession, gamerSid, previousPlacementId).then(([id, infoJson]) => {
-            infoJson.creativeId =  this._campaign.getCreativeId();
+    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, IProgrammaticInfoJson]> {
+        return super.getInfoJson(params, eventId, gameSession, gamerSid, previousPlacementId).then(([id, infoJson]: [string, IProgrammaticInfoJson]) => {
+            infoJson.creativeId = this._campaign.getCreativeId();
 
-            return <[string, unknown]>[eventId, infoJson];
+            return <[string, IProgrammaticInfoJson]>[eventId, infoJson];
         });
     }
 }

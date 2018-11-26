@@ -94,7 +94,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private loadIframe(): void {
-        const iframe: unknown = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
         this._mraidBridge.connect(iframe);
 
         this.createMRAID(

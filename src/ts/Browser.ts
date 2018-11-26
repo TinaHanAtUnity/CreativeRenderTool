@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         fields.forEach(([field, setter, parser]: [string, string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById(field);
-            (<unknown>UnityAds.getBackend().Api.Sdk)[setter](parser ? parser(element) : element.value);
+            (<any>UnityAds.getBackend().Api.Sdk)[setter](parser ? parser(element) : element.value);
         });
     };
 
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById('android' + field);
-            (<unknown>UnityAds.getBackend().Api.DeviceInfo)['set' + field](parser ? parser(element) : element.value);
+            (<any>UnityAds.getBackend().Api.DeviceInfo)['set' + field](parser ? parser(element) : element.value);
         });
     };
 
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById('ios' + field);
-            (<unknown>UnityAds.getBackend().Api.DeviceInfo)['set' + field](parser ? parser(element) : element.value);
+            (<any>UnityAds.getBackend().Api.DeviceInfo)['set' + field](parser ? parser(element) : element.value);
         });
     };
 
@@ -138,8 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
             autoSkipElement.disabled = true;
             initializeButton.disabled = true;
 
-            const publicStorage: unknown = {
-                test: {}
+            const publicStorage = {
+                test: <{ [key: string]: unknown }>{}
             };
 
             if(abGroupElement.value.length) {
@@ -229,14 +229,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        if((<unknown>window).parent[JS_FUNC_NAME_GET_HEADLESS]()) {
+        if((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS]()) {
             initialize();
         } else {
             initializeButton.addEventListener('click', (event: Event) => {
                 event.preventDefault();
                 initialize();
             }, false);
-            (<unknown>window).parent.document.getElementById('initialize').disabled = false;
+            (<any>window).parent.document.getElementById('initialize').disabled = false;
         }
     }
 });

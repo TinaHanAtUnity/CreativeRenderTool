@@ -38,27 +38,27 @@ export class AndroidVideoPlayerApi extends EventedNativeApi<IAndroidVideoEventHa
     public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case AndroidVideoPlayerEvent[AndroidVideoPlayerEvent.INFO]:
-                this._handlers.forEach(handler => handler.onInfo(parameters[0], parameters[1], parameters[2]));
+                this._handlers.forEach(handler => handler.onInfo(<string>parameters[0], <number>parameters[1], <number>parameters[2]));
                 break;
 
             case AndroidVideoPlayerError[AndroidVideoPlayerError.GENERIC_ERROR]:
-                this._handlers.forEach(handler => handler.onGenericError(parameters[0], parameters[1], parameters[2]));
+                this._handlers.forEach(handler => handler.onGenericError(<string>parameters[0], <number>parameters[1], <number>parameters[2]));
                 break;
 
             case AndroidVideoPlayerError[AndroidVideoPlayerError.PAUSE_ERROR]:
-                this._handlers.forEach(handler => handler.onPauseError(parameters[0]));
+                this._handlers.forEach(handler => handler.onPauseError(<string>parameters[0]));
                 break;
 
             case AndroidVideoPlayerError[AndroidVideoPlayerError.PREPARE_ERROR]:
-                this._handlers.forEach(handler => handler.onPrepareError(parameters[0]));
+                this._handlers.forEach(handler => handler.onPrepareError(<string>parameters[0]));
                 break;
 
             case AndroidVideoPlayerError[AndroidVideoPlayerError.SEEKTO_ERROR]:
-                this._handlers.forEach(handler => handler.onSeekToError(parameters[0]));
+                this._handlers.forEach(handler => handler.onSeekToError(<string>parameters[0]));
                 break;
 
             case AndroidVideoPlayerError[AndroidVideoPlayerError.ILLEGAL_STATE]:
-                this._handlers.forEach(handler => handler.onIllegalStateError(parameters[0], parameters[1]));
+                this._handlers.forEach(handler => handler.onIllegalStateError(<string>parameters[0], <boolean>parameters[1]));
                 break;
 
             default:

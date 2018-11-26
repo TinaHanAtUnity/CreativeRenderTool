@@ -19,9 +19,9 @@ export class MOAT extends View<VastCampaign> {
 
     private _core: ICoreApi;
     private _iframe: HTMLIFrameElement;
-    private _resizeHandler: unknown;
-    private _resizeDelayer: unknown;
-    private _resizeTimeout: unknown;
+    private _resizeHandler: EventListener;
+    private _resizeDelayer: EventListener;
+    private _resizeTimeout?: number;
     private _didInitMoat = false;
     private _messageListener: (e: MessageEvent) => void;
     private _state: MoatState = MoatState.STOPPED;
@@ -36,7 +36,7 @@ export class MOAT extends View<VastCampaign> {
 
     public render(): void {
         super.render();
-        const iframe: unknown = this._iframe = <HTMLIFrameElement>this._container.querySelector('#moat-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#moat-iframe');
         iframe.srcdoc = MOATContainer;
     }
 
@@ -81,7 +81,7 @@ export class MOAT extends View<VastCampaign> {
         if (!this._didInitMoat) {
             this._didInitMoat = true;
             this._resizeDelayer = (event: Event) => {
-                this._resizeTimeout = setTimeout(() => {
+                this._resizeTimeout = window.setTimeout(() => {
                     this._resizeHandler(event);
                 }, 200);
             };

@@ -6,6 +6,18 @@ import { ISchema, Model } from 'Core/Models/Model';
 
 export type ICampaignTrackingUrls = { [key: string]: string[] };
 
+export interface IRawCampaign {
+    id: string;
+    willExpireAt?: number;
+    contentType: string;
+    adType?: string;
+    correlationId?: string;
+    creativeId?: string;
+    seatId?: number;
+    meta?: string;
+    mediaId: string;
+}
+
 export interface ICampaign {
     id: string;
     willExpireAt: number | undefined;

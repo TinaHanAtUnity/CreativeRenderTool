@@ -17,8 +17,8 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _loadingScreen: HTMLElement;
-    private _loadingScreenTimeout: unknown;
-    private _prepareTimeout: unknown;
+    private _loadingScreenTimeout?: number;
+    private _prepareTimeout?: number;
 
     private _iframe: HTMLIFrameElement;
 
@@ -94,7 +94,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private loadIframe(): void {
-        const iframe: unknown = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
         this._mraidBridge.connect(iframe);
 
         const container = this.setUpMraidContainer();
@@ -143,12 +143,12 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private showLoadingScreen() {
         this._loadingScreen.style.display = 'block';
-        this._loadingScreenTimeout = setTimeout(() => {
+        this._loadingScreenTimeout = window.setTimeout(() => {
             if(this._isLoaded) {
                 this.showMRAIDAd();
             } else {
                 // start the prepare timeout and wait for the onload event
-                this._prepareTimeout = setTimeout(() => {
+                this._prepareTimeout = window.setTimeout(() => {
                     this._canClose = true;
                     this._closeElement.style.opacity = '1';
                     this._closeElement.style.display = 'block';

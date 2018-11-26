@@ -99,7 +99,7 @@ export class Backend implements IWebViewBridge {
     }
 
     public sendEvent(category: string, name: string, ...parameters: unknown[]) {
-        this._nativeBridge.handleEvent([category, name].concat(parameters));
+        this._nativeBridge.handleEvent((<unknown[]>[category, name]).concat(parameters));
     }
 
     public getPlatform(): Platform {
@@ -107,7 +107,7 @@ export class Backend implements IWebViewBridge {
     }
 
     public handleInvocation(rawInvocations: string): void {
-        const invocations: IInvocation[] = JSON.parse(rawInvocations).map((invocation: unknown) => this.parseInvocation(invocation));
+        const invocations: IInvocation[] = JSON.parse(rawInvocations).map((invocation: unknown) => this.parseInvocation(<[string, string, [string | number][], number]>invocation));
         const results = invocations.map((invocation) => this.executeInvocation(invocation));
         this._nativeBridge.handleCallback(results.map(result => [result.callbackId.toString(), CallbackStatus[result.callbackStatus], result.parameters]));
     }
@@ -116,7 +116,7 @@ export class Backend implements IWebViewBridge {
         return;
     }
 
-    private parseInvocation(invocation: unknown): IInvocation {
+    private parseInvocation(invocation: [string, string, [string | number][], number]): IInvocation {
         return {
             className: invocation[0],
             method: invocation[1],

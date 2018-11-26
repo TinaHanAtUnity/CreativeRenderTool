@@ -1,4 +1,5 @@
 import {
+    IInfoJson,
     IOperativeEventManagerParams,
     IOperativeEventParams,
     OperativeEventManager
@@ -70,7 +71,7 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
     }
 
     public sendHttpKafkaEvent(kafkaType: string, eventType: string, params: IOperativeEventParams): Promise<INativeResponse> {
-        const fulfilled = ([id, infoJson]: [string, unknown]) => {
+        const fulfilled = ([id, infoJson]: [string, IInfoJson]) => {
 
             // todo: clears duplicate data for httpkafka, should be cleaned up
             delete infoJson.eventId;
@@ -86,15 +87,16 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
             delete infoJson.networkType;
             delete infoJson.connectionType;
 
-            infoJson.id = id;
-            infoJson.ts = (new Date()).toISOString();
-            infoJson.event_type = eventType;
-            infoJson.sourceGameId = this._clientInfo.getGameId();
-            infoJson.targetGameId = this._xPromoCampaign.getGameId().toString();
-            infoJson.creativePackId = this._xPromoCampaign.getCreativeId();
-            infoJson.targetStoreId = this._xPromoCampaign.getAppStoreId();
-
-            return HttpKafka.sendEvent(kafkaType, KafkaCommonObjectType.PERSONAL, infoJson).catch(() => {
+            return HttpKafka.sendEvent(kafkaType, KafkaCommonObjectType.PERSONAL, {
+                ...infoJson,
+                id: id,
+                ts: (new Date()).toISOString(),
+                event_type: eventType,
+                sourceGameId: this._clientInfo.getGameId(),
+                targetGameId: this._xPromoCampaign.getGameId().toString(),
+                creativePackId: this._xPromoCampaign.getCreativeId(),
+                targetStoreId: this._xPromoCampaign.getAppStoreId()
+            }).catch(() => {
                 const sessionId = this._campaign.getSession().getId();
                 return this._core.DeviceInfo.getUniqueEventId().then(eventId => {
                     new FailedXpromoOperativeEventManager(this._core, sessionId, eventId).storeFailedEvent(this._storageBridge, {

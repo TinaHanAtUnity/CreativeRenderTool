@@ -67,7 +67,7 @@ export class IosDeviceInfoApi extends NativeApi {
     public handleEvent(event: string, parameters: unknown[]): void {
         switch (event) {
             case DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED]:
-                this.onVolumeChanged.trigger(parameters[0], parameters[1]);
+                this.onVolumeChanged.trigger(<number>parameters[0], <number>parameters[1]);
                 break;
             default:
                 super.handleEvent(event, parameters);

@@ -68,7 +68,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected _closeElement: HTMLElement;
     protected _didReward = false;
-    protected _updateInterval: unknown;
+    protected _updateInterval?: number;
     protected _closeRemaining: number;
     protected _CLOSE_LENGTH = 30;
 
@@ -164,7 +164,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._mraidBridge = mraidBridge;
     }
 
-    public createMRAID(container: unknown): Promise<string> {
+    public createMRAID(container: string): Promise<string> {
         const fetchingTimestamp = Date.now();
         let fetchingStopTimestamp = Date.now();
         let mraidParseTimestamp = Date.now();
@@ -252,7 +252,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             const skipLength = this._placement.allowSkipInSeconds();
             this._closeRemaining = this._CLOSE_LENGTH;
             let skipRemaining = skipLength;
-            this._updateInterval = setInterval(() => {
+            this._updateInterval = window.setInterval(() => {
                 if(this._closeRemaining > 0) {
                     this._closeRemaining--;
                 }
@@ -272,7 +272,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             }, 1000);
         } else {
             this._closeRemaining = this._CLOSE_LENGTH;
-            this._updateInterval = setInterval(() => {
+            this._updateInterval = window.setInterval(() => {
                 const progress = (this._CLOSE_LENGTH - this._closeRemaining) / this._CLOSE_LENGTH;
                 if(progress >= 0.75 && !this._didReward) {
                     this._handlers.forEach(handler => handler.onMraidReward());

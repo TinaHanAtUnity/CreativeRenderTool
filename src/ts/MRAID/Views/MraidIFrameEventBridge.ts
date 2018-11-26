@@ -37,7 +37,7 @@ export class MraidIFrameEventBridge {
     private _handler: IMRAIDHandler;
 
     private _messageListener: (e: Event) => void;
-    private _mraidHandlers: { [event: string]: (msg: unknown) => void };
+    private _mraidHandlers: { [event: string]: (msg: { [key: string]: unknown }) => void };
 
     constructor(core: ICoreApi, handler: IMRAIDHandler) {
         this._core = core;
@@ -45,14 +45,14 @@ export class MraidIFrameEventBridge {
 
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
         this._mraidHandlers = {};
-        this._mraidHandlers[MRAIDEvents.ORIENTATION] = (msg: unknown) => this.handleSetOrientationProperties(<IMRAIDOrientationProperties>msg.properties);
-        this._mraidHandlers[MRAIDEvents.OPEN] = (msg: unknown) => this.handleOpen(msg.url);
-        this._mraidHandlers[MRAIDEvents.LOADED] = (msg: unknown) => this.handleLoaded();
-        this._mraidHandlers[MRAIDEvents.ANALYTICS_EVENT] = (msg: unknown) => this.handleAnalyticsEvent(msg.event, msg.eventData);
-        this._mraidHandlers[MRAIDEvents.CLOSE] = (msg: unknown) => this.handleClose();
-        this._mraidHandlers[MRAIDEvents.STATE_CHANGE] = (msg: unknown) => this.handleCustomState(msg.state);
-        this._mraidHandlers[MRAIDEvents.SEND_STATS] = (msg: unknown) => this.handleSendStats(msg.totalTime, msg.playTime, msg.frameCount);
-        this._mraidHandlers[MRAIDEvents.AR] = (msg: unknown) => this.handleAr(msg);
+        this._mraidHandlers[MRAIDEvents.ORIENTATION] = msg => this.handleSetOrientationProperties(<IMRAIDOrientationProperties>msg.properties);
+        this._mraidHandlers[MRAIDEvents.OPEN] = msg => this.handleOpen(<string>msg.url);
+        this._mraidHandlers[MRAIDEvents.LOADED] = msg => this.handleLoaded();
+        this._mraidHandlers[MRAIDEvents.ANALYTICS_EVENT] = msg => this.handleAnalyticsEvent(<string>msg.event, <string>msg.eventData);
+        this._mraidHandlers[MRAIDEvents.CLOSE] = msg => this.handleClose();
+        this._mraidHandlers[MRAIDEvents.STATE_CHANGE] = msg => this.handleCustomState(<string>msg.state);
+        this._mraidHandlers[MRAIDEvents.SEND_STATS] = msg => this.handleSendStats(<number>msg.totalTime, <number>msg.playTime, <number>msg.frameCount);
+        this._mraidHandlers[MRAIDEvents.AR] = msg => this.handleAr(<MessageEvent>msg);
     }
 
     public connect(iframe: HTMLIFrameElement) {

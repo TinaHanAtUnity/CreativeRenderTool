@@ -2,7 +2,7 @@ import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { AuctionResponse, IAuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
@@ -24,6 +24,13 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 
 export class NoFillError extends Error {
+}
+
+export interface IRawBannerResponse {
+    auctionId: string;
+    correlationId: string;
+    placements: { [key: string]: string };
+    media: { [key: string]: IAuctionResponse };
 }
 
 export class BannerCampaignManager {
@@ -129,7 +136,7 @@ export class BannerCampaignManager {
     }
 
     private parseBannerCampaign(response: INativeResponse, placement: Placement): Promise<Campaign> {
-        const json = JsonParser.parse(response.response);
+        const json = JsonParser.parse<IRawBannerResponse>(response.response);
         const session = new Session(json.auctionId);
 
         if('placements' in json) {

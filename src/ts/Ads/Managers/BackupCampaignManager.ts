@@ -15,6 +15,8 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MraidLoader } from 'MRAID/Parsers/MraidLoader';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { CometCampaignLoader } from 'Performance/Parsers/CometCampaignLoader';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export class BackupCampaignManager {
     private static _maxExpiryDelay: number = 7 * 24 * 3600 * 1000; // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
@@ -22,11 +24,13 @@ export class BackupCampaignManager {
     private _core: ICoreApi;
     private _storageBridge: StorageBridge;
     private _coreConfiguration: CoreConfiguration;
+    private _deviceInfo: DeviceInfo;
 
-    constructor(core: ICoreApi, storageBridge: StorageBridge, coreConfiguration: CoreConfiguration) {
+    constructor(core: ICoreApi, storageBridge: StorageBridge, coreConfiguration: CoreConfiguration, deviceInfo: DeviceInfo) {
         this._core = core;
         this._storageBridge = storageBridge;
         this._coreConfiguration = coreConfiguration;
+        this._deviceInfo = deviceInfo;
     }
 
     // todo: once auction v5 is unconditionally adopoted, trackingUrls should not be optional
@@ -34,6 +38,13 @@ export class BackupCampaignManager {
         // never store data when in test mode
         if(this._coreConfiguration.getTestMode()) {
             return;
+        }
+
+        // do not store data for old Androids (ABT-697)
+        if(this._deviceInfo instanceof AndroidDeviceInfo) {
+            if(this._deviceInfo.getApiLevel() < 19) {
+                return;
+            }
         }
 
         const rootKey: string = 'backupcampaign.placement.' + placement.getId();
@@ -53,6 +64,13 @@ export class BackupCampaignManager {
         // never store data when in test mode
         if(this._coreConfiguration.getTestMode()) {
             return;
+        }
+
+        // do not store data for old Androids (ABT-697)
+        if(this._deviceInfo instanceof AndroidDeviceInfo) {
+            if(this._deviceInfo.getApiLevel() < 19) {
+                return;
+            }
         }
 
         const rootKey: string = 'backupcampaign.campaign.' + campaign.getMediaId();

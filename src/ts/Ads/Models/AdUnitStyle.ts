@@ -1,6 +1,6 @@
 import { ISchema, Model } from 'Core/Models/Model';
 
-interface IAdUnitStyle {
+export interface IAdUnitStyle {
     ctaButtonColor?: string;
 }
 

@@ -44,31 +44,31 @@ export class LifecycleApi extends NativeApi {
     public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case LifecycleEvent[LifecycleEvent.CREATED]:
-                this.onActivityCreated.trigger(parameters[0]);
+                this.onActivityCreated.trigger(<string>parameters[0]);
                 break;
 
             case LifecycleEvent[LifecycleEvent.STARTED]:
-                this.onActivityStarted.trigger(parameters[0]);
+                this.onActivityStarted.trigger(<string>parameters[0]);
                 break;
 
             case LifecycleEvent[LifecycleEvent.RESUMED]:
-                this.onActivityResumed.trigger(parameters[0]);
+                this.onActivityResumed.trigger(<string>parameters[0]);
                 break;
 
             case LifecycleEvent[LifecycleEvent.PAUSED]:
-                this.onActivityPaused.trigger(parameters[0]);
+                this.onActivityPaused.trigger(<string>parameters[0]);
                 break;
 
             case LifecycleEvent[LifecycleEvent.STOPPED]:
-                this.onActivityStopped.trigger(parameters[0]);
+                this.onActivityStopped.trigger(<string>parameters[0]);
                 break;
 
             case LifecycleEvent[LifecycleEvent.SAVE_INSTANCE_STATE]:
-                this.onActivitySaveInstanceState.trigger(parameters[0]);
+                this.onActivitySaveInstanceState.trigger(<string>parameters[0]);
                 break;
 
             case LifecycleEvent[LifecycleEvent.DESTROYED]:
-                this.onActivityDestroyed.trigger(parameters[0]);
+                this.onActivityDestroyed.trigger(<string>parameters[0]);
                 break;
 
             default:

@@ -90,35 +90,35 @@ export class VideoPlayerApi extends EventedNativeApi<IVideoEventHandler> {
     public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case VideoPlayerEvent[VideoPlayerEvent.PROGRESS]:
-                this._handlers.forEach(handler => handler.onProgress(parameters[0]));
+                this._handlers.forEach(handler => handler.onProgress(<number>parameters[0]));
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.COMPLETED]:
-                this._handlers.forEach(handler => handler.onCompleted(parameters[0]));
+                this._handlers.forEach(handler => handler.onCompleted(<string>parameters[0]));
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.PREPARED]:
-                this._handlers.forEach(handler => handler.onPrepared(parameters[0], parameters[1], parameters[2], parameters[3]));
+                this._handlers.forEach(handler => handler.onPrepared(<string>parameters[0], <number>parameters[1], <number>parameters[2], <number>parameters[3]));
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.PREPARE_TIMEOUT]:
-                this._handlers.forEach(handler => handler.onPrepareTimeout(parameters[0]));
+                this._handlers.forEach(handler => handler.onPrepareTimeout(<string>parameters[0]));
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.PLAY]:
-                this._handlers.forEach(handler => handler.onPlay(parameters[0]));
+                this._handlers.forEach(handler => handler.onPlay(<string>parameters[0]));
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.PAUSE]:
-                this._handlers.forEach(handler => handler.onPause(parameters[0]));
+                this._handlers.forEach(handler => handler.onPause(<string>parameters[0]));
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.SEEKTO]:
-                this._handlers.forEach(handler => handler.onSeek(parameters[0]));
+                this._handlers.forEach(handler => handler.onSeek(<string>parameters[0]));
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.STOP]:
-                this._handlers.forEach(handler => handler.onStop(parameters[0]));
+                this._handlers.forEach(handler => handler.onStop(<string>parameters[0]));
                 break;
 
             default:

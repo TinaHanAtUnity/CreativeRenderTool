@@ -3,7 +3,12 @@ import { AssetManager } from 'Ads/Managers/AssetManager';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import {
+    AuctionResponse,
+    IRawAuctionResponse,
+    IRawAuctionV5Response,
+    IRawRealtimeResponse
+} from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
@@ -79,7 +84,7 @@ export class CampaignManager {
 
     public readonly onCampaign = new Observable3<string, Campaign, ICampaignTrackingUrls | undefined>();
     public readonly onNoFill = new Observable1<string>();
-    public readonly onError = new Observable4<WebViewError, string[], string, Session | undefined>();
+    public readonly onError = new Observable4<unknown, string[], string, Session | undefined>();
     public readonly onConnectivityError = new Observable1<string[]>();
     public readonly onAdPlanReceived = new Observable2<number, number>();
 
@@ -101,7 +106,7 @@ export class CampaignManager {
     private _deviceConnectionType: string | undefined;
     private _previousPlacementId: string | undefined;
     private _realtimeUrl: string | undefined;
-    private _realtimeBody: unknown = {};
+    private _realtimeBody?: { [key: string]: unknown } = {};
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
 
@@ -253,7 +258,7 @@ export class CampaignManager {
     private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters): Promise<void[]> {
         let json;
         try {
-            json = JsonParser.parse(response.response);
+            json = JsonParser.parse<IRawAuctionResponse>(response.response);
         } catch (e) {
             Diagnostics.trigger('auction_invalid_json', {
                 response: response.response
@@ -317,7 +322,7 @@ export class CampaignManager {
 
                     const contentType = json.media[mediaId].contentType;
                     const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
-                    if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
+                    if(contentType && contentType !== 'comet/campaign' && typeof cacheTTL !== 'undefined' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
                         refreshDelay = cacheTTL;
                     }
                 }
@@ -358,7 +363,7 @@ export class CampaignManager {
     private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters): Promise<void[]> {
         let json;
         try {
-            json = JsonParser.parse(response.response);
+            json = JsonParser.parse<IRawAuctionV5Response>(response.response);
         } catch (e) {
             Diagnostics.trigger('invalid_auction_v5_json', {
                 response: response.response
@@ -461,7 +466,7 @@ export class CampaignManager {
 
                 const contentType = json.media[mediaId].contentType;
                 const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
-                if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
+                if(contentType && contentType !== 'comet/campaign' && typeof cacheTTL !== 'undefined' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
                     refreshDelay = cacheTTL;
                 }
             }
@@ -497,7 +502,7 @@ export class CampaignManager {
     }
 
     private parseRealtimeCampaign(response: INativeResponse, session: Session, placement: Placement): Promise<Campaign | void> {
-        const json = JsonParser.parse(response.response);
+        const json = JsonParser.parse<IRawRealtimeResponse>(response.response);
 
         if('placements' in json) {
             const mediaId: string = json.placements[placement.getId()];
@@ -565,7 +570,7 @@ export class CampaignManager {
             if (campaign instanceof PerformanceMRAIDCampaign) {
                 const cachingDuration = Date.now() - cachingTimestamp;
 
-                const kafkaObject: unknown = {};
+                const kafkaObject: { [key: string]: unknown } = {};
                 kafkaObject.type = 'playable_caching_time';
                 kafkaObject.eventData = {
                     contentType: contentType
@@ -727,13 +732,12 @@ export class CampaignManager {
             });
         }
 
-        const promises: Promise<unknown>[] = [];
-        promises.push(this._deviceInfo.getScreenWidth());
-        promises.push(this._deviceInfo.getScreenHeight());
-        promises.push(this._deviceInfo.getConnectionType());
-        promises.push(this._deviceInfo.getNetworkType());
-
-        return Promise.all(promises).then(([screenWidth, screenHeight, connectionType, networkType]) => {
+        return Promise.all([
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight(),
+            this._deviceInfo.getConnectionType(),
+            this._deviceInfo.getNetworkType()
+        ]).then(([screenWidth, screenHeight, connectionType, networkType]) => {
             url = Url.addParameters(url, {
                 screenWidth: screenWidth,
                 screenHeight: screenHeight,
@@ -747,7 +751,7 @@ export class CampaignManager {
     }
 
     private createRequestBody(gameSessionCounters: IGameSessionCounters, nofillRetry?: boolean, realtimePlacement?: Placement): Promise<unknown> {
-        const placementRequest: unknown = {};
+        const placementRequest: { [key: string]: unknown } = {};
 
         if(realtimePlacement && this._realtimeBody) {
 
@@ -762,13 +766,15 @@ export class CampaignManager {
             }
 
             if(realtimePlacement.getRealtimeData()) {
-                const realtimeDataObject: unknown = {};
+                const realtimeDataObject: { [key: string]: string | undefined } = {};
                 realtimeDataObject[realtimePlacement.getId()] = realtimePlacement.getRealtimeData();
                 this._realtimeBody.realtimeData = realtimeDataObject;
             }
 
             return this._deviceInfo.getFreeSpace().then((freeSpace) => {
-                this._realtimeBody.deviceFreeSpace = freeSpace;
+                if(this._realtimeBody) {
+                    this._realtimeBody.deviceFreeSpace = freeSpace;
+                }
                 return this._realtimeBody;
             }).catch((e) => {
                 // Try the request with the original request value anyways
@@ -777,22 +783,7 @@ export class CampaignManager {
         }
         this._realtimeBody = undefined;
 
-        const promises: Promise<unknown>[] = [];
-        promises.push(this._deviceInfo.getFreeSpace());
-        promises.push(this._deviceInfo.getNetworkOperator());
-        promises.push(this._deviceInfo.getNetworkOperatorName());
-        promises.push(this._deviceInfo.getHeadset());
-        promises.push(this._deviceInfo.getDeviceVolume());
-        promises.push(this.getFullyCachedCampaigns());
-        promises.push(this.getVersionCode());
-        promises.push(this._adMobSignalFactory.getAdRequestSignal().then(signal => {
-            return signal.getBase64ProtoBufNonEncoded();
-        }));
-        promises.push(this._adMobSignalFactory.getOptionalSignal().then(signal => {
-            return signal.getDTO();
-        }));
-
-        const body: unknown = {
+        const body: { [key: string]: unknown } = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
             bundleId: this._clientInfo.getApplicationName(),
             coppa: this._coreConfig.isCoppaCompliant(),
@@ -815,7 +806,21 @@ export class CampaignManager {
             body.nofillRetry = true;
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal, optionalSignal]) => {
+        return Promise.all([
+            this._deviceInfo.getFreeSpace(),
+            this._deviceInfo.getNetworkOperator(),
+            this._deviceInfo.getNetworkOperatorName(),
+            this._deviceInfo.getHeadset(),
+            this._deviceInfo.getDeviceVolume(),
+            this.getFullyCachedCampaigns(),
+            this.getVersionCode(),
+            this._adMobSignalFactory.getAdRequestSignal().then(signal => {
+                return signal.getBase64ProtoBufNonEncoded();
+            }),
+            this._adMobSignalFactory.getOptionalSignal().then(signal => {
+                return signal.getDTO();
+            })
+        ]).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal, optionalSignal]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
@@ -832,11 +837,10 @@ export class CampaignManager {
                 body.versionCode = versionCode;
             }
 
-            const metaDataPromises: Promise<unknown>[] = [];
-            metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
-            metaDataPromises.push(this._metaDataManager.fetch(FrameworkMetaData));
-
-            return Promise.all(metaDataPromises).then(([mediation, framework]) => {
+            return Promise.all([
+                this._metaDataManager.fetch(MediationMetaData),
+                this._metaDataManager.fetch(FrameworkMetaData)
+            ]).then(([mediation, framework]) => {
                 if(mediation) {
                     body.mediationName = mediation.getName();
                     body.mediationVersion = mediation.getVersion();

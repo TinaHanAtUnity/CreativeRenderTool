@@ -121,7 +121,7 @@ export class AuctionRequest {
     private _timeout: number | undefined;
     private _session: Session;
     private _url: string | null;
-    private _body: unknown | null;
+    private _body: { [key: string]: unknown } | null;
     private _headers: [string, string][] = [];
 
     private _requestStart: number;
@@ -146,11 +146,10 @@ export class AuctionRequest {
         if (this._promise) {
             return this._promise;
         }
-        const promises = [
+        this._promise = Promise.all([
             this.getRequestURL(),
             this.getRequestBody()
-        ];
-        this._promise = Promise.all(promises).then(([url, body]) => {
+        ]).then(([url, body]) => {
             this._url = url;
             this._requestStart = Date.now();
             if (AuctionRequest.CampaignResponse) {
@@ -185,7 +184,7 @@ export class AuctionRequest {
     }
 
     // Overrides the body used in the request.
-    public setBody(body: unknown) {
+    public setBody(body: { [key: string]: unknown }) {
         this._body = body;
     }
 
@@ -323,7 +322,7 @@ export class AuctionRequest {
     }
 
     protected createPlacementRequest(): unknown {
-        const placementRequest: unknown = {};
+        const placementRequest: { [key: string]: unknown } = {};
         Object.keys(this._placements).forEach((placementId) => {
             const placement = this._placements[placementId];
             placementRequest[placementId] = this.createPlacementDTO(placement);
@@ -331,8 +330,8 @@ export class AuctionRequest {
         return placementRequest;
     }
 
-    protected createPlacementDTO(placement: Placement): unknown {
-        const dto: unknown = {
+    protected createPlacementDTO(placement: Placement): { [key: string]: unknown } {
+        const dto: { [key: string]: unknown } = {
             adTypes: placement.getAdTypes(),
             allowSkip: placement.allowSkip()
         };
@@ -356,22 +355,8 @@ export class AuctionRequest {
         if (this._body) {
             return Promise.resolve(this._body);
         }
-        const promises: Promise<unknown>[] = [];
-        promises.push(this._deviceInfo.getFreeSpace());
-        promises.push(this._deviceInfo.getNetworkOperator());
-        promises.push(this._deviceInfo.getNetworkOperatorName());
-        promises.push(this._deviceInfo.getHeadset());
-        promises.push(this._deviceInfo.getDeviceVolume());
-        promises.push(this.getFullyCachedCampaigns());
-        promises.push(this.getVersionCode());
-        promises.push(this._adMobSignalFactory.getAdRequestSignal().then(signal => {
-            return signal.getBase64ProtoBufNonEncoded();
-        }));
-        promises.push(this._adMobSignalFactory.getOptionalSignal().then(signal => {
-            return signal.getDTO();
-        }));
 
-        const body: unknown = {
+        const body: { [key: string]: unknown } = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
             bundleId: this._clientInfo.getApplicationName(),
             coppa: this._coreConfig.isCoppaCompliant(),
@@ -394,7 +379,21 @@ export class AuctionRequest {
             body.nofillRetry = true;
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal, optionalSignal]) => {
+        return Promise.all([
+            this._deviceInfo.getFreeSpace(),
+            this._deviceInfo.getNetworkOperator(),
+            this._deviceInfo.getNetworkOperatorName(),
+            this._deviceInfo.getHeadset(),
+            this._deviceInfo.getDeviceVolume(),
+            this.getFullyCachedCampaigns(),
+            this.getVersionCode(),
+            this._adMobSignalFactory.getAdRequestSignal().then(signal => {
+                return signal.getBase64ProtoBufNonEncoded();
+            }),
+            this._adMobSignalFactory.getOptionalSignal().then(signal => {
+                return signal.getDTO();
+            })
+        ]).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal, optionalSignal]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
@@ -411,11 +410,10 @@ export class AuctionRequest {
                 body.versionCode = versionCode;
             }
 
-            const metaDataPromises: Promise<unknown>[] = [];
-            metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
-            metaDataPromises.push(this._metaDataManager.fetch(FrameworkMetaData));
-
-            return Promise.all(metaDataPromises).then(([mediation, framework]) => {
+            return Promise.all([
+                this._metaDataManager.fetch(MediationMetaData),
+                this._metaDataManager.fetch(FrameworkMetaData)
+            ]).then(([mediation, framework]) => {
                 if (mediation) {
                     body.mediationName = mediation.getName();
                     body.mediationVersion = mediation.getVersion();

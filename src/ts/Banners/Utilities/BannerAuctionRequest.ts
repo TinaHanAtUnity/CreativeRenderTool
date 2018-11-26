@@ -7,7 +7,7 @@ export class BannerAuctionRequest extends AuctionRequest {
         return new BannerAuctionRequest(params);
     }
 
-    protected createPlacementDTO(placement: Placement): unknown {
+    protected createPlacementDTO(placement: Placement): { [key: string]: unknown } {
         const placementRequest = super.createPlacementDTO(placement);
         // TODO replace with actual dimensions
         placementRequest.dimensions = {

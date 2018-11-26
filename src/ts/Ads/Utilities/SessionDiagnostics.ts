@@ -10,7 +10,7 @@ export interface IKafkaObject {
 }
 
 export class SessionDiagnostics {
-    public static trigger(type: string, error: {}, session: Session): Promise<INativeResponse> {
+    public static trigger(type: string, error: unknown, session: Session): Promise<INativeResponse> {
         // ElasticSearch schema generation can result in dropping errors if root values are not the same type across errors
         if(!error || typeof error !== 'object' || Array.isArray(error)) {
             error = {

@@ -55,7 +55,7 @@ export class VPAID {
         return this.mediaFile.getFileURL()!;
     }
 
-    public getCreativeParameters(): unknown {
+    public getCreativeParameters(): string | null | {} {
         const ad = this.vast.getAd();
         if (ad) {
             const creative = <VastCreativeLinear>ad.getCreative();

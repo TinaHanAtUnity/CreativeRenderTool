@@ -102,25 +102,25 @@ export class ARApi extends NativeApi {
     public handleEvent(event: string, parameters: unknown[]): void {
         switch (event) {
             case AREvent[AREvent.AR_PLANES_ADDED]:
-                this.onPlanesAdded.trigger(parameters[0]);
+                this.onPlanesAdded.trigger(<string>parameters[0]);
                 break;
             case AREvent[AREvent.AR_PLANES_REMOVED]:
-                this.onPlanesRemoved.trigger(parameters[0]);
+                this.onPlanesRemoved.trigger(<string>parameters[0]);
                 break;
             case AREvent[AREvent.AR_PLANES_UPDATED]:
-                this.onPlanesUpdated.trigger(parameters[0]);
+                this.onPlanesUpdated.trigger(<string>parameters[0]);
                 break;
             case AREvent[AREvent.AR_ANCHORS_UPDATED]:
-                this.onAnchorsUpdated.trigger(parameters[0]);
+                this.onAnchorsUpdated.trigger(<string>parameters[0]);
                 break;
             case AREvent[AREvent.AR_FRAME_UPDATED]:
-                this.onFrameUpdated.trigger(parameters[0]);
+                this.onFrameUpdated.trigger(<string>parameters[0]);
                 break;
             case AREvent[AREvent.AR_WINDOW_RESIZED]:
-                this.onWindowResized.trigger(parameters[0], parameters[1]);
+                this.onWindowResized.trigger(<number>parameters[0], <number>parameters[1]);
                 break;
             case AREvent[AREvent.AR_ERROR]:
-                this.onError.trigger(parameters[0]);
+                this.onError.trigger(<number>parameters[0]);
                 break;
             case AREvent[AREvent.AR_SESSION_INTERRUPTED]:
                 this.onSessionInterrupted.trigger();

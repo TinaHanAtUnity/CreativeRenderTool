@@ -38,7 +38,7 @@ export class NotificationApi extends NativeApi {
     public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case NotificationEvent[NotificationEvent.ACTION]:
-                this.onNotification.trigger(parameters[0], parameters[1]);
+                this.onNotification.trigger(<string>parameters[0], parameters[1]);
                 break;
 
             default:

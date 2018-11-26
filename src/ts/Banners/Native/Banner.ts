@@ -101,16 +101,16 @@ export class BannerApi extends NativeApi {
     }
 
     private handleBannerResized(parameters: unknown[]) {
-        const x = parameters[0];
-        const y = parameters[1];
-        const width = parameters[2];
-        const height = parameters[3];
-        const alpha = parameters[4];
+        const x = <number>parameters[0];
+        const y = <number>parameters[1];
+        const width = <number>parameters[2];
+        const height = <number>parameters[3];
+        const alpha = <number>parameters[4];
         this.onBannerResized.trigger({x, y, width, height, alpha});
     }
 
     private handleBannerVisibilityChanged(parameters: unknown[]) {
-        const visibilityAsNumber = parameters[0];
+        const visibilityAsNumber = <number>parameters[0];
         const visibility = this.getVisibilityForNumber(visibilityAsNumber);
         this.onBannerVisibilityChanged.trigger(visibility);
     }
@@ -133,7 +133,7 @@ export class BannerApi extends NativeApi {
             throw new WebViewError('Banner attached state event with no attached state parameter');
         } else {
             const attached = parameters[0];
-            this.onBannerAttachedState.trigger(attached);
+            this.onBannerAttachedState.trigger(<boolean>attached);
         }
     }
 

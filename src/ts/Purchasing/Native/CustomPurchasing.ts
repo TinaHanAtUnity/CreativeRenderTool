@@ -34,13 +34,13 @@ export class CustomPurchasingApi extends NativeApi {
     public handleEvent(event: string, parameters: unknown[]) {
         switch (event) {
         case CustomPurchasingEvent[CustomPurchasingEvent.PRODUCTS_RETRIEVED]:
-            this.onProductsRetrieved.trigger(parameters[0]);
+            this.onProductsRetrieved.trigger(<IProduct[]>parameters[0]);
             break;
         case CustomPurchasingEvent[CustomPurchasingEvent.TRANSACTION_COMPLETE]:
-            this.onTransactionComplete.trigger(parameters[0]);
+            this.onTransactionComplete.trigger(<ITransactionDetails>parameters[0]);
             break;
         case CustomPurchasingEvent[CustomPurchasingEvent.TRANSACTION_ERROR]:
-            const details: ITransactionErrorDetails = parameters[0];
+            const details = <ITransactionErrorDetails>parameters[0];
             details.store = this.translateStore(details.store);
             this.onTransactionError.trigger(details);
             break;
