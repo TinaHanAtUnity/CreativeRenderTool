@@ -119,7 +119,7 @@ import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEven
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
@@ -591,8 +591,8 @@ export class TestFixtures {
     }
 
     public static getPrivacy(platform: Platform, campaign: Campaign): Privacy {
-        const gdprManager = sinon.createStubInstance(GdprManager);
-        return new Privacy(platform, campaign, gdprManager, TestFixtures.getAdsConfiguration().isGDPREnabled(), TestFixtures.getCoreConfiguration().isCoppaCompliant());
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
+        return new Privacy(platform, campaign, privacyManager, TestFixtures.getAdsConfiguration().isGDPREnabled(), TestFixtures.getCoreConfiguration().isCoppaCompliant());
     }
 
     public static getEndScreenParameters(platform: Platform, core: ICoreApi, campaign: PerformanceCampaign|XPromoCampaign): IEndScreenParameters {
@@ -660,7 +660,7 @@ export class TestFixtures {
             overlay: TestFixtures.getVideoOverlay(platform, core, ads, campaign),
             video: new Video('', TestFixtures.getSession()),
             privacy: TestFixtures.getPrivacy(platform, campaign),
-            gdprManager: sinon.createStubInstance(GdprManager),
+            privacyManager: sinon.createStubInstance(UserPrivacyManager),
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };
     }
@@ -693,7 +693,7 @@ export class TestFixtures {
             overlay: TestFixtures.getVideoOverlay(platform, core, ads, campaign),
             video: new Video('', TestFixtures.getSession()),
             privacy: TestFixtures.getPrivacy(platform, campaign),
-            gdprManager: sinon.createStubInstance(GdprManager),
+            privacyManager: sinon.createStubInstance(UserPrivacyManager),
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };
     }

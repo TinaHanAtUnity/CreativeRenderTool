@@ -1,7 +1,7 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -41,7 +41,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     adsConfig: AdsConfiguration;
     request: RequestManager;
     options: any;
-    gdprManager: GdprManager;
+    privacyManager: UserPrivacyManager;
     adMobSignalFactory?: AdMobSignalFactory;
     webPlayerContainer?: WebPlayerContainer;
     programmaticTrackingService: ProgrammaticTrackingService;
