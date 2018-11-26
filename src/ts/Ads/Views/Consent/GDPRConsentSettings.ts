@@ -40,6 +40,22 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
         (<HTMLElement>this._container.querySelector('.info-container')).appendChild(this._infoContainer.container());
     }
 
+    public show(): void {
+        // no need to call super.show
+
+        // gray line between main and sub checkbox
+        // todo: maybe there is some better way to set correct height of the line
+        const experienceLabel = <HTMLElement>this._container.querySelector('.personalized-experience-label');
+        const adsLabel = <HTMLElement>this._container.querySelector('.personalized-ads-label');
+
+        if(experienceLabel && adsLabel && adsLabel.offsetHeight > experienceLabel.offsetHeight) {
+            const lineElement = this._container.querySelector('.sub-box-line');
+            if (lineElement) {
+                lineElement.classList.add('two-lines');
+            }
+        }
+    }
+
     private onBackButtonEvent(event: Event): void {
         event.preventDefault();
 
