@@ -1,21 +1,19 @@
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
-import { ILimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
-import { ProductInfo } from 'Promo/Models/ProductInfo';
+import { IRawLimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
+import { ProductInfo, IRawProductInfo } from 'Promo/Models/ProductInfo';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { IRawProductInfo } from 'Promo/Parsers/PromoCampaignParser';
 
 export interface IRawPromoCampaign {
     expiry?: string;
-    contentType?: string;
-    meta?: string;
     creativeUrl?: string;
     dynamicMarkup: string | undefined;
     rewardedPromo: boolean;
-    limitedTimeOffer: ILimitedTimeOfferData | undefined;
+    limitedTimeOffer: IRawLimitedTimeOfferData | undefined;
     costs: IRawProductInfo[];
     payouts: IRawProductInfo[];
-    premiumProduct: ProductInfo;
+    premiumProduct: IRawProductInfo;
+    iapProductId?: string;
 }
 
 export interface IPromoCampaign extends ICampaign {

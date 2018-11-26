@@ -11,6 +11,12 @@ export interface IProductInfo {
     quantity: number;
 }
 
+export interface IRawProductInfo {
+    productId: string;
+    type: string;
+    quantity: number;
+}
+
 export class ProductInfo extends Model<IProductInfo> {
     constructor(data: IProductInfo) {
         super('ProductInfo', {
