@@ -13,7 +13,6 @@ export class VastVideoOverlay extends NewVideoOverlay implements IPrivacyHandler
 
         this._seatId = parameters.campaign.getSeatId();
         this._hasEndcard = parameters.campaign.hasEndscreen();
-        this._showGDPRBanner = showGDPRBanner;
     }
 
     public render(): void {
