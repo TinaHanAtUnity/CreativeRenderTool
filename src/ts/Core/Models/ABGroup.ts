@@ -45,4 +45,4 @@ export const FakeDisabledABTest = new DisabledABTest(16, 17);
 export const NativeGreenEndScreenButtonColorTest = new ABTest(7, 8);
 export const FPSCollectionTest = new ABTest(16);
 export const NextSkipIconTest = new ABTest(5, 6);
-export const AuctionV5Test = new ABTest();
+export const AuctionV5Test = new ABTest(15);
