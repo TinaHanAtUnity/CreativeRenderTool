@@ -1,7 +1,7 @@
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
@@ -62,7 +62,7 @@ describe('MRAIDEventHandlersTest', () => {
     let mraidEventHandler: MRAIDEventHandler;
     let extendedMraidCampaign: MRAIDCampaign;
     let programmaticMraidCampaign: MRAIDCampaign;
-    let gdprManager: GdprManager;
+    let privacyManager: UserPrivacyManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
 
     describe('with onClick', () => {
@@ -97,7 +97,7 @@ describe('MRAIDEventHandlersTest', () => {
             mraidView = sinon.createStubInstance(MRAID);
             (<sinon.SinonSpy>mraidView.container).restore();
             sinon.stub(mraidView, 'container').returns(document.createElement('div'));
-            gdprManager = sinon.createStubInstance(GdprManager);
+            privacyManager = sinon.createStubInstance(UserPrivacyManager);
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             extendedMraidAdUnitParams = {
@@ -121,8 +121,8 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new Privacy(platform, extendedMraidCampaign, gdprManager, false, false),
-                gdprManager: gdprManager,
+                privacy: new Privacy(platform, extendedMraidCampaign, privacyManager, false, false),
+                privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService
             };
 
@@ -313,7 +313,7 @@ describe('MRAIDEventHandlersTest', () => {
             request = new RequestManager(platform, core, new WakeUpManager(core));
             sinon.stub(request, 'followRedirectChain').resolves();
             placement = TestFixtures.getPlacement();
-            gdprManager = sinon.createStubInstance(GdprManager);
+            privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
@@ -323,7 +323,7 @@ describe('MRAIDEventHandlersTest', () => {
             adsConfig = TestFixtures.getAdsConfiguration();
             programmaticMraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
 
-            privacy = new Privacy(platform, programmaticMraidCampaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+            privacy = new Privacy(platform, programmaticMraidCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             mraidView = new MRAID(platform, core, <AndroidDeviceInfo>deviceInfo, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup());
             mraidView.setMraidEventBridge(new MraidIFrameEventBridge(core, mraidView));
 
@@ -363,8 +363,8 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new Privacy(platform, programmaticMraidCampaign, gdprManager, false, false),
-                gdprManager: gdprManager,
+                privacy: new Privacy(platform, programmaticMraidCampaign, privacyManager, false, false),
+                privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService
             };
 

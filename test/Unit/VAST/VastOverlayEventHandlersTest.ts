@@ -2,7 +2,7 @@ import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
@@ -80,8 +80,8 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
             metaDataManager = new MetaDataManager(core);
             campaign = TestFixtures.getEventVastCampaign();
             clientInfo = TestFixtures.getClientInfo();
-            const gdprManager = sinon.createStubInstance(GdprManager);
-            privacy = new Privacy(platform, campaign, gdprManager, false, false);
+            const privacyManager = sinon.createStubInstance(UserPrivacyManager);
+            privacy = new Privacy(platform, campaign, privacyManager, false, false);
 
             clientInfo = TestFixtures.getClientInfo(platform);
 
@@ -145,7 +145,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 endScreen: undefined,
                 overlay: overlay,
                 video: campaign.getVideo(),
-                gdprManager: gdprManager,
+                privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService
             };
 
