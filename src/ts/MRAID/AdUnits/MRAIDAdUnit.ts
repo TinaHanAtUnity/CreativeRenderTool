@@ -111,12 +111,20 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._mraid.hide();
         if(this._endScreen) {
             this._endScreen.hide();
-            this._endScreen.container().parentElement!.removeChild(this._endScreen.container());
+
+            const endScreenContainer = this._endScreen.container();
+            if (endScreenContainer && endScreenContainer.parentElement) {
+                endScreenContainer.parentElement.removeChild(this._endScreen.container());
+            }
         }
 
         if(this._privacy) {
             this._privacy.hide();
-            this._privacy.container().parentElement!.removeChild(this._privacy.container());
+
+            const privacyContainer = this._privacy.container();
+            if (privacyContainer && privacyContainer.parentElement) {
+                privacyContainer.parentElement.removeChild(this._privacy.container());
+            }
         }
 
         const operativeEventParams = this.getOperativeEventParams();
@@ -134,7 +142,12 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
 
         this.onFinish.trigger();
-        this._mraid.container().parentElement!.removeChild(this._mraid.container());
+
+        const mraidContainer = this._mraid.container();
+        if (mraidContainer && mraidContainer.parentElement) {
+            mraidContainer.parentElement.removeChild(this._mraid.container());
+        }
+
         this.unsetReferences();
 
         this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
