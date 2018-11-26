@@ -11,16 +11,34 @@
   background: $white;
   overflow: hidden;
 
+  .safe-area-content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  .back-button {
+    display: flex;
+    align-items: center;
+    font-size: $default-font-size * .65
+    color: $black;
+    opacity: .5;
+    width: 2 * $default-size;
+    padding: 0 $default-size;
+    height: 8%;
+  }
+
   .container {
-    padding: $default-size;
+    padding: 0 $default-size 0 $default-size;
   }
 
   .personalization-container {
-    height: 50%;
+    height: 42%;
     overflow: auto;
 
     .privacy-info-title {
-      padding-top: $default-size;
       font-weight: 500;
     }
 
@@ -37,14 +55,18 @@
   }
 
   .stripe {
+    top:0;
     position: relative;
     height: 1px;
-    margin: 0.25 * $default-size $default-size 0.25 * $default-size $default-size;
+    margin: 0.25 * $default-size 0 0.25 * $default-size 0;
     background-color: $light-gray;
   }
 
   .settings-container {
-    top: 50%;
+    height: 50%;
+    display: flex;
+    flex-direction: column;
+    // justify-content: center;
   }
 
   .button-container {
@@ -73,5 +95,27 @@
     .checkbox-item-container {
       margin: $default-size 0 $default-size 0;
     }
+
+    .indented-checkbox {
+      padding-left: 1.25 * $default-size;
+    }
+
+    // line between main and sub checkbox
+    // todo: should be tested carefully
+    // todo: on some devices the label is wrapped. Use screen ratio to set height
+    .sub-box-line {
+      position: absolute;
+      width: .75 * $default-size;
+      height: 1.25 * $default-size;
+      border-left: 1px solid $light-gray;
+      border-bottom: 1px solid $light-gray;
+      transform: translate(.3 * $default-size, -.9 * $default-size);
+    }
+
+    .two-lines.sub-box-line {
+      height: 1.9 * $default-size;
+      transform: translate(.3 * $default-size, -1.6 * $default-size);
+    }
+
   }
 }

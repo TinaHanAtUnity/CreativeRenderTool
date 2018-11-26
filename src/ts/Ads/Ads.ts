@@ -224,7 +224,7 @@ export class Ads implements IAds {
 
     public showConsent(placementId: string, options: any, callback: INativeCallback): Promise<void> {
         return (<AdUnitContainer>this.Container).open('Consent', ['webview'], false, Orientation.NONE, true, true, true, false, options).then(() => {
-            const consentView = new GDPRConsent({ platform: this._core.NativeBridge.getPlatform() });
+            const consentView = new GDPRConsent({ platform: this._core.NativeBridge.getPlatform(), gdprManager: this.GdprManager });
             consentView.setDoneCallback(() => {
                 this.consentDone(placementId, options, callback);
             });

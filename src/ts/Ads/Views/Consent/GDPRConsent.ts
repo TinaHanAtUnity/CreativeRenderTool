@@ -3,9 +3,11 @@ import GDPRConsentTemplate from 'html/consent/gdpr-consent.html';
 import { Template } from 'Core/Utilities/Template';
 import { GDPRConsentSettings } from 'Ads/Views/Consent/GDPRConsentSettings';
 import { Platform } from 'Core/Constants/Platform';
+import { GdprManager } from 'Ads/Managers/GdprManager';
 
 export interface IGDPRConsentViewParameters {
     platform: Platform;
+    gdprManager: GdprManager;
 }
 
 export interface IGDPRConsentHandler {
@@ -65,7 +67,7 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
         event.preventDefault();
 
         if (!this._consentSettingsView) {
-            this._consentSettingsView = new GDPRConsentSettings(this._platform);
+            this._consentSettingsView = new GDPRConsentSettings(this._platform, this._parameters.gdprManager);
             this._consentSettingsView.render();
 
             document.body.appendChild(this._consentSettingsView.container());
