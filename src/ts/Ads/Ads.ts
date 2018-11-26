@@ -225,25 +225,21 @@ export class Ads implements IAds {
     public showConsent(placementId: string, options: any, callback: INativeCallback): Promise<void> {
         return (<AdUnitContainer>this.Container).open('Consent', ['webview'], false, Orientation.NONE, true, true, true, false, options).then(() => {
             const consentView = new GDPRConsent({ platform: this._core.NativeBridge.getPlatform(), gdprManager: this.GdprManager });
+            this.Container.addEventHandler(consentView);
             consentView.setDoneCallback(() => {
-                this.consentDone(placementId, options, callback);
+                this._core.Api.Sdk.logDebug('showConsent, doneCallback called');
+                consentView.hide();
+                (<AdUnitContainer>this.Container).close()
             });
-            this._core.Api.Sdk.logDebug('showConsent, about to render view');
+            consentView.setCloseCallback(() => {
+                this.show(placementId, options, callback);
+            });
             consentView.render();
-            this._core.Api.Sdk.logDebug('showConsent, rendered, about to append');
             document.body.appendChild(consentView.container());
-            this._core.Api.Sdk.logDebug('showConsent, appended, about to show');
+            this._core.Api.Sdk.logDebug('Showing consent view');
             return consentView.show();
         }).catch((e: Error) => {
             this._core.Api.Sdk.logWarning('Error opening Consent view ' + e);
-            this.consentDone(placementId, options, callback);
-        });
-    }
-
-    public consentDone(placementId: string, options: any, callback: INativeCallback): void {
-        this._core.Api.Sdk.logDebug('consentDone, Consent stuff is done, showing ad');
-        (<AdUnitContainer>this.Container).close().then(() => {
-            this.show(placementId, options, callback);
         });
     }
 

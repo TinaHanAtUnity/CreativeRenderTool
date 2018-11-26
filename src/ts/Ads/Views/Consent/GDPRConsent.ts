@@ -4,6 +4,7 @@ import { Template } from 'Core/Utilities/Template';
 import { GDPRConsentSettings } from 'Ads/Views/Consent/GDPRConsentSettings';
 import { Platform } from 'Core/Constants/Platform';
 import { GdprManager } from 'Ads/Managers/GdprManager';
+import { AdUnitContainerSystemMessage } from 'Ads/AdUnits/Containers/AdUnitContainer';
 
 export interface IGDPRConsentViewParameters {
     platform: Platform;
@@ -19,6 +20,8 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
     private _parameters: IGDPRConsentViewParameters;
     private _consentSettingsView: GDPRConsentSettings;
     private _doneCallback: () => void;
+    private _closeCallback: () => void;
+    private _isShowing: boolean;
 
     constructor(parameters: IGDPRConsentViewParameters) {
         super(parameters.platform, 'gdpr-consent');
@@ -40,6 +43,11 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
         ];
     }
 
+    public show(): void {
+        this._isShowing = true;
+        super.show();
+    }
+
     public hide(): void {
         super.hide();
 
@@ -54,6 +62,33 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
     // TODO: I feel this could be done neater
     public setDoneCallback(callback: () => void): void {
         this._doneCallback = callback;
+    }
+
+    public setCloseCallback(callback: () => void): void {
+        this._closeCallback = callback;
+    }
+
+    public onContainerShow(): void {
+        // Blank
+    }
+
+    public onContainerDestroy(): void {
+        if (this._isShowing) {
+            this._isShowing = false;
+            this._closeCallback();
+        }
+    }
+
+    public onContainerBackground(): void {
+        // Blank
+    }
+
+    public onContainerForeground(): void {
+        // Blank
+    }
+
+    public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
+        // Blank
     }
 
     private onAgreeEvent(event: Event) {
