@@ -229,9 +229,10 @@ export class Ads implements IAds {
             consentView.setDoneCallback(() => {
                 this._core.Api.Sdk.logDebug('showConsent, doneCallback called');
                 consentView.hide();
-                (<AdUnitContainer>this.Container).close()
+                (<AdUnitContainer>this.Container).close();
             });
             consentView.setCloseCallback(() => {
+                this.Container.removeEventHandler(consentView);
                 this.show(placementId, options, callback);
             });
             consentView.render();
