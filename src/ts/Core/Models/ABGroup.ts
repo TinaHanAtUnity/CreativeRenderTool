@@ -104,4 +104,4 @@ class ABTest {
 export const NativeGreenEndScreenButtonColorTest = new ABTest(GroupSeven, GroupEight);
 export const FPSCollectionTest = new ABTest(GroupSixteen);
 export const NextSkipIconTest = new ABTest(GroupFive, GroupSix);
-export const AuctionV5Test = new ABTest(GroupDisabled);
+export const AuctionV5Test = new ABTest(GroupFifteen);
