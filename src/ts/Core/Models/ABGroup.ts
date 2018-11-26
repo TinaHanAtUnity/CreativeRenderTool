@@ -42,7 +42,7 @@ export const FakeEnabledABTest = new ABTest(16, 17);
 export const FakeDisabledABTest = new DisabledABTest(16, 17);
 
 // Add actual A/B tests below
-export const GreenEndScreenButtonColorTest = new ABTest(18, 19);
+export const NativeGreenEndScreenButtonColorTest = new ABTest(7, 8);
 export const FPSCollectionTest = new ABTest(16);
-export const ExitSkipIconTest = new ABTest(16, 17);
-export const AuctionV5Test = new ABTest(15);
+export const NextSkipIconTest = new ABTest(5, 6);
+export const AuctionV5Test = new ABTest();

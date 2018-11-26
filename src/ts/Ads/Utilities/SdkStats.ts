@@ -5,15 +5,15 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
+import { ICoreApi } from 'Core/ICore';
+import { CacheManager } from 'Core/Managers/CacheManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IFileInfo } from 'Core/Native/Cache';
-import { Cache } from 'Core/Utilities/Cache';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { Request } from 'Core/Utilities/Request';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
@@ -76,8 +76,8 @@ interface IEventInfo {
 }
 
 export class SdkStats {
-    public static initialize(nativeBridge: NativeBridge, request: Request, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, sessionManager: SessionManager, campaignManager: CampaignManager, metaDataManager: MetaDataManager, clientInfo: ClientInfo, cache: Cache) {
-        SdkStats._nativeBridge = nativeBridge;
+    public static initialize(core: ICoreApi, request: RequestManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, sessionManager: SessionManager, campaignManager: CampaignManager, metaDataManager: MetaDataManager, clientInfo: ClientInfo, cache: CacheManager) {
+        SdkStats._core = core;
         SdkStats._request = request;
         SdkStats._coreConfig = coreConfig;
         SdkStats._adsConfig = adsConfig;
@@ -169,8 +169,8 @@ export class SdkStats {
         return SdkStats._frameSetStarted[placementId];
     }
 
-    private static _nativeBridge: NativeBridge;
-    private static _request: Request;
+    private static _core: ICoreApi;
+    private static _request: RequestManager;
     private static _coreConfig: CoreConfiguration;
     private static _adsConfig: AdsConfiguration;
     private static _sessionManager: SessionManager;
@@ -191,9 +191,9 @@ export class SdkStats {
     private static _frameSetStarted: { [id: string]: number } = {};
 
     private static isTestActive(): boolean {
-        const gameSessionId: number = SdkStats._sessionManager.getGameSessionId();
+        const gameSessionId = SdkStats._sessionManager.getGameSessionId();
 
-        if(gameSessionId % 1000 === 0) {
+        if(typeof gameSessionId === 'number' && gameSessionId % 1000 === 0) {
             return true;
         }
 
@@ -302,7 +302,7 @@ export class SdkStats {
             const asset: Asset | undefined = CampaignAssetInfo.getCachedAsset(campaign);
 
             if(asset) {
-                return SdkStats._nativeBridge.Cache.getFileInfo(<string>asset.getFileId()).then((fileInfo: IFileInfo) => {
+                return SdkStats._core.Cache.getFileInfo(<string>asset.getFileId()).then((fileInfo: IFileInfo) => {
                     if(fileInfo.found) {
                         return fileInfo.size;
                     } else {

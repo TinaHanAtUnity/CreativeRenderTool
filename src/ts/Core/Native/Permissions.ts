@@ -1,8 +1,9 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { Platform } from 'Core/Constants/Platform';
-import { AndroidPermissionsApi } from 'Core/Native/Android/AndroidPermissions';
+import { AndroidPermissionsApi } from 'Core/Native/Android/Permissions';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { IosPermissionsApi } from 'Core/Native/iOS/IosPermissions';
+import { IosPermissionsApi } from 'Core/Native/iOS/Permissions';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { PermissionsUtil } from 'Core/Utilities/Permissions';
 
@@ -15,12 +16,12 @@ export class PermissionsApi extends NativeApi {
     public permissionRequestCode: number = 1000;
     public onPermissionsResult = new Observable2<string, boolean>();
 
-    public Android: AndroidPermissionsApi;
-    public Ios: IosPermissionsApi;
+    public readonly Android?: AndroidPermissionsApi;
+    public readonly Ios?: IosPermissionsApi;
     private readonly _currentPlatform: Platform;
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Permissions', ApiPackage.CORE);
+        super(nativeBridge, 'Permissions', ApiPackage.CORE, EventCategory.PERMISSIONS);
         const currentPlatform = nativeBridge.getPlatform();
         if (currentPlatform === Platform.ANDROID) {
             this.Android = new AndroidPermissionsApi(nativeBridge);

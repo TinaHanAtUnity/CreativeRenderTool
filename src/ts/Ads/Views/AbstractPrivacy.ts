@@ -2,8 +2,8 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { ITemplateData, View } from 'Core/Views/View';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
@@ -15,7 +15,7 @@ export interface IBuildInformation extends ITemplateData {
     userAgent: string;
     platform: string;
     campaign: string;
-    apiLevel: number;
+    osVersion: string;
     group: number;
     sdk: string;
     webview: string | null;
@@ -31,8 +31,8 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
 
     private static buildInformation: IBuildInformation;
 
-    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, isGDPREnabled: boolean, id: string) {
-        super(nativeBridge, id);
+    constructor(platform: Platform, isCoppaCompliant: boolean, isGDPREnabled: boolean, id: string) {
+        super(platform, id);
         this._templateData = {
             'isCoppaCompliant': isCoppaCompliant,
             'isGDPREnabled': isGDPREnabled,
@@ -40,13 +40,13 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
         };
     }
 
-    public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge, configuration: CoreConfiguration) {
+    public static createBuildInformation(platform: Platform, clientInfo: ClientInfo, deviceInfo: DeviceInfo, campaign: Campaign, configuration: CoreConfiguration) {
         const date = new Date();
         AbstractPrivacy.buildInformation = {
             userAgent: window.navigator.userAgent,
-            platform: clientInfo.getPlatform() === Platform.IOS ? 'iOS' : 'Android',
+            platform: platform === Platform.IOS ? 'iOS' : 'Android',
             campaign: campaign.getId(),
-            apiLevel: nativeBridge.getApiLevel(),
+            osVersion: deviceInfo.getOsVersion(),
             group: configuration.getAbGroup(),
             sdk: clientInfo.getSdkVersionName(),
             webview: clientInfo.getWebviewVersion(),

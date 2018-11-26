@@ -5,6 +5,7 @@ import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { AppStoreDownloadHelper } from 'Ads/Utilities/AppStoreDownloadHelper';
 
 export class XPromoEndScreenEventHandler extends EndScreenEventHandler<XPromoCampaign, XPromoAdUnit> {
+
     constructor(adUnit: XPromoAdUnit, parameters: IXPromoAdUnitParameters, downloadHelper: AppStoreDownloadHelper) {
         super(adUnit, parameters, downloadHelper);
     }

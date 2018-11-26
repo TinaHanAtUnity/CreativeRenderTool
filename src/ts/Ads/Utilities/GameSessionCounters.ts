@@ -2,6 +2,17 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
+export interface IGameSessionCounters {
+    adRequests: number;
+    starts: number;
+    views: number;
+    startsPerCampaign: {[id: string]: number};
+    startsPerTarget: {[id: string]: number};
+    viewsPerCampaign: {[id: string]: number};
+    viewsPerTarget: {[id: string]: number};
+    latestCampaignsStarts: {[id: string]: string};
+}
+
 export class GameSessionCounters {
 
     public static init() {
@@ -59,23 +70,22 @@ export class GameSessionCounters {
                 this._targetViewCounter[targetGameId] = 1;
             }
         }
-
     }
 
     public static addAdRequest() {
         this._adRequestCount++;
     }
 
-    public static getDTO(): { [key: string]: any } {
+    public static getCurrentCounters(): IGameSessionCounters {
         return {
             adRequests: this._adRequestCount,
             starts: this._totalStartCount,
             views: this._totalViewCount,
-            startsPerCampaign: this._campaignStartCounter,
-            startsPerTarget: this._targetStartCounter,
-            viewsPerCampaign: this._campaignViewCounter,
-            viewsPerTarget: this._targetViewCounter,
-            latestCampaignsStarts: this._latestCampaignsStarts
+            startsPerCampaign: { ...this._campaignStartCounter },
+            startsPerTarget: { ...this._targetStartCounter },
+            viewsPerCampaign: { ...this._campaignViewCounter },
+            viewsPerTarget: { ...this._targetViewCounter },
+            latestCampaignsStarts: { ...this._latestCampaignsStarts }
         };
     }
 

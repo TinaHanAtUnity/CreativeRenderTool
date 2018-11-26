@@ -3,15 +3,17 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
+import { Platform } from 'Core/Constants/Platform';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 
 export class ProgrammaticMraidUrlParser extends CampaignParser {
-    public static ContentType = CampaignContentTypes.ProgrammaticMraidUrl;
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+
+    public static ContentType = 'programmatic/mraid-url';
+
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraidUrl = response.getJsonContent();
 
         if(!jsonMraidUrl) {
@@ -28,8 +30,9 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
-            id: this.getProgrammaticCampaignId(nativeBridge),
+            id: this.getProgrammaticCampaignId(platform),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
+            contentType: ProgrammaticMraidUrlParser.ContentType,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
             creativeId: response.getCreativeId() || undefined,
