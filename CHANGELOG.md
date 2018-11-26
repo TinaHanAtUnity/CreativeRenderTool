@@ -1,4 +1,4 @@
-# Pending
+# Mon Nov 26 09:36:32 UTC 2018
 
 * Type out IInfoJson & fix undefined sessionId [#7275](https://github.com/Applifier/unity-ads-webview/pull/7275)
 * Disable backup campaigns on pre-4.4. Androids [#7276](https://github.com/Applifier/unity-ads-webview/pull/7276)
