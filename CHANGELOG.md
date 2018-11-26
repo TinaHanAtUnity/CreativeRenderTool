@@ -1,3 +1,11 @@
+# Pending
+
+* Turn on Auction V5 Test in GroupFifteen [#7297](https://github.com/Applifier/unity-ads-webview/pull/7297)
+* BYOP Promo Product Type Filtering [#7073](https://github.com/Applifier/unity-ads-webview/pull/7073)
+* Refactor Vast Overlay and Privacy [#6890](https://github.com/Applifier/unity-ads-webview/pull/6890)
+* Fix logic that show call button only for VAST [#7296](https://github.com/Applifier/unity-ads-webview/pull/7296)
+* Update Privacy Naming and User Summary Endpoints in GCP [#7127](https://github.com/Applifier/unity-ads-webview/pull/7127)
+
 # Mon Nov 26 09:36:32 UTC 2018
 
 * Type out IInfoJson & fix undefined sessionId [#7275](https://github.com/Applifier/unity-ads-webview/pull/7275)
