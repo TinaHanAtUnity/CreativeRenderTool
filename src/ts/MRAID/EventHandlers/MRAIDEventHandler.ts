@@ -16,6 +16,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { KeyCode } from 'Core/Constants/Android/KeyCode';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -181,5 +182,23 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
 
     private setCallButtonEnabled(enabled: boolean) {
         this._mraidView.setCallButtonEnabled(enabled);
+    }
+
+    public onKeyEvent(keyCode: number): void {
+        if(keyCode === KeyCode.BACK && this.canSkip()) {
+            if(!this._placement.skipEndCardOnClose()) {
+                this.onMraidSkip();
+            } else {
+                this.onMraidClose()
+            }
+        }
+    }
+
+    private canSkip(): boolean {
+        if(!this._placement.allowSkip() || !this._adUnit.isShowing() || !this._adUnit.isShowingMRAID()) {
+            return false;
+        }
+
+        return this._adUnit.getMRAIDView().canSkip();
     }
 }
