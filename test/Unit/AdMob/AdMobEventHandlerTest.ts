@@ -5,7 +5,7 @@ import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { ITouchInfo } from 'AdMob/Views/AFMABridge';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Session } from 'Ads/Models/Session';
@@ -47,7 +47,7 @@ const resolveAfter = (timeout: number): Promise<void> => {
         const testTimeout = 250;
         let coreConfig;
         let adsConfig;
-        let gdprManager;
+        let privacyManager;
 
         beforeEach(() => {
             adUnit = sinon.createStubInstance(AdMobAdUnit);
@@ -68,7 +68,7 @@ const resolveAfter = (timeout: number): Promise<void> => {
             (<sinon.SinonStub>campaign.getSession).returns(TestFixtures.getSession());
             coreConfig = sinon.createStubInstance(CoreConfiguration);
             adsConfig = sinon.createStubInstance(AdsConfiguration);
-            gdprManager = sinon.createStubInstance(GdprManager);
+            privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
             clientInfo = sinon.createStubInstance(ClientInfo);
 
@@ -85,7 +85,7 @@ const resolveAfter = (timeout: number): Promise<void> => {
                 clientInfo: clientInfo,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
-                gdprManager: gdprManager
+                privacyManager: privacyManager
             });
         });
 
