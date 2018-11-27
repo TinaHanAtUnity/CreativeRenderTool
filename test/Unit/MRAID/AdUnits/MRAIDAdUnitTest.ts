@@ -31,6 +31,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Privacy } from 'Ads/Views/Privacy';
+import { ARUtil } from 'AR/Utilities/ARUtil';
 
 describe('MraidAdUnit', () => {
     let sandbox: sinon.SinonSandbox;
@@ -54,7 +55,7 @@ describe('MraidAdUnit', () => {
     let clientInfo: ClientInfo;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
     });
 
     afterEach(() => {
@@ -145,36 +146,48 @@ describe('MraidAdUnit', () => {
     });
 
     describe('on show', () => {
-        const onShowTests = () => {
-            let onStartObserver: IObserver0;
+        let onStartObserver: IObserver0;
 
+        describe('for Mraid', () => {
             beforeEach(() => {
                 onStartObserver = sinon.spy();
                 mraidAdUnit.onStart.subscribe(onStartObserver);
                 return mraidAdUnit.show();
             });
 
+            afterEach(() => {
+                sandbox.restore();
+                return mraidAdUnit.hide();
+            });
+
             it('should trigger onStart', () => {
                 sinon.assert.calledOnce(<sinon.SinonSpy>onStartObserver);
             });
 
-            xit('should set up the web player', () => {
-                // it will eventually
-                // sinon.assert.calledOnce(<sinon.SinonSpy>WebPlayer.setSettings);
-                // sinon.assert.calledOnce(<sinon.SinonSpy>WebPlayer.setEventSettings);
-            });
-
             it('should open the container', () => {
-                sinon.assert.calledOnce(<sinon.SinonSpy>mraidAdUnitParameters.container.open);
+                sinon.assert.calledWith(<sinon.SinonSpy>mraidAdUnitParameters.container.open, mraidAdUnit, ['webview'], true, Orientation.NONE, true, false, true, false, {});
+            });
+        });
+
+        describe('for AR', () => {
+
+            beforeEach(() => {
+                onStartObserver = sinon.spy();
+                mraidAdUnit.onStart.subscribe(onStartObserver);
+                sandbox.stub(ARUtil, 'isARCreative').returns(true);
+                sandbox.stub(ARUtil, 'isARSupported').returns(Promise.resolve(true));
+                return mraidAdUnit.show();
             });
 
             afterEach(() => {
+                sandbox.restore();
                 return mraidAdUnit.hide();
             });
-        };
 
-        describe('on android', () => {
-            onShowTests();
+            it('should set up the ar View if AR is supported', () => {
+                sinon.assert.calledWith(<sinon.SinonSpy>mraidAdUnitParameters.container.open, mraidAdUnit, ['arview', 'webview'], true, Orientation.NONE, true, false, true, false, {});
+
+            });
         });
     });
 
@@ -204,18 +217,12 @@ describe('MraidAdUnit', () => {
             });
         });
 
-        xit('should send the finish event', () => {
-            // return mraidAdUnit.show().then(() => mraidAdUnit.hide()).then(() => {
-            //     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendFinishEvent, mraidAdUnitParameters.placement.getId(), finishState);
-            // });
-        });
+        it('should send the finish event', () => {
+            sinon.stub(ads.Listener, 'sendFinishEvent').returns(Promise.resolve(void(0)));
 
-        xit('should hide the endscreen if endscreen exists', () => {
-            //
-        });
-
-        xit('should hide the privacy if privacy exists', () => {
-            //
+            return mraidAdUnit.show().then(() => mraidAdUnit.hide()).then(() => {
+                sinon.assert.calledWith(<sinon.SinonSpy>ads.Listener.sendFinishEvent, mraidAdUnitParameters.placement.getId(), finishState);
+            });
         });
     });
 
@@ -277,16 +284,6 @@ describe('MraidAdUnit', () => {
         });
     });
 
-    describe('onContainerShow', () => {
-        xit('should set the viewable state to true', () => {
-            //
-        });
-
-        xit('should auto close after autoclose delay timer reached', () => {
-            //
-        });
-    });
-
     describe('onContainerDestroy', () => {
         beforeEach(() => {
             sandbox.stub(mraidAdUnit, 'setFinishState');
@@ -330,9 +327,19 @@ describe('MraidAdUnit', () => {
         });
     });
 
-    describe('onContainerForeground', () => {
-        xit ('should set the viewable state to true when the mraid is set as showing', () => {
-            //
+    xdescribe('onContainerShow', () => {
+        xit('should send the true viewable event over the bridge when mraid is set as showing', () => {
+            // TODO
+        });
+
+        xit('should auto close after autoclose delay timer reached', () => {
+            // TODO
+        });
+    });
+
+    xdescribe('onContainerForeground', () => {
+        xit ('should send the true viewable event over the bridge when mraid is set as showing', () => {
+            // TODO
         });
     });
 });
