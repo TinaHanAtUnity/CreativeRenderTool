@@ -6,7 +6,6 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAID } from 'MRAID/Views/MRAID';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { Platform } from 'Core/Constants/Platform';
 import { IObserver0 } from 'Core/Utilities/IObserver';
@@ -32,6 +31,7 @@ import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Privacy } from 'Ads/Views/Privacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 describe('MraidAdUnit', () => {
     let sandbox: sinon.SinonSandbox;
@@ -39,7 +39,7 @@ describe('MraidAdUnit', () => {
     let mraidAdUnit: MRAIDAdUnit;
     let mraidView: MRAID;
     let operativeEventManager: OperativeEventManager;
-    let gdprManager: GdprManager;
+    let userPrivacyManager: UserPrivacyManager;
 
     let platform: Platform;
     let backend: Backend;
@@ -68,7 +68,7 @@ describe('MraidAdUnit', () => {
         mraidView = sinon.createStubInstance(MRAID);
         (<sinon.SinonSpy>mraidView.container).restore();
         sinon.stub(mraidView, 'container').returns(document.createElement('div'));
-        gdprManager = sinon.createStubInstance(GdprManager);
+        userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
 
         platform = Platform.ANDROID;
         backend = TestFixtures.getBackend(platform);
@@ -126,8 +126,8 @@ describe('MraidAdUnit', () => {
             options: {},
             mraid: mraidView,
             endScreen: undefined,
-            privacy: new Privacy(platform, mraidCampaign, gdprManager, false, false),
-            gdprManager: sinon.createStubInstance(GdprManager),
+            privacy: new Privacy(platform, mraidCampaign, userPrivacyManager, false, false),
+            privacyManager: userPrivacyManager,
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };
 
