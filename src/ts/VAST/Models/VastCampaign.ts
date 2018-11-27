@@ -3,6 +3,7 @@ import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
 import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
 import { Vast } from 'VAST/Models/Vast';
+import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 
 export interface IVastCampaign extends IProgrammaticCampaign {
     vast: Vast;
@@ -38,8 +39,6 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             impressionUrls: ['array'],
             isMoatEnabled: ['boolean', 'undefined']
         }, campaign);
-
-        this.processCustomTracking(campaign.trackingUrls);
     }
 
     public getVast(): Vast {
@@ -111,6 +110,12 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
         return this.get('isMoatEnabled');
     }
 
+    // Overidden function so tracking urls can combined with tracking urls from vast creative
+    public setTrackingUrls(trackingUrls: ICampaignTrackingUrls) {
+        this.set('trackingUrls', trackingUrls);
+        this.processCustomTracking(trackingUrls);
+    }
+
     public getDTO(): { [key: string]: any } {
         let portrait;
         const portraitAsset = this.get('portrait');
@@ -134,18 +139,14 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
         };
     }
 
-    private processCustomTracking(tracking: any) {
-        if (tracking) {
-            for (const trackingEventName in tracking) {
-                if (tracking.hasOwnProperty(trackingEventName)) {
-                    const urls = tracking[trackingEventName];
-                    if (urls) {
-                        urls.forEach((url: string) => {
-                            this.getVast().addTrackingEventUrl(trackingEventName, url);
-                        });
-                    }
-                }
-            }
+    private processCustomTracking(trackingUrls: ICampaignTrackingUrls) {
+        if (trackingUrls) {
+            Object.keys(trackingUrls).forEach((event) => {
+                const eventUrls = this.getTrackingUrlsForEvent(event);
+                eventUrls.forEach((eventUrl) => {
+                    this.getVast().addTrackingEventUrl(event, eventUrl);
+                });
+            });
         }
     }
 }
