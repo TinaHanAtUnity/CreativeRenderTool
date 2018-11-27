@@ -96,7 +96,7 @@ import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitF
 import { XPromoAdUnitFactory } from 'XPromo/AdUnits/XPromoAdUnitFactory';
 import AuctionV5Response from 'json/AuctionV5Response.json';
 
-xdescribe('CampaignManager', () => {
+describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let platform: Platform;
@@ -627,9 +627,8 @@ xdescribe('CampaignManager', () => {
 
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
-                assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
-
                 triggeredCampaign.setTrackingUrls(vastOnShowTrackingUrls);
+                assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
                 assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
                     'http://customTrackingUrl/start',
                     'http://customTrackingUrl/start2',
@@ -970,7 +969,6 @@ xdescribe('CampaignManager', () => {
                     }
 
                     mockRequest.verify();
-                    (<VastCampaign>triggeredCampaign).setTrackingUrls(vastOnShowTrackingUrls);
                     assert.isTrue(triggeredCampaign instanceof VastCampaign);
                     assert.equal(triggeredPlacement, 'video');
                     assert.equal(triggeredCampaign.getAdType(), 'vast-sample-ad-type');

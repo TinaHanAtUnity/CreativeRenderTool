@@ -39,6 +39,8 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             impressionUrls: ['array'],
             isMoatEnabled: ['boolean', 'undefined']
         }, campaign);
+
+        this.processCustomTracking(campaign.trackingUrls);
     }
 
     public getVast(): Vast {
@@ -112,7 +114,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
 
     // Overidden function so tracking urls can combined with tracking urls from vast creative
     public setTrackingUrls(trackingUrls: ICampaignTrackingUrls) {
-        this.set('trackingUrls', trackingUrls);
+        super.setTrackingUrls(trackingUrls);
         this.processCustomTracking(trackingUrls);
     }
 
