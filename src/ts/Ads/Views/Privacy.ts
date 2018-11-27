@@ -1,5 +1,5 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
@@ -11,7 +11,6 @@ import { Template } from 'Core/Utilities/Template';
 import PrivacyTemplate from 'html/Privacy.html';
 
 enum PrivacyCardState {
-    INITIAL,
     PRIVACY,
     BUILD,
     REPORT
@@ -28,27 +27,27 @@ enum ReportReason {
 export class Privacy extends AbstractPrivacy {
 
     private _onReport: Observable2<Campaign, string> = new Observable2();
-    private _gdprManager: GdprManager;
+    private _privacyManager: UserPrivacyManager;
     private _dataDeletionConfirmation: boolean = false;
-    private _currentState : number = -1;
+    private _currentState: PrivacyCardState = PrivacyCardState.PRIVACY;
     private _campaign: Campaign;
     private _reportSent: boolean = false;
     private _gdprEnabled: boolean = false;
-    private _personalInfoObtained: boolean = false;
+    private _userSummaryObtained: boolean = false;
 
     constructor(platform: Platform, campaign: Campaign,
-                gdprManager: GdprManager, gdprEnabled: boolean,
+                privacyManager: UserPrivacyManager, gdprEnabled: boolean,
                 isCoppaCompliant: boolean) {
 
         super(platform, isCoppaCompliant, gdprEnabled, 'privacy');
-        this._templateData.badAdKeys = Object.keys(ReportReason);
+        this._templateData.reportKeys = Object.keys(ReportReason);
         // tslint:disable-next-line
-        this._templateData.badAdReasons = Object.keys(ReportReason).map(key => ReportReason[<any>key]);
+        this._templateData.reportReasons = Object.keys(ReportReason).map((reason: any) => ReportReason[reason]);
 
         this._template = new Template(PrivacyTemplate);
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
-        this._gdprManager = gdprManager;
+        this._privacyManager = privacyManager;
 
         this._bindings = [
             {
@@ -58,8 +57,13 @@ export class Privacy extends AbstractPrivacy {
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onStateClick(event, true),
+                listener: (event: Event) => this.changePrivacyState(event, true),
                 selector: '.left-side-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.changePrivacyState(event, false),
+                selector: '.middle-link'
             },
             {
                 event: 'click',
@@ -78,11 +82,6 @@ export class Privacy extends AbstractPrivacy {
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onStateClick(event, false),
-                selector: '.middle-link'
-            },
-            {
-                event: 'click',
                 listener: (event: Event) => this.onReportAd(event),
                 selector: '.report-button'
             }
@@ -92,10 +91,10 @@ export class Privacy extends AbstractPrivacy {
     public show(): void {
         super.show();
 
-        this.editPopupPerUser();
+        this.populateUserSummary();
 
         if (this._gdprEnabled) {
-            const elId = this._gdprManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
+            const elId = this._privacyManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
             const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
             activeRadioButton.checked = true;
@@ -113,11 +112,6 @@ export class Privacy extends AbstractPrivacy {
                 this._dataDeletionConfirmation = false;
             };
         }
-    }
-
-    public render(): void {
-        super.render();
-        this.setCardState(false);
     }
 
     protected onCloseEvent(event: Event): void {
@@ -159,11 +153,6 @@ export class Privacy extends AbstractPrivacy {
         activeRadioButton.checked = true;
     }
 
-    private onStateClick(event: Event, isLeftClick: boolean): void {
-        event.preventDefault();
-        this.setCardState(isLeftClick);
-    }
-
     private onReportAd(event: Event): void {
         event.preventDefault();
         if (!this._reportSent) {
@@ -193,81 +182,84 @@ export class Privacy extends AbstractPrivacy {
         }
     }
 
-    private setCardState(isLeftClick: boolean) {
+    private changePrivacyState(event: Event, isLeftClick: boolean) {
+        event.preventDefault();
 
-        const leftEl = <HTMLDivElement>this._container.querySelector('.left-side-link');
-        const middleEl = <HTMLDivElement>this._container.querySelector('.middle-link');
+        const leftSideLink = <HTMLDivElement>this._container.querySelector('.left-side-link');
+        const middleLink = <HTMLDivElement>this._container.querySelector('.middle-link');
+        const closeButton = <HTMLDivElement>this._container.querySelector('.close-button');
         const classList = this._container.classList;
-        const rCard = 'Report Ad ⚑';
-        const pCard = 'Privacy info 👁';
-        const bCard = 'Build info ⚙';
+        const reportButtonText = 'Report Ad ⚑';
+        const privacyButtonText = 'Privacy info 👁';
+        const buildButtonText = 'Build info ⚙';
+        const confirmText = 'Confirm';
+        const closeText = 'Close';
 
-        switch(this._currentState) {
-
-            // Privacy info showing
+        switch (this._currentState) {
+            // Privacy screen showing
             case PrivacyCardState.PRIVACY: {
-                leftEl.innerText = pCard;
+                leftSideLink.innerText = privacyButtonText;
+                closeButton.innerText = closeText;
                 if (isLeftClick) {
                     this._currentState = PrivacyCardState.BUILD;
-                    middleEl.innerText = rCard;
+                    middleLink.innerText = reportButtonText;
                     classList.add('build');
                 } else {
                     this._currentState = PrivacyCardState.REPORT;
-                    middleEl.innerText = bCard;
+                    middleLink.innerText = buildButtonText;
                     classList.add('report');
                 }
                 break;
             }
-            // Build info showing
+            // Build screen showing
             case PrivacyCardState.BUILD: {
                 classList.remove('build');
                 if (isLeftClick) {
                     this._currentState = PrivacyCardState.PRIVACY;
-                    leftEl.innerText = bCard;
-                    middleEl.innerText = rCard;
+                    leftSideLink.innerText = buildButtonText;
+                    middleLink.innerText = reportButtonText;
+                    closeButton.innerText = confirmText;
                 } else {
                     this._currentState = PrivacyCardState.REPORT;
-                    leftEl.innerText = pCard;
-                    middleEl.innerText = bCard;
+                    leftSideLink.innerText = privacyButtonText;
+                    middleLink.innerText = buildButtonText;
                     classList.add('report');
                 }
                 break;
             }
-            // Report Ad showing
+            // Report screen showing
             case PrivacyCardState.REPORT: {
                 classList.remove('report');
-                middleEl.innerText = rCard;
+                middleLink.innerText = reportButtonText;
                 if (isLeftClick) {
                     this._currentState = PrivacyCardState.PRIVACY;
-                    leftEl.innerText = bCard;
+                    leftSideLink.innerText = buildButtonText;
+                    closeButton.innerText = confirmText;
                 } else {
                     this._currentState = PrivacyCardState.BUILD;
-                    leftEl.innerText = pCard;
+                    leftSideLink.innerText = privacyButtonText;
                     classList.add('build');
                 }
                 break;
             }
-            // Initial Configuration
             default: {
-                this._currentState = PrivacyCardState.PRIVACY;
-                leftEl.innerText = bCard;
-                middleEl.innerText = rCard;
+                // Must be included. Thanks linter.
             }
         }
     }
 
-    private editPopupPerUser() {
-        if (!this._personalInfoObtained) {
-            this._gdprManager.retrievePersonalInformation().then((personalProperties) => {
-                this._personalInfoObtained = true;
+    private populateUserSummary() {
+        if (!this._userSummaryObtained) {
+            this._privacyManager.retrieveUserSummary().then((userSummary) => {
+                this._userSummaryObtained = true;
                 document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
-                document.getElementById('phone-type')!.innerHTML = ` - Using ${personalProperties.deviceModel}`;
-                document.getElementById('country')!.innerHTML = ` - Located in ${personalProperties.country}`;
-                document.getElementById('game-plays-this-week')!.innerHTML = ` - Used this app ${personalProperties.gamePlaysThisWeek} times this week`;
-                document.getElementById('ads-seen-in-game')!.innerHTML = ` - Seen ${personalProperties.adsSeenInGameThisWeek} ads in this app`;
-                document.getElementById('games-installed-from-ads')!.innerHTML = ` - Installed ${personalProperties.installsFromAds} apps based on those ads`;
+                document.getElementById('phone-type')!.innerHTML = ` - Using ${userSummary.deviceModel}`;
+                document.getElementById('country')!.innerHTML = ` - Located in ${userSummary.country}`;
+                document.getElementById('game-plays-this-week')!.innerHTML = ` - Used this app ${userSummary.gamePlaysThisWeek} times this week`;
+                document.getElementById('ads-seen-in-game')!.innerHTML = ` - Seen ${userSummary.adsSeenInGameThisWeek} ads in this app`;
+                document.getElementById('games-installed-from-ads')!.innerHTML = ` - Installed ${userSummary.installsFromAds} apps based on those ads`;
             }).catch(error => {
-                Diagnostics.trigger('gdpr_personal_info_failed', error);
+                Diagnostics.trigger('user_summary_failed', error);
                 document.getElementById('sorry-message')!.innerHTML = 'Sorry. We were unable to deliver our collected information at this time.';
             });
         }

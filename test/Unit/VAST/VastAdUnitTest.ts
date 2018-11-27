@@ -1,7 +1,7 @@
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
@@ -122,8 +122,8 @@ describe('VastAdUnitTest', () => {
             campaign: vastCampaign
         });
 
-        const gdprManager = sinon.createStubInstance(GdprManager);
-        const privacy = new Privacy(platform, vastCampaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
+        const privacy = new Privacy(platform, vastCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
         const overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
@@ -149,7 +149,7 @@ describe('VastAdUnitTest', () => {
             endScreen: undefined,
             overlay: overlay,
             video: video,
-            gdprManager: gdprManager,
+            privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService
         };
 
@@ -163,8 +163,8 @@ describe('VastAdUnitTest', () => {
             const video = new Video('', TestFixtures.getSession());
             vastCampaign = TestFixtures.getEventVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
-            const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new Privacy(platform, vastCampaign, gdprManager, false, false);
+            const privacyManager = sinon.createStubInstance(UserPrivacyManager);
+            const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false);
             const overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
@@ -230,15 +230,14 @@ describe('VastAdUnitTest', () => {
             vastEndScreenParameters = {
                 campaign: vastAdUnitParameters.campaign,
                 clientInfo: vastAdUnitParameters.clientInfo,
-                seatId: vastAdUnitParameters.campaign.getSeatId(),
-                showPrivacyDuringEndscreen: false
+                seatId: vastAdUnitParameters.campaign.getSeatId()
             };
 
             const video = new Video('', TestFixtures.getSession());
             vastCampaign = TestFixtures.getCompanionVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
-            const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new Privacy(platform, vastCampaign, gdprManager, false, false);
+            const privacyManager = sinon.createStubInstance(UserPrivacyManager);
+            const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false);
             const overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
             vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
             vastAdUnitParameters.overlay = overlay;

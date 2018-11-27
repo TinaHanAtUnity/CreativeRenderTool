@@ -1,4 +1,4 @@
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Backend } from 'Backend/Backend';
 import { FinishState } from 'Core/Constants/FinishState';
@@ -86,10 +86,10 @@ describe('PromoEventHandlersTest', () => {
     });
 
     describe('when calling onGDPRPopupSkipped', () => {
-        let gdprManager: GdprManager;
+        let privacyManager: UserPrivacyManager;
 
         beforeEach(() => {
-            gdprManager = sinon.createStubInstance(GdprManager);
+            privacyManager = sinon.createStubInstance(UserPrivacyManager);
         });
 
         it ('should set the optOutRecorded flag in the configuration', () => {
@@ -97,7 +97,7 @@ describe('PromoEventHandlersTest', () => {
 
             config.isOptOutRecorded.returns(false);
 
-            PromoEventHandler.onGDPRPopupSkipped(config, gdprManager);
+            PromoEventHandler.onGDPRPopupSkipped(config, privacyManager);
             sinon.assert.calledWith(<sinon.SinonSpy>config.setOptOutRecorded, true);
         });
 
@@ -106,17 +106,17 @@ describe('PromoEventHandlersTest', () => {
 
             config.isOptOutRecorded.returns(false);
 
-            PromoEventHandler.onGDPRPopupSkipped(config, gdprManager);
-            sinon.assert.calledWithExactly(<sinon.SinonSpy>gdprManager.sendGDPREvent, 'skip');
+            PromoEventHandler.onGDPRPopupSkipped(config, privacyManager);
+            sinon.assert.calledWithExactly(<sinon.SinonSpy>privacyManager.sendGDPREvent, 'skip');
         });
 
         it('should not call gdpr or set optOutRecorded when already recorded', () => {
             const config = sinon.createStubInstance(AdsConfiguration);
 
             config.isOptOutRecorded.returns(true);
-            PromoEventHandler.onGDPRPopupSkipped(config, gdprManager);
+            PromoEventHandler.onGDPRPopupSkipped(config, privacyManager);
             sinon.assert.notCalled(<sinon.SinonSpy>config.setOptOutRecorded);
-            sinon.assert.notCalled(<sinon.SinonSpy>gdprManager.sendGDPREvent);
+            sinon.assert.notCalled(<sinon.SinonSpy>privacyManager.sendGDPREvent);
         });
     });
 });

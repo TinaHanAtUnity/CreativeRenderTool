@@ -30,7 +30,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private _downloadHelper: IAppStoreDownloadHelper;
 
     constructor(adUnit: T2, parameters: IAdUnitParameters<T>, downloadHelper: IAppStoreDownloadHelper) {
-        super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
+        super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig);
         this._adUnit = adUnit;
         this._downloadHelper = downloadHelper;
     }

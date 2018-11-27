@@ -1,7 +1,7 @@
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
@@ -82,12 +82,12 @@ describe('DisplayInterstitialEventHandler', () => {
             const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
-            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
             const coreConfig = TestFixtures.getCoreConfiguration();
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
-            const privacy = new Privacy(platform, campaign, gdprManager, false, false);
+            const privacy = new Privacy(platform, campaign, privacyManager, false, false);
 
             view = new DisplayInterstitial(platform, core, deviceInfo, placement, campaign, privacy, false);
 
@@ -111,7 +111,7 @@ describe('DisplayInterstitialEventHandler', () => {
                 request: request,
                 options: {},
                 view: view,
-                gdprManager: gdprManager,
+                privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService
             };
 

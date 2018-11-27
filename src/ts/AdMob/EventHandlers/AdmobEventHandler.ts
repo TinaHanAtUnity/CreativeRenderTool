@@ -7,7 +7,7 @@ import { IAdMobEventHandler } from 'AdMob/Views/AdMobView';
 import { IOpenableIntentsRequest, ITouchInfo } from 'AdMob/Views/AFMABridge';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Session } from 'Ads/Models/Session';
@@ -34,7 +34,7 @@ export interface IAdMobEventHandlerParameters {
     campaign: AdMobCampaign;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
-    gdprManager: GdprManager;
+    privacyManager: UserPrivacyManager;
 }
 
 export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHandler {
@@ -55,7 +55,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     private _clientInfo: ClientInfo;
 
     constructor(parameters: IAdMobEventHandlerParameters) {
-        super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
+        super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig);
         this._adUnit = parameters.adUnit;
         this._platform = parameters.platform;
         this._core = parameters.core;
