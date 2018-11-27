@@ -4,7 +4,7 @@ import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 
 import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHandler';
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
@@ -114,8 +114,8 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.spy(core.Android!.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-            const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new Privacy(platform, campaign, gdprManager, false, false);
+            const privacyManager = sinon.createStubInstance(UserPrivacyManager);
+            const privacy = new Privacy(platform, campaign, privacyManager, false, false);
             const endScreenParams : IEndScreenParameters = {
                 platform,
                 core,
@@ -154,7 +154,7 @@ describe('EndScreenEventHandlerTest', () => {
                 overlay: overlay,
                 video: video,
                 privacy: privacy,
-                gdprManager: gdprManager,
+                privacyManager: privacyManager,
                 programmaticTrackingService: programmticTrackingService
             };
 
@@ -366,8 +366,8 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
-            const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new Privacy(platform, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+            const privacyManager = sinon.createStubInstance(UserPrivacyManager);
+            const privacy = new Privacy(platform, campaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
                 platform,
                 core,
@@ -405,7 +405,7 @@ describe('EndScreenEventHandlerTest', () => {
                 overlay: overlay,
                 video: video,
                 privacy: privacy,
-                gdprManager: gdprManager,
+                privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService
             };
 

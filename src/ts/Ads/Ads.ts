@@ -10,7 +10,7 @@ import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -70,6 +70,7 @@ import { XPromo } from 'XPromo/XPromo';
 import { AR } from 'AR/AR';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export class Ads implements IAds {
 
@@ -86,7 +87,7 @@ export class Ads implements IAds {
 
     public Config: AdsConfiguration;
     public Container: Activity | ViewController;
-    public GdprManager: GdprManager;
+    public PrivacyManager: UserPrivacyManager;
     public PlacementManager: PlacementManager;
     public AssetManager: AssetManager;
     public CampaignManager: CampaignManager;
@@ -142,7 +143,7 @@ export class Ads implements IAds {
         }
         this.SessionManager = new SessionManager(this._core.Api, this._core.RequestManager, this._core.StorageBridge);
         this.MissedImpressionManager = new MissedImpressionManager(this._core.Api);
-        this.BackupCampaignManager = new BackupCampaignManager(this._core.Api, this._core.StorageBridge, this._core.Config);
+        this.BackupCampaignManager = new BackupCampaignManager(this._core.Api, this._core.StorageBridge, this._core.Config, this._core.DeviceInfo);
         this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this._core.NativeBridge.getPlatform(), this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo);
         this.ContentTypeHandlerManager = new ContentTypeHandlerManager();
     }
@@ -153,11 +154,11 @@ export class Ads implements IAds {
             GameSessionCounters.init();
             return this.setupTestEnvironment();
         }).then(() => {
-            this.GdprManager = new GdprManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager);
+            this.PrivacyManager = new UserPrivacyManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this._core.ClientInfo, this._core.DeviceInfo, this._core.RequestManager);
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
-            return this.GdprManager.getConsentAndUpdateConfiguration().catch((error) => {
+            return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
                 // error happens when consent value is undefined
             });
@@ -256,7 +257,10 @@ export class Ads implements IAds {
             return;
         }
 
-        this._core.CacheBookkeeping.deleteCachedCampaignResponse();
+        const trackingUrls = placement.getCurrentTrackingUrls();
+        if(trackingUrls) {
+            campaign.setTrackingUrls(trackingUrls);
+        }
 
         if (placement.getRealtimeData()) {
             this._core.Api.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
@@ -337,6 +341,7 @@ export class Ads implements IAds {
             }
 
             const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
+            AbstractPrivacy.createBuildInformation(this._core.NativeBridge.getPlatform(), this._core.ClientInfo, this._core.DeviceInfo, campaign, this._core.Config);
             this._currentAdUnit = this.getAdUnitFactory(campaign).createAdUnit({
                 platform: this._core.NativeBridge.getPlatform(),
                 core: this._core.Api,
@@ -372,7 +377,7 @@ export class Ads implements IAds {
                 adsConfig: this.Config,
                 request: this._core.RequestManager,
                 options: options,
-                gdprManager: this.GdprManager,
+                privacyManager: this.PrivacyManager,
                 adMobSignalFactory: this.AdMobSignalFactory,
                 programmaticTrackingService: this.ProgrammaticTrackingService,
                 webPlayerContainer: this.InterstitialWebPlayerContainer,
