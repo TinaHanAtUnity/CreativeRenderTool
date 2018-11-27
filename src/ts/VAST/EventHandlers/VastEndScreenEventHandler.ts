@@ -13,9 +13,8 @@ import { Url } from 'Core/Utilities/Url';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
-    private _clientInfo: ClientInfo;
     private _request: RequestManager;
-    private _campaign: VastCampaign;
+    private _vastCampaign: VastCampaign;
     private _vastEndScreen: VastEndScreen | null;
     private _platform: Platform;
     private _core: ICoreApi;
@@ -24,9 +23,8 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._platform = parameters.platform;
         this._core = parameters.core;
         this._vastAdUnit = adUnit;
-        this._clientInfo = parameters.clientInfo;
         this._request = parameters.request;
-        this._campaign = parameters.campaign;
+        this._vastCampaign = parameters.campaign;
         this._vastEndScreen = this._vastAdUnit.getEndScreen();
     }
 
@@ -35,7 +33,8 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
 
         const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
         if (clickThroughURL) {
-            return this._request.followRedirectChain(clickThroughURL).then((url: string) => {
+            const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
+            return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking, true).then((url: string) => {
                 return this.openUrlOnCallButton(url);
             }).catch(() => {
                 const urlParts = Url.parse(clickThroughURL);
@@ -44,7 +43,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
                     clickUrl: clickThroughURL,
                     host: urlParts.host,
                     protocol: urlParts.protocol,
-                    creativeId: this._campaign.getCreativeId()
+                    creativeId: this._vastCampaign.getCreativeId()
                 });
                 Diagnostics.trigger('click_request_head_rejected', error);
                 return this.openUrlOnCallButton(clickThroughURL);
@@ -64,13 +63,13 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     }
 
     public onVastEndScreenShow(): void {
-        this._vastAdUnit.sendCompanionTrackingEvent(this._campaign.getSession().getId());
+        this._vastAdUnit.sendCompanionTrackingEvent(this._vastCampaign.getSession().getId());
     }
 
     private openUrlOnCallButton(url: string): Promise<void> {
         return this.onOpenUrl(url).then(() => {
             this.setCallButtonEnabled(true);
-            this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._campaign.getSession().getId());
+            this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._vastCampaign.getSession().getId());
         }).catch(() => {
             this.setCallButtonEnabled(true);
         });
