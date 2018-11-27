@@ -108,7 +108,7 @@ def main() {
                                     booleanParam(name: 'RUN_TD_TESTS', value: false)
                                   ],
                                 )
-                            }
+                            },
 
                             'ios-system-tests': {
                                 build(
