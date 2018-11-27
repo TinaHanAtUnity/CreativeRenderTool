@@ -37,9 +37,11 @@ describe('CustomPurchasingAdapter', () => {
         promoEvents = sinon.createStubInstance(PromoEvents);
         request = sinon.createStubInstance(RequestManager);
         sandbox = sinon.createSandbox();
-
         sinon.stub(purchasing.CustomPurchasing, 'refreshCatalog').returns(Promise.resolve());
         sinon.stub(purchasing.CustomPurchasing, 'purchaseItem').returns(Promise.resolve());
+        sinon.stub(purchasing.CustomPurchasing, 'onProductsRetrieved').returns(Promise.resolve());
+        sinon.stub(purchasing.CustomPurchasing, 'onTransactionComplete').returns(Promise.resolve());
+        sinon.stub(purchasing.CustomPurchasing, 'onTransactionError').returns(Promise.resolve());
 
         purchasingAdapter = new CustomPurchasingAdapter(core, purchasing, promoEvents, request, analyticsManager);
         sandbox.stub((<any>purchasingAdapter)._thirdPartyEventManager, 'sendWithGet');
@@ -101,6 +103,38 @@ describe('CustomPurchasingAdapter', () => {
                 assert.equal(e.message, 'Error');
             });
         });
+    });
+
+    describe('isValidProductType', () => {
+        const testCaseList = [{
+            name: 'should return true for product type: consumable',
+            productType: 'consumable',
+            expectedResult: true
+        }, {
+            name: 'should return true for product type: nonconsumable',
+            productType: 'nonconsumable',
+            expectedResult: true
+        }, {
+            name: 'should return false for incorrect product type: XYZ',
+            productType: 'XYZ',
+            expectedResult: false
+        }, {
+            name: 'should return false for empty product type:',
+            productType: '',
+            expectedResult: false
+        }, {
+            name: 'should return false for undefined product type:',
+            productType: undefined,
+            expectedResult: false
+        }];
+
+        const isValidProductType = 'isValidProductType';
+        for(const testCase of testCaseList) {
+            it(testCase.name, () => {
+                const actualResult = purchasingAdapter[isValidProductType](testCase.productType);
+                assert.equal(testCase.expectedResult, actualResult);
+            });
+        }
     });
 
     describe('PurchaseItem', () => {
