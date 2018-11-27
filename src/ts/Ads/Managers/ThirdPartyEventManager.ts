@@ -51,7 +51,7 @@ export class ThirdPartyEventManager {
         this._core = core;
         this._request = request;
 
-        if(templateValues) {
+        if (templateValues) {
             this.setTemplateValues(templateValues);
         }
     }
@@ -101,7 +101,7 @@ export class ThirdPartyEventManager {
             retryWithConnectionEvents: false
         };
         let request: Promise<INativeResponse>;
-        switch(method) {
+        switch (method) {
             case ThirdPartyEventMethod.POST:
                 request = this._request.post(url, body, headers, options);
                 break;
@@ -156,14 +156,14 @@ export class ThirdPartyEventManager {
     }
 
     private getUrl(url: string): string {
-        if(url) {
-            for(const key in this._templateValues) {
-                if(this._templateValues.hasOwnProperty(key)) {
+        if (url) {
+            for (const key in this._templateValues) {
+                if (this._templateValues.hasOwnProperty(key)) {
                     url = url.replace(key, this._templateValues[key]);
                 }
             }
         }
 
-        return url;
+        return Url.encode(url);
     }
 }

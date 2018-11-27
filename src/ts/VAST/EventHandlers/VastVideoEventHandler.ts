@@ -171,8 +171,6 @@ export class VastVideoEventHandler extends VideoEventHandler {
     }
 
     private sendThirdPartyEvent(event: string, url: string): void {
-        url = url.replace(/%ZONE%/, this._placement.getId());
-        url = url.replace(/%SDK_VERSION%/, this._clientInfo.getSdkVersion().toString());
         this._thirdPartyEventManager.sendWithGet(event, this._campaign.getSession().getId(), url, this._vastCampaign.getUseWebViewUserAgentForTracking());
     }
 }
