@@ -1,4 +1,4 @@
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -35,9 +35,9 @@ describe('EndScreenTest', () => {
     });
 
     const createEndScreen = (language : string) : PerformanceEndScreen => {
-        const gdprManager = sinon.createStubInstance(GdprManager);
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const campaign = TestFixtures.getCampaign();
-        const privacy = new Privacy(platform, campaign, gdprManager, false, false);
+        const privacy = new Privacy(platform, campaign, privacyManager, false, false);
         const params : IEndScreenParameters = {
             platform,
             core,

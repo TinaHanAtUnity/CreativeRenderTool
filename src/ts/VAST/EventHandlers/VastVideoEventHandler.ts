@@ -153,7 +153,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
     }
 
     private sendThirdPartyImpressionEvent(): void {
-        const impressionUrls = this._vastCampaign.getImpressionUrls().concat(this._vastCampaign.getTrackingUrlsForEvent('impression'));
+        const impressionUrls = this._vastCampaign.getImpressionUrls();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
                 this.sendThirdPartyEvent('vast impression', impressionUrl);
@@ -162,7 +162,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
     }
 
     private sendThirdPartyTrackingEvent(eventName: string): void {
-        const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName).concat(this._vastCampaign.getTrackingUrlsForEvent(eventName));
+        const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {
                 this.sendThirdPartyEvent(`vast ${eventName}`, url);
