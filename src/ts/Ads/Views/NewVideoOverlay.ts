@@ -54,10 +54,12 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
     private _timerElement: HTMLElement;
+    private _chinaAdvertisementElement: HTMLElement;
 
     private _fadeTimer: any;
     private _areControlsVisible: boolean = false;
     private _gameId: string;
+    private _country: string | undefined;
     private _abGroup: ABGroup;
     private _campaign: Campaign;
 
@@ -68,6 +70,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._localization = new Localization(parameters.deviceInfo.getLanguage(), 'overlay');
         this._gameId = parameters.clientInfo.getGameId();
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
+        this._country = parameters.coreConfig.getCountry();
         this._abGroup = parameters.coreConfig.getAbGroup();
         this._campaign = parameters.campaign;
         this._showGDPRBanner = showGDPRBanner;
@@ -151,6 +154,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         super.render();
         this.setupElementReferences();
 
+        if (this._country === 'CN') {
+            this._chinaAdvertisementElement.style.display = 'block';
+        }
+
         if (CustomFeatures.isCheetahGame(this._gameId)) {
             this._skipButtonElement.classList.add('close-icon-skip');
         } else if (NextSkipIconTest.isValid(this._abGroup)) {
@@ -198,6 +205,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         if (this._skipRemaining <= 0) {
             this.showSkipButton();
+            this._chinaAdvertisementElement.classList.add('with-skip-button');
         }
     }
 
@@ -363,6 +371,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._timerElement = <HTMLElement>this._container.querySelector('.timer');
+        this._chinaAdvertisementElement = <HTMLLIElement>this._container.querySelector('.china-advertisement');
     }
 
     private showSkipButton() {

@@ -9,11 +9,13 @@ const SQUARE_END_SCREEN = 'square-end-screen';
 export class PerformanceEndScreen extends EndScreen {
     private _core: ICoreApi;
     private _campaign: PerformanceCampaign;
+    private _country: string | undefined;
 
-    constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign) {
+    constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters);
 
         this._campaign = campaign;
+        this._country = country;
 
         this._template = new Template(this.getTemplate(), this._localization);
 
@@ -48,6 +50,14 @@ export class PerformanceEndScreen extends EndScreen {
             appDownloadUrl: this._campaign.getAppDownloadUrl(),
             adUnitStyle: this._adUnitStyle
         }));
+    }
+
+    public render(): void {
+        super.render();
+
+        if (this._country === 'CN') {
+            (<HTMLElement>this._container.querySelector('.china-advertisement')).style.display = 'block';
+        }
     }
 
     protected getEndscreenAlt(): string | undefined {
