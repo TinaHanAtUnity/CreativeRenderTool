@@ -338,7 +338,7 @@ describe('VastVideoEventHandler tests', () => {
             vastEndScreenParameters = {
                 campaign: vastAdUnitParameters.campaign,
                 clientInfo: vastAdUnitParameters.clientInfo,
-                seatId: vastAdUnitParameters.campaign.getSeatId()
+                country: vastAdUnitParameters.coreConfig.getCountry()
             };
             vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
             sinon.spy(vastEndScreen, 'show');

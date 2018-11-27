@@ -226,7 +226,7 @@ describe('VastAdUnitTest', () => {
             vastEndScreenParameters = {
                 campaign: vastAdUnitParameters.campaign,
                 clientInfo: vastAdUnitParameters.clientInfo,
-                seatId: vastAdUnitParameters.campaign.getSeatId()
+                country: vastAdUnitParameters.coreConfig.getCountry()
             };
 
             const video = new Video('', TestFixtures.getSession());
