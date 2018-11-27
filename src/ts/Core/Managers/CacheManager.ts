@@ -377,7 +377,7 @@ export class CacheManager {
             callback.networkRetry = true;
 
             // note: this timeout may never trigger since timeouts are unreliable when ad unit is not active
-            // therefore this method should not assume unknown previous state and work the same way as system event handlers
+            // therefore this method should not assume any previous state and work the same way as system event handlers
             // if this never triggers, retrying will still be triggered from connection events
             setTimeout(() => {
                 const retryCallback = this._callbacks[url];
