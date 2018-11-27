@@ -22,25 +22,6 @@ export enum ThirdPartyEventMacro {
 
 export type TemplateValueMap = { [id: string]: string };
 
-export interface IThirdPartyEventManagerFactory {
-    create(templateValues: TemplateValueMap): ThirdPartyEventManager;
-}
-
-export class ThirdPartyEventManagerFactory implements IThirdPartyEventManagerFactory {
-
-    private _core: ICoreApi;
-    private _requestManager: RequestManager;
-
-    constructor(core: ICoreApi, requestManager: RequestManager) {
-        this._core = core;
-        this._requestManager = requestManager;
-    }
-
-    public create(templateValues: TemplateValueMap): ThirdPartyEventManager {
-        return new ThirdPartyEventManager(this._core, this._requestManager, templateValues);
-    }
-}
-
 export class ThirdPartyEventManager {
 
     private _core: ICoreApi;
@@ -165,5 +146,24 @@ export class ThirdPartyEventManager {
         }
 
         return Url.encode(url);
+    }
+}
+
+export interface IThirdPartyEventManagerFactory {
+    create(templateValues: TemplateValueMap): ThirdPartyEventManager;
+}
+
+export class ThirdPartyEventManagerFactory implements IThirdPartyEventManagerFactory {
+
+    private _core: ICoreApi;
+    private _requestManager: RequestManager;
+
+    constructor(core: ICoreApi, requestManager: RequestManager) {
+        this._core = core;
+        this._requestManager = requestManager;
+    }
+
+    public create(templateValues: TemplateValueMap): ThirdPartyEventManager {
+        return new ThirdPartyEventManager(this._core, this._requestManager, templateValues);
     }
 }
