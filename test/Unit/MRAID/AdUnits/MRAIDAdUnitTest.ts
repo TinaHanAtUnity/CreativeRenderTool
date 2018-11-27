@@ -327,19 +327,21 @@ describe('MraidAdUnit', () => {
         });
     });
 
-    xdescribe('onContainerShow', () => {
-        xit('should send the true viewable event over the bridge when mraid is set as showing', () => {
-            // TODO
-        });
-
-        xit('should auto close after autoclose delay timer reached', () => {
-            // TODO
+    describe('onContainerShow', () => {
+        it('should send the true viewable event over the bridge', () => {
+            return mraidAdUnit.show().then(() => {
+                mraidAdUnit.onContainerShow();
+                sinon.assert.calledWith(<sinon.SinonSpy>mraidView.setViewableState, true);
+            }).then(() => mraidAdUnit.hide());
         });
     });
 
-    xdescribe('onContainerForeground', () => {
-        xit ('should send the true viewable event over the bridge when mraid is set as showing', () => {
-            // TODO
+    describe('onContainerForeground', () => {
+        it ('should send the true viewable event over the bridge when mraid is set as showing', () => {
+            return mraidAdUnit.show().then(() => {
+                mraidAdUnit.onContainerForeground();
+                sinon.assert.calledWith(<sinon.SinonSpy>mraidView.setViewableState, true);
+            }).then(() => mraidAdUnit.hide());
         });
     });
 });
