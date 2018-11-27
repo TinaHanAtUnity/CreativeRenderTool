@@ -4,7 +4,7 @@ import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { AndroidVideoEventHandler } from 'Ads/EventHandlers/AndroidVideoEventHandler';
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import {
     IOperativeEventManagerParams,
     IOperativeEventParams,
@@ -138,8 +138,8 @@ describe('VideoEventHandlersTest', () => {
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
-        const gdprManager = sinon.createStubInstance(GdprManager);
-        const privacy = new Privacy(platform, vastCampaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
+        const privacy = new Privacy(platform, vastCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
 
         overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
 
@@ -177,7 +177,7 @@ describe('VideoEventHandlersTest', () => {
             endScreen: undefined,
             overlay: overlay,
             video: video,
-            gdprManager: gdprManager,
+            privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService
         };
 
@@ -204,11 +204,11 @@ describe('VideoEventHandlersTest', () => {
             overlay: overlay,
             video: video,
             privacy: privacy,
-            gdprManager: gdprManager,
+            privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService
         };
 
-        const xpromoPrivacy = new Privacy(platform, xPromoCampaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+        const xpromoPrivacy = new Privacy(platform, xPromoCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
         xPromoCampaign = TestFixtures.getXPromoCampaign();
         const xpromoEndScreenParams : IEndScreenParameters = {
             platform,
@@ -244,7 +244,7 @@ describe('VideoEventHandlersTest', () => {
             overlay: overlay,
             video: video,
             privacy: privacy,
-            gdprManager: gdprManager,
+            privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService
         };
 

@@ -45,6 +45,9 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                 this._purchasing.CustomPurchasing.onProductsRetrieved.unsubscribe(observer);
                 const productsDict: {[productId: string]: IProduct } = {};
                 for (const product of products) {
+                    if (!this.isValidProductType(product.productType)) {
+                        this._core.Sdk.logWarning(`refresh catalog received a productID (${product.productId}) that has an invalid productType. productType should be either 'consumable' or 'nonconsumable'`);
+                    }
                     productsDict[product.productId] = product;
                 }
                 this._products = productsDict;
@@ -140,5 +143,13 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
 
     public onPromoClosed(thirdPartyEventManager: ThirdPartyEventManager, campaign: PromoCampaign) {
         // does nothing
+    }
+
+    private isValidProductType(productType: string | undefined): boolean {
+        if (productType && productType.length > 0) {
+            const lowercaseProductType = productType.toLowerCase();
+            return lowercaseProductType === 'consumable' || lowercaseProductType === 'nonconsumable';
+        }
+        return false;
     }
 }

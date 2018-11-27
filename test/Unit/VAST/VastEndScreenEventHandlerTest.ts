@@ -2,7 +2,7 @@ import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
@@ -99,8 +99,8 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 campaign: campaign,
                 playerMetadataServerId: 'test-gamerSid'
             });
-            const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new Privacy(platform, campaign, gdprManager, false, false);
+            const privacyManager = sinon.createStubInstance(UserPrivacyManager);
+            const privacy = new Privacy(platform, campaign, privacyManager, false, false);
             const video = new Video('', TestFixtures.getSession());
             const overlay = new Overlay(platform, ads, deviceInfo, true, 'en', 'testGameId', privacy, false);
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -127,15 +127,14 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 endScreen: undefined,
                 overlay: overlay,
                 video: video,
-                gdprManager: gdprManager,
+                privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService
             };
 
             vastEndScreenParameters = {
                 campaign: vastAdUnitParameters.campaign,
                 clientInfo: vastAdUnitParameters.clientInfo,
-                seatId: vastAdUnitParameters.campaign.getSeatId(),
-                showPrivacyDuringEndscreen: false
+                seatId: vastAdUnitParameters.campaign.getSeatId()
             };
         });
 

@@ -2,7 +2,7 @@ import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
@@ -97,7 +97,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 sandbox.stub(container, 'close').returns(Promise.resolve());
                 thirdPartyEventManager = new ThirdPartyEventManager(core, request);
                 sessionManager = new SessionManager(core, request, storageBridge);
-                const gdprManager = sinon.createStubInstance(GdprManager);
+                const privacyManager = sinon.createStubInstance(UserPrivacyManager);
                 const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                     platform: platform,
@@ -115,7 +115,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                     playerMetadataServerId: 'test-gamerSid'
                 });
 
-                const privacy = new Privacy(platform, campaign, gdprManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+                const privacy = new Privacy(platform, campaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
 
                 webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
                 (<any>webPlayerContainer).onPageStarted = new Observable1<string>();
@@ -150,7 +150,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                     request: request,
                     options: {},
                     view: view,
-                    gdprManager: gdprManager,
+                    privacyManager: privacyManager,
                     programmaticTrackingService: programmaticTrackingService
                 };
 

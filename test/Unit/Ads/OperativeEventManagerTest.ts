@@ -172,6 +172,7 @@ describe('OperativeEventManagerTest', () => {
         beforeEach(() => {
             placement = TestFixtures.getPlacement();
             session = TestFixtures.getSession();
+            session.setGameSessionCounters(TestFixtures.getGameSessionCounters());
             campaign = TestFixtures.getCampaign();
             core.DeviceInfo = sinon.createStubInstance(DeviceInfoApi);
             requestSpy = sinon.spy(request, 'post');
@@ -231,7 +232,7 @@ describe('OperativeEventManagerTest', () => {
 
             it('XPromoCampaign specific', () => {
                 HttpKafka.setRequest(request);
-                campaign = TestFixtures.getXPromoCampaign();
+                campaign = TestFixtures.getXPromoCampaign(session);
                 const params = {
                     ... operativeEventManagerParams,
                     campaign: campaign
@@ -252,7 +253,7 @@ describe('OperativeEventManagerTest', () => {
             });
 
             it('VastCampaign specific', () => {
-                campaign = TestFixtures.getEventVastCampaign();
+                campaign = TestFixtures.getEventVastCampaign(session);
                 const params = {
                     ... operativeEventManagerParams,
                     campaign: campaign
@@ -265,7 +266,7 @@ describe('OperativeEventManagerTest', () => {
             });
 
             it('MRAIDCampaign specific', () => {
-                campaign = TestFixtures.getExtendedMRAIDCampaign();
+                campaign = TestFixtures.getExtendedMRAIDCampaign(session);
                 const params = {
                     ... operativeEventManagerParams,
                     campaign: campaign
@@ -284,7 +285,7 @@ describe('OperativeEventManagerTest', () => {
             });
 
             it('DisplayInterstitialCampaign specific', () => {
-                campaign = TestFixtures.getDisplayInterstitialCampaign();
+                campaign = TestFixtures.getDisplayInterstitialCampaign(session);
                 const params = {
                     ... operativeEventManagerParams,
                     campaign: campaign

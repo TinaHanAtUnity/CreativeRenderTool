@@ -7,7 +7,7 @@ import {
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
@@ -74,7 +74,7 @@ describe('IosAdUnitTest', () => {
         const campaign = TestFixtures.getCampaign();
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
-        const gdprManager = sinon.createStubInstance(GdprManager);
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
@@ -111,7 +111,7 @@ describe('IosAdUnitTest', () => {
             adsConfig: adsConfig,
             request: request,
             options: {},
-            gdprManager: gdprManager,
+            privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService
         };
     });
