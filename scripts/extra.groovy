@@ -32,7 +32,7 @@ def main() {
                             sharedLibs = load 'sharedLibs.groovy'
                         }
                     }
-                }
+                },
 
                 'wait': {
                     try {
