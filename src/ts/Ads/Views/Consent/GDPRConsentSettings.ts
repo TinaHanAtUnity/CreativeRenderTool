@@ -54,6 +54,24 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
                 lineElement.classList.add('two-lines');
             }
         }
+
+        const mainCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-checkbox');
+        const subCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-3rd-party');
+        if (subCheckbox) {
+            subCheckbox.onchange = () => {
+                if (subCheckbox.checked) {
+                    mainCheckbox.checked = true;
+                }
+            };
+        }
+
+        if (mainCheckbox) {
+            mainCheckbox.onchange = () => {
+                if (!mainCheckbox.checked) {
+                    subCheckbox.checked = false;
+                }
+            };
+        }
     }
 
     private onBackButtonEvent(event: Event): void {
