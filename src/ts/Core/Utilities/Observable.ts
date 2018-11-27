@@ -8,31 +8,6 @@ import {
     IObserver6
 } from 'Core/Utilities/IObserver';
 
-export class EasyObservable<T extends unknown[]> {
-
-    protected _observers: ((...parameters: T) => void)[];
-
-    public subscribe(observer: (...parameters: T) => void): (...parameters: T) => void {
-        this._observers.push(observer);
-        return observer;
-    }
-
-    public unsubscribe(observer?: (...parameters: T) => void): void {
-        if(this._observers.length) {
-            if(typeof observer !== 'undefined') {
-                this._observers = this._observers.filter(storedObserver => storedObserver !== observer);
-            } else {
-                this._observers = [];
-            }
-        }
-    }
-
-    public trigger(...parameters: T) {
-        this._observers.forEach(observer => observer(...parameters));
-    }
-
-}
-
 export abstract class Observable<T> {
 
     protected _observers: T[] = [];
