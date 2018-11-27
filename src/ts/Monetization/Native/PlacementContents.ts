@@ -4,6 +4,7 @@ import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
+import { IPlacementContentParams } from 'Monetization/Managers/PlacementContentManager';
 
 export enum IPlacementContentType {
     SHOW_AD,
@@ -14,11 +15,6 @@ export enum IPlacementContentType {
 
 export enum PlacementContentEvent {
     CUSTOM
-}
-
-export interface IPlacementContentParams {
-    [key: string]: unknown;
-    type: IPlacementContentType;
 }
 
 export class PlacementContentsApi extends NativeApi {

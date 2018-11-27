@@ -105,7 +105,7 @@ export class GdprManager {
 
         return this._request.get(url).then((response) => {
             return {
-                ... JsonParser.parse<{ gamePlaysThisWeek: number, adsSeenInGameThisWeek: number, installsFromAds: number }>(response.response),
+                ... JsonParser.parse<{ gamePlaysThisWeek: number; adsSeenInGameThisWeek: number; installsFromAds: number }>(response.response),
                 ... personalPayload
             };
         }).catch(error => {

@@ -9,7 +9,7 @@ import { PlacementContentState } from 'Monetization/Constants/PlacementContentSt
 import { IMonetizationApi } from 'Monetization/IMonetization';
 import { IPlacementContentType } from 'Monetization/Native/PlacementContents';
 import { IPromoApi } from 'Promo/IPromo';
-import { ProductInfo } from 'Promo/Models/ProductInfo';
+import { IRawProductInfo, ProductInfo } from 'Promo/Models/ProductInfo';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IProductData } from 'Promo/Models/Product';
@@ -25,9 +25,11 @@ export interface IPlacementContentMap {
 
 export interface IPlacementContentParams {
     type: IPlacementContentType;
-    product: IProductData;
-    payouts?: unknown[];
-    costs?: unknown[];
+    productId?: string;
+    rewarded?: boolean;
+    product?: IProductData;
+    payouts?: IRawProductInfo[];
+    costs?: IRawProductInfo[];
     offerDuration?: number;
     impressionDate?: Date;
 }
@@ -88,7 +90,7 @@ export class PlacementContentManager {
         adUnit.onClose.subscribe(() => this.onAdUnitFinish(placementId, adUnit.getFinishState()));
     }
 
-    private createPlacementContentParams(placement: Placement, campaign: Campaign) {
+    private createPlacementContentParams(placement: Placement, campaign: Campaign): IPlacementContentParams {
         if (!(campaign instanceof PromoCampaign)) {
             return {
                 type: IPlacementContentType.SHOW_AD,
@@ -108,20 +110,20 @@ export class PlacementContentManager {
         }
         const localizedPrice = PurchasingUtilities.getProductLocalizedPrice(productId);
         if (localizedPrice) {
-            result.product.localizedPrice = localizedPrice;
+            result.product!.localizedPrice = localizedPrice;
         }
 
         const isoCurrencyCode = PurchasingUtilities.getProductIsoCurrencyCode(productId);
         if (isoCurrencyCode) {
-            result.product.isoCurrencyCode = isoCurrencyCode;
+            result.product!.isoCurrencyCode = isoCurrencyCode;
         }
         const localizedPriceString = PurchasingUtilities.getProductPrice(productId);
         if (localizedPriceString) {
-            result.product.localizedPriceString = localizedPriceString;
+            result.product!.localizedPriceString = localizedPriceString;
         }
         const localizedTitle = PurchasingUtilities.getProductName(productId);
         if (localizedTitle) {
-            result.product.localizedTitle = localizedTitle;
+            result.product!.localizedTitle = localizedTitle;
         }
         const costs = this.transformProductInfosToJSON(campaign.getCosts());
         if (costs.length > 0) {
@@ -138,8 +140,8 @@ export class PlacementContentManager {
         return result;
     }
 
-    private transformProductInfosToJSON(productInfoList: ProductInfo[]) {
-        const result: unknown[] = [];
+    private transformProductInfosToJSON(productInfoList: ProductInfo[]): IRawProductInfo[] {
+        const result: IRawProductInfo[] = [];
         if (productInfoList.length > 0) {
             for (const productInfo of productInfoList) {
                 result.push(productInfo.getDTO());
@@ -178,7 +180,7 @@ export class PlacementContentManager {
         });
     }
 
-    private createNoFillParams() {
+    private createNoFillParams(): IPlacementContentParams {
         return {
             type: IPlacementContentType.NO_FILL
         };

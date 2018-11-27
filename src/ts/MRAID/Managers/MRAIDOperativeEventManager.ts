@@ -1,4 +1,4 @@
-import { IOperativeEventManagerParams, IOperativeEventParams } from 'Ads/Managers/OperativeEventManager';
+import { IInfoJson, IOperativeEventManagerParams, IOperativeEventParams } from 'Ads/Managers/OperativeEventManager';
 import { IPerformanceInfoJson } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
 import { Url } from 'Core/Utilities/Url';
@@ -31,7 +31,7 @@ export class MRAIDOperativeEventManager extends ProgrammaticOperativeEventManage
         return super.createClickEventUrl();
     }
 
-    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, any]> {
+    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, IInfoJson]> {
         return super.getInfoJson(params, eventId, gameSession, gamerSid, previousPlacementId).then(([id, infoJson]: [string, IPerformanceInfoJson]) => {
             if(params.asset) {
                 infoJson.unityCreativeId = params.asset.getCreativeId();

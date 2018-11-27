@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         fields.forEach(([field, setter, parser]: [string, string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById(field);
+            // tslint:disable-next-line
             (<any>UnityAds.getBackend().Api.Sdk)[setter](parser ? parser(element) : element.value);
         });
     };
@@ -78,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById('android' + field);
+            // tslint:disable-next-line
             (<any>UnityAds.getBackend().Api.DeviceInfo)['set' + field](parser ? parser(element) : element.value);
         });
     };
@@ -113,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
         fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById('ios' + field);
+            // tslint:disable-next-line
             (<any>UnityAds.getBackend().Api.DeviceInfo)['set' + field](parser ? parser(element) : element.value);
         });
     };
@@ -229,6 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
+        // tslint:disable-next-line
         if((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS]()) {
             initialize();
         } else {
@@ -236,6 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 event.preventDefault();
                 initialize();
             }, false);
+            // tslint:disable-next-line
             (<any>window).parent.document.getElementById('initialize').disabled = false;
         }
     }

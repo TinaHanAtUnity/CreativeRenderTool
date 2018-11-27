@@ -229,7 +229,7 @@ export class Core implements ICore {
             } else {
                 this.Api.Request.setConcurrentRequestCount(1);
             }
-        }).catch((error: { message: string, name: unknown }) => {
+        }).catch((error: { message: string; name: unknown }) => {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
             jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);

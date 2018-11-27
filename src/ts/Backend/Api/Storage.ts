@@ -54,6 +54,7 @@ export class Storage extends BackendApi {
             storage[keyArray[0]] = this.setInMemoryValue(storage[keyArray[0]], keyArray.slice(1).join('.'), value);
             return storage;
         } else {
+            // tslint:disable-next-line
             storage[keyArray[0]] = <any>value;
             return storage;
         }
