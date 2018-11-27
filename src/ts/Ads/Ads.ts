@@ -222,30 +222,21 @@ export class Ads implements IAds {
         });
     }
 
-    public showConsent(placementId: string, options: any, callback: INativeCallback): Promise<void> {
-        return (<AdUnitContainer>this.Container).open('Consent', ['webview'], false, Orientation.NONE, true, true, true, false, options).then(() => {
-            const consentView = new GDPRConsent({ platform: this._core.NativeBridge.getPlatform(), gdprManager: this.GdprManager });
-            this.Container.addEventHandler(consentView);
-            consentView.setDoneCallback(() => {
-                this._core.Api.Sdk.logDebug('showConsent, doneCallback called');
-                consentView.hide();
-                (<AdUnitContainer>this.Container).close();
-            });
-            consentView.setCloseCallback(() => {
-                this.Container.removeEventHandler(consentView);
-                this.show(placementId, options, callback);
-            });
-            consentView.render();
-            document.body.appendChild(consentView.container());
-            this._core.Api.Sdk.logDebug('Showing consent view');
-            return consentView.show();
-        }).catch((e: Error) => {
-            this._core.Api.Sdk.logWarning('Error opening Consent view ' + e);
+    public showConsentIfNeeded(options: any): Promise<void> {
+        const showConsent = true;
+        if (!showConsent) {
+            return Promise.resolve();
+        }
+        const consentView = new GDPRConsent({
+            platform: this._core.NativeBridge.getPlatform(),
+            gdprManager: this.GdprManager,
+            adUnitContainer: this.Container
         });
+        return consentView.showAndHandleConsent(options);
     }
 
     public show(placementId: string, options: any, callback: INativeCallback): void {
-        // callback(CallbackStatus.OK);
+        callback(CallbackStatus.OK);
 
         if(this._showing) {
             // do not send finish event because there will be a finish event from currently open ad unit
@@ -298,11 +289,15 @@ export class Ads implements IAds {
                     this._core.Api.Sdk.logInfo('Unity Ads received new fill for placement ' + placement.getId() + ', streaming new ad unit');
                     this._wasRealtimePlacement = true;
                     placement.setCurrentCampaign(realtimeCampaign);
-                    this.showAd(placement, realtimeCampaign, options);
+                    this.showConsentIfNeeded(options).then(() => {
+                        this.showAd(placement, realtimeCampaign, options);
+                    });
                 } else {
                     SessionDiagnostics.trigger('realtime_no_fill', {}, campaign.getSession());
                     this._core.Api.Sdk.logInfo('Unity Ads received no new fill for placement ' + placement.getId() + ', opening old ad unit');
-                    this.showAd(placement, campaign, options);
+                    this.showConsentIfNeeded(options).then(() => {
+                        this.showAd(placement, campaign, options);
+                    });
                 }
             }).catch((e) => {
                 if (e instanceof TimeoutError) {
@@ -314,10 +309,14 @@ export class Ads implements IAds {
                     error: e
                 });
                 this._core.Api.Sdk.logInfo('Unity Ads realtime fill request for placement ' + placement.getId() + ' failed, opening old ad unit');
-                this.showAd(placement, campaign, options);
+                this.showConsentIfNeeded(options).then(() => {
+                    this.showAd(placement, campaign, options);
+                });
             });
         } else {
-            this.showAd(placement, campaign, options);
+            this.showConsentIfNeeded(options).then(() => {
+                this.showAd(placement, campaign, options);
+            });
         }
     }
 

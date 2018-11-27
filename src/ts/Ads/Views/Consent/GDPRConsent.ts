@@ -4,11 +4,12 @@ import { Template } from 'Core/Utilities/Template';
 import { GDPRConsentSettings } from 'Ads/Views/Consent/GDPRConsentSettings';
 import { Platform } from 'Core/Constants/Platform';
 import { GdprManager } from 'Ads/Managers/GdprManager';
-import { AdUnitContainerSystemMessage } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, AdUnitContainerSystemMessage, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 
 export interface IGDPRConsentViewParameters {
     platform: Platform;
     gdprManager: GdprManager;
+    adUnitContainer: AdUnitContainer;
 }
 
 export interface IGDPRConsentHandler {
@@ -19,15 +20,16 @@ export interface IGDPRConsentHandler {
 export class GDPRConsent extends View<IGDPRConsentHandler> {
     private _parameters: IGDPRConsentViewParameters;
     private _consentSettingsView: GDPRConsentSettings;
-    private _doneCallback: () => void;
-    private _closeCallback: () => void;
+    private _donePromiseResolve: () => void;
     private _isShowing: boolean;
+    private _adUnitContainer: AdUnitContainer;
 
     constructor(parameters: IGDPRConsentViewParameters) {
         super(parameters.platform, 'gdpr-consent');
 
         this._parameters = parameters;
         this._template = new Template(GDPRConsentTemplate);
+        this._adUnitContainer = parameters.adUnitContainer;
 
         this._bindings = [
             {
@@ -43,6 +45,21 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
         ];
     }
 
+    public showAndHandleConsent(options: any): Promise<void> {
+        return (<AdUnitContainer>this._adUnitContainer).open('Consent', ['webview'], false, Orientation.NONE, true, true, true, false, options).then(() => {
+            const donePromise = new Promise<void>((resolve) => {
+                this._donePromiseResolve = resolve;
+            });
+            this._adUnitContainer.addEventHandler(this);
+            this.render();
+            document.body.appendChild(this.container());
+            this.show();
+            return donePromise;
+        }).catch((e: Error) => {
+            // this._core.Api.Sdk.logWarning('Error opening Consent view ' + e);
+        });
+    }
+
     public show(): void {
         this._isShowing = true;
         super.show();
@@ -56,16 +73,7 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
             document.body.removeChild(this._consentSettingsView.container());
             delete this._consentSettingsView;
         }
-
-    }
-
-    // TODO: I feel this could be done neater
-    public setDoneCallback(callback: () => void): void {
-        this._doneCallback = callback;
-    }
-
-    public setCloseCallback(callback: () => void): void {
-        this._closeCallback = callback;
+        this._adUnitContainer.close();
     }
 
     public onContainerShow(): void {
@@ -75,7 +83,8 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
     public onContainerDestroy(): void {
         if (this._isShowing) {
             this._isShowing = false;
-            this._closeCallback();
+            this._adUnitContainer.removeEventHandler(this);
+            this._donePromiseResolve();
         }
     }
 
@@ -95,7 +104,6 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onConsent(true));
         this.hide();
-        this._doneCallback();
     }
 
     private onOptionsEvent(event: Event) {
