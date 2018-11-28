@@ -60,7 +60,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             }
         } else {    // DSP MRAID
             this.setCallButtonEnabled(false);
-            return this._request.followRedirectChain(url, this._useWebViewUserAgentForTracking, true).then((storeUrl) => {
+            return this._request.followRedirectChain(url, this._useWebViewUserAgentForTracking).then((storeUrl) => {
                 return this.openUrlOnCallButton(storeUrl);
             }).catch(() => {
                 const urlParts = Url.parse(url);

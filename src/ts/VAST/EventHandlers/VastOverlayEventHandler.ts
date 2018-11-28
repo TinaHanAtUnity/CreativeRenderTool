@@ -70,7 +70,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
-            return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking, true).then((url: string) => {
+            return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
                 return this.openUrlOnCallButton(url);
             }).catch(() => {
                 const urlParts = Url.parse(clickThroughURL);

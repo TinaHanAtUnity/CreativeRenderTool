@@ -213,7 +213,7 @@ export class RequestManager {
     }
 
     // Follows the redirects of a URL, returning the final location.
-    public followRedirectChain(url: string, useWebViewUserAgentForTracking?: boolean, resolveOnHttpError = false): Promise<string> {
+    public followRedirectChain(url: string, useWebViewUserAgentForTracking?: boolean): Promise<string> {
         let redirectCount = 0;
         const headers: [string, string][] = [];
         if (useWebViewUserAgentForTracking && typeof navigator !== 'undefined' && navigator.userAgent) {
@@ -240,11 +240,7 @@ export class RequestManager {
                         } else if (RequestManager.is2xxSuccessful(response.responseCode)) {
                             resolve(requestUrl);
                         } else {
-                            if (resolveOnHttpError) {
-                                resolve(requestUrl);
-                            } else {
-                                reject(new Error(`Request to ${requestUrl} failed with status ${response.responseCode}`));
-                            }
+                            reject(new Error(`Request to ${requestUrl} failed with status ${response.responseCode}`));
                         }
                     }).catch(reject);
                 }
