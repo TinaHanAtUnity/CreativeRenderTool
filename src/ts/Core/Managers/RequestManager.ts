@@ -213,7 +213,7 @@ export class RequestManager {
     }
 
     // Follows the redirects of a URL, returning the final location.
-    public followRedirectChain(url: string, useWebViewUserAgentForTracking?: boolean): Promise<string> {
+    public followRedirectChain(url: string, useWebViewUserAgentForTracking = false): Promise<string> {
         let redirectCount = 0;
         const headers: [string, string][] = [];
         if (useWebViewUserAgentForTracking && typeof navigator !== 'undefined' && navigator.userAgent) {
