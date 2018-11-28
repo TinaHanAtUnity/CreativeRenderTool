@@ -30,6 +30,14 @@
     height: 8%;
   }
 
+  .wrapper {
+    display: flex;
+    height: 92%;
+    width: 100%;
+    flex-direction: column;
+  }
+
+
   .container {
     padding: 0 $default-size 0 $default-size;
   }
@@ -55,10 +63,8 @@
   }
 
   .stripe {
-    top:0;
-    position: relative;
     height: 1px;
-    margin: 0.25 * $default-size 0 0.25 * $default-size 0;
+    margin: 0.25 * $default-size 1.5 * $default-size 0.25 * $default-size 1.5 * $default-size;
     background-color: $light-gray;
   }
 
@@ -66,7 +72,7 @@
     height: 50%;
     display: flex;
     flex-direction: column;
-    // justify-content: center;
+    justify-content: space-evenly;
   }
 
   .button-container {
@@ -115,6 +121,32 @@
     .two-lines.sub-box-line {
       height: 1.9 * $default-size;
       transform: translate(.3 * $default-size, -1.6 * $default-size);
+    }
+  }
+}
+
+body {
+  &.landscape #gdpr-consent-settings {
+    .wrapper {
+      display: flex;
+      height: 92%;
+      width: 100%;
+      flex-direction: row;
+    }
+    .personalization-container {
+      width: 49%;
+      height: 100%;
+    }
+
+    .stripe {
+      width: 1px;
+      margin: 0.25 * $default-size 1.5 * $default-size 0.25 * $default-size 1.5 * $default-size;
+      background-color: $light-gray;
+    }
+
+    .settings-container {
+      height: 100%;
+      width: 49%;
     }
 
   }

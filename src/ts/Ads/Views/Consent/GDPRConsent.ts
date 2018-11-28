@@ -7,6 +7,7 @@ import { GdprManager } from 'Ads/Managers/GdprManager';
 import { AdUnitContainerSystemMessage } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IGDPRConsentSettingsHandler } from 'Ads/Views/Consent/GDPRConsentSettings';
 import { IConsent } from 'Ads/Views/Consent/IConsent';
+import { ButtonSpinner } from "./ButtonSpinner";
 
 export interface IGDPRConsentViewParameters {
     platform: Platform;
@@ -95,9 +96,32 @@ export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConse
 
     private onAgreeEvent(event: Event) {
         event.preventDefault();
-        this._handlers.forEach(handler => handler.onConsent({ all: true, ads: false, gameExp: false, external: false }));
+        // this._handlers.forEach(handler => handler.onConsent({ all: true, ads: false, gameExp: false, external: false }));
         this.hide();
         this._doneCallback();
+       //  this.runAnimation();
+    }
+
+    private runAnimation(): void {
+        const buttonSPinner = new ButtonSpinner(this._platform);
+        buttonSPinner.render();
+        const button = <HTMLElement>this._container.querySelector('.agree');
+        if (button) {
+            // button.style.display = 'none';
+            // button.appendChild(buttonSPinner.container());
+        }
+        const buttonContainer = <HTMLElement>this._container.querySelector('.button-container');
+        if (buttonContainer) {
+            // buttonContainer.appendChild(buttonSPinner.container());
+            buttonContainer.replaceChild(buttonSPinner.container(), button);
+
+        }
+        setTimeout(() => {
+            this.hide();
+            this._doneCallback();
+        }, 1500);
+
+
     }
 
     private onOptionsEvent(event: Event) {
