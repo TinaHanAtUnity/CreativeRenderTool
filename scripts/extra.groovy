@@ -37,7 +37,7 @@ def main() {
                         waitWebviewDeployed(webviewBranch)
                     } catch (FlowInterruptedException interruptEx) {
                         currentBuild.result = 'ABORTED'
-                        echo("\n\nWARNING! Webview branch '${webviewBranch}' deployment seems to have not succeeded! Not running tests.\n\n")
+                        error("\n\nWARNING! Webview branch '${webviewBranch}' deployment seems to have not succeeded! Not running tests.\n\n")
                     }
                 }
             )
