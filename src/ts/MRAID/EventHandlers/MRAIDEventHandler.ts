@@ -54,7 +54,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             this.sendTrackingEvents();
             this.handleClickAttribution();
             if(!this._campaign.getClickAttributionUrlFollowsRedirects()) {
-                return this._request.followRedirectChain(url, this._useWebViewUserAgentForTracking, true).then((storeUrl) => {
+                return this._request.followRedirectChain(url).then((storeUrl) => {
                     this.openUrl(storeUrl);
                 });
             }
