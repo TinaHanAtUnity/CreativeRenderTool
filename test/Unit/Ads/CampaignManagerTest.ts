@@ -66,6 +66,7 @@ import OnProgrammaticVastPlcCampaignTooMuchWrapping from 'json/OnProgrammaticVas
 import OnProgrammaticVastPlcCampaignWrapped from 'json/OnProgrammaticVastPlcCampaignWrapped.json';
 import OnStaticInterstitialDisplayHtmlCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
 import OnStaticInterstitialDisplayJsCampaign from 'json/OnStaticInterstitialDisplayJsCampaign.json';
+import OnProgrammaticVPAIDPlcCampaignJson from 'json/OnProgrammaticVPAIDPlcCampaign.json';
 import OnXPromoPlcCampaignJson from 'json/OnXPromoPlcCampaign.json';
 import 'mocha';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
@@ -95,6 +96,9 @@ import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
 import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { XPromoAdUnitFactory } from 'XPromo/AdUnits/XPromoAdUnitFactory';
 import AuctionV5Response from 'json/AuctionV5Response.json';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
+import { VPAIDAdUnitFactory } from 'VPAID/AdUnits/VPAIDAdUnitFactory';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -123,7 +127,7 @@ describe('CampaignManager', () => {
     let backupCampaignManager: BackupCampaignManager;
     let contentTypeHandlerManager: ContentTypeHandlerManager;
 
-    const vastOnShowTrackingUrls: ICampaignTrackingUrls = {
+    const onShowTrackingUrls: ICampaignTrackingUrls = {
         'start': [
             'www.testyboy.com',
             'www.scottwise.com'
@@ -627,8 +631,7 @@ describe('CampaignManager', () => {
 
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
-                // Temporary before trackingUrls are refactored
-                triggeredCampaign.setTrackingUrls(vastOnShowTrackingUrls);
+                triggeredCampaign.setTrackingUrls(onShowTrackingUrls);
                 assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
                 assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
                     'http://customTrackingUrl/start',
@@ -893,6 +896,7 @@ describe('CampaignManager', () => {
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
             contentTypeHandlerManager.addHandler(ProgrammaticMraidUrlParser.ContentType, { parser: new ProgrammaticMraidUrlParser(), factory: new MRAIDAdUnitFactory() });
             contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(), factory: new MRAIDAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticVPAIDParser.ContentType, { parser: new ProgrammaticVPAIDParser(), factory: new VPAIDAdUnitFactory() });
             campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
 
             campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
@@ -958,6 +962,34 @@ describe('CampaignManager', () => {
             });
         });
 
+        describe('VPAID campaign', () => {
+            it('should process custom tracking urls for Auction programmatic/vpaid Campaign', () => {
+                mockRequest.expects('post').returns(Promise.resolve({
+                    response: OnProgrammaticVPAIDPlcCampaignJson
+                }));
+
+                return campaignManager.request().then(() => {
+                    if(triggeredError) {
+                        throw triggeredError;
+                    }
+
+                    mockRequest.verify();
+                    triggeredCampaign.setTrackingUrls(onShowTrackingUrls);
+                    assert.isTrue(triggeredCampaign instanceof VPAIDCampaign);
+                    assert.equal(triggeredPlacement, 'video');
+                    assert.equal(triggeredCampaign.getAdType(), 'vpaid-sample-ad-type');
+                    assert.equal(triggeredCampaign.getCreativeId(), 'vpaid-sample-creative-id');
+                    assert.equal(triggeredCampaign.getSeatId(), 900);
+                    assert.equal(triggeredCampaign.getCorrelationId(), '885a17ef11f05deb34b72b');
+                    assert.deepEqual((<VPAIDCampaign>triggeredCampaign).getVPAID().getTrackingEventUrls('start'), [
+                        'https://fake-ads-backend.unityads.unity3d.com/ack/333?event=vast-tracking-url',
+                        'www.testyboy.com',
+                        'www.scottwise.com'
+                    ]);
+                });
+            });
+        });
+
         describe('programmatic campaign', () => {
             it('should process custom tracking urls for Auction programmatic/vast Campaign', () => {
                 mockRequest.expects('post').returns(Promise.resolve({
@@ -970,8 +1002,7 @@ describe('CampaignManager', () => {
                     }
 
                     mockRequest.verify();
-                    // Temporary before trackingUrls are refactored
-                    triggeredCampaign.setTrackingUrls(vastOnShowTrackingUrls);
+                    triggeredCampaign.setTrackingUrls(onShowTrackingUrls);
                     assert.isTrue(triggeredCampaign instanceof VastCampaign);
                     assert.equal(triggeredPlacement, 'video');
                     assert.equal(triggeredCampaign.getAdType(), 'vast-sample-ad-type');
