@@ -34,7 +34,6 @@ import { ARUtil } from 'AR/Utilities/ARUtil';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 describe('MraidAdUnit', () => {
-    let sandbox: sinon.SinonSandbox;
     let mraidAdUnitParameters: IMRAIDAdUnitParameters;
     let mraidAdUnit: MRAIDAdUnit;
     let mraidView: MRAID;
@@ -54,9 +53,7 @@ describe('MraidAdUnit', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
 
-    before(() => {
-        sandbox = sinon.createSandbox();
-    });
+    const sandbox = sinon.createSandbox();
 
     afterEach(() => {
         sandbox.restore();
