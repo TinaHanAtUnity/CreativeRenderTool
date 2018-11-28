@@ -50,7 +50,7 @@ def main() {
             def hybridTestBuilders = [:]
 
             ['hybrid-test-android','hybrid-test-ios'].each {
-                stage -> builders[stage] = {
+                stage -> hybridTestBuilders[stage] = {
                   def jobName = "ads-sdk-$stage"
                   def build_ = build(
                     job: "Applifier/unity-ads-sdk-tests/$jobName",
@@ -72,7 +72,7 @@ def main() {
             def systemTestBuilders = [:]
 
             ['systest-android','systest-ios'].each {
-                stage -> builders[stage] = {
+                stage -> systemTestBuilders[stage] = {
                     def jobName = "ads-sdk-$stage"
                     build(
                       job: "Applifier/unity-ads-sdk-tests/$jobName",
