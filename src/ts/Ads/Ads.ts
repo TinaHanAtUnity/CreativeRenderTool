@@ -223,8 +223,7 @@ export class Ads implements IAds {
     }
 
     public showConsentIfNeeded(options: any): Promise<void> {
-        const showConsent = true;
-        if (!showConsent) {
+        if (!this.getNeedToShowConsent()) {
             return Promise.resolve();
         }
         const consentView = new ConsentUnit({
@@ -276,7 +275,7 @@ export class Ads implements IAds {
             campaign.setTrackingUrls(trackingUrls);
         }
 
-        if (placement.getRealtimeData()) {
+        if (placement.getRealtimeData() && !this.getNeedToShowConsent()) {
             this._core.Api.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
             const start = Date.now();
 
@@ -289,15 +288,11 @@ export class Ads implements IAds {
                     this._core.Api.Sdk.logInfo('Unity Ads received new fill for placement ' + placement.getId() + ', streaming new ad unit');
                     this._wasRealtimePlacement = true;
                     placement.setCurrentCampaign(realtimeCampaign);
-                    this.showConsentIfNeeded(options).then(() => {
-                        this.showAd(placement, realtimeCampaign, options);
-                    });
+                    this.showAd(placement, realtimeCampaign, options);
                 } else {
                     SessionDiagnostics.trigger('realtime_no_fill', {}, campaign.getSession());
                     this._core.Api.Sdk.logInfo('Unity Ads received no new fill for placement ' + placement.getId() + ', opening old ad unit');
-                    this.showConsentIfNeeded(options).then(() => {
-                        this.showAd(placement, campaign, options);
-                    });
+                    this.showAd(placement, campaign, options);
                 }
             }).catch((e) => {
                 if (e instanceof TimeoutError) {
@@ -309,9 +304,7 @@ export class Ads implements IAds {
                     error: e
                 });
                 this._core.Api.Sdk.logInfo('Unity Ads realtime fill request for placement ' + placement.getId() + ' failed, opening old ad unit');
-                this.showConsentIfNeeded(options).then(() => {
-                    this.showAd(placement, campaign, options);
-                });
+                this.showAd(placement, campaign, options);
             });
         } else {
             this.showConsentIfNeeded(options).then(() => {
@@ -334,6 +327,11 @@ export class Ads implements IAds {
 
         const context = this.Banners.BannerAdContext;
         context.hide();
+    }
+
+    private getNeedToShowConsent(): boolean {
+        // TODO: this info comes from elsewhere
+        return true;
     }
 
     private showAd(placement: Placement, campaign: Campaign, options: any) {
