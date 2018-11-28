@@ -4,14 +4,11 @@ import { Template } from 'Core/Utilities/Template';
 import { PrivacyRowItemContainer } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { Platform } from 'Core/Constants/Platform';
 import { GdprManager } from 'Ads/Managers/GdprManager';
+import { IConsent } from 'Ads/Views/Consent/IConsent';
 
-export interface IConsentSettings {
-    personalized: boolean;
-}
 
 export interface IGDPRConsentSettingsHandler {
-    onClose(): void;
-    onConsetSettings(consent: IConsentSettings): void;
+    onConset(consent: IConsent): void;
 }
 
 export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
@@ -27,6 +24,16 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
                 event: 'click',
                 listener: (event: Event) => this.onBackButtonEvent(event),
                 selector: '.back-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onAcceptAllEvent(event),
+                selector: '.accept-all'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onSaveMyChoicesEvent(event),
+                selector: '.save-my-choices'
             }
         ];
 
@@ -78,5 +85,37 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
         event.preventDefault();
 
         this.hide();
+    }
+
+    private onAcceptAllEvent(event: Event): void {
+        event.preventDefault();
+
+        const consent: IConsent = {
+            gameExp: true,
+            ads: true,
+            external: true
+        };
+
+        this._handlers.forEach(handler => handler.onConset(consent));
+        // todo: animations
+
+    }
+
+    private onSaveMyChoicesEvent(event: Event) {
+        event.preventDefault();
+        const experienceCheckbox = <HTMLInputElement>this._container.querySelector('#ppersonalized-experience-checkbox');
+        const adsCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-checkbox');
+        const ads3rdPartyCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-3rd-party');
+
+        const consent: IConsent = {
+            gameExp: experienceCheckbox ? experienceCheckbox.checked : false,
+            ads: adsCheckbox ? adsCheckbox.checked : false,
+            external: ads3rdPartyCheckbox ? ads3rdPartyCheckbox.checked : false
+        };
+
+        this._handlers.forEach(handler => handler.onConset(consent));
+
+        // todo: animations
+
     }
 }

@@ -1,7 +1,7 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
 import { IGDPRConsentHandler } from 'Ads/Views/Consent/GDPRConsent';
-import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
+import { IConsent } from 'Ads/Views/Consent/IConsent';
 
 export class GDPRConsentHandler<T extends Campaign> implements IGDPRConsentHandler {
 
@@ -12,12 +12,7 @@ export class GDPRConsentHandler<T extends Campaign> implements IGDPRConsentHandl
 
     }
 
-    public onConsent(consent: boolean): void {
+    public onConsent(consent: IConsent): void {
         // todo: send events
     }
-
-    public onShowOptions(): void {
-        // todo: show dialog
-    }
-
 }

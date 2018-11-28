@@ -4,6 +4,8 @@ import { Template } from 'Core/Utilities/Template';
 import { GDPRConsentSettings } from 'Ads/Views/Consent/GDPRConsentSettings';
 import { Platform } from 'Core/Constants/Platform';
 import { GdprManager } from 'Ads/Managers/GdprManager';
+import { IGDPRConsentSettingsHandler } from 'Ads/Views/Consent/GDPRConsentSettings';
+import { IConsent } from 'Ads/Views/Consent/IConsent';
 
 export interface IGDPRConsentViewParameters {
     platform: Platform;
@@ -11,11 +13,10 @@ export interface IGDPRConsentViewParameters {
 }
 
 export interface IGDPRConsentHandler {
-    onConsent(consent: boolean): void;
-    onShowOptions(): void;
+    onConsent(consent: IConsent): void;
 }
 
-export class GDPRConsent extends View<IGDPRConsentHandler> {
+export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConsentSettingsHandler {
     private _parameters: IGDPRConsentViewParameters;
     private _consentSettingsView: GDPRConsentSettings;
     private _doneCallback: () => void;
@@ -44,6 +45,7 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
         super.hide();
 
         if (this._consentSettingsView) {
+            this._consentSettingsView.removeEventHandler(this);
             this._consentSettingsView.hide();
             document.body.removeChild(this._consentSettingsView.container());
             delete this._consentSettingsView;
@@ -58,7 +60,7 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
 
     private onAgreeEvent(event: Event) {
         event.preventDefault();
-        this._handlers.forEach(handler => handler.onConsent(true));
+        this._handlers.forEach(handler => handler.onConsent({ all: true, ads: false, gameExp: false, external: false }));
         this.hide();
         this._doneCallback();
     }
@@ -68,11 +70,21 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
 
         if (!this._consentSettingsView) {
             this._consentSettingsView = new GDPRConsentSettings(this._platform, this._parameters.gdprManager);
+            this._consentSettingsView.addEventHandler(this);
             this._consentSettingsView.render();
 
             document.body.appendChild(this._consentSettingsView.container());
         }
 
         this._consentSettingsView.show();
+    }
+
+    // IGDPRConsentSettingsHandler
+    public onConset(consent: IConsent): void {
+        this._handlers.forEach(handler => handler.onConsent(consent));
+
+        // todo: could make sense to create a controller class for showing and hiding GDPRConsent and GDPRConsentSettings views
+        this.hide();
+        this._doneCallback();
     }
 }
