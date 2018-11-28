@@ -15,6 +15,7 @@ export class ConsentUnit implements IGDPRConsentHandler {
     private _showing: boolean;
     private _adUnitContainer: AdUnitContainer;
     private _gdprConsentView: GDPRConsent;
+    private _platform: Platform;
 
     constructor(parameters: IConsentUnitParameters) {
         this._gdprConsentView = new GDPRConsent({
@@ -23,6 +24,7 @@ export class ConsentUnit implements IGDPRConsentHandler {
         });
         this._adUnitContainer = parameters.adUnitContainer;
         this._gdprConsentView.addEventHandler(this);
+        this._platform = parameters.platform;
     }
 
     public show(options: any): Promise<void> {
@@ -82,6 +84,11 @@ export class ConsentUnit implements IGDPRConsentHandler {
 
     // IGDPRConsentHandler
     public onConsentHide(): void {
-        this._adUnitContainer.close();
+        this._adUnitContainer.close().then(() => {
+            if (this._platform === Platform.ANDROID) {
+                // Android will not trigger onCointainerDestroy if close()-was called, iOS will
+                this.onContainerDestroy();
+            }
+        });
     }
 }

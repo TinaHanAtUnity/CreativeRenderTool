@@ -15,4 +15,14 @@ export class GDPRConsentHandler<T extends Campaign> implements IGDPRConsentHandl
     public onConsent(consent: IConsent): void {
         // todo: send events
     }
+
+    // IGDPRConsentHandler
+    public onShowOptions(): void {
+        // TODO: Implement
+    }
+
+    // IGDPRConsentHandler
+    public onConsentHide(): void {
+        // Blank
+    }
 }
