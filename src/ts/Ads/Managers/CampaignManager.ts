@@ -725,7 +725,7 @@ export class CampaignManager {
 
         if(CampaignManager.AbGroup) {
             url = Url.addParameters(url, {
-                forceAbGroup: CampaignManager.AbGroup.toNumber()
+                forceAbGroup: CampaignManager.AbGroup
             });
         }
 
@@ -878,7 +878,7 @@ export class CampaignManager {
                 body.gdprEnabled = this._adsConfig.isGDPREnabled();
                 body.optOutEnabled = this._adsConfig.isOptOutEnabled();
                 body.optOutRecorded = this._adsConfig.isOptOutRecorded();
-                body.abGroup = this._coreConfig.getAbGroup().toNumber();
+                body.abGroup = this._coreConfig.getAbGroup();
 
                 const organizationId = this._coreConfig.getOrganizationId();
                 if(organizationId) {
