@@ -208,7 +208,7 @@ describe('VastVideoEventHandler tests', () => {
             // when the session manager is told that the video has started
             // then the VAST start callback URL should be requested by the event manager
             const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
-            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'getUrl');
+            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
 
             vastVideoEventHandler.onPlay('https://test.com');
 
@@ -243,7 +243,7 @@ describe('VastVideoEventHandler tests', () => {
             vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
 
             const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
-            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'getUrl');
+            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
 
             vastVideoEventHandler.onPlay('https://test.com');
 
@@ -287,7 +287,7 @@ describe('VastVideoEventHandler tests', () => {
             // when the session manager is told that the video has completed
             // then the VAST complete callback URL should be requested by the event manager
             const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
-            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'getUrl');
+            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
             vastVideoEventHandler.onCompleted('https://test.com');
 
             assert.equal(spySendWithGet.getCall(0).args[0], 'vast complete', 'Second event sent should be \'vast complete\'');
@@ -389,7 +389,7 @@ describe('VastVideoEventHandler tests', () => {
             const urlTemplate = 'http://foo.biz/%ZONE%/456';
             campaign.getImpressionUrls = sinon.stub().returns([urlTemplate]);
             const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
-            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'getUrl');
+            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
             vastVideoEventHandler.onPlay('https://test.com');
             assert.equal(spySendWithGet.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
             assert.equal(spySendWithGet.getCall(0).args[2], 'http://foo.biz/%ZONE%/456', 'First event url incorrect');
@@ -401,7 +401,7 @@ describe('VastVideoEventHandler tests', () => {
             const urlTemplate = 'http://foo.biz/%SDK_VERSION%/456';
             campaign.getImpressionUrls = sinon.stub().returns([urlTemplate]);
             const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
-            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'getUrl');
+            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
             vastVideoEventHandler.onPlay('https://test.com');
             sinon.assert.calledThrice(spySendWithGet);
             assert.equal(spySendWithGet.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
@@ -414,7 +414,7 @@ describe('VastVideoEventHandler tests', () => {
             const urlTemplate = 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%';
             campaign.getImpressionUrls = sinon.stub().returns([urlTemplate]);
             const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
-            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'getUrl');
+            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
             vastVideoEventHandler.onPlay('https://test.com');
             sinon.assert.calledThrice(spySendWithGet);
             assert.equal(spySendWithGet.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
@@ -427,7 +427,7 @@ describe('VastVideoEventHandler tests', () => {
             const urlTemplate = 'http://foo.biz/%ZONE%/%SDK_VERSION%/456';
             campaign.getImpressionUrls = sinon.stub().returns([urlTemplate]);
             const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
-            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'getUrl');
+            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
             vastVideoEventHandler.onPlay('https://test.com');
             sinon.assert.calledThrice(spySendWithGet);
             assert.equal(spySendWithGet.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');

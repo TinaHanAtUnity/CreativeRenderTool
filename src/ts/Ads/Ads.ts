@@ -85,7 +85,7 @@ export class Ads implements IAds {
     public readonly BackupCampaignManager: BackupCampaignManager;
     public readonly ProgrammaticTrackingService: ProgrammaticTrackingService;
     public readonly ContentTypeHandlerManager: ContentTypeHandlerManager;
-    public readonly ThirdParyEventManagerFactory: IThirdPartyEventManagerFactory;
+    public readonly ThirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
 
     public Config: AdsConfiguration;
     public Container: Activity | ViewController;
@@ -148,7 +148,7 @@ export class Ads implements IAds {
         this.BackupCampaignManager = new BackupCampaignManager(this._core.Api, this._core.StorageBridge, this._core.Config, this._core.DeviceInfo);
         this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this._core.NativeBridge.getPlatform(), this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo);
         this.ContentTypeHandlerManager = new ContentTypeHandlerManager();
-        this.ThirdParyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
+        this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
     }
 
     public initialize(jaegerInitSpan: JaegerSpan) {
@@ -362,7 +362,7 @@ export class Ads implements IAds {
                 container: this.Container,
                 deviceInfo: this._core.DeviceInfo,
                 clientInfo: this._core.ClientInfo,
-                thirdPartyEventManager: this.ThirdParyEventManagerFactory.create({
+                thirdPartyEventManager: this.ThirdPartyEventManagerFactory.create({
                     [ThirdPartyEventMacro.ZONE]: placement.getId(),
                     [ThirdPartyEventMacro.SDK_VERSION]: this._core.ClientInfo.getSdkVersion().toString(),
                     [ThirdPartyEventMacro.GAMER_SID]: playerMetadataServerId || ''

@@ -37,9 +37,9 @@ export class ThirdPartyEventManager {
         }
     }
 
-    public replaceUrlTemplateValues(urls: string[]): string[] {
+    public replaceTemplateValuesAndEncodeUrls(urls: string[]): string[] {
         return urls.map((url) => {
-            return this.getUrl(url);
+            return this.replaceTemplateValuesAndEncodeUrl(url);
         });
     }
 
@@ -72,7 +72,7 @@ export class ThirdPartyEventManager {
             }
         }
 
-        url = this.getUrl(url);
+        url = this.replaceTemplateValuesAndEncodeUrl(url);
 
         this._core.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
         const options = {
@@ -136,7 +136,7 @@ export class ThirdPartyEventManager {
         return Promise.resolve();
     }
 
-    private getUrl(url: string): string {
+    private replaceTemplateValuesAndEncodeUrl(url: string): string {
         if (url) {
             for (const key in this._templateValues) {
                 if (this._templateValues.hasOwnProperty(key)) {

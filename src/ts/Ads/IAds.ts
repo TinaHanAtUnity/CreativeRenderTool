@@ -59,5 +59,5 @@ export interface IAds extends IApiModule {
     AssetManager: AssetManager;
     CampaignManager: CampaignManager;
     RefreshManager: OldCampaignRefreshManager;
-    ThirdParyEventManagerFactory: IThirdPartyEventManagerFactory;
+    ThirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
 }
