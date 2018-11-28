@@ -6,7 +6,7 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import {
     ABGroup,
-    NativeGreenEndScreenButtonColorTest
+    GreenEndScreenButtonColorTest
 } from 'Core/Models/ABGroup';
 import { Localization } from 'Core/Utilities/Localization';
 import { View } from 'Core/Views/View';
@@ -126,8 +126,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     private overrideButtonColor(ctaButtonColor: string | undefined): string | undefined {
-        if (NativeGreenEndScreenButtonColorTest.isValid(this._abGroup)) {
-            return '#A4C639';
+        if (GreenEndScreenButtonColorTest.isValid(this._abGroup)) {
+            return '#83CD0C';
         }
         return ctaButtonColor;
     }
