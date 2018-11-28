@@ -68,10 +68,10 @@ import { VPAID } from 'VPAID/VPAID';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromo } from 'XPromo/XPromo';
 import { AR } from 'AR/AR';
-import { GDPRConsent } from 'Ads/Views/Consent/GDPRConsent';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
 
 export class Ads implements IAds {
 
@@ -222,30 +222,20 @@ export class Ads implements IAds {
         });
     }
 
-    public showConsent(placementId: string, options: any, callback: INativeCallback): Promise<void> {
-        return (<AdUnitContainer>this.Container).open('Consent', ['webview'], false, Orientation.NONE, true, true, true, false, options).then(() => {
-            const consentView = new GDPRConsent({ platform: this._core.NativeBridge.getPlatform(), gdprManager: this.GdprManager });
-            this.Container.addEventHandler(consentView);
-            consentView.setDoneCallback(() => {
-                this._core.Api.Sdk.logDebug('showConsent, doneCallback called');
-                consentView.hide();
-                (<AdUnitContainer>this.Container).close();
-            });
-            consentView.setCloseCallback(() => {
-                this.Container.removeEventHandler(consentView);
-                this.show(placementId, options, callback);
-            });
-            consentView.render();
-            document.body.appendChild(consentView.container());
-            this._core.Api.Sdk.logDebug('Showing consent view');
-            return consentView.show();
-        }).catch((e: Error) => {
-            this._core.Api.Sdk.logWarning('Error opening Consent view ' + e);
+    public showConsentIfNeeded(options: any): Promise<void> {
+        if (!this.getNeedToShowConsent()) {
+            return Promise.resolve();
+        }
+        const consentView = new ConsentUnit({
+            platform: this._core.NativeBridge.getPlatform(),
+            gdprManager: this.GdprManager,
+            adUnitContainer: this.Container
         });
+        return consentView.show(options);
     }
 
     public show(placementId: string, options: any, callback: INativeCallback): void {
-        // callback(CallbackStatus.OK);
+        callback(CallbackStatus.OK);
 
         if(this._showing) {
             // do not send finish event because there will be a finish event from currently open ad unit
@@ -285,7 +275,7 @@ export class Ads implements IAds {
             campaign.setTrackingUrls(trackingUrls);
         }
 
-        if (placement.getRealtimeData()) {
+        if (placement.getRealtimeData() && !this.getNeedToShowConsent()) {
             this._core.Api.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
             const start = Date.now();
 
@@ -317,7 +307,9 @@ export class Ads implements IAds {
                 this.showAd(placement, campaign, options);
             });
         } else {
-            this.showAd(placement, campaign, options);
+            this.showConsentIfNeeded(options).then(() => {
+                this.showAd(placement, campaign, options);
+            });
         }
     }
 
@@ -335,6 +327,11 @@ export class Ads implements IAds {
 
         const context = this.Banners.BannerAdContext;
         context.hide();
+    }
+
+    private getNeedToShowConsent(): boolean {
+        // TODO: this info comes from elsewhere
+        return true;
     }
 
     private showAd(placement: Placement, campaign: Campaign, options: any) {
