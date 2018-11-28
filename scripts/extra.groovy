@@ -98,7 +98,7 @@ def main() {
                             //manually
                             'android-system-tests': {
                                 build(
-                                  job: "Applifier/unity-ads-sdk-tests/ads-sdk-systest-ios/",
+                                  job: "Applifier/unity-ads-sdk-tests/ads-sdk-systest-android/",
                                   propagate: false,
                                   wait: false,
                                   parameters: [
@@ -112,7 +112,7 @@ def main() {
 
                             'ios-system-tests': {
                                 build(
-                                  job: "Applifier/unity-ads-sdk-tests/ads-sdk-systest-android/",
+                                  job: "Applifier/unity-ads-sdk-tests/ads-sdk-systest-ios/",
                                   propagate: false,
                                   wait: false,
                                   parameters: [
