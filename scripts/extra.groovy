@@ -6,6 +6,7 @@ def waitWebviewDeployed(webviewBranch) {
     timeout(15) {
         def CONFIG_URL = "https://config.unityads.unity3d.com/webview/${webviewBranch}/test/config.json"
         echo "Waiting for $CONFIG_URL..."
+        echo "Revision from env.revision='${env.revision}'"
         waitUntil {
             def status = sh(returnStdout: true, script: "curl -sL -w \"%{http_code}\\n\" \"$CONFIG_URL\" -o /dev/null").trim()
             return status == '200'
