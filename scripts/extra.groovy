@@ -117,7 +117,7 @@ def main() {
                                   wait: false,
                                   parameters: [
                                     string(name: 'WEBVIEW_BRANCH', value: env.BRANCH_NAME),
-                                    string(name: 'UNITY_ADS_ANDROID_BRANCH', value: nativeBranch),
+                                    string(name: 'UNITY_ADS_IOS_BRANCH', value: nativeBranch),
                                     //TODO: enable tests before pushing to master
                                     booleanParam(name: 'RUN_TD_TESTS', value: false)
                                   ],
