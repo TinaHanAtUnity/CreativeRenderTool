@@ -1,3 +1,20 @@
+# PENDING
+
+* Add 广告 to Overlays for China Ads [#7102](https://github.com/Applifier/unity-ads-webview/pull/7102)
+
+# Mon Nov 26 23:00:23 UTC 2018
+
+* Revert Tracking Urls Changes for VAST and Disable Auction V5 [#7317](https://github.com/Applifier/unity-ads-webview/pull/7317)
+* BYOP Promo Product Type Filtering [#7073](https://github.com/Applifier/unity-ads-webview/pull/7073)
+* Refactor Vast Overlay and Privacy [#6890](https://github.com/Applifier/unity-ads-webview/pull/6890)
+* Fix logic that show call button only for VAST [#7296](https://github.com/Applifier/unity-ads-webview/pull/7296)
+* Update Privacy Naming and User Summary Endpoints in GCP [#7127](https://github.com/Applifier/unity-ads-webview/pull/7127)
+
+# Mon Nov 26 09:36:32 UTC 2018
+
+* Type out IInfoJson & fix undefined sessionId [#7275](https://github.com/Applifier/unity-ads-webview/pull/7275)
+* Disable backup campaigns on pre-4.4. Androids [#7276](https://github.com/Applifier/unity-ads-webview/pull/7276)
+
 # Wed Nov 21 20:44:19 UTC 2018
 
 * Don't show mute and CTA button on top of GDPR banner in video overlay [#7252](https://github.com/Applifier/unity-ads-webview/pull/7252)
