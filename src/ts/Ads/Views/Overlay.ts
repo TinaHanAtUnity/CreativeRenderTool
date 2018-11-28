@@ -39,6 +39,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _progressElement: HTMLElement;
     private _privacyButtonElement: HTMLElement;
     private _GDPRPopupElement: HTMLElement;
+    private _chinaAdvertisementElement: HTMLElement;
 
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
@@ -47,9 +48,9 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _showGDPRBanner: boolean = false;
     private _disablePrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
-    private _seatId: number | undefined;
+    private _country: string | undefined;
 
-    constructor(platform: Platform, ads: IAdsApi, deviceInfo: DeviceInfo, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, seatId?: number) {
+    constructor(platform: Platform, ads: IAdsApi, deviceInfo: DeviceInfo, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, country?: string) {
         super(platform, 'overlay', muted);
 
         this._deviceInfo = deviceInfo;
@@ -57,7 +58,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         this._showGDPRBanner = showGDPRBanner;
         this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
         this._gameId = gameId;
-        this._seatId = seatId;
+        this._country = country;
 
         this._templateData = {
             muted
@@ -134,13 +135,6 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     public render(): void {
         super.render();
 
-        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
-            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
-            if (tencentAdTag) {
-                tencentAdTag.innerText = '广告';
-            }
-        }
-
         this._skipElement = <HTMLElement>this._container.querySelector('.skip-hit-area');
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
@@ -149,7 +143,12 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
         this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
+        this._chinaAdvertisementElement = <HTMLElement>this._container.querySelector('.china-advertisement');
         this.choosePrivacyShown();
+
+        if(this._country === 'CN') {
+            this._chinaAdvertisementElement.style.display = 'block';
+        }
 
         if(CustomFeatures.isCheetahGame(this._gameId)) {
             const skipIconElement = <HTMLElement>this._container.querySelector('.skip');
@@ -196,6 +195,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
             if(this._skipRemaining <= 0) {
                 this.setSkipElementVisible(true);
                 this.updateProgressCircle(this._skipElement, 1);
+                this._chinaAdvertisementElement.classList.add('with-skip-button');
             } else {
                 this.updateProgressCircle(this._skipElement, (this._skipDuration - this._skipRemaining) / this._skipDuration);
             }

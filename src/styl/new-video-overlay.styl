@@ -382,8 +382,13 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     font-weight: bold;
   }
 
-  .tencent-advertisement {
-    $tencent-overlay($default-scale-size);
+  .china-advertisement {
+    $china-overlay($default-scale-size);
+    opacity: .58;
+  }
+
+  .china-advertisement.with-skip-button {
+    padding-top: 0;
   }
 
   &:not(.show-gdpr-banner) {
@@ -435,6 +440,11 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     &.show-gdpr-banner {
       .bottom-container {
         height: $new-video-overlay-styles.touchable-area-height * 2;
+
+        .left-corner,
+        .right-corner {
+          bottom: auto;
+        }
 
         .center {
           bottom: 0;
