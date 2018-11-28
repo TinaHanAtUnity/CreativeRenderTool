@@ -4,7 +4,6 @@ import { Template } from 'Core/Utilities/Template';
 import { GDPRConsentSettings, IGDPRConsentSettingsHandler } from 'Ads/Views/Consent/GDPRConsentSettings';
 import { Platform } from 'Core/Constants/Platform';
 import { GdprManager } from 'Ads/Managers/GdprManager';
-import { AdUnitContainerSystemMessage } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IConsent } from 'Ads/Views/Consent/IConsent';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 

@@ -5,6 +5,10 @@ import { IConsent } from 'Ads/Views/Consent/IConsent';
 
 export class GDPRConsentHandler<T extends Campaign> implements IGDPRConsentHandler {
 
+    public onConsentHide(): void {
+        // todo
+    }
+
     private adUnit: AbstractAdUnit;
 
     constructor(adUnit: AbstractAdUnit, parameters: IAdUnitParameters<T>) {
