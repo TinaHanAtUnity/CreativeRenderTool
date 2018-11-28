@@ -176,7 +176,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                     const vastEndScreenParameters: IVastEndscreenParameters = {
                         campaign: vastAdUnitParameters.campaign,
                         clientInfo: vastAdUnitParameters.clientInfo,
-                        seatId: vastAdUnitParameters.campaign.getSeatId()
+                        country: vastAdUnitParameters.coreConfig.getCountry()
                     };
                     const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
                     sinon.spy(vastEndScreen, 'show');
