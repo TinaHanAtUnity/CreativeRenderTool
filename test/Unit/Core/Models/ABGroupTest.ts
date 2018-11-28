@@ -3,7 +3,7 @@ import { toAbGroup, FakeEnabledABTest, FakeDisabledABTest } from 'Core/Models/AB
 import 'mocha';
 
 describe('ABGroupTests', () => {
-    const validGroups = [...Array(20).keys()];
+    const validGroups = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ];
 
     describe('toAbGroup', () => {
         it('should return test A/B group for number 99', () => {
