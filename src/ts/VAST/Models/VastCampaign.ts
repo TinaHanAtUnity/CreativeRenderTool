@@ -40,7 +40,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             isMoatEnabled: ['boolean', 'undefined']
         }, campaign);
 
-        this.processCustomTracking(campaign.trackingUrls);
+        this.addCustomTracking(campaign.trackingUrls);
     }
 
     public getVast(): Vast {
@@ -115,7 +115,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
     // Overidden function so tracking urls can combined with tracking urls from vast creative
     public setTrackingUrls(trackingUrls: ICampaignTrackingUrls) {
         super.setTrackingUrls(trackingUrls);
-        this.processCustomTracking(trackingUrls);
+        this.addCustomTracking(trackingUrls);
     }
 
     public getDTO(): { [key: string]: any } {
@@ -141,13 +141,15 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
         };
     }
 
-    private processCustomTracking(trackingUrls: ICampaignTrackingUrls) {
+    private addCustomTracking(trackingUrls: ICampaignTrackingUrls) {
         if (trackingUrls) {
             Object.keys(trackingUrls).forEach((event) => {
-                const eventUrls = this.getTrackingUrlsForEvent(event);
-                eventUrls.forEach((eventUrl) => {
-                    this.getVast().addTrackingEventUrl(event, eventUrl);
-                });
+                const eventUrls = trackingUrls[event];
+                if (eventUrls) {
+                    eventUrls.forEach((eventUrl) => {
+                        this.getVast().addTrackingEventUrl(event, eventUrl);
+                    });
+                }
             });
         }
     }
