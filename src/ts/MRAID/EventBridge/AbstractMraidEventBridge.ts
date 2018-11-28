@@ -37,6 +37,8 @@ export interface IMRAIDBridge {
     sendViewableEvent(viewable: boolean): void;
 }
 
+export type IMRAIDBridgeConnector = HTMLIFrameElement | WebPlayerContainer;
+
 export enum MRAIDEvents {
     ORIENTATION         = 'orientation',
     OPEN                = 'open',
@@ -65,7 +67,7 @@ export abstract class AbstractMRAIDEventBridge implements IMRAIDBridge {
         this._handler = handler;
     }
 
-    public abstract connect(connector: HTMLIFrameElement | WebPlayerContainer): void;
+    public abstract connect(connector: IMRAIDBridgeConnector): void;
 
     public abstract disconnect(): void;
 
