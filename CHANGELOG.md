@@ -1,3 +1,11 @@
+# Pending
+
+* Read Unity Analytics identifiers from Unity Engine [#7274](https://github.com/Applifier/unity-ads-webview/pull/7274)
+
+# Wed Nov 28 13:03:18 UTC 2018
+
+* Add 广告 to Overlays for China Ads [#7102](https://github.com/Applifier/unity-ads-webview/pull/7102)
+
 # Mon Nov 26 23:00:23 UTC 2018
 
 * Revert Tracking Urls Changes for VAST and Disable Auction V5 [#7317](https://github.com/Applifier/unity-ads-webview/pull/7317)
