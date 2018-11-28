@@ -47,6 +47,7 @@ import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Purchasing } from 'Purchasing/Purchasing';
 import { JsonParser } from 'Core/Utilities/JsonParser';
+import { UnityInfo } from 'Core/Models/UnityInfo';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 
 export class Core implements ICore {
@@ -68,6 +69,7 @@ export class Core implements ICore {
     public JaegerManager: JaegerManager;
     public ClientInfo: ClientInfo;
     public DeviceInfo: DeviceInfo;
+    public UnityInfo: UnityInfo;
     public Config: CoreConfiguration;
 
     public Analytics: Analytics;
@@ -134,6 +136,7 @@ export class Core implements ICore {
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
             }
             this.CacheManager = new CacheManager(this.Api, this.WakeUpManager, this.RequestManager, this.CacheBookkeeping);
+            this.UnityInfo = new UnityInfo(this.NativeBridge.getPlatform(), this.Api);
             this.JaegerManager = new JaegerManager(this.RequestManager);
             this.JaegerManager.addOpenSpan(jaegerInitSpan);
 
@@ -148,7 +151,7 @@ export class Core implements ICore {
                 this.Api.Request.setConcurrentRequestCount(8);
             }
 
-            return Promise.all([this.DeviceInfo.fetch(), this.setupTestEnvironment()]);
+            return Promise.all([this.DeviceInfo.fetch(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
             HttpKafka.setDeviceInfo(this.DeviceInfo);
             this._initialized = true;
