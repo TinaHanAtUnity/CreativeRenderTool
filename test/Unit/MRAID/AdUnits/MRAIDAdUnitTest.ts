@@ -157,7 +157,6 @@ describe('MraidAdUnit', () => {
             });
 
             afterEach(() => {
-                sandbox.restore();
                 return mraidAdUnit.hide();
             });
 
@@ -181,7 +180,6 @@ describe('MraidAdUnit', () => {
             });
 
             afterEach(() => {
-                sandbox.restore();
                 return mraidAdUnit.hide();
             });
 
@@ -292,7 +290,7 @@ describe('MraidAdUnit', () => {
         });
 
         afterEach(() => {
-            sandbox.restore();
+            mraidAdUnit.hide();
         });
 
         it('should set finish state and hide the view if adunit is showing', () => {
@@ -300,7 +298,7 @@ describe('MraidAdUnit', () => {
                 mraidAdUnit.onContainerDestroy();
                 sinon.assert.calledWith(<sinon.SinonSpy>mraidAdUnit.setFinishState, FinishState.SKIPPED);
                 sinon.assert.called(<sinon.SinonSpy>mraidAdUnit.hide);
-            }).then(() => mraidAdUnit.hide());
+            });
         });
 
         it('should do nothing if adunit is not showing', () => {
@@ -312,14 +310,14 @@ describe('MraidAdUnit', () => {
 
     describe('onContainerBackground', () => {
         afterEach(() => {
-            sandbox.restore();
+            mraidAdUnit.hide();
         });
 
         it('should set viewable state to false', () => {
             return mraidAdUnit.show().then(() => {
                 mraidAdUnit.onContainerBackground();
                 sinon.assert.calledWith(<sinon.SinonSpy>mraidView.setViewableState, false);
-            }).then(() => mraidAdUnit.hide());
+            });
         });
 
         it('should do nothing if adunit is not showing', () => {
@@ -329,20 +327,28 @@ describe('MraidAdUnit', () => {
     });
 
     describe('onContainerShow', () => {
+        afterEach(() => {
+            mraidAdUnit.hide();
+        });
+
         it('should send the true viewable event over the bridge', () => {
             return mraidAdUnit.show().then(() => {
                 mraidAdUnit.onContainerShow();
                 sinon.assert.calledWith(<sinon.SinonSpy>mraidView.setViewableState, true);
-            }).then(() => mraidAdUnit.hide());
+            });
         });
     });
 
     describe('onContainerForeground', () => {
+        afterEach(() => {
+            mraidAdUnit.hide();
+        });
+
         it ('should send the true viewable event over the bridge when mraid is set as showing', () => {
             return mraidAdUnit.show().then(() => {
                 mraidAdUnit.onContainerForeground();
                 sinon.assert.calledWith(<sinon.SinonSpy>mraidView.setViewableState, true);
-            }).then(() => mraidAdUnit.hide());
+            });
         });
     });
 });

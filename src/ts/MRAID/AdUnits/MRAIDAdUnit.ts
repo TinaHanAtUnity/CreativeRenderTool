@@ -108,13 +108,13 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowing(false);
         this.setShowingMRAID(false);
 
-        this._mraid.hide();
-        this.hideEndScreen();
-        this.hidePrivacy();
+        this.hideMraidView();
+        this.removeEndScreenContainer();
+        this.removePrivacyContainer();
 
         this.sendFinishOperativeEvents();
         this.onFinish.trigger();
-        this.hideMraidContainer();
+        this.removeMraidContainer();
         this.unsetReferences();
 
         this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
@@ -219,7 +219,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         };
     }
 
-    private hideEndScreen() {
+    private removeEndScreenContainer() {
         if(this._endScreen) {
             this._endScreen.hide();
 
@@ -230,7 +230,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
     }
 
-    private hidePrivacy() {
+    private removePrivacyContainer() {
         if(this._privacy) {
             this._privacy.hide();
 
@@ -239,6 +239,17 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 privacyContainer.parentElement.removeChild(this._privacy.container());
             }
         }
+    }
+
+    private removeMraidContainer() {
+        const mraidContainer = this._mraid.container();
+        if (mraidContainer && mraidContainer.parentElement) {
+            mraidContainer.parentElement.removeChild(this._mraid.container());
+        }
+    }
+
+    private hideMraidView() {
+        this._mraid.hide();
     }
 
     private sendFinishOperativeEvents() {
@@ -257,13 +268,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             this.sendTrackingEvent('complete');
         } else if(finishState === FinishState.SKIPPED) {
             this._operativeEventManager.sendSkip(operativeEventParams);
-        }
-    }
-
-    private hideMraidContainer() {
-        const mraidContainer = this._mraid.container();
-        if (mraidContainer && mraidContainer.parentElement) {
-            mraidContainer.parentElement.removeChild(this._mraid.container());
         }
     }
 }
