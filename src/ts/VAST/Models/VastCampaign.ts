@@ -112,7 +112,6 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
         return this.get('isMoatEnabled');
     }
 
-    // Overidden function so tracking urls can combined with tracking urls from vast creative
     public setTrackingUrls(trackingUrls: ICampaignTrackingUrls) {
         super.setTrackingUrls(trackingUrls);
         this.addCustomTracking(trackingUrls);
