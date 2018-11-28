@@ -1,7 +1,7 @@
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
@@ -28,8 +28,8 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
     private _showGDPRBanner: boolean;
     private _gdprPopupClicked: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
-        super(nativeBridge, 'closer');
+    constructor(platform: Platform, placement: Placement, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+        super(platform, 'closer');
         this._template = new Template(CloserTemplate);
         this._placement = placement;
         this._privacy = privacy;
@@ -96,14 +96,13 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
     }
 
     public update(progress: number, total: number) {
-        let modifiedTotal = total;
-        if (progress >= (modifiedTotal * 0.75)) {
+        if (progress >= (total * 0.75)) {
             this._canReward = true;
         }
 
-        modifiedTotal = this._placement.allowSkip() ? this._placement.allowSkipInSeconds() : modifiedTotal;
-        const secondsLeft = this.clampLower(Math.floor(modifiedTotal - progress), 0);
-        let progressFraction = progress / modifiedTotal;
+        total = this._placement.allowSkip() ? this._placement.allowSkipInSeconds() : total;
+        const secondsLeft = this.clampLower(Math.floor(total - progress), 0);
+        let progressFraction = progress / total;
         if (secondsLeft <= 0) {
             this._allowClose = true;
         }

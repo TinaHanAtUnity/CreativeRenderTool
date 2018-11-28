@@ -1,3 +1,4 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
@@ -59,7 +60,7 @@ export class AppSheetApi extends NativeApi {
     public readonly onError = new Observable2<string, IAppSheetOptions>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AppSheet', ApiPackage.CORE);
+        super(nativeBridge, 'AppSheet', ApiPackage.CORE, EventCategory.APPSHEET);
     }
 
     public canOpen(): Promise<boolean> {

@@ -1,7 +1,8 @@
-import { Request, INativeResponse } from 'Core/Utilities/Request';
 import { ICampaignErrorHandler } from 'Ads/Errors/CampaignErrorHandlerFactory';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CampaignError } from 'Ads/Errors/CampaignError';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
+import { Url } from 'Core/Utilities/Url';
 
 // VAST Error code defined in 3.0
 // https://wiki.iabtechlab.com/index.php?title=VAST_Error_Code_Troubleshooting_Matrix
@@ -62,19 +63,19 @@ export class VastErrorInfo {
 }
 
 export class VastCampaignErrorHandler implements ICampaignErrorHandler {
-    private _request: Request;
-    private _nativeBridge: NativeBridge;
+    private _core: ICoreApi;
+    private _request: RequestManager;
 
-    constructor(nativeBridge: NativeBridge, request: Request) {
+    constructor(core: ICoreApi, request: RequestManager) {
         this._request = request;
-        this._nativeBridge = nativeBridge;
+        this._core = core;
     }
 
     public handleCampaignError(campaignError: CampaignError): Promise<void> {
         if (campaignError.errorTrackingUrl) {
             const errorCode = campaignError.errorCode ? campaignError.errorCode : VastErrorCode.UNDEFINED_ERROR;
             const errorUrl = this.formatVASTErrorURL(campaignError.errorTrackingUrl, errorCode, campaignError.assetUrl);
-            this._nativeBridge.Sdk.logInfo(`VAST Campaign Error tracking url: ${errorUrl} with errorCode: ${errorCode} errorMessage: ${campaignError.errorMessage}`);
+            this._core.Sdk.logInfo(`VAST Campaign Error tracking url: ${errorUrl} with errorCode: ${errorCode} errorMessage: ${campaignError.errorMessage}`);
 
             this._request.get(errorUrl, []).then(() => {
                 return Promise.resolve();
@@ -86,7 +87,7 @@ export class VastCampaignErrorHandler implements ICampaignErrorHandler {
     private formatVASTErrorURL(errorUrl: string, errorCode: VastErrorCode, assetUrl?: string): string {
         let formattedUrl = errorUrl.replace('[ERRORCODE]', errorCode.toString());
         if (assetUrl) {
-            formattedUrl = formattedUrl.replace('[ASSETURI]', assetUrl);
+            formattedUrl = formattedUrl.replace('[ASSETURI]', Url.encodeParam(assetUrl));
         }
         return formattedUrl;
     }

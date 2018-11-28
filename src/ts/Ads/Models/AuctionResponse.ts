@@ -1,8 +1,9 @@
 import { Model } from 'Core/Models/Model';
 import { JsonParser } from 'Core/Utilities/JsonParser';
+import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 
 export interface IAuctionResponse {
-    placements: string[];
+    placements: AuctionPlacement[];
     contentType: string;
     content: string;
     cacheTTL: number | undefined;
@@ -25,7 +26,7 @@ export interface IAuctionResponse {
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
-    constructor(placements: string[], data: any, mediaId: string, correlationId: string) {
+    constructor(placements: AuctionPlacement[], data: any, mediaId: string, correlationId: string) {
         super('AuctionResponse', {
             placements: ['array'],
             contentType: ['string'],
@@ -53,7 +54,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('contentType', data.contentType);
         this.set('content', data.content);
         this.set('cacheTTL', data.cacheTTL);
-        this.set('trackingUrls', data.trackingUrls);
+        this.set('trackingUrls', data.trackingUrls ? data.trackingUrls : {}); // todo: hack for auction v5 test, trackingUrls should be removed from this model once auction v5 is unconditionally adopted
         this.set('adType', data.adType);
         this.set('creativeId', data.creativeId);
         this.set('seatId', data.seatId);
@@ -71,7 +72,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('isMoatEnabled', data.isMoatEnabled);
     }
 
-    public getPlacements(): string[] {
+    public getPlacements(): AuctionPlacement[] {
         return this.get('placements');
     }
 

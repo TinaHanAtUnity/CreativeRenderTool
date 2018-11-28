@@ -1,5 +1,6 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { Platform } from 'Core/Constants/Platform';
-import { AndroidRequestApi } from 'Core/Native/Android/AndroidRequestApi';
+import { AndroidRequestApi } from 'Core/Native/Android/Request';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable3, Observable5 } from 'Core/Utilities/Observable';
@@ -10,20 +11,20 @@ export enum RequestEvent {
 }
 
 export class RequestApi extends NativeApi {
-    public Android: AndroidRequestApi;
+    public readonly Android?: AndroidRequestApi;
 
-    public readonly onComplete = new Observable5<string, string, string, number, Array<[string, string]>>();
+    public readonly onComplete = new Observable5<string, string, string, number, [string, string][]>();
     public readonly onFailed = new Observable3<string, string, string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Request', ApiPackage.CORE);
+        super(nativeBridge, 'Request', ApiPackage.CORE, EventCategory.REQUEST);
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
             this.Android = new AndroidRequestApi(nativeBridge);
         }
     }
 
-    public get(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
+    public get(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             return this._nativeBridge.invoke<string>(this._fullApiClassName, 'get', [id, url, headers, connectTimeout]);
         } else {
@@ -31,7 +32,7 @@ export class RequestApi extends NativeApi {
         }
     }
 
-    public post(id: string, url: string, requestBody: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
+    public post(id: string, url: string, requestBody: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             return this._nativeBridge.invoke<string>(this._fullApiClassName, 'post', [id, url, requestBody, headers, connectTimeout]);
         } else {
@@ -39,7 +40,7 @@ export class RequestApi extends NativeApi {
         }
     }
 
-    public head(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
+    public head(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number): Promise<string> {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             return this._nativeBridge.invoke<string>(this._fullApiClassName, 'head', [id, url, headers, connectTimeout]);
         } else {

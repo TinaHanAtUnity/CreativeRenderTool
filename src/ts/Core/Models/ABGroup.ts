@@ -101,8 +101,7 @@ class ABTest {
 
 // Add ABTests below
 // Example : export const GdprBaseAbTest = new ABTest(GroupSixteen, GroupSeventeen);
-
+export const NativeGreenEndScreenButtonColorTest = new ABTest(GroupSeven, GroupEight);
 export const FPSCollectionTest = new ABTest(GroupSixteen);
-export const ClickDelayTrackingTest = new ABTest(GroupFourteen, GroupFifteen);
-export const PerformanceVideoOverlayCTAButtonTest = new ABTest(GroupEighteen, GroupNineteen);
-export const AllowRewardedSkipTest = new ABTest(GroupSixteen, GroupSeventeen);
+export const NextSkipIconTest = new ABTest(GroupFive, GroupSix);
+export const AuctionV5Test = new ABTest(GroupDisabled);

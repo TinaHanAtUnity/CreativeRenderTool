@@ -1,6 +1,6 @@
+import { IARApi } from 'AR/AR';
 import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
 import { IosARApi } from 'AR/Native/iOS/IosARApi';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 export interface IARFrameTransform {
@@ -147,9 +147,9 @@ export class ARUtil {
         return isAR;
     }
 
-    public static isARSupported(nativeBridge: NativeBridge): Promise<boolean> {
-        return nativeBridge.AR.Ios ? nativeBridge.AR.Ios.isARSupported() :
-            nativeBridge.AR.Android ? ARUtil.isARSupportedAndroid(nativeBridge.AR.Android) :
+    public static isARSupported(ar?: IARApi): Promise<boolean> {
+        return ar && ar.AR.Ios ? ar.AR.Ios.isARSupported() :
+            ar && ar.AR.Android ? ARUtil.isARSupportedAndroid(ar.AR.Android) :
                 Promise.resolve<boolean>(false);
     }
 

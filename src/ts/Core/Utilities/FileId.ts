@@ -1,19 +1,19 @@
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { CacheApi } from 'Core/Native/Cache';
 
 export class FileId {
-    public static getFileId(url: string, nativeBridge: NativeBridge): Promise<string> {
-        let modifiedUrl = url;
-        if(modifiedUrl in this._fileIds) {
-            return Promise.resolve(this._fileIds[modifiedUrl]);
+
+    public static getFileId(url: string, cache: CacheApi): Promise<string> {
+        if(url in this._fileIds) {
+            return Promise.resolve(this._fileIds[url]);
         }
 
-        if(modifiedUrl.indexOf('?') !== -1) {
-            modifiedUrl = modifiedUrl.split('?')[0];
+        if(url.indexOf('?') !== -1) {
+            url = url.split('?')[0];
         }
 
         let extension: string;
-        let urlFilename: string = modifiedUrl;
-        const urlPaths = modifiedUrl.split('/');
+        let urlFilename: string = url;
+        const urlPaths = url.split('/');
         if(urlPaths.length > 1) {
             urlFilename = urlPaths[urlPaths.length - 1];
         }
@@ -22,12 +22,12 @@ export class FileId {
             extension = fileExtensions[fileExtensions.length - 1];
         }
 
-        return nativeBridge.Cache.getHash(modifiedUrl).then(hash => {
+        return cache.getHash(url).then(hash => {
             let fileId: string;
             if(extension) {
-                fileId = this._fileIds[modifiedUrl] = hash + '.' + extension;
+                fileId = this._fileIds[url] = hash + '.' + extension;
             } else {
-                fileId = this._fileIds[modifiedUrl] = hash;
+                fileId = this._fileIds[url] = hash;
             }
             return fileId;
         });
@@ -43,8 +43,8 @@ export class FileId {
         return fileIdSplit[1];
     }
 
-    public static getFileUrl(fileId: string, nativeBridge: NativeBridge): Promise<string> {
-        return nativeBridge.Cache.getFilePath(fileId).then(filePath => {
+    public static getFileUrl(fileId: string, cache: CacheApi): Promise<string> {
+        return cache.getFilePath(fileId).then(filePath => {
             return 'file://' + filePath;
         });
     }

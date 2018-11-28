@@ -1,9 +1,9 @@
-import 'mocha';
-import * as sinon from 'sinon';
 import { assert } from 'chai';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import 'mocha';
 import { CustomPurchasingApi, CustomPurchasingEvent } from 'Purchasing/Native/CustomPurchasing';
 import { ITransactionErrorDetails } from 'Purchasing/PurchasingAdapter';
+import * as sinon from 'sinon';
 
 describe('CustomPurchasingApi', () => {
 
@@ -19,10 +19,10 @@ describe('CustomPurchasingApi', () => {
 
         describe('TRANSACTION_ERROR', () => {
 
-            const tests: Array<{
+            const tests: {
                 input: ITransactionErrorDetails;
                 output: ITransactionErrorDetails;
-            }> = [
+            }[] = [
                 {
                     input: {
                         transactionError: 'SERVER_ERROR',

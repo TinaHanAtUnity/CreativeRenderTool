@@ -1,12 +1,13 @@
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';
 import { VastCreative } from 'VAST/Models/VastCreative';
 import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
+import { Url } from 'Core/Utilities/Url';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 
 export class VastParser {
@@ -73,7 +74,7 @@ export class VastParser {
         return new Vast(ads, errorURLTemplates);
     }
 
-    public retrieveVast(vast: any, nativeBridge: NativeBridge, request: Request, parent?: Vast, depth: number = 0): Promise<Vast> {
+    public retrieveVast(vast: any, core: ICoreApi, request: RequestManager, parent?: Vast, depth: number = 0): Promise<Vast> {
         let parsedVast: Vast;
 
         if (depth === 0) {
@@ -101,10 +102,11 @@ export class VastParser {
             throw new Error(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
         }
 
-        nativeBridge.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
+        const encodedWrapperURL = Url.encodeUrlWithQueryParams(wrapperURL);
+        core.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + encodedWrapperURL);
 
-        return request.get(wrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
-            return this.retrieveVast(response.response, nativeBridge, request, parsedVast, depth + 1);
+        return request.get(encodedWrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
+            return this.retrieveVast(response.response, core, request, parsedVast, depth + 1);
         });
     }
 
