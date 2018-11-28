@@ -68,10 +68,10 @@ import { VPAID } from 'VPAID/VPAID';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromo } from 'XPromo/XPromo';
 import { AR } from 'AR/AR';
-import { GDPRConsent } from 'Ads/Views/Consent/GDPRConsent';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
 
 export class Ads implements IAds {
 
@@ -227,12 +227,12 @@ export class Ads implements IAds {
         if (!showConsent) {
             return Promise.resolve();
         }
-        const consentView = new GDPRConsent({
+        const consentView = new ConsentUnit({
             platform: this._core.NativeBridge.getPlatform(),
             gdprManager: this.GdprManager,
             adUnitContainer: this.Container
         });
-        return consentView.showAndHandleConsent(options);
+        return consentView.show(options);
     }
 
     public show(placementId: string, options: any, callback: INativeCallback): void {
