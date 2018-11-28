@@ -2,6 +2,7 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 // TODO: move to sharedLibs
 def waitWebviewDeployed(webviewBranch) {
+    // TODO: use Travis build status to detect webview deployment status
     timeout(15) {
         def CONFIG_URL = "https://config.unityads.unity3d.com/webview/${webviewBranch}/test/config.json"
         echo "Waiting for $CONFIG_URL..."
@@ -104,6 +105,7 @@ def main() {
                                   parameters: [
                                     string(name: 'WEBVIEW_BRANCH', value: env.BRANCH_NAME),
                                     string(name: 'UNITY_ADS_ANDROID_BRANCH', value: nativeBranch),
+
                                     //TODO: enable tests before pushing to master
                                     booleanParam(name: 'RUN_TD_TESTS', value: false)
                                   ],
@@ -118,8 +120,10 @@ def main() {
                                   parameters: [
                                     string(name: 'WEBVIEW_BRANCH', value: env.BRANCH_NAME),
                                     string(name: 'UNITY_ADS_IOS_BRANCH', value: nativeBranch),
-                                    //TODO: enable tests before pushing to master
-                                    booleanParam(name: 'RUN_TD_TESTS', value: false)
+
+                                    //TODO: remove the following parameters before pushing to master:
+                                    string(name: 'TD_SCHEDULER', value: "SINGLE"),
+                                    string(name: 'TD_DEVICE_GROUP_ID', value: "4127")
                                   ],
                                 )
                             }
