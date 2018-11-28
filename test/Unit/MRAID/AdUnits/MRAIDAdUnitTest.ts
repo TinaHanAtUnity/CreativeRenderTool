@@ -89,6 +89,7 @@ describe('MraidAdUnit', () => {
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
         const mraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
+        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
@@ -114,21 +115,21 @@ describe('MraidAdUnit', () => {
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: sinon.createStubInstance(Activity),
-            deviceInfo: sinon.createStubInstance(DeviceInfo),
-            clientInfo: sinon.createStubInstance(ClientInfo),
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
             campaign: mraidCampaign,
             coreConfig: coreConfig,
             adsConfig: adsConfig,
-            request: sinon.createStubInstance(Request),
+            request: request,
             options: {},
             mraid: mraidView,
             endScreen: undefined,
             privacy: new Privacy(platform, mraidCampaign, userPrivacyManager, false, false),
             privacyManager: userPrivacyManager,
-            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
+            programmaticTrackingService: programmaticTrackingService
         };
 
         (<any>mraidAdUnitParameters.container).onShow = new Observable0();
