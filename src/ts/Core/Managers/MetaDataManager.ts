@@ -1,12 +1,12 @@
+import { ICoreApi } from 'Core/ICore';
 import { BaseMetaData } from 'Core/Models/MetaData/BaseMetaData';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export class MetaDataManager {
     private _metaDataCache: { [key: string]: any } = {};
-    private _nativeBridge: NativeBridge;
+    private _core: ICoreApi;
 
-    constructor(nativeBridge: NativeBridge) {
-        this._nativeBridge = nativeBridge;
+    constructor(core: ICoreApi) {
+        this._core = core;
     }
 
     public fetch<T extends BaseMetaData>(MetaDataConstructor: { new(): T}, cache: boolean = true, keys?: string[]): Promise<T | undefined> {
@@ -19,7 +19,7 @@ export class MetaDataManager {
             }
         }
 
-        return metaData.fetch(this._nativeBridge, keys).then((success) => {
+        return metaData.fetch(this._core, keys).then((success) => {
             if (success) {
                 if(cache) {
                     this._metaDataCache[metaData.getCategory()] = metaData;

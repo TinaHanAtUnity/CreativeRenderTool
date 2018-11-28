@@ -1,31 +1,33 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { GDPREventAction, GDPREventSource, GdprManager } from 'Ads/Managers/GdprManager';
+import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/ICore';
 
 export class PrivacyEventHandler implements IPrivacyHandler {
 
-    private _nativeBridge: NativeBridge;
-    private _gdprManager: GdprManager;
+    private _platform: Platform;
+    private _core: ICoreApi;
+    private _privacyManager: UserPrivacyManager;
     private _configuration: AdsConfiguration;
     private _placement: Placement;
 
-    constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
-        this._nativeBridge = nativeBridge;
-        this._gdprManager = parameters.gdprManager;
+    constructor(parameters: IAdUnitParameters<Campaign>) {
+        this._platform = parameters.platform;
+        this._core = parameters.core;
+        this._privacyManager = parameters.privacyManager;
         this._configuration = parameters.adsConfig;
         this._placement = parameters.placement;
     }
 
     public onPrivacy(url: string): void {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._nativeBridge.UrlScheme.open(url);
-        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.Intent.launch({
+        if (this._platform === Platform.IOS) {
+            this._core.iOS!.UrlScheme.open(url);
+        } else if (this._platform === Platform.ANDROID) {
+            this._core.Android!.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': url
             });
@@ -42,9 +44,9 @@ export class PrivacyEventHandler implements IPrivacyHandler {
                 this._configuration.setOptOutEnabled(optOutEnabled);
                 if (optOutEnabled) {
                     // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
-                    this._gdprManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
+                    this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
                 } else {
-                    this._gdprManager.sendGDPREvent(GDPREventAction.OPTIN);
+                    this._privacyManager.sendGDPREvent(GDPREventAction.OPTIN);
                 }
             }
         } else {
@@ -55,9 +57,9 @@ export class PrivacyEventHandler implements IPrivacyHandler {
             // as skip because user has not pressed any button and opening the privacy dialog might have been just a misclick
             if (optOutEnabled) {
                 // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
-                this._gdprManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
+                this._privacyManager.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.USER);
             } else {
-                this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
+                this._privacyManager.sendGDPREvent(GDPREventAction.SKIP);
             }
         }
     }

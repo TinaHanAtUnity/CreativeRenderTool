@@ -1,4 +1,4 @@
-import { Cache, HeadersType, ICacheEvent } from 'Core/Utilities/Cache';
+import { CacheManager, HeadersType, ICacheEvent } from 'Core/Managers/CacheManager';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { IObserver1, IObserver2, IObserver3, IObserver5 } from 'Core/Utilities/IObserver';
 
@@ -19,7 +19,7 @@ export interface ICacheDiagnostics {
 
 export class CacheDiagnostics {
 
-    private readonly _cache: Cache;
+    private readonly _cache: CacheManager;
     private readonly _data: ICacheDiagnostics;
 
     private readonly _startObserver: IObserver2<ICacheEvent, number>;
@@ -29,7 +29,7 @@ export class CacheDiagnostics {
     private readonly _finishErrorObserver: IObserver5<ICacheEvent, number, number, number, HeadersType>;
     private readonly _errorObserver: IObserver3<ICacheEvent, string, string>;
 
-    constructor(cache: Cache, data: ICacheDiagnostics) {
+    constructor(cache: CacheManager, data: ICacheDiagnostics) {
         this._cache = cache;
         this._data = data;
         this._startObserver = cache.onStart.subscribe((event, size) => this.sendDiagnostic(size === 0 ? CacheDiagnosticEvent.STARTED : CacheDiagnosticEvent.RESUMED, event));

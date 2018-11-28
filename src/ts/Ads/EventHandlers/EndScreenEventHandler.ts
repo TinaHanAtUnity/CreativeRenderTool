@@ -1,10 +1,13 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
+import { IAdsApi } from 'Ads/IAds';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
-import { IEndScreenHandler } from 'Ads/Views/EndScreen';
-import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { IAppStoreDownloadHelper, IAppStoreDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { IEndScreenHandler } from 'Ads/Views/EndScreen';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { StoreName } from 'Performance/Models/PerformanceCampaign';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -18,13 +21,16 @@ export interface IEndScreenDownloadParameters {
 
 export abstract class EndScreenEventHandler<T extends Campaign, T2 extends AbstractAdUnit> extends GDPREventHandler implements IEndScreenHandler {
 
+    protected _platform: Platform;
+    protected _core: ICoreApi;
+    protected _ads: IAdsApi;
     protected _adUnit: T2;
     protected _campaign: T;
 
     private _downloadHelper: IAppStoreDownloadHelper;
 
     constructor(adUnit: T2, parameters: IAdUnitParameters<T>, downloadHelper: IAppStoreDownloadHelper) {
-        super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
+        super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig);
         this._adUnit = adUnit;
         this._downloadHelper = downloadHelper;
     }
