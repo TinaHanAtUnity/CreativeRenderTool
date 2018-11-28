@@ -20,13 +20,7 @@ export class WebView {
     }
 
     public show(placementId: string, options: any, callback: INativeCallback): void {
-        callback(CallbackStatus.OK);
-        if (this._showConsent) {
-            this._core.Ads.showConsent(placementId, options, callback);
-            // this._showConsent = false;
-        } else {
-            this._core.Ads.show(placementId, options, callback);
-        }
+        this._core.Ads.show(placementId, options, callback);
     }
 
     public showBanner(placementId: string, callback: INativeCallback) {

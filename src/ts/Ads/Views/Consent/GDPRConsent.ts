@@ -4,7 +4,6 @@ import { Template } from 'Core/Utilities/Template';
 import { GDPRConsentSettings } from 'Ads/Views/Consent/GDPRConsentSettings';
 import { Platform } from 'Core/Constants/Platform';
 import { GdprManager } from 'Ads/Managers/GdprManager';
-import { AdUnitContainerSystemMessage } from 'Ads/AdUnits/Containers/AdUnitContainer';
 
 export interface IGDPRConsentViewParameters {
     platform: Platform;
@@ -14,14 +13,12 @@ export interface IGDPRConsentViewParameters {
 export interface IGDPRConsentHandler {
     onConsent(consent: boolean): void;
     onShowOptions(): void;
+    onConsentHide(): void;
 }
 
 export class GDPRConsent extends View<IGDPRConsentHandler> {
     private _parameters: IGDPRConsentViewParameters;
     private _consentSettingsView: GDPRConsentSettings;
-    private _doneCallback: () => void;
-    private _closeCallback: () => void;
-    private _isShowing: boolean;
 
     constructor(parameters: IGDPRConsentViewParameters) {
         super(parameters.platform, 'gdpr-consent');
@@ -43,11 +40,6 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
         ];
     }
 
-    public show(): void {
-        this._isShowing = true;
-        super.show();
-    }
-
     public hide(): void {
         super.hide();
 
@@ -56,46 +48,13 @@ export class GDPRConsent extends View<IGDPRConsentHandler> {
             document.body.removeChild(this._consentSettingsView.container());
             delete this._consentSettingsView;
         }
-
-    }
-
-    // TODO: I feel this could be done neater
-    public setDoneCallback(callback: () => void): void {
-        this._doneCallback = callback;
-    }
-
-    public setCloseCallback(callback: () => void): void {
-        this._closeCallback = callback;
-    }
-
-    public onContainerShow(): void {
-        // Blank
-    }
-
-    public onContainerDestroy(): void {
-        if (this._isShowing) {
-            this._isShowing = false;
-            this._closeCallback();
-        }
-    }
-
-    public onContainerBackground(): void {
-        // Blank
-    }
-
-    public onContainerForeground(): void {
-        // Blank
-    }
-
-    public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
-        // Blank
+        this._handlers.forEach(h => h.onConsentHide());
     }
 
     private onAgreeEvent(event: Event) {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onConsent(true));
         this.hide();
-        this._doneCallback();
     }
 
     private onOptionsEvent(event: Event) {
