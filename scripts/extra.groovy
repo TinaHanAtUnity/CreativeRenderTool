@@ -16,9 +16,7 @@ def waitWebviewDeployed(webviewBranch) {
 def main() {
     webviewBranch = "${env.BRANCH_NAME}/${env.revision}"
 
-    //TODO: use if clause below instead before pushing to master
-    //if (env.BRANCH_NAME =~ /^PR-/) {
-    if (env.BRANCH_NAME =~ /feature\/jenkinsfile/) {
+    if (env.BRANCH_NAME =~ /^PR-/) {
         stage('Wait for webview deployment') {
             parallel (
                 'checkout-helpers': {
@@ -88,16 +86,12 @@ def main() {
 
             try {
                 dir('results') {
-                    //TODO: use if clause below instead before pushing to master
-                    //if (env.BRANCH_NAME =~ /^staging/) {
-                    // run deployment tests
-                    if (env.BRANCH_NAME =~ /feature\/jenkinsfile/) {
+                    if (env.BRANCH_NAME =~ /^staging/) { // run deployment tests
                         nativeBranch = env.BRANCH_NAME.replace("staging/", "");
 
                         parallel (hybridTestBuilders + systemTestBuilders)
 
-                    // run only hybrid tests
-                    } else {
+                    } else { // run only hybrid tests
                         parallel hybridTestBuilders
                     }
                 }
