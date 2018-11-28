@@ -32,7 +32,7 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory {
             const vastEndscreenParameters: IVastEndscreenParameters = {
                 campaign: vastAdUnitParameters.campaign,
                 clientInfo: vastAdUnitParameters.clientInfo,
-                seatId: vastAdUnitParameters.campaign.getSeatId()
+                country: vastAdUnitParameters.coreConfig.getCountry()
             };
 
             vastEndScreen = new VastEndScreen(parameters.platform, vastEndscreenParameters, privacy);

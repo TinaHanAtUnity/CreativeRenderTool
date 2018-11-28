@@ -18,7 +18,7 @@ export interface IVastEndScreenHandler {
 export interface IVastEndscreenParameters {
     campaign: VastCampaign;
     clientInfo: ClientInfo;
-    seatId: number | undefined;
+    country: string | undefined;
 }
 
 export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandler {
@@ -27,14 +27,14 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     private _privacy: AbstractPrivacy;
     private _callButtonEnabled: boolean = true;
     private _campaign: VastCampaign;
-    private _seatId: number | undefined;
+    private _country: string | undefined;
 
     constructor(platform: Platform, parameters: IVastEndscreenParameters, privacy: AbstractPrivacy) {
         super(platform, 'vast-end-screen');
 
         this._campaign = parameters.campaign;
         this._template = new Template(VastEndScreenTemplate);
-        this._seatId = parameters.seatId;
+        this._country = parameters.country;
         this._privacy = privacy;
 
         if(this._campaign) {
@@ -79,11 +79,8 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     public render(): void {
         super.render();
 
-        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
-            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
-            if (tencentAdTag) {
-                tencentAdTag.innerText = '广告';
-            }
+        if (this._country === 'CN') {
+            (<HTMLElement>this._container.querySelector('.china-advertisement')).style.display = 'block';
         }
 
         if(this._isSwipeToCloseEnabled) {
