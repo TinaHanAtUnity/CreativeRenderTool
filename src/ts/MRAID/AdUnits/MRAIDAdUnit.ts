@@ -231,13 +231,9 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private removePrivacyContainer() {
-        if(this._privacy) {
-            this._privacy.hide();
-
-            const privacyContainer = this._privacy.container();
-            if (privacyContainer && privacyContainer.parentElement) {
-                privacyContainer.parentElement.removeChild(this._privacy.container());
-            }
+        const privacyContainer = this._privacy.container();
+        if (privacyContainer && privacyContainer.parentElement) {
+            privacyContainer.parentElement.removeChild(this._privacy.container());
         }
     }
 
