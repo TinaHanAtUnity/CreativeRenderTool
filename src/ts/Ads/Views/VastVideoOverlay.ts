@@ -1,4 +1,3 @@
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
@@ -18,13 +17,6 @@ export class VastVideoOverlay extends NewVideoOverlay implements IPrivacyHandler
     public render(): void {
         super.render();
         this.choosePrivacyShown();
-
-        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
-            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
-            if (tencentAdTag) {
-                tencentAdTag.innerText = '广告';
-            }
-        }
     }
 
     protected cleanUpPrivacy() {
