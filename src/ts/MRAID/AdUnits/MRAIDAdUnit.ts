@@ -108,7 +108,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowing(false);
         this.setShowingMRAID(false);
 
-        this.hideMraidView();
+        this._mraid.hide();
         this.removeEndScreenContainer();
         this.removePrivacyContainer();
 
@@ -246,10 +246,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         if (mraidContainer && mraidContainer.parentElement) {
             mraidContainer.parentElement.removeChild(this._mraid.container());
         }
-    }
-
-    private hideMraidView() {
-        this._mraid.hide();
     }
 
     private sendFinishOperativeEvents() {
