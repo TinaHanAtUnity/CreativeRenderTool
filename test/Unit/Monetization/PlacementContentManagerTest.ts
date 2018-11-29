@@ -119,7 +119,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
                 beforeEach(() => {
                     campaignManager.onCampaign.trigger(tt.placementId, tt.campaign, undefined);
-                    return new Promise(setTimeout);
+                    return new Promise((resolve) => setTimeout(resolve, 0));
                 });
 
                 describe(`on campaign for ${tt.name}`, () => {
@@ -145,7 +145,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 const placementId = 'foobar';
                 beforeEach(() => {
                     campaignManager.onNoFill.trigger(placementId);
-                    return new Promise(setTimeout);
+                    return new Promise((resolve) => setTimeout(resolve, 0));
                 });
                 it('should create an undecided placement content type', () => {
                     const call = asStub(monetization.PlacementContents.createPlacementContent).getCall(0);
@@ -183,7 +183,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     };
 
                     adUnit.onStart.trigger();
-                    return new Promise(setTimeout);
+                    return new Promise((resolve) => setTimeout(resolve, 0));
                 });
 
                 it('should set all other ads to waiting', () => {
@@ -198,7 +198,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 beforeEach(() => {
                     asStub(adUnit.getFinishState).returns(finishState);
                     adUnit.onClose.trigger();
-                    return new Promise(setTimeout);
+                    return new Promise((resolve) => setTimeout(resolve, 0));
                 });
 
                 it('should call the ad finished listeners for this placement content', () => {
@@ -242,7 +242,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
 
                     promo.Purchasing.onIAPSendEvent.trigger('{"type": "CatalogUpdated"}');
-                    return new Promise(setTimeout);
+                    return new Promise((resolve) => setTimeout(resolve, 0));
                 });
 
                 it('should set the current placementContent state to waiting', () => {
@@ -255,7 +255,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
 
                     promo.Purchasing.onIAPSendEvent.trigger('{"type": "CatalogUpdated"}');
-                    return new Promise(setTimeout);
+                    return new Promise((resolve) => setTimeout(resolve, 0));
                 });
 
                 it('should mark placement as ready if product is in the catalog', () => {

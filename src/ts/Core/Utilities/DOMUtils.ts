@@ -6,7 +6,7 @@ export class DOMUtils {
         if (/^\s*text\/html\s*(?:;|$)/i.test(type)) {
             const doc = document.implementation.createHTMLDocument('');
             if (markup.toLowerCase().indexOf('<!doctype') > -1) {
-                doc.documentElement.innerHTML = markup;
+                doc.documentElement!.innerHTML = markup;
             } else {
                 doc.body.innerHTML = markup;
             }

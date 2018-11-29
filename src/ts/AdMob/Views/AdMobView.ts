@@ -191,7 +191,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this.removeScriptTags(dom);
         this.injectVideoURL(dom);
         return this.injectScripts(dom).then(() => {
-            return dom.documentElement.outerHTML;
+            return dom.documentElement!.outerHTML;
         });
     }
 
@@ -223,7 +223,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private removeScriptTags(dom: Document) {
         this.removeScriptTag(dom, 'mraid.js');
         this.removeScriptTag(dom, 'afma_unity_stub.js');
-        return dom.documentElement.outerHTML;
+        return dom.documentElement!.outerHTML;
     }
 
     private removeScriptTag(doc: Document, scriptName: string) {
