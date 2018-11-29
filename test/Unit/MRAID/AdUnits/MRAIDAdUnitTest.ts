@@ -23,6 +23,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { Privacy } from 'Ads/Views/Privacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 
 describe('MraidAdUnit', () => {
     const sandbox = sinon.createSandbox();
@@ -30,6 +31,10 @@ describe('MraidAdUnit', () => {
     let mraidAdUnit: MRAIDAdUnit;
     let mraidView: MRAID;
     let ads: IAdsApi;
+    let operativeEventManager: OperativeEventManager;
+
+    let containerOpen: sinon.SinonSpy;
+    let containerClose: sinon.SinonSpy;
 
     afterEach(() => {
         sandbox.restore();
@@ -57,7 +62,7 @@ describe('MraidAdUnit', () => {
         const adsConfig = TestFixtures.getAdsConfiguration();
         const mraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
 
-        const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+        operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform: platform,
             core: core,
             ads: ads,
@@ -98,8 +103,8 @@ describe('MraidAdUnit', () => {
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };
 
-        (<sinon.SinonStub>mraidAdUnitParameters.container.open).returns(Promise.resolve());
-        (<sinon.SinonStub>mraidAdUnitParameters.container.close).returns(Promise.resolve());
+        containerOpen = (<sinon.SinonStub>mraidAdUnitParameters.container.open).returns(Promise.resolve());
+        containerClose = (<sinon.SinonStub>mraidAdUnitParameters.container.close).returns(Promise.resolve());
 
         sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
         sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
@@ -110,7 +115,7 @@ describe('MraidAdUnit', () => {
     });
 
     describe('on show', () => {
-        let onStartObserver: IObserver0;
+        let onStartObserver: sinon.SinonSpy;
 
         describe('for Mraid', () => {
             beforeEach(() => {
@@ -124,11 +129,12 @@ describe('MraidAdUnit', () => {
             });
 
             it('should trigger onStart', () => {
-                sinon.assert.calledOnce(<sinon.SinonSpy>onStartObserver);
+                sinon.assert.calledOnce(onStartObserver);
+                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendStart);
             });
 
             it('should open the container', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>mraidAdUnitParameters.container.open, mraidAdUnit, ['webview'], true, Orientation.NONE, true, false, true, false, {});
+                sinon.assert.calledWith(containerOpen, mraidAdUnit, ['webview'], true, Orientation.NONE, true, false, true, false, {});
             });
         });
 
@@ -147,20 +153,19 @@ describe('MraidAdUnit', () => {
             });
 
             it('should set up the ar View if AR is supported', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>mraidAdUnitParameters.container.open, mraidAdUnit, ['arview', 'webview'], true, Orientation.NONE, true, false, true, false, {});
+                sinon.assert.calledOnce(onStartObserver);
+                sinon.assert.calledWith(containerOpen, mraidAdUnit, ['arview', 'webview'], true, Orientation.NONE, true, false, true, false, {});
 
             });
         });
     });
 
     describe('on hide', () => {
-        const finishState = FinishState.COMPLETED;
-        let onCloseObserver: IObserver0;
+        let onCloseObserver: sinon.SinonSpy;
 
         beforeEach(() => {
             onCloseObserver = sinon.spy();
             mraidAdUnit.onClose.subscribe(onCloseObserver);
-            mraidAdUnit.setFinishState(finishState);
         });
 
         it('should resolve when isShowing is false', () => {
@@ -168,7 +173,7 @@ describe('MraidAdUnit', () => {
             sandbox.stub(mraidAdUnit, 'setShowingMRAID');
 
             return mraidAdUnit.hide().then(() => {
-                sinon.assert.notCalled(<sinon.SinonSpy>onCloseObserver);
+                sinon.assert.notCalled(onCloseObserver);
                 sinon.assert.notCalled(<sinon.SinonSpy>mraidAdUnit.setShowing);
                 sinon.assert.notCalled(<sinon.SinonSpy>mraidAdUnit.setShowingMRAID);
             });
@@ -176,15 +181,29 @@ describe('MraidAdUnit', () => {
 
         it('should trigger on close', () => {
             return mraidAdUnit.show().then(() => mraidAdUnit.hide()).then(() => {
-                sinon.assert.called(<sinon.SinonSpy>onCloseObserver);
+                sinon.assert.called(containerClose);
+                sinon.assert.called(onCloseObserver);
             });
         });
 
-        it('should send the finish event', () => {
-            sinon.stub(ads.Listener, 'sendFinishEvent').returns(Promise.resolve(void(0)));
+        it('should send the finish events if finish state is complete', () => {
+            mraidAdUnit.setFinishState(FinishState.COMPLETED);
+            sandbox.stub(ads.Listener, 'sendFinishEvent').returns(Promise.resolve(void(0)));
 
             return mraidAdUnit.show().then(() => mraidAdUnit.hide()).then(() => {
-                sinon.assert.calledWith(<sinon.SinonSpy>ads.Listener.sendFinishEvent, mraidAdUnitParameters.placement.getId(), finishState);
+                sinon.assert.calledWith(<sinon.SinonSpy>ads.Listener.sendFinishEvent, mraidAdUnitParameters.placement.getId(), FinishState.COMPLETED);
+                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile);
+                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendView);
+            });
+        });
+
+        it('should send the skip events if finish state is skipped', () => {
+            mraidAdUnit.setFinishState(FinishState.SKIPPED);
+            sandbox.stub(ads.Listener, 'sendFinishEvent').returns(Promise.resolve(void(0)));
+
+            return mraidAdUnit.show().then(() => mraidAdUnit.hide()).then(() => {
+                sinon.assert.calledWith(<sinon.SinonSpy>ads.Listener.sendFinishEvent, mraidAdUnitParameters.placement.getId(), FinishState.SKIPPED);
+                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendSkip);
             });
         });
     });
@@ -202,7 +221,7 @@ describe('MraidAdUnit', () => {
         it('should change the orientation properties used by container open', () => {
             mraidAdUnit.setOrientationProperties(properties);
             return mraidAdUnit.show().then(() => {
-                sinon.assert.calledWith(<sinon.SinonSpy>mraidAdUnitParameters.container.open, mraidAdUnit, ['webview'], false, Orientation.NONE, true, false, true, false, {});
+                sinon.assert.calledWith(containerOpen, mraidAdUnit, ['webview'], false, Orientation.NONE, true, false, true, false, {});
             });
         });
     });
