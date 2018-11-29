@@ -1,26 +1,50 @@
 import { assert } from 'chai';
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { toAbGroup, FakeEnabledABTest, FakeDisabledABTest } from 'Core/Models/ABGroup';
 import 'mocha';
 
-describe('ABGroupBuilder tests', () => {
-    describe('getAbGroup', () => {
-        it('should give a valid group for numbers between 0-19', () => {
-            for(let i = 0; i < 20; i++) {
-                const abGroup = ABGroupBuilder.getAbGroup(i);
-                assert.notEqual(abGroup.toNumber(), -1);
-                assert.equal(abGroup.toNumber(), i);
+describe('ABGroupTests', () => {
+    const validGroups = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ];
+
+    describe('toAbGroup', () => {
+        it('should return test A/B group for number 99', () => {
+            assert.equal(toAbGroup(99), 99);
+        });
+
+        it('should return a valid group for numbers between 0-19', () => {
+            assert.equal(toAbGroup(validGroups[0]), 0);
+            for (const i of validGroups) {
+                assert.equal(toAbGroup(i), i);
+            }
+            assert.equal(toAbGroup(validGroups[validGroups.length - 1]), 19);
+        });
+
+        it('should return invalid group', () => {
+            assert.equal(toAbGroup(-1), -1);
+            assert.equal(toAbGroup(20), -1);
+        });
+    });
+
+    describe('FakeEnabledABTest', () => {
+        it('should return true for A/B groups 16 and 17', () => {
+            assert.isTrue(FakeEnabledABTest.isValid(toAbGroup(16)));
+            assert.isTrue(FakeEnabledABTest.isValid(toAbGroup(17)));
+        });
+
+        it('should return false for other A/B groups', () => {
+            const invalidGroups = validGroups.filter(v => v !== 16 && v !== 17);
+            for (const i of invalidGroups) {
+                assert.isFalse(FakeEnabledABTest.isValid(toAbGroup(i)));
             }
         });
+    });
 
-        it('should give a valid group for 99', () => {
-            const abGroup = ABGroupBuilder.getAbGroup(99);
-            assert.notEqual(abGroup.toNumber(), -1);
-            assert.equal(abGroup.toNumber(), 99);
-        });
-
-        it('should give group none when not valid', () => {
-            const abGroup = ABGroupBuilder.getAbGroup(20);
-            assert.equal(abGroup.toNumber(), -1);
+    describe('FakeDisabledABTest tests', () => {
+        it('should return false for all A/B groups', () => {
+            for (const i of validGroups) {
+                assert.isFalse(FakeDisabledABTest.isValid(toAbGroup(i)));
+            }
+            assert.isFalse(FakeDisabledABTest.isValid(99));
+            assert.isFalse(FakeDisabledABTest.isValid(-1));
         });
     });
 });

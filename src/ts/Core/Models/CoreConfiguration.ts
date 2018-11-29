@@ -27,7 +27,7 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
         enabled: ['boolean'],
         country: ['string'],
         coppaCompliant: ['boolean'],
-        abGroup: ['object'],
+        abGroup: ['number'],
         properties: ['string'],
         analytics: ['boolean'],
         test: ['boolean'],
@@ -82,7 +82,7 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
             'enabled': this.isEnabled(),
             'country': this.getCountry(),
             'coppaCompliant': this.isCoppaCompliant(),
-            'abGroup': this.getAbGroup().toNumber(),
+            'abGroup': this.getAbGroup(),
             'gamerToken': this.getToken(),
             'projectId': this.getUnityProjectId()
         };

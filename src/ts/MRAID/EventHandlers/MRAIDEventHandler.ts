@@ -24,8 +24,6 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adUnit: MRAIDAdUnit;
     private _mraidView: MRAIDView<IMRAIDViewHandler>;
-    private _clientInfo: ClientInfo;
-    private _deviceInfo: DeviceInfo;
     private _request: RequestManager;
     private _placement: Placement;
     private _platform: Platform;
@@ -39,8 +37,6 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._adUnit = adUnit;
         this._mraidView = adUnit.getMRAIDView();
-        this._clientInfo = parameters.clientInfo;
-        this._deviceInfo = parameters.deviceInfo;
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._request = parameters.request;
@@ -62,7 +58,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             }
         } else {    // DSP MRAID
             this.setCallButtonEnabled(false);
-            return this._request.followRedirectChain(url).then((storeUrl) => {
+            return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking()).then((storeUrl) => {
                 return this.openUrlOnCallButton(storeUrl);
             }).catch(() => {
                 const urlParts = Url.parse(url);
@@ -121,9 +117,8 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
 
     private handleClickAttribution() {
         const clickAttributionUrl = this._campaign.getClickAttributionUrl();
-        const useWebViewUA = this._campaign.getUseWebViewUserAgentForTracking();
         if(this._campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
-            this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true, useWebViewUA).then(response => {
+            this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true, this._campaign.getUseWebViewUserAgentForTracking()).then(response => {
                 const location = RequestManager.getHeader(response.headers, 'location');
                 if(location) {
                     this.openUrl(location);
@@ -147,7 +142,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             });
         } else {
             if (clickAttributionUrl) {
-                this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false, useWebViewUA);
+                this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false, this._campaign.getUseWebViewUserAgentForTracking());
             }
         }
     }

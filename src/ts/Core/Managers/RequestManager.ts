@@ -213,8 +213,12 @@ export class RequestManager {
     }
 
     // Follows the redirects of a URL, returning the final location.
-    public followRedirectChain(url: string, resolveOnHttpError = false): Promise<string> {
+    public followRedirectChain(url: string, useWebViewUserAgentForTracking = false): Promise<string> {
         let redirectCount = 0;
+        const headers: [string, string][] = [];
+        if (useWebViewUserAgentForTracking && typeof navigator !== 'undefined' && navigator.userAgent) {
+            headers.push(['User-Agent', navigator.userAgent]);
+        }
         return new Promise((resolve, reject) => {
             const makeRequest = (requestUrl: string) => {
                 redirectCount++;
@@ -225,7 +229,7 @@ export class RequestManager {
                     // market:// or itunes:// urls can be opened directly
                     resolve(requestUrl);
                 } else {
-                    this.head(requestUrl).then((response: INativeResponse) => {
+                    this.head(requestUrl, headers).then((response: INativeResponse) => {
                         if (RequestManager.is3xxRedirect(response.responseCode)) {
                             const location = RequestManager.getHeader(response.headers, 'location');
                             if (location) {
@@ -236,11 +240,7 @@ export class RequestManager {
                         } else if (RequestManager.is2xxSuccessful(response.responseCode)) {
                             resolve(requestUrl);
                         } else {
-                            if (resolveOnHttpError) {
-                                resolve(requestUrl);
-                            } else {
-                                reject(new Error(`Request to ${requestUrl} failed with status ${response.responseCode}`));
-                            }
+                            reject(new Error(`Request to ${requestUrl} failed with status ${response.responseCode}`));
                         }
                     }).catch(reject);
                 }
