@@ -105,4 +105,4 @@ export const NativeGreenEndScreenButtonColorTest = new ABTest(GroupSeven, GroupE
 export const FPSCollectionTest = new ABTest(GroupSixteen);
 export const NextSkipIconTest = new ABTest(GroupFive, GroupSix);
 export const AuctionV5Test = new ABTest(GroupDisabled);
-export const VastParsingStrictTest = new ABTest(GroupNone); // Testing new vast parser logic
+export const VastParsingStrictTest = new ABTest(GroupDisabled); // Testing new vast parser logic
