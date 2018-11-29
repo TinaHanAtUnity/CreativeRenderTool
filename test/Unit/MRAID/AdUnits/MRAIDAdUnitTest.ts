@@ -6,7 +6,6 @@ import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAID } from 'MRAID/Views/MRAID';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { Platform } from 'Core/Constants/Platform';
-import { IObserver0 } from 'Core/Utilities/IObserver';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -121,6 +120,7 @@ describe('MraidAdUnit', () => {
             beforeEach(() => {
                 onStartObserver = sinon.spy();
                 mraidAdUnit.onStart.subscribe(onStartObserver);
+                sandbox.stub(ads.Listener, 'sendStartEvent').returns(Promise.resolve(void(0)));
                 return mraidAdUnit.show();
             });
 
@@ -131,10 +131,15 @@ describe('MraidAdUnit', () => {
             it('should trigger onStart', () => {
                 sinon.assert.calledOnce(onStartObserver);
                 sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendStart);
+                sinon.assert.called(<sinon.SinonSpy>ads.Listener.sendStartEvent);
             });
 
             it('should open the container', () => {
                 sinon.assert.calledWith(containerOpen, mraidAdUnit, ['webview'], true, Orientation.NONE, true, false, true, false, {});
+            });
+
+            it('should open the view', () => {
+                sinon.assert.called(<sinon.SinonSpy>mraidView.show);
             });
         });
 
@@ -204,6 +209,12 @@ describe('MraidAdUnit', () => {
             return mraidAdUnit.show().then(() => mraidAdUnit.hide()).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>ads.Listener.sendFinishEvent, mraidAdUnitParameters.placement.getId(), FinishState.SKIPPED);
                 sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendSkip);
+            });
+        });
+
+        it('should close the view', () => {
+            return mraidAdUnit.show().then(() => mraidAdUnit.hide()).then(() => {
+                sinon.assert.called(<sinon.SinonSpy>mraidView.hide);
             });
         });
     });
