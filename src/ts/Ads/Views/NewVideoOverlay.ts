@@ -15,6 +15,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export interface IVideoOverlayParameters<T extends Campaign> {
     platform: Platform;
@@ -402,8 +403,8 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._container.classList.add('fade-in');
         this._areControlsVisible = true;
 
-        const showCallButtonWithSkip = this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign;
-        if (!showCallButtonWithSkip || InstantInstallNowTest.isValid(this._abGroup)) {
+        const isVASTCampaign = this._campaign instanceof VastCampaign;
+        if (isVASTCampaign || (this._skipEnabled && InstantInstallNowTest.isValid(this._abGroup))) {
             setTimeout(() => {
                 this.showCallButton();
             }, 500);
