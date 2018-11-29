@@ -37,7 +37,7 @@ export class AdsConfigurationParser {
         if (configGamePrivacy) {
             gamePrivacy = new GamePrivacy(configGamePrivacy);
         } else {
-            gamePrivacy = new GamePrivacy({ method: PrivacyMethod.DISABLED });
+            gamePrivacy = new GamePrivacy({ method: PrivacyMethod.DEFAULT });
         }
 
         const configurationParams: IAdsConfiguration = {
