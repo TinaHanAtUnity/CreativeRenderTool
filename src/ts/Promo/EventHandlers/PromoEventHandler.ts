@@ -1,4 +1,4 @@
-import { GDPREventAction, GdprManager } from 'Ads/Managers/GdprManager';
+import { GDPREventAction, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { FinishState } from 'Core/Constants/FinishState';
 import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
@@ -20,10 +20,10 @@ export class PromoEventHandler {
         PurchasingUtilities.onPurchase(campaign.getIapProductId(), campaign, placementId);
     }
 
-    public static onGDPRPopupSkipped(configuration: AdsConfiguration, gdprManager: GdprManager): void {
+    public static onGDPRPopupSkipped(configuration: AdsConfiguration, privacyManager: UserPrivacyManager): void {
         if (!configuration.isOptOutRecorded()) {
             configuration.setOptOutRecorded(true);
-            gdprManager.sendGDPREvent(GDPREventAction.SKIP);
+            privacyManager.sendGDPREvent(GDPREventAction.SKIP);
         }
     }
 }
