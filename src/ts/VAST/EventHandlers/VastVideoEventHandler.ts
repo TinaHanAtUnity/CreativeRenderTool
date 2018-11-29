@@ -100,7 +100,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
             session.setEventSent(EventType.IMPRESSION);
         }
 
-        this.sendThirdPartyImpressionEvent();
+        this.sendThirdPartyVastImpressionEvent();
         this.sendThirdPartyTrackingEvent('creativeView');
         this.sendThirdPartyTrackingEvent('start');
         this.sendThirdPartyTrackingEvent('impression');
@@ -152,7 +152,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         this.sendThirdPartyTrackingEvent('complete');
     }
 
-    private sendThirdPartyImpressionEvent(): void {
+    private sendThirdPartyVastImpressionEvent(): void {
         const impressionUrls = this._vastCampaign.getImpressionUrls();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
