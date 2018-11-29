@@ -56,28 +56,21 @@ export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConse
     private onAgreeEvent(event: Event) {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onConsent({ all: true, ads: false, gameExp: false, external: false }));
-        this.hide();
-       //  this.runAnimation();
+        this.runAnimation();
     }
 
     private runAnimation(): void {
         const buttonSPinner = new ButtonSpinner(this._platform);
         buttonSPinner.render();
-        const button = <HTMLElement>this._container.querySelector('.agree');
-        if (button) {
-            // button.style.display = 'none';
-            // button.appendChild(buttonSPinner.container());
-        }
-        const buttonContainer = <HTMLElement>this._container.querySelector('.button-container');
-        if (buttonContainer) {
-            // buttonContainer.appendChild(buttonSPinner.container());
-            buttonContainer.replaceChild(buttonSPinner.container(), button);
+        const agreeButton = <HTMLElement>this._container.querySelector('.agree');
+        if (agreeButton) {
+            agreeButton.appendChild(buttonSPinner.container());
+            agreeButton.classList.add('click-animation');
 
         }
         setTimeout(() => {
             this.hide();
         }, 1500);
-
     }
 
     private onOptionsEvent(event: Event) {
@@ -95,10 +88,12 @@ export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConse
     }
 
     // IGDPRConsentSettingsHandler
-    // todo: rename method
-    public onConset(consent: IConsent): void {
+    public onPersonalizedConsent(consent: IConsent): void {
         this._handlers.forEach(handler => handler.onConsent(consent));
+    }
 
+    // IGDPRConsentSettingsHandler
+    public onClose(): void {
         this.hide();
     }
 }

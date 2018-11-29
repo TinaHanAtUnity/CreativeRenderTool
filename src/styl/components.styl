@@ -479,3 +479,21 @@ $checkbox-group-container($scale-size = $default-scale-size, $context-font-size 
     background-image: url('./../img/checkbox.png');
   }
 }
+
+$click-animation() {
+  span {
+    display: block;
+    animation: onagree .3s ease-in forwards;
+  }
+
+  @keyframes onagree {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-8px);
+      opacity: .25;
+    }
+  }
+}

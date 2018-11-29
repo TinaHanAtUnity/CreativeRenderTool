@@ -5,10 +5,12 @@ import { PrivacyRowItemContainer } from 'Ads/Views/Consent/PrivacyRowItemContain
 import { Platform } from 'Core/Constants/Platform';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { IConsent } from 'Ads/Views/Consent/IConsent';
+import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 
 
 export interface IGDPRConsentSettingsHandler {
-    onConset(consent: IConsent): void;
+    onPersonalizedConsent(consent: IConsent): void;
+    onClose(): void;
 }
 
 export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
@@ -96,8 +98,9 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
             external: true
         };
 
-        this._handlers.forEach(handler => handler.onConset(consent));
-        // todo: animations
+        this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));
+
+        this.runAnimation(<HTMLElement>this._container.querySelector('.accept-all'));
 
     }
 
@@ -113,9 +116,20 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
             external: ads3rdPartyCheckbox ? ads3rdPartyCheckbox.checked : false
         };
 
-        this._handlers.forEach(handler => handler.onConset(consent));
+        this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));
+        this.runAnimation(<HTMLElement>this._container.querySelector('.save-my-choices'));
 
-        // todo: animations
+    }
+    private runAnimation(buttonElement: HTMLElement): void {
+        const buttonSpinner = new ButtonSpinner(this._platform);
+        buttonSpinner.render();
+        if (buttonElement) {
+            buttonElement.appendChild(buttonSpinner.container());
+            buttonElement.classList.add('click-animation');
 
+        }
+        setTimeout(() => {
+            this._handlers.forEach(handler => handler.onClose());
+        }, 1500);
     }
 }

@@ -75,10 +75,6 @@
     justify-content: space-evenly;
   }
 
-  .button-container {
-
-  }
-
   .accept-all {
     background-color: $blue;
     color: $white;
@@ -86,9 +82,14 @@
   }
 
   .consent-button {
+    position: relative;
     border-radius: $default-size * .25;
     border: 1px solid $light-gray;
     font-size: $default-font-size * .65;
+
+    &.click-animation {
+      $click-animation();
+    }
   }
   .item {
     text-align: center;
