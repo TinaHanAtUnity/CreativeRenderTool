@@ -1,11 +1,9 @@
 import { View } from 'Core/Views/View';
 import GDPRConsentTemplate from 'html/consent/gdpr-consent.html';
 import { Template } from 'Core/Utilities/Template';
-import { GDPRConsentSettings } from 'Ads/Views/Consent/GDPRConsentSettings';
+import { GDPRConsentSettings, IGDPRConsentSettingsHandler } from 'Ads/Views/Consent/GDPRConsentSettings';
 import { Platform } from 'Core/Constants/Platform';
 import { GdprManager } from 'Ads/Managers/GdprManager';
-import { AdUnitContainerSystemMessage } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { IGDPRConsentSettingsHandler } from 'Ads/Views/Consent/GDPRConsentSettings';
 import { IConsent } from 'Ads/Views/Consent/IConsent';
 
 export interface IGDPRConsentViewParameters {
