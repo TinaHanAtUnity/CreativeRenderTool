@@ -151,7 +151,7 @@ export class VastParserStrict {
     private getNodesWithName(rootNode: HTMLElement, name: string): HTMLElement[] {
         let nodes: HTMLElement[] = [];
         if (rootNode.nodeName === name) {
-            nodes.push(<HTMLElement>rootNode);
+            nodes.push(rootNode);
         }
         for (const node of rootNode.childNodes) {
             const childNodesWithName: HTMLElement[] = this.getNodesWithName(<HTMLElement>node, name);

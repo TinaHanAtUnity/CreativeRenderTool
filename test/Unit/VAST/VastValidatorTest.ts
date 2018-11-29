@@ -56,7 +56,7 @@ describe('VastValidatorTest', () => {
             const creative = new VastCreativeLinear(
                 30,
                 10,
-                [new VastMediaFile('file://mycoolVideo.mp4', 'video', 'codec', 'mp4', 2000, 100, 5000, 200, 200, 'apiFramework', 20)], 
+                [new VastMediaFile('file://mycoolVideo.mp4', 'video', 'codec', 'mp4', 2000, 100, 5000, 200, 200, 'apiFramework', 20)],
                 'http://google.com/clickThrough?someQuery=test&other=no',
                 ['http://reddit.com/click', 'https://reddit.com/thridparty/click?someQuery=test&other=no'],
                 ['http://google.com/custom/click?someQuery=test&other=no'],
@@ -121,7 +121,7 @@ describe('VastValidatorTest', () => {
             const creative1 = new VastCreativeLinear(
                 30,
                 10,
-                [new VastMediaFile('file://mycoolVideo.mp4', 'video', 'codec', 'mp4', 2000, 100, 5000, 200, 200, 'apiFramework', 20)], 
+                [new VastMediaFile('file://mycoolVideo.mp4', 'video', 'codec', 'mp4', 2000, 100, 5000, 200, 200, 'apiFramework', 20)],
                 'http://google.com/clickThrough',
                 ['http://reddit.com/click', 'https://reddit.com/thridparty/click'],
                 ['http://google.com/custom/click'],
