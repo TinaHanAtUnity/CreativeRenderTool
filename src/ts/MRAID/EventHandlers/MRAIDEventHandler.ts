@@ -200,7 +200,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             if(!this._placement.skipEndCardOnClose()) {
                 this.onMraidSkip();
             } else {
-                this.onMraidClose()
+                this.onMraidClose();
             }
         }
     }
