@@ -340,7 +340,8 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
                         bypassAppSheet: campaign.getBypassAppSheet(),
                         appStoreId: campaign.getAppStoreId(),
                         store: campaign.getStore(),
-                        videoProgress: this._videoProgress
+                        videoProgress: this._videoProgress,
+                        appDownloadUrl: campaign instanceof PerformanceCampaign ? campaign.getAppDownloadUrl() : ''
                     });
                 }
             });
