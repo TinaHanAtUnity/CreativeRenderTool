@@ -67,7 +67,7 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
             const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
                 const abGroup = parameters.coreConfig.getAbGroup();
                 const backButtonTestEnabled = AndroidBackButtonSkipTest.isValid(abGroup);
-                if(backButtonTestEnabled || CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                if(backButtonTestEnabled) {
                     mraidEventHandler.onKeyEvent(keyCode);
                 }
             });
