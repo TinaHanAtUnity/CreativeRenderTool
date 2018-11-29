@@ -1,4 +1,14 @@
-# PENDING
+# Pending
+
+* Set web browser UA for click event in programmatic VAST and MRAID [#7362](https://github.com/Applifier/unity-ads-webview/pull/7362)
+* Refactor ABGroup and limit tests to groups 5-19 [#7101](https://github.com/Applifier/unity-ads-webview/pull/7101)
+* Fix VAST/VPAID Tracking for Auction V5 [#7322](https://github.com/Applifier/unity-ads-webview/pull/7322)
+
+# Wed Nov 28 22:24:34 UTC 2018
+
+* Read Unity Analytics identifiers from Unity Engine [#7274](https://github.com/Applifier/unity-ads-webview/pull/7274)
+
+# Wed Nov 28 13:03:18 UTC 2018
 
 * Add 广告 to Overlays for China Ads [#7102](https://github.com/Applifier/unity-ads-webview/pull/7102)
 
