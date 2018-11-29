@@ -16,6 +16,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { Url } from 'Core/Utilities/Url';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
@@ -24,8 +25,6 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adUnit: MRAIDAdUnit;
     private _mraidView: MRAIDView<IMRAIDViewHandler>;
-    private _clientInfo: ClientInfo;
-    private _deviceInfo: DeviceInfo;
     private _request: RequestManager;
     private _placement: Placement;
     private _platform: Platform;
@@ -34,13 +33,11 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     protected _campaign: MRAIDCampaign;
 
     constructor(adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
-        super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
+        super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig);
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._adUnit = adUnit;
         this._mraidView = adUnit.getMRAIDView();
-        this._clientInfo = parameters.clientInfo;
-        this._deviceInfo = parameters.deviceInfo;
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._request = parameters.request;
@@ -62,14 +59,19 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             }
         } else {    // DSP MRAID
             this.setCallButtonEnabled(false);
-            return this._request.followRedirectChain(url).then((storeUrl) => {
-                return this.openUrl(storeUrl).then(() => {
-                    this.setCallButtonEnabled(true);
-                    this.sendTrackingEvents();
-                }).catch((e) => {
-                    this.setCallButtonEnabled(true);
-                    this.sendTrackingEvents();
+            return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking()).then((storeUrl) => {
+                return this.openUrlOnCallButton(storeUrl);
+            }).catch(() => {
+                const urlParts = Url.parse(url);
+                const error = new DiagnosticError(new Error('MRAID clickThroughURL error'), {
+                    contentType: 'mraid',
+                    clickUrl: url,
+                    host: urlParts.host,
+                    protocol: urlParts.protocol,
+                    creativeId: this._campaign.getCreativeId()
                 });
+                Diagnostics.trigger('click_request_head_rejected', error);
+                return this.openUrlOnCallButton(url);
             });
         }
         return Promise.resolve();
@@ -116,9 +118,8 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
 
     private handleClickAttribution() {
         const clickAttributionUrl = this._campaign.getClickAttributionUrl();
-        const useWebViewUA = this._campaign.getUseWebViewUserAgentForTracking();
         if(this._campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
-            this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true, useWebViewUA).then(response => {
+            this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true, this._campaign.getUseWebViewUserAgentForTracking()).then(response => {
                 const location = RequestManager.getHeader(response.headers, 'location');
                 if(location) {
                     this.openUrl(location);
@@ -142,7 +143,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             });
         } else {
             if (clickAttributionUrl) {
-                this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false, useWebViewUA);
+                this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false, this._campaign.getUseWebViewUserAgentForTracking());
             }
         }
     }
@@ -160,6 +161,16 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         }
 
         this._adUnit.sendClick();
+    }
+
+    private openUrlOnCallButton(url: string): Promise<void> {
+        return this.openUrl(url).then(() => {
+            this.setCallButtonEnabled(true);
+            this.sendTrackingEvents();
+        }).catch(() => {
+            this.setCallButtonEnabled(true);
+            this.sendTrackingEvents();
+        });
     }
 
     private openUrl(url: string): Promise<void> {

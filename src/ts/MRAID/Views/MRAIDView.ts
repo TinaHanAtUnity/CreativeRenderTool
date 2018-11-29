@@ -13,7 +13,7 @@ import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { MraidIFrameEventBridge, IMRAIDHandler } from 'Ads/Views/MraidIFrameEventBridge';
+import { MraidIFrameEventBridge, IMRAIDHandler } from 'MRAID/Views/MraidIFrameEventBridge';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;

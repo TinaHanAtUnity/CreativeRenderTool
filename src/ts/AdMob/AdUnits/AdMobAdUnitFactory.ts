@@ -37,7 +37,7 @@ export class AdMobAdUnitFactory extends AbstractAdUnitFactory {
             clientInfo: parameters.clientInfo,
             coreConfig: parameters.coreConfig,
             adsConfig: parameters.adsConfig,
-            gdprManager: parameters.gdprManager
+            privacyManager: parameters.privacyManager
         });
         view.addEventHandler(eventHandler);
         Privacy.setupReportListener(privacy, adUnit);

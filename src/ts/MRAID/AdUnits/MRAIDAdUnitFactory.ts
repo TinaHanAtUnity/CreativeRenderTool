@@ -12,7 +12,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { MraidIFrameEventBridge } from 'Ads/Views/MraidIFrameEventBridge';
+import { MraidIFrameEventBridge } from 'MRAID/Views/MraidIFrameEventBridge';
 import { Platform } from 'Core/Constants/Platform';
 import { AndroidBackButtonSkipTest } from 'Core/Models/ABGroup';
 

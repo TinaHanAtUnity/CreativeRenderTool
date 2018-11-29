@@ -2,7 +2,7 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
 import { IAdsApi } from 'Ads/IAds';
-import { GDPREventSource, GdprManager } from 'Ads/Managers/GdprManager';
+import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -74,7 +74,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 overlay: sinon.createStubInstance(Overlay),
                 video: sinon.createStubInstance(Video),
                 privacy: sinon.createStubInstance(Privacy),
-                gdprManager: sinon.createStubInstance(GdprManager),
+                privacyManager: sinon.createStubInstance(UserPrivacyManager),
                 programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
             };
 
@@ -113,7 +113,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
                 privacyEventHandler.onGDPROptOut(true);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.gdprManager.sendGDPREvent, 'optout', GDPREventSource.USER);
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'optout', GDPREventSource.USER);
             });
 
             it('should send operative event with action `optin`', () => {
@@ -122,7 +122,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
                 privacyEventHandler.onGDPROptOut(false);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.gdprManager.sendGDPREvent, 'optin');
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'optin');
             });
 
             it('should send operative event with action `skip`', () => {
@@ -131,7 +131,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
                 privacyEventHandler.onGDPROptOut(false);
 
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.gdprManager.sendGDPREvent, 'skip');
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.privacyManager.sendGDPREvent, 'skip');
             });
         });
     });

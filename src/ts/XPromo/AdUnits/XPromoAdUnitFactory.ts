@@ -18,7 +18,7 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
 
     public createAdUnit(parameters: IAdUnitParameters<XPromoCampaign>): XPromoAdUnit {
         const privacy = this.createPrivacy(parameters);
-        const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose();
+        const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose() || false;
         const overlay = this.createOverlay(parameters, privacy, showPrivacyDuringVideo);
 
         const endScreenParameters = this.createEndScreenParameters(privacy, parameters.campaign.getGameName(), parameters);

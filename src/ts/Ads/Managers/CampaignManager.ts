@@ -8,7 +8,7 @@ import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
+import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
@@ -131,6 +131,7 @@ export class CampaignManager {
         }
 
         GameSessionCounters.addAdRequest();
+        const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
 
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
@@ -140,7 +141,7 @@ export class CampaignManager {
         this.resetRealtimeDataForPlacements();
         const jaegerSpan = this._jaegerManager.startSpan('CampaignManagerRequest');
         jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._platform]);
-        return Promise.all([this.createRequestUrl(false, nofillRetry), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(false, nofillRetry), this.createRequestBody(countersForOperativeEvents, nofillRetry)]).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
 
@@ -173,11 +174,11 @@ export class CampaignManager {
                     this.setSDKSignalValues(requestTimestamp);
 
                     if(AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
-                        return this.parseAuctionV5Campaigns(response).catch((e) => {
+                        return this.parseAuctionV5Campaigns(response, countersForOperativeEvents).catch((e) => {
                             this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
                         });
                     } else {
-                        return this.parseCampaigns(response).catch((e) => {
+                        return this.parseCampaigns(response, countersForOperativeEvents).catch((e) => {
                             this.handleGeneralError(e, 'parse_campaigns_error');
                         });
                     }
@@ -208,7 +209,7 @@ export class CampaignManager {
     }
 
     public requestRealtime(placement: Placement, session: Session): Promise<Campaign | void> {
-        return Promise.all([this.createRequestUrl(true, undefined, session), this.createRequestBody(false, placement)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(true, undefined, session), this.createRequestBody(session.getGameSessionCounters(), false, placement)]).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Requesting realtime ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             return this._request.post(requestUrl, body, [], {
@@ -249,7 +250,7 @@ export class CampaignManager {
         });
     }
 
-    private parseCampaigns(response: INativeResponse): Promise<void[]> {
+    private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters): Promise<void[]> {
         let json;
         try {
             json = JsonParser.parse(response.response);
@@ -268,6 +269,7 @@ export class CampaignManager {
 
         const session: Session = this._sessionManager.create(json.auctionId);
         session.setAdPlan(response.response);
+        session.setGameSessionCounters(gameSessionCounters);
 
         this._backupCampaignManager.deleteBackupCampaigns();
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
@@ -353,7 +355,7 @@ export class CampaignManager {
         }
     }
 
-    private parseAuctionV5Campaigns(response: INativeResponse): Promise<void[]> {
+    private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters): Promise<void[]> {
         let json;
         try {
             json = JsonParser.parse(response.response);
@@ -372,6 +374,7 @@ export class CampaignManager {
 
         const session: Session = this._sessionManager.create(json.auctionId);
         session.setAdPlan(response.response);
+        session.setGameSessionCounters(gameSessionCounters);
 
         this._backupCampaignManager.deleteBackupCampaigns();
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
@@ -714,7 +717,7 @@ export class CampaignManager {
 
         if(CampaignManager.AbGroup) {
             url = Url.addParameters(url, {
-                forceAbGroup: CampaignManager.AbGroup.toNumber()
+                forceAbGroup: CampaignManager.AbGroup
             });
         }
 
@@ -743,7 +746,7 @@ export class CampaignManager {
         });
     }
 
-    private createRequestBody(nofillRetry?: boolean, realtimePlacement?: Placement): Promise<any> {
+    private createRequestBody(gameSessionCounters: IGameSessionCounters, nofillRetry?: boolean, realtimePlacement?: Placement): Promise<any> {
         const placementRequest: any = {};
 
         if(realtimePlacement && this._realtimeBody) {
@@ -854,7 +857,8 @@ export class CampaignManager {
                     if (!placement.isBannerPlacement()) {
                         placementRequest[placementId] = {
                             adTypes: placement.getAdTypes(),
-                            allowSkip: placement.allowSkip()
+                            allowSkip: placement.allowSkip(),
+                            auctionType: placement.getAuctionType()
                         };
                     }
                 });
@@ -862,11 +866,11 @@ export class CampaignManager {
                 body.properties = this._coreConfig.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
                 body.projectId = this._coreConfig.getUnityProjectId();
-                body.gameSessionCounters = GameSessionCounters.getDTO();
+                body.gameSessionCounters = gameSessionCounters;
                 body.gdprEnabled = this._adsConfig.isGDPREnabled();
                 body.optOutEnabled = this._adsConfig.isOptOutEnabled();
                 body.optOutRecorded = this._adsConfig.isOptOutRecorded();
-                body.abGroup = this._coreConfig.getAbGroup().toNumber();
+                body.abGroup = this._coreConfig.getAbGroup();
 
                 const organizationId = this._coreConfig.getOrganizationId();
                 if(organizationId) {
