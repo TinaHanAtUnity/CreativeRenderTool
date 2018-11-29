@@ -59,6 +59,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _fadeTimer: any;
     private _areControlsVisible: boolean = false;
     private _gameId: string;
+
     private _country: string | undefined;
     private _abGroup: ABGroup;
     private _campaign: Campaign;
@@ -75,6 +76,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._campaign = parameters.campaign;
         this._showGDPRBanner = showGDPRBanner;
         this._showPrivacyDuringVideo = showPrivacyDuringVideo;
+
         this._templateData = {
             muted: parameters.placement.muteVideo()
         };
