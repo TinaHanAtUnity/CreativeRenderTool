@@ -1,4 +1,5 @@
 import { Placement } from 'Ads/Models/Placement';
+import { GamePrivacy } from 'Ads/Models/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
 
@@ -10,6 +11,7 @@ export interface IAdsConfiguration {
     optOutRecorded: boolean;
     optOutEnabled: boolean;
     defaultBannerPlacement: Placement | undefined;
+    gamePrivacy: GamePrivacy;
 }
 
 export class AdsConfiguration extends Model<IAdsConfiguration> {
@@ -20,7 +22,8 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         gdprEnabled: ['boolean'],
         optOutRecorded: ['boolean'],
         optOutEnabled: ['boolean'],
-        defaultBannerPlacement: ['string', 'undefined']
+        defaultBannerPlacement: ['string', 'undefined'],
+        gamePrivacy: ['object']
     };
 
     constructor(data: IAdsConfiguration) {
@@ -103,6 +106,10 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
 
     public setOptOutEnabled(optOutEnabled: boolean) {
         this.set('optOutEnabled', optOutEnabled);
+    }
+
+    public getGamePrivacy(): GamePrivacy {
+        return this.get('gamePrivacy');
     }
 
     public getDTO(): { [key: string]: any } {

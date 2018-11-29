@@ -1,4 +1,5 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -72,6 +73,10 @@ describe('configurationParserTest', () => {
             assert.equal(adsConfig.isOptOutEnabled(), false);
         });
 
+        it('should have game privacy method parameter from configuration', () => {
+            assert.equal(adsConfig.getGamePrivacy().getMethod(), PrivacyMethod.LEGITIMATE_INTEREST);
+        });
+
         it('should have server side test mode false when undefined in config', () => {
             assert.equal(coreConfig.getTestMode(), false);
         });
@@ -95,6 +100,27 @@ describe('configurationParserTest', () => {
 
             it('should return placement by id', () => {
                 assert.equal(adsConfig.getPlacement('premium').getName(), 'Premium placement');
+            });
+        });
+
+        describe('Parsing GamePrivacy', () => {
+            let configJson: any;
+            beforeEach(() => {
+                configJson = JSON.parse(ConfigurationJson);
+            });
+
+            it('should set to DEFAULT if game privacy is missing from configuration', () => {
+                configJson.gamePrivacy = undefined;
+                const config = AdsConfigurationParser.parse(configJson);
+                assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.DEFAULT);
+                assert.equal(config.getGamePrivacy().isEnabled(), false);
+            });
+
+            it('should set to UNITY_CONSENT', () => {
+                configJson.gamePrivacy.method = PrivacyMethod.UNITY_CONSENT;
+                const config = AdsConfigurationParser.parse(configJson);
+                assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.UNITY_CONSENT);
+                assert.equal(config.getGamePrivacy().isEnabled(), true);
             });
         });
     });
