@@ -7,7 +7,7 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
-import { ABGroup, NextSkipIconTest } from 'Core/Models/ABGroup';
+import { ABGroup } from 'Core/Models/ABGroup';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -59,6 +59,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _fadeTimer: any;
     private _areControlsVisible: boolean = false;
     private _gameId: string;
+
     private _country: string | undefined;
     private _abGroup: ABGroup;
     private _campaign: Campaign;
@@ -75,6 +76,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._campaign = parameters.campaign;
         this._showGDPRBanner = showGDPRBanner;
         this._showPrivacyDuringVideo = showPrivacyDuringVideo;
+
         this._templateData = {
             muted: parameters.placement.muteVideo()
         };
@@ -160,8 +162,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         if (CustomFeatures.isCheetahGame(this._gameId)) {
             this._skipButtonElement.classList.add('close-icon-skip');
-        } else if (NextSkipIconTest.isValid(this._abGroup)) {
-            this._skipButtonElement.classList.add('next-icon-skip');
         }
     }
 
