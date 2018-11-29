@@ -3,6 +3,7 @@
 * Fix AR MRAID safety paddings on iPhone X [#6944](https://github.com/Applifier/unity-ads-webview/pull/6944)
 * Remove skip icon experiment [#7383](https://github.com/Applifier/unity-ads-webview/pull/7383)
 * Remove green button A/B test [#7342](https://github.com/Applifier/unity-ads-webview/pull/7342)
+* Fix China Ad Watermark for Performance Ads with SquareEndScreen [#7406](https://github.com/Applifier/unity-ads-webview/pull/7406)
 
 # Thu Nov 29 15:00:34 UTC 201
 
