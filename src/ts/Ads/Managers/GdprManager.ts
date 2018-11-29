@@ -1,4 +1,5 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { GamePrivacy, IUnityConsentPermissions, PrivacyMethod } from 'Ads/Models/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
@@ -11,6 +12,8 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ITemplateData } from 'Core/Views/View';
 
+const ignoreReturnType: () => void = () => { return; };
+
 export interface IGdprPersonalProperties extends ITemplateData {
     deviceModel: string;
     country: string;
@@ -21,6 +24,7 @@ export interface IGdprPersonalProperties extends ITemplateData {
 
 export enum GDPREventSource {
     METADATA = 'metadata',
+    NO_REVIEW = 'no_review',
     USER = 'user'
 }
 
@@ -40,6 +44,7 @@ export class GdprManager {
     private readonly _core: ICoreApi;
     private readonly _coreConfig: CoreConfiguration;
     private readonly _adsConfig: AdsConfiguration;
+    private readonly _gamePrivacy: GamePrivacy;
     private readonly _clientInfo: ClientInfo;
     private readonly _deviceInfo: DeviceInfo;
     private readonly _request: RequestManager;
@@ -49,6 +54,7 @@ export class GdprManager {
         this._core = core;
         this._coreConfig = coreConfig;
         this._adsConfig = adsConfig;
+        this._gamePrivacy = adsConfig.getGamePrivacy();
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
@@ -73,6 +79,33 @@ export class GdprManager {
         return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson).then(() => {
             return Promise.resolve();
         });
+    }
+
+    public sendUnityConsentEvent(permissions: IUnityConsentPermissions, source: GDPREventSource): Promise<void> {
+        const allowed = this._gamePrivacy.isEnabled() && this._gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT;
+        if (!allowed) {
+            return Promise.resolve();
+        }
+
+        const infoJson: any = {
+            adid: this._deviceInfo.getAdvertisingIdentifier(),
+            action: GDPREventAction.CONSENT,
+            projectId: this._coreConfig.getUnityProjectId(),
+            platform: Platform[this._platform].toLowerCase(),
+            gameId: this._clientInfo.getGameId(),
+            source: source,
+            method: PrivacyMethod.UNITY_CONSENT,
+            version: this._gamePrivacy.getVersion(),
+            coppa: this._coreConfig.isCoppaCompliant(),
+            permissions: permissions
+        };
+
+        if (source === GDPREventSource.NO_REVIEW) {
+            infoJson.permissions = { all : true };
+        }
+
+        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson)
+            .then(ignoreReturnType);
     }
 
     public getConsentAndUpdateConfiguration(): Promise<boolean> {
