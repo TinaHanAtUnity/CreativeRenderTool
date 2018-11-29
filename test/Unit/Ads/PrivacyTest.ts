@@ -4,8 +4,8 @@ import { assert } from 'chai';
 import { GamePrivacy, PrivacyMethod } from 'Ads/Models/Privacy';
 
 describe('GamePrivacyTests', () => {
-    it('should be disabled if PrivacyMethod.DISABLED', () => {
-        const gamePrivacy = new GamePrivacy({ method: PrivacyMethod.DISABLED});
+    it('should be disabled if PrivacyMethod.DEFAULT', () => {
+        const gamePrivacy = new GamePrivacy({ method: PrivacyMethod.DEFAULT});
         assert.isFalse(gamePrivacy.isEnabled());
         assert.equal(gamePrivacy.getVersion(), 0);
     });

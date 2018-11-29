@@ -1,7 +1,7 @@
 import { Model } from 'Core/Models/Model';
 
 export enum PrivacyMethod {
-    DISABLED = 'disabled',
+    DEFAULT = 'default',
     LEGITIMATE_INTEREST = 'legitimate_interest',
     UNITY_CONSENT = 'unity_consent',
     DEVELOPER_CONSENT = 'developer_consent'

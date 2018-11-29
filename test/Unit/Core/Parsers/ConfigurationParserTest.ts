@@ -109,10 +109,10 @@ describe('configurationParserTest', () => {
                 configJson = JSON.parse(ConfigurationJson);
             });
 
-            it('should set to DISABLED if game privacy is missing from configuration', () => {
+            it('should set to DEFAULT if game privacy is missing from configuration', () => {
                 configJson.gamePrivacy = undefined;
                 const config = AdsConfigurationParser.parse(configJson);
-                assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.DISABLED);
+                assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.DEFAULT);
                 assert.equal(config.getGamePrivacy().isEnabled(), false);
             });
 

@@ -6,7 +6,6 @@ import { Platform } from 'Core/Constants/Platform';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { IConsent } from 'Ads/Views/Consent/IConsent';
 
-
 export interface IGDPRConsentSettingsHandler {
     onConset(consent: IConsent): void;
 }
