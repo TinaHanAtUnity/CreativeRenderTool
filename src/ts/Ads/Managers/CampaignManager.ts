@@ -556,6 +556,7 @@ export class CampaignManager {
                 errorCode: error.errorCode || undefined,
                 message: error.message || undefined
             });
+            throw error;
         });
     }
 
