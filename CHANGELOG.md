@@ -4,6 +4,10 @@
 * Remove skip icon experiment [#7383](https://github.com/Applifier/unity-ads-webview/pull/7383)
 * Remove green button A/B test [#7342](https://github.com/Applifier/unity-ads-webview/pull/7342)
 
+# Thu Nov 29 15:00:34 UTC 201
+
+* Hotfix for missing iOS app background notification listener for SDK versions 2.0.3 - 2.3.0
+
 # Thu Nov 29 10:53:37 UTC 2018
 
 * Set web browser UA for click event in programmatic VAST and MRAID [#7362](https://github.com/Applifier/unity-ads-webview/pull/7362)
