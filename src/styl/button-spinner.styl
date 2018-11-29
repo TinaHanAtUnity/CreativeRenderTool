@@ -1,26 +1,30 @@
-@import "vars.styl"
+@import "vars.styl";
 
 #button-spinner {
 
   position: absolute;
-  right: 0
-  padding-right: $default-size * .5;
   top: 50%;
+  right: 0;
+  padding-right: $default-size * .5;
   transform: translateY(-50%);
   animation: show-up 1s ease-in forwards;
 
   .loader {
-    border: 0.2 * $default-px-size solid rgba(255,255,255,0.1);
-    border-radius: 50%;
-    border-top: .2 * $default-px-size solid white;
     width: 1.5 * $default-px-size;
     height: 1.5 * $default-px-size;
+    border: .2 * $default-px-size solid rgba(255, 255, 255, .1);
+    border-top: .2 * $default-px-size solid white;
+    border-radius: 50%;
     animation: spin 1s ease-in infinite;
   }
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 
   @keyframes show-up {
@@ -28,7 +32,7 @@
       opacity: 0;
     }
     to {
-      opacity 1;
+      opacity: 1;
     }
   }
 }
