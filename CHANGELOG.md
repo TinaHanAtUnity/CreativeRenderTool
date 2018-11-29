@@ -1,4 +1,4 @@
-# Pending
+# Thu Nov 29 10:53:37 UTC 2018
 
 * Set web browser UA for click event in programmatic VAST and MRAID [#7362](https://github.com/Applifier/unity-ads-webview/pull/7362)
 * Refactor ABGroup and limit tests to groups 5-19 [#7101](https://github.com/Applifier/unity-ads-webview/pull/7101)
