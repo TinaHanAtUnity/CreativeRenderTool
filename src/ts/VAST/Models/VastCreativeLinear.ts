@@ -15,10 +15,10 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
     constructor();
     constructor(duration: number, skipDelay: number, mediaFiles: any[],
         videoClickThroughURLTemplate: string, videoClickTrackingURLTemplates: string[],
-        videoCustomClickURLTemplates: string[], adParameters: any);
+        videoCustomClickURLTemplates: string[], adParameters: string);
     constructor(duration?: number, skipDelay?: number, mediaFiles?: any[],
                 videoClickThroughURLTemplate?: string, videoClickTrackingURLTemplates?: string[],
-                videoCustomClickURLTemplates?: string[], adParameters?: any) {
+                videoCustomClickURLTemplates?: string[], adParameters?: string) {
         super('VastCreativeLinear', {
             type: ['string'],
             trackingEvents: ['object'],
@@ -110,12 +110,4 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
         };
     }
 
-    public validate(): Error[] {
-        const errors: Error[] = [];
-        if (this.getDuration() === -1) {
-            errors.push(new Error('Missing valid duration'));
-        }
-
-        return errors;
-    }
 }

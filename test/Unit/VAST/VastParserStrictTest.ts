@@ -11,15 +11,17 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import RootVastClean from 'xml/RootVastClean.xml';
 import RootVastDirty from 'xml/RootVastDirty.xml';
-import VastCompanionAd from 'xml/VastCompanionAd.xml';
+import VastCompanionAdXml from 'xml/VastCompanionAd.xml';
 import VastCompanionAdWithoutClickThrough from 'xml/VastCompanionAdWithoutClickThrough.xml';
-import VastCompanionAdWithoutImages from 'xml/VastCompanionAdWithoutImages.xml';
+import VastCompanionAdWithoutLandscapeImageXml from 'xml/VastCompanionAdWithoutLandscapeImage.xml';
+import VastCompanionAdWithoutPortraitImageXml from 'xml/VastCompanionAdWithoutPortraitImage.xml';
 
 import VastRaw from 'xml/VastRaw.xml';
 import VastWithSpaces from 'xml/VastWithSpaces.xml';
 import WrappedVast from 'xml/WrappedVast.xml';
+import EventTestVast from 'xml/EventTestVast.xml';
 
-describe('VastParser', () => {
+describe('VastParserStrict', () => {
     let request: RequestManager;
     let platform: Platform;
     let backend: Backend;
@@ -30,26 +32,26 @@ describe('VastParser', () => {
 
     it('should throw when given null', () => {
         assert.throws(() => {
-            TestFixtures.getVastParser().parseVast(null);
+            TestFixtures.getVastParserStrict().parseVast(null);
         });
     });
 
     it('should throw when given an object with no data', () => {
         assert.throws(() => {
-            TestFixtures.getVastParser().parseVast('');
+            TestFixtures.getVastParserStrict().parseVast('');
         });
     });
 
     it('should throw when given a vast string with invalid document element', () => {
         assert.throws(() => {
-            assert.isNull(TestFixtures.getVastParser().parseVast(
+            assert.isNull(TestFixtures.getVastParserStrict().parseVast(
                 '<?xml version="1.0" encoding="UTF-8" standalone="no"?><foo></foo>'
             ));
         }, 'VAST xml data is missing');
     });
 
     it('should have correct data given url encoded data string and additional tracking events', () => {
-        const vast = TestFixtures.getVastParser().parseVast(vastRaw);
+        const vast = TestFixtures.getVastParserStrict().parseVast(vastRaw);
         assert.equal(1, vast.getAds().length);
         assert.deepEqual(vast.getImpressionUrls(), [
             'http://dt.videohub2.tv/ssframework/tvuid?a=set&UI=ef20e47b94a670839943ad4d9f933016&ss_rand=1848887672',
@@ -94,12 +96,12 @@ describe('VastParser', () => {
     });
 
     it('should have correct click through url', () => {
-        const vast = TestFixtures.getVastParser().parseVast(vastRaw);
+        const vast = TestFixtures.getVastParserStrict().parseVast(vastRaw);
         assert.equal(vast.getVideoClickThroughURL(), 'http://www.tremorvideo.com');
     });
 
     it('should have correct video click trough tracking url', () => {
-        const vast = TestFixtures.getVastParser().parseVast(vastRaw);
+        const vast = TestFixtures.getVastParserStrict().parseVast(vastRaw);
         assert.deepEqual(vast.getVideoClickTrackingURLs(), ['http://l0.videohub.tv/ssframework/log/log.png?a=logitemaction&ssPD=app.com&AFC=PR_VIDEO&EC=2&RC=3&VI=cf0a3a96deaa32ab3baae57ae79aaadb&admode=preroll&PRI=4finj1hf9j13no1mt2ako8l&dspPrice=3.0&PBI=2704636&rtb=2&UI=ef20e47b94a670839943ad4d9f933016&AVI=419254&Uctry=N%2FA&Ust=N%2FA&AC=4&NI=1031&ADI=7286756&CbC=1&CbF=true&SmC=2&CbM=b4%2F1&Uzip=N%2FA&ssBI=4&RprC=0&sspId=TREMORVIDEO&VcaI=12300&RrC=0&VgI=cf0a3a96deaa32ab3baae57ae79aaadb&CI=2704646&PI=442224&CC=7&Udma=N%2FA&VmC=0&PcI=247281&VscaI=12300&VclF=true&PC=1&ssRnd=624905135', 'http://events.tremorhub.com/evt?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&evt=click&vastcrtype=linear&crid=7286756']);
     });
 
@@ -107,7 +109,7 @@ describe('VastParser', () => {
         const vastNoAdRaw = '<?xml version="1.0" encoding="UTF-8" standalone="no"?><VAST version="2.0"></VAST>';
 
         try {
-            const vastPromise = TestFixtures.getVastParser().retrieveVast(vastNoAdRaw, core, request);
+            const vastPromise = TestFixtures.getVastParserStrict().retrieveVast(vastNoAdRaw, core, request);
             vastPromise.then(() => {
                 assert.fail('Should fail when parsing invalid VAST');
             });
@@ -135,7 +137,7 @@ describe('VastParser', () => {
             response: 'invalid vast'
         }));
 
-        const vastPromise = TestFixtures.getVastParser().retrieveVast(rootVast, core, request);
+        const vastPromise = TestFixtures.getVastParserStrict().retrieveVast(rootVast, core, request);
 
         vastPromise.then(() => {
             assert.fail('Should fail when parsing invalid VAST');
@@ -151,13 +153,13 @@ describe('VastParser', () => {
     it('should trim spaces around VASTAdTagURI', () => {
         const rootVast = RootVastDirty;
 
-        const vast = TestFixtures.getVastParser().parseVast(rootVast);
+        const vast = TestFixtures.getVastParserStrict().parseVast(rootVast);
         assert.equal(vast.getWrapperURL(), 'http://demo.tremormedia.com/proddev/vast/vast_wrapper_linear_1.xml');
     });
 
     it('should have all extra spaces in urls trimmed', () => {
         const vastWithSpaces = VastWithSpaces;
-        const vast = TestFixtures.getVastParser().parseVast(vastWithSpaces);
+        const vast = TestFixtures.getVastParserStrict().parseVast(vastWithSpaces);
 
         assert.deepEqual(vast.getImpressionUrls(), [
             'http://dt.videohub2.tv/ssframework/tvuid?a=set&UI=ef20e47b94a670839943ad4d9f933016&ss_rand=1848887672',
@@ -206,42 +208,42 @@ describe('VastParser', () => {
 
     describe('Companion Ad', () => {
         it('should have correct companion landscape url', () => {
-            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAd);
+            const vast = TestFixtures.getVastParserStrict().parseVast(VastCompanionAdXml);
             assert.equal(vast.getCompanionLandscapeUrl(), 'http://unity.com/landscape.jpg');
         });
 
         it('should have correct companion portrait url', () => {
-            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAd);
+            const vast = TestFixtures.getVastParserStrict().parseVast(VastCompanionAdXml);
             assert.equal(vast.getCompanionPortraitUrl(), 'http://unity.com/portrait.jpg');
         });
 
         it('should have correct companion clickthrough url', () => {
-            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAd);
+            const vast = TestFixtures.getVastParserStrict().parseVast(VastCompanionAdXml);
             assert.equal(vast.getCompanionClickThroughUrl(), 'https://test.com/companionClickThrough');
         });
 
         it('should return null if the companion does not have a static resource tag for landscape image', () => {
-            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAdWithoutImages);
+            const vast = TestFixtures.getVastParserStrict().parseVast(VastCompanionAdWithoutLandscapeImageXml);
             assert.equal(vast.getCompanionLandscapeUrl(), null);
         });
 
         it('should return null if the companion does not have a static resource tag for portrait image', () => {
-            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAdWithoutImages);
+            const vast = TestFixtures.getVastParserStrict().parseVast(VastCompanionAdWithoutPortraitImageXml);
             assert.equal(vast.getCompanionPortraitUrl(), null);
         });
 
         it('should have correct companion landscape url when no clickthrough url is present', () => {
-            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAdWithoutClickThrough);
+            const vast = TestFixtures.getVastParserStrict().parseVast(VastCompanionAdWithoutPortraitImageXml);
             assert.equal(vast.getCompanionLandscapeUrl(), 'http://unity.com/landscape.jpg');
         });
 
         it('should have correct companion portrait url when no clickthrough url is present', () => {
-            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAdWithoutClickThrough);
+            const vast = TestFixtures.getVastParserStrict().parseVast(VastCompanionAdWithoutLandscapeImageXml);
             assert.equal(vast.getCompanionPortraitUrl(), 'http://unity.com/portrait.jpg');
         });
 
         it('should have the correct companion tracking urls', () => {
-            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAd);
+            const vast = TestFixtures.getVastParserStrict().parseVast(VastCompanionAdXml);
             assert.deepEqual(vast.getCompanionCreativeViewTrackingUrls(), ['https://test.com/clicktracking', 'https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_uuid=83d5ca41-447b-4650-a4a1-745fa218e1e1&mt_cmid=1&mt_aid=123&event=companionImpression&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111']);
         });
     });
@@ -253,5 +255,61 @@ describe('VastParser', () => {
         core = TestFixtures.getCoreApi(nativeBridge);
         const wakeUpManager = new WakeUpManager(core);
         request = new RequestManager(platform, core, wakeUpManager);
+    });
+
+    it('Should successfully parse EventTestVast.xml', () => {
+        const vastParser = TestFixtures.getVastParserStrict();
+        assert.doesNotThrow(() => {
+            vastParser.parseVast(EventTestVast);
+        });
+    });
+
+    it('Should successfully parse VastCompanionAd.xml', () => {
+        const vastParser = TestFixtures.getVastParserStrict();
+        assert.doesNotThrow(() => {
+            vastParser.parseVast(VastCompanionAdXml);
+        });
+    });
+
+    it('Should successfully parse VastCompanionAdWithoutLandscapeImage.xml', () => {
+        const vastParser = TestFixtures.getVastParserStrict();
+        assert.doesNotThrow(() => {
+            vastParser.parseVast(VastCompanionAdWithoutLandscapeImageXml);
+        });
+    });
+
+    it('Should successfully parse VastCompanionAdWithoutPortraitImage.xml', () => {
+        const vastParser = TestFixtures.getVastParserStrict();
+        assert.doesNotThrow(() => {
+            vastParser.parseVast(VastCompanionAdWithoutPortraitImageXml);
+        });
+    });
+
+    it('Should successfully parse VastRaw.xml', () => {
+        const vastParser = TestFixtures.getVastParserStrict();
+        assert.doesNotThrow(() => {
+            vastParser.parseVast(VastRaw);
+        });
+    });
+
+    it('Should successfully parse VastWithSpaces.xml', () => {
+        const vastParser = TestFixtures.getVastParserStrict();
+        assert.doesNotThrow(() => {
+            vastParser.parseVast(VastWithSpaces);
+        });
+    });
+
+    it('Should successfully parse WrappedVast.xml', () => {
+        const vastParser = TestFixtures.getVastParserStrict();
+        assert.doesNotThrow(() => {
+            vastParser.parseVast(WrappedVast);
+        });
+    });
+
+    it('Should successfully parse VastCompanionAdWithoutClickThrough.xml', () => {
+        const vastParser = TestFixtures.getVastParserStrict();
+        assert.throws(() => {
+            vastParser.parseVast(VastCompanionAdWithoutClickThrough);
+        });
     });
 });

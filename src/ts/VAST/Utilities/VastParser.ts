@@ -3,47 +3,12 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';
+import { VastCreative } from 'VAST/Models/VastCreative';
 import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { Url } from 'Core/Utilities/Url';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
-import { JsonParser } from 'Core/Utilities/JsonParser';
-
-enum VastNodeName {
-    ERROR = 'Error',
-    AD = 'Ad',
-    WRAPPER = 'Wrapper',
-    INLINE = 'InLine',
-    VAST_AD_TAG_URI = 'VASTAdTagURI',
-    IMPRESSION = 'Impression',
-    LINEAR = 'Linear',
-    COMPANION = 'Companion',
-    DURATION = 'Duration',
-    CLICK_THROUGH = 'ClickThrough',
-    CLICK_TRACKING = 'ClickTracking',
-    TRACKING = 'Tracking',
-    MEDIA_FILE = 'MediaFile',
-    AD_PARAMETERS = 'AdParameters',
-    STATIC_RESOURCE = 'StaticResource',
-    COMPANION_CLICK_THROUGH = 'CompanionClickThrough'
-}
-
-enum VastAttributeNames {
-    ID = 'id',
-    SKIP_OFFSET = 'skipoffset',
-    EVENT = 'event',
-    DELIVERY = 'delivery',
-    CODEC = 'codec',
-    TYPE = 'type',
-    BITRATE = 'bitrate',
-    MIN_BITRATE = 'minBitrate',
-    MAX_BITRATE = 'maxBitrate',
-    WIDTH = 'width',
-    HEIGHT = 'height',
-    API_FRAMEWORK = 'apiFramework',
-    CREATIVE_TYPE = 'creativeType'
-}
 
 export class VastParser {
 
@@ -78,68 +43,35 @@ export class VastParser {
 
         const xml = (this._domParser).parseFromString(vast, 'text/xml');
         const ads: VastAd[] = [];
-        const parseErrorURLTemplates: string[] = [];
-
-        // use the parsererror tag from DomParser to give accurate error messages
-        const parseErrors = xml.getElementsByTagName('parsererror');
-        if (parseErrors.length > 0) {
-            // then we have failed to parse the xml
-            const parseMessages: string[] = [];
-            for(const element of parseErrors) {
-                if (element.textContent) {
-                    parseMessages.push(element.textContent);
-                }
-            }
-            throw new Error(`VAST xml was not parseable:\n   ${parseMessages.join('\n    ')}`);
-        }
+        const errorURLTemplates: string[] = [];
 
         if (!xml || !xml.documentElement || xml.documentElement.nodeName !== 'VAST') {
             throw new Error('VAST xml data is missing');
         }
 
-        const documentElement = xml.documentElement;
+        const childNodes = <Node[]><any>xml.documentElement.childNodes;
 
         // collect error URLs before moving on to ads
-        this.getChildrenNodesWithName(documentElement, VastNodeName.ERROR).map((element: HTMLElement) => {
-            parseErrorURLTemplates.push(this.parseNodeText(element));
-        });
-        // parse each Ad element
-        this.getNodesWithName(documentElement, VastNodeName.AD).map((element: HTMLElement) => {
-            if (ads.length <= 0) {
-                const ad = this.parseAdElement(element);
-                ads.push(ad);
+        for(const node of childNodes) {
+            if (node.nodeName === 'Error') {
+                errorURLTemplates.push(this.parseNodeText(node));
             }
-        });
+        }
+
+        for(const node of childNodes) {
+            if (ads.length === 0 && node.nodeName === 'Ad') {
+                const ad = this.parseAdElement(node);
+                if (ad != null) {
+                    ads.push(ad);
+                }
+            }
+        }
 
         if (ads.length === 0) {
             throw new Error('VAST Ad tag is missing');
         }
 
-        return new Vast(ads, parseErrorURLTemplates);
-    }
-
-    // only searches direct children for nodes with matching name
-    private getChildrenNodesWithName(node: HTMLElement, name: string): HTMLElement[] {
-        const nodes: HTMLElement[] = [];
-        for (const child of node.childNodes) {
-            if (child.nodeName === name) {
-                nodes.push(<HTMLElement>child);
-            }
-        }
-        return nodes;
-    }
-
-    // recursively search for nodes with matching name
-    private getNodesWithName(rootNode: HTMLElement, name: string): HTMLElement[] {
-        let nodes: HTMLElement[] = [];
-        if (rootNode.nodeName === name) {
-            nodes.push(<HTMLElement>rootNode);
-        }
-        for (const node of rootNode.childNodes) {
-            const childNodesWithName: HTMLElement[] = this.getNodesWithName(<HTMLElement>node, name);
-            nodes = nodes.concat(childNodesWithName);
-        }
-        return nodes;
+        return new Vast(ads, errorURLTemplates);
     }
 
     public retrieveVast(vast: any, core: ICoreApi, request: RequestManager, parent?: Vast, depth: number = 0): Promise<Vast> {
@@ -201,81 +133,105 @@ export class VastParser {
         }
     }
 
-    private parseNodeText(node: HTMLElement): string {
-        if (node.textContent) {
-            return node.textContent.trim();
-        } else {
-            return '';
-        }
-    }
+    private parseNodeText(node: any): string {
+        let parsedText = node && (node.textContent || node.text);
 
-    private parseAdElement(adElement: HTMLElement): VastAd {
-        // const vastAd = new VastAd();
-
-        // use the first 'InLine' ad
-        for (const element of this.getNodesWithName(adElement, VastNodeName.INLINE)) {
-            const inlineAd = this.parseWrapperOrInLineElement(element);
-            inlineAd.setId(adElement.getAttribute(VastAttributeNames.ID));
-            return inlineAd;
-        }
-        // use the first 'Wrapper' ad if there is no 'InLine' ad
-        for (const element of this.getNodesWithName(adElement, VastNodeName.WRAPPER)) {
-            const wrapperAd = this.parseWrapperOrInLineElement(element);
-            wrapperAd.setId(adElement.getAttribute(VastAttributeNames.ID));
-            return wrapperAd;
+        if (parsedText) {
+            parsedText = parsedText.trim();
         }
 
-        // return undefined if there is no inline or wrapper ad
-        return new VastAd();
+        return parsedText;
     }
 
-    private parseWrapperOrInLineElement(adElement: HTMLElement): VastAd {
-        const vastAd = new VastAd();
-        this.getNodesWithName(adElement, VastNodeName.VAST_AD_TAG_URI).map((element: HTMLElement) => {
-            const url = this.parseNodeText(element);
-            vastAd.addWrapperURL(url);
-        });
-
-        this.getNodesWithName(adElement, VastNodeName.ERROR).map((element: HTMLElement) => {
-            const url = this.parseNodeText(element);
-            vastAd.addErrorURLTemplate(url);
-        });
-
-        this.getNodesWithName(adElement, VastNodeName.IMPRESSION).map((element: HTMLElement) => {
-            const url = this.parseNodeText(element);
-            vastAd.addImpressionURLTemplate(url);
-        });
-
-        this.getNodesWithName(adElement, VastNodeName.LINEAR).map((element: HTMLElement) => {
-            const creative = this.parseCreativeLinearElement(element);
-            vastAd.addCreative(creative);
-        });
-
-        this.getNodesWithName(adElement, VastNodeName.COMPANION).map((element: HTMLElement) => {
-            const companionAd = this.parseCreativeCompanionAdElement(element);
-            vastAd.addCompanionAd(companionAd);
-        });
-
-        return vastAd;
+    private parseAdElement(adElement: any): VastAd | undefined {
+        let ad: VastAd | undefined;
+        const childNodes = adElement.childNodes;
+        for(const adTypeElement of childNodes) {
+            if (adTypeElement.nodeName === 'Wrapper') {
+                ad = this.parseWrapperElement(adTypeElement);
+                break;
+            }
+            if (adTypeElement.nodeName === 'InLine') {
+                ad = this.parseInLineElement(adTypeElement);
+                break;
+            }
+        }
+        if (ad) {
+            ad.setId(adElement.getAttribute('id'));
+        }
+        return ad;
     }
 
-    private getIntAttribute(element: HTMLElement, attribute: string): number {
-        const stringAttribute: string | null = element.getAttribute(attribute);
-        return parseInt(stringAttribute || '0', 10);
+    private parseWrapperElement(wrapperElement: any): VastAd {
+        return this.parseInLineElement(wrapperElement);
     }
 
-    private parseCreativeLinearElement(creativeElement: HTMLElement): VastCreativeLinear {
+    private parseInLineElement(inLineElement: any): VastAd {
+        const ad = new VastAd();
+        const childNodes = inLineElement.childNodes;
+        for(const node of childNodes) {
+            const url = this.parseNodeText(node);
+            switch (node.nodeName) {
+                case 'Error':
+                    if (url) {
+                        ad.addErrorURLTemplate(url);
+                    }
+                    break;
+                case 'Impression':
+                    if (url) {
+                        ad.addImpressionURLTemplate(url);
+                    }
+                    break;
+                case 'Creatives':
+                    const childCreatives = this.childsByName(node, 'Creative');
+                    for(const creativeElement of childCreatives) {
+                        const creativeChildren = creativeElement.childNodes;
+                        for(const creativeTypeElement of creativeChildren) {
+                            let creative: VastCreative;
+                            switch (creativeTypeElement.nodeName) {
+                                case 'Linear':
+                                    if (ad.getCreatives().length === 0) {
+                                        creative = this.parseCreativeLinearElement(creativeTypeElement);
+                                        if (creative) {
+                                            ad.addCreative(creative);
+                                        }
+                                    }
+                                    break;
+                                case 'CompanionAds':
+                                    const companionAdElements = this.childsByName(creativeTypeElement, 'Companion');
+                                    for(const companionAdElement of companionAdElements) {
+                                        const companionAd = this.parseCreativeCompanionAdElement(companionAdElement);
+                                        if (companionAd) {
+                                            ad.addCompanionAd(companionAd);
+                                        }
+                                    }
+                                    break;
+                                default:
+                            }
+                        }
+                    }
+                    break;
+                case 'VASTAdTagURI':
+                    if (url) {
+                        ad.addWrapperURL(url);
+                    }
+                    break;
+                default:
+            }
+        }
+        return ad;
+    }
+
+    private parseCreativeLinearElement(creativeElement: any): any {
         const creative = new VastCreativeLinear();
 
-        this.getNodesWithName(creativeElement, VastNodeName.DURATION).map((element: HTMLElement, index: number) => {
-            if (index === 0) {
-                const durationString = this.parseNodeText(element);
-                creative.setDuration(this.parseDuration(durationString));
-            }
-        });
+        creative.setDuration(this.parseDuration(this.parseNodeText(this.childByName(creativeElement, 'Duration'))));
+        if (creative.getDuration() === -1 && creativeElement.parentNode.parentNode.parentNode.nodeName !== 'Wrapper') {
+            return null;
+        }
 
         const mediaDuration = creative.getDuration();
-        const skipOffset = creativeElement.getAttribute(VastAttributeNames.SKIP_OFFSET);
+        const skipOffset = creativeElement.getAttribute('skipoffset');
         if (skipOffset == null) {
             creative.setSkipDelay(null);
         } else if (skipOffset.charAt(skipOffset.length - 1) === '%') {
@@ -285,82 +241,102 @@ export class VastParser {
             creative.setSkipDelay(this.parseDuration(skipOffset));
         }
 
-        this.getNodesWithName(creativeElement, VastNodeName.CLICK_THROUGH).map((element: HTMLElement, index: number) => {
-            if (index === 0) {
-                const url = this.parseNodeText(element);
-                creative.setVideoClickThroughURLTemplate(url);
+        const videoClicksElement = this.childByName(creativeElement, 'VideoClicks');
+        if (videoClicksElement != null) {
+            creative.setVideoClickThroughURLTemplate(this.parseNodeText(this.childByName(videoClicksElement, 'ClickThrough')));
+            const trackingVideoClickEventsElements = this.childsByName(videoClicksElement, 'ClickTracking');
+            for(const trackingVideoClickEventsElement of trackingVideoClickEventsElements) {
+                const trackingVideoClickURLTemplate = this.parseNodeText(trackingVideoClickEventsElement);
+                if (trackingVideoClickURLTemplate != null) {
+                    creative.addVideoClickTrackingURLTemplate(trackingVideoClickURLTemplate);
+                }
             }
-        });
+        }
 
-        this.getNodesWithName(creativeElement, VastNodeName.CLICK_TRACKING).map((element: HTMLElement) => {
-            const url = this.parseNodeText(element);
-            creative.addVideoClickTrackingURLTemplate(url);
-        });
-
-        this.getNodesWithName(creativeElement, VastNodeName.TRACKING).map((element: HTMLElement) => {
-            const url = this.parseNodeText(element);
-            const eventName = element.getAttribute(VastAttributeNames.EVENT);
-            if (eventName) {
-                creative.addTrackingEvent(eventName, url);
+        const trackingEventsElements = this.childsByName(creativeElement, 'TrackingEvents');
+        for(const trackingEventsElement of trackingEventsElements) {
+            const trackingElements = this.childsByName(trackingEventsElement, 'Tracking');
+            for(const trackingElement of trackingElements) {
+                const eventName = trackingElement.getAttribute('event');
+                const trackingURLTemplate = this.parseNodeText(trackingElement);
+                if ((eventName != null) && (trackingURLTemplate != null)) {
+                    creative.addTrackingEvent(eventName, trackingURLTemplate);
+                }
             }
-        });
+        }
 
-        this.getNodesWithName(creativeElement, VastNodeName.MEDIA_FILE).map((element: HTMLElement) => {
-            const bitrate = this.getIntAttribute(element, VastAttributeNames.BITRATE);
-            const mediaFile = new VastMediaFile(
-                this.parseNodeText(element),
-                element.getAttribute(VastAttributeNames.DELIVERY),
-                element.getAttribute(VastAttributeNames.CODEC),
-                element.getAttribute(VastAttributeNames.TYPE),
-                bitrate,
-                this.getIntAttribute(element, VastAttributeNames.MIN_BITRATE),
-                this.getIntAttribute(element, VastAttributeNames.MAX_BITRATE),
-                this.getIntAttribute(element, VastAttributeNames.WIDTH),
-                this.getIntAttribute(element, VastAttributeNames.HEIGHT),
-                element.getAttribute(VastAttributeNames.API_FRAMEWORK),
-                this.parseMediaFileSize(mediaDuration, bitrate)
-            );
-            creative.addMediaFile(mediaFile);
-        });
+        const mediaFilesElements = this.childsByName(creativeElement, 'MediaFiles');
+        if (mediaFilesElements.length > 0) {
+            const mediaFilesElement = mediaFilesElements[0];
+            const mediaFileElements = this.childsByName(mediaFilesElement, 'MediaFile');
+            for(const mediaFileElement of mediaFileElements) {
+                const mediaFile = new VastMediaFile(
+                    this.parseNodeText(mediaFileElement),
+                    mediaFileElement.getAttribute('delivery'),
+                    mediaFileElement.getAttribute('codec'),
+                    mediaFileElement.getAttribute('type'),
+                    parseInt(mediaFileElement.getAttribute('bitrate') || 0, 10),
+                    parseInt(mediaFileElement.getAttribute('minBitrate') || 0, 10),
+                    parseInt(mediaFileElement.getAttribute('maxBitrate') || 0, 10),
+                    parseInt(mediaFileElement.getAttribute('width') || 0, 10),
+                    parseInt(mediaFileElement.getAttribute('height') || 0, 10),
+                    mediaFileElement.getAttribute('apiFramework'),
+                    this.parseMediaFileSize(mediaDuration, parseInt(mediaFileElement.getAttribute('bitrate') || 0, 10)));
+                creative.addMediaFile(mediaFile);
+            }
+        }
 
-        this.getNodesWithName(creativeElement, VastNodeName.AD_PARAMETERS).map((element: HTMLElement, index: number) => {
-            if (index === 0) {
-                const adParameters = this.parseNodeText(element);
+        const adParametersElement = this.childByName(creativeElement, 'AdParameters');
+        if (adParametersElement) {
+            const adParameters = this.parseNodeText(adParametersElement);
+            if (adParameters) {
                 creative.setAdParameters(adParameters);
             }
-        });
+        }
 
         return creative;
     }
 
-    private parseCreativeCompanionAdElement(companionAdElement: HTMLElement): VastCreativeCompanionAd {
-        const id = companionAdElement.getAttribute(VastAttributeNames.ID);
-        const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
-        const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
-        const companionAd = new VastCreativeCompanionAd(id, height, width);
+    private parseCreativeCompanionAdElement(companionAdElement: any): any {
+        const staticResourceElement = this.childByName(companionAdElement, 'StaticResource');
+        const companionClickThroughElement = this.childByName(companionAdElement, 'CompanionClickThrough');
 
-        // Get tracking urls for companion ad
-        this.getNodesWithName(companionAdElement, VastNodeName.TRACKING).map((element: HTMLElement) => {
-            const url = this.parseNodeText(element);
-            const eventName = element.getAttribute(VastAttributeNames.EVENT);
-            if (eventName) {
-                companionAd.addTrackingEvent(eventName, url);
-            }
-        });
+        if (companionAdElement && staticResourceElement) {
+            const id = companionAdElement.getAttribute('id');
+            const height = parseInt(companionAdElement.getAttribute('height') || 0, 10);
+            const width = parseInt(companionAdElement.getAttribute('width') || 0, 10);
+            const creativeType = staticResourceElement.getAttribute('creativeType');
+            const staticResourceURL = this.parseNodeText(staticResourceElement);
+            const companionClickThroughURLTemplate = this.parseNodeText(companionClickThroughElement);
 
-        this.getNodesWithName(companionAdElement, VastNodeName.STATIC_RESOURCE).map((element: HTMLElement, index: number) => {
-            if (index === 0) {
-                const creativeType = element.getAttribute(VastAttributeNames.CREATIVE_TYPE);
-                companionAd.setCreativeType(creativeType);
-                companionAd.setStaticResourceURL(this.parseNodeText(element));
+            const trackingEvents = this.getTrackingEventsFromElement(companionAdElement);
+
+            return new VastCreativeCompanionAd(id, height, width, creativeType, staticResourceURL, companionClickThroughURLTemplate, trackingEvents);
+        } else {
+            return null;
+        }
+    }
+
+    private getTrackingEventsFromElement(el: Node): { [eventType: string]: string[] } {
+        const events: { [eventType: string]: string[] } = {};
+
+        const trackingEventsElements = this.childsByName(el, 'TrackingEvents');
+        for(const trackingEventsElement of trackingEventsElements) {
+            const trackingElements = this.childsByName(trackingEventsElement, 'Tracking');
+            for(const trackingElement of trackingElements) {
+                const eventName = trackingElement.getAttribute('event');
+                const trackingURLTemplate = this.parseNodeText(trackingElement);
+                if ((eventName != null) && (trackingURLTemplate != null)) {
+                    if (events[eventName] !== undefined) {
+                        events[eventName].push(trackingURLTemplate);
+                    } else {
+                        events[eventName] = [trackingURLTemplate];
+                    }
+                }
             }
-        });
-        this.getNodesWithName(companionAdElement, VastNodeName.COMPANION_CLICK_THROUGH).map((element: HTMLElement, index: number) => {
-            if (index === 0) {
-                companionAd.setCompanionClickThroughURLTemplate(this.parseNodeText(element));
-            }
-        });
-        return companionAd;
+        }
+
+        return events;
     }
 
     private parseDuration(durationString: string): number {
@@ -388,6 +364,26 @@ export class VastParser {
         }
 
         return hours + minutes + seconds;
+    }
+
+    private childByName(node: any, name: string): any {
+        const childNodes = node.childNodes;
+        for(const child of childNodes) {
+            if (child.nodeName === name) {
+                return child;
+            }
+        }
+    }
+
+    private childsByName(node: any, name: string): any {
+        const matches: Node[] = [];
+        const childNodes = node.childNodes;
+        for(const child of childNodes) {
+            if (child.nodeName === name) {
+                matches.push(child);
+            }
+        }
+        return matches;
     }
 
 }

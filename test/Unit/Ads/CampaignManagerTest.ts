@@ -297,7 +297,6 @@ describe('CampaignManager', () => {
 
                     assert.equal(triggeredCampaign.getVideo().getUrl(), 'https://speed-s.pointroll.com/pointroll/media/asset/Nissan/221746/Nissan_FY16_FTC_GM_Generic_Instream_1280x720_400kbps_15secs.mp4');
                     assert.deepEqual(triggeredCampaign.getVast().getAd()!.getErrorURLTemplates(), [
-                        '',
                         'https://bid.g.doubleclick.net/xbbe/notify/tremorvideo?creative_id=17282869&usl_id=0&errorcode=[ERRORCODE]&asseturi=[ASSETURI]&ord=[CACHEBUSTING]&offset=[CONTENTPLAYHEAD]&d=APEucNX6AnAylHZpx52AcFEstrYbL-_q_2ud9qCaXyViLGR4yz7SDI0QjLTfTgW5N60hztCt5lwtX-qOtPbrEbEH7AkfRc7aI04dfJWGCQhTntCRkpOC6UUNuHBWGPhsjDpKl8_I-piRwwFMMkZSXe8jaPe6gsJMdwmNCBn8OfpcbVAS0bknPVh1KkaXOZY-wnjj6kR0_VFyzS1fPi5lD3kj3lnBaEliKv-aqtH6SRbhBZoP7J-M9hM',
                         'http://events.tremorhub.com/diag?rid=fd53cdbe934c44c68c57467d184160d7&pbid=1585&seatid=60673&aid=13457&asid=5097&lid=3&rid=fd53cdbe934c44c68c57467d184160d7&rtype=VAST_ERR&vastError=[ERRORCODE]&sec=false&adcode=rwd19-1059849-video&seatId=60673&pbid=1585&brid=3418&sid=9755&sdom=demo.app.com&asid=5097&nid=3&lid=3&adom=nissanusa.com&crid=17282869&aid=13457'
                     ]);
@@ -492,12 +491,12 @@ describe('CampaignManager', () => {
                 const response = {
                     response: OnProgrammaticVastPlcCampaignIncorrect
                 };
-                return verifyErrorForResponse(response, 'VAST xml was not parseable:\n   This page contains the following errors:error on line 33 at column 12: Opening and ending tag mismatch: VASTy line 0 and VAST\nBelow is a rendering of the page up to the first error.');
+                return verifyErrorForResponse(response, 'VAST xml data is missing');
             });
 
             it('should trigger onError after requesting a wrapped vast placement with incorrect document element node name', () => {
                 const response = {
-                    response: OnProgrammaticVastPlcCampaignIncorrectWrapped
+                    response: OnProgrammaticVastPlcCampaignIncorrect
                 };
                 const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
                 const wrappedResponse = Promise.resolve({
@@ -511,7 +510,7 @@ describe('CampaignManager', () => {
                 const response = {
                     response: OnProgrammaticVastPlcCampaignNoData
                 };
-                return verifyErrorForResponse(response, 'VAST xml was not parseable:\n   This page contains the following errors:error on line 1 at column 1: Document is empty\nBelow is a rendering of the page up to the first error.');
+                return verifyErrorForResponse(response, 'VAST xml data is missing');
             });
 
             it('should trigger onError after requesting a wrapped vast placement when a failure occurred requesting the wrapped VAST', () => {

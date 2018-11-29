@@ -98,6 +98,7 @@ import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 import EventTestVast from 'xml/EventTestVast.xml';
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
+import VastAdWithoutCompanionAdXml from 'xml/VastAdWithoutCompanionAd.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
@@ -127,6 +128,7 @@ import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters, IAppStoreDow
 import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
+import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -546,9 +548,16 @@ export class TestFixtures {
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345', session));
     }
 
-    public static getCompanionVastCampaignWihoutImages(): VastCampaign {
+    public static getCompanionVastCampaignWithoutImages(): VastCampaign {
         const vastParser = TestFixtures.getVastParser();
         const vastXml = VastCompanionAdWithoutImagesXml;
+        const vast = vastParser.parseVast(vastXml);
+        return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
+    }
+
+    public static getCompanionVastCampaignWithoutCompanionAd(): VastCampaign {
+        const vastParser = TestFixtures.getVastParser();
+        const vastXml = VastAdWithoutCompanionAdXml;
         const vast = vastParser.parseVast(vastXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
     }
@@ -772,6 +781,13 @@ export class TestFixtures {
         let vastParser: VastParser;
         const domParser = new DOMParser();
         vastParser = new VastParser(domParser);
+        return vastParser;
+    }
+
+    public static getVastParserStrict(): VastParserStrict {
+        let vastParser: VastParserStrict;
+        const domParser = new DOMParser();
+        vastParser = new VastParserStrict(domParser);
         return vastParser;
     }
 

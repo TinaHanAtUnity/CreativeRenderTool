@@ -171,7 +171,7 @@ export class Ads implements IAds {
                 this.AssetManager.setCacheDiagnostics(true);
             }
 
-            const parserModules = [AdMob, Display, MRAID, Performance, VAST, VPAID, XPromo];
+            const parserModules = [AdMob, Display, MRAID, Performance, VPAID, XPromo];
             parserModules.forEach(moduleConstructor => {
                 const module = new moduleConstructor();
                 const contentTypeHandlerMap = module.getContentTypeHandlerMap();
@@ -181,6 +181,14 @@ export class Ads implements IAds {
                     }
                 }
             });
+
+            const vast = new VAST(this._core);
+            const vastContentTypeHandlerMap = vast.getContentTypeHandlerMap();
+            for (const contentType in vastContentTypeHandlerMap) {
+                if (vastContentTypeHandlerMap.hasOwnProperty(contentType)) {
+                    this.ContentTypeHandlerManager.addHandler(contentType, vastContentTypeHandlerMap[contentType]);
+                }
+            }
 
             const promo = new Promo(this._core, this, this._core.Purchasing, this._core.Analytics);
             const promoContentTypeHandlerMap = promo.getContentTypeHandlerMap();

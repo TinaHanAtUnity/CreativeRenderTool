@@ -15,8 +15,10 @@ import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErr
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 
 export class ProgrammaticVastParser extends CampaignParser {
+
     public static ContentType = CampaignContentTypes.ProgrammaticVast;
 
     public static setVastParserMaxDepth(depth: number): void {
@@ -116,5 +118,19 @@ export class ProgrammaticVastParser extends CampaignParser {
         const campaign = new VastCampaign(vastCampaignParms);
 
         return Promise.resolve(campaign);
+    }
+}
+
+export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
+
+    protected _vastParserStrict: VastParserStrict = new VastParserStrict();
+
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign> {
+        const decodedVast = decodeURIComponent(response.getContent()).trim();
+
+        return this._vastParserStrict.retrieveVast(decodedVast, core, request).then((vast): Promise<Campaign> => {
+            const campaignId = this.getProgrammaticCampaignId(platform);
+            return this.parseVastToCampaign(vast, platform, campaignId, session, response, connectionType);
+        });
     }
 }
