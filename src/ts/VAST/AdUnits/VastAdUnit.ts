@@ -4,7 +4,6 @@ import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { MOAT } from 'Ads/Views/MOAT';
 import { StreamType } from 'Core/Constants/Android/StreamType';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 
@@ -18,11 +17,11 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _moat?: MOAT;
     private _volume: number;
     private _muted: boolean = false;
-    private _events: Array<[number, string]> = [[0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
+    private _events: [number, string][] = [[0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
 
-    constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
-        super(nativeBridge, parameters);
+    constructor(parameters: IVastAdUnitParameters) {
+        super(parameters);
 
         parameters.overlay.setSpinnerEnabled(!parameters.campaign.getVideo().isCached());
 
@@ -37,15 +36,15 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
             document.body.appendChild(this._endScreen.container());
         }
 
-        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+        if(parameters.platform === Platform.ANDROID) {
             Promise.all([
-                nativeBridge.DeviceInfo.Android.getDeviceVolume(StreamType.STREAM_MUSIC),
-                nativeBridge.DeviceInfo.Android.getDeviceMaxVolume(StreamType.STREAM_MUSIC)
+                parameters.core.DeviceInfo.Android!.getDeviceVolume(StreamType.STREAM_MUSIC),
+                parameters.core.DeviceInfo.Android!.getDeviceMaxVolume(StreamType.STREAM_MUSIC)
             ]).then(([volume, maxVolume]) => {
                 this.setVolume(volume / maxVolume);
             });
-        } else if(nativeBridge.getPlatform() === Platform.IOS) {
-            nativeBridge.DeviceInfo.Ios.getDeviceVolume().then((volume) => {
+        } else if(parameters.platform === Platform.IOS) {
+            parameters.core.DeviceInfo.Ios!.getDeviceVolume().then((volume) => {
                 this.setVolume(volume);
             });
         }
@@ -89,7 +88,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return this._events;
     }
 
-    public setEvents(events: Array<[number, string]>) {
+    public setEvents(events: [number, string][]) {
         this._events = events;
     }
 
@@ -120,7 +119,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {
-                this._thirdPartyEventManager.sendWithGet(`vast ${eventName}`, sessionId, url);
+                this._thirdPartyEventManager.sendWithGet(`vast ${eventName}`, sessionId, url, this._vastCampaign.getUseWebViewUserAgentForTracking());
             }
         }
     }
@@ -146,7 +145,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     public sendCompanionTrackingEvent(sessionId: string): void {
         const companionTrackingUrls = this._vastCampaign.getVast().getCompanionCreativeViewTrackingUrls();
         for (const url of companionTrackingUrls) {
-            this._thirdPartyEventManager.sendWithGet('companion', sessionId, url);
+            this._thirdPartyEventManager.sendWithGet('companion', sessionId, url, this._vastCampaign.getUseWebViewUserAgentForTracking());
         }
     }
 
@@ -157,7 +156,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
         if (clickTrackingEventUrls) {
             for (const clickTrackingEventUrl of clickTrackingEventUrls) {
-                this._thirdPartyEventManager.sendWithGet('vast video click', sessionId, clickTrackingEventUrl);
+                this._thirdPartyEventManager.sendWithGet('vast video click', sessionId, clickTrackingEventUrl, this._vastCampaign.getUseWebViewUserAgentForTracking());
             }
         }
     }

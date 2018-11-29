@@ -7,25 +7,26 @@ import { IAdMobEventHandler } from 'AdMob/Views/AdMobView';
 import { IOpenableIntentsRequest, ITouchInfo } from 'AdMob/Views/AFMABridge';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Session } from 'Ads/Models/Session';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Promises } from 'Core/Utilities/Promises';
-import { Request } from 'Core/Utilities/Request';
 import { Timer } from 'Core/Utilities/Timer';
 import { Url } from 'Core/Utilities/Url';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
-    request: Request;
-    nativeBridge: NativeBridge;
+    request: RequestManager;
+    platform: Platform;
+    core: ICoreApi;
     session: Session;
     thirdPartyEventManager: ThirdPartyEventManager;
     adMobSignalFactory: AdMobSignalFactory;
@@ -33,7 +34,7 @@ export interface IAdMobEventHandlerParameters {
     campaign: AdMobCampaign;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
-    gdprManager: GdprManager;
+    privacyManager: UserPrivacyManager;
 }
 
 export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHandler {
@@ -43,9 +44,10 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     }
     private static _loadTimeout: number = 5000;
     private _adUnit: AdMobAdUnit;
-    private _nativeBridge: NativeBridge;
+    private _platform: Platform;
+    private _core: ICoreApi;
     private _timeoutTimer: Timer;
-    private _request: Request;
+    private _request: RequestManager;
     private _session: Session;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adMobSignalFactory: AdMobSignalFactory;
@@ -53,9 +55,10 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     private _clientInfo: ClientInfo;
 
     constructor(parameters: IAdMobEventHandlerParameters) {
-        super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
+        super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig);
         this._adUnit = parameters.adUnit;
-        this._nativeBridge = parameters.nativeBridge;
+        this._platform = parameters.platform;
+        this._core = parameters.core;
         this._request = parameters.request;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._session = parameters.session;
@@ -75,10 +78,10 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
         if (!isAboutPage) {
             this._adUnit.sendClickEvent();
         }
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._nativeBridge.UrlScheme.open(url);
+        if (this._platform === Platform.IOS) {
+            this._core.iOS!.UrlScheme.open(url);
         } else {
-            this._nativeBridge.Intent.launch({
+            this._core.Android!.Intent.launch({
                 action: 'android.intent.action.VIEW',
                 uri: url
             });
@@ -87,7 +90,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
 
     public onAttribution(url: string, touchInfo: ITouchInfo): Promise<void> {
         const userAgent = this.getUserAgentHeader();
-        const headers: Array<[string, string]> = [
+        const headers: [string, string][] = [
             ['User-Agent', userAgent]
         ];
         const isMsPresent = Url.getQueryParameter(url, 'ms');
@@ -118,7 +121,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     }
 
     public onSetOrientationProperties(allowOrientation: boolean, forceOrientation: Orientation) {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._platform === Platform.IOS) {
             this._adUnit.getContainer().reorient(true, forceOrientation);
         } else {
             this._adUnit.getContainer().reorient(allowOrientation, forceOrientation);
@@ -126,7 +129,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     }
 
     public onOpenableIntentsRequest(request: IOpenableIntentsRequest): void {
-        this._nativeBridge.Intent.canOpenIntents(request.intents).then((results) => {
+        this._core.Android!.Intent.canOpenIntents(request.intents).then((results) => {
             this._adUnit.sendOpenableIntentsResponse({
                 id: request.id,
                 results: results

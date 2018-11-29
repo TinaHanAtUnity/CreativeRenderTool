@@ -1,18 +1,18 @@
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/ICore';
 import { StorageError, StorageType } from 'Core/Native/Storage';
 
 export class MetaData {
-    private _nativeBridge: NativeBridge;
+    private _core: ICoreApi;
 
-    constructor(nativeBridge: NativeBridge) {
-        this._nativeBridge = nativeBridge;
+    constructor(core: ICoreApi) {
+        this._core = core;
     }
 
     public get<T>(key: string, deleteValue: boolean) {
-        return this._nativeBridge.Storage.get<T>(StorageType.PUBLIC, key + '.value').then((value: T) => {
+        return this._core.Storage.get<T>(StorageType.PUBLIC, key + '.value').then((value: T) => {
             if(deleteValue) {
-                this._nativeBridge.Storage.delete(StorageType.PUBLIC, key);
-                this._nativeBridge.Storage.write(StorageType.PUBLIC);
+                this._core.Storage.delete(StorageType.PUBLIC, key);
+                this._core.Storage.write(StorageType.PUBLIC);
             }
             return Promise.resolve([true, value]);
         }).catch(([error]) => {
@@ -32,7 +32,7 @@ export class MetaData {
     }
 
     public getKeys(category: string): Promise<string[]> {
-        return this._nativeBridge.Storage.getKeys(StorageType.PUBLIC, category, false).then(results => {
+        return this._core.Storage.getKeys(StorageType.PUBLIC, category, false).then(results => {
             return results;
         }).catch(([error]) => {
             switch(error) {
@@ -47,7 +47,7 @@ export class MetaData {
     }
 
     public hasCategory(category: string): Promise<boolean> {
-        return this._nativeBridge.Storage.getKeys(StorageType.PUBLIC, category, false).then(results => {
+        return this._core.Storage.getKeys(StorageType.PUBLIC, category, false).then(results => {
             return results.length > 0;
         }).catch(([error]) => {
             switch(error) {

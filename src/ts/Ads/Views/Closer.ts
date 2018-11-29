@@ -1,7 +1,7 @@
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
@@ -28,8 +28,8 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
     private _showGDPRBanner: boolean;
     private _gdprPopupClicked: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
-        super(nativeBridge, 'closer');
+    constructor(platform: Platform, placement: Placement, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+        super(platform, 'closer');
         this._template = new Template(CloserTemplate);
         this._placement = placement;
         this._privacy = privacy;

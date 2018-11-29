@@ -4,18 +4,17 @@ import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import {
-    ABGroup,
-    GreenEndScreenButtonColorTest
-} from 'Core/Models/ABGroup';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ABGroup } from 'Core/Models/ABGroup';
 import { Localization } from 'Core/Utilities/Localization';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 
 export interface IEndScreenParameters {
-    nativeBridge: NativeBridge;
+    platform: Platform;
+    core: ICoreApi;
+    apiLevel?: number;
     language: string;
     gameId: string;
     targetGameName: string | undefined;
@@ -45,9 +44,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _gdprPopupClicked = false;
     private _campaignId: string | undefined;
     private _osVersion: string | undefined;
+    private _apiLevel?: number;
 
     constructor(parameters : IEndScreenParameters) {
-        super(parameters.nativeBridge, 'end-screen');
+        super(parameters.platform, 'end-screen');
         this._localization = new Localization(parameters.language, 'endscreen');
         this._abGroup = parameters.abGroup;
         this._gameName = parameters.targetGameName;
@@ -56,6 +56,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._showGDPRBanner = parameters.showGDPRBanner;
         this._campaignId = parameters.campaignId;
         this._osVersion = parameters.osVersion;
+        this._apiLevel = parameters.apiLevel;
 
         this._bindings = [
             {
@@ -93,8 +94,14 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     public render(): void {
         super.render();
+
         if (this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
+        }
+
+        const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
+        if (ctaButtonColor) {
+            (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
         }
 
         const endScreenAlt = this.getEndscreenAlt();
@@ -107,25 +114,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             this._container.classList.add('show-gdpr-banner');
         }
 
-        let ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
-
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            if (this._nativeBridge.getApiLevel() <= 19) {   // Android <= 4.4.4
-                this._container.classList.add('old-androids');
-            }
-            ctaButtonColor = this.overrideButtonColor(ctaButtonColor);
+        // Android <= 4.4.4
+        if (this._platform === Platform.ANDROID && this._apiLevel! <= 19) {
+            this._container.classList.add('old-androids');
         }
-
-        if (ctaButtonColor) {
-            (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
-        }
-    }
-
-    private overrideButtonColor(ctaButtonColor: string | undefined): string | undefined {
-        if (GreenEndScreenButtonColorTest.isValid(this._abGroup)) {
-            return '#83CD0C';
-        }
-        return ctaButtonColor;
     }
 
     public show(): void {
