@@ -2,29 +2,20 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAID } from 'MRAID/Views/MRAID';
-import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { Platform } from 'Core/Constants/Platform';
 import { IObserver0 } from 'Core/Utilities/IObserver';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { Observable0 } from 'Core/Utilities/Observable';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { Backend } from 'Backend/Backend';
-import { ICoreApi } from 'Core/ICore';
 import { IAdsApi } from 'Ads/IAds';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
@@ -34,67 +25,45 @@ import { ARUtil } from 'AR/Utilities/ARUtil';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 describe('MraidAdUnit', () => {
+    const sandbox = sinon.createSandbox();
     let mraidAdUnitParameters: IMRAIDAdUnitParameters;
     let mraidAdUnit: MRAIDAdUnit;
     let mraidView: MRAID;
-    let operativeEventManager: OperativeEventManager;
-    let userPrivacyManager: UserPrivacyManager;
-
-    let platform: Platform;
-    let backend: Backend;
-    let nativeBridge: NativeBridge;
-    let core: ICoreApi;
     let ads: IAdsApi;
-    let ar: IARApi;
-
-    let purchasing: IPurchasingApi;
-    let thirdPartyEventManager: ThirdPartyEventManager;
-    let focusManager: FocusManager;
-    let deviceInfo: DeviceInfo;
-    let clientInfo: ClientInfo;
-
-    const sandbox = sinon.createSandbox();
 
     afterEach(() => {
         sandbox.restore();
     });
 
     beforeEach(() => {
-        nativeBridge = sinon.createStubInstance(NativeBridge);
+        const platform = Platform.ANDROID;
+        const backend = TestFixtures.getBackend(platform);
+        const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
 
-        mraidView = sinon.createStubInstance(MRAID);
-        (<sinon.SinonSpy>mraidView.container).restore();
-        sinon.stub(mraidView, 'container').returns(document.createElement('div'));
-        userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
-
-        platform = Platform.ANDROID;
-        backend = TestFixtures.getBackend(platform);
-        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-        core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
-        ar = TestFixtures.getARApi(nativeBridge);
+        mraidView = sinon.createStubInstance(MRAID);
+
+        (<sinon.SinonSpy>mraidView.container).restore();
+        sandbox.stub(mraidView, 'container').returns(document.createElement('div'));
+
+        const userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
+        const core = TestFixtures.getCoreApi(nativeBridge);
         const wakeUpManager = new WakeUpManager(core);
         const request = new RequestManager(platform, core, wakeUpManager);
         const storageBridge = new StorageBridge(core);
-        focusManager = new FocusManager(platform, core);
-        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
-        clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
-        thirdPartyEventManager = new ThirdPartyEventManager(core, request);
-        const sessionManager = new SessionManager(core, request, storageBridge);
-        const metaDataManager = new MetaDataManager(core);
+        const clientInfo = TestFixtures.getClientInfo(platform);
+        const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
         const mraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
-        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
-        operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
-            platform,
-            core,
-            ads,
+        const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            platform: platform,
+            core: core,
+            ads: ads,
             request: request,
-            metaDataManager: metaDataManager,
-            sessionManager: sessionManager,
+            metaDataManager: new MetaDataManager(core),
+            sessionManager: new SessionManager(core, request, storageBridge),
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
             coreConfig: coreConfig,
@@ -104,17 +73,17 @@ describe('MraidAdUnit', () => {
         });
 
         mraidAdUnitParameters = {
-            platform,
-            core,
-            ads,
-            ar,
-            purchasing,
+            platform: platform,
+            core: core,
+            ads: ads,
+            ar: TestFixtures.getARApi(nativeBridge),
+            purchasing: TestFixtures.getPurchasingApi(nativeBridge),
             forceOrientation: Orientation.LANDSCAPE,
-            focusManager: focusManager,
+            focusManager: new FocusManager(platform, core),
             container: sinon.createStubInstance(Activity),
             deviceInfo: deviceInfo,
             clientInfo: clientInfo,
-            thirdPartyEventManager: thirdPartyEventManager,
+            thirdPartyEventManager: new ThirdPartyEventManager(core, request),
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
             campaign: mraidCampaign,
@@ -126,14 +95,11 @@ describe('MraidAdUnit', () => {
             endScreen: undefined,
             privacy: new Privacy(platform, mraidCampaign, userPrivacyManager, false, false),
             privacyManager: userPrivacyManager,
-            programmaticTrackingService: programmaticTrackingService
+            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };
 
-        (<any>mraidAdUnitParameters.container).onShow = new Observable0();
-        (<any>mraidAdUnitParameters.container).onAndroidPause = new Observable0();
         (<sinon.SinonStub>mraidAdUnitParameters.container.open).returns(Promise.resolve());
         (<sinon.SinonStub>mraidAdUnitParameters.container.close).returns(Promise.resolve());
-        (<sinon.SinonStub>mraidAdUnitParameters.container.setViewFrame).returns(Promise.resolve());
 
         sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
         sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
@@ -198,9 +164,10 @@ describe('MraidAdUnit', () => {
         });
 
         it('should resolve when isShowing is false', () => {
+            sandbox.stub(mraidAdUnit, 'setShowing');
+            sandbox.stub(mraidAdUnit, 'setShowingMRAID');
+
             return mraidAdUnit.hide().then(() => {
-                sandbox.stub(mraidAdUnit, 'setShowing');
-                sandbox.stub(mraidAdUnit, 'setShowingMRAID');
                 sinon.assert.notCalled(<sinon.SinonSpy>onCloseObserver);
                 sinon.assert.notCalled(<sinon.SinonSpy>mraidAdUnit.setShowing);
                 sinon.assert.notCalled(<sinon.SinonSpy>mraidAdUnit.setShowingMRAID);
