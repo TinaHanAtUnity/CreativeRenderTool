@@ -53,7 +53,13 @@ export class ConsentUnit implements IGDPRConsentHandler {
         if (this._showing) {
             this._showing = false;
             this._adUnitContainer.removeEventHandler(this);
-            this._donePromiseResolve();
+            if (this._gdprConsentView.container().parentElement) {
+                document.body.removeChild(this._gdprConsentView.container());
+            }
+            // Fixes browser build for android. TODO: find a neater way
+            setTimeout(() => {
+                this._donePromiseResolve();
+            }, 0);
         }
     }
 
@@ -85,7 +91,7 @@ export class ConsentUnit implements IGDPRConsentHandler {
     // IGDPRConsentHandler
     public onConsentHide(): void {
         this._adUnitContainer.close().then(() => {
-            if (this._platform === Platform.ANDROID) {
+            if (this._platform !== Platform.IOS) {
                 // Android will not trigger onCointainerDestroy if close()-was called, iOS will
                 this.onContainerDestroy();
             }
