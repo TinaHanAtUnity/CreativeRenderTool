@@ -34,6 +34,10 @@ describe('MraidAdUnit', () => {
 
     let containerOpen: sinon.SinonSpy;
     let containerClose: sinon.SinonSpy;
+    let operativeEventStartStub: sinon.SinonStub;
+    let operativeEventViewStub: sinon.SinonStub;
+    let operativeEventThirdQuartileStub: sinon.SinonStub;
+    let operativeEventSkipStub: sinon.SinonStub;
 
     afterEach(() => {
         sandbox.restore();
@@ -105,22 +109,26 @@ describe('MraidAdUnit', () => {
         containerOpen = (<sinon.SinonStub>mraidAdUnitParameters.container.open).returns(Promise.resolve());
         containerClose = (<sinon.SinonStub>mraidAdUnitParameters.container.close).returns(Promise.resolve());
 
-        sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
-        sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
-        sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
-        sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
+        operativeEventStartStub = sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
+        operativeEventViewStub = sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
+        operativeEventThirdQuartileStub = sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
+        operativeEventSkipStub = sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
 
         mraidAdUnit = new MRAIDAdUnit(mraidAdUnitParameters);
     });
 
     describe('on show', () => {
         let onStartObserver: sinon.SinonSpy;
+        let sendStartEventStub: sinon.SinonStub;
+        let mraidViewShowSpy: sinon.SinonSpy;
 
         describe('for Mraid', () => {
             beforeEach(() => {
                 onStartObserver = sinon.spy();
+                mraidViewShowSpy = <sinon.SinonSpy>mraidView.show;
                 mraidAdUnit.onStart.subscribe(onStartObserver);
-                sandbox.stub(ads.Listener, 'sendStartEvent').returns(Promise.resolve(void(0)));
+                sendStartEventStub = sandbox.stub(ads.Listener, 'sendStartEvent').returns(Promise.resolve(void(0)));
+
                 return mraidAdUnit.show();
             });
 
@@ -130,8 +138,8 @@ describe('MraidAdUnit', () => {
 
             it('should trigger onStart', () => {
                 sinon.assert.calledOnce(onStartObserver);
-                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendStart);
-                sinon.assert.called(<sinon.SinonSpy>ads.Listener.sendStartEvent);
+                sinon.assert.called(operativeEventStartStub);
+                sinon.assert.called(sendStartEventStub);
             });
 
             it('should open the container', () => {
@@ -139,7 +147,7 @@ describe('MraidAdUnit', () => {
             });
 
             it('should open the view', () => {
-                sinon.assert.called(<sinon.SinonSpy>mraidView.show);
+                sinon.assert.called(mraidViewShowSpy);
             });
         });
 
@@ -150,6 +158,7 @@ describe('MraidAdUnit', () => {
                 mraidAdUnit.onStart.subscribe(onStartObserver);
                 sandbox.stub(ARUtil, 'isARCreative').returns(true);
                 sandbox.stub(ARUtil, 'isARSupported').returns(Promise.resolve(true));
+
                 return mraidAdUnit.show();
             });
 
@@ -167,20 +176,23 @@ describe('MraidAdUnit', () => {
 
     describe('on hide', () => {
         let onCloseObserver: sinon.SinonSpy;
+        let sendFinishEventStub: sinon.SinonStub;
+        let hideViewSpy: sinon.SinonSpy;
 
         beforeEach(() => {
             onCloseObserver = sinon.spy();
             mraidAdUnit.onClose.subscribe(onCloseObserver);
+            hideViewSpy = <sinon.SinonSpy>mraidView.hide;
         });
 
         it('should resolve when isShowing is false', () => {
-            sandbox.stub(mraidAdUnit, 'setShowing');
-            sandbox.stub(mraidAdUnit, 'setShowingMRAID');
+            const setShowingStub = sandbox.stub(mraidAdUnit, 'setShowing');
+            const setShowingMRAIDStub = sandbox.stub(mraidAdUnit, 'setShowingMRAID');
 
             return mraidAdUnit.hide().then(() => {
                 sinon.assert.notCalled(onCloseObserver);
-                sinon.assert.notCalled(<sinon.SinonSpy>mraidAdUnit.setShowing);
-                sinon.assert.notCalled(<sinon.SinonSpy>mraidAdUnit.setShowingMRAID);
+                sinon.assert.notCalled(setShowingStub);
+                sinon.assert.notCalled(setShowingMRAIDStub);
             });
         });
 
@@ -193,28 +205,28 @@ describe('MraidAdUnit', () => {
 
         it('should send the finish events if finish state is complete', () => {
             mraidAdUnit.setFinishState(FinishState.COMPLETED);
-            sandbox.stub(ads.Listener, 'sendFinishEvent').returns(Promise.resolve(void(0)));
+            sendFinishEventStub = sandbox.stub(ads.Listener, 'sendFinishEvent').returns(Promise.resolve(void(0)));
 
             return mraidAdUnit.show().then(() => mraidAdUnit.hide()).then(() => {
-                sinon.assert.calledWith(<sinon.SinonSpy>ads.Listener.sendFinishEvent, mraidAdUnitParameters.placement.getId(), FinishState.COMPLETED);
-                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile);
-                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendView);
+                sinon.assert.calledWith(sendFinishEventStub, mraidAdUnitParameters.placement.getId(), FinishState.COMPLETED);
+                sinon.assert.called(operativeEventThirdQuartileStub);
+                sinon.assert.called(operativeEventViewStub);
             });
         });
 
         it('should send the skip events if finish state is skipped', () => {
             mraidAdUnit.setFinishState(FinishState.SKIPPED);
-            sandbox.stub(ads.Listener, 'sendFinishEvent').returns(Promise.resolve(void(0)));
+            sendFinishEventStub = sandbox.stub(ads.Listener, 'sendFinishEvent').returns(Promise.resolve(void(0)));
 
             return mraidAdUnit.show().then(() => mraidAdUnit.hide()).then(() => {
-                sinon.assert.calledWith(<sinon.SinonSpy>ads.Listener.sendFinishEvent, mraidAdUnitParameters.placement.getId(), FinishState.SKIPPED);
-                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendSkip);
+                sinon.assert.calledWith(sendFinishEventStub, mraidAdUnitParameters.placement.getId(), FinishState.SKIPPED);
+                sinon.assert.called(operativeEventSkipStub);
             });
         });
 
         it('should close the view', () => {
             return mraidAdUnit.show().then(() => mraidAdUnit.hide()).then(() => {
-                sinon.assert.called(<sinon.SinonSpy>mraidView.hide);
+                sinon.assert.called(hideViewSpy);
             });
         });
     });
@@ -278,9 +290,12 @@ describe('MraidAdUnit', () => {
     });
 
     describe('onContainerDestroy', () => {
+        let adUnitHideSpy: sinon.SinonSpy;
+        let setFinishStateSpy: sinon.SinonSpy;
+
         beforeEach(() => {
-            sandbox.stub(mraidAdUnit, 'setFinishState');
-            sandbox.stub(mraidAdUnit, 'hide');
+            setFinishStateSpy = sandbox.spy(mraidAdUnit, 'setFinishState');
+            adUnitHideSpy = sandbox.spy(mraidAdUnit, 'hide');
         });
 
         afterEach(() => {
@@ -290,19 +305,25 @@ describe('MraidAdUnit', () => {
         it('should set finish state and hide the view if adunit is showing', () => {
             return mraidAdUnit.show().then(() => {
                 mraidAdUnit.onContainerDestroy();
-                sinon.assert.calledWith(<sinon.SinonSpy>mraidAdUnit.setFinishState, FinishState.SKIPPED);
-                sinon.assert.called(<sinon.SinonSpy>mraidAdUnit.hide);
+                sinon.assert.calledWith(setFinishStateSpy, FinishState.SKIPPED);
+                sinon.assert.called(adUnitHideSpy);
             });
         });
 
         it('should do nothing if adunit is not showing', () => {
             mraidAdUnit.onContainerDestroy();
-            sinon.assert.notCalled(<sinon.SinonSpy>mraidAdUnit.setFinishState);
-            sinon.assert.notCalled(<sinon.SinonSpy>mraidAdUnit.hide);
+            sinon.assert.notCalled(setFinishStateSpy);
+            sinon.assert.notCalled(adUnitHideSpy);
         });
     });
 
     describe('onContainerBackground', () => {
+        let setViewableSpy: sinon.SinonSpy;
+
+        beforeEach(() => {
+            setViewableSpy = <sinon.SinonSpy>mraidView.setViewableState;
+        });
+
         afterEach(() => {
             mraidAdUnit.hide();
         });
@@ -310,17 +331,23 @@ describe('MraidAdUnit', () => {
         it('should set viewable state to false', () => {
             return mraidAdUnit.show().then(() => {
                 mraidAdUnit.onContainerBackground();
-                sinon.assert.calledWith(<sinon.SinonSpy>mraidView.setViewableState, false);
+                sinon.assert.calledWith(setViewableSpy, false);
             });
         });
 
         it('should do nothing if adunit is not showing', () => {
             mraidAdUnit.onContainerBackground();
-            sinon.assert.notCalled(<sinon.SinonSpy>mraidView.setViewableState);
+            sinon.assert.notCalled(setViewableSpy);
         });
     });
 
     describe('onContainerShow', () => {
+        let setViewableSpy: sinon.SinonSpy;
+
+        beforeEach(() => {
+            setViewableSpy = <sinon.SinonSpy>mraidView.setViewableState;
+        });
+
         afterEach(() => {
             mraidAdUnit.hide();
         });
@@ -328,12 +355,18 @@ describe('MraidAdUnit', () => {
         it('should send the true viewable event over the bridge', () => {
             return mraidAdUnit.show().then(() => {
                 mraidAdUnit.onContainerShow();
-                sinon.assert.calledWith(<sinon.SinonSpy>mraidView.setViewableState, true);
+                sinon.assert.calledWith(setViewableSpy, true);
             });
         });
     });
 
     describe('onContainerForeground', () => {
+        let setViewableSpy: sinon.SinonSpy;
+
+        beforeEach(() => {
+            setViewableSpy = <sinon.SinonSpy>mraidView.setViewableState;
+        });
+
         afterEach(() => {
             mraidAdUnit.hide();
         });
@@ -341,7 +374,7 @@ describe('MraidAdUnit', () => {
         it ('should send the true viewable event over the bridge when mraid is set as showing', () => {
             return mraidAdUnit.show().then(() => {
                 mraidAdUnit.onContainerForeground();
-                sinon.assert.calledWith(<sinon.SinonSpy>mraidView.setViewableState, true);
+                sinon.assert.calledWith(setViewableSpy, true);
             });
         });
     });
