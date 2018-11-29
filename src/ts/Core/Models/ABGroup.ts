@@ -45,4 +45,4 @@ export const FakeDisabledABTest = new DisabledABTest(16, 17);
 
 export const FPSCollectionTest = new ABTest(16);
 export const AuctionV5Test = new DisabledABTest(15);
-export const InstantInstallNowTest = new ABTest(7, 8);
+export const InstantInstallNowTest = new ABTest(5, 6);
