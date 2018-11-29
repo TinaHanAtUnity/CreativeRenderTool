@@ -1,3 +1,9 @@
+# Pending
+
+* Fix AR MRAID safety paddings on iPhone X [#6944](https://github.com/Applifier/unity-ads-webview/pull/6944)
+* Remove skip icon experiment [#7383](https://github.com/Applifier/unity-ads-webview/pull/7383)
+* Remove green button A/B test [#7342](https://github.com/Applifier/unity-ads-webview/pull/7342)
+
 # Thu Nov 29 10:53:37 UTC 2018
 
 * Set web browser UA for click event in programmatic VAST and MRAID [#7362](https://github.com/Applifier/unity-ads-webview/pull/7362)
