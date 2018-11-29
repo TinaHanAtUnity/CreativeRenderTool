@@ -7,7 +7,6 @@ import { GdprManager } from 'Ads/Managers/GdprManager';
 import { IConsent } from 'Ads/Views/Consent/IConsent';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 
-
 export interface IGDPRConsentSettingsHandler {
     onPersonalizedConsent(consent: IConsent): void;
     onClose(): void;

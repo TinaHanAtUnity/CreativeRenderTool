@@ -6,6 +6,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 
 interface IPrivacyInfoContainerHandler {
+    todoPlaceholderEventNoBlankInterfacesAllowed(): void;
 }
 
 interface IRowItemContainerParams {
@@ -53,7 +54,6 @@ export class PrivacyRowItemContainer extends View<IPrivacyInfoContainerHandler> 
     }
 
     private fillPersonalInfoFields(): void {
-        console.log('fillPersonalInfoFields');
         // todo: manager class should check is the information already available to avoid extra requests
         this._gdprManager.retrievePersonalInformation().then((personalProperties) => {
             document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
@@ -63,7 +63,6 @@ export class PrivacyRowItemContainer extends View<IPrivacyInfoContainerHandler> 
             document.getElementById('ads-seen-in-game')!.innerHTML = `Seen ${personalProperties.adsSeenInGameThisWeek} ads in this app`;
             document.getElementById('games-installed-from-ads')!.innerHTML = `Installed ${personalProperties.installsFromAds} apps based on those ads`;
         }).catch(error => {
-            console.log('fillPersonalInfoFields error: ' + JSON.stringify(error));
             Diagnostics.trigger('gdpr_personal_info_failed', error);
             document.getElementById('sorry-message')!.innerHTML = 'Sorry. We were unable to deliver our collected information at this time.';
         });
