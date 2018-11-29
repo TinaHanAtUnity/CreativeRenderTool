@@ -1,4 +1,4 @@
-# Pending
+# Thu Nov 29 22:28:30 UTC 2018
 
 * Fix AR MRAID safety paddings on iPhone X [#6944](https://github.com/Applifier/unity-ads-webview/pull/6944)
 * Remove skip icon experiment [#7383](https://github.com/Applifier/unity-ads-webview/pull/7383)
