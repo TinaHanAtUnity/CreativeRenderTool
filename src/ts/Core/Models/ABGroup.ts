@@ -43,6 +43,5 @@ export const FakeDisabledABTest = new DisabledABTest(16, 17);
 
 // Add actual A/B tests below
 export const FPSCollectionTest = new ABTest(16);
-export const NextSkipIconTest = new ABTest(5, 6);
 export const AuctionV5Test = new DisabledABTest(15);
 export const AndroidBackButtonSkipTest = new ABTest(7, 8);
