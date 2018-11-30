@@ -14,8 +14,7 @@ def waitWebviewDeployed(webviewBranch) {
 }
 
 def main() {
-    webviewBranch = "${env.BRANCH_NAME}/${env.revision}"
-    echo "#### $env.CHANGE_BRANCH ####"
+    webviewBranch = "${env.CHANGE_BRANCH}/${env.revision}"
 
     if (env.BRANCH_NAME =~ /^PR-/) {
         stage('Wait for webview deployment') {
