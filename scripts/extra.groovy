@@ -15,7 +15,8 @@ def waitWebviewDeployed(webviewBranch) {
 
 def main() {
     webviewBranch = "${env.CHANGE_BRANCH}/${env.revision}"
-    echo "#### ${env.GIT_COMMIT} ####"
+    commitId = sh(returnStdout: true, script: 'git rev-parse HEAD')
+    echo "#### $commitId ####"
 
     if (env.BRANCH_NAME =~ /^PR-/) {
         stage('Wait for webview deployment') {
