@@ -21,7 +21,7 @@
     "mocha": "5.2.0",
     "node-fetch": "2.3.0",
     "protobufjs": "6.8.8",
-    "puppeteer": "1.10.0",
+    "puppeteer": "1.11.0",
     "puppeteer-extra": "2.1.1",
     "puppeteer-extra-plugin-user-data-dir": "2.1.1",
     "puppeteer-extra-plugin-user-preferences": "2.1.1",
@@ -41,6 +41,6 @@
     "tslib": "1.9.3",
     "tslint": "5.11.0",
     "tslint-microsoft-contrib": "5.2.1",
-    "typescript": "3.1.6"
+    "typescript": "3.2.1"
   }
 }
