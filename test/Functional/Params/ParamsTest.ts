@@ -141,7 +141,7 @@ describe('Event parameters should match specifications', () => {
             response.response = ConfigurationAuctionPlc;
             const requestSpy = sinon.stub(request, 'get').returns(Promise.resolve(response));
             const span = sinon.createStubInstance(JaegerSpan);
-            const configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), TestFixtures.getAndroidDeviceInfo(core), request);
+            const configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), TestFixtures.getAndroidDeviceInfo(core), TestFixtures.getUnityInfo(platform, core), request);
             return configManager.getConfig(span).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getConfigRequestParams(), url);
@@ -160,7 +160,7 @@ describe('Event parameters should match specifications', () => {
             response.response = ConfigurationAuctionPlc;
             const requestSpy = sinon.stub(request, 'get').returns(Promise.resolve(response));
             const span = sinon.createStubInstance(JaegerSpan);
-            const configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), TestFixtures.getIosDeviceInfo(core), request);
+            const configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), TestFixtures.getIosDeviceInfo(core), TestFixtures.getUnityInfo(platform, core), request);
             return configManager.getConfig(span).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
 
