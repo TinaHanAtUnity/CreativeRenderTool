@@ -77,7 +77,8 @@ describe('MraidAdUnit', () => {
             coreConfig: coreConfig,
             adsConfig: adsConfig,
             storageBridge: storageBridge,
-            campaign: mraidCampaign
+            campaign: mraidCampaign,
+            playerMetadataServerId: 'https://hi.com'
         });
 
         mraidAdUnitParameters = {
