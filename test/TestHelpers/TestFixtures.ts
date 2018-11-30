@@ -127,6 +127,7 @@ import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters, IAppStoreDow
 import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
+import { UnityInfo } from 'Core/Models/UnityInfo';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -580,7 +581,8 @@ export class TestFixtures {
             coreConfig: TestFixtures.getCoreConfiguration(),
             adsConfig: TestFixtures.getAdsConfiguration(),
             storageBridge: storageBridge,
-            campaign: campaign
+            campaign: campaign,
+            playerMetadataServerId: 'test-gamerSid'
         });
 
         if (campaign instanceof XPromoCampaign) {
@@ -999,5 +1001,9 @@ export class TestFixtures {
             viewsPerTarget: {},
             latestCampaignsStarts: {}
         };
+    }
+
+    public static getUnityInfo(platform: Platform, core: ICoreApi): UnityInfo {
+        return new UnityInfo(platform, core);
     }
 }
