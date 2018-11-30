@@ -49,7 +49,7 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
     }
 
     public show(): void {
-        // no need to call super.show
+        super.show();
 
         // gray line between main and sub checkbox
         // todo: maybe there is some better way to set correct height of the line
