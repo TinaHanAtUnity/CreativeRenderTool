@@ -79,6 +79,7 @@ def main() {
                       parameters: [
                         string(name: 'WEBVIEW_BRANCH', value: env.BRANCH_NAME),
                         string(name: 'UNITY_ADS_ANDROID_BRANCH', value: nativeBranch),
+                        string(name: 'UNITY_ADS_IOS_BRANCH', value: nativeBranch)
                       ],
                     )
                 }
