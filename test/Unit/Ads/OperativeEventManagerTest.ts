@@ -79,7 +79,8 @@ describe('OperativeEventManagerTest', () => {
             coreConfig: TestFixtures.getCoreConfiguration(),
             adsConfig: TestFixtures.getAdsConfiguration(),
             storageBridge: storageBridge,
-            campaign: campaign
+            campaign: campaign,
+            playerMetadataServerId: 'test-gamerSid'
         };
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
     });
@@ -166,17 +167,16 @@ describe('OperativeEventManagerTest', () => {
         let session: Session;
         let requestSpy: any;
         const uniqueEventID = '42';
-        const gamerSid = 'foobar';
         const previousPlacementId = 'foobar1';
 
         beforeEach(() => {
             placement = TestFixtures.getPlacement();
             session = TestFixtures.getSession();
+            session.setGameSessionCounters(TestFixtures.getGameSessionCounters());
             campaign = TestFixtures.getCampaign();
             core.DeviceInfo = sinon.createStubInstance(DeviceInfoApi);
             requestSpy = sinon.spy(request, 'post');
 
-            operativeEventManager.setGamerServerId('foobar');
             OperativeEventManager.setPreviousPlacementId(previousPlacementId);
 
             (<sinon.SinonStub>core.DeviceInfo.getUniqueEventId).returns(Promise.resolve('42'));
@@ -204,7 +204,7 @@ describe('OperativeEventManagerTest', () => {
                     assert.equal(data.advertisingTrackingId, deviceInfo.getAdvertisingIdentifier());
                     assert.equal(data.limitAdTracking, deviceInfo.getLimitAdTracking());
                     assert.equal(data.osVersion, deviceInfo.getOsVersion());
-                    assert.equal(data.sid, gamerSid);
+                    assert.equal(data.sid, 'test-gamerSid');
                     assert.equal(data.deviceMake, deviceInfo.getManufacturer());
                     assert.equal(data.deviceModel, deviceInfo.getModel());
                     assert.equal(data.sdkVersion, clientInfo.getSdkVersion());
@@ -232,7 +232,7 @@ describe('OperativeEventManagerTest', () => {
 
             it('XPromoCampaign specific', () => {
                 HttpKafka.setRequest(request);
-                campaign = TestFixtures.getXPromoCampaign();
+                campaign = TestFixtures.getXPromoCampaign(session);
                 const params = {
                     ... operativeEventManagerParams,
                     campaign: campaign
@@ -253,7 +253,7 @@ describe('OperativeEventManagerTest', () => {
             });
 
             it('VastCampaign specific', () => {
-                campaign = TestFixtures.getEventVastCampaign();
+                campaign = TestFixtures.getEventVastCampaign(session);
                 const params = {
                     ... operativeEventManagerParams,
                     campaign: campaign
@@ -266,7 +266,7 @@ describe('OperativeEventManagerTest', () => {
             });
 
             it('MRAIDCampaign specific', () => {
-                campaign = TestFixtures.getExtendedMRAIDCampaign();
+                campaign = TestFixtures.getExtendedMRAIDCampaign(session);
                 const params = {
                     ... operativeEventManagerParams,
                     campaign: campaign
@@ -285,7 +285,7 @@ describe('OperativeEventManagerTest', () => {
             });
 
             it('DisplayInterstitialCampaign specific', () => {
-                campaign = TestFixtures.getDisplayInterstitialCampaign();
+                campaign = TestFixtures.getDisplayInterstitialCampaign(session);
                 const params = {
                     ... operativeEventManagerParams,
                     campaign: campaign

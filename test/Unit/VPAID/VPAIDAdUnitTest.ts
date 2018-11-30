@@ -1,7 +1,7 @@
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -84,7 +84,7 @@ describe('VPAIDAdUnit', () => {
             privacy: sinon.createStubInstance(Privacy),
             forceOrientation: Orientation.NONE,
             options: {},
-            gdprManager: sinon.createStubInstance(GdprManager),
+            privacyManager: sinon.createStubInstance(UserPrivacyManager),
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };
 

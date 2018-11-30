@@ -5,7 +5,7 @@ import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
@@ -24,6 +24,7 @@ import { WebPlayerApi } from 'Ads/Native/WebPlayer';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
+import { IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
 
 export interface IAdsApi extends IModuleApi {
     AdsProperties: AdsPropertiesApi;
@@ -53,9 +54,10 @@ export interface IAds extends IApiModule {
     ContentTypeHandlerManager: ContentTypeHandlerManager;
     Config: AdsConfiguration;
     Container: Activity | ViewController;
-    GdprManager: GdprManager;
+    PrivacyManager: UserPrivacyManager;
     PlacementManager: PlacementManager;
     AssetManager: AssetManager;
     CampaignManager: CampaignManager;
     RefreshManager: OldCampaignRefreshManager;
+    ThirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
 }
