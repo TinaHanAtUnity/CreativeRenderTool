@@ -36,18 +36,23 @@
   }
 
   .privacy-button {
-    $privacy-button-default($default-scale-size);
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    margin: 0 0 $default-size * $default-scale-size * 1 0;
-    color: white;
+    position: absolute;
+    bottom: 2px;
+    right: 1px;
+    height: 15px;
+    width: 15px;
+    z-index: 1000;
+    color: $admob-privacy-background;
+    box-shadow: -0.5px 0 0 1px rgba(238, 241, 251, 1);
+    text-align: center;
 
     .icon-gdpr {
-      position: absolute;
-      font-size: .85rem;
-      bottom: 0;
-      background-color: white;
+      display: block;
+      font-size: $default-scale-size * $default-size * $default-font-size * .7;
+      font-weight: 300;
+      height: 15px;
+      width: 15px;
+      background-color: $admob-privacy-background;
       color: $admob-privacy-blue;
     }
   }
