@@ -10,7 +10,16 @@
     height: 100vh;
     border: none;
   }
+
   .gdpr-pop-up {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 6vh;
+    background-color: $white;
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, .1);
+    opacity: 1;
+
     .gdpr-text {
       padding: $default-scale-size * $default-font-size * .5;
       font-size: $default-scale-size * $default-font-size * .5;
@@ -24,35 +33,25 @@
         color: $blue;
       }
     }
-
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: 6vh;
-    background-color:white;
-    box-shadow: 0 0 15px 0 rgba(0, 0, 0, .1);
-    opacity: 1;
-    
   }
 
   .privacy-button {
-    position: absolute;
-    bottom: 2px;
-    right: 1px;
-    height: 15px;
-    width: 15px;
+    position: fixed;
+    right: 4px;
+    bottom: 1px;
     z-index: 1000;
-    color: $admob-privacy-background;
-    box-shadow: -0.5px 0 0 1px rgba(238, 241, 251, 1);
+    width: 15px;
+    height: 17px;
+    color: $white;
     text-align: center;
+    font-weight: 300;
+    font-size: small;
 
     .icon-gdpr {
       display: block;
-      font-size: $default-scale-size * $default-size * $default-font-size * .7;
-      font-weight: 300;
-      height: 15px;
-      width: 15px;
-      background-color: $admob-privacy-background;
+      width: 18px;
+      height: 17px;
+      background-color: $white;
       color: $admob-privacy-blue;
     }
   }
