@@ -1,8 +1,13 @@
-# Pending
+# Thu Nov 29 22:28:30 UTC 2018
 
 * Fix AR MRAID safety paddings on iPhone X [#6944](https://github.com/Applifier/unity-ads-webview/pull/6944)
 * Remove skip icon experiment [#7383](https://github.com/Applifier/unity-ads-webview/pull/7383)
 * Remove green button A/B test [#7342](https://github.com/Applifier/unity-ads-webview/pull/7342)
+* Fix China Ad Watermark for Performance Ads with SquareEndScreen [#7406](https://github.com/Applifier/unity-ads-webview/pull/7406)
+
+# Thu Nov 29 15:00:34 UTC 201
+
+* Hotfix for missing iOS app background notification listener for SDK versions 2.0.3 - 2.3.0
 
 # Thu Nov 29 10:53:37 UTC 2018
 

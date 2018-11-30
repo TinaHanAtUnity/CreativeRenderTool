@@ -282,7 +282,8 @@ describe('Event parameters should match specifications', () => {
                 coreConfig: TestFixtures.getCoreConfiguration(),
                 adsConfig: TestFixtures.getAdsConfiguration(),
                 storageBridge: storageBridge,
-                campaign: campaign
+                campaign: campaign,
+                playerMetadataServerId: 'test-gamerSid'
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
             campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
@@ -329,7 +330,8 @@ describe('Event parameters should match specifications', () => {
                 coreConfig: TestFixtures.getCoreConfiguration(),
                 adsConfig: TestFixtures.getAdsConfiguration(),
                 storageBridge: storageBridge,
-                campaign: campaign
+                campaign: campaign,
+                playerMetadataServerId: 'test-gamerSid'
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
             campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
@@ -383,7 +385,8 @@ describe('Event parameters should match specifications', () => {
                     coreConfig: TestFixtures.getCoreConfiguration(),
                     adsConfig: TestFixtures.getAdsConfiguration(),
                     storageBridge: storageBridge,
-                    campaign: campaign
+                    campaign: campaign,
+                    playerMetadataServerId: 'test-gamerSid'
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
                 campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());
@@ -475,7 +478,8 @@ describe('Event parameters should match specifications', () => {
                     coreConfig: TestFixtures.getCoreConfiguration(),
                     adsConfig: TestFixtures.getAdsConfiguration(),
                     storageBridge: storageBridge,
-                    campaign: campaign
+                    campaign: campaign,
+                    playerMetadataServerId: 'test-gamerSid'
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
                 campaign.getSession().setGameSessionCounters(TestFixtures.getGameSessionCounters());

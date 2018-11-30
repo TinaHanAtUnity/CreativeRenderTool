@@ -88,7 +88,8 @@ describe('AndroidAdUnitTest', () => {
             coreConfig: coreConfig,
             adsConfig: adsConfig,
             storageBridge: storageBridge,
-            campaign: TestFixtures.getCampaign()
+            campaign: TestFixtures.getCampaign(),
+            playerMetadataServerId: 'test-gamerSid'
         });
 
         adUnitParams = {
