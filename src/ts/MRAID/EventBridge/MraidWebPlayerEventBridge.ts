@@ -4,13 +4,14 @@ import { AbstractMRAIDEventBridge, IMRAIDHandler, MRAIDEvents, IMRAIDOrientation
 import { ICoreApi } from 'Core/ICore';
 
 export class MraidWebPlayerEventBridge extends AbstractMRAIDEventBridge {
-    private _container: WebPlayerContainer | undefined;
+    private _container: WebPlayerContainer;
     private _core: ICoreApi;
     private _webPlayerEventObserver: IObserver1<string>;
 
-    constructor(core: ICoreApi, handler: IMRAIDHandler) {
+    constructor(core: ICoreApi, handler: IMRAIDHandler, container: WebPlayerContainer) {
         super(handler);
         this._core = core;
+        this._container = container;
         this._mraidHandlers[MRAIDEvents.RESIZE_WEBVIEW] = () => this.handleResizeWebview();
         this._mraidHandlers[MRAIDEvents.ORIENTATION] = (msg: any) => this.handleSetOrientationProperties(<IMRAIDOrientationProperties>msg[0]);
         this._mraidHandlers[MRAIDEvents.OPEN] = (msg: any) => this.handleOpen(msg[0]);
@@ -18,15 +19,12 @@ export class MraidWebPlayerEventBridge extends AbstractMRAIDEventBridge {
         this._mraidHandlers[MRAIDEvents.STATE_CHANGE] = (msg: any) => this.handleCustomState(msg[0]);
     }
 
-    public connect(container: WebPlayerContainer): void {
-        this._container = container;
+    public connect(): void {
         this._webPlayerEventObserver = this._container.onWebPlayerEvent.subscribe((event) => this.onWebPlayerEvent(JSON.parse(event)));
     }
 
     public disconnect(): void {
-        if (this._container) {
-            this._container.onWebPlayerEvent.unsubscribe(this._webPlayerEventObserver);
-        }
+        this._container.onWebPlayerEvent.unsubscribe(this._webPlayerEventObserver);
     }
 
     public sendViewableEvent(viewable: boolean) {
@@ -54,10 +52,6 @@ export class MraidWebPlayerEventBridge extends AbstractMRAIDEventBridge {
             webPlayerParams.push(parameters);
         }
 
-        if (this._container) {
-            return this._container.sendEvent(webPlayerParams);
-        }
-
-        return Promise.resolve();
+        return this._container.sendEvent(webPlayerParams);
     }
 }

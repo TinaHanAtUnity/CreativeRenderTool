@@ -1,16 +1,16 @@
-
 import { ICoreApi } from 'Core/ICore';
 import { AbstractMRAIDEventBridge, IMRAIDHandler, MRAIDEvents, IMRAIDOrientationProperties } from 'MRAID/EventBridge/AbstractMraidEventBridge';
 
 export class MraidIFrameEventBridge extends AbstractMRAIDEventBridge {
-    private _iframe: HTMLIFrameElement | undefined;
+    private _iframe: HTMLIFrameElement;
     private _core: ICoreApi;
 
     private _messageListener: (e: Event) => void;
 
-    constructor(core: ICoreApi, handler: IMRAIDHandler) {
+    constructor(core: ICoreApi, handler: IMRAIDHandler, iframe: HTMLIFrameElement) {
         super(handler);
         this._core = core;
+        this._iframe = iframe;
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
         this._mraidHandlers[MRAIDEvents.ORIENTATION] = (msg: any) => this.handleSetOrientationProperties(<IMRAIDOrientationProperties>msg.properties);
         this._mraidHandlers[MRAIDEvents.OPEN] = (msg: any) => this.handleOpen(msg.url);
@@ -20,8 +20,7 @@ export class MraidIFrameEventBridge extends AbstractMRAIDEventBridge {
         this._mraidHandlers[MRAIDEvents.AR] = (msg: any) => this.handleAr(msg);
     }
 
-    public connect(iframe: HTMLIFrameElement) {
-        this._iframe = iframe;
+    public connect() {
         window.addEventListener('message', this._messageListener, false);
     }
 
@@ -43,7 +42,7 @@ export class MraidIFrameEventBridge extends AbstractMRAIDEventBridge {
     }
 
     private postMessage(event: string, data?: any) {
-        if (this._iframe && this._iframe.contentWindow) {
+        if (this._iframe.contentWindow) {
             this._iframe.contentWindow.postMessage({
                 type: event,
                 value: data

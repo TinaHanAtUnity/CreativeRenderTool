@@ -17,6 +17,7 @@ import ExtendedMRAIDTemplate from 'html/ExtendedMRAID.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { MraidIFrameEventBridge } from 'MRAID/EventBridge/MraidIFrameEventBridge';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;
@@ -149,12 +150,12 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             });
         });
 
-        this._mraidBridge.connect(iframe);
+        this._mraidBridgeContainer.connect(new MraidIFrameEventBridge(this._core, this, iframe));
     }
 
     public setViewableState(viewable: boolean): void {
         if(this._iframeLoaded && !this._loadingScreenTimeout) {
-            this._mraidBridge.sendViewableEvent(viewable);
+            this._mraidBridgeContainer.sendViewableEvent(viewable);
         }
 
         this.setAnalyticsBackgroundTime(viewable);
@@ -204,7 +205,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
 
         super.hide();
-        this._mraidBridge.disconnect();
+        this._mraidBridgeContainer.disconnect();
     }
 
     private showLoadingScreen() {

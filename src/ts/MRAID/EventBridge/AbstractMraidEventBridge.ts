@@ -31,7 +31,7 @@ export interface IMRAIDHandler {
 }
 
 export interface IMRAIDBridge {
-    connect(connector: HTMLIFrameElement | WebPlayerContainer): void;
+    connect(): void;
     disconnect(): void;
     setHandler(handler: IMRAIDHandler): void;
     sendViewableEvent(viewable: boolean): void;
@@ -67,7 +67,7 @@ export abstract class AbstractMRAIDEventBridge implements IMRAIDBridge {
         this._handler = handler;
     }
 
-    public abstract connect(connector: IMRAIDBridgeConnector): void;
+    public abstract connect(): void;
 
     public abstract disconnect(): void;
 

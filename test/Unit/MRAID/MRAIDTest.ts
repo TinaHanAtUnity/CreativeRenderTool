@@ -57,7 +57,6 @@ describe('MRAID', () => {
     it('should render', (done) => {
         const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
         const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
-        mraid.setMraidEventBridge(new MraidIFrameEventBridge(core, mraid));
 
         mraid.render();
 

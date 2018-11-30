@@ -47,9 +47,9 @@ import { Sdk } from 'Backend/Api/Sdk';
                 onBridgeAREvent: sinon.spy()
             };
 
-            mraidBridge = new MraidWebPlayerEventBridge(core, handler);
             container = new InterstitialWebPlayerContainer(platform, ads);
-            mraidBridge.connect(container);
+            mraidBridge = new MraidWebPlayerEventBridge(core, handler, container);
+            mraidBridge.connect();
         });
 
         afterEach(() => {

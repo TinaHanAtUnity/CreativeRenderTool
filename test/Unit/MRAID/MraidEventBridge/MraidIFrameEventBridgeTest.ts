@@ -34,10 +34,10 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/AbstractMraidEvent
                 onBridgeSendStats: sinon.spy(),
                 onBridgeAREvent: sinon.spy()
             };
-            mraidBridge = new MraidIFrameEventBridge(core, handler);
             iframe = document.createElement('iframe');
             document.body.appendChild(iframe);
-            mraidBridge.connect(iframe);
+            mraidBridge = new MraidIFrameEventBridge(core, handler, iframe);
+            mraidBridge.connect();
         });
 
         afterEach(() => {
