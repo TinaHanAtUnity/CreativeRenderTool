@@ -9,14 +9,14 @@ import { Url } from 'Core/Utilities/Url';
 
 export abstract class CampaignParser {
 
-    public _creativeID: string | undefined;
-    public _seatID: number | undefined;
+    public creativeID: string | undefined;
+    public seatID: number | undefined;
 
     public abstract parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign>;
 
     public setCreativeIdentification(response: AuctionResponse) {
-        this._creativeID = response.getCreativeId() || undefined;
-        this._seatID = response.getSeatId() || undefined;
+        this.creativeID = response.getCreativeId() || undefined;
+        this.seatID = response.getSeatId() || undefined;
     }
 
     protected getProgrammaticCampaignId(platform: Platform): string {

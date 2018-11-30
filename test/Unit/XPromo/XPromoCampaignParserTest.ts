@@ -78,10 +78,10 @@ describe('XPromoCampaignParser', () => {
             });
 
             it('should set the creative identification in the parser', () => {
-                assert.isNotNull(parser._creativeID);
-                assert.isNotNull(parser._seatID);
-                assert.equal(parser._creativeID, campaign.getCreativeId());
-                assert.equal(parser._seatID, campaign.getSeatId());
+                assert.isNotNull(parser.creativeID);
+                assert.isNotNull(parser.seatID);
+                assert.equal(parser.creativeID, campaign.getCreativeId());
+                assert.equal(parser.seatID, campaign.getSeatId());
             });
 
             it('should have valid data', () => {

@@ -552,7 +552,7 @@ export class CampaignManager {
 
             return this.setupCampaignAssets(response.getPlacements(), campaign, response.getContentType(), session);
         }).catch((error) => {
-            CreativeBlocking.report(parser._creativeID, parser._seatID, BlockingReason.VIDEO_PARSE_FAILURE, {
+            CreativeBlocking.report(parser.creativeID, parser.seatID, BlockingReason.VIDEO_PARSE_FAILURE, {
                 errorCode: error.errorCode || undefined,
                 message: error.message || undefined
             });
