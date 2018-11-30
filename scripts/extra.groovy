@@ -85,21 +85,18 @@ def main() {
                 }
             }
 
-            try {
-                dir('results') {
-                    if (env.BRANCH_NAME =~ /^staging/) { // run deployment tests
-                        nativeBranch = env.BRANCH_NAME.replace("staging/", "");
+            dir('results') {
+                if (env.BRANCH_NAME =~ /^staging/) { // run deployment tests
+                    nativeBranch = env.BRANCH_NAME.replace("staging/", "");
 
-                        parallel (hybridTestBuilders + systemTestBuilders)
+                    parallel (hybridTestBuilders + systemTestBuilders)
 
-                    } else { // run only hybrid tests
-                        parallel hybridTestBuilders
-                    }
+                } else { // run only hybrid tests
+                    parallel hybridTestBuilders
                 }
-            } finally {
-                archiveArtifacts artifacts: "results/**", fingerprint: true
-                step ([$class: "JUnitResultArchiver", testResults: "results/**/*.xml"])
             }
+            archiveArtifacts artifacts: "results/**", fingerprint: true
+            step ([$class: "JUnitResultArchiver", testResults: "results/**/*.xml"])
         }
     }
 }
