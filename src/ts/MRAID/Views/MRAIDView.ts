@@ -455,7 +455,11 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this.onAREvent(msg).catch((reason) => this._core.Sdk.logError('AR message error: ' + reason.toString()));
     }
 
-    public canSkip() {
+    public canSkip(): boolean {
         return this._canSkip;
+    }
+
+    public canClose(): boolean {
+        return this._canClose;
     }
 }

@@ -196,11 +196,11 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     public onKeyEvent(keyCode: number): void {
-        if(keyCode === KeyCode.BACK && this.canSkip()) {
-            if(!this._placement.skipEndCardOnClose()) {
-                this.onMraidSkip();
-            } else {
+        if(keyCode === KeyCode.BACK) {
+            if(this.canClose()) {
                 this.onMraidClose();
+            } else if(this.canSkip()) {
+                this.onMraidSkip();
             }
         }
     }
@@ -211,5 +211,13 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         }
 
         return this._adUnit.getMRAIDView().canSkip();
+    }
+
+    private canClose(): boolean {
+        if (!this._adUnit.isShowing() || !this._adUnit.isShowingMRAID()) {
+            return false;
+        }
+
+        return this._adUnit.getMRAIDView().canClose();
     }
 }
