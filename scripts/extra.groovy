@@ -3,7 +3,7 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 def waitWebviewDeployed(webviewBranch) {
     // TODO: use Travis build status to detect webview deployment status
     timeout(time: 15, unit: 'MINUTES') {
-        def CONFIG_URL = "https://config.unityads.unity3d.com/webview/${webviewBranch}/test/config.json"
+        def CONFIG_URL = "https://config.unityads.unity3d.com/webview/${webviewBranch}/release/config.json"
         echo "Waiting for $CONFIG_URL..."
 
         waitUntil {
