@@ -1,5 +1,7 @@
 @import "components.styl";
 
+// todo: fix lint warnings
+// @stylint off
 #gdpr-consent-settings {
   position: absolute;
   top: 0;
@@ -22,13 +24,21 @@
   .back-button {
     display: flex;
     align-items: center;
-    font-size: $default-font-size * .65
+    font-size: $default-font-size * .65;
     color: $black;
     opacity: .5;
     width: 2 * $default-size;
     padding: 0 $default-size;
     height: 8%;
   }
+
+  .wrapper {
+    display: flex;
+    height: 92%;
+    width: 100%;
+    flex-direction: column;
+  }
+
 
   .container {
     padding: 0 $default-size 0 $default-size;
@@ -55,10 +65,8 @@
   }
 
   .stripe {
-    top:0;
-    position: relative;
     height: 1px;
-    margin: 0.25 * $default-size 0 0.25 * $default-size 0;
+    margin: 0.25 * $default-size 1.5 * $default-size .25 * $default-size 1.5 * $default-size;
     background-color: $light-gray;
   }
 
@@ -66,23 +74,24 @@
     height: 50%;
     display: flex;
     flex-direction: column;
-    // justify-content: center;
-  }
-
-  .button-container {
-
+    justify-content: space-evenly;
   }
 
   .accept-all {
     background-color: $blue;
     color: $white;
-    margin-bottom: .25 * $default-size
+    margin-bottom: .25 * $default-size;
   }
 
   .consent-button {
+    position: relative;
     border-radius: $default-size * .25;
     border: 1px solid $light-gray;
     font-size: $default-font-size * .65;
+
+    &.click-animation {
+      $click-animation();
+    }
   }
   .item {
     text-align: center;
@@ -116,6 +125,33 @@
       height: 1.9 * $default-size;
       transform: translate(.3 * $default-size, -1.6 * $default-size);
     }
+  }
+}
+
+body {
+  &.landscape #gdpr-consent-settings {
+    .wrapper {
+      display: flex;
+      height: 92%;
+      width: 100%;
+      flex-direction: row;
+    }
+    .personalization-container {
+      width: 49%;
+      height: 100%;
+    }
+
+    .stripe {
+      width: 1px;
+      margin: 0.25 * $default-size 1.5 * $default-size 0.25 * $default-size 1.5 * $default-size;
+      background-color: $light-gray;
+    }
+
+    .settings-container {
+      height: 100%;
+      width: 49%;
+    }
 
   }
 }
+// @stylint on

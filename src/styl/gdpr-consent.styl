@@ -1,6 +1,8 @@
 @import "vars.styl";
 @import "components.styl";
 
+// todo: fix lint warnings
+// @stylint off
 #gdpr-consent {
   position: absolute;
   top: 0;
@@ -14,7 +16,7 @@
   justify-content: center;
 
   .consent-container {
-    positon: absolute;
+    position: absolute;
     width: 80%;
     background: white;
     align-self: center;
@@ -22,7 +24,7 @@
   }
 
   .item {
-    padding: $default-size $default-size;
+    padding: .75 * $default-size $default-size;
   }
 
   .privacy-logo {
@@ -33,7 +35,6 @@
     padding: 2 * $default-size 0 0 0;
   }
 
-  .title,
   .agree,
   .show-options {
     text-align: center;
@@ -41,6 +42,7 @@
   .title {
     padding-top: $default-size;
     font-weight: 500;
+    text-align: justify;
   }
   .description {
     font-size: $default-size * .65;
@@ -52,10 +54,11 @@
   .agree {
     background-color: $blue;
     color: $white;
-    margin-bottom: .75 * $default-size
+    margin-bottom: .75 * $default-size;
   }
 
   .consent-button {
+    position: relative;
     border-radius: $default-size * .25;
     border: 1px solid $light-gray;
     font-size: $default-size * .65;
@@ -64,4 +67,9 @@
   .unityads-logo {
     $set-image(100%, $default-scale-size * $default-size, 0, "../img/unityads.png", contain);
   }
+
+  .click-animation.agree {
+    $click-animation();
+  }
 }
+// @stylint on
