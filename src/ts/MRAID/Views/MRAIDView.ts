@@ -13,8 +13,7 @@ import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { IMRAIDHandler } from 'MRAID/EventBridge/AbstractMraidEventBridge';
-import { MRAIDBridgeContainer } from 'MRAID/EventBridge/MRAIDBridgeContainer';
+import { MRAIDBridgeContainer, IMRAIDHandler } from 'MRAID/EventBridge/MRAIDBridgeContainer';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -125,7 +124,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         ];
 
         this._gameSessionId = gameSessionId || 0;
-        this._mraidBridgeContainer = new MRAIDBridgeContainer();
+        this._mraidBridgeContainer = new MRAIDBridgeContainer(this);
     }
 
     public abstract setViewableState(viewable: boolean): void;

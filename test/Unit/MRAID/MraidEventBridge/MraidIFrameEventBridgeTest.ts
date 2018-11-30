@@ -8,10 +8,10 @@ import { MraidIFrameEventBridge } from 'MRAID/EventBridge/MraidIFrameEventBridge
 import { Platform } from 'Core/Constants/Platform';
 import { Backend } from 'Backend/Backend';
 import { ICoreApi } from 'Core/ICore';
-import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/AbstractMraidEventBridge';
+import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDBridgeContainer';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe('MraidIframeEventBridge', () => {
+    describe(`${platform} MraidIframeEventBridge`, () => {
         let handler: IMRAIDHandler;
         let mraidBridge: MraidIFrameEventBridge;
         let iframe: HTMLIFrameElement;

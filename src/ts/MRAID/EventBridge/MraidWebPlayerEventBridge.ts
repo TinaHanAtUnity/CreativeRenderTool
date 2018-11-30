@@ -1,7 +1,8 @@
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { IObserver1 } from 'Core/Utilities/IObserver';
-import { AbstractMRAIDEventBridge, IMRAIDHandler, MRAIDEvents, IMRAIDOrientationProperties } from 'MRAID/EventBridge/AbstractMraidEventBridge';
+import { AbstractMRAIDEventBridge, IMRAIDOrientationProperties } from 'MRAID/EventBridge/AbstractMraidEventBridge';
 import { ICoreApi } from 'Core/ICore';
+import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDBridgeContainer';
 
 export class MraidWebPlayerEventBridge extends AbstractMRAIDEventBridge {
     private _container: WebPlayerContainer;
@@ -12,6 +13,7 @@ export class MraidWebPlayerEventBridge extends AbstractMRAIDEventBridge {
         super(handler);
         this._core = core;
         this._container = container;
+
         this._mraidHandlers[MRAIDEvents.RESIZE_WEBVIEW] = () => this.handleResizeWebview();
         this._mraidHandlers[MRAIDEvents.ORIENTATION] = (msg: any) => this.handleSetOrientationProperties(<IMRAIDOrientationProperties>msg[0]);
         this._mraidHandlers[MRAIDEvents.OPEN] = (msg: any) => this.handleOpen(msg[0]);
@@ -31,15 +33,11 @@ export class MraidWebPlayerEventBridge extends AbstractMRAIDEventBridge {
         this.sendEvent('viewable', [viewable]);
     }
 
-    private handleResizeWebview() {
-        this._handler.onBridgeResizeWebview();
-    }
-
     private onWebPlayerEvent(args: any[]) {
         const eventType = args.shift();
         const params = args.shift();
 
-        this._core.Sdk.logInfo(`mraid: event=${eventType}, data=${params}`);
+        this._core.Sdk.logDebug(`mraid: event=${eventType}, data=${params}`);
         if (eventType in this._mraidHandlers) {
             const handler = this._mraidHandlers[eventType];
             handler(params);

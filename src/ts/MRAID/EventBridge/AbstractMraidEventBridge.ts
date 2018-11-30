@@ -1,5 +1,5 @@
+import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDBridgeContainer';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export interface IExpandProperties {
     width: number;
@@ -18,37 +18,10 @@ export interface IMRAIDOrientationProperties {
     forceOrientation: string;
 }
 
-export interface IMRAIDHandler {
-    onBridgeSetOrientationProperties(allowOrientationChange: boolean, orientation: Orientation): void;
-    onBridgeOpen(url: string): void;
-    onBridgeLoad(): void;
-    onBridgeAnalyticsEvent(event: string, eventData: string): void;
-    onBridgeClose(): void;
-    onBridgeStateChange(customState: string): void;
-    onBridgeResizeWebview(): void;
-    onBridgeSendStats(totalTime: number, playTime: number, frameCount: number): void;
-    onBridgeAREvent(event: MessageEvent): void;
-}
-
 export interface IMRAIDBridge {
     connect(): void;
     disconnect(): void;
-    setHandler(handler: IMRAIDHandler): void;
     sendViewableEvent(viewable: boolean): void;
-}
-
-export type IMRAIDBridgeConnector = HTMLIFrameElement | WebPlayerContainer;
-
-export enum MRAIDEvents {
-    ORIENTATION         = 'orientation',
-    OPEN                = 'open',
-    LOADED              = 'loaded',
-    ANALYTICS_EVENT     = 'analyticsEvent',
-    CLOSE               = 'close',
-    STATE_CHANGE        = 'customMraidState',
-    RESIZE_WEBVIEW      = 'resizeWebview',
-    SEND_STATS          = 'sendStats',
-    AR                  = 'ar'
 }
 
 export abstract class AbstractMRAIDEventBridge implements IMRAIDBridge {
@@ -59,12 +32,9 @@ export abstract class AbstractMRAIDEventBridge implements IMRAIDBridge {
         this._handler = handler;
 
         this._mraidHandlers = {};
+
         this._mraidHandlers[MRAIDEvents.LOADED] = () => this.handleLoaded();
         this._mraidHandlers[MRAIDEvents.CLOSE] = () => this.handleClose();
-    }
-
-    public setHandler(handler: IMRAIDHandler) {
-        this._handler = handler;
     }
 
     public abstract connect(): void;
@@ -112,11 +82,15 @@ export abstract class AbstractMRAIDEventBridge implements IMRAIDBridge {
         this._handler.onBridgeAREvent(event);
     }
 
-    private handleLoaded() {
+    protected handleResizeWebview() {
+        this._handler.onBridgeResizeWebview();
+    }
+
+    protected handleLoaded() {
         this._handler.onBridgeLoad();
     }
 
-    private handleClose() {
+    protected handleClose() {
         this._handler.onBridgeClose();
     }
 }

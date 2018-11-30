@@ -150,7 +150,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             });
         });
 
-        this._mraidBridgeContainer.connect(new MraidIFrameEventBridge(this._core, this, iframe));
+        this._mraidBridgeContainer.connect(new MraidIFrameEventBridge(this._core, this._mraidBridgeContainer, iframe));
     }
 
     public setViewableState(viewable: boolean): void {
