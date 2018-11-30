@@ -156,7 +156,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         super.render();
         this.setupElementReferences();
 
-        if (this._country === 'CN') {
+        if (this._country === 'CN' && this._chinaAdvertisementElement) {
             this._chinaAdvertisementElement.style.display = 'block';
         }
 

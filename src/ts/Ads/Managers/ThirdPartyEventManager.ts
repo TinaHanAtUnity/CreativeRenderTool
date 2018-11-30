@@ -13,34 +13,34 @@ enum ThirdPartyEventMethod {
     POST,
     GET
 }
+
+export enum ThirdPartyEventMacro {
+    ZONE = '%ZONE%',
+    SDK_VERSION = '%SDK_VERSION%',
+    GAMER_SID = '%GAMER_SID%'
+}
+
+export type TemplateValueMap = { [id: string]: string };
+
 export class ThirdPartyEventManager {
 
     private _core: ICoreApi;
     private _request: RequestManager;
     private _templateValues: { [id: string]: string } = {};
 
-    public static replaceUrlTemplateValues(urls: string[], templateValues: { [id: string]: string }): string[] {
-        const modifiedUrls: string[] = [];
-        for (const url of urls) {
-            if(url) {
-                for(const key in templateValues) {
-                    if(templateValues.hasOwnProperty(key)) {
-                        const modifiedUrl = url.replace(key, templateValues[key]);
-                        modifiedUrls.push(modifiedUrl);
-                    }
-                }
-            }
-        }
-        return modifiedUrls;
-    }
-
-    constructor(core: ICoreApi, request: RequestManager, templateValues?: { [id: string]: string }) {
+    constructor(core: ICoreApi, request: RequestManager, templateValues?: TemplateValueMap) {
         this._core = core;
         this._request = request;
 
-        if(templateValues) {
+        if (templateValues) {
             this.setTemplateValues(templateValues);
         }
+    }
+
+    public replaceTemplateValuesAndEncodeUrls(urls: string[]): string[] {
+        return urls.map((url) => {
+            return this.replaceTemplateValuesAndEncodeUrl(url);
+        });
     }
 
     public clickAttributionEvent(url: string, redirects: boolean, useWebViewUA?: boolean): Promise<INativeResponse> {
@@ -72,7 +72,7 @@ export class ThirdPartyEventManager {
             }
         }
 
-        url = this.getUrl(url);
+        url = this.replaceTemplateValuesAndEncodeUrl(url);
 
         this._core.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
         const options = {
@@ -82,7 +82,7 @@ export class ThirdPartyEventManager {
             retryWithConnectionEvents: false
         };
         let request: Promise<INativeResponse>;
-        switch(method) {
+        switch (method) {
             case ThirdPartyEventMethod.POST:
                 request = this._request.post(url, body, headers, options);
                 break;
@@ -107,11 +107,11 @@ export class ThirdPartyEventManager {
         });
     }
 
-    public setTemplateValues(templateValues: { [id: string]: string }): void {
+    public setTemplateValues(templateValues: TemplateValueMap): void {
         this._templateValues = templateValues;
     }
 
-    public setTemplateValue(key: string, value: string): void {
+    public setTemplateValue(key: ThirdPartyEventMacro, value: string): void {
         this._templateValues[key] = value;
     }
 
@@ -136,15 +136,34 @@ export class ThirdPartyEventManager {
         return Promise.resolve();
     }
 
-    private getUrl(url: string): string {
-        if(url) {
-            for(const key in this._templateValues) {
-                if(this._templateValues.hasOwnProperty(key)) {
+    private replaceTemplateValuesAndEncodeUrl(url: string): string {
+        if (url) {
+            for (const key in this._templateValues) {
+                if (this._templateValues.hasOwnProperty(key)) {
                     url = url.replace(key, this._templateValues[key]);
                 }
             }
         }
 
-        return url;
+        return Url.encode(url);
+    }
+}
+
+export interface IThirdPartyEventManagerFactory {
+    create(templateValues: TemplateValueMap): ThirdPartyEventManager;
+}
+
+export class ThirdPartyEventManagerFactory implements IThirdPartyEventManagerFactory {
+
+    private _core: ICoreApi;
+    private _requestManager: RequestManager;
+
+    constructor(core: ICoreApi, requestManager: RequestManager) {
+        this._core = core;
+        this._requestManager = requestManager;
+    }
+
+    public create(templateValues: TemplateValueMap): ThirdPartyEventManager {
+        return new ThirdPartyEventManager(this._core, this._requestManager, templateValues);
     }
 }

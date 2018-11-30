@@ -114,6 +114,18 @@
       "required": "no",
       "queryString": true,
       "body": false
+    },
+    {
+      "parameter": "analyticsUserId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "analyticsSessionId",
+      "required": "no",
+      "queryString": true,
+      "body": false
     }
   ]
 }
