@@ -7,11 +7,15 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
+import { assert } from 'chai';
 import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { ThirdPartyEventManager, ThirdPartyEventMacro, TemplateValueMap } from 'Ads/Managers/ThirdPartyEventManager';
+import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 
 describe('NativePromoEventHandlerTest', () => {
     let sandbox: sinon.SinonSandbox;
@@ -25,6 +29,9 @@ describe('NativePromoEventHandlerTest', () => {
     let clientInfo: ClientInfo;
     let request: RequestManager;
     let wakeUpManager: WakeUpManager;
+    let metadataManager: MetaDataManager;
+    let thirdPartyEventManager: ThirdPartyEventManager;
+    let templateValues: TemplateValueMap;
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
@@ -37,13 +44,22 @@ describe('NativePromoEventHandlerTest', () => {
         sinon.stub(purchasing.CustomPurchasing, 'available').resolves(false);
         clientInfo = sinon.createStubInstance(ClientInfo);
         wakeUpManager = new WakeUpManager(core);
-        request = new RequestManager(platform, core, wakeUpManager);
+        request = sinon.createStubInstance(RequestManager);
         (<sinon.SinonStub>clientInfo.getSdkVersion).returns(3000);
         sandbox.stub(PurchasingUtilities, 'onPurchase');
+        metadataManager = sinon.createStubInstance(MetaDataManager);
+        const playerMetaData = sinon.createStubInstance(PlayerMetaData);
+        (<sinon.SinonStub>playerMetaData.getServerId).returns('test-serverId');
+        (<sinon.SinonStub>metadataManager.fetch).resolves(playerMetaData);
 
-        nativePromoEventHandler = new NativePromoEventHandler(core, ads, purchasing, clientInfo, request);
-        sandbox.stub((<any>nativePromoEventHandler)._thirdPartyEventManager, 'sendWithGet');
-        sandbox.stub((<any>nativePromoEventHandler)._thirdPartyEventManager, 'setTemplateValue');
+        nativePromoEventHandler = new NativePromoEventHandler(core, ads, purchasing, clientInfo, {
+            create: (_templateValues: TemplateValueMap) => {
+                templateValues = _templateValues;
+                thirdPartyEventManager = new ThirdPartyEventManager(core, request, _templateValues);
+                sinon.stub(thirdPartyEventManager, 'sendWithGet');
+                return thirdPartyEventManager;
+            }
+        }, metadataManager);
         sandbox.stub(nativePromoEventHandler.onClose, 'trigger');
     });
 
@@ -56,32 +72,46 @@ describe('NativePromoEventHandlerTest', () => {
         it('should replace %ZONE% template value and fire tracking urls for impression', () => {
 
             return nativePromoEventHandler.onImpression(TestFixtures.getPromoCampaign(), 'test').then(() => {
-                sinon.assert.calledWith((<any>nativePromoEventHandler)._thirdPartyEventManager.setTemplateValue, '%ZONE%', 'test');
-                sinon.assert.calledThrice((<any>nativePromoEventHandler)._thirdPartyEventManager.sendWithGet);
+                assert.deepEqual(templateValues, {
+                    [ThirdPartyEventMacro.ZONE]: 'test',
+                    [ThirdPartyEventMacro.SDK_VERSION]: '3000',
+                    [ThirdPartyEventMacro.GAMER_SID]: 'test-serverId'
+                });
+                sinon.assert.calledThrice(<sinon.SinonStub>thirdPartyEventManager.sendWithGet);
+                sinon.assert.calledWith(<sinon.SinonStub>thirdPartyEventManager.sendWithGet, 'impression', '12345', 'http://test.impression.com/blah1');
+                sinon.assert.calledWith(<sinon.SinonStub>thirdPartyEventManager.sendWithGet, 'impression', '12345', 'http://test.impression.com/blah2');
+                sinon.assert.calledWith(<sinon.SinonStub>thirdPartyEventManager.sendWithGet, 'impression', '12345', 'http://test.impression.com/%ZONE%/blah?sdkVersion=%SDK_VERSION%');
             });
         });
     });
 
     describe('onPromoClosed', () => {
         it('should fire tracking urls', () => {
-            return nativePromoEventHandler.onPromoClosed(TestFixtures.getPromoCampaign()).then(() => {
-                sinon.assert.calledOnce((<any>nativePromoEventHandler)._thirdPartyEventManager.sendWithGet);
+            return nativePromoEventHandler.onImpression(TestFixtures.getPromoCampaign(), 'test').then(() => {
+                return nativePromoEventHandler.onPromoClosed(TestFixtures.getPromoCampaign()).then(() => {
+                    sinon.assert.callCount(<sinon.SinonStub>thirdPartyEventManager.sendWithGet, 4);
+                    sinon.assert.calledWith(<sinon.SinonStub>thirdPartyEventManager.sendWithGet, 'complete', '12345', 'http://test.complete.com/complete1');
+                });
             });
         });
 
         it('should trigger on close to refresh campaigns', () => {
-            return nativePromoEventHandler.onPromoClosed(TestFixtures.getPromoCampaign()).then(() => {
-                sinon.assert.calledOnce(<sinon.SinonSpy>nativePromoEventHandler.onClose.trigger);
+            return nativePromoEventHandler.onImpression(TestFixtures.getPromoCampaign(), 'test').then(() => {
+                return nativePromoEventHandler.onPromoClosed(TestFixtures.getPromoCampaign()).then(() => {
+                    sinon.assert.calledOnce(<sinon.SinonSpy>nativePromoEventHandler.onClose.trigger);
+                });
             });
         });
     });
 
     describe('onClick', () => {
         it('should fire click tracking urls', () => {
-            return nativePromoEventHandler.onClick('test', TestFixtures.getPromoCampaign(), 'test').then(() => {
-                sinon.assert.calledWith((<any>nativePromoEventHandler)._thirdPartyEventManager.setTemplateValue, '%ZONE%', 'test');
-                sinon.assert.calledOnce((<any>nativePromoEventHandler)._thirdPartyEventManager.sendWithGet);
-                sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.onPurchase);
+            return nativePromoEventHandler.onImpression(TestFixtures.getPromoCampaign(), 'test').then(() => {
+                return nativePromoEventHandler.onClick('test', TestFixtures.getPromoCampaign(), 'test').then(() => {
+                    sinon.assert.callCount(<sinon.SinonStub>thirdPartyEventManager.sendWithGet, 4);
+                    sinon.assert.calledOnce(<sinon.SinonSpy>PurchasingUtilities.onPurchase);
+                    sinon.assert.calledWith(<sinon.SinonStub>thirdPartyEventManager.sendWithGet, 'click', '12345', 'http://test.complete.com/click1');
+                });
             });
         });
     });
