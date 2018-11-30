@@ -87,7 +87,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             coreConfig: coreConfig,
             adsConfig: adsConfig,
             storageBridge: storageBridge,
-            campaign: campaign
+            campaign: campaign,
+            playerMetadataServerId: 'test-gamerSid'
         });
 
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);

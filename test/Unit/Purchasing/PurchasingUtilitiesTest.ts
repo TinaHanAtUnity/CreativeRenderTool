@@ -26,6 +26,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { IProduct, ITransactionDetails } from 'Purchasing/PurchasingAdapter';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 describe('PurchasingUtilitiesTest', () => {
     let platform: Platform;
@@ -45,6 +46,7 @@ describe('PurchasingUtilitiesTest', () => {
     let sandbox: sinon.SinonSandbox;
     let promoCatalog: string;
     let request: RequestManager;
+    let thirdPartyEventManager: ThirdPartyEventManager;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -91,6 +93,8 @@ describe('PurchasingUtilitiesTest', () => {
         sinon.stub(purchasing.CustomPurchasing, 'refreshCatalog').returns(Promise.resolve());
         sinon.stub(purchasing.CustomPurchasing, 'purchaseItem').returns(Promise.resolve());
 
+        thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
+
         return PurchasingUtilities.initialize(core, promo, purchasing, clientInfo, coreConfig, adsConfig, placementManager, campaignManager, promoEvents, request, analyticsManager);
     });
     afterEach(() => {
@@ -124,7 +128,7 @@ describe('PurchasingUtilitiesTest', () => {
                     receipt: 'moneymoneymoney',
                     extras: 'schooterdoooter'
                 }));
-                return PurchasingUtilities.onPurchase('myPromo', TestFixtures.getPromoCampaign(), 'myCoolPlacement');
+                return PurchasingUtilities.onPurchase(thirdPartyEventManager, 'myPromo', TestFixtures.getPromoCampaign(), 'myCoolPlacement');
             });
 
             afterEach(() => {
@@ -139,7 +143,7 @@ describe('PurchasingUtilitiesTest', () => {
         describe('onFailure', () => {
             it('should fail when purchase item transaction fails over api', () => {
                 (<sinon.SinonStub>purchasing.CustomPurchasing.purchaseItem).returns(Promise.reject('fail'));
-                PurchasingUtilities.onPurchase('test', TestFixtures.getPromoCampaign(), 'myCoolPlacement').catch((e) => {
+                PurchasingUtilities.onPurchase(thirdPartyEventManager, 'test', TestFixtures.getPromoCampaign(), 'myCoolPlacement').catch((e) => {
                     assert.equal(e.message, undefined);
                 });
             });
@@ -147,7 +151,7 @@ describe('PurchasingUtilitiesTest', () => {
             it('should fail when purchase item transaction error occurs ', () => {
                 sandbox.stub(purchasing.CustomPurchasing.onTransactionError, 'subscribe').callsFake((resolve) => resolve('UNKNOWN_ERROR', 'schooty'));
                 (<sinon.SinonStub>purchasing.CustomPurchasing.purchaseItem).returns(Promise.reject('fail'));
-                PurchasingUtilities.onPurchase('test', TestFixtures.getPromoCampaign(), 'myCoolPlacement').catch((e) => {
+                PurchasingUtilities.onPurchase(thirdPartyEventManager, 'test', TestFixtures.getPromoCampaign(), 'myCoolPlacement').catch((e) => {
                     assert.equal(e.message, `Did not complete transaction due to ${'UNKNOWN_ERROR'}:${'schooty'}`);
                 });
             });
@@ -208,7 +212,7 @@ describe('PurchasingUtilitiesTest', () => {
     describe('onPromoClosed', () => {
         it('should resolve and do nothing for CustomPurchasingAdapter', () => {
             sandbox.stub(((<any>PurchasingUtilities)._purchasingAdapter), 'onPromoClosed');
-            PurchasingUtilities.onPromoClosed(TestFixtures.getPromoCampaign(), 'myCoolPlacement');
+            PurchasingUtilities.onPromoClosed(thirdPartyEventManager, TestFixtures.getPromoCampaign(), 'myCoolPlacement');
             sinon.assert.called(((<any>PurchasingUtilities)._purchasingAdapter).onPromoClosed);
         });
     });
