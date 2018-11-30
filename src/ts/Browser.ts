@@ -1,9 +1,9 @@
+import 'Workarounds';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
 import { Platform } from 'Core/Constants/Platform';
 import { Backend } from 'Backend/Backend';
-import 'Workarounds';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { toAbGroup } from 'Core/Models/ABGroup';
