@@ -3,12 +3,7 @@ import ButtonSpinnerTemplate from 'html/consent/button-spinner.html';
 import { Platform } from 'Core/Constants/Platform';
 import { Template } from 'Core/Utilities/Template';
 
-
-export interface IButtonSpinnerHandler {
-
-}
-
-export class ButtonSpinner extends View<IButtonSpinnerHandler> {
+export class ButtonSpinner extends View<{}> {
 
     constructor(platform: Platform) {
         super(platform, 'button-spinner');
