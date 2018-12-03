@@ -1,4 +1,4 @@
-# Pending
+# Mon Dec  3 21:13:08 UTC 2018
 
 * Show install now button after 0,5s experiment [#7382](https://github.com/Applifier/unity-ads-webview/pull/7382)
 * UADS-1002 : gamerSid should be included on all Operative events [#7173](https://github.com/Applifier/unity-ads-webview/pull/7173)
