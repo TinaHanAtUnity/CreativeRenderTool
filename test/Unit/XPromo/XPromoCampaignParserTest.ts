@@ -52,6 +52,7 @@ describe('XPromoCampaignParser', () => {
             const parse = (data: any) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
+                parser.setCreativeIdentification(response);
                 return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
                     campaign = <XPromoCampaign>parsedCampaign;
                 });
@@ -74,6 +75,13 @@ describe('XPromoCampaignParser', () => {
 
             beforeEach(() => {
                 return parse(JSON.parse(XPromoCampaignJSON));
+            });
+
+            it('should set the creative identification in the parser', () => {
+                assert.isNotNull(parser.creativeID);
+                assert.isNotNull(parser.seatID);
+                assert.equal(parser.creativeID, campaign.getCreativeId());
+                assert.equal(parser.seatID, campaign.getSeatId());
             });
 
             it('should have valid data', () => {

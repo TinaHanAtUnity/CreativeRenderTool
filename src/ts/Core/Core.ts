@@ -14,7 +14,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { toAbGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -168,7 +168,7 @@ export class Core implements ICore {
             }
 
             const configSpan = this.JaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
-            this.ConfigManager = new ConfigManager(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo, this.DeviceInfo, this.RequestManager);
+            this.ConfigManager = new ConfigManager(this.NativeBridge.getPlatform(), this.Api, this.MetaDataManager, this.ClientInfo, this.DeviceInfo, this.UnityInfo, this.RequestManager);
 
             let configPromise;
             if(TestEnvironment.get('creativeUrl')) {
@@ -271,7 +271,7 @@ export class Core implements ICore {
                 // needed in both due to placement level control support
                 const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
                 if (!isNaN(abGroupNumber)) { // if it is a number get the group
-                    const abGroup = ABGroupBuilder.getAbGroup(abGroupNumber);
+                    const abGroup = toAbGroup(abGroupNumber);
                     ConfigManager.setAbGroup(abGroup);
                 }
             }

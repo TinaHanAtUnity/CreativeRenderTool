@@ -13,6 +13,7 @@ import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { AndroidBackButtonSkipTest } from 'Core/Models/ABGroup';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -79,8 +80,10 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
         if (parameters.platform === Platform.ANDROID) {
             const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
                 endScreenEventHandler.onKeyEvent(keyCode);
+                const abGroup = parameters.coreConfig.getAbGroup();
+                const backButtonTestEnabled = AndroidBackButtonSkipTest.isValid(abGroup);
 
-                if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                if(backButtonTestEnabled || CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
                     performanceOverlayEventHandler.onKeyEvent(keyCode);
                 }
             });

@@ -336,7 +336,8 @@ describe('MRAIDEventHandlersTest', () => {
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
-                campaign: programmaticMraidCampaign
+                campaign: programmaticMraidCampaign,
+                playerMetadataServerId: 'test-gamerSid'
             });
 
             programmaticMraidAdUnitParams = {

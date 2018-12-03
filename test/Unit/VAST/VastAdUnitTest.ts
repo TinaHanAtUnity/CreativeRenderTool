@@ -115,7 +115,8 @@ describe('VastAdUnitTest', () => {
             coreConfig: coreConfig,
             adsConfig: adsConfig,
             storageBridge: storageBridge,
-            campaign: vastCampaign
+            campaign: vastCampaign,
+            playerMetadataServerId: 'test-gamerSid'
         });
 
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
@@ -264,10 +265,11 @@ describe('VastAdUnitTest', () => {
         it('it should fire companion tracking events', () => {
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             const companionTrackingUrls = vastCampaign.getVast().getCompanionCreativeViewTrackingUrls();
+            const useWebViewUserAgentForTracking = vastCampaign.getUseWebViewUserAgentForTracking();
             assert.isTrue(companionTrackingUrls.length > 0); // make sure that there are tracking urls
             for (const companionTrackingUrl of companionTrackingUrls) {
                 // make each tracking url expected.
-                mockEventManager.expects('sendWithGet').withExactArgs('companion', '123', companionTrackingUrl);
+                mockEventManager.expects('sendWithGet').withExactArgs('companion', '123', companionTrackingUrl, useWebViewUserAgentForTracking);
             }
             vastAdUnit.sendCompanionTrackingEvent('123');
             mockEventManager.verify();

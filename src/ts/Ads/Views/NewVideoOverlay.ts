@@ -7,7 +7,7 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
-import { ABGroup, NextSkipIconTest } from 'Core/Models/ABGroup';
+import { ABGroup, InstantInstallNowTest } from 'Core/Models/ABGroup';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -15,6 +15,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export interface IVideoOverlayParameters<T extends Campaign> {
     platform: Platform;
@@ -59,6 +60,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _fadeTimer: any;
     private _areControlsVisible: boolean = false;
     private _gameId: string;
+
     private _country: string | undefined;
     private _abGroup: ABGroup;
     private _campaign: Campaign;
@@ -75,6 +77,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._campaign = parameters.campaign;
         this._showGDPRBanner = showGDPRBanner;
         this._showPrivacyDuringVideo = showPrivacyDuringVideo;
+
         this._templateData = {
             muted: parameters.placement.muteVideo()
         };
@@ -154,14 +157,12 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         super.render();
         this.setupElementReferences();
 
-        if (this._country === 'CN') {
+        if (this._country === 'CN' && this._chinaAdvertisementElement) {
             this._chinaAdvertisementElement.style.display = 'block';
         }
 
         if (CustomFeatures.isCheetahGame(this._gameId)) {
             this._skipButtonElement.classList.add('close-icon-skip');
-        } else if (NextSkipIconTest.isValid(this._abGroup)) {
-            this._skipButtonElement.classList.add('next-icon-skip');
         }
     }
 
@@ -402,13 +403,12 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._container.classList.add('fade-in');
         this._areControlsVisible = true;
 
-        if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
-            return;
+        const isVASTCampaign = this._campaign instanceof VastCampaign;
+        if (isVASTCampaign || (this._skipEnabled && InstantInstallNowTest.isValid(this._abGroup))) {
+            setTimeout(() => {
+                this.showCallButton();
+            }, 500);
         }
-
-        setTimeout(() => {
-            this.showCallButton();
-        }, 500);
     }
 
     private fadeOut() {

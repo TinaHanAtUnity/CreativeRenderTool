@@ -112,7 +112,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
         const playableConfiguration = this._campaign.getPlayableConfiguration();
         if(playableConfiguration) {
             // check configuration based on the ab group
-            const groupKey = 'group' + this._abGroup.toNumber();
+            const groupKey = 'group' + this._abGroup;
             if(playableConfiguration[groupKey]) {
                 this._configuration = playableConfiguration[groupKey];
             } else if (playableConfiguration.default) {

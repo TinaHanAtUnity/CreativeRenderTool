@@ -39,6 +39,7 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onMraidOrientationProperties(orientationProperties: IOrientationProperties): void;
     onPlayableAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: any): void;
     onMraidShowEndScreen(): void;
+    onKeyEvent(keyCode: number): void;
 }
 
 export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler, IMRAIDHandler {
@@ -449,5 +450,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public onBridgeAREvent(msg: MessageEvent) {
         this.onAREvent(msg).catch((reason) => this._core.Sdk.logError('AR message error: ' + reason.toString()));
+    }
+
+    public canSkip(): boolean {
+        return this._canSkip;
+    }
+
+    public canClose(): boolean {
+        return this._canClose;
     }
 }
