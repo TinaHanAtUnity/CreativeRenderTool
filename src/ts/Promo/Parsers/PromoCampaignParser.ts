@@ -11,6 +11,7 @@ import { ILimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTim
 import { IProductInfo, ProductInfo, ProductInfoType, IRawProductInfo } from 'Promo/Models/ProductInfo';
 import { IPromoCampaign, IRawPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { promises } from 'fs';
 
 export class PromoCampaignParser extends CampaignParser {
 
@@ -26,36 +27,46 @@ export class PromoCampaignParser extends CampaignParser {
             willExpireAt = response.getCacheTTL();
         }
 
-        const premiumProduct: ProductInfo = this.getProductInfo(promoJson);
-        const baseCampaignParams: ICampaign = {
-            contentType: PromoCampaignParser.ContentType,
-            id: premiumProduct.getId(),
-            willExpireAt: willExpireAt ? Date.now() + (willExpireAt * 1000) : undefined,
-            adType: promoJson.contentType || response.getContentType(),
-            correlationId: undefined,
-            creativeId: response.getCreativeId() || undefined,
-            seatId: response.getSeatId() || undefined,
-            meta: promoJson.meta,
-            session: session,
-            mediaId: response.getMediaId(),
-            trackingUrls: response.getTrackingUrls() || {}
-        };
-        const promoCampaignParams: IPromoCampaign = {
-            ... baseCampaignParams,
-            dynamicMarkup: promoJson.dynamicMarkup,
-            creativeAsset: promoJson.creativeUrl ? new HTML(promoJson.creativeUrl, session) : undefined,
-            rewardedPromo: promoJson.rewardedPromo || false,
-            limitedTimeOffer: this.getLimitedTimeOffer(promoJson),
-            costs: this.getProductInfoList(promoJson.costs),
-            payouts: this.getProductInfoList(promoJson.payouts),
-            premiumProduct: premiumProduct
-        };
-        const promoCampaign = new PromoCampaign(promoCampaignParams);
-        let promise = Promise.resolve();
-        if (PurchasingUtilities.isInitialized() && !PurchasingUtilities.isCatalogValid()) {
-            promise = PurchasingUtilities.refreshCatalog();
+        const premiumProduct = this.getRootProductInfo(promoJson);
+
+        if (premiumProduct) {
+            const baseCampaignParams: ICampaign = {
+                contentType: PromoCampaignParser.ContentType,
+                id: premiumProduct.getId(),
+                willExpireAt: willExpireAt ? Date.now() + (willExpireAt * 1000) : undefined,
+                adType: response.getContentType(),
+                correlationId: undefined,
+                creativeId: response.getCreativeId() || undefined,
+                seatId: response.getSeatId() || undefined,
+                meta: undefined,
+                session: session,
+                mediaId: response.getMediaId(),
+                trackingUrls: response.getTrackingUrls() || {}
+            };
+            const promoCampaignParams: IPromoCampaign = {
+                ... baseCampaignParams,
+                dynamicMarkup: promoJson.dynamicMarkup,
+                creativeAsset: promoJson.creativeUrl ? new HTML(promoJson.creativeUrl, session) : undefined,
+                rewardedPromo: promoJson.rewardedPromo || false,
+                limitedTimeOffer: this.getLimitedTimeOffer(promoJson),
+                costs: this.getProductInfoList(promoJson.costs),
+                payouts: this.getProductInfoList(promoJson.payouts),
+                premiumProduct: premiumProduct
+            };
+
+            const promoCampaign = new PromoCampaign(promoCampaignParams);
+            let promise = Promise.resolve();
+
+            if (PurchasingUtilities.isInitialized() && !PurchasingUtilities.isCatalogValid()) {
+                promise = PurchasingUtilities.refreshCatalog();
+            }
+
+            return promise.then(() => Promise.resolve(promoCampaign));
+        } else {
+            core.Sdk.logError('Product is undefined');
+            return Promise.reject();
         }
-        return promise.then(() => Promise.resolve(promoCampaign));
+
     }
 
     private getLimitedTimeOffer(promoJson: IRawPromoCampaign): LimitedTimeOffer | undefined {
