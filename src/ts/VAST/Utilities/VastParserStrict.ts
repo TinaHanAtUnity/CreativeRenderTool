@@ -8,7 +8,8 @@ import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { Url } from 'Core/Utilities/Url';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
-import { VastValidator } from 'VAST/Utilities/VastValidator';
+import { VastAdValidator } from 'VAST/Validators/VastAdValidator';
+import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -100,16 +101,15 @@ export class VastParserStrict {
         const documentElement = xml.documentElement;
 
         // collect error URLs before moving on to ads
-        this.getChildrenNodesWithName(documentElement, VastNodeName.ERROR).map((element: HTMLElement) => {
+        this.getChildrenNodesWithName(documentElement, VastNodeName.ERROR).forEach((element: HTMLElement) => {
             parseErrorURLTemplates.push(this.parseNodeText(element));
         });
         let errors: Error[] = [];
         // parse each Ad element
-        this.getNodesWithName(documentElement, VastNodeName.AD).map((element: HTMLElement) => {
+        this.getNodesWithName(documentElement, VastNodeName.AD).forEach((element: HTMLElement) => {
             if (ads.length <= 0) {
                 const ad = this.parseAdElement(element);
-                // ads.push(ad);
-                const adErrors = VastValidator.validateVastAd(ad);
+                const adErrors = new VastAdValidator(ad).getErrors();
                 if (adErrors.length > 0) {
                     errors = errors.concat(adErrors);
                 } else {
@@ -132,7 +132,7 @@ export class VastParserStrict {
 
     private formatErrorMessage(errors: Error[]): Error {
         return new Error(`VAST parse encountered these errors while parsing:
-            ${VastValidator.formatErrors(errors)}
+            ${VastValidationUtilities.formatErrors(errors)}
         `);
     }
 
@@ -147,17 +147,25 @@ export class VastParserStrict {
         return nodes;
     }
 
-    // recursively search for nodes with matching name
+    // search for nodes with matching name
     private getNodesWithName(rootNode: HTMLElement, name: string): HTMLElement[] {
-        let nodes: HTMLElement[] = [];
-        if (rootNode.nodeName === name) {
-            nodes.push(rootNode);
+        const nodesWithName: HTMLElement[] = [];
+        const nodesToProcess: HTMLElement[] = [];
+        nodesToProcess.push(rootNode);
+
+        while (nodesToProcess.length > 0) {
+            const node = nodesToProcess.pop();
+            if (node) {
+                if (node.nodeName === name) {
+                    nodesWithName.push(node);
+                }
+                for (let i = node.childNodes.length - 1; i >= 0; i--) { // reverse iterating for speed rather than having to use array.shift
+                    nodesToProcess.push(<HTMLElement>node.childNodes[i]);
+                }
+            }
         }
-        for (const node of rootNode.childNodes) {
-            const childNodesWithName: HTMLElement[] = this.getNodesWithName(<HTMLElement>node, name);
-            nodes = nodes.concat(childNodesWithName);
-        }
-        return nodes;
+
+        return nodesWithName;
     }
 
     public retrieveVast(vast: any, core: ICoreApi, request: RequestManager, parent?: Vast, depth: number = 0): Promise<Vast> {
@@ -170,13 +178,18 @@ export class VastParserStrict {
         try {
             parsedVast = this.parseVast(vast);
         } catch (e) {
-            const error = new DiagnosticError(e, { vast: vast, wrapperDepth: depth });
             if (depth > 0) {
-                // tslint:disable:no-string-literal
-                error.diagnostic['rootWrapperVast'] = this._rootWrapperVast;
-                // tslint:enable
+                throw new DiagnosticError(e, {
+                    vast: vast,
+                    wrapperDepth: depth,
+                    rootWrapperVast: this._rootWrapperVast
+                });
+            } else {
+                throw new DiagnosticError(e, {
+                    vast: vast,
+                    wrapperDepth: depth
+                });
             }
-            throw error;
         }
 
         this.applyParentURLs(parsedVast, parent);
@@ -228,17 +241,16 @@ export class VastParserStrict {
     }
 
     private parseAdElement(adElement: HTMLElement): VastAd {
-        // const vastAd = new VastAd();
 
         // use the first 'InLine' ad
         for (const element of this.getNodesWithName(adElement, VastNodeName.INLINE)) {
-            const inlineAd = this.parseWrapperOrInLineElement(element);
+            const inlineAd = this.parseAdContent(element);
             inlineAd.setId(adElement.getAttribute(VastAttributeNames.ID));
             return inlineAd;
         }
         // use the first 'Wrapper' ad if there is no 'InLine' ad
         for (const element of this.getNodesWithName(adElement, VastNodeName.WRAPPER)) {
-            const wrapperAd = this.parseWrapperOrInLineElement(element);
+            const wrapperAd = this.parseAdContent(element);
             wrapperAd.setId(adElement.getAttribute(VastAttributeNames.ID));
             return wrapperAd;
         }
@@ -247,29 +259,29 @@ export class VastParserStrict {
         return new VastAd();
     }
 
-    private parseWrapperOrInLineElement(adElement: HTMLElement): VastAd {
+    private parseAdContent(adElement: HTMLElement): VastAd {
         const vastAd = new VastAd();
-        this.getNodesWithName(adElement, VastNodeName.VAST_AD_TAG_URI).map((element: HTMLElement) => {
+        this.getNodesWithName(adElement, VastNodeName.VAST_AD_TAG_URI).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
             vastAd.addWrapperURL(url);
         });
 
-        this.getNodesWithName(adElement, VastNodeName.ERROR).map((element: HTMLElement) => {
+        this.getNodesWithName(adElement, VastNodeName.ERROR).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
             vastAd.addErrorURLTemplate(url);
         });
 
-        this.getNodesWithName(adElement, VastNodeName.IMPRESSION).map((element: HTMLElement) => {
+        this.getNodesWithName(adElement, VastNodeName.IMPRESSION).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
             vastAd.addImpressionURLTemplate(url);
         });
 
-        this.getNodesWithName(adElement, VastNodeName.LINEAR).map((element: HTMLElement) => {
+        this.getNodesWithName(adElement, VastNodeName.LINEAR).forEach((element: HTMLElement) => {
             const creative = this.parseCreativeLinearElement(element);
             vastAd.addCreative(creative);
         });
 
-        this.getNodesWithName(adElement, VastNodeName.COMPANION).map((element: HTMLElement) => {
+        this.getNodesWithName(adElement, VastNodeName.COMPANION).forEach((element: HTMLElement) => {
             const companionAd = this.parseCreativeCompanionAdElement(element);
             vastAd.addCompanionAd(companionAd);
         });
@@ -285,37 +297,37 @@ export class VastParserStrict {
     private parseCreativeLinearElement(creativeElement: HTMLElement): VastCreativeLinear {
         const creative = new VastCreativeLinear();
 
-        this.getNodesWithName(creativeElement, VastNodeName.DURATION).map((element: HTMLElement, index: number) => {
-            if (index === 0) {
-                const durationString = this.parseNodeText(element);
-                creative.setDuration(this.parseDuration(durationString));
-            }
-        });
+        const durationElement = this.getNodesWithName(creativeElement, VastNodeName.DURATION)[0];
+        if (durationElement) {
+            const durationString = this.parseNodeText(durationElement);
+            creative.setDuration(this.parseDuration(durationString));
+        }
 
         const mediaDuration = creative.getDuration();
         const skipOffset = creativeElement.getAttribute(VastAttributeNames.SKIP_OFFSET);
-        if (skipOffset == null) {
-            creative.setSkipDelay(null);
-        } else if (skipOffset.charAt(skipOffset.length - 1) === '%') {
-            const percent = parseInt(skipOffset, 10);
-            creative.setSkipDelay(creative.getDuration() * (percent / 100));
+        if (skipOffset) {
+            if (skipOffset.charAt(skipOffset.length - 1) === '%') {
+                const percent = parseInt(skipOffset, 10);
+                creative.setSkipDelay(creative.getDuration() * (percent / 100));
+            } else {
+                creative.setSkipDelay(this.parseDuration(skipOffset));
+            }
         } else {
-            creative.setSkipDelay(this.parseDuration(skipOffset));
+            creative.setSkipDelay(null);
         }
 
-        this.getNodesWithName(creativeElement, VastNodeName.CLICK_THROUGH).map((element: HTMLElement, index: number) => {
-            if (index === 0) {
-                const url = this.parseNodeText(element);
-                creative.setVideoClickThroughURLTemplate(url);
-            }
-        });
+        const clickThroughElement = this.getNodesWithName(creativeElement, VastNodeName.CLICK_THROUGH)[0];
+        if (clickThroughElement) {
+            const url = this.parseNodeText(clickThroughElement);
+            creative.setVideoClickThroughURLTemplate(url);
+        }
 
-        this.getNodesWithName(creativeElement, VastNodeName.CLICK_TRACKING).map((element: HTMLElement) => {
+        this.getNodesWithName(creativeElement, VastNodeName.CLICK_TRACKING).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
             creative.addVideoClickTrackingURLTemplate(url);
         });
 
-        this.getNodesWithName(creativeElement, VastNodeName.TRACKING).map((element: HTMLElement) => {
+        this.getNodesWithName(creativeElement, VastNodeName.TRACKING).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
             const eventName = element.getAttribute(VastAttributeNames.EVENT);
             if (eventName) {
@@ -323,7 +335,7 @@ export class VastParserStrict {
             }
         });
 
-        this.getNodesWithName(creativeElement, VastNodeName.MEDIA_FILE).map((element: HTMLElement) => {
+        this.getNodesWithName(creativeElement, VastNodeName.MEDIA_FILE).forEach((element: HTMLElement) => {
             const bitrate = this.getIntAttribute(element, VastAttributeNames.BITRATE);
             const mediaFile = new VastMediaFile(
                 this.parseNodeText(element),
@@ -341,12 +353,11 @@ export class VastParserStrict {
             creative.addMediaFile(mediaFile);
         });
 
-        this.getNodesWithName(creativeElement, VastNodeName.AD_PARAMETERS).map((element: HTMLElement, index: number) => {
-            if (index === 0) {
-                const adParameters = this.parseNodeText(element);
-                creative.setAdParameters(adParameters);
-            }
-        });
+        const adParamsElement = this.getNodesWithName(creativeElement, VastNodeName.AD_PARAMETERS)[0];
+        if (adParamsElement) {
+            const adParameters = this.parseNodeText(adParamsElement);
+            creative.setAdParameters(adParameters);
+        }
 
         return creative;
     }
@@ -358,7 +369,7 @@ export class VastParserStrict {
         const companionAd = new VastCreativeCompanionAd(id, height, width);
 
         // Get tracking urls for companion ad
-        this.getNodesWithName(companionAdElement, VastNodeName.TRACKING).map((element: HTMLElement) => {
+        this.getNodesWithName(companionAdElement, VastNodeName.TRACKING).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
             const eventName = element.getAttribute(VastAttributeNames.EVENT);
             if (eventName) {
@@ -366,18 +377,17 @@ export class VastParserStrict {
             }
         });
 
-        this.getNodesWithName(companionAdElement, VastNodeName.STATIC_RESOURCE).map((element: HTMLElement, index: number) => {
-            if (index === 0) {
-                const creativeType = element.getAttribute(VastAttributeNames.CREATIVE_TYPE);
-                companionAd.setCreativeType(creativeType);
-                companionAd.setStaticResourceURL(this.parseNodeText(element));
-            }
-        });
-        this.getNodesWithName(companionAdElement, VastNodeName.COMPANION_CLICK_THROUGH).map((element: HTMLElement, index: number) => {
-            if (index === 0) {
-                companionAd.setCompanionClickThroughURLTemplate(this.parseNodeText(element));
-            }
-        });
+        const staticResourceElement = this.getNodesWithName(companionAdElement, VastNodeName.STATIC_RESOURCE)[0];
+        if (staticResourceElement) {
+            const creativeType = staticResourceElement.getAttribute(VastAttributeNames.CREATIVE_TYPE);
+            companionAd.setCreativeType(creativeType);
+            companionAd.setStaticResourceURL(this.parseNodeText(staticResourceElement));
+        }
+
+        const companionClickThroughElement = this.getNodesWithName(companionAdElement, VastNodeName.COMPANION_CLICK_THROUGH)[0];
+        if (companionClickThroughElement) {
+            companionAd.setCompanionClickThroughURLTemplate(this.parseNodeText(companionClickThroughElement));
+        }
         return companionAd;
     }
 

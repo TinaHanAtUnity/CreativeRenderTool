@@ -1,16 +1,15 @@
 import { AbstractParserModule, IContentTypeHandler } from 'Ads/Modules/AbstractParserModule';
 import { VastAdUnitFactory } from 'VAST/AdUnits/VastAdUnitFactory';
 import { ProgrammaticVastParser, ProgrammaticVastParserStrict } from 'VAST/Parsers/ProgrammaticVastParser';
-import { ICore } from 'Core/ICore';
-import { VastParsingStrictTest } from 'Core/Models/ABGroup';
+import { VastParsingStrictTest, ABGroup } from 'Core/Models/ABGroup';
 
 export class VAST extends AbstractParserModule {
 
-    constructor(core: ICore) {
+    constructor(abGroup: ABGroup) {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         let parser: ProgrammaticVastParser;
         // switch parsers based on ABGroup
-        if (VastParsingStrictTest.isValid(core.Config.getAbGroup())) {
+        if (VastParsingStrictTest.isValid(abGroup)) {
             parser = new ProgrammaticVastParserStrict();
         } else {
             parser = new ProgrammaticVastParser();

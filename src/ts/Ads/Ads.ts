@@ -182,7 +182,7 @@ export class Ads implements IAds {
                 }
             });
 
-            const vast = new VAST(this._core);
+            const vast = new VAST(this._core.Config.getAbGroup());
             const vastContentTypeHandlerMap = vast.getContentTypeHandlerMap();
             for (const contentType in vastContentTypeHandlerMap) {
                 if (vastContentTypeHandlerMap.hasOwnProperty(contentType)) {

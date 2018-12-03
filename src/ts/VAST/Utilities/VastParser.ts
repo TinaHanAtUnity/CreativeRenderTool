@@ -84,13 +84,18 @@ export class VastParser {
         try {
             parsedVast = this.parseVast(vast);
         } catch (e) {
-            const error = new DiagnosticError(e, { vast: vast, wrapperDepth: depth });
             if (depth > 0) {
-                // tslint:disable:no-string-literal
-                error.diagnostic['rootWrapperVast'] = this._rootWrapperVast;
-                // tslint:enable
+                throw new DiagnosticError(e, {
+                    vast: vast,
+                    wrapperDepth: depth,
+                    rootWrapperVast: this._rootWrapperVast
+                });
+            } else {
+                throw new DiagnosticError(e, {
+                    vast: vast,
+                    wrapperDepth: depth
+                });
             }
-            throw error;
         }
 
         this.applyParentURLs(parsedVast, parent);
