@@ -14,7 +14,7 @@ def waitWebviewDeployed(webviewBranch) {
 }
 
 def main() {
-    commitId = sh(returnStdout: true, script: 'git rev-parse HEAD^1')
+    commitId = sh(returnStdout: true, script: 'git rev-parse HEAD^1').trim()
     echo "#### $commitId ####"
     webviewBranch = "${env.CHANGE_BRANCH}/${commitId}"
 
