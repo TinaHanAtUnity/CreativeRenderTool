@@ -6,6 +6,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { IConsent } from 'Ads/Views/Consent/IConsent';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
+import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
 
 export interface IGDPRConsentSettingsHandler {
     onPersonalizedConsent(consent: IConsent): void;
@@ -15,6 +16,7 @@ export interface IGDPRConsentSettingsHandler {
 export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
 
     private _infoContainer: PrivacyRowItemContainer;
+    private _checkboxGroup: PersonalizationCheckboxGroup;
 
     constructor(platform: Platform, gdprManager: GdprManager) {
         super(platform, 'gdpr-consent-settings');
@@ -39,6 +41,7 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
         ];
 
         this._infoContainer = new PrivacyRowItemContainer({ platform: platform, gdprManager: gdprManager });
+        this._checkboxGroup = new PersonalizationCheckboxGroup(platform);
     }
 
     public render(): void {
@@ -46,40 +49,15 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
 
         this._infoContainer.render();
         (<HTMLElement>this._container.querySelector('.info-container')).appendChild(this._infoContainer.container());
+
+        this._checkboxGroup.render();
+        (<HTMLElement>this._container.querySelector('.checkbox-group-container')).appendChild(this._checkboxGroup.container());
     }
 
     public show(): void {
         super.show();
 
-        // gray line between main and sub checkbox
-        // todo: maybe there is some better way to set correct height of the line
-        const experienceLabel = <HTMLElement>this._container.querySelector('.personalized-experience-label');
-        const adsLabel = <HTMLElement>this._container.querySelector('.personalized-ads-label');
-
-        if(experienceLabel && adsLabel && adsLabel.offsetHeight > experienceLabel.offsetHeight) {
-            const lineElement = this._container.querySelector('.sub-box-line');
-            if (lineElement) {
-                lineElement.classList.add('two-lines');
-            }
-        }
-
-        const mainCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-checkbox');
-        const subCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-3rd-party');
-        if (subCheckbox) {
-            subCheckbox.onchange = () => {
-                if (subCheckbox.checked) {
-                    mainCheckbox.checked = true;
-                }
-            };
-        }
-
-        if (mainCheckbox) {
-            mainCheckbox.onchange = () => {
-                if (!mainCheckbox.checked) {
-                    subCheckbox.checked = false;
-                }
-            };
-        }
+        this._checkboxGroup.show();
     }
 
     private onBackButtonEvent(event: Event): void {
@@ -105,14 +83,11 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
 
     private onSaveMyChoicesEvent(event: Event) {
         event.preventDefault();
-        const experienceCheckbox = <HTMLInputElement>this._container.querySelector('#ppersonalized-experience-checkbox');
-        const adsCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-checkbox');
-        const ads3rdPartyCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-3rd-party');
 
         const consent: IConsent = {
-            gameExp: experienceCheckbox ? experienceCheckbox.checked : false,
-            ads: adsCheckbox ? adsCheckbox.checked : false,
-            external: ads3rdPartyCheckbox ? ads3rdPartyCheckbox.checked : false
+            gameExp: this._checkboxGroup.isPersonalizedExperienceChecked(),
+            ads: this._checkboxGroup.isPersonalizedAdsChecked(),
+            external: this._checkboxGroup.isAds3rdPartyChecked()
         };
 
         this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));

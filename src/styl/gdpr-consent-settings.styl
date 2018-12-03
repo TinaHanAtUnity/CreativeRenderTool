@@ -112,18 +112,20 @@
     // line between main and sub checkbox
     // todo: should be tested carefully
     // todo: on some devices the label is wrapped. Use screen ratio to set height
-    .sub-box-line {
-      position: absolute;
-      width: .75 * $default-size;
-      height: 1.25 * $default-size;
-      border-left: 1px solid $light-gray;
-      border-bottom: 1px solid $light-gray;
-      transform: translate(.3 * $default-size, -.9 * $default-size);
-    }
+    #personalization-checkbox-group {
+      .sub-box-line {
+        position: absolute;
+        width: .75 * $default-size;
+        height: 1.25 * $default-size;
+        border-left: 1px solid $light-gray;
+        border-bottom: 1px solid $light-gray;
+        transform: translate(.3 * $default-size, -.9 * $default-size);
+      }
 
-    .two-lines.sub-box-line {
-      height: 1.9 * $default-size;
-      transform: translate(.3 * $default-size, -1.6 * $default-size);
+      .two-lines.sub-box-line {
+        height: 1.9 * $default-size;
+        transform: translate(.3 * $default-size, -1.6 * $default-size);
+      }
     }
   }
 }
