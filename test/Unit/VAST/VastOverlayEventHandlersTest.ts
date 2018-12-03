@@ -10,7 +10,7 @@ import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { MOAT } from 'Ads/Views/MOAT';
-import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
@@ -102,10 +102,10 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 coreConfig: coreConfig,
                 placement: placement,
                 clientInfo: clientInfo,
-                platfrom: platform,
+                platform: platform,
                 ads: ads
             };
-            overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false);
+            overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
 
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 

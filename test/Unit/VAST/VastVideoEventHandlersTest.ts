@@ -96,6 +96,17 @@ describe('VastVideoEventHandler tests', () => {
         deviceInfo = new AndroidDeviceInfo(core);
         const coreConfig = TestFixtures.getCoreConfiguration();
 
+        placement = new Placement({
+            id: '123',
+            name: 'test',
+            default: true,
+            allowSkip: true,
+            skipInSeconds: 5,
+            disableBackButton: true,
+            useDeviceOrientationForVideo: false,
+            muteVideo: false
+        });
+
         const videoOverlayParameters: IVideoOverlayParameters<Campaign> = {
             deviceInfo: deviceInfo,
             campaign: campaign,
@@ -107,17 +118,6 @@ describe('VastVideoEventHandler tests', () => {
         };
         overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-
-        placement = new Placement({
-            id: '123',
-            name: 'test',
-            default: true,
-            allowSkip: true,
-            skipInSeconds: 5,
-            disableBackButton: true,
-            useDeviceOrientationForVideo: false,
-            muteVideo: false
-        });
 
         wakeUpManager = new WakeUpManager(core);
         request = new RequestManager(platform, core, wakeUpManager);
