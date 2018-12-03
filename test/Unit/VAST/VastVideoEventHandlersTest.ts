@@ -12,7 +12,7 @@ import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { MOAT } from 'Ads/Views/MOAT';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -31,6 +31,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
+import { Campaign } from 'Ads/Models/Campaign';
 
 import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
@@ -54,7 +55,7 @@ describe('VastVideoEventHandler tests', () => {
     let placement: Placement;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
-    let overlay: Overlay;
+    let overlay: NewVideoOverlay;
     let vastEndScreen: VastEndScreen;
     let wakeUpManager: WakeUpManager;
     let request: RequestManager;
@@ -92,7 +93,19 @@ describe('VastVideoEventHandler tests', () => {
         clientInfo = TestFixtures.getClientInfo();
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
         privacy = new Privacy(platform, campaign, privacyManager, false, false);
-        overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
+        deviceInfo = new AndroidDeviceInfo(core);
+        const coreConfig = TestFixtures.getCoreConfiguration();
+
+        const videoOverlayParameters: IVideoOverlayParameters<Campaign> = {
+            deviceInfo: deviceInfo,
+            campaign: campaign,
+            coreConfig: coreConfig,
+            placement: placement,
+            clientInfo: clientInfo,
+            platform: platform,
+            ads: ads
+        };
+        overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         placement = new Placement({
@@ -106,7 +119,6 @@ describe('VastVideoEventHandler tests', () => {
             muteVideo: false
         });
 
-        deviceInfo = new AndroidDeviceInfo(core);
         wakeUpManager = new WakeUpManager(core);
         request = new RequestManager(platform, core, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(core, request, {
@@ -115,7 +127,6 @@ describe('VastVideoEventHandler tests', () => {
         });
         sessionManager = new SessionManager(core, request, storageBridge);
 
-        const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
