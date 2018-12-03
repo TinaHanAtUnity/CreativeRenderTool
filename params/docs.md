@@ -86,6 +86,8 @@
 | optOutEnabled | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | abGroup | number | AB Group number assigned to this user from configuration | Server | all |
 | unityCreativeId | string | Creative id of the shown creative | SDK | all |
+| analyticsUserId | string | Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending) | SDK | all |
+| analyticsSessionId | string | Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit | SDK | all |
 
 
 
@@ -111,6 +113,8 @@
 | frameworkVersion | no | True | False | string | Unity engine version | SDK | all |
 | adapterName | no | True | False | string | Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer | SDK | all |
 | adapterVersion | no | True | False | string | SDK version name for adapter, should be in sync with SDK version | SDK | all |
+| analyticsUserId | no | True | False | string | Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending) | SDK | all |
+| analyticsSessionId | no | True | False | string | Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit | SDK | all |
 
 
 
