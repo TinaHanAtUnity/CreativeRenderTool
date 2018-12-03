@@ -1,3 +1,14 @@
+# Pending
+
+* UADS-1002 : gamerSid should be included on all Operative events [#7173](https://github.com/Applifier/unity-ads-webview/pull/7173)
+* Update dependencies [#7384](https://github.com/Applifier/unity-ads-webview/pull/7384)
+* Fix autoskip, abgroup, country and other settings in the browser tester [#7409](https://github.com/Applifier/unity-ads-webview/pull/7409)
+* Add consent styling [#7410](https://github.com/Applifier/unity-ads-webview/pull/7410)
+* Add Unity Analytics identifiers in config request [#7412](https://github.com/Applifier/unity-ads-webview/pull/7412)
+* Add support for Creative Blocking Service [#7100](https://github.com/Applifier/unity-ads-webview/pull/7100)
+* Enable Auction V5 on Group 15 [#7408](https://github.com/Applifier/unity-ads-webview/pull/7408)
+* Style Privacy more Natively for Admob Ads [#7174](https://github.com/Applifier/unity-ads-webview/pull/7174)
+
 # Thu Nov 29 22:28:30 UTC 2018
 
 * Fix AR MRAID safety paddings on iPhone X [#6944](https://github.com/Applifier/unity-ads-webview/pull/6944)
