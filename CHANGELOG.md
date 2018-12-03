@@ -8,6 +8,7 @@
 * Add support for Creative Blocking Service [#7100](https://github.com/Applifier/unity-ads-webview/pull/7100)
 * Enable Auction V5 on Group 15 [#7408](https://github.com/Applifier/unity-ads-webview/pull/7408)
 * Style Privacy more Natively for Admob Ads [#7174](https://github.com/Applifier/unity-ads-webview/pull/7174)
+* Android back button experiment [#7386](https://github.com/Applifier/unity-ads-webview/pull/7386)
 
 # Thu Nov 29 22:28:30 UTC 2018
 
