@@ -41,7 +41,6 @@ describe('VastLinearCreativeValidatorTest', () => {
             assert.equal(VastValidationUtilities.formatErrors(errors), 'VAST creative trackingEvents contains invalid url("google.com/click")\n    VAST creative trackingEvents contains invalid url("")\n    VAST linear creative videoClickTrackingURLTemplates contains invalid url("reddit.com/click")\n    VAST linear creative videoClickTrackingURLTemplates contains invalid url("click?someQuery=test&other=no")\n    VAST linear creative videoCustomClickURLTemplates contains invalid url("")');
         });
 
-
         it('Should give errors when invalid VastLinearCreative is given', () => {
             const creative = new VastCreativeLinear(
                 -1,
