@@ -177,7 +177,8 @@ describe('CampaignRefreshManager', () => {
             coreConfig: coreConfig,
             adsConfig: adsConfig,
             storageBridge: storageBridge,
-            campaign: campaign
+            campaign: campaign,
+            playerMetadataServerId: 'test-gamerSid'
         });
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));

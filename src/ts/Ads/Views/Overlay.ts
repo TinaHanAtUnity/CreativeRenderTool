@@ -146,7 +146,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         this._chinaAdvertisementElement = <HTMLElement>this._container.querySelector('.china-advertisement');
         this.choosePrivacyShown();
 
-        if(this._country === 'CN') {
+        if(this._country === 'CN' && this._chinaAdvertisementElement) {
             this._chinaAdvertisementElement.style.display = 'block';
         }
 

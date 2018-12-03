@@ -35,7 +35,7 @@ export class ProgrammaticOperativeEventManager extends OperativeEventManager {
     }
 
     protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, IProgrammaticInfoJson]> {
-        return super.getInfoJson(params, eventId, gameSession, gamerSid, previousPlacementId).then(([id, infoJson]: [string, IProgrammaticInfoJson]) => {
+        return super.getInfoJson(params, eventId, gameSession, previousPlacementId).then(([id, infoJson]: [string, IProgrammaticInfoJson]) => {
             infoJson.creativeId = this._campaign.getCreativeId();
 
             return <[string, IProgrammaticInfoJson]>[eventId, infoJson];

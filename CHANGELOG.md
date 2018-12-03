@@ -1,3 +1,25 @@
+# Pending
+
+* Show install now button after 0,5s experiment [#7382](https://github.com/Applifier/unity-ads-webview/pull/7382)
+* UADS-1002 : gamerSid should be included on all Operative events [#7173](https://github.com/Applifier/unity-ads-webview/pull/7173)
+* Update dependencies [#7384](https://github.com/Applifier/unity-ads-webview/pull/7384)
+* Fix autoskip, abgroup, country and other settings in the browser tester [#7409](https://github.com/Applifier/unity-ads-webview/pull/7409)
+* Add Unity Analytics identifiers in config request [#7412](https://github.com/Applifier/unity-ads-webview/pull/7412)
+* Add support for Creative Blocking Service [#7100](https://github.com/Applifier/unity-ads-webview/pull/7100)
+* Enable Auction V5 on Group 15 [#7408](https://github.com/Applifier/unity-ads-webview/pull/7408)
+* Style Privacy more Natively for Admob Ads [#7174](https://github.com/Applifier/unity-ads-webview/pull/7174)
+
+# Thu Nov 29 22:28:30 UTC 2018
+
+* Fix AR MRAID safety paddings on iPhone X [#6944](https://github.com/Applifier/unity-ads-webview/pull/6944)
+* Remove skip icon experiment [#7383](https://github.com/Applifier/unity-ads-webview/pull/7383)
+* Remove green button A/B test [#7342](https://github.com/Applifier/unity-ads-webview/pull/7342)
+* Fix China Ad Watermark for Performance Ads with SquareEndScreen [#7406](https://github.com/Applifier/unity-ads-webview/pull/7406)
+
+# Thu Nov 29 15:00:34 UTC 201
+
+* Hotfix for missing iOS app background notification listener for SDK versions 2.0.3 - 2.3.0
+
 # Thu Nov 29 10:53:37 UTC 2018
 
 * Set web browser UA for click event in programmatic VAST and MRAID [#7362](https://github.com/Applifier/unity-ads-webview/pull/7362)

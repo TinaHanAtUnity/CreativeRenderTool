@@ -107,14 +107,10 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
     }
 
     protected sendTrackingEvent(eventName: string): void {
-        const sdkVersion = this._clientInfo.getSdkVersion();
-        const placementId = this._placement.getId();
         const sessionId = this._campaign.getSession().getId();
 
         const urls = this._campaign.getTrackingUrlsForEvent(eventName);
-        for (let url of urls) {
-            url = url.replace(/%ZONE%/, placementId);
-            url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
+        for (const url of urls) {
             this._thirdPartyEventManager.sendWithGet(`banner ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
         }
     }

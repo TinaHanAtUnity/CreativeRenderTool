@@ -54,7 +54,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
             it('calling fetch should return configuration', () => {
                 const span = sinon.createStubInstance(JaegerSpan);
-                configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), platform === Platform.ANDROID ? TestFixtures.getAndroidDeviceInfo(core) : TestFixtures.getIosDeviceInfo(core), request);
+                configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), platform === Platform.ANDROID ? TestFixtures.getAndroidDeviceInfo(core) : TestFixtures.getIosDeviceInfo(core), TestFixtures.getUnityInfo(platform, core), request);
                 configPromise = configManager.getConfig(span);
 
                 return configPromise.then((configuration) => {
@@ -78,7 +78,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
             it('calling fetch should return error', () => {
                 const span = sinon.createStubInstance(JaegerSpan);
-                configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), platform === Platform.ANDROID ? TestFixtures.getAndroidDeviceInfo(core) : TestFixtures.getIosDeviceInfo(core), request);
+                configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), platform === Platform.ANDROID ? TestFixtures.getAndroidDeviceInfo(core) : TestFixtures.getIosDeviceInfo(core), TestFixtures.getUnityInfo(platform, core), request);
                 return configManager.getConfig(span).then(() => {
                     assert.fail('should not resolve');
                 }).catch((error: any) => {
@@ -102,7 +102,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
             it('calling fetch should throw ConfigError', () => {
                 const span = sinon.createStubInstance(JaegerSpan);
-                configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), platform === Platform.ANDROID ? TestFixtures.getAndroidDeviceInfo(core) : TestFixtures.getIosDeviceInfo(core), request);
+                configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), platform === Platform.ANDROID ? TestFixtures.getAndroidDeviceInfo(core) : TestFixtures.getIosDeviceInfo(core), TestFixtures.getUnityInfo(platform, core), request);
                 return configManager.getConfig(span).then(() => {
                     assert.fail('should not resolve');
                 }).catch((error: any) => {
@@ -126,7 +126,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
             it('calling fetch should throw ConfigError', () => {
                 const span = sinon.createStubInstance(JaegerSpan);
-                configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), platform === Platform.ANDROID ? TestFixtures.getAndroidDeviceInfo(core) : TestFixtures.getIosDeviceInfo(core), request);
+                configManager = new ConfigManager(platform, core, metaDataManager, TestFixtures.getClientInfo(platform), platform === Platform.ANDROID ? TestFixtures.getAndroidDeviceInfo(core) : TestFixtures.getIosDeviceInfo(core), TestFixtures.getUnityInfo(platform, core), request);
                 return configManager.getConfig(span).then(() => {
                     assert.fail('should not resolve');
                 }).catch((error: any) => {

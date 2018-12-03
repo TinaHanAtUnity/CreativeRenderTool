@@ -16,6 +16,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 
 enum CacheType {
     REQUIRED,
@@ -408,5 +409,9 @@ export class AssetManager {
             const errorData = this._pts.buildErrorData(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
             this._pts.reportError(errorData);
         }
+
+        CreativeBlocking.report(campaign.getCreativeId(), seatId, BlockingReason.FILE_TOO_LARGE, {
+            fileSize: Math.floor(totalSize / (1024 * 1024))
+        });
     }
 }

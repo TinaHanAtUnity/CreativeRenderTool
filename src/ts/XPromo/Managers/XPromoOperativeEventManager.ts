@@ -11,6 +11,7 @@ import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { Promises } from 'Core/Utilities/Promises';
 
 export class XPromoOperativeEventManager extends OperativeEventManager {
 
@@ -31,16 +32,7 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
 
         session.setEventSent(EventType.START);
         GameSessionCounters.addStart(this._xPromoCampaign);
-        return this._metaDataManager.fetch(PlayerMetaData, false).then(player => {
-            if(player) {
-                this.setGamerServerId(player.getServerId());
-            } else {
-                this.setGamerServerId(undefined);
-            }
-            return this.sendHttpKafkaEvent('ads.xpromo.operative.videostart.v1.json', 'start', params);
-        }).then(() => {
-            return;
-        });
+        return Promises.voidResult(this.sendHttpKafkaEvent('ads.xpromo.operative.videostart.v1.json', 'start', params));
     }
 
     public sendView(params: IOperativeEventParams): Promise<void> {
@@ -108,7 +100,7 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
             });
         };
 
-        return this.createUniqueEventMetadata(params, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId()).then(fulfilled);
+        return this.createUniqueEventMetadata(params, this._sessionManager.getGameSessionId(), OperativeEventManager.getPreviousPlacementId()).then(fulfilled);
     }
 
     protected createVideoEventUrl(type: string): string | undefined {

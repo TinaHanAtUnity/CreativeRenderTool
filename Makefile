@@ -13,7 +13,7 @@ ROLLUP := $(BIN)/rollup
 STYLINT := $(BIN)/stylint
 PBJS := $(BIN)/pbjs
 PBTS := $(BIN)/pbts
-CC := java -jar node_modules/google-closure-compiler/compiler.jar
+CC := npx google-closure-compiler
 INLINE := $(BIN)/inline-source
 
 # Directories

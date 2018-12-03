@@ -32,7 +32,7 @@ export class MRAIDOperativeEventManager extends ProgrammaticOperativeEventManage
     }
 
     protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, IInfoJson]> {
-        return super.getInfoJson(params, eventId, gameSession, gamerSid, previousPlacementId).then(([id, infoJson]: [string, IPerformanceInfoJson]) => {
+        return super.getInfoJson(params, eventId, gameSession, previousPlacementId).then(([id, infoJson]: [string, IPerformanceInfoJson]) => {
             if(params.asset) {
                 infoJson.unityCreativeId = params.asset.getCreativeId();
             }

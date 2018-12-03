@@ -48,6 +48,10 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._purchasing = parameters.purchasing;
     }
 
+    public getThirdPartyEventManager(): ThirdPartyEventManager {
+        return this._thirdPartyEventManager;
+    }
+
     public show(): Promise<void> {
         this.setShowing(true);
         this._ads.Listener.sendStartEvent(this._placement.getId());
