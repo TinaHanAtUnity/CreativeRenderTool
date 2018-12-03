@@ -5,6 +5,7 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
+import { BlockingReason, CreativeBlocking } from 'Core/Utilities/CreativeBlocking';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
@@ -279,11 +280,17 @@ export class Privacy extends AbstractPrivacy {
             finishState = 'VIDEO_PROGRESS';
         }
 
+        const creativeId = campaign.getCreativeId();
+        const seatId = campaign.getSeatId();
+        CreativeBlocking.report(creativeId, seatId, BlockingReason.USER_REPORT, {
+            message: reasonKey
+        });
+
         const error = {
-            creativeId: campaign.getCreativeId(),
+            creativeId: creativeId,
             reason: reasonKey,
             adType: adType,
-            seatId: campaign.getSeatId(),
+            seatId: seatId,
             finishState: finishState,
             isCached: isCached
         };

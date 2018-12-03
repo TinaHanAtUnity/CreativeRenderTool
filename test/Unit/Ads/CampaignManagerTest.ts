@@ -27,7 +27,7 @@ import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ABGroupBuilder, AuctionV5Test } from 'Core/Models/ABGroup';
+import { AuctionV5Test } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -66,6 +66,7 @@ import OnProgrammaticVastPlcCampaignTooMuchWrapping from 'json/OnProgrammaticVas
 import OnProgrammaticVastPlcCampaignWrapped from 'json/OnProgrammaticVastPlcCampaignWrapped.json';
 import OnStaticInterstitialDisplayHtmlCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
 import OnStaticInterstitialDisplayJsCampaign from 'json/OnStaticInterstitialDisplayJsCampaign.json';
+import OnProgrammaticVPAIDPlcCampaignJson from 'json/OnProgrammaticVPAIDPlcCampaign.json';
 import OnXPromoPlcCampaignJson from 'json/OnXPromoPlcCampaign.json';
 import 'mocha';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
@@ -95,6 +96,9 @@ import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
 import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { XPromoAdUnitFactory } from 'XPromo/AdUnits/XPromoAdUnitFactory';
 import AuctionV5Response from 'json/AuctionV5Response.json';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
+import { VPAIDAdUnitFactory } from 'VPAID/AdUnits/VPAIDAdUnitFactory';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -122,6 +126,13 @@ describe('CampaignManager', () => {
     let placementManager: PlacementManager;
     let backupCampaignManager: BackupCampaignManager;
     let contentTypeHandlerManager: ContentTypeHandlerManager;
+
+    const onShowTrackingUrls: ICampaignTrackingUrls = {
+        'start': [
+            'www.testyboy.com',
+            'www.scottwise.com'
+        ]
+    };
 
     beforeEach(() => {
         coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
@@ -622,12 +633,14 @@ describe('CampaignManager', () => {
 
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
+                triggeredCampaign.setTrackingUrls(onShowTrackingUrls);
                 assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
-
                 assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
                     'http://customTrackingUrl/start',
                     'http://customTrackingUrl/start2',
-                    'http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=?%SDK_VERSION%'
+                    'http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=?%SDK_VERSION%',
+                    'www.testyboy.com',
+                    'www.scottwise.com'
                 ]);
                 assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('firstQuartile'), [
                     'http://customTrackingUrl/firstQuartile'
@@ -885,6 +898,7 @@ describe('CampaignManager', () => {
             contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
             contentTypeHandlerManager.addHandler(ProgrammaticMraidUrlParser.ContentType, { parser: new ProgrammaticMraidUrlParser(), factory: new MRAIDAdUnitFactory() });
             contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(), factory: new MRAIDAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticVPAIDParser.ContentType, { parser: new ProgrammaticVPAIDParser(), factory: new VPAIDAdUnitFactory() });
             campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
 
             campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
@@ -950,6 +964,34 @@ describe('CampaignManager', () => {
             });
         });
 
+        describe('VPAID campaign', () => {
+            it('should process custom tracking urls for Auction programmatic/vpaid Campaign', () => {
+                mockRequest.expects('post').returns(Promise.resolve({
+                    response: OnProgrammaticVPAIDPlcCampaignJson
+                }));
+
+                return campaignManager.request().then(() => {
+                    if(triggeredError) {
+                        throw triggeredError;
+                    }
+
+                    mockRequest.verify();
+                    triggeredCampaign.setTrackingUrls(onShowTrackingUrls);
+                    assert.isTrue(triggeredCampaign instanceof VPAIDCampaign);
+                    assert.equal(triggeredPlacement, 'video');
+                    assert.equal(triggeredCampaign.getAdType(), 'vpaid-sample-ad-type');
+                    assert.equal(triggeredCampaign.getCreativeId(), 'vpaid-sample-creative-id');
+                    assert.equal(triggeredCampaign.getSeatId(), 900);
+                    assert.equal(triggeredCampaign.getCorrelationId(), '885a17ef11f05deb34b72b');
+                    assert.deepEqual((<VPAIDCampaign>triggeredCampaign).getVPAID().getTrackingEventUrls('start'), [
+                        'https://fake-ads-backend.unityads.unity3d.com/ack/333?event=vast-tracking-url',
+                        'www.testyboy.com',
+                        'www.scottwise.com'
+                    ]);
+                });
+            });
+        });
+
         describe('programmatic campaign', () => {
             it('should process custom tracking urls for Auction programmatic/vast Campaign', () => {
                 mockRequest.expects('post').returns(Promise.resolve({
@@ -962,6 +1004,7 @@ describe('CampaignManager', () => {
                     }
 
                     mockRequest.verify();
+                    triggeredCampaign.setTrackingUrls(onShowTrackingUrls);
                     assert.isTrue(triggeredCampaign instanceof VastCampaign);
                     assert.equal(triggeredPlacement, 'video');
                     assert.equal(triggeredCampaign.getAdType(), 'vast-sample-ad-type');
@@ -971,7 +1014,9 @@ describe('CampaignManager', () => {
                     assert.equal((<VastCampaign>triggeredCampaign).getVideo().getUrl(), 'https://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
                     assert.deepEqual((<VastCampaign>triggeredCampaign).getVast().getTrackingEventUrls('start'), [
                         'https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=HriweFDQPzT1jnyWbt-UA8UKb9IOsNlB9YIUyM9eE5ujdz4eYZgsoFvzcfOR0945o8vsJZHvyi000XO4SVoOkgxlWcUpHRArDKtM16J5jLAhZkWxULyJ0JywIVC3Tebds1o5ZYQ5_KsbpqCbO-q56Jd3AKgbIlTgIDjATlSFf8AiOl96Y81UkZutA8jx4E2sQTCKg1ar6uXQvuXV6KG4IYdx8Jr5e9ZFvgjy6kxbgbuyuEw2_SKzmBCsj3Q2qOM_YxDzaxd5xa2kJ5H9udVwtLUs8OnndWj-k0f__xj958kx6pBvcCwm-xfQiP8zA0DuMq7IHqGt9uvzuvcSN8XX3klwoaYNjZGcggH_AvNoJMPM2lfBidn6cPGOk9IXNNdvT7s42Ss05RSVVqIm87eGmWWVfoSut_UIMTMes1JtxuSuBKCk3abJdUm1GhdJ8OTF3mOVJ1vKj7M%3D',
-                        'https://www.dummy-url.com'
+                        'https://www.dummy-url.com',
+                        'www.testyboy.com',
+                        'www.scottwise.com'
                     ]);
                 });
             });

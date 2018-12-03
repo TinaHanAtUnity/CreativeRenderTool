@@ -104,7 +104,8 @@ describe('OverlayEventHandlerTest', () => {
             coreConfig: coreConfig,
             adsConfig: adsConfig,
             storageBridge: storageBridge,
-            campaign: campaign
+            campaign: campaign,
+            playerMetadataServerId: 'test-gamerSid'
         });
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
         video = new Video('', TestFixtures.getSession());
