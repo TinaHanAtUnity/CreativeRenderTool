@@ -14,6 +14,8 @@ import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { MraidIFrameEventBridge } from 'MRAID/Views/MraidIFrameEventBridge';
 import { ARMRAIDEventHandler } from 'AR/EventHandlers/ARMRAIDEventHandler';
+import { Platform } from 'Core/Constants/Platform';
+import { AndroidBackButtonSkipTest } from 'Core/Models/ABGroup';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -63,6 +65,22 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
             isAR ? ARMRAIDEventHandler : MRAIDEventHandler;
         const mraidEventHandler: IMRAIDViewHandler = new EventHandler(mraidAdUnit, mraidAdUnitParameters);
         mraid.addEventHandler(mraidEventHandler);
+
+        if (parameters.platform === Platform.ANDROID) {
+            const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
+                const abGroup = parameters.coreConfig.getAbGroup();
+                const backButtonTestEnabled = AndroidBackButtonSkipTest.isValid(abGroup);
+                if(backButtonTestEnabled) {
+                    mraidEventHandler.onKeyEvent(keyCode);
+                }
+            });
+            mraidAdUnit.onClose.subscribe(() => {
+                if(onBackKeyObserver) {
+                    parameters.ads.Android!.AdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
+                }
+            });
+        }
+
         Privacy.setupReportListener(privacy, mraidAdUnit);
         return mraidAdUnit;
     }

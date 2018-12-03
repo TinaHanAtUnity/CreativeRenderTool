@@ -15,6 +15,7 @@ import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Url } from 'Core/Utilities/Url';
+import { UnityInfo } from 'Core/Models/UnityInfo';
 
 export class ConfigManager {
 
@@ -34,16 +35,18 @@ export class ConfigManager {
     private _metaDataManager: MetaDataManager;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
+    private _unityInfo: UnityInfo;
     private _request: RequestManager;
 
     private _rawConfig?: any;
 
-    constructor(platform: Platform, core: ICoreApi, metaDataManager: MetaDataManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager) {
+    constructor(platform: Platform, core: ICoreApi, metaDataManager: MetaDataManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, unityInfo: UnityInfo, request: RequestManager) {
         this._platform = platform;
         this._core = core;
         this._metaDataManager = metaDataManager;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
+        this._unityInfo = unityInfo;
         this._request = request;
     }
 
@@ -128,6 +131,8 @@ export class ConfigManager {
             language: this._deviceInfo.getLanguage(),
             test: this._clientInfo.getTestMode(),
             gamerToken: gamerToken,
+            analyticsUserId: this._unityInfo.getAnalyticsUserId(),
+            analyticsSessionId: this._unityInfo.getAnalyticsSessionId(),
             forceAbGroup: abGroup
         });
 
