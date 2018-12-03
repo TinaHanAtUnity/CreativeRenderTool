@@ -149,23 +149,8 @@ export class VastParserStrict {
 
     // search for nodes with matching name
     private getNodesWithName(rootNode: HTMLElement, name: string): HTMLElement[] {
-        const nodesWithName: HTMLElement[] = [];
-        const nodesToProcess: HTMLElement[] = [];
-        nodesToProcess.push(rootNode);
-
-        while (nodesToProcess.length > 0) {
-            const node = nodesToProcess.pop();
-            if (node) {
-                if (node.nodeName === name) {
-                    nodesWithName.push(node);
-                }
-                for (let i = node.childNodes.length - 1; i >= 0; i--) { // reverse iterating for speed rather than having to use array.shift
-                    nodesToProcess.push(<HTMLElement>node.childNodes[i]);
-                }
-            }
-        }
-
-        return nodesWithName;
+        const nodeList = rootNode.querySelectorAll(name);
+        return Array.prototype.slice.call(nodeList);
     }
 
     public retrieveVast(vast: any, core: ICoreApi, request: RequestManager, parent?: Vast, depth: number = 0): Promise<Vast> {
