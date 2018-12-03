@@ -71,6 +71,8 @@ import { AR } from 'AR/AR';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { ARUtil } from 'AR/Utilities/ARUtil';
+import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 
 export class Ads implements IAds {
 
@@ -193,6 +195,16 @@ export class Ads implements IAds {
             this.Banners = new Banners(this._core, this);
             this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
             this.AR = new AR(this._core);
+
+            const arAnalyticsPromises: [Promise<boolean>, Promise<boolean>, Promise<CurrentPermission>] = [
+                ARUtil.isARSupported(this.AR.Api),
+                PermissionsUtil.checkPermissionInManifest(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.CAMERA),
+                PermissionsUtil.checkPermissions(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.CAMERA)
+            ];
+
+            Promise.all(arAnalyticsPromises).then(([arSupported, permissionInManifest, permissionResult]: [boolean, boolean, CurrentPermission]) => {
+                Diagnostics.trigger('ar_device_support', {arSupported, permissionInManifest, permissionResult});
+            });
 
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this._core.JaegerManager, this.BackupCampaignManager);
             this.RefreshManager = new OldCampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
