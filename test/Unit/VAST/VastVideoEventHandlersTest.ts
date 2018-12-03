@@ -93,7 +93,7 @@ describe('VastVideoEventHandler tests', () => {
         clientInfo = TestFixtures.getClientInfo();
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
         privacy = new Privacy(platform, campaign, privacyManager, false, false);
-        deviceInfo = new AndroidDeviceInfo(core);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         const coreConfig = TestFixtures.getCoreConfiguration();
 
         placement = new Placement({
