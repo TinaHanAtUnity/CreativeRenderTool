@@ -3,6 +3,7 @@ import { IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export class ARMRAIDEventHandler extends MRAIDEventHandler implements IMRAIDViewHandler {
+
     public onPlayableAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, backgroundTime: number, event: string, eventData: any): void {
         const kafkaObject: any = {};
         kafkaObject.type = event;
@@ -17,7 +18,7 @@ export class ARMRAIDEventHandler extends MRAIDEventHandler implements IMRAIDView
         }
 
         kafkaObject.auctionId = this._campaign.getSession().getId();
-        kafkaObject.abGroup = this._coreConfig.getAbGroup().toNumber();
+        kafkaObject.abGroup = this._coreConfig.getAbGroup();
 
         HttpKafka.sendEvent('ads.sdk2.events.ar.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
