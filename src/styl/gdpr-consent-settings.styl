@@ -24,7 +24,7 @@
   .back-button {
     display: flex;
     align-items: center;
-    font-size: $default-font-size * .65;
+    font-size: $privacy-text-font-size;
     color: $black;
     opacity: .5;
     width: 2 * $default-size;
@@ -49,14 +49,14 @@
     overflow: auto;
 
     .privacy-info-title {
-      font-weight: 500;
+      font-weight: $privacy-title-font-weight;
     }
 
     .privacy-info-description {
       font-size: $default-font-size * .65;
       text-align: justify;
       color: $privacy-text-color;
-      font-weight: 300;
+      font-weight: $privacy-text-font-weight;
     }
   }
 
@@ -87,7 +87,7 @@
     position: relative;
     border-radius: $default-size * .25;
     border: 1px solid $light-gray;
-    font-size: $default-font-size * .65;
+    font-size: $privacy-text-font-size;
 
     &.click-animation {
       $click-animation();
@@ -99,7 +99,7 @@
   }
 
   .checkbox-group-container {
-    $checkbox-group-container($default-scale-size, $default-font-size * .65);
+    $checkbox-group-container($default-scale-size, $privacy-text-font-size);
   }
 }
 
