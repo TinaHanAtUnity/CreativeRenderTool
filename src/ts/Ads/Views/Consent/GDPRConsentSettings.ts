@@ -4,12 +4,12 @@ import { Template } from 'Core/Utilities/Template';
 import { PrivacyRowItemContainer } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { Platform } from 'Core/Constants/Platform';
 import { GdprManager } from 'Ads/Managers/GdprManager';
-import { IConsent } from 'Ads/Views/Consent/IConsent';
+import { IPersonalizedConsent } from 'Ads/Views/Consent/IPermissions';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
 
 export interface IGDPRConsentSettingsHandler {
-    onPersonalizedConsent(consent: IConsent): void;
+    onPersonalizedConsent(consent: IPersonalizedConsent): void;
     onClose(): void;
 }
 
@@ -69,10 +69,10 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
     private onAcceptAllEvent(event: Event): void {
         event.preventDefault();
 
-        const consent: IConsent = {
-            gameExp: true,
-            ads: true,
-            external: true
+        const consent: IPersonalizedConsent = {
+                gameExp: true,
+                ads: true,
+                external: true
         };
 
         this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));
@@ -84,13 +84,13 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
     private onSaveMyChoicesEvent(event: Event) {
         event.preventDefault();
 
-        const consent: IConsent = {
+        const personalizedConsent: IPersonalizedConsent = {
             gameExp: this._checkboxGroup.isPersonalizedExperienceChecked(),
             ads: this._checkboxGroup.isPersonalizedAdsChecked(),
             external: this._checkboxGroup.isAds3rdPartyChecked()
         };
 
-        this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));
+        this._handlers.forEach(handler => handler.onPersonalizedConsent(personalizedConsent));
         this.runAnimation(<HTMLElement>this._container.querySelector('.save-my-choices'));
 
     }

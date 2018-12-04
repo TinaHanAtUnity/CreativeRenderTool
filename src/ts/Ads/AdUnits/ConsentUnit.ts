@@ -2,7 +2,7 @@ import { AdUnitContainer, AdUnitContainerSystemMessage, Orientation } from 'Ads/
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPRConsent, IGDPRConsentHandler } from 'Ads/Views/Consent/GDPRConsent';
-import { IConsent } from 'Ads/Views/Consent/IConsent';
+import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 export interface IConsentUnitParameters {
     platform: Platform;
@@ -79,7 +79,8 @@ export class ConsentUnit implements IGDPRConsentHandler {
     }
 
     // IGDPRConsentHandler
-    public onConsent(consent: IConsent): void {
+    public onConsent(consent: IPermissions): void {
+        // console.log(JSON.stringify(consent));
         // TODO: Implement
     }
 
