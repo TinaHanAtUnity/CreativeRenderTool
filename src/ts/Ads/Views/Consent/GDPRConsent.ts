@@ -4,7 +4,7 @@ import { Template } from 'Core/Utilities/Template';
 import { GDPRConsentSettings, IGDPRConsentSettingsHandler } from 'Ads/Views/Consent/GDPRConsentSettings';
 import { Platform } from 'Core/Constants/Platform';
 import { GdprManager } from 'Ads/Managers/GdprManager';
-import { IConsent } from 'Ads/Views/Consent/IConsent';
+import { IPermissions, IPersonalizedConsent } from 'Ads/Views/Consent/IPermissions';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 
 export interface IGDPRConsentViewParameters {
@@ -13,7 +13,7 @@ export interface IGDPRConsentViewParameters {
 }
 
 export interface IGDPRConsentHandler {
-    onConsent(consent: IConsent): void;
+    onConsent(consent: IPermissions): void;
     onConsentHide(): void;
 }
 
@@ -55,7 +55,11 @@ export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConse
 
     private onAgreeEvent(event: Event) {
         event.preventDefault();
-        this._handlers.forEach(handler => handler.onConsent({ all: true, ads: false, gameExp: false, external: false }));
+
+        const permissions: IPermissions = {
+            all: true
+        };
+        this._handlers.forEach(handler => handler.onConsent(permissions));
         this.runAnimation();
     }
 
@@ -88,8 +92,12 @@ export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConse
     }
 
     // IGDPRConsentSettingsHandler
-    public onPersonalizedConsent(consent: IConsent): void {
-        this._handlers.forEach(handler => handler.onConsent(consent));
+    public onPersonalizedConsent(consent: IPersonalizedConsent): void {
+        const permissions: IPermissions = {
+            personalizedConsent: consent
+        };
+
+        this._handlers.forEach(handler => handler.onConsent(permissions));
     }
 
     // IGDPRConsentSettingsHandler
