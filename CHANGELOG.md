@@ -1,4 +1,4 @@
-# Pending
+# Mon Dec  3 21:13:08 UTC 2018
 
 * Show install now button after 0,5s experiment [#7382](https://github.com/Applifier/unity-ads-webview/pull/7382)
 * UADS-1002 : gamerSid should be included on all Operative events [#7173](https://github.com/Applifier/unity-ads-webview/pull/7173)
@@ -8,6 +8,7 @@
 * Add support for Creative Blocking Service [#7100](https://github.com/Applifier/unity-ads-webview/pull/7100)
 * Enable Auction V5 on Group 15 [#7408](https://github.com/Applifier/unity-ads-webview/pull/7408)
 * Style Privacy more Natively for Admob Ads [#7174](https://github.com/Applifier/unity-ads-webview/pull/7174)
+* Android back button experiment [#7386](https://github.com/Applifier/unity-ads-webview/pull/7386)
 
 # Thu Nov 29 22:28:30 UTC 2018
 
