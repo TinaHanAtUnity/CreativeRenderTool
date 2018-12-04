@@ -18,15 +18,13 @@ import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { PerformanceOverlayEventHandler } from '../../../src/ts/Performance/EventHandlers/PerformanceOverlayEventHandler';
-import { IARApi } from '../../../src/ts/AR/AR';
-import { IPurchasingApi } from '../../../src/ts/Purchasing/IPurchasing';
-import { ThirdPartyEventManager } from '../../../src/ts/Ads/Managers/ThirdPartyEventManager';
-import { WakeUpManager } from '../../../src/ts/Core/Managers/WakeUpManager';
-import { RequestManager } from '../../../src/ts/Core/Managers/RequestManager';
-import { PerformanceAdUnit } from '../../../src/ts/Performance/AdUnits/PerformanceAdUnit';
-import { PerformanceCampaign } from '../../../src/ts/Performance/Models/PerformanceCampaign';
-import { XPromoCampaign } from '../../../src/ts/XPromo/Models/XPromoCampaign';
+import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
+import { IARApi } from 'AR/AR';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
+import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 
 describe('VideoOverlayTest', () => {
     let platform: Platform;
