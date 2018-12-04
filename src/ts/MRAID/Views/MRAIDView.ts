@@ -80,6 +80,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected _mraidBridge: MraidIFrameEventBridge;
 
+    protected _privacyPanelOpen: boolean;
+
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(platform, id);
 
@@ -92,6 +94,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
         this._abGroup = abGroup;
 
+        this._privacyPanelOpen = false;
         this._privacy.render();
         this._privacy.hide();
         document.body.appendChild(this._privacy.container());
@@ -375,18 +378,21 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     public onPrivacyClose(): void {
         if(this._privacy) {
             this._privacy.hide();
+            this._privacyPanelOpen = false;
         }
     }
 
     public onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._privacy.show();
+        this._privacyPanelOpen = true;
     }
 
     public onGDPRPopupEvent(event: Event) {
         event.preventDefault();
         this._gdprPopupClicked = true;
         this._privacy.show();
+        this._privacyPanelOpen = true;
     }
 
     protected onSetOrientationProperties(allowOrientationChange: boolean, orientation: Orientation) {
