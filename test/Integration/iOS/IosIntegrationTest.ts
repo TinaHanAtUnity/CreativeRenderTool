@@ -7,8 +7,17 @@ import { UnityAds } from 'Backend/UnityAds';
 import { Platform } from 'Core/Constants/Platform';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
+import { fakeARUtils, unfakeARUtils } from 'TestHelpers/FakeARUtils';
 
 describe('IosIntegrationTest', () => {
+
+    beforeEach(() => {
+        fakeARUtils();
+    });
+
+    afterEach(() => {
+        unfakeARUtils();
+    });
 
     it('should handle happy path on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(10000);
