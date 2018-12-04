@@ -14,6 +14,8 @@ export class PersonalizationCheckboxGroup extends View<{}> {
     }
 
     public show(): void {
+        // todo: set values from configuration
+
         // gray line between main and sub checkbox
         // todo: maybe there is some better way to set correct height of the line
         const experienceLabel = <HTMLElement>this._container.querySelector('.personalized-experience-label');
