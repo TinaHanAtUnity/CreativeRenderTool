@@ -478,6 +478,33 @@ $checkbox-group-container($scale-size = $default-scale-size, $context-font-size 
   [type="checkbox"]:not(:checked) + label:before {
     background-image: url('./../img/checkbox.png');
   }
+
+  .checkbox-item-container {
+    margin: $default-size 0 $default-size 0;
+  }
+
+  .indented-checkbox {
+    padding-left: 1.25 * $default-size;
+  }
+
+  // line between main and sub checkbox
+  // todo: should be tested carefully
+  // todo: on some devices the label is wrapped. Use screen ratio to set height
+  #personalization-checkbox-group {
+    .sub-box-line {
+      position: absolute;
+      width: .75 * $default-size;
+      height: 1.25 * $default-size;
+      border-bottom: 1px solid $light-gray;
+      border-left: 1px solid $light-gray;
+      transform: translate(.3 * $default-size, -.9 * $default-size);
+    }
+
+    .two-lines.sub-box-line {
+      height: 1.9 * $default-size;
+      transform: translate(.3 * $default-size, -1.6 * $default-size);
+    }
+  }
 }
 
 $click-animation() {
