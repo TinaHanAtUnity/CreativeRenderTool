@@ -60,7 +60,6 @@ describe('AndroidVastTest', () => {
             });
 
             UnityAds.setBackend(new Backend(Platform.ANDROID));
-            UnityAds.getBackend().Api.Request.setLog([]);
             UnityAds.getBackend().Api.Request.setPassthrough(true);
 
             UnityAds.getBackend().Api.DeviceInfo.setAdvertisingTrackingId('78db88cb-2026-4423-bfe0-07e9ed2701c3');
@@ -83,40 +82,49 @@ describe('AndroidVastTest', () => {
         assert.isNotFalse(readyPlacement);
     });
 
-    it('should not send click event more than once', function(this: Mocha.ITestCallbackContext) {
-        this.timeout(35000);
+    describe('After showing a vast ad', () => {
+        let finishState: string;
 
-        const adFinished = new Promise((resolve) => {
-            const finishListener = listener.onFinish.subscribe((placement, state) => {
-                listener.onFinish.unsubscribe(finishListener);
-                resolve(state);
+        before(function(this: Mocha.ITestCallbackContext) {
+            this.timeout(35000);
+            const adFinished = new Promise<string>((resolve) => {
+                const finishListener = listener.onFinish.subscribe((placement, state) => {
+                    listener.onFinish.unsubscribe(finishListener);
+                    resolve(state);
+                });
+            });
+
+            return new Promise((resolve, reject) => {
+                adFinished.then((state: string) => {
+                    try {
+                        finishState = state;
+                        resolve();
+                    } catch (e) {
+                        reject(e);
+                    }
+                });
+
+                VideoAdUnit.clickCTAForTesting = true;
+                if (UnityAds.isReady('video')) {
+                    UnityAds.show('video');
+                }
+            })
+            .then(() => VideoAdUnit.clickCTAForTesting = false)
+            .catch((e) => {
+                VideoAdUnit.clickCTAForTesting = false;
+                throw e;
             });
         });
 
-        return new Promise((resolve, reject) => {
-            adFinished.then((state) => {
-                try {
-                    assert.equal(state, FinishState[FinishState.COMPLETED]);
+        it('should have finished with COMPLETED', () => {
+            assert.equal(finishState, FinishState[FinishState.COMPLETED], 'Finish stats were not equal');
+        });
 
-                    const log = UnityAds.getBackend().Api.Request.getLog('GET');
-                    const clicks = log.filter((s) => s.indexOf('event=tracking_click_through') > -1);
-                    assert.equal(clicks.length, 1);
-
-                    resolve();
-                } catch (e) {
-                    reject(e);
-                }
-            });
-
-            VideoAdUnit.clickCTAForTesting = true;
-            if (UnityAds.isReady('video')) {
-                UnityAds.show('video');
-            }
-        })
-        .then(() => VideoAdUnit.clickCTAForTesting = false)
-        .catch((e) => {
-            VideoAdUnit.clickCTAForTesting = false;
-            throw e;
+        it('should not send click event more than once', () => {
+            const log = UnityAds.getBackend().Api.Request.getLog('GET');
+            const clicks = log.filter((s) => s.indexOf('event=tracking_click_through') > -1);
+            assert.equal(clicks.length, 1);
         });
     });
+
 });
