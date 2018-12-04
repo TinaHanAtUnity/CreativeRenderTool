@@ -15,9 +15,18 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { PerformanceOverlayEventHandler } from '../../../src/ts/Performance/EventHandlers/PerformanceOverlayEventHandler';
+import { IARApi } from '../../../src/ts/AR/AR';
+import { IPurchasingApi } from '../../../src/ts/Purchasing/IPurchasing';
+import { ThirdPartyEventManager } from '../../../src/ts/Ads/Managers/ThirdPartyEventManager';
+import { WakeUpManager } from '../../../src/ts/Core/Managers/WakeUpManager';
+import { RequestManager } from '../../../src/ts/Core/Managers/RequestManager';
+import { PerformanceAdUnit } from '../../../src/ts/Performance/AdUnits/PerformanceAdUnit';
+import { PerformanceCampaign } from '../../../src/ts/Performance/Models/PerformanceCampaign';
+import { XPromoCampaign } from '../../../src/ts/XPromo/Models/XPromoCampaign';
 
 describe('VideoOverlayTest', () => {
     let platform: Platform;
@@ -30,6 +39,12 @@ describe('VideoOverlayTest', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let coreConfig: CoreConfiguration;
+    let ar: IARApi;
+    let purchasing: IPurchasingApi;
+    let adUnit: PerformanceAdUnit;
+    let thirdPartyEventManager: ThirdPartyEventManager;
+    let wakeUpManager: WakeUpManager;
+    let request: RequestManager;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -37,6 +52,12 @@ describe('VideoOverlayTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        ar = TestFixtures.getARApi(nativeBridge);
+        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
+        adUnit = TestFixtures.getPerformanceAdUnit(platform, core, ads, ar, purchasing);
+        wakeUpManager = new WakeUpManager(core);
+        request = new RequestManager(platform, core, wakeUpManager);
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request);
 
         privacy = new Privacy(platform, TestFixtures.getCampaign(), sinon.createStubInstance(UserPrivacyManager), false, false);
         deviceInfo = <DeviceInfo>{ getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false, getOsVersion: () => '8.0' };
@@ -92,5 +113,66 @@ describe('VideoOverlayTest', () => {
         overlay.render();
         assert.isNotNull(overlay.container().querySelector('.vast-button'));
         assert.isNull(overlay.container().querySelector('.install-button'));
+    });
+
+    describe('onCallButtonEvent', () => {
+        let perfOverlayHandler: PerformanceOverlayEventHandler;
+
+        beforeEach(() => {
+            perfOverlayHandler = new PerformanceOverlayEventHandler(
+                adUnit,
+                TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, ar, purchasing),
+                TestFixtures.getAppStoreDownloadHelper(platform, core, ads, videoOverlayParameters.campaign, adUnit, thirdPartyEventManager, nativeBridge)
+            );
+            sinon.stub(perfOverlayHandler, 'onOverlayDownload');
+        });
+
+        it('should call onOverlayDownload for performance campaign with correct parameters', () => {
+            const standaloneCampaign = TestFixtures.getCampaignStandaloneAndroid();
+            videoOverlayParameters.campaign = standaloneCampaign;
+            const videoOverlayDownloadParameters = {
+                clickAttributionUrl: standaloneCampaign.getClickAttributionUrl(),
+                clickAttributionUrlFollowsRedirects: standaloneCampaign.getClickAttributionUrlFollowsRedirects(),
+                bypassAppSheet: standaloneCampaign.getBypassAppSheet(),
+                appStoreId: standaloneCampaign.getAppStoreId(),
+                store: standaloneCampaign.getStore(),
+                videoProgress: undefined,
+                appDownloadUrl: standaloneCampaign.getAppDownloadUrl()
+            };
+
+            const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+            overlay.addEventHandler(perfOverlayHandler);
+            overlay.render();
+            const ctaButton = overlay.container().querySelector('.call-button');
+            if (ctaButton) {
+                ctaButton.dispatchEvent(new Event('click'));
+            }
+
+            sinon.assert.calledWith(<sinon.SinonSpy>perfOverlayHandler.onOverlayDownload, videoOverlayDownloadParameters);
+        });
+
+        it('should call onOverlayDownload for xPromo campaign with correct parameters', () => {
+            const xPromoCampaign = TestFixtures.getXPromoCampaign();
+            videoOverlayParameters.campaign = xPromoCampaign;
+            const videoOverlayDownloadParameters = {
+                clickAttributionUrl: xPromoCampaign.getClickAttributionUrl(),
+                clickAttributionUrlFollowsRedirects: xPromoCampaign.getClickAttributionUrlFollowsRedirects(),
+                bypassAppSheet: xPromoCampaign.getBypassAppSheet(),
+                appStoreId: xPromoCampaign.getAppStoreId(),
+                store: xPromoCampaign.getStore(),
+                videoProgress: undefined,
+                appDownloadUrl: undefined
+            };
+
+            const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+            overlay.addEventHandler(perfOverlayHandler);
+            overlay.render();
+            const ctaButton = overlay.container().querySelector('.call-button');
+            if (ctaButton) {
+                ctaButton.dispatchEvent(new Event('click'));
+            }
+
+            sinon.assert.calledWith(<sinon.SinonSpy>perfOverlayHandler.onOverlayDownload, videoOverlayDownloadParameters);
+        });
     });
 });
