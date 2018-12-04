@@ -291,12 +291,10 @@ describe('MraidAdUnit', () => {
     });
 
     describe('onContainerDestroy', () => {
-        let adUnitHideSpy: sinon.SinonSpy;
         let setFinishStateSpy: sinon.SinonSpy;
 
         beforeEach(() => {
             setFinishStateSpy = sandbox.spy(mraidAdUnit, 'setFinishState');
-            adUnitHideSpy = sandbox.spy(mraidAdUnit, 'hide');
         });
 
         afterEach(() => {
@@ -307,14 +305,12 @@ describe('MraidAdUnit', () => {
             return mraidAdUnit.show().then(() => {
                 mraidAdUnit.onContainerDestroy();
                 sinon.assert.calledWith(setFinishStateSpy, FinishState.SKIPPED);
-                sinon.assert.called(adUnitHideSpy);
             });
         });
 
         it('should do nothing if adunit is not showing', () => {
             mraidAdUnit.onContainerDestroy();
             sinon.assert.notCalled(setFinishStateSpy);
-            sinon.assert.notCalled(adUnitHideSpy);
         });
     });
 
