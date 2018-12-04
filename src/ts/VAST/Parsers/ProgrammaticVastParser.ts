@@ -25,7 +25,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH = depth;
     }
 
-    private static VAST_PARSER_MAX_DEPTH: number;
+    protected static VAST_PARSER_MAX_DEPTH: number;
 
     protected _vastParser: VastParser = new VastParser();
 
@@ -127,6 +127,10 @@ export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
+
+        if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
+            this._vastParserStrict.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
+        }
 
         return this._vastParserStrict.retrieveVast(decodedVast, core, request).then((vast): Promise<Campaign> => {
             const campaignId = this.getProgrammaticCampaignId(platform);

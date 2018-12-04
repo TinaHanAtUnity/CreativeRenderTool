@@ -84,18 +84,14 @@ export class VastParser {
         try {
             parsedVast = this.parseVast(vast);
         } catch (e) {
+            const errorData: any = {
+                vast: vast,
+                wrapperDepth: depth
+            };
             if (depth > 0) {
-                throw new DiagnosticError(e, {
-                    vast: vast,
-                    wrapperDepth: depth,
-                    rootWrapperVast: this._rootWrapperVast
-                });
-            } else {
-                throw new DiagnosticError(e, {
-                    vast: vast,
-                    wrapperDepth: depth
-                });
+                errorData.rootWrapperVast = this._rootWrapperVast;
             }
+            throw new DiagnosticError(e, errorData);
         }
 
         this.applyParentURLs(parsedVast, parent);

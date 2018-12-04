@@ -38,14 +38,14 @@ describe('VastCreativeCompanionAdValidatorTest', () => {
             });
             const errors = new VastCreativeCompanionAdValidator(companionAd).getErrors();
             assert.lengthOf(errors, 5, JSON.stringify(errors));
-            assert.equal(VastValidationUtilities.formatErrors(errors), 'VAST Companion ad(testId) "StaticResource" attribute "creativeType=invalid" is not supported!\n    VAST companion ad(testId) companionClickThroughURLTemplate contains invalid url("invalidClick")\n    VAST companion ad trackingEvents contains invalid url("")\n    VAST companion ad trackingEvents contains invalid url("abc")\n    VAST companion ad trackingEvents contains invalid url("abc?no=hello")');
+            assert.equal(VastValidationUtilities.formatErrors(errors), 'VAST Companion ad(testId) "StaticResource" attribute "creativeType=invalid" is not supported\n    VAST companion ad(testId) companionClickThroughURLTemplate contains invalid url("invalidClick")\n    VAST companion ad trackingEvents contains invalid url("")\n    VAST companion ad trackingEvents contains invalid url("abc")\n    VAST companion ad trackingEvents contains invalid url("abc?no=hello")');
         });
 
         it('Should give errors when invalid VastCreativeCompanionAd is given', () => {
             const companionAd = new VastCreativeCompanionAd(null, null, null);
             const errors = new VastCreativeCompanionAdValidator(companionAd).getErrors();
             assert.lengthOf(errors, 3, JSON.stringify(errors));
-            assert.equal(VastValidationUtilities.formatErrors(errors), 'VAST Companion ad(null) is missing required StaticResource Element!\n    VAST Companion ad(null) "StaticResource" is missing required "creativeType" attribute!\n    VAST Companion ad(null) is missing required CompanionClickThrough Element!');
+            assert.equal(VastValidationUtilities.formatErrors(errors), 'VAST Companion ad(null) is missing required StaticResource Element\n    VAST Companion ad(null) "StaticResource" is missing required "creativeType" attribute\n    VAST Companion ad(null) is missing required CompanionClickThrough Element');
         });
     });
 });

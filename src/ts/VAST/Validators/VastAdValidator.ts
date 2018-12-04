@@ -20,27 +20,47 @@ export class VastAdValidator implements IValidator {
     }
 
     private validate(vastAd: VastAd) {
-        vastAd.getCreatives().map((creative) => {
+        this.validateCreatives(vastAd);
+        this.validateCompanionAds(vastAd);
+        this.validateErrorURLTemplates(vastAd);
+        this.validateImpressionURLTemplates(vastAd);
+        this.validateWrapperURLs(vastAd);
+    }
+
+    private validateCreatives(vastAd: VastAd) {
+        vastAd.getCreatives().forEach((creative) => {
             if (creative instanceof VastCreativeLinear) {
                 this._errors = this._errors.concat(new VastLinearCreativeValidator(creative).getErrors());
             } else {
                 this._errors = this._errors.concat(new VastCreativeValidator(creative).getErrors());
             }
         });
-        vastAd.getCompanionAds().map((companionAd) => {
+    }
+
+    private validateCompanionAds(vastAd: VastAd) {
+        vastAd.getCompanionAds().forEach((companionAd) => {
             this._errors = this._errors.concat(new VastCreativeCompanionAdValidator(companionAd).getErrors());
         });
-        vastAd.getErrorURLTemplates().map((url) => {
+    }
+
+    private validateErrorURLTemplates(vastAd: VastAd) {
+        vastAd.getErrorURLTemplates().forEach((url) => {
             if (!Url.isValid(url)) {
                 this._errors.push(VastValidationUtilities.invalidUrlError('VastAd errorURLTemplates', url));
             }
         });
-        vastAd.getImpressionURLTemplates().map((url) => {
+    }
+
+    private validateImpressionURLTemplates(vastAd: VastAd) {
+        vastAd.getImpressionURLTemplates().forEach((url) => {
             if (!Url.isValid(url)) {
                 this._errors.push(VastValidationUtilities.invalidUrlError('VastAd impressionURLTemplates', url));
             }
         });
-        vastAd.getWrapperURLs().map((url) => {
+    }
+
+    private validateWrapperURLs(vastAd: VastAd) {
+        vastAd.getWrapperURLs().forEach((url) => {
             if (!Url.isValid(url)) {
                 this._errors.push(VastValidationUtilities.invalidUrlError('VastAd wrapperURLs', url));
             }

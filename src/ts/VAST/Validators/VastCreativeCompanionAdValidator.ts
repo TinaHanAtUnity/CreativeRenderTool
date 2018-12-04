@@ -18,25 +18,43 @@ export class VastCreativeCompanionAdValidator implements IValidator {
     }
 
     private validate(companionAd: VastCreativeCompanionAd) {
+        this.validateStaticResourceUrl(companionAd);
+        this.validateCreativeType(companionAd);
+        this.validateCompanionClickThroughURLTemplate(companionAd);
+        this.validateTrackingEvents(companionAd);
+    }
+
+    private validateStaticResourceUrl(companionAd: VastCreativeCompanionAd) {
         const adId = companionAd.getId();
         const staticResourceURL = companionAd.getStaticResourceURL();
         if (staticResourceURL === null) {
-            this._errors.push(new Error(`VAST Companion ad(${adId}) is missing required StaticResource Element!`));
+            this._errors.push(new Error(`VAST Companion ad(${adId}) is missing required StaticResource Element`));
         } else if (!Url.isValid(staticResourceURL)) {
             this._errors.push(VastValidationUtilities.invalidUrlError(`companion ad(${adId}) staticResourceUrl`, staticResourceURL));
         }
+    }
+
+    private validateCreativeType(companionAd: VastCreativeCompanionAd) {
+        const adId = companionAd.getId();
         const creativeType = companionAd.getCreativeType();
         if (creativeType === null) {
-            this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" is missing required "creativeType" attribute!`));
+            this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" is missing required "creativeType" attribute`));
         } else if (VastCreativeCompanionAdValidator._supportedCreativeTypes.indexOf(creativeType) === -1) {
-            this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" attribute "creativeType=${creativeType}" is not supported!`));
+            this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" attribute "creativeType=${creativeType}" is not supported`));
         }
+    }
+
+    private validateCompanionClickThroughURLTemplate(companionAd: VastCreativeCompanionAd) {
+        const adId = companionAd.getId();
         const companionClickThroughURLTemplate = companionAd.getCompanionClickThroughURLTemplate();
         if (companionClickThroughURLTemplate === null) {
-            this._errors.push(new Error(`VAST Companion ad(${adId}) is missing required CompanionClickThrough Element!`));
+            this._errors.push(new Error(`VAST Companion ad(${adId}) is missing required CompanionClickThrough Element`));
         } else if (!Url.isValid(companionClickThroughURLTemplate)) {
             this._errors.push(VastValidationUtilities.invalidUrlError(`companion ad(${adId}) companionClickThroughURLTemplate`, companionClickThroughURLTemplate));
         }
+    }
+
+    private validateTrackingEvents(companionAd: VastCreativeCompanionAd) {
         const trackingEvents = companionAd.getTrackingEvents();
         Object.keys(trackingEvents).map((key) => {
             const urls = trackingEvents[key];

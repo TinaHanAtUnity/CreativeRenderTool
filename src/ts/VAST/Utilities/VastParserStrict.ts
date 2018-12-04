@@ -67,11 +67,6 @@ export class VastParserStrict {
         this._maxWrapperDepth = maxWrapperDepth;
     }
 
-    public parseMediaFileSize(duration: number, kbitrate: number): number {
-        // returning file size in byte from bit
-        return (duration * kbitrate * 1000) / 8;
-    }
-
     public parseVast(vast: string | null): Vast {
         if (!vast) {
             throw new Error('VAST data is missing');
@@ -130,6 +125,48 @@ export class VastParserStrict {
         return new Vast(ads, parseErrorURLTemplates);
     }
 
+    public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, parent?: Vast, depth: number = 0): Promise<Vast> {
+        let parsedVast: Vast;
+
+        if (depth === 0) {
+            this._rootWrapperVast = vast;
+        }
+
+        try {
+            parsedVast = this.parseVast(vast);
+        } catch (e) {
+            const errorData: any = {
+                vast: vast,
+                wrapperDepth: depth
+            };
+            if (depth > 0) {
+                errorData.rootWrapperVast = this._rootWrapperVast;
+            }
+            throw new DiagnosticError(e, errorData);
+        }
+
+        this.applyParentURLs(parsedVast, parent);
+
+        const wrapperURL = parsedVast.getWrapperURL();
+        if (!wrapperURL) {
+            return Promise.resolve(parsedVast);
+        } else if (depth >= this._maxWrapperDepth) {
+            throw new Error(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
+        }
+
+        const encodedWrapperURL = Url.encodeUrlWithQueryParams(wrapperURL);
+        core.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + encodedWrapperURL);
+
+        return request.get(encodedWrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
+            return this.retrieveVast(response.response, core, request, parsedVast, depth + 1);
+        });
+    }
+
+    private getVideoSizeInBytes(duration: number, kbitrate: number): number {
+        // returning file size in byte from bit
+        return (duration * kbitrate * 1000) / 8;
+    }
+
     private formatErrorMessage(errors: Error[]): Error {
         return new Error(`VAST parse encountered these errors while parsing:
             ${VastValidationUtilities.formatErrors(errors)}
@@ -151,47 +188,6 @@ export class VastParserStrict {
     private getNodesWithName(rootNode: HTMLElement, name: string): HTMLElement[] {
         const nodeList = rootNode.querySelectorAll(name);
         return Array.prototype.slice.call(nodeList);
-    }
-
-    public retrieveVast(vast: any, core: ICoreApi, request: RequestManager, parent?: Vast, depth: number = 0): Promise<Vast> {
-        let parsedVast: Vast;
-
-        if (depth === 0) {
-            this._rootWrapperVast = vast;
-        }
-
-        try {
-            parsedVast = this.parseVast(vast);
-        } catch (e) {
-            if (depth > 0) {
-                throw new DiagnosticError(e, {
-                    vast: vast,
-                    wrapperDepth: depth,
-                    rootWrapperVast: this._rootWrapperVast
-                });
-            } else {
-                throw new DiagnosticError(e, {
-                    vast: vast,
-                    wrapperDepth: depth
-                });
-            }
-        }
-
-        this.applyParentURLs(parsedVast, parent);
-
-        const wrapperURL = parsedVast.getWrapperURL();
-        if (!wrapperURL) {
-            return Promise.resolve(parsedVast);
-        } else if (depth >= this._maxWrapperDepth) {
-            throw new Error(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
-        }
-
-        const encodedWrapperURL = Url.encodeUrlWithQueryParams(wrapperURL);
-        core.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + encodedWrapperURL);
-
-        return request.get(encodedWrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
-            return this.retrieveVast(response.response, core, request, parsedVast, depth + 1);
-        });
     }
 
     private applyParentURLs(parsedVast: Vast, parent?: Vast) {
@@ -333,7 +329,7 @@ export class VastParserStrict {
                 this.getIntAttribute(element, VastAttributeNames.WIDTH),
                 this.getIntAttribute(element, VastAttributeNames.HEIGHT),
                 element.getAttribute(VastAttributeNames.API_FRAMEWORK),
-                this.parseMediaFileSize(mediaDuration, bitrate)
+                this.getVideoSizeInBytes(mediaDuration, bitrate)
             );
             creative.addMediaFile(mediaFile);
         });
