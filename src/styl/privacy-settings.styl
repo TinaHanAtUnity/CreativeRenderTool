@@ -1,39 +1,78 @@
+@import "components.styl";
+
 #privacy-settings {
   position: absolute;
-  display: flex;
   top: 0;
+  right: 0;
+  bottom: 0;
   left: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  overflow: hidden;
   width: 100%;
   height: 100%;
-  align-items: flex-end;
-  flex-direction: row;
   background: rgba(0, 0, 0, .5);
 
-  .main-view-container {
+  .container {
+    position: relative;
+    overflow: auto;
+    padding: $default-size;
+    width: 100%;
+    height: 80%;
     border-top-left-radius: $default-size;
     border-top-right-radius: $default-size;
     background: $white;
+  }
+
+  .main-view-container {
+    text-align: center;
 
     .settings-button {
       display: flex;
       flex-direction: column;
-      text-align: center;
-      background: $white-smoke;
-      padding: $default-size;
       margin: .5 * $default-size 0;
+      padding: $default-size;
+      background: $white-smoke;
+      text-align: center;
     }
   }
 
-  .personalization-container {
-    display: none;
+  .checkbox-group-container {
+    $checkbox-group-container($default-scale-size, $default-font-size * .65);
   }
 
-  .view-your-data-container {
-    display: none;
+  &.initial {
+    .back-button {
+      display: none;
+    }
   }
 
-  .report-ad-container {
-    display: none;
+  &:not(.initial) {
+    .main-view-container {
+      display: none;
+    }
   }
+  &:not(.personalization) {
+    .personalization-container {
+      display: none;
+    }
+  }
+  &:not(.data) {
+    .view-your-data-container {
+      display: none;
+    }
+  }
+  &:not(.report) {
+    .report-ad-container {
+      display: none;
+    }
+  }
+  &:not(.build-info) {
+    .build-info-container {
+      display: none;
+    }
+  }
+
 
 }
