@@ -41,7 +41,7 @@ export class Promo extends AbstractParserModule implements IPromo {
         };
 
         this.PromoEvents = new PromoEvents(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, core.ClientInfo, core.DeviceInfo, analytics.AnalyticsStorage);
-        this.OrganicPurchaseManager = new OrganicPurchaseManager(core.Api.Storage, core.Api.Sdk, this.PromoEvents, core.RequestManager);
+        this.OrganicPurchaseManager = new OrganicPurchaseManager(core.Api.Storage, this.PromoEvents, core.RequestManager);
     }
 
     public initialize() {

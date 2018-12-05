@@ -7,13 +7,11 @@ import { OrganicPurchase, IOrganicPurchase, OrganicPurchaseManager } from 'Purch
 import { Observable2 } from 'Core/Utilities/Observable';
 import { StorageApi } from 'Core/Native/Storage';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { SdkApi } from 'Core/Native/Sdk';
 
 describe('OrganicPurchaseManager', () => {
 
     let organicPurchase: OrganicPurchase | undefined;
     let promoEvents: PromoEvents;
-    let sdk: SdkApi;
     let request: RequestManager;
     let storage: StorageApi;
     let organicPurchaseManager: OrganicPurchaseManager;
@@ -26,9 +24,8 @@ describe('OrganicPurchaseManager', () => {
     beforeEach(() => {
         request = sinon.createStubInstance(RequestManager);
         storage = sinon.createStubInstance(StorageApi);
-        sdk = sinon.createStubInstance(SdkApi);
         promoEvents = sinon.createStubInstance(PromoEvents);
-        organicPurchaseManager = new OrganicPurchaseManager(storage, sdk, promoEvents, request);
+        organicPurchaseManager = new OrganicPurchaseManager(storage, promoEvents, request);
 
         onSetObservable = new Observable2();
         storage.onSet = onSetObservable;

@@ -5,8 +5,6 @@ import { Url } from 'Core/Utilities/Url';
 import { Model, ISchema } from 'Core/Models/Model';
 import { Promises } from 'Core/Utilities/Promises';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { IObserver2 } from 'Core/Utilities/IObserver';
-import { SdkApi } from 'Core/Native/Sdk';
 
 export interface IOrganicPurchase {
     productId: string | undefined;
@@ -73,14 +71,12 @@ export class OrganicPurchaseManager {
     private static InAppPurchaseStorageKey = 'iap.purchases';
 
     private _storage: StorageApi;
-    private _sdk: SdkApi;
     private _promoEvents: PromoEvents;
     private _request: RequestManager;
     private _onSetObserver: (key: string, data: object) => void;
 
-    constructor(storage: StorageApi, sdk: SdkApi, promoEvents: PromoEvents, request: RequestManager) {
+    constructor(storage: StorageApi, promoEvents: PromoEvents, request: RequestManager) {
         this._storage = storage;
-        this._sdk = sdk;
         this._promoEvents = promoEvents;
         this._request = request;
         this._onSetObserver = () => this.getOrganicPurchase();
@@ -115,7 +111,6 @@ export class OrganicPurchaseManager {
             }
         }).then(() => {
             this.subscribe();
-            this._sdk.logError('Shawn getOrganicPurchase');
         }).catch((e) => {
             this.subscribe();
             throw e;
