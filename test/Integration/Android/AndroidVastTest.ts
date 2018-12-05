@@ -104,8 +104,6 @@ describe('AndroidVastTest', () => {
                     }
                 });
 
-                debugger;
-
                 listener.onStart.subscribe((placement) => {
                     const cta = <HTMLButtonElement>document.querySelector('.call-button');
                     cta.click();
