@@ -52,6 +52,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _hasCameraPermission = false;
     private _permissionResultObserver: IObserver2<string, boolean>;
+    private _viewable: boolean;
 
     constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
         super(platform, core, deviceInfo, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
@@ -64,6 +65,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._template = new Template(ExtendedMRAIDTemplate, this._localization);
         this._permissionLearnMoreOpen = false;
+        this._viewable = false;
 
         this._bindings = this._bindings.concat([
             {
@@ -160,6 +162,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._mraidBridge.sendViewableEvent(viewable);
         }
 
+        this._viewable = viewable;
         this.setAnalyticsBackgroundTime(viewable);
     }
 
@@ -481,7 +484,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         beginButton.innerHTML = `${buttonText}...${autoBeginTimeout}`;
 
         this._autoBeginTimer = setInterval(() => {
-            const timerPaused = this._permissionLearnMoreOpen || this._privacyPanelOpen;
+            const timerPaused = !this._viewable || this._permissionLearnMoreOpen || this._privacyPanelOpen;
             if (timerPaused) {
                 return;
             }
