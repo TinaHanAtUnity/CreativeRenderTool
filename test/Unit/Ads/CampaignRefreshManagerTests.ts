@@ -8,7 +8,7 @@ import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
@@ -132,7 +132,7 @@ describe('CampaignRefreshManager', () => {
     let cacheBookkeeping: CacheBookkeepingManager;
     let cache: CacheManager;
     let jaegerManager: JaegerManager;
-    let gdprManager: GdprManager;
+    let privacyManager: UserPrivacyManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
     let placementManager: PlacementManager;
     let backupCampaignManager: BackupCampaignManager;
@@ -161,7 +161,7 @@ describe('CampaignRefreshManager', () => {
         cacheBookkeeping = new CacheBookkeepingManager(core);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
-        backupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig);
+        backupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig, deviceInfo);
         campaignParserManager = new ContentTypeHandlerManager();
         assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
         container = new TestContainer();
@@ -178,13 +178,14 @@ describe('CampaignRefreshManager', () => {
             coreConfig: coreConfig,
             adsConfig: adsConfig,
             storageBridge: storageBridge,
-            campaign: campaign
+            campaign: campaign,
+            playerMetadataServerId: 'test-gamerSid'
         });
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
 
-        gdprManager = sinon.createStubInstance(GdprManager);
+        privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
         adUnitParams = {
             platform,
@@ -205,7 +206,7 @@ describe('CampaignRefreshManager', () => {
             adsConfig: adsConfig,
             request: request,
             options: {},
-            gdprManager: gdprManager,
+            privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService
         };
 

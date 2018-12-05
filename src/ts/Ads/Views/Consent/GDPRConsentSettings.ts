@@ -3,7 +3,7 @@ import GDPRConsentSettingsTemplate from 'html/consent/gdpr-consent-settings.html
 import { Template } from 'Core/Utilities/Template';
 import { PrivacyRowItemContainer } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { Platform } from 'Core/Constants/Platform';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IPersonalizedConsent } from 'Ads/Views/Consent/IPermissions';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
@@ -18,7 +18,7 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
     private _infoContainer: PrivacyRowItemContainer;
     private _checkboxGroup: PersonalizationCheckboxGroup;
 
-    constructor(platform: Platform, gdprManager: GdprManager) {
+    constructor(platform: Platform, gdprManager: UserPrivacyManager) {
         super(platform, 'gdpr-consent-settings');
         this._template = new Template(GDPRConsentSettingsTemplate);
 

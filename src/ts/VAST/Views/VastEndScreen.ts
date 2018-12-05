@@ -18,8 +18,7 @@ export interface IVastEndScreenHandler {
 export interface IVastEndscreenParameters {
     campaign: VastCampaign;
     clientInfo: ClientInfo;
-    seatId: number | undefined;
-    showPrivacyDuringEndscreen: boolean;
+    country: string | undefined;
 }
 
 export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandler {
@@ -28,16 +27,15 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     private _privacy: AbstractPrivacy;
     private _callButtonEnabled: boolean = true;
     private _campaign: VastCampaign;
-    private _seatId: number | undefined;
-    private _showPrivacyDuringEndscreen: boolean;
+    private _country: string | undefined;
 
     constructor(platform: Platform, parameters: IVastEndscreenParameters, privacy: AbstractPrivacy) {
         super(platform, 'vast-end-screen');
 
         this._campaign = parameters.campaign;
         this._template = new Template(VastEndScreenTemplate);
-        this._seatId = parameters.seatId;
-        this._showPrivacyDuringEndscreen = parameters.showPrivacyDuringEndscreen;
+        this._country = parameters.country;
+        this._privacy = privacy;
 
         if(this._campaign) {
             const landscape = this._campaign.getLandscape();
@@ -76,28 +74,14 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
                 selector: '.campaign-container, .game-background'
             });
         }
-
-        if (this._showPrivacyDuringEndscreen) {
-            this._privacy = privacy;
-            this._privacy.render();
-            this._privacy.hide();
-            document.body.appendChild(this._privacy.container());
-            this._privacy.addEventHandler(this);
-        }
     }
 
     public render(): void {
         super.render();
 
-        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
-            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
-            if (tencentAdTag) {
-                tencentAdTag.innerText = '广告';
-            }
-        }
-
-        if (!this._showPrivacyDuringEndscreen) {
-            (<HTMLElement>this._container.querySelector('.privacy-button')).style.display = 'none';
+        const chinaAdvertisementElement: HTMLElement | null = this._container.querySelector('.china-advertisement');
+        if (this._country === 'CN' && chinaAdvertisementElement) {
+            chinaAdvertisementElement.style.display = 'block';
         }
 
         if(this._isSwipeToCloseEnabled) {
@@ -117,20 +101,11 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
         }
     }
 
-    public hide(): void {
-        super.hide();
-
-        if (this._privacy) {
-            this._privacy.hide();
-        }
-    }
-
     public remove(): void {
         if (this._privacy) {
-            this._privacy.removeEventHandler(this);
-            if (this._privacy.container().parentElement) {
-                this._privacy.container().parentElement!.removeChild(this._privacy.container());
-            }
+            this._privacy.hide();
+            document.body.removeChild(this._privacy.container());
+            delete this._privacy;
         }
 
         if (this.container().parentElement) {

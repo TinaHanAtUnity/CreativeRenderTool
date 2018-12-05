@@ -19,7 +19,6 @@ import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
-import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export abstract class AbstractAdUnitFactory {
     private static _forceGDPRBanner: boolean = false;
@@ -88,15 +87,16 @@ export abstract class AbstractAdUnitFactory {
         });
     }
 
-    protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean | undefined): AbstractVideoOverlay {
-        const showGDPRBanner = (parameters.campaign instanceof VastCampaign) ? this.showGDPRBanner(parameters) : false;
+    protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
+
         let overlay: AbstractVideoOverlay;
 
         const skipAllowed = parameters.placement.allowSkip();
+
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
-            overlay = new ClosableVideoOverlay(parameters.platform, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            overlay = new ClosableVideoOverlay(parameters.platform, parameters.campaign, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            overlay = new NewVideoOverlay(parameters, privacy, showGDPRBanner, showPrivacyDuringVideo);
+            overlay = new NewVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
@@ -133,7 +133,7 @@ export abstract class AbstractAdUnitFactory {
     }
 
     protected createPrivacy(parameters: IAdUnitParameters<Campaign>): Privacy {
-        const privacy = new Privacy(parameters.platform, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
+        const privacy = new Privacy(parameters.platform, parameters.campaign, parameters.privacyManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
         const privacyEventHandler = new PrivacyEventHandler(parameters);
 
         privacy.addEventHandler(privacyEventHandler);

@@ -13,6 +13,7 @@ import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { AndroidBackButtonSkipTest } from 'Core/Models/ABGroup';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -26,7 +27,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
 
     public createAdUnit(parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
         const privacy = this.createPrivacy(parameters);
-        const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose();
+        const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose() || false;
         const overlay = this.createOverlay(parameters, privacy, showPrivacyDuringVideo);
 
         const adUnitStyle: AdUnitStyle = parameters.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
@@ -37,7 +38,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
             campaignId: parameters.campaign.getId(),
             osVersion: parameters.deviceInfo.getOsVersion()
         };
-        const endScreen = new PerformanceEndScreen(endScreenParameters, parameters.campaign);
+        const endScreen = new PerformanceEndScreen(endScreenParameters, parameters.campaign, parameters.coreConfig.getCountry());
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
@@ -79,8 +80,10 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
         if (parameters.platform === Platform.ANDROID) {
             const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
                 endScreenEventHandler.onKeyEvent(keyCode);
+                const abGroup = parameters.coreConfig.getAbGroup();
+                const backButtonTestEnabled = AndroidBackButtonSkipTest.isValid(abGroup);
 
-                if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                if(backButtonTestEnabled || CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
                     performanceOverlayEventHandler.onKeyEvent(keyCode);
                 }
             });

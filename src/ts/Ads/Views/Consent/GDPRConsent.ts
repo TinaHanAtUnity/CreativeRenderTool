@@ -3,13 +3,13 @@ import GDPRConsentTemplate from 'html/consent/gdpr-consent.html';
 import { Template } from 'Core/Utilities/Template';
 import { GDPRConsentSettings, IGDPRConsentSettingsHandler } from 'Ads/Views/Consent/GDPRConsentSettings';
 import { Platform } from 'Core/Constants/Platform';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IPermissions, IPersonalizedConsent } from 'Ads/Views/Consent/IPermissions';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 
 export interface IGDPRConsentViewParameters {
     platform: Platform;
-    gdprManager: GdprManager;
+    gdprManager: UserPrivacyManager;
 }
 
 export interface IGDPRConsentHandler {

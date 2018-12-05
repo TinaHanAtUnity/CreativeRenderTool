@@ -1,12 +1,12 @@
 import { AdUnitContainer, AdUnitContainerSystemMessage, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPRConsent, IGDPRConsentHandler } from 'Ads/Views/Consent/GDPRConsent';
 import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 export interface IConsentUnitParameters {
     platform: Platform;
-    gdprManager: GdprManager;
+    gdprManager: UserPrivacyManager;
     adUnitContainer: AdUnitContainer;
 }
 

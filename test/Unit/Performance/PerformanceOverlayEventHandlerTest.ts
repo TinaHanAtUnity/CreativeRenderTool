@@ -1,7 +1,7 @@
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IAdsApi } from 'Ads/IAds';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
@@ -91,11 +91,12 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             coreConfig: coreConfig,
             adsConfig: adsConfig,
             storageBridge: storageBridge,
-            campaign: campaign
+            campaign: campaign,
+            playerMetadataServerId: 'test-gamerSid'
         });
 
-        const gdprManager = sinon.createStubInstance(GdprManager);
-        const privacy = new Privacy(platform, campaign, gdprManager, false, false);
+        const privacyManager = sinon.createStubInstance(UserPrivacyManager);
+        const privacy = new Privacy(platform, campaign, privacyManager, false, false);
         const endScreenParams : IEndScreenParameters = {
             platform,
             core,
@@ -134,7 +135,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             overlay: overlay,
             video: video,
             privacy: privacy,
-            gdprManager: gdprManager,
+            privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService
         };
 

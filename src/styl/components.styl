@@ -177,8 +177,9 @@ $radio-group-container($scale-size = $default-scale-size, $context-font-size = 1
 
 }
 
-$tencent-overlay($scale-size = $default-scale-size) {
+$china-overlay($scale-size = $default-scale-size) {
   position: fixed;
+  display: none;
   padding: $default-scale-size * .7rem;
   color: $white;
   font-size: $default-scale-size * $default-font-size * .75;
@@ -349,19 +350,12 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
         font-size: $pop-up-font-size * 1.25;
       }
 
+      .middle-link,
       .left-side-link {
         bottom: 0;
         display: inline-block;
         margin-bottom: $pop-up-size * .5;
         margin-left: $pop-up-size * .5;
-        width: 22%;
-        color: darken($end-screen-info-gray, 40%);
-      }
-
-      .middle-link {
-        bottom: 0;
-        display: inline-block;
-        margin: $pop-up-size * .5;
         width: 22%;
         color: darken($end-screen-info-gray, 40%);
       }

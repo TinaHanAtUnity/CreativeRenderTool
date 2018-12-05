@@ -15,6 +15,7 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Double } from 'Core/Utilities/Double';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 
 export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEventHandler {
 
@@ -177,6 +178,11 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                 originalUrl: originalUrl,
                 isCached: CampaignAssetInfo.isCached(this._campaign)
             });
+
+            CreativeBlocking.report(this._campaign.getCreativeId(), this._campaign.getSeatId(), BlockingReason.VIDEO_TOO_LONG, {
+                videoLength: duration
+            });
+
             return this.handleVideoError('video_too_long', error);
         }
 

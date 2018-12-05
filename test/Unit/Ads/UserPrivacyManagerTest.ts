@@ -1,4 +1,4 @@
-import { GDPREventAction, GDPREventSource, GdprManager } from 'Ads/Managers/GdprManager';
+import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { GamePrivacy, IUnityConsentPermissions, PrivacyMethod } from 'Ads/Models/Privacy';
 import { Backend } from 'Backend/Backend';
@@ -19,7 +19,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
-describe('GdprManagerTest', () => {
+describe('UserPrivacyManagerTest', () => {
     const testGameId = '12345';
     const testAdvertisingId = '128970986778678';
     const testUnityProjectId = 'game-1';
@@ -31,8 +31,8 @@ describe('GdprManagerTest', () => {
     let clientInfo: ClientInfo;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
+    let privacyManager: UserPrivacyManager;
     let gamePrivacy: GamePrivacy;
-    let gdprManager: GdprManager;
     let request: RequestManager;
 
     let onSetStub: sinon.SinonStub;
@@ -90,8 +90,8 @@ describe('GdprManagerTest', () => {
         onSetStub.callsFake((fun) => {
             storageTrigger = fun;
         });
-        gdprManager = new GdprManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request);
-        sendGDPREventStub = sinon.spy(gdprManager, 'sendGDPREvent');
+        privacyManager = new UserPrivacyManager(platform, core, coreConfig, adsConfig, clientInfo, deviceInfo, request);
+        sendGDPREventStub = sinon.spy(privacyManager, 'sendGDPREvent');
     });
 
     afterEach(() => {
@@ -210,7 +210,7 @@ describe('GdprManagerTest', () => {
         describe('and consent is undefined', () => {
             it('should not update the configuration', () => {
                 consent = undefined;
-                return gdprManager.getConsentAndUpdateConfiguration().then(() => {
+                return privacyManager.getConsentAndUpdateConfiguration().then(() => {
                     assert.fail('should throw');
                 }).catch(() => {
                     sinon.assert.notCalled(<sinon.SinonStub>adsConfig.setGDPREnabled);
@@ -265,7 +265,7 @@ describe('GdprManagerTest', () => {
                         });
                     });
 
-                    return gdprManager.getConsentAndUpdateConfiguration().then(() => {
+                    return privacyManager.getConsentAndUpdateConfiguration().then(() => {
                         return writePromise.then(() => {
                             sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
                             sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
@@ -293,7 +293,7 @@ describe('GdprManagerTest', () => {
                         isGDPREnabled = false;
                         return Promise.resolve(true);
                     });
-                    return gdprManager.getConsentAndUpdateConfiguration().then((storedConsent: boolean) => {
+                    return privacyManager.getConsentAndUpdateConfiguration().then((storedConsent: boolean) => {
                         assert.equal(storedConsent, true);
                         sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
                         sinon.assert.notCalled(sendGDPREventStub);
@@ -315,7 +315,7 @@ describe('GdprManagerTest', () => {
                             return Promise.resolve().then(resolve);
                         });
                     });
-                    return gdprManager.getConsentAndUpdateConfiguration().then(() => {
+                    return privacyManager.getConsentAndUpdateConfiguration().then(() => {
                         assert.fail('should throw');
                     }).catch((error: Error) => {
                         assert.equal(error.message, 'Configuration gdpr is not enabled');
@@ -343,7 +343,7 @@ describe('GdprManagerTest', () => {
                         });
                         consent = userConsents;
 
-                        return gdprManager.getConsentAndUpdateConfiguration().then(() => {
+                        return privacyManager.getConsentAndUpdateConfiguration().then(() => {
                             return writePromise.then(() => {
                                 sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                                 if (event === 'optout') {
@@ -393,13 +393,13 @@ describe('GdprManagerTest', () => {
         });
 
         it('should call request.get', () => {
-            return gdprManager.retrievePersonalInformation().then(() => {
-                sinon.assert.calledWith(getRequestStub, `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=${gameId}&adid=${adId}&projectId=${projectId}&storeId=${stores}`);
+            return privacyManager.retrieveUserSummary().then(() => {
+                sinon.assert.calledWith(getRequestStub, `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=${gameId}&adid=${adId}&projectId=${projectId}&storeId=${stores}`);
             });
         });
 
         it('verify response has personal payload', () => {
-            return gdprManager.retrievePersonalInformation().then((response) => {
+            return privacyManager.retrieveUserSummary().then((response) => {
                 assert.equal(response.deviceModel, model);
                 assert.equal(response.country, countryCode);
             });
@@ -408,18 +408,18 @@ describe('GdprManagerTest', () => {
         it('should call diagnostics on error', () => {
             getRequestStub.reset();
             getRequestStub.rejects('Test Error');
-            return gdprManager.retrievePersonalInformation().then(() => {
+            return privacyManager.retrieveUserSummary().then(() => {
                 assert.fail('Should throw error');
             }).catch((error) => {
                 assert.equal(error, 'Test Error');
-                sinon.assert.calledWith(diagnosticTriggerStub, 'gdpr_request_failed', {url: `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=${gameId}&adid=${adId}&projectId=${projectId}&storeId=${stores}`});
+                sinon.assert.calledWith(diagnosticTriggerStub, 'gdpr_request_failed', {url: `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=${gameId}&adid=${adId}&projectId=${projectId}&storeId=${stores}`});
             });
         });
 
         it('should call logError on error', () => {
             getRequestStub.reset();
             getRequestStub.rejects('Test Error');
-            return gdprManager.retrievePersonalInformation().then(() => {
+            return privacyManager.retrieveUserSummary().then(() => {
                 assert.fail('Should throw error');
             }).catch((error) => {
                 assert.equal(error, 'Test Error');
@@ -524,7 +524,7 @@ describe('GdprManagerTest', () => {
                     }
                     return true;
                 };
-                gdprManager.sendGDPREvent(t.action, t.source);
+                privacyManager.sendGDPREvent(t.action, t.source);
                 assert.isTrue(comparison(httpKafkaStub.firstCall.args[2]), `expected infoJson ${JSON.stringify(t.infoJson)}\nreceived infoJson ${JSON.stringify(httpKafkaStub.firstCall.args[2])}`);
                 httpKafkaStub.calledWithExactly('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, t.infoJson);
             });
@@ -537,7 +537,7 @@ describe('GdprManagerTest', () => {
 
         describe('when sending event', () => {
             function sendEvent(permissions: IUnityConsentPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER): Promise<any> {
-                return gdprManager.sendUnityConsentEvent(permissions, source).then(() => {
+                return privacyManager.sendUnityConsentEvent(permissions, source).then(() => {
                     sinon.assert.calledOnce(httpKafkaStub);
                     return httpKafkaStub.firstCall.args[2];
                 });
@@ -586,14 +586,14 @@ describe('GdprManagerTest', () => {
         describe('should not send event', () => {
             it('if game privacy is disabled', () => {
                 sandbox.stub(gamePrivacy, 'isEnabled').returns(false);
-                return gdprManager.sendUnityConsentEvent(anyConsent, GDPREventSource.USER).then(() => {
+                return privacyManager.sendUnityConsentEvent(anyConsent, GDPREventSource.USER).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });
 
             it('if game privacy method is other than UnityConsent', () => {
                 sandbox.stub(gamePrivacy, 'getMethod').returns(PrivacyMethod.DEVELOPER_CONSENT);
-                return gdprManager.sendUnityConsentEvent(anyConsent, GDPREventSource.USER).then(() => {
+                return privacyManager.sendUnityConsentEvent(anyConsent, GDPREventSource.USER).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });
