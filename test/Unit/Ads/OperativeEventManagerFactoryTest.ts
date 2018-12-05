@@ -70,7 +70,8 @@ describe('OperativeEventManagerFactoryTest', () => {
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
-                campaign: campaign
+                campaign: campaign,
+                playerMetadataServerId: 'test-gamerSid'
             });
 
             assert.isTrue(manager instanceof PerformanceOperativeEventManager, 'Manager not instance of PerformanceOperativeEventManager');
@@ -90,7 +91,8 @@ describe('OperativeEventManagerFactoryTest', () => {
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
-                campaign: campaign
+                campaign: campaign,
+                playerMetadataServerId: 'test-gamerSid'
             });
 
             assert.isTrue(manager instanceof XPromoOperativeEventManager, 'Manager not instance of XPromoOperativeEventManager');
@@ -110,7 +112,8 @@ describe('OperativeEventManagerFactoryTest', () => {
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
-                campaign: campaign
+                campaign: campaign,
+                playerMetadataServerId: 'test-gamerSid'
             });
 
             assert.isTrue(manager instanceof MRAIDOperativeEventManager, 'Manager not instance of MRAIDOperativeEventManager');
@@ -130,7 +133,8 @@ describe('OperativeEventManagerFactoryTest', () => {
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,
                 storageBridge: storageBridge,
-                campaign: campaign
+                campaign: campaign,
+                playerMetadataServerId: 'test-gamerSid'
             });
 
             assert.isTrue(manager instanceof OperativeEventManager, 'Manager not instance of OperativeEventManager');

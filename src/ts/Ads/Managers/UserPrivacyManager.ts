@@ -14,7 +14,7 @@ import { ITemplateData } from 'Core/Views/View';
 
 const ignoreReturnType: () => void = () => { return; };
 
-export interface IGdprPersonalProperties extends ITemplateData {
+interface IUserSummary extends ITemplateData {
     deviceModel: string;
     country: string;
     gamePlaysThisWeek: number;
@@ -35,7 +35,7 @@ export enum GDPREventAction {
     OPTIN = 'optin'
 }
 
-export class GdprManager {
+export class UserPrivacyManager {
 
     private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
     private static GdprConsentStorageKey = 'gdpr.consent.value';
@@ -124,11 +124,11 @@ export class GdprManager {
         }
     }
 
-    public retrievePersonalInformation(): Promise<IGdprPersonalProperties> {
-        const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._coreConfig.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
+    public retrieveUserSummary(): Promise<IUserSummary> {
+        const url = `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._coreConfig.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
 
         // Test url which should respond with : {"adsSeenInGameThisWeek":27,"gamePlaysThisWeek":39,"installsFromAds":0}
-        // const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=1501434&adid=BC5BAF66-713E-44A5-BE8E-56497B6B6E0A&projectId=567&storeId=google`;
+        // const url = `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=1501434&adid=BC5BAF66-713E-44A5-BE8E-56497B6B6E0A&projectId=567&storeId=google`;
         const personalPayload = {
             deviceModel: this._deviceInfo.getModel(),
             country: this._coreConfig.getCountry()
@@ -154,7 +154,7 @@ export class GdprManager {
 
     private pushConsent(consent: boolean): Promise<void> {
         // get last state of gdpr consent
-        return this._core.Storage.get(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
+        return this._core.Storage.get(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
             // only if consent has changed push to kafka
             if (consentLastSentToKafka !== consent) {
                 return this.sendGdprConsentEvent(consent);
@@ -168,7 +168,7 @@ export class GdprManager {
     }
 
     private getConsent(): Promise<boolean> {
-        return this._core.Storage.get(StorageType.PUBLIC, GdprManager.GdprConsentStorageKey).then((data: any) => {
+        return this._core.Storage.get(StorageType.PUBLIC, UserPrivacyManager.GdprConsentStorageKey).then((data: any) => {
             const value: boolean | undefined = this.getConsentTypeHack(data);
             if(typeof(value) !== 'undefined') {
                 return Promise.resolve(value);
@@ -223,7 +223,7 @@ export class GdprManager {
             sendEvent = this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.METADATA);
         }
         return sendEvent.then(() => {
-            return this._core.Storage.set(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey, consent).then(() => {
+            return this._core.Storage.set(StorageType.PRIVATE, UserPrivacyManager.GdprLastConsentValueStorageKey, consent).then(() => {
                 return this._core.Storage.write(StorageType.PRIVATE);
             });
         });

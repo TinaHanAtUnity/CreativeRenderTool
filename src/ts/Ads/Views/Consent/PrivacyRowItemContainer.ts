@@ -3,7 +3,7 @@ import PrivacyRowItemContainerTemplate from 'html/consent/privacy-row-item-conta
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 interface IPrivacyInfoContainerHandler {
     todoPlaceholderEventNoBlankInterfacesAllowed(): void;
@@ -11,12 +11,12 @@ interface IPrivacyInfoContainerHandler {
 
 interface IRowItemContainerParams {
     platform: Platform;
-    gdprManager: GdprManager;
+    gdprManager: UserPrivacyManager;
 }
 
 export class PrivacyRowItemContainer extends View<IPrivacyInfoContainerHandler> {
 
-    private _gdprManager: GdprManager;
+    private _gdprManager: UserPrivacyManager;
 
     constructor(parameters: IRowItemContainerParams) {
         super(parameters.platform, 'privacy-row-item-container');
@@ -55,7 +55,7 @@ export class PrivacyRowItemContainer extends View<IPrivacyInfoContainerHandler> 
 
     private fillPersonalInfoFields(): void {
         // todo: manager class should check is the information already available to avoid extra requests
-        this._gdprManager.retrievePersonalInformation().then((personalProperties) => {
+        this._gdprManager.retrieveUserSummary().then((personalProperties) => {
             document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
             document.getElementById('phone-type')!.innerHTML = `Using ${personalProperties.deviceModel}`;
             document.getElementById('country')!.innerHTML = `Located in ${personalProperties.country}`;

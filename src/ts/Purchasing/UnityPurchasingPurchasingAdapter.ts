@@ -64,9 +64,9 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         return this._initPromise;
     }
 
-    public purchaseItem(productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails> {
+    public purchaseItem(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails> {
         const purchaseUrls = campaign.getTrackingUrlsForEvent('purchase');
-        const modifiedPurchaseUrls = ThirdPartyEventManager.replaceUrlTemplateValues(purchaseUrls, {'%ZONE%': placementId}).map((value: string): string => {
+        const modifiedPurchaseUrls = thirdPartyEventManager.replaceTemplateValuesAndEncodeUrls(purchaseUrls).map((value: string): string => {
             if (PromoEvents.purchaseHostnameRegex.test(value)) {
                 return Url.addParameters(value, {'native': isNative, 'iap_service': true});
             }
@@ -84,15 +84,15 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         return Promise.resolve(<ITransactionDetails>{});
     }
 
-    public onPromoClosed(campaign: PromoCampaign, placementId: string): void {
+    public onPromoClosed(thirdPartyEventManager: ThirdPartyEventManager, campaign: PromoCampaign, placementId: string): void {
         const purchaseUrls = campaign.getTrackingUrlsForEvent('purchase');
-        const modifiedPurchaseUrls = ThirdPartyEventManager.replaceUrlTemplateValues(purchaseUrls, {'%ZONE%': placementId});
+        const modifiedPurchaseUrls = thirdPartyEventManager.replaceTemplateValuesAndEncodeUrls(purchaseUrls);
         const iapPayload: IPromoPayload = {
             gamerToken: this._coreConfiguration.getToken(),
             trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
             iapPromo: true,
             gameId: this._clientInfo.getGameId() + '|' + this._coreConfiguration.getToken(),
-            abGroup: this._coreConfiguration.getAbGroup().toNumber(),
+            abGroup: this._coreConfiguration.getAbGroup(),
             request: IPromoRequest.CLOSE,
             purchaseTrackingUrls: modifiedPurchaseUrls
         };
@@ -129,7 +129,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
     private getInitializationPayload(): IPromoPayload {
         return <IPromoPayload>{
             iapPromo: true,
-            abGroup: this._coreConfiguration.getAbGroup().toNumber(),
+            abGroup: this._coreConfiguration.getAbGroup(),
             gameId: this._clientInfo.getGameId() + '|' + this._coreConfiguration.getToken(),
             trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
             gamerToken: this._coreConfiguration.getToken(),

@@ -1,4 +1,4 @@
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { toAbGroup } from 'Core/Models/ABGroup';
 import { CoreConfiguration, ICoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 export class CoreConfigurationParser {
@@ -7,7 +7,7 @@ export class CoreConfigurationParser {
             enabled: configJson.enabled,
             country: configJson.country,
             coppaCompliant: configJson.coppaCompliant,
-            abGroup: ABGroupBuilder.getAbGroup(configJson.abGroup),
+            abGroup: toAbGroup(configJson.abGroup),
             properties: configJson.properties,
             analytics: configJson.analytics ? true : false,
             test: configJson.test ? true : false,

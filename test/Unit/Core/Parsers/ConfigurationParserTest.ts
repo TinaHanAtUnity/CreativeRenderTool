@@ -3,7 +3,6 @@ import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
 
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
@@ -38,7 +37,7 @@ describe('configurationParserTest', () => {
         });
 
         it('should have abGroup parameter from configuration', () => {
-            assert.equal(coreConfig.getAbGroup(), ABGroupBuilder.getAbGroup(99));
+            assert.equal(coreConfig.getAbGroup(), 99);
         });
 
         it('should have properties parameter from configuration', () => {
