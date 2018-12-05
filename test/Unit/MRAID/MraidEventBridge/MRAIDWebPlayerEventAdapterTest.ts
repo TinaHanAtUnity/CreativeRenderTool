@@ -5,7 +5,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { MRAIDWebPlayerEventAdapter } from 'MRAID/EventBridge/MRAIDWebPlayerEventAdapter';
-import { IMRAIDHandler, MRAIDEvents, MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
+import { MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 import { Backend } from 'Backend/Backend';
 import { ICoreApi } from 'Core/ICore';
 import { Platform } from 'Core/Constants/Platform';
@@ -13,6 +13,7 @@ import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/Intersti
 import { Observable1 } from 'Core/Utilities/Observable';
 import { WebPlayerApi } from 'Ads/Native/WebPlayer';
 import { IAdsApi } from 'Ads/IAds';
+import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} MRAIDWebPlayerEventAdapter`, () => {

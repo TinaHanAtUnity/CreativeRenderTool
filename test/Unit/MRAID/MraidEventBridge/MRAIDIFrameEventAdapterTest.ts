@@ -8,7 +8,8 @@ import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapt
 import { Platform } from 'Core/Constants/Platform';
 import { Backend } from 'Backend/Backend';
 import { ICoreApi } from 'Core/ICore';
-import { IMRAIDHandler, MRAIDEvents, MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
+import { MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
+import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} MRAIDIframeEventAdapter`, () => {

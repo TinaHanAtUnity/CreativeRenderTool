@@ -1,17 +1,4 @@
-import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-
-export interface IExpandProperties {
-    width: number;
-    height: number;
-    useCustomClose: boolean;
-    isModal: boolean;
-}
-
-export interface IMRAIDDiagnostic {
-    type: string;
-    message: string;
-}
 
 export interface IMRAIDOrientationProperties {
     allowOrientationChange: boolean;
@@ -22,6 +9,35 @@ export interface IMRAIDAdapter {
     connect(): void;
     disconnect(): void;
     sendViewableEvent(viewable: boolean): void;
+}
+
+export interface IMRAIDHandler {
+    onBridgeSetOrientationProperties(allowOrientationChange: boolean, orientation: Orientation): void;
+    onBridgeOpen(url: string): void;
+    onBridgeLoad(): void;
+    onBridgeAnalyticsEvent(event: string, eventData: string): void;
+    onBridgeClose(): void;
+    onBridgeStateChange(customState: string): void;
+    onBridgeResizeWebview(): void;
+    onBridgeSendStats(totalTime: number, playTime: number, frameCount: number): void;
+    onBridgeAREvent(event: MessageEvent): void;
+}
+
+export interface IMRAIDOrientationProperties {
+    allowOrientationChange: boolean;
+    forceOrientation: string;
+}
+
+export enum MRAIDEvents {
+    ORIENTATION         = 'orientation',
+    OPEN                = 'open',
+    LOADED              = 'loaded',
+    ANALYTICS_EVENT     = 'analyticsEvent',
+    CLOSE               = 'close',
+    STATE_CHANGE        = 'customMraidState',
+    RESIZE_WEBVIEW      = 'resizeWebview',
+    SEND_STATS          = 'sendStats',
+    AR                  = 'ar'
 }
 
 export abstract class MRAIDEventAdapter implements IMRAIDAdapter {
