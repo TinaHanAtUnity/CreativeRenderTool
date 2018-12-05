@@ -523,5 +523,19 @@
     "description": "Creative id of the shown creative",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "analyticsUserId",
+    "type": "string",
+    "description": "Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending)",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "analyticsSessionId",
+    "type": "string",
+    "description": "Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]

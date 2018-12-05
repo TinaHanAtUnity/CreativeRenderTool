@@ -1,12 +1,13 @@
+import { IAdsApi } from 'Ads/IAds';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
-import { ABGroup, ExitSkipIconTest } from 'Core/Models/ABGroup';
+import { ABGroup, InstantInstallNowTest } from 'Core/Models/ABGroup';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -14,8 +15,11 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export interface IVideoOverlayParameters<T extends Campaign> {
+    platform: Platform;
+    ads: IAdsApi;
     deviceInfo: DeviceInfo;
     clientInfo: ClientInfo;
     campaign: T;
@@ -24,6 +28,11 @@ export interface IVideoOverlayParameters<T extends Campaign> {
 }
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
+
+    protected _privacy: AbstractPrivacy;
+    protected _showGDPRBanner: boolean;
+
+    private _ads: IAdsApi;
     private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
@@ -34,6 +43,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _videoProgress: number;
 
     private _muteEnabled: boolean = false;
+    private _showPrivacyDuringVideo: boolean = false;
 
     private _debugMessageVisible: boolean = false;
     private _callButtonVisible: boolean = false;
@@ -45,29 +55,29 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
     private _timerElement: HTMLElement;
+    private _chinaAdvertisementElement: HTMLElement;
 
     private _fadeTimer: any;
     private _areControlsVisible: boolean = false;
-    private _privacy: AbstractPrivacy;
-    private _gdprPopupClicked: boolean = false;
-    private _showGDPRBanner: boolean = false;
-    private _showPrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
-    private _seatId: number | undefined;
+
+    private _country: string | undefined;
     private _abGroup: ABGroup;
     private _campaign: Campaign;
 
-    constructor(nativeBridge: NativeBridge, parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean) {
-        super(nativeBridge, 'new-video-overlay', parameters.placement.muteVideo());
+    constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
+        super(parameters.platform, 'new-video-overlay', parameters.placement.muteVideo());
 
+        this._ads = parameters.ads;
         this._localization = new Localization(parameters.deviceInfo.getLanguage(), 'overlay');
-        this._showGDPRBanner = showGDPRBanner;
-        this._showPrivacyDuringVideo = showPrivacyDuringVideo;
         this._gameId = parameters.clientInfo.getGameId();
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
-        this._seatId = parameters.campaign.getSeatId();
+        this._country = parameters.coreConfig.getCountry();
         this._abGroup = parameters.coreConfig.getAbGroup();
         this._campaign = parameters.campaign;
+        this._showGDPRBanner = showGDPRBanner;
+        this._showPrivacyDuringVideo = showPrivacyDuringVideo;
+
         this._templateData = {
             muted: parameters.placement.muteVideo()
         };
@@ -136,14 +146,9 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
     public hide() {
         super.hide();
+        this.cleanUpPrivacy();
 
-        if (this._privacy) {
-            this._privacy.hide();
-            document.body.removeChild(this._privacy.container());
-            delete this._privacy;
-        }
-
-        if (this._showGDPRBanner && !this._gdprPopupClicked) {
+        if (this._showGDPRBanner) {
             this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
         }
     }
@@ -151,19 +156,13 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     public render(): void {
         super.render();
         this.setupElementReferences();
-        this.choosePrivacyShown();
 
-        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
-            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
-            if (tencentAdTag) {
-                tencentAdTag.innerText = '广告';
-            }
+        if (this._country === 'CN' && this._chinaAdvertisementElement) {
+            this._chinaAdvertisementElement.style.display = 'block';
         }
 
         if (CustomFeatures.isCheetahGame(this._gameId)) {
             this._skipButtonElement.classList.add('close-icon-skip');
-        } else if (ExitSkipIconTest.isValid(this._abGroup)) {
-            this._skipButtonElement.classList.add('exit-icon-skip');
         }
     }
 
@@ -207,6 +206,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         if (this._skipRemaining <= 0) {
             this.showSkipButton();
+            this._chinaAdvertisementElement.classList.add('with-skip-button');
         }
     }
 
@@ -256,18 +256,18 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             this._privacy.hide();
         }
         this._isPrivacyShowing = false;
-        this._nativeBridge.VideoPlayer.play();
+        this._ads.VideoPlayer.play();
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
         // do nothing
     }
 
-    public choosePrivacyShown(): void {
+    protected choosePrivacyShown(): void {
         if (!this._showPrivacyDuringVideo) {
             this._container.classList.remove('show-gdpr-banner');
             this._container.classList.remove('show-gdpr-button');
-        } else if (!this._gdprPopupClicked && this._showGDPRBanner) {
+        } else if (this._showGDPRBanner) {
             this._container.classList.add('show-gdpr-banner');
             this._container.classList.remove('show-gdpr-button');
         } else {
@@ -276,15 +276,14 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         }
     }
 
-    private onGDPRPopupEvent(event: Event) {
+    protected onGDPRPopupEvent(event: Event) {
         event.preventDefault();
         event.stopPropagation();
         this._isPrivacyShowing = true;
-        if (!this._gdprPopupClicked) {
-            this._gdprPopupClicked = true;
-            this.choosePrivacyShown();
-        }
-        this._nativeBridge.VideoPlayer.pause();
+        this._showGDPRBanner = false;
+        this.choosePrivacyShown();
+
+        this._ads.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();
         }
@@ -294,7 +293,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._isPrivacyShowing = true;
         event.preventDefault();
         event.stopPropagation();
-        this._nativeBridge.VideoPlayer.pause();
+        this._ads.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();
         }
@@ -373,6 +372,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._timerElement = <HTMLElement>this._container.querySelector('.timer');
+        this._chinaAdvertisementElement = <HTMLLIElement>this._container.querySelector('.china-advertisement');
     }
 
     private showSkipButton() {
@@ -402,10 +402,25 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private fadeIn() {
         this._container.classList.add('fade-in');
         this._areControlsVisible = true;
+
+        const isVASTCampaign = this._campaign instanceof VastCampaign;
+        if (isVASTCampaign || (this._skipEnabled && InstantInstallNowTest.isValid(this._abGroup))) {
+            setTimeout(() => {
+                this.showCallButton();
+            }, 500);
+        }
     }
 
     private fadeOut() {
         this._container.classList.remove('fade-in');
         this._areControlsVisible = false;
+    }
+
+    protected cleanUpPrivacy() {
+        if (this._privacy) {
+            this._privacy.hide();
+            document.body.removeChild(this._privacy.container());
+            delete this._privacy;
+        }
     }
 }

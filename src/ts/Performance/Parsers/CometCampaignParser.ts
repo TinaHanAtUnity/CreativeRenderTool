@@ -7,9 +7,10 @@ import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Request } from 'Core/Utilities/Request';
 import { IMRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
@@ -35,7 +36,7 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeVideo = 'comet/video';
     public static ContentTypeMRAID = 'comet/mraid-url';
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
@@ -60,10 +61,11 @@ export class CometCampaignParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: json.id,
             willExpireAt: undefined,
+            contentType: CometCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,
-            creativeId: undefined,
-            seatId: undefined,
+            creativeId: response.getCreativeId() || undefined,
+            seatId: response.getSeatId() || undefined,
             meta: json.meta,
             session: session,
             mediaId: response.getMediaId(),
@@ -92,6 +94,7 @@ export class CometCampaignParser extends CampaignParser {
                 appStoreId: json.appStoreId,
                 playableConfiguration: undefined
             };
+            parameters.contentType = CometCampaignParser.ContentTypeMRAID;
 
             const mraidCampaign = new PerformanceMRAIDCampaign(parameters);
 

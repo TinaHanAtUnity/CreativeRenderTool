@@ -1,10 +1,12 @@
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { StorageType } from 'Core/Native/Storage';
+
+import { StorageType, StorageApi } from 'Core/Native/Storage';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Url } from 'Core/Utilities/Url';
-import { Request } from 'Core/Utilities/Request';
 import { Model, ISchema } from 'Core/Models/Model';
 import { Promises } from 'Core/Utilities/Promises';
+import { RequestManager } from 'Core/Managers/RequestManager';
+import { IObserver2 } from 'Core/Utilities/IObserver';
+import { SdkApi } from 'Core/Native/Sdk';
 
 export interface IOrganicPurchase {
     productId: string | undefined;
@@ -12,6 +14,7 @@ export interface IOrganicPurchase {
     currency: string | undefined;
     receiptPurchaseData: string | undefined;
     signature: string | undefined;
+    ts: number | undefined;
 }
 
 export class OrganicPurchase extends Model<IOrganicPurchase> {
@@ -20,7 +23,8 @@ export class OrganicPurchase extends Model<IOrganicPurchase> {
         price: ['number', 'undefined'],
         currency: ['string', 'undefined'],
         receiptPurchaseData: ['string', 'undefined'],
-        signature: ['string', 'undefined']
+        signature: ['string', 'undefined'],
+        ts: ['number', 'undefined']
     };
 
     constructor(data: IOrganicPurchase) {
@@ -47,40 +51,57 @@ export class OrganicPurchase extends Model<IOrganicPurchase> {
         return this.get('signature');
     }
 
+    public getTs(): number | undefined {
+        return this.get('ts');
+    }
+
     public getDTO(): { [key: string]: any } {
         return {
             'productId': this.getId(),
             'price': this.getPrice(),
             'currency': this.getCurrency(),
             'receiptPurchaseData': this.getReceipt(),
-            'signature': this.getSignature()
+            'signature': this.getSignature(),
+            'ts': this.getTs()
         };
     }
 }
 
-// gets instantiated in webview.ts and will begin watching for organic purchase events.
+// gets instantiated in Promo.ts and will begin watching for organic purchase events.
 export class OrganicPurchaseManager {
 
     private static InAppPurchaseStorageKey = 'iap.purchases';
 
-    private _nativeBridge: NativeBridge;
+    private _storage: StorageApi;
+    private _sdk: SdkApi;
     private _promoEvents: PromoEvents;
-    private _request: Request;
+    private _request: RequestManager;
+    private _onSetObserver: (key: string, data: object) => void;
 
-    constructor(nativeBridge: NativeBridge, promoEvents: PromoEvents, request: Request) {
-        this._nativeBridge = nativeBridge;
+    constructor(storage: StorageApi, sdk: SdkApi, promoEvents: PromoEvents, request: RequestManager) {
+        this._storage = storage;
+        this._sdk = sdk;
         this._promoEvents = promoEvents;
         this._request = request;
+        this._onSetObserver = () => this.getOrganicPurchase();
     }
 
     public initialize(): Promise<void> {
-        const promise = this.getOrganicPurchase();
-        this._nativeBridge.Storage.onSet.subscribe(() => this.getOrganicPurchase());
-        return Promises.voidResult(promise);
+        return Promises.voidResult(this.getOrganicPurchase());
     }
 
-    private getOrganicPurchase(): Promise<void[]> {
-        return this._nativeBridge.Storage.get(StorageType.PUBLIC, OrganicPurchaseManager.InAppPurchaseStorageKey).then((data: any) => {
+    private subscribe() {
+        this.unsubscribe();
+        this._storage.onSet.subscribe(this._onSetObserver);
+    }
+
+    private unsubscribe() {
+        this._storage.onSet.unsubscribe(this._onSetObserver);
+    }
+
+    private getOrganicPurchase(): Promise<void> {
+        this.unsubscribe();
+        return this._storage.get(StorageType.PUBLIC, OrganicPurchaseManager.InAppPurchaseStorageKey).then((data: any) => {
             const promises: Promise<void>[] = [];
             if (data && data.length && data.length > 0) {
                 for(const event of data) {
@@ -88,15 +109,22 @@ export class OrganicPurchaseManager {
                     const promise = this.postOrganicPurchaseEvents(organicPurchaseEvent);
                     promises.push(promise);
                 }
-                promises.push(this.resetIAPPurchaseMetaData());
+                return Promise.all(promises).then(() => {
+                    return this.resetIAPPurchaseMetaData();
+                });
             }
-            return Promise.all(promises);
+        }).then(() => {
+            this.subscribe();
+            this._sdk.logError('Shawn getOrganicPurchase');
+        }).catch((e) => {
+            this.subscribe();
+            throw e;
         });
     }
 
     private resetIAPPurchaseMetaData(): Promise<void> {
-        return this._nativeBridge.Storage.set(StorageType.PUBLIC, OrganicPurchaseManager.InAppPurchaseStorageKey, []).then(() => {
-            return this._nativeBridge.Storage.write(StorageType.PUBLIC);
+        return this._storage.set(StorageType.PUBLIC, OrganicPurchaseManager.InAppPurchaseStorageKey, []).then(() => {
+            return this._storage.write(StorageType.PUBLIC);
         });
     }
 

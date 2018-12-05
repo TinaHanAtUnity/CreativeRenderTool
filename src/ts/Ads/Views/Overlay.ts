@@ -1,15 +1,18 @@
+import { IAdsApi } from 'Ads/IAds';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { Platform } from 'Core/Constants/Platform';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import OverlayTemplate from 'html/Overlay.html';
 
 export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
+    private _ads: IAdsApi;
+    private _deviceInfo: DeviceInfo;
     private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
@@ -36,6 +39,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _progressElement: HTMLElement;
     private _privacyButtonElement: HTMLElement;
     private _GDPRPopupElement: HTMLElement;
+    private _chinaAdvertisementElement: HTMLElement;
 
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
@@ -44,16 +48,17 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _showGDPRBanner: boolean = false;
     private _disablePrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
-    private _seatId: number | undefined;
+    private _country: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, seatId?: number) {
-        super(nativeBridge, 'overlay', muted);
+    constructor(platform: Platform, ads: IAdsApi, deviceInfo: DeviceInfo, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, country?: string) {
+        super(platform, 'overlay', muted);
 
+        this._deviceInfo = deviceInfo;
         this._localization = new Localization(language, 'overlay');
         this._showGDPRBanner = showGDPRBanner;
         this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
         this._gameId = gameId;
-        this._seatId = seatId;
+        this._country = country;
 
         this._templateData = {
             muted
@@ -130,13 +135,6 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     public render(): void {
         super.render();
 
-        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
-            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
-            if (tencentAdTag) {
-                tencentAdTag.innerText = '广告';
-            }
-        }
-
         this._skipElement = <HTMLElement>this._container.querySelector('.skip-hit-area');
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
@@ -145,7 +143,12 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
         this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
+        this._chinaAdvertisementElement = <HTMLElement>this._container.querySelector('.china-advertisement');
         this.choosePrivacyShown();
+
+        if(this._country === 'CN' && this._chinaAdvertisementElement) {
+            this._chinaAdvertisementElement.style.display = 'block';
+        }
 
         if(CustomFeatures.isCheetahGame(this._gameId)) {
             const skipIconElement = <HTMLElement>this._container.querySelector('.skip');
@@ -192,6 +195,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
             if(this._skipRemaining <= 0) {
                 this.setSkipElementVisible(true);
                 this.updateProgressCircle(this._skipElement, 1);
+                this._chinaAdvertisementElement.classList.add('with-skip-button');
             } else {
                 this.updateProgressCircle(this._skipElement, (this._skipDuration - this._skipRemaining) / this._skipDuration);
             }
@@ -242,7 +246,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
             this._privacy.hide();
         }
         this._isPrivacyShowing = false;
-        this._nativeBridge.VideoPlayer.play();
+        this._ads.VideoPlayer.play();
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
@@ -273,7 +277,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
             this._gdprPopupClicked = true;
             this.choosePrivacyShown();
         }
-        this._nativeBridge.VideoPlayer.pause();
+        this._ads.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();
         }
@@ -282,7 +286,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private onPrivacyEvent(event: Event) {
         this._isPrivacyShowing = true;
         event.preventDefault();
-        this._nativeBridge.VideoPlayer.pause();
+        this._ads.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();
         }
@@ -340,7 +344,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
+        if(this._platform === Platform.ANDROID && (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
             this._container.style.display = 'none';
             /* tslint:disable:no-unused-expression */

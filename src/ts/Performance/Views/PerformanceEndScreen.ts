@@ -1,17 +1,21 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { ICoreApi } from 'Core/ICore';
+import { Template } from 'Core/Utilities/Template';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
-import { Template } from 'Core/Utilities/Template';
 
 const SQUARE_END_SCREEN = 'square-end-screen';
 
 export class PerformanceEndScreen extends EndScreen {
+    private _core: ICoreApi;
     private _campaign: PerformanceCampaign;
+    private _country: string | undefined;
 
-    constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign) {
+    constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign, country?: string) {
         super(parameters);
 
         this._campaign = campaign;
+        this._country = country;
 
         this._template = new Template(this.getTemplate(), this._localization);
 
@@ -30,6 +34,9 @@ export class PerformanceEndScreen extends EndScreen {
             'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
             'endscreenAlt': this.getEndscreenAlt()
         };
+
+        this._core = parameters.core;
+        this._campaign = campaign;
     }
 
     protected onDownloadEvent(event: Event): void {
@@ -43,6 +50,15 @@ export class PerformanceEndScreen extends EndScreen {
             appDownloadUrl: this._campaign.getAppDownloadUrl(),
             adUnitStyle: this._adUnitStyle
         }));
+    }
+
+    public render(): void {
+        super.render();
+
+        const chinaAdvertisementElement: HTMLElement | null = this._container.querySelector('.china-advertisement');
+        if (this._country === 'CN' && chinaAdvertisementElement) {
+            chinaAdvertisementElement.style.display = 'block';
+        }
     }
 
     protected getEndscreenAlt(): string | undefined {
@@ -59,4 +75,5 @@ export class PerformanceEndScreen extends EndScreen {
         }
         return super.getTemplate();
     }
+
 }

@@ -1,20 +1,24 @@
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { Campaign } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
+import { AnalyticsManager } from 'Analytics/AnalyticsManager';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IPromoApi } from 'Promo/IPromo';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingCatalog } from 'Promo/Models/PurchasingCatalog';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { IPurchasingAdapter, IProduct, ITransactionDetails } from 'Purchasing/PurchasingAdapter';
-import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
-import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurchasingAdapter';
-import { Campaign } from 'Ads/Models/Campaign';
-import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
-import { Request } from 'Core/Utilities/Request';
+import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import { IProduct, IPurchasingAdapter } from 'Purchasing/PurchasingAdapter';
+import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurchasingAdapter';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -35,11 +39,13 @@ export interface IPromoPayload {
 
 export class PurchasingUtilities {
 
-    public static initialize(clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, nativeBridge: NativeBridge, placementManager: PlacementManager, campaignManager: CampaignManager, analyticsManager: AnalyticsManager | undefined, promoEvents: PromoEvents, request: Request) {
+    public static initialize(core: ICoreApi, promo: IPromoApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, placementManager: PlacementManager, campaignManager: CampaignManager, promoEvents: PromoEvents, request: RequestManager, analyticsManager?: AnalyticsManager) {
+        this._core = core;
+        this._promo = promo;
+        this._purchasing = purchasing;
         this._clientInfo = clientInfo;
         this._coreConfig = coreConfig;
         this._adsConfig = adsConfig;
-        this._nativeBridge = nativeBridge;
         this._placementManager = placementManager;
         this._analyticsManager = analyticsManager;
         this._promoEvents = promoEvents;
@@ -60,11 +66,11 @@ export class PurchasingUtilities {
         return this._isInitialized;
     }
 
-    public static onPurchase(productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean = false) {
-        return this._purchasingAdapter.purchaseItem(productId, campaign, placementId, isNative);
+    public static onPurchase(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean = false) {
+        return this._purchasingAdapter.purchaseItem(thirdPartyEventManager, productId, campaign, placementId, isNative);
     }
-    public static onPromoClosed(campaign: PromoCampaign, placementId: string): void {
-        this._purchasingAdapter.onPromoClosed(campaign, placementId);
+    public static onPromoClosed(thirdPartyEventManager: ThirdPartyEventManager, campaign: PromoCampaign, placementId: string): void {
+        this._purchasingAdapter.onPromoClosed(thirdPartyEventManager, campaign, placementId);
     }
 
     public static refreshCatalog(): Promise<void> {
@@ -137,6 +143,9 @@ export class PurchasingUtilities {
 
     private static _refreshPromise: Promise<void> | null;
     private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
+    private static _core: ICoreApi;
+    private static _promo: IPromoApi;
+    private static _purchasing: IPurchasingApi;
     private static _clientInfo: ClientInfo;
     private static _coreConfig: CoreConfiguration;
     private static _adsConfig: AdsConfiguration;
@@ -145,7 +154,7 @@ export class PurchasingUtilities {
     private static _purchasingAdapter: IPurchasingAdapter;
     private static _analyticsManager: AnalyticsManager | undefined;
     private static _promoEvents: PromoEvents;
-    private static _request: Request;
+    private static _request: RequestManager;
     private static _isInitialized = false;
 
     private static setProductPlacementStates(): void {
@@ -163,17 +172,17 @@ export class PurchasingUtilities {
     }
 
     private static getPurchasingAdapter() {
-        return this._nativeBridge.Monetization.CustomPurchasing.available().then((isAvailable) => {
+        return this._purchasing.CustomPurchasing.available().then((isAvailable) => {
             if (isAvailable) {
-                this._nativeBridge.Sdk.logInfo('CustomPurchasing delegate is set');
-                return new CustomPurchasingAdapter(this._nativeBridge, this._analyticsManager, this._promoEvents, this._request);
+                this._core.Sdk.logInfo('CustomPurchasing delegate is set');
+                return new CustomPurchasingAdapter(this._core, this._purchasing, this._promoEvents, this._request, this._analyticsManager);
             } else {
-                this._nativeBridge.Sdk.logInfo('UnityPurchasing delegate is set');
-                return new UnityPurchasingPurchasingAdapter(this._nativeBridge, this._coreConfig, this._adsConfig, this._clientInfo);
+                this._core.Sdk.logInfo('UnityPurchasing delegate is set');
+                return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._adsConfig, this._clientInfo);
             }
         }).catch((e) => {
-            this._nativeBridge.Sdk.logInfo('UnityPurchasing delegate is set');
-            return new UnityPurchasingPurchasingAdapter(this._nativeBridge, this._coreConfig, this._adsConfig, this._clientInfo);
+            this._core.Sdk.logInfo('UnityPurchasing delegate is set');
+            return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._adsConfig, this._clientInfo);
         });
     }
 
@@ -181,7 +190,7 @@ export class PurchasingUtilities {
         try {
             this._catalog = new PurchasingCatalog(products);
         } catch(e) {
-            this._nativeBridge.Sdk.logInfo('Error, cannot create catalog: ' + JSON.stringify(e));
+            this._core.Sdk.logInfo('Error, cannot create catalog: ' + JSON.stringify(e));
         }
     }
 }

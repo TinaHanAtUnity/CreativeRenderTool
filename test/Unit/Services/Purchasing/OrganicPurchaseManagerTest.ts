@@ -2,20 +2,20 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
-import { Request } from 'Core/Utilities/Request';
 import { OrganicPurchase, IOrganicPurchase, OrganicPurchaseManager } from 'Purchasing/OrganicPurchaseManager';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { StorageApi } from 'Core/Native/Storage';
+import { RequestManager } from 'Core/Managers/RequestManager';
+import { SdkApi } from 'Core/Native/Sdk';
 
 describe('OrganicPurchaseManager', () => {
 
     let organicPurchase: OrganicPurchase | undefined;
-
-    let nativeBridge: NativeBridge;
     let promoEvents: PromoEvents;
-    let request: Request;
+    let sdk: SdkApi;
+    let request: RequestManager;
+    let storage: StorageApi;
     let organicPurchaseManager: OrganicPurchaseManager;
     let onSetObservable: Observable2<string, object>;
     let getStub: sinon.SinonStub;
@@ -24,18 +24,17 @@ describe('OrganicPurchaseManager', () => {
     let postStub: sinon.SinonStub;
 
     beforeEach(() => {
-
-        nativeBridge = sinon.createStubInstance(NativeBridge);
-        nativeBridge.Storage = sinon.createStubInstance(StorageApi);
-        request = sinon.createStubInstance(Request);
+        request = sinon.createStubInstance(RequestManager);
+        storage = sinon.createStubInstance(StorageApi);
+        sdk = sinon.createStubInstance(SdkApi);
         promoEvents = sinon.createStubInstance(PromoEvents);
-        organicPurchaseManager = new OrganicPurchaseManager(nativeBridge, promoEvents, request);
+        organicPurchaseManager = new OrganicPurchaseManager(storage, sdk, promoEvents, request);
 
         onSetObservable = new Observable2();
-        nativeBridge.Storage.onSet = onSetObservable;
-        getStub = <sinon.SinonStub>nativeBridge.Storage.get;
-        setStub = (<sinon.SinonStub>nativeBridge.Storage.set);
-        writeStub = (<sinon.SinonStub>nativeBridge.Storage.write);
+        storage.onSet = onSetObservable;
+        getStub = <sinon.SinonStub>storage.get;
+        setStub = (<sinon.SinonStub>storage.set);
+        writeStub = (<sinon.SinonStub>storage.write);
         postStub = (<sinon.SinonStub>request.post);
 
         getStub.resolves({});
@@ -92,7 +91,8 @@ describe('OrganicPurchaseManager', () => {
                 price: 1.25,
                 currency: 'EUR',
                 receiptPurchaseData: 'testReceiptPurchaseData',
-                signature: 'testSignaure'
+                signature: 'testSignaure',
+                ts: 0
             };
             organicPurchase = new OrganicPurchase(organicPurchaseEvent);
 

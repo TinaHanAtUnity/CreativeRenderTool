@@ -100,7 +100,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
             session.setEventSent(EventType.IMPRESSION);
         }
 
-        this.sendThirdPartyImpressionEvent();
+        this.sendThirdPartyVastImpressionEvent();
         this.sendThirdPartyTrackingEvent('creativeView');
         this.sendThirdPartyTrackingEvent('start');
         this.sendThirdPartyTrackingEvent('impression');
@@ -152,7 +152,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         this.sendThirdPartyTrackingEvent('complete');
     }
 
-    private sendThirdPartyImpressionEvent(): void {
+    private sendThirdPartyVastImpressionEvent(): void {
         const impressionUrls = this._vastCampaign.getImpressionUrls();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
@@ -171,8 +171,6 @@ export class VastVideoEventHandler extends VideoEventHandler {
     }
 
     private sendThirdPartyEvent(event: string, url: string): void {
-        url = url.replace(/%ZONE%/, this._placement.getId());
-        url = url.replace(/%SDK_VERSION%/, this._clientInfo.getSdkVersion().toString());
         this._thirdPartyEventManager.sendWithGet(event, this._campaign.getSession().getId(), url, this._vastCampaign.getUseWebViewUserAgentForTracking());
     }
 }
