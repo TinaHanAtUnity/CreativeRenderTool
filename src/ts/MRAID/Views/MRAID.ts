@@ -25,16 +25,14 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _creativeId: string | undefined;
 
     private _iframe: HTMLIFrameElement;
-    private _thirdPartyEventManager: ThirdPartyEventManager | undefined;
 
-    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number, thirdPartyEventManager?: ThirdPartyEventManager) {
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(platform, core, deviceInfo, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
         this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
         this._creativeId = campaign.getCreativeId();
-        this._thirdPartyEventManager = thirdPartyEventManager;
 
         this._template = new Template(MRAIDTemplate);
     }
