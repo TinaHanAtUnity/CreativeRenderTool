@@ -73,15 +73,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
                 return this.openUrlOnCallButton(url);
             }).catch(() => {
-                const urlParts = Url.parse(clickThroughURL);
-                const error = new DiagnosticError(new Error('VAST overlay clickThroughURL error'), {
-                    contentType: 'vast_overlay',
-                    clickUrl: clickThroughURL,
-                    host: urlParts.host,
-                    protocol: urlParts.protocol,
-                    creativeId: this._vastCampaign.getCreativeId()
-                });
-                Diagnostics.trigger('click_request_head_rejected', error);
                 return this.openUrlOnCallButton(clickThroughURL);
             });
         } else {
