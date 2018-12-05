@@ -1,6 +1,6 @@
 import { AdsConfiguration, IAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
-import { GamePrivacy, PrivacyMethod } from 'Ads/Models/Privacy';
+import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 
@@ -32,12 +32,17 @@ export class AdsConfigurationParser {
         }
 
         let gamePrivacy : GamePrivacy;
+        let userPrivacy : UserPrivacy | undefined;
         const configGamePrivacy = configJson.gamePrivacy;
+        const configUserPrivacy = configJson.userPrivacy;
 
         if (configGamePrivacy) {
             gamePrivacy = new GamePrivacy(configGamePrivacy);
         } else {
             gamePrivacy = new GamePrivacy({ method: PrivacyMethod.DEFAULT });
+        }
+        if (configUserPrivacy) {
+            userPrivacy = new UserPrivacy(configUserPrivacy);
         }
 
         const configurationParams: IAdsConfiguration = {
@@ -48,7 +53,8 @@ export class AdsConfigurationParser {
             optOutRecorded: configJson.optOutRecorded,
             optOutEnabled: configJson.optOutEnabled,
             defaultBannerPlacement: defaultBannerPlacement,
-            gamePrivacy: gamePrivacy
+            gamePrivacy: gamePrivacy,
+            userPrivacy: userPrivacy
         };
         return new AdsConfiguration(configurationParams);
     }

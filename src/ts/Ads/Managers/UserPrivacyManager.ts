@@ -1,5 +1,5 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, IUnityConsentPermissions, PrivacyMethod } from 'Ads/Models/Privacy';
+import { GamePrivacy, UserPrivacy, IUnityConsentPermissions, PrivacyMethod } from 'Ads/Models/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
@@ -45,6 +45,7 @@ export class UserPrivacyManager {
     private readonly _coreConfig: CoreConfiguration;
     private readonly _adsConfig: AdsConfiguration;
     private readonly _gamePrivacy: GamePrivacy;
+    private readonly _userPrivacy: UserPrivacy;
     private readonly _clientInfo: ClientInfo;
     private readonly _deviceInfo: DeviceInfo;
     private readonly _request: RequestManager;
@@ -55,6 +56,7 @@ export class UserPrivacyManager {
         this._coreConfig = coreConfig;
         this._adsConfig = adsConfig;
         this._gamePrivacy = adsConfig.getGamePrivacy();
+        this._userPrivacy = adsConfig.getUserPrivacy();
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
