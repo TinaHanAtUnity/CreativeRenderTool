@@ -85,7 +85,6 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this._container.addEventHandler(this);
 
         if (VideoAdUnit.clickCTAForTesting) {
-            // tslint:disable-next-line:no-debugger
             (<HTMLButtonElement>this._overlay!.container()!.querySelector('.call-button'))!.click();
         }
 
