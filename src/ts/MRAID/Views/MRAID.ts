@@ -70,7 +70,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         if(this._domContentLoaded) {
 
             if (CustomFeatures.isLoopMeSeat(this._campaign.getSeatId())) {
-                this.sendTrackingEvent('impression');
+                this._handlers.forEach(handler => handler.onViewableChangeEvent());
             }
 
             this._mraidBridge.sendViewableEvent(viewable);
@@ -145,20 +145,5 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             return;
         }
         this._handlers.forEach(handler => handler.onMraidClick(url));
-    }
-
-    private sendTrackingEvent(eventName: string): void {
-        const sessionId = this._campaign.getSession().getId();
-        const trackingUrls = this._campaign.getTrackingUrls();
-
-        if(trackingUrls && trackingUrls[eventName]) {
-            const trackingEventUrls = trackingUrls[eventName];
-
-            if(trackingEventUrls) {
-                for (const url of trackingEventUrls) {
-                    this._thirdPartyEventManager!.sendWithGet(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
-                }
-            }
-        }
     }
 }

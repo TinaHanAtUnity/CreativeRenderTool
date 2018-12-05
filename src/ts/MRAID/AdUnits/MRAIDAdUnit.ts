@@ -195,13 +195,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         // EMPTY
     }
 
-    private unsetReferences() {
-        delete this._mraid;
-        delete this._endScreen;
-        delete this._privacy;
-    }
-
-    private sendTrackingEvent(eventName: string): void {
+    public sendTrackingEvent(eventName: string): void {
         const sessionId = this._campaign.getSession().getId();
 
         if(this._additionalTrackingEvents && this._additionalTrackingEvents[eventName]) {
@@ -213,6 +207,12 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 }
             }
         }
+    }
+
+    private unsetReferences() {
+        delete this._mraid;
+        delete this._endScreen;
+        delete this._privacy;
     }
 
     private getOperativeEventParams(): IOperativeEventParams {
