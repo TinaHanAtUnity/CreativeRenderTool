@@ -190,6 +190,10 @@ export class VastParserStrict {
         return Array.prototype.slice.call(nodeList);
     }
 
+    private getFirstNodeWithName(rootNode: HTMLElement, name: string): HTMLElement | null {
+        return rootNode.querySelector(name);
+    }
+
     private applyParentURLs(parsedVast: Vast, parent?: Vast) {
         if (parent) {
             const ad = parent.getAd();
@@ -224,14 +228,17 @@ export class VastParserStrict {
     private parseAdElement(adElement: HTMLElement): VastAd {
 
         // use the first 'InLine' ad
-        for (const element of this.getNodesWithName(adElement, VastNodeName.INLINE)) {
-            const inlineAd = this.parseAdContent(element);
+        const inlineElement = this.getFirstNodeWithName(adElement, VastNodeName.INLINE);
+        if (inlineElement) {
+            const inlineAd = this.parseAdContent(inlineElement);
             inlineAd.setId(adElement.getAttribute(VastAttributeNames.ID));
             return inlineAd;
         }
+
         // use the first 'Wrapper' ad if there is no 'InLine' ad
-        for (const element of this.getNodesWithName(adElement, VastNodeName.WRAPPER)) {
-            const wrapperAd = this.parseAdContent(element);
+        const wrapperElement = this.getFirstNodeWithName(adElement, VastNodeName.WRAPPER);
+        if (wrapperElement) {
+            const wrapperAd = this.parseAdContent(wrapperElement);
             wrapperAd.setId(adElement.getAttribute(VastAttributeNames.ID));
             return wrapperAd;
         }
@@ -278,7 +285,7 @@ export class VastParserStrict {
     private parseCreativeLinearElement(creativeElement: HTMLElement): VastCreativeLinear {
         const creative = new VastCreativeLinear();
 
-        const durationElement = this.getNodesWithName(creativeElement, VastNodeName.DURATION)[0];
+        const durationElement = this.getFirstNodeWithName(creativeElement, VastNodeName.DURATION);
         if (durationElement) {
             const durationString = this.parseNodeText(durationElement);
             creative.setDuration(this.parseDuration(durationString));
@@ -297,7 +304,7 @@ export class VastParserStrict {
             creative.setSkipDelay(null);
         }
 
-        const clickThroughElement = this.getNodesWithName(creativeElement, VastNodeName.CLICK_THROUGH)[0];
+        const clickThroughElement = this.getFirstNodeWithName(creativeElement, VastNodeName.CLICK_THROUGH);
         if (clickThroughElement) {
             const url = this.parseNodeText(clickThroughElement);
             creative.setVideoClickThroughURLTemplate(url);
@@ -334,7 +341,7 @@ export class VastParserStrict {
             creative.addMediaFile(mediaFile);
         });
 
-        const adParamsElement = this.getNodesWithName(creativeElement, VastNodeName.AD_PARAMETERS)[0];
+        const adParamsElement = this.getFirstNodeWithName(creativeElement, VastNodeName.AD_PARAMETERS);
         if (adParamsElement) {
             const adParameters = this.parseNodeText(adParamsElement);
             creative.setAdParameters(adParameters);
@@ -358,14 +365,14 @@ export class VastParserStrict {
             }
         });
 
-        const staticResourceElement = this.getNodesWithName(companionAdElement, VastNodeName.STATIC_RESOURCE)[0];
+        const staticResourceElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.STATIC_RESOURCE);
         if (staticResourceElement) {
             const creativeType = staticResourceElement.getAttribute(VastAttributeNames.CREATIVE_TYPE);
             companionAd.setCreativeType(creativeType);
             companionAd.setStaticResourceURL(this.parseNodeText(staticResourceElement));
         }
 
-        const companionClickThroughElement = this.getNodesWithName(companionAdElement, VastNodeName.COMPANION_CLICK_THROUGH)[0];
+        const companionClickThroughElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.COMPANION_CLICK_THROUGH);
         if (companionClickThroughElement) {
             companionAd.setCompanionClickThroughURLTemplate(this.parseNodeText(companionClickThroughElement));
         }
