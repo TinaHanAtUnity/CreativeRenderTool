@@ -74,10 +74,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         });
     }
 
-    public open(): Promise<void> {
-        return Promise.resolve();
-    }
-
     public hide(): Promise<void> {
         this.onHide();
         this.hideView();
