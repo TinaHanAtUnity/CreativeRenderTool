@@ -1,0 +1,486 @@
+<html>
+<head>
+    <style>
+        .noselect {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        #promo .backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background-color: #000;
+            opacity: 0.5;
+            text-align: center;
+        }
+        
+        #promo .promo-container {
+            display: flex;
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            opacity: 0;
+        }
+        
+        #promo .promo-container.start-animation {
+            animation: 0.3s jump-in, 0.3s fade-in;
+            -webkit-animation: 0.3s jump-in, 0.3s fade-in;
+            opacity: 1;
+        }
+        
+        #promo .promo-background {
+            position: relative;
+            margin: auto;
+            width: 100%;
+            height: 100%;
+        }
+        
+        #promo .promo-background.close-animation {
+            animation: 0.3s jump-out, 0.3s fade-out;
+            -webkit-animation: 0.3s jump-out, 0.3s fade-out;
+            opacity: 0;
+        }
+        
+        #promo .promo-background.portrait {
+            background-size: contain;
+            background-position: center;
+        }
+        
+        #promo .promo-background.landscape {
+            background-size: contain;
+            background-position: center;
+        }
+        
+        #promo .portrait .btn-promo {
+            top: 80%;
+            left: 25%;
+            width: 46%;
+            height: 11%;
+        }
+        
+        #promo .landscape .btn-promo {
+            top: 80%;
+            left: 25%;
+            width: 46%;
+            height: 11%;
+        }
+        
+        .hide {
+            display: none !important;
+        }
+        
+        #promo .btn-promo {
+            display: block;
+            background-size: contain;
+            background-position: center center;
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: transparent;
+            font-weight: bold;
+            text-align: center;
+            position: absolute;
+            justify-content: center;
+            align-items: center;
+            outline: none;
+        }
+        
+        #promo .btn-promo:active {
+            transform: translateY(4px);
+            -webkit-transform: translateY(4px);
+        }
+        
+        #promo .price-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: auto;
+            -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+        
+        #promo .btn-close {
+            position: absolute;
+            top: -11px;
+            right: -13px;
+            width: 48px;
+            height: 48px;
+            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAMAAAApWqozAAAAflBMVEUAAAD///////////////////////////////////////////////////////////////////////////////////96enp8fHyAgICNjY2Pj4+YmJibm5udnZ2np6eqqqqrq6uzs7O4uLjOzs7Pz8/U1NTg4OD29vb9/f3///+EXL7WAAAAFnRSTlMAASI4OURtg5CZmqWtv8LD2efu8vP8Qle0zwAAAXdJREFUOMuVldmSgkAMRaMMgwgKKMYNV2Q5//+D8yA6NItl3yfoPtWVTtK5IqYmjhcs4nQdLwLPmcgnuX5CS4nvjqLOkp6WziA6DRlUOB2IYPXcqx7XbL/b7bPro3qurHqx/G4AKLKtvrXNCgA2vyY7A6A8akfHEoCZcS5AfdMB3WqA1tnuBqhOOqhTBWzecU9XQHXQER0qYPXKSQjUJx3VqQbCphYAN/2gG8CzOhFQNsv3cxs635uPEohERFyAJmd36hZ9rmnoI4ArInOgeLG06HMNL7oAfJFJAmSt7Rdt/GRAMpEfoNpqDzBY3VaAIx6Qq3Zpk1XNAU8C4KJdusvqFQhk8R9yi+6ymgELiYG9dukuq3sglhTYaZ82Wd0Bqay/h9d2YVhdMACu36buy6I8AE8cm3JbNZL4Fi1q1/zfPqul/YO1GgV2Q8ZqfNkNRruRazfMWzaRXxqbyEdtws6ARMSJ+mjkjJvm3DTNufvRYxs7Tgft+A9/pK1YTQijoQAAAABJRU5ErkJggg==);
+            background-repeat: no-repeat;
+            transform: scale(0.75);
+            -webkit-transform: scale(0.75);
+        }
+        
+        *,
+        *:before,
+        *:after {
+            box-sizing: border-box;
+        }
+        
+        .set-size {
+            font-size: 2em;
+        }
+        
+        .charts-container:after {
+            clear: both;
+            content: "";
+            display: table;
+        }
+        
+        .pie-wrapper {
+            height: 1em;
+            width: 1em;
+            float: left;
+            margin: 15px;
+            position: absolute;
+            top: -19px;
+            right: -19px;
+            background-color: rgb(120, 120, 120);
+            border-radius: 100%;
+        }
+        
+        .pie-wrapper .pie {
+            height: 100%;
+            width: 100%;
+            clip: rect(0, 1em, 1em, 0.5em);
+            left: 0;
+            position: absolute;
+            top: 0;
+        }
+        
+        .pie-wrapper .pie .half-circle {
+            height: 100%;
+            width: 100%;
+            border: 0.1em solid #3498db;
+            border-radius: 50%;
+            clip: rect(0, 0.5em, 1em, 0);
+            left: 0;
+            position: absolute;
+            top: 0;
+        }
+        
+        .pie-wrapper .timerLabel {
+            font-family: Helvetica, sans-serif;
+            font-size: 16px;
+            border-radius: 50%;
+            bottom: 0;
+            color: #ecf0f1;
+            top: 40%;
+            cursor: default;
+            display: block;
+            position: absolute;
+            left: 0;
+            right: 0;
+            text-align: center;
+            margin-top: -7px;
+        }
+        
+        .pie-wrapper .shadow {
+            height: 100%;
+            width: 100%;
+            border: 0.1em solid #bdc3c7;
+            border-radius: 50%;
+        }
+        
+        .pie-wrapper.progress .pie .right-side {
+            -webkit-transform: rotate(180deg);
+            transform: rotate(180deg);
+            display: none;
+        }
+        
+        .pie-wrapper.progress .pie .half-circle {
+            border-color: white;
+            display: none;
+        }
+        
+        .animationTimerDuration {
+            display: none
+        }
+        
+        @media all and (orientation: portrait) {
+            .promo-background.landscape {
+                display: none;
+            }
+            .promo-background.portrait {
+                display: block;
+            }
+        }
+        
+        @media all and (orientation: landscape) {
+            .promo-background.landscape {
+                display: block;
+            }
+            .promo-background.portrait {
+                display: none;
+            }
+        }
+        
+        @keyframes jump-in {
+            from {
+                transform: scale(0.25)
+            }
+            to {
+                transform: scale(1)
+            }
+        }
+        
+        @-webkit-keyframes jump-in {
+            0% {
+                -webkit-transform: scale(0.25)
+            }
+            100% {
+                -webkit-transform: scale(1)
+            }
+        }
+        
+        @keyframes fade-in {
+            from {
+                opacity: 0
+            }
+            to {
+                opacity: 1
+            }
+        }
+        
+        @-webkit-keyframes fade-in {
+            0% {
+                opacity: 0
+            }
+            100% {
+                opacity: 1
+            }
+        }
+        
+        @keyframes jump-out {
+            from {
+                transform: scale(1)
+            }
+            to {
+                transform: scale(0.25)
+            }
+        }
+        
+        @-webkit-keyframes jump-out {
+            0% {
+                -webkit-transform: scale(1)
+            }
+            100% {
+                -webkit-transform: scale(0.25)
+            }
+        }
+        
+        @keyframes fade-out {
+            from {
+                opacity: 1
+            }
+            to {
+                opacity: 0
+            }
+        }
+        
+        @-webkit-keyframes fade-out {
+            0% {
+                opacity: 1
+            }
+            100% {
+                opacity: 0
+            }
+        }
+    </style>
+</head>
+
+<body id="promo" class="noselect">
+    <div class="backdrop"></div>
+    <div class="promo-container">
+
+        <span class="animationTimerDuration"><%= data.rewardedPromoTimerDuration %></span>
+        <div class="promo-background portrait" style="background-image: url('<%= data.portraitBackgroundImage && data.portraitBackgroundImage.replace("file://", "") %>')">
+            <button class="btn-promo" onclick="purchase()" style="background-image: url('<%= data.portraitButtonImage && data.portraitButtonImage.replace("file://", "") %>')">
+                <span class="price-text" style="font-family: <%= data.portraitPriceTextFontFamily %>; color: <%= data.portraitPriceTextFontColor %>; font-size: <%= data.portraitPriceTextFontSize %>vh"><%= data.localizedPrice %></span>
+            </button>
+
+            <div class="set-size charts-container pie-wrapper progress" style="visibility: hidden">
+                <span class="timerLabel">5</span>
+                <div class="pie">
+                    <div class="left-side half-circle"></div>
+                    <div class="right-side half-circle"></div>
+                </div>
+                <div class="shadow"></div>
+            </div>
+            <a onclick="closePromo(this)">
+                <span class="btn-close"></span>
+            </a>
+        </div>
+
+        <div class="promo-background landscape" style="background-image: url('<%= data.landscapeBackgroundImage && data.landscapeBackgroundImage.replace("file://", "") %>')">
+            <button class="btn-promo" onclick="purchase()" style="background-image: url('<%= data.landscapeButtonImage && data.landscapeButtonImage.replace("file://", "") %>')">
+                <span class="price-text" style="font-family: <%= data.landscapePriceTextFontFamily %>; color: <%= data.landscapePriceTextFontColor %>; font-size: <%= data.landscapePriceTextFontSize %>vh"><%= data.localizedPrice %></span>
+            </button>
+
+            <div class="set-size charts-container pie-wrapper progress" style="visibility: hidden">
+                <span class="timerLabel">5</span>
+                <div class="pie">
+                    <div class="left-side half-circle"></div>
+                    <div class="right-side half-circle"></div>
+                </div>
+                <div class="shadow"></div>
+            </div>
+            <a onclick="closePromo(this)">
+                <span class="btn-close"></span>
+            </a>
+        </div>
+
+    </div>
+</body>
+
+<script type="text/javascript">
+    var portraitImageSize = {
+        width: 580,
+        height: 1035
+    };
+    var landscapeImageSize = {
+        width: 580,
+        height: 1035
+    };
+    var portraitImageAspectRatio = round(portraitImageSize.width / portraitImageSize.height);
+    var landscapeImageAspectRatio = round(landscapeImageSize.width / landscapeImageSize.height);
+    var currentOrientation;
+    var animationMaxDuration = 5;
+    var animationTimePassed = 0;
+    var animationInterval;
+    var orientationIndex;
+    var doesBrowserSupportJavascriptCSSTransform = true;
+
+    var interval = setInterval(function() {
+        if (document.readyState === 'complete') {
+            clearInterval(interval);
+            initialize();
+        }
+    }, 100);
+
+    window.addEventListener('resize', function() {
+        setCurrentOrientation();
+        setStylesBasedOnAspectRatio();
+    });
+
+    function initialize() {
+        setCurrentOrientation();
+        setStylesBasedOnAspectRatio();
+        var animationTime = parseInt(document.querySelector(".animationTimerDuration").innerHTML);
+        if (animationTime > 0) {
+            startTimerAnimation(animationTime)
+        }
+        document.querySelector('#promo .promo-container').classList.add('start-animation');
+    }
+
+    function setStylesBasedOnAspectRatio() {
+        var screenAspectRatio = round(window.innerWidth / window.innerHeight);
+        var portraitContainer = document.querySelector('#promo .promo-background.portrait');
+        var landscapeContainer = document.querySelector('#promo .promo-background.landscape');
+        if (currentOrientation == 'landscape') {
+            screenAspectRatio = 1 / screenAspectRatio;
+        }
+        setContainerStyles(screenAspectRatio, portraitContainer, portraitImageAspectRatio);
+        setContainerStyles(1 / screenAspectRatio, landscapeContainer, landscapeImageAspectRatio);
+    }
+
+    function setContainerStyles(screenAspectRatio, container, imageAspectRatio) {
+        if (screenAspectRatio < imageAspectRatio) {
+            container.style.width = "100%";
+            container.style.height = 0;
+            container.style.paddingLeft = 0;
+            container.style.paddingTop = round(1 / imageAspectRatio * 100) + "%";
+        } else {
+            container.style.height = "100%";
+            container.style.width = 0;
+            container.style.paddingTop = 0;
+            container.style.paddingLeft = round(imageAspectRatio / screenAspectRatio * 100) + "%";
+        }
+    }
+
+    function setCurrentOrientation() {
+        if (window.innerWidth > window.innerHeight) {
+            currentOrientation = 'landscape';
+            orientationIndex = 1;
+        } else {
+            currentOrientation = 'portrait';
+            orientationIndex = 0;
+        }
+    }
+
+    function round(num) {
+        return Math.round(num * 100) / 100;
+    }
+
+    function checkIfBrowserSupportTransformAnimation() {
+        var transformElement = document.createElement("testingTransformElement")
+        var transformElementCSSText = transformElement.style.cssText;
+        transformElement.style.transform = 'rotate(180deg)'
+        doesBrowserSupportJavascriptCSSTransform = (transformElementCSSText != transformElement.style.cssText);
+    }
+
+    function updateTimerAnimation() {
+        document.getElementsByClassName("timerLabel")[orientationIndex].innerHTML = Math.ceil(animationMaxDuration - animationTimePassed)
+
+        if (doesBrowserSupportJavascriptCSSTransform) {
+            var leftSideDegrees = (360 / animationMaxDuration) * animationTimePassed
+            var leftCircle = document.getElementsByClassName("left-side")[orientationIndex]
+            leftCircle.style.transform = 'rotate(' + leftSideDegrees + 'deg)'
+            leftCircle.style.display = "block"
+
+            var rightCircle = document.getElementsByClassName("right-side")[orientationIndex]
+            if (leftSideDegrees < 180) {
+                rightCircle.style.display = "none"
+            } else {
+                rightCircle.style.display = "block"
+                document.querySelectorAll(".pie")[orientationIndex].style.clip = "rect(auto, auto, auto, auto)";
+            }
+        }
+
+        animationTimePassed = animationTimePassed + 0.1
+        if (animationTimePassed > animationMaxDuration) {
+            clearInterval(animationInterval)
+            document.getElementsByClassName("btn-close")[orientationIndex].style.visibility = "visible";
+            document.getElementsByClassName("progress")[orientationIndex].style.visibility = "hidden";
+        }
+    }
+
+    function startTimerAnimation(seconds) {
+        animationMaxDuration = seconds
+        checkIfBrowserSupportTransformAnimation();
+        document.getElementsByClassName("progress")[orientationIndex].style.visibility = "visible";
+        document.getElementsByClassName("timerLabel")[orientationIndex].innerHTML = animationMaxDuration
+        document.getElementsByClassName("btn-close")[orientationIndex].style.visibility = "hidden";
+        document.getElementsByClassName("half-circle")[orientationIndex].style.display = "block"
+        animationInterval = setInterval(updateTimerAnimation, 100)
+    }
+
+    function closePromo(el) {
+        window.parent.postMessage({
+            type: "close"
+        }, '*');
+        el.parentElement.classList.add('close-animation');
+    }
+
+    function purchase() {
+        window.parent.postMessage({
+            type: "promo"
+        }, '*');
+    }
+</script>
+
+</html>

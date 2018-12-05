@@ -10,6 +10,7 @@ import { View } from 'Core/Views/View';
 import PromoTpl from 'html/Promo.html';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import PromoIndexTpl from 'html/PromoIndex.html';
 
 export class Promo extends View<{}> implements IPrivacyHandler {
 
@@ -32,7 +33,6 @@ export class Promo extends View<{}> implements IPrivacyHandler {
     constructor(platform: Platform, core: ICoreApi, campaign: PromoCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, placement: Placement) {
         super(platform, 'promo');
         this._localization = new Localization(language, 'promo');
-
         this._core = core;
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
@@ -45,8 +45,35 @@ export class Promo extends View<{}> implements IPrivacyHandler {
         if(campaign) {
             this._templateData = {
                 'localizedPrice': PurchasingUtilities.getProductPrice(campaign.getIapProductId()),
-                'isRewardedPromo': !placement.allowSkip()
+                'isRewardedPromo': !placement.allowSkip(), // Support older promo version
+                'rewardedPromoTimerDuration': !placement.allowSkip() ? 5 : 0
             };
+            const portraitAssets = campaign.getPortraitAssets();
+            if (portraitAssets) {
+                const font = portraitAssets.getButtonAsset().getFont();
+                if (font) {
+                    this._templateData.portraitPriceTextFontFamily = font.getFamily();
+                    this._templateData.portraitPriceTextFontColor = font.getColor();
+                    this._templateData.portraitPriceTextFontSize = font.getSize();
+                    const fontURL = font.getUrl();
+                    this._templateData.portraitPriceTextFontURL = fontURL.length > 0 ? fontURL : undefined;
+                }
+                this._templateData.portraitBackgroundImage = portraitAssets.getBackgroundAsset().getImage().getUrl();
+                this._templateData.portraitButtonImage = portraitAssets.getButtonAsset().getImage().getUrl();
+            }
+            const landscapeAssets = campaign.getLandscapeAssets();
+            if (landscapeAssets) {
+                const font = landscapeAssets.getButtonAsset().getFont();
+                if (font) {
+                    this._templateData.landscapePriceTextFontFamily = font.getFamily();
+                    this._templateData.landscapePriceTextFontColor = font.getColor();
+                    this._templateData.landscapePriceTextFontSize = font.getSize();
+                    const fontURL = font.getUrl();
+                    this._templateData.landscapePriceTextFontURL = fontURL.length > 0 ? fontURL : undefined;
+                }
+                this._templateData.landscapeBackgroundImage = landscapeAssets.getBackgroundAsset().getImage().getUrl();
+                this._templateData.landscapeButtonImage = landscapeAssets.getButtonAsset().getImage().getUrl();
+            }
         }
 
         this._bindings = [
@@ -77,13 +104,17 @@ export class Promo extends View<{}> implements IPrivacyHandler {
         super.render();
 
         this._iframe = this._container.querySelector('iframe');
-
-        this.getPromoMarkup().then((markup) => {
-            if (markup) {
-                const tpl = new Template(markup, this._localization);
-                this._iframe!.setAttribute('srcdoc', tpl.render(this._templateData ? this._templateData : {}));
-            }
-        });
+        if (this._promoCampaign.isUsingServerTemplate()) {
+            this.getPromoMarkup().then((markup) => {
+                if (markup) {
+                    const tpl = new Template(markup, this._localization);
+                    this._iframe!.setAttribute('srcdoc', tpl.render(this._templateData ? this._templateData : {}));
+                }
+            });
+        } else {
+            const tpl = new Template(PromoIndexTpl, this._localization);
+            this._iframe!.setAttribute('srcdoc', tpl.render(this._templateData ? this._templateData : {}));
+        }
         this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
     }

@@ -45,7 +45,7 @@ describe('PromoCampaignParser', () => {
     });
 
     describe('parsing a campaign', () => {
-        describe('with valid payload', () => {
+        describe('with valid payload where the template is fetched from the backend', () => {
             let campaign: PromoCampaign;
             let sandbox: sinon.SinonSandbox;
 
@@ -79,9 +79,61 @@ describe('PromoCampaignParser', () => {
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
                 assert.equal(campaign.getIapProductId(), content.premiumProduct.productId, 'IAP Product ID is not equal');
                 assert.equal(campaign.getDynamicMarkup(), content.dynamicMarkup, 'Dynamic Markup is not equal');
-                assert.equal(campaign.getRewardedPromo(), content.rewardedPromo, 'Allow Skip is not equal');
                 assert.equal(campaign.getCreativeResource()!.getUrl(), content.creativeUrl, 'Creative URL is not equal');
                 assert.equal(campaign.getLimitedTimeOffer()!.getDuration(), 86400, 'Limited Time Offer duration is not equal');
+                assert.equal(campaign.isUsingServerTemplate(), true, 'Should not be using webview template');
+            });
+        });
+
+        describe('with valid payload where backend supplies enough information so webview template can be used', () => {
+            let campaign: PromoCampaign;
+            let sandbox: sinon.SinonSandbox;
+
+            const parse = (data: any) => {
+                const auctionPlacement = new AuctionPlacement(placementId, mediaId);
+                const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
+                return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
+                    campaign = <PromoCampaign>parsedCampaign;
+                });
+            };
+
+            beforeEach(() => {
+                sandbox = sinon.createSandbox();
+                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
+                sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
+                return parse(JSON.parse(IAPPromoCampaign).campaign2);
+            });
+
+            afterEach(() => {
+                sandbox.restore();
+            });
+
+            it('should have valid data', () => {
+                assert.isNotNull(campaign, 'Campaign is null');
+                assert.isTrue(campaign instanceof PromoCampaign, 'Campaign was not a PromoCampaign');
+                const json = JSON.parse(IAPPromoCampaign).campaign2;
+                const content = JSON.parse(json.content);
+                assert.equal(campaign.getSession(), session, 'Session is not equal');
+                assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
+                assert.equal(campaign.getIapProductId(), content.premiumProduct.productId, 'IAP Product ID is not equal');
+                assert.equal(campaign.getDynamicMarkup(), content.dynamicMarkup, 'Dynamic Markup is not equal');
+                assert.equal(campaign.getCreativeResource()!.getUrl(), content.creativeUrl, 'Creative URL is not equal');
+                assert.equal(campaign.getLimitedTimeOffer()!.getDuration(), 86400, 'Limited Time Offer duration is not equal');
+                assert.equal(campaign.isUsingServerTemplate(), false, 'Should be using server');
+                const portraitAsset = campaign.getPortraitAssets()!;
+                assert.equal(portraitAsset.getBackgroundAsset().getImage().getOriginalUrl(), content.portrait.background.url, 'portrait background url does not match');
+                assert.equal(portraitAsset.getButtonAsset().getImage().getOriginalUrl(), content.portrait.button.url, 'portrait background url does not match');
+                assert.equal(portraitAsset.getButtonAsset().getFont()!.getColor(), content.portrait.button.font.color, 'portrait button font color do not match');
+                assert.equal(portraitAsset.getButtonAsset().getFont()!.getSize(), content.portrait.button.font.size, 'portrait button font size do not match');
+                assert.equal(portraitAsset.getButtonAsset().getFont()!.getFamily(), content.portrait.button.font.family, 'portrait button font family do not match');
+                assert.equal(portraitAsset.getButtonAsset().getFont()!.getOriginalUrl(), content.portrait.button.font.url, 'portrait button font url do not match');
+                const landscapeAsset = campaign.getLandscapeAssets()!;
+                assert.equal(landscapeAsset.getBackgroundAsset().getImage().getOriginalUrl(), content.landscape.background.url, 'landscape background url does not match');
+                assert.equal(landscapeAsset.getButtonAsset().getImage().getOriginalUrl(), content.landscape.button.url, 'landscape background url does not match');
+                assert.equal(landscapeAsset.getButtonAsset().getFont()!.getColor(), content.landscape.button.font.color, 'landscape button font color do not match');
+                assert.equal(landscapeAsset.getButtonAsset().getFont()!.getSize(), content.landscape.button.font.size, 'landscape button font size do not match');
+                assert.equal(landscapeAsset.getButtonAsset().getFont()!.getFamily(), content.landscape.button.font.family, 'landscape button font family do not match');
+                assert.equal(landscapeAsset.getButtonAsset().getFont()!.getOriginalUrl(), content.landscape.button.font.url, 'landscape button font url do not match');
             });
         });
 
@@ -115,68 +167,6 @@ describe('PromoCampaignParser', () => {
                  };
                 const actual = campaign.getTrackingEventUrls();
                 assert.deepEqual(actual, expected);
-            });
-        });
-
-        describe('With content that includes rewardedPromo as false', () => {
-            let campaign: PromoCampaign;
-            let sandbox: sinon.SinonSandbox;
-
-            const parse = (data: any) => {
-                const auctionPlacement = new AuctionPlacement(placementId, mediaId);
-                const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
-                return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
-                    campaign = <PromoCampaign>parsedCampaign;
-                });
-            };
-
-            beforeEach(() => {
-                sandbox = sinon.createSandbox();
-                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
-                sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
-                return parse(JSON.parse(IAPPromoCampaign).campaign2);
-            });
-
-            afterEach(() => {
-                sandbox.restore();
-            });
-
-            it('should set rewardedPromo to false in the campaign', () => {
-                const json = JSON.parse(IAPPromoCampaign).campaign2;
-                const content = JSON.parse(json.content);
-                assert.equal(content.rewardedPromo, false);
-                assert.equal(campaign.getRewardedPromo(), content.rewardedPromo);
-            });
-        });
-
-        describe('With content that includes no rewardedPromo', () => {
-            let campaign: PromoCampaign;
-            let sandbox: sinon.SinonSandbox;
-
-            const parse = (data: any) => {
-                const auctionPlacement = new AuctionPlacement(placementId, mediaId);
-                const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
-                return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
-                    campaign = <PromoCampaign>parsedCampaign;
-                });
-            };
-
-            beforeEach(() => {
-                sandbox = sinon.createSandbox();
-                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
-                sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
-                return parse(JSON.parse(IAPPromoCampaign).campaign3);
-            });
-
-            afterEach(() => {
-                sandbox.restore();
-            });
-
-            it('should set rewardedPromo to false in the campaign', () => {
-                const json = JSON.parse(IAPPromoCampaign).campaign3;
-                const content = JSON.parse(json.content);
-                assert.equal(content.rewardedPromo, undefined);
-                assert.equal(campaign.getRewardedPromo(), false);
             });
         });
 

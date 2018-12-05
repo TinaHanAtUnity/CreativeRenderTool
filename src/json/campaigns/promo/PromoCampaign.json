@@ -2,7 +2,7 @@
     "campaign1": {
         "adType": "PROMO",
         "contentType": "purchasing/iap",
-        "content": "{\"iapProductId\":\"tinderProductID\",\"creativeUrl\":\"http:tinderWasHere.html\",\"rewardedPromo\":true,\"version\":1,\"limitedTimeOffer\":{\"duration\": 86400},\"premiumProduct\":{\"productId\":\"tinderProductID\",\"type\":\"PREMIUM\",\"quantity\":1}}",
+        "content": "{\"iapProductId\":\"tinderProductID\",\"creativeUrl\":\"http:tinderWasHere.html\",\"version\":1,\"limitedTimeOffer\":{\"duration\": 86400},\"premiumProduct\":{\"productId\":\"tinderProductID\",\"type\":\"PREMIUM\",\"quantity\":1}}",
         "trackingUrls": {
             "click": [
                 "https://events.iap.unity3d.com/events/v1/click?fakeEvent=true&val=1.99",
@@ -25,7 +25,7 @@
     "campaign2": {
         "adType": "PROMO2",
         "contentType": "purchasing/iap",
-        "content": "{\"iapProductId\":\"tinderProductID\",\"rewardedPromo\":false,\"version\":1,\"premiumProduct\":{\"productId\":\"tinderProductID\",\"type\":\"PREMIUM\",\"quantity\":1}}",
+        "content": "{\"iapProductId\":\"tinderProductID\",\"creativeUrl\":\"http:tinderWasHere.html\",\"version\":1,\"limitedTimeOffer\":{\"duration\":86400},\"premiumProduct\":{\"productId\":\"tinderProductID\",\"type\":\"PREMIUM\",\"quantity\":1},\"portrait\":{\"button\":{\"url\":\"https:\/\/storage.example.com\/button.png\",\"font\":{\"family\":\"Arial\",\"color\":\"FFFFFF\",\"size\":3.1,\"url\":\"https:\/\/storage.example.com\/font.ttf\"}},\"background\":{\"url\":\"https:\/\/storage.example.com\/background.png\"}},\"landscape\":{\"button\":{\"url\":\"https:\/\/storage.example.com\/button.png\",\"font\":{\"family\":\"Arial\",\"color\":\"FFFFFF\",\"size\":3.1,\"url\":\"\"}},\"background\":{\"url\":\"https:\/\/storage.example.com\/background.png\"}}}",
         "trackingUrls": {}
     },
     "campaign3": {
