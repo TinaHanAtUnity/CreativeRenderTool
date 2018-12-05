@@ -481,7 +481,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         const beginButton = <HTMLElement>this._cameraPermissionPanel.querySelector('.permission-accept-button');
         const buttonText = beginButton.innerHTML.trim();
         let autoBeginTimeout = ARMRAID.AutoBeginTimeout;
-        beginButton.innerHTML = `${buttonText}...${autoBeginTimeout}`;
+        beginButton.innerHTML = `Begins...${autoBeginTimeout}`;
 
         this._autoBeginTimer = setInterval(() => {
             const timerPaused = !this._viewable || this._permissionLearnMoreOpen || this._privacyPanelOpen;
@@ -490,7 +490,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }
 
             autoBeginTimeout--;
-            beginButton.innerHTML = `${buttonText}...${autoBeginTimeout}`;
+            beginButton.innerHTML = `Begins...${autoBeginTimeout}`;
 
             if (autoBeginTimeout <= 0) {
                 this.onCameraPermissionEvent(true);
