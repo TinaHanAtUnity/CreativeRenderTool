@@ -114,7 +114,7 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         return this.get('gamePrivacy');
     }
 
-    public getUserPrivacy(): GamePrivacy {
+    public getUserPrivacy(): GamePrivacy | undefined {
         return this.get('userPrivacy');
     }
 

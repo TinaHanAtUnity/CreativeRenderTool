@@ -45,7 +45,7 @@ export class UserPrivacyManager {
     private readonly _coreConfig: CoreConfiguration;
     private readonly _adsConfig: AdsConfiguration;
     private readonly _gamePrivacy: GamePrivacy;
-    private readonly _userPrivacy: UserPrivacy;
+    private readonly _userPrivacy: UserPrivacy | undefined;
     private readonly _clientInfo: ClientInfo;
     private readonly _deviceInfo: DeviceInfo;
     private readonly _request: RequestManager;
