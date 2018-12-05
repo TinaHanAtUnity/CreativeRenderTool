@@ -1,10 +1,10 @@
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { IObserver1 } from 'Core/Utilities/IObserver';
-import { AbstractMRAIDEventBridge, IMRAIDOrientationProperties } from 'MRAID/EventBridge/AbstractMraidEventBridge';
+import { MRAIDEventAdapter, IMRAIDOrientationProperties } from 'MRAID/EventBridge/MRAIDEventAdapter';
 import { ICoreApi } from 'Core/ICore';
-import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDBridgeContainer';
+import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 
-export class MraidWebPlayerEventBridge extends AbstractMRAIDEventBridge {
+export class MRAIDWebPlayerEventAdapter extends MRAIDEventAdapter {
     private _container: WebPlayerContainer;
     private _core: ICoreApi;
     private _webPlayerEventObserver: IObserver1<string>;

@@ -1,4 +1,4 @@
-import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDBridgeContainer';
+import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 
 export interface IExpandProperties {
@@ -18,13 +18,13 @@ export interface IMRAIDOrientationProperties {
     forceOrientation: string;
 }
 
-export interface IMRAIDBridge {
+export interface IMRAIDAdapter {
     connect(): void;
     disconnect(): void;
     sendViewableEvent(viewable: boolean): void;
 }
 
-export abstract class AbstractMRAIDEventBridge implements IMRAIDBridge {
+export abstract class MRAIDEventAdapter implements IMRAIDAdapter {
     protected _handler: IMRAIDHandler;
     protected _mraidHandlers: { [event: string]: (msg: any) => void };
 

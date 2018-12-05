@@ -13,7 +13,7 @@ import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { MRAIDBridgeContainer, IMRAIDHandler } from 'MRAID/EventBridge/MRAIDBridgeContainer';
+import { MRAIDAdapterContainer, IMRAIDHandler } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -78,7 +78,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _backgroundTime: number = 0;
     protected _backgroundTimestamp: number;
 
-    protected _mraidBridgeContainer: MRAIDBridgeContainer;
+    protected _mraidAdapterContainer: MRAIDAdapterContainer;
 
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(platform, id);
@@ -125,7 +125,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         ];
 
         this._gameSessionId = gameSessionId || 0;
-        this._mraidBridgeContainer = new MRAIDBridgeContainer(this);
+        this._mraidAdapterContainer = new MRAIDAdapterContainer(this);
     }
 
     public abstract setViewableState(viewable: boolean): void;

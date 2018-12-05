@@ -4,8 +4,8 @@ import * as sinon from 'sinon';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { MraidWebPlayerEventBridge } from 'MRAID/EventBridge/MraidWebPlayerEventBridge';
-import { IMRAIDHandler, MRAIDEvents, MRAIDBridgeContainer } from 'MRAID/EventBridge/MRAIDBridgeContainer';
+import { MRAIDWebPlayerEventAdapter } from 'MRAID/EventBridge/MRAIDWebPlayerEventAdapter';
+import { IMRAIDHandler, MRAIDEvents, MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 import { Backend } from 'Backend/Backend';
 import { ICoreApi } from 'Core/ICore';
 import { Platform } from 'Core/Constants/Platform';
@@ -15,17 +15,17 @@ import { WebPlayerApi } from 'Ads/Native/WebPlayer';
 import { IAdsApi } from 'Ads/IAds';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe(`${platform} MraidWebPlayerEventBridge`, () => {
+    describe(`${platform} MRAIDWebPlayerEventAdapter`, () => {
         let handler: IMRAIDHandler;
         let containerHandler: IMRAIDHandler;
-        let mraidBridge: MraidWebPlayerEventBridge;
+        let mraidAdapter: MRAIDWebPlayerEventAdapter;
         let webPlayerAPI: WebPlayerApi;
         let nativeBridge: NativeBridge;
         let backend: Backend;
         let core: ICoreApi;
         let ads: IAdsApi;
         let container: InterstitialWebPlayerContainer;
-        let mraidBridgeContainer: MRAIDBridgeContainer;
+        let mraidAdapterContainer: MRAIDAdapterContainer;
 
         beforeEach(() => {
             backend = TestFixtures.getBackend(platform);
@@ -48,16 +48,16 @@ import { IAdsApi } from 'Ads/IAds';
                 onBridgeAREvent: sinon.spy()
             };
 
-            mraidBridgeContainer = new MRAIDBridgeContainer(handler);
-            containerHandler = mraidBridgeContainer.getHandler();
+            mraidAdapterContainer = new MRAIDAdapterContainer(handler);
+            containerHandler = mraidAdapterContainer.getHandler();
 
             container = new InterstitialWebPlayerContainer(platform, ads);
-            mraidBridge = new MraidWebPlayerEventBridge(core, mraidBridgeContainer, container);
-            mraidBridge.connect();
+            mraidAdapter = new MRAIDWebPlayerEventAdapter(core, mraidAdapterContainer, container);
+            mraidAdapter.connect();
         });
 
         afterEach(() => {
-            mraidBridge.disconnect();
+            mraidAdapter.disconnect();
         });
 
         describe('receiving MRAID events', () => {

@@ -1,4 +1,4 @@
-import { AbstractMRAIDEventBridge } from 'MRAID/EventBridge/AbstractMraidEventBridge';
+import { MRAIDEventAdapter } from 'MRAID/EventBridge/MRAIDEventAdapter';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 
 export interface IMRAIDHandler {
@@ -30,8 +30,8 @@ export enum MRAIDEvents {
     AR                  = 'ar'
 }
 
-export class MRAIDBridgeContainer implements IMRAIDHandler {
-    private _eventBridge: AbstractMRAIDEventBridge;
+export class MRAIDAdapterContainer implements IMRAIDHandler {
+    private _eventAdapter: MRAIDEventAdapter;
     private _handler: IMRAIDHandler;
 
     constructor(handler: IMRAIDHandler) {
@@ -42,17 +42,17 @@ export class MRAIDBridgeContainer implements IMRAIDHandler {
         return this._handler;
     }
 
-    public connect(eventBridge: AbstractMRAIDEventBridge): void {
-        this._eventBridge = eventBridge;
-        this._eventBridge.connect();
+    public connect(eventAdapter: MRAIDEventAdapter): void {
+        this._eventAdapter = eventAdapter;
+        this._eventAdapter.connect();
     }
 
     public disconnect(): void {
-        this._eventBridge.connect();
+        this._eventAdapter.connect();
     }
 
     public sendViewableEvent(viewable: boolean) {
-        this._eventBridge.sendViewableEvent(viewable);
+        this._eventAdapter.sendViewableEvent(viewable);
     }
 
     public onBridgeSetOrientationProperties(allowOrientationChange: boolean, orientation: Orientation): void {

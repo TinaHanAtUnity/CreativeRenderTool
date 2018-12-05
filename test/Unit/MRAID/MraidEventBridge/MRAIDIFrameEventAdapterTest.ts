@@ -4,22 +4,22 @@ import * as sinon from 'sinon';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { MraidIFrameEventBridge } from 'MRAID/EventBridge/MraidIFrameEventBridge';
+import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
 import { Platform } from 'Core/Constants/Platform';
 import { Backend } from 'Backend/Backend';
 import { ICoreApi } from 'Core/ICore';
-import { IMRAIDHandler, MRAIDEvents, MRAIDBridgeContainer } from 'MRAID/EventBridge/MRAIDBridgeContainer';
+import { IMRAIDHandler, MRAIDEvents, MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe(`${platform} MraidIframeEventBridge`, () => {
+    describe(`${platform} MRAIDIframeEventAdapter`, () => {
         let handler: IMRAIDHandler;
         let containerHandler: IMRAIDHandler;
-        let mraidBridge: MraidIFrameEventBridge;
+        let mraidAdapter: MRAIDIFrameEventAdapter;
         let iframe: HTMLIFrameElement;
         let nativeBridge: NativeBridge;
         let backend: Backend;
         let core: ICoreApi;
-        let mraidBridgeContainer: MRAIDBridgeContainer;
+        let mraidAdapterContainer: MRAIDAdapterContainer;
 
         beforeEach(() => {
             backend = TestFixtures.getBackend(platform);
@@ -38,19 +38,19 @@ import { IMRAIDHandler, MRAIDEvents, MRAIDBridgeContainer } from 'MRAID/EventBri
                 onBridgeAREvent: sinon.spy()
             };
 
-            mraidBridgeContainer = new MRAIDBridgeContainer(handler);
-            containerHandler = mraidBridgeContainer.getHandler();
+            mraidAdapterContainer = new MRAIDAdapterContainer(handler);
+            containerHandler = mraidAdapterContainer.getHandler();
 
             iframe = document.createElement('iframe');
             document.body.appendChild(iframe);
 
-            mraidBridge = new MraidIFrameEventBridge(core, mraidBridgeContainer, iframe);
-            mraidBridge.connect();
+            mraidAdapter = new MRAIDIFrameEventAdapter(core, mraidAdapterContainer, iframe);
+            mraidAdapter.connect();
         });
 
         afterEach(() => {
             document.body.removeChild(iframe);
-            mraidBridge.disconnect();
+            mraidAdapter.disconnect();
         });
 
         describe('receiving MRAID events', () => {

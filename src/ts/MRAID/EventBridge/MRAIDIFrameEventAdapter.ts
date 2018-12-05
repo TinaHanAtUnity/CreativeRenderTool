@@ -1,8 +1,8 @@
 import { ICoreApi } from 'Core/ICore';
-import { AbstractMRAIDEventBridge, IMRAIDOrientationProperties } from 'MRAID/EventBridge/AbstractMraidEventBridge';
-import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDBridgeContainer';
+import { MRAIDEventAdapter, IMRAIDOrientationProperties } from 'MRAID/EventBridge/MRAIDEventAdapter';
+import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 
-export class MraidIFrameEventBridge extends AbstractMRAIDEventBridge {
+export class MRAIDIFrameEventAdapter extends MRAIDEventAdapter {
     private _iframe: HTMLIFrameElement;
     private _core: ICoreApi;
 
