@@ -1,4 +1,4 @@
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -79,7 +79,7 @@ describe('ThirdPartyEventManagerTest', () => {
         const requestSpy = <sinon.SinonSpy>request.get;
         const urlTemplate = 'http://foo.biz/%ZONE%/123';
         const placement = TestFixtures.getPlacement();
-        thirdPartyEventManager.setTemplateValues({ '%ZONE%': placement.getId() });
+        thirdPartyEventManager.setTemplateValues({[ThirdPartyEventMacro.ZONE]: placement.getId()});
         thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
         assert(requestSpy.calledOnce, 'request get should\'ve been called');
         assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/' + placement.getId() + '/123', 'Should have replaced %ZONE% from the url');
@@ -88,7 +88,7 @@ describe('ThirdPartyEventManagerTest', () => {
     it('should replace "%SDK_VERSION%" in the url with the SDK version as a query parameter', () => {
         const requestSpy = <sinon.SinonSpy>request.get;
         const urlTemplate = 'http://foo.biz/%SDK_VERSION%/123';
-        thirdPartyEventManager.setTemplateValues({ '%SDK_VERSION%': '12345' });
+        thirdPartyEventManager.setTemplateValues({[ThirdPartyEventMacro.SDK_VERSION]: '12345'});
         thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
         assert(requestSpy.calledOnce, 'request get should\'ve been called');
         assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/12345/123', 'Should have replaced %SDK_VERSION% from the url');
@@ -97,10 +97,20 @@ describe('ThirdPartyEventManagerTest', () => {
     it('should replace template values given in constructor', () => {
         const requestSpy = <sinon.SinonSpy>request.get;
         const urlTemplate = 'http://foo.biz/%SDK_VERSION%/123';
-        thirdPartyEventManager = new ThirdPartyEventManager(core, request, { '%SDK_VERSION%': '12345' });
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request, {[ThirdPartyEventMacro.SDK_VERSION]: '12345'});
         thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
         assert(requestSpy.calledOnce, 'request get should\'ve been called');
         assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/12345/123', 'Should have replaced %SDK_VERSION% from the url');
+    });
+
+    it('should replace template values added through setTemplateValue', () => {
+        const requestSpy = <sinon.SinonSpy>request.get;
+        const urlTemplate = 'http://foo.biz/%SDK_VERSION%/123';
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request, {});
+        thirdPartyEventManager.setTemplateValue(ThirdPartyEventMacro.SDK_VERSION, '12346');
+        thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
+        assert(requestSpy.calledOnce, 'request get should\'ve been called');
+        assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/12346/123', 'Should have replaced %SDK_VERSION% from the url');
     });
 
     describe('Sending Performance Tracking Urls', () => {

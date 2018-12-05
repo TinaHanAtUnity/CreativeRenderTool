@@ -6,7 +6,6 @@ import { BannerCampaignParser } from 'Banners/Parsers/BannerCampaignParser';
 import { assert } from 'chai';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import BannerCampaignJSON from 'json/campaigns/banner/ValidBannerCampaign.json';
@@ -17,10 +16,8 @@ import { Platform } from 'Core/Constants/Platform';
 
 describe('BannerCampaignParser', () => {
     const placementId = 'TestPlacement';
-    const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = ABGroupBuilder.getAbGroup(99);
 
     let parser: BannerCampaignParser;
     let nativeBridge: NativeBridge;

@@ -18,6 +18,7 @@ import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { IProduct, IPurchasingAdapter } from 'Purchasing/PurchasingAdapter';
 import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurchasingAdapter';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -65,11 +66,11 @@ export class PurchasingUtilities {
         return this._isInitialized;
     }
 
-    public static onPurchase(productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean = false) {
-        return this._purchasingAdapter.purchaseItem(productId, campaign, placementId, isNative);
+    public static onPurchase(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean = false) {
+        return this._purchasingAdapter.purchaseItem(thirdPartyEventManager, productId, campaign, placementId, isNative);
     }
-    public static onPromoClosed(campaign: PromoCampaign, placementId: string): void {
-        this._purchasingAdapter.onPromoClosed(campaign, placementId);
+    public static onPromoClosed(thirdPartyEventManager: ThirdPartyEventManager, campaign: PromoCampaign, placementId: string): void {
+        this._purchasingAdapter.onPromoClosed(thirdPartyEventManager, campaign, placementId);
     }
 
     public static refreshCatalog(): Promise<void> {

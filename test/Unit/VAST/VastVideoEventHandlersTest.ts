@@ -6,7 +6,7 @@ import { IAdsApi } from 'Ads/IAds';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, ThirdPartyEventMacro } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
@@ -109,7 +109,10 @@ describe('VastVideoEventHandler tests', () => {
         deviceInfo = new AndroidDeviceInfo(core);
         wakeUpManager = new WakeUpManager(core);
         request = new RequestManager(platform, core, wakeUpManager);
-        thirdPartyEventManager = new ThirdPartyEventManager(core, request);
+        thirdPartyEventManager = new ThirdPartyEventManager(core, request, {
+            [ThirdPartyEventMacro.ZONE]: placement.getId(),
+            [ThirdPartyEventMacro.SDK_VERSION]: '2000'
+        });
         sessionManager = new SessionManager(core, request, storageBridge);
 
         const coreConfig = TestFixtures.getCoreConfiguration();
@@ -126,7 +129,8 @@ describe('VastVideoEventHandler tests', () => {
             coreConfig: coreConfig,
             adsConfig: adsConfig,
             storageBridge: storageBridge,
-            campaign: campaign
+            campaign: campaign,
+            playerMetadataServerId: 'test-gamerSid'
         });
 
         privacyManager = sinon.createStubInstance(UserPrivacyManager);
@@ -203,23 +207,24 @@ describe('VastVideoEventHandler tests', () => {
             // given a VAST placement
             // when the session manager is told that the video has started
             // then the VAST start callback URL should be requested by the event manager
-            const mockEventManager = sinon.mock(thirdPartyEventManager);
-            mockEventManager.expects('sendWithGet').withArgs('vast start', '12345', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
-            mockEventManager.expects('sendWithGet').withArgs('vast impression', '12345', 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=123');
-            mockEventManager.expects('sendWithGet').withArgs('vast creativeView', '12345', 'http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
+            const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
+            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
 
             vastVideoEventHandler.onPlay('https://test.com');
 
-            mockEventManager.verify();
+            sinon.assert.calledWith(spySendWithGet, 'vast start', '12345', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%');
+            sinon.assert.calledWith(spySendWithGet, 'vast impression', '12345', 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=%ZONE%');
+            sinon.assert.calledWith(spySendWithGet, 'vast creativeView', '12345', 'http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%');
+
+            sinon.assert.calledWith(spyGetUrl, 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%');
+            assert.isTrue(spyGetUrl.returned('http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123'));
+            sinon.assert.calledWith(spyGetUrl, 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=%ZONE%');
+            assert.isTrue(spyGetUrl.returned('http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=123'));
+            sinon.assert.calledWith(spyGetUrl, 'http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%');
+            assert.isTrue(spyGetUrl.returned('http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123'));
         });
 
         it('sends start events from VAST and custom tracking URLs', () => {
-            // given a VAST placement
-            // when the session manager is told that the video has started
-            // then the VAST start callback URL should be requested by the event manager
-            const vastParser = TestFixtures.getVastParser();
-            const vastXml = EventTestVast;
-            const vast = vastParser.parseVast(vastXml);
 
             const customTracking = {
                 'start': [
@@ -237,17 +242,30 @@ describe('VastVideoEventHandler tests', () => {
             videoEventHandlerParams.campaign = vastAdUnitParameters.campaign;
             vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
 
-            const mockEventManager = sinon.mock(thirdPartyEventManager);
-            mockEventManager.expects('sendWithGet').withArgs('vast start', '12345', 'http://customTrackingUrl/start');
-            mockEventManager.expects('sendWithGet').withArgs('vast start', '12345', 'http://customTrackingUrl/start2');
-            mockEventManager.expects('sendWithGet').withArgs('vast start', '12345', 'http://customTrackingUrl/start3/123/blah?sdkVersion=2000');
-            mockEventManager.expects('sendWithGet').withArgs('vast start', '12345', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
-            mockEventManager.expects('sendWithGet').withArgs('vast impression', '12345', 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=123');
-            mockEventManager.expects('sendWithGet').withArgs('vast creativeView', '12345', 'http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
+            const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
+            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
 
             vastVideoEventHandler.onPlay('https://test.com');
 
-            mockEventManager.verify();
+            sinon.assert.calledWith(spySendWithGet, 'vast start', '12345', 'http://customTrackingUrl/start');
+            sinon.assert.calledWith(spySendWithGet, 'vast start', '12345', 'http://customTrackingUrl/start2');
+            sinon.assert.calledWith(spySendWithGet, 'vast start', '12345', 'http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=%SDK_VERSION%');
+            sinon.assert.calledWith(spySendWithGet, 'vast start', '12345', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%');
+            sinon.assert.calledWith(spySendWithGet, 'vast impression', '12345', 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=%ZONE%');
+            sinon.assert.calledWith(spySendWithGet, 'vast creativeView', '12345', 'http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%');
+
+            sinon.assert.calledWith(spyGetUrl, 'http://customTrackingUrl/start');
+            assert.isTrue(spyGetUrl.returned('http://customTrackingUrl/start'));
+            sinon.assert.calledWith(spyGetUrl, 'http://customTrackingUrl/start2');
+            assert.isTrue(spyGetUrl.returned('http://customTrackingUrl/start2'));
+            sinon.assert.calledWith(spyGetUrl, 'http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=%SDK_VERSION%');
+            assert.isTrue(spyGetUrl.returned('http://customTrackingUrl/start3/123/blah?sdkVersion=2000'));
+            sinon.assert.calledWith(spyGetUrl, 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%');
+            assert.isTrue(spyGetUrl.returned('http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123'));
+            sinon.assert.calledWith(spyGetUrl, 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=%ZONE%');
+            assert.isTrue(spyGetUrl.returned('http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=123'));
+            sinon.assert.calledWith(spyGetUrl, 'http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%');
+            assert.isTrue(spyGetUrl.returned('http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123'));
         });
 
         it('tiggers moat play event', () => {
@@ -268,14 +286,15 @@ describe('VastVideoEventHandler tests', () => {
             // given a VAST placement
             // when the session manager is told that the video has completed
             // then the VAST complete callback URL should be requested by the event manager
-            const mockEventManager = sinon.mock(thirdPartyEventManager);
-            const expectation = mockEventManager.expects('sendWithGet').once();
+            const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
+            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
             vastVideoEventHandler.onCompleted('https://test.com');
-            mockEventManager.verify();
 
-            assert.equal(expectation.getCall(0).args[0], 'vast complete', 'Second event sent should be \'vast complete\'');
-            assert.equal(expectation.getCall(0).args[1], '12345', 'Second event session id should be 12345');
-            assert.equal(expectation.getCall(0).args[2], 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123', 'Incorrect second event URL');
+            assert.equal(spySendWithGet.getCall(0).args[0], 'vast complete', 'Second event sent should be \'vast complete\'');
+            assert.equal(spySendWithGet.getCall(0).args[1], '12345', 'Second event session id should be 12345');
+            assert.equal(spySendWithGet.getCall(0).args[2], 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%', 'Incorrect second event URL');
+            sinon.assert.calledWith(spyGetUrl, 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%');
+            assert.isTrue(spyGetUrl.returned('http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123'));
         });
 
         it('should hide ad unit', () => {
@@ -368,50 +387,53 @@ describe('VastVideoEventHandler tests', () => {
     describe('sendImpressionEvent', () => {
         it('should replace "%ZONE%" in the url with the placement id', () => {
             const urlTemplate = 'http://foo.biz/%ZONE%/456';
-            sandbox.stub(campaign, 'getImpressionUrls').returns([ urlTemplate ]);
-
-            const mockEventManager = sinon.mock(thirdPartyEventManager);
-            const expectation = mockEventManager.expects('sendWithGet').thrice();
+            campaign.getImpressionUrls = sinon.stub().returns([urlTemplate]);
+            const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
+            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
             vastVideoEventHandler.onPlay('https://test.com');
-            mockEventManager.verify();
-            assert.equal(expectation.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
-            assert.equal(expectation.getCall(0).args[2], 'http://foo.biz/' + placement.getId() + '/456', 'First event url incorrect');
+            assert.equal(spySendWithGet.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
+            assert.equal(spySendWithGet.getCall(0).args[2], 'http://foo.biz/%ZONE%/456', 'First event url incorrect');
+            sinon.assert.calledWith(spyGetUrl, 'http://foo.biz/%ZONE%/456');
+            assert.isTrue(spyGetUrl.returned(`http://foo.biz/${placement.getId()}/456`));
         });
 
         it('should replace "%SDK_VERSION%" in the url with the SDK version', () => {
             const urlTemplate = 'http://foo.biz/%SDK_VERSION%/456';
-            sandbox.stub(campaign, 'getImpressionUrls').returns([ urlTemplate ]);
-
-            const mockEventManager = sinon.mock(thirdPartyEventManager);
-            const expectation = mockEventManager.expects('sendWithGet').thrice();
+            campaign.getImpressionUrls = sinon.stub().returns([urlTemplate]);
+            const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
+            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
             vastVideoEventHandler.onPlay('https://test.com');
-            mockEventManager.verify();
-            assert.equal(expectation.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
-            assert.equal(expectation.getCall(0).args[2], 'http://foo.biz/2000/456', 'First event url incorrect');
+            sinon.assert.calledThrice(spySendWithGet);
+            assert.equal(spySendWithGet.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
+            assert.equal(spySendWithGet.getCall(0).args[2], 'http://foo.biz/%SDK_VERSION%/456', 'First event url incorrect');
+            sinon.assert.calledWith(spyGetUrl, 'http://foo.biz/%SDK_VERSION%/456');
+            assert.isTrue(spyGetUrl.returned('http://foo.biz/2000/456'));
         });
 
         it('should replace "%SDK_VERSION%" in the url with the SDK version as a query parameter', () => {
-            const urlTemplate = 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%';
-            sandbox.stub(campaign, 'getImpressionUrls').returns([ urlTemplate ]);
-
-            const mockEventManager = sinon.mock(thirdPartyEventManager);
-            const expectation = mockEventManager.expects('sendWithGet').thrice();
+            const urlTemplate = 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%';
+            campaign.getImpressionUrls = sinon.stub().returns([urlTemplate]);
+            const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
+            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
             vastVideoEventHandler.onPlay('https://test.com');
-            mockEventManager.verify();
-            assert.equal(expectation.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
-            assert.equal(expectation.getCall(0).args[2], 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=2000', 'First event url incorrect');
+            sinon.assert.calledThrice(spySendWithGet);
+            assert.equal(spySendWithGet.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
+            assert.equal(spySendWithGet.getCall(0).args[2], 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%', 'First event url incorrect');
+            sinon.assert.calledWith(spyGetUrl, 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%');
+            assert.isTrue(spyGetUrl.returned('http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=2000'));
         });
 
         it('should replace both "%ZONE%" and "%SDK_VERSION%" in the url with corresponding parameters', () => {
             const urlTemplate = 'http://foo.biz/%ZONE%/%SDK_VERSION%/456';
-            sandbox.stub(campaign, 'getImpressionUrls').returns([ urlTemplate ]);
-
-            const mockEventManager = sinon.mock(thirdPartyEventManager);
-            const expectation = mockEventManager.expects('sendWithGet').thrice();
+            campaign.getImpressionUrls = sinon.stub().returns([urlTemplate]);
+            const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
+            const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
             vastVideoEventHandler.onPlay('https://test.com');
-            mockEventManager.verify();
-            assert.equal(expectation.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
-            assert.equal(expectation.getCall(0).args[2], 'http://foo.biz/' + placement.getId() + '/2000/456', 'First event url incorrect');
+            sinon.assert.calledThrice(spySendWithGet);
+            assert.equal(spySendWithGet.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
+            assert.equal(spySendWithGet.getCall(0).args[2], 'http://foo.biz/%ZONE%/%SDK_VERSION%/456', 'First event url incorrect');
+            sinon.assert.calledWith(spyGetUrl, 'http://foo.biz/%ZONE%/%SDK_VERSION%/456');
+            assert.isTrue(spyGetUrl.returned(`http://foo.biz/${placement.getId()}/2000/456`));
         });
     });
 });
