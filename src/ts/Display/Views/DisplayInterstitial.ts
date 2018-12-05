@@ -11,6 +11,7 @@ import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialC
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 export interface IDisplayInterstitialHandler extends IGDPREventHandler {
     onDisplayInterstitialClose(): void;
@@ -127,6 +128,10 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
+        // do nothing
+    }
+
+    public onPersonalizedConsent(permissions: IPermissions): void {
         // do nothing
     }
 

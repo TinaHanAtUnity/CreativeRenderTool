@@ -10,6 +10,7 @@ import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
+import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 export interface IEndScreenParameters {
     platform: Platform;
@@ -164,6 +165,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
+        // do nothing
+    }
+
+    public onPersonalizedConsent(permissions: IPermissions): void {
         // do nothing
     }
 

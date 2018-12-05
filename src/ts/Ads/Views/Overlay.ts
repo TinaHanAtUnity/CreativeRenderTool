@@ -7,6 +7,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
+import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 import OverlayTemplate from 'html/Overlay.html';
 
 export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
@@ -250,6 +251,10 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
+        // do nothing
+    }
+
+    public onPersonalizedConsent(permissions: IPermissions): void {
         // do nothing
     }
 

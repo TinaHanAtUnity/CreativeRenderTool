@@ -5,6 +5,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
+import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 import CloserTemplate from 'html/closer.html';
 
@@ -92,6 +93,10 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
+        // do nothing
+    }
+
+    public onPersonalizedConsent(permissions: IPermissions): void {
         // do nothing
     }
 

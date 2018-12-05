@@ -4,11 +4,14 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { ITemplateData, View } from 'Core/Views/View';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
     onPrivacyClose(): void;
     onGDPROptOut(optOutEnabled: boolean): void;
+    // todo: replace onGDPROptout with this new method
+    onPersonalizedConsent(permissions: IPermissions): void;
 }
 
 export interface IBuildInformation extends ITemplateData {

@@ -10,6 +10,7 @@ import { View } from 'Core/Views/View';
 import PromoTpl from 'html/Promo.html';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 export class Promo extends View<{}> implements IPrivacyHandler {
 
@@ -118,6 +119,10 @@ export class Promo extends View<{}> implements IPrivacyHandler {
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
+        // do nothing
+    }
+
+    public onPersonalizedConsent(permissions: IPermissions): void {
         // do nothing
     }
 

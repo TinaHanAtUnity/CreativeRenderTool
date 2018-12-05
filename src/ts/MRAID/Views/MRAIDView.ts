@@ -14,6 +14,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MraidIFrameEventBridge, IMRAIDHandler } from 'MRAID/Views/MraidIFrameEventBridge';
+import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -219,6 +220,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     public onGDPROptOut(optOutEnabled: boolean) {
+        // do nothing
+    }
+
+    public onPersonalizedConsent(permissions: IPermissions): void {
         // do nothing
     }
 

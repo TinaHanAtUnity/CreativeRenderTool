@@ -1,4 +1,4 @@
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
@@ -7,6 +7,7 @@ import { Template } from 'Core/Utilities/Template';
 import PrivacySettingsTemplate from 'html/consent/PrivacySettings.html';
 import { PrivacyRowItemContainer } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
+import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 enum ViewState {
     INITIAL,
@@ -18,11 +19,11 @@ enum ViewState {
 
 export class PrivacySettings extends AbstractPrivacy {
 
-    private _gdprManager: GdprManager;
+    private _gdprManager: UserPrivacyManager;
     private _privacyRowItemContainer: PrivacyRowItemContainer;
     private _personalizationCheckBoxGroup: PersonalizationCheckboxGroup;
 
-    constructor(platform: Platform, gdprManager: GdprManager, campaign?: Campaign,
+    constructor(platform: Platform, gdprManager: UserPrivacyManager, campaign?: Campaign,
                 gdprEnabled?: boolean,
                 isCoppaCompliant?: boolean) {
         super(platform, isCoppaCompliant || false, gdprEnabled || false, 'privacy-settings');
@@ -53,6 +54,11 @@ export class PrivacySettings extends AbstractPrivacy {
                 event: 'click',
                 listener: (event: Event) => this.onBuildInfoButtonEvent(event),
                 selector: '.build-info-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onCloseEvent(event),
+                selector: '.container'
             }
         ];
 
@@ -75,7 +81,19 @@ export class PrivacySettings extends AbstractPrivacy {
     protected onCloseEvent(event: Event): void {
         event.preventDefault();
 
+        const consent: IPermissions = {
+            personalizedConsent: {
+                gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
+                ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
+                external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
+            }
+        };
+
+        this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));
         this._handlers.forEach(handler => handler.onPrivacyClose());
+
+        // todo: for testing, remove
+        this.hide();
     }
 
     protected onPrivacyEvent(event: Event): void {

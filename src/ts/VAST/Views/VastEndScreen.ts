@@ -7,6 +7,7 @@ import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 export interface IVastEndScreenHandler {
     onVastEndScreenClick(): void;
@@ -124,6 +125,10 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     }
 
     public onGDPROptOut(optOutEnabled: boolean) {
+        // do nothing
+    }
+
+    public onPersonalizedConsent(permissions: IPermissions): void {
         // do nothing
     }
 

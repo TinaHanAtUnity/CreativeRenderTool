@@ -16,6 +16,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 export interface IVideoOverlayParameters<T extends Campaign> {
     platform: Platform;
@@ -260,6 +261,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
+        // do nothing
+    }
+
+    public onPersonalizedConsent(permissions: IPermissions): void {
         // do nothing
     }
 
