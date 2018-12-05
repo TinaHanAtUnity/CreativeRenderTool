@@ -16,6 +16,7 @@ import MRAIDContainer from 'html/mraid/container.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -24,14 +25,16 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _creativeId: string | undefined;
 
     private _iframe: HTMLIFrameElement;
+    private _thirdPartyEventManager: ThirdPartyEventManager | undefined;
 
-    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number, thirdPartyEventManager?: ThirdPartyEventManager) {
         super(platform, core, deviceInfo, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
         this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
         this._creativeId = campaign.getCreativeId();
+        this._thirdPartyEventManager = thirdPartyEventManager;
 
         this._template = new Template(MRAIDTemplate);
     }
@@ -65,6 +68,11 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public setViewableState(viewable: boolean) {
         if(this._domContentLoaded) {
+
+            if (CustomFeatures.isLoopMeSeat(this._campaign.getSeatId())) {
+                this.sendTrackingEvent('impression');
+            }
+
             this._mraidBridge.sendViewableEvent(viewable);
         }
         this.setAnalyticsBackgroundTime(viewable);
@@ -137,5 +145,20 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             return;
         }
         this._handlers.forEach(handler => handler.onMraidClick(url));
+    }
+
+    private sendTrackingEvent(eventName: string): void {
+        const sessionId = this._campaign.getSession().getId();
+        const trackingUrls = this._campaign.getTrackingUrls();
+
+        if(trackingUrls && trackingUrls[eventName]) {
+            const trackingEventUrls = trackingUrls[eventName];
+
+            if(trackingEventUrls) {
+                for (const url of trackingEventUrls) {
+                    this._thirdPartyEventManager.sendWithGet(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
+                }
+            }
+        }
     }
 }

@@ -43,7 +43,7 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
         } else if (ARUtil.isARCreative(parameters.campaign) || MRAIDAdUnitFactory._forcedARMRAID) {
             mraid = new ARMRAID(parameters.platform, parameters.core, parameters.ar, parameters.deviceInfo, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         } else {
-            mraid = new MRAID(parameters.platform, parameters.core, parameters.deviceInfo, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
+            mraid = new MRAID(parameters.platform, parameters.core, parameters.deviceInfo, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId, parameters.thirdPartyEventManager);
         }
 
         mraid.setMraidEventBridge(new MraidIFrameEventBridge(parameters.core, mraid));
