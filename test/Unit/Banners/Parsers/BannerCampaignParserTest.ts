@@ -16,7 +16,6 @@ import { Platform } from 'Core/Constants/Platform';
 
 describe('BannerCampaignParser', () => {
     const placementId = 'TestPlacement';
-    const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
 
