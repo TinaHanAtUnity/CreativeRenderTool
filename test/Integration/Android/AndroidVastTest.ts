@@ -82,6 +82,21 @@ describe('AndroidVastTest', () => {
         assert.isNotFalse(readyPlacement);
     });
 
+    const clickElementWhenPresent = (sel: string) => {
+        return new Promise((resolve) => {
+            const checkEl = () => {
+                const el = <HTMLButtonElement>document.querySelector(sel);
+                if (el) {
+                    el.click();
+                    resolve();
+                } else {
+                    window.setTimeout(checkEl, 20);
+                }
+            };
+            checkEl();
+        });
+    };
+
     describe('After showing a vast ad', () => {
         let finishState: string;
 
@@ -105,8 +120,7 @@ describe('AndroidVastTest', () => {
                 });
 
                 listener.onStart.subscribe((placement) => {
-                    const cta = <HTMLButtonElement>document.querySelector('.call-button');
-                    cta.click();
+                    clickElementWhenPresent('.call-button');
                 });
 
                 if (UnityAds.isReady('video')) {
