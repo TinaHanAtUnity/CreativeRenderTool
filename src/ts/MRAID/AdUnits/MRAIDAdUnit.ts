@@ -34,7 +34,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _options: any;
     private _orientationProperties: IOrientationProperties;
     private _endScreen?: EndScreen;
-    private _showingMRAID: boolean;
     private _clientInfo: ClientInfo;
     private _placement: Placement;
     private _campaign: MRAIDCampaign;
@@ -75,7 +74,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public show(): Promise<void> {
         this.setShowing(true);
-        this.setShowingMRAID(true);
+
         this._mraid.show();
         this._ads.Listener.sendStartEvent(this._placement.getId());
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
@@ -106,7 +105,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             return Promise.resolve();
         }
         this.setShowing(false);
-        this.setShowingMRAID(false);
 
         this._mraid.hide();
         this.removeEndScreenContainer();
@@ -143,14 +141,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public getMRAIDView(): MRAIDView<IMRAIDViewHandler> {
         return this._mraid;
-    }
-
-    public setShowingMRAID(showing: boolean) {
-        this._showingMRAID = showing;
-    }
-
-    public isShowingMRAID(): boolean {
-        return this._showingMRAID;
     }
 
     public onContainerShow(): void {

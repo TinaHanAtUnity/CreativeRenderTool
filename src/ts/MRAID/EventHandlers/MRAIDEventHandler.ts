@@ -109,7 +109,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     public onMraidShowEndScreen(): void {
         const endScreen = this._adUnit.getEndScreen();
         if(endScreen) {
-            this._adUnit.setShowingMRAID(false);
+            this._adUnit.setShowing(false);
             this._adUnit.getMRAIDView().hide();
             endScreen.show();
         }
