@@ -90,18 +90,6 @@ export abstract class MRAIDEventAdapter implements IMRAIDAdapter {
         this._handler.onBridgeStateChange(customState);
     }
 
-    protected handleSendStats(totalTime: number, playTime: number, frameCount: number) {
-        this._handler.onBridgeSendStats(totalTime, playTime, frameCount);
-    }
-
-    protected handleAr(event: MessageEvent) {
-        this._handler.onBridgeAREvent(event);
-    }
-
-    protected handleResizeWebview() {
-        this._handler.onBridgeResizeWebview();
-    }
-
     protected handleLoaded() {
         this._handler.onBridgeLoad();
     }

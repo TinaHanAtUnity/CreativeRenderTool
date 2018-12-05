@@ -51,4 +51,8 @@ export class MRAIDWebPlayerEventAdapter extends MRAIDEventAdapter {
 
         return this._container.sendEvent(webPlayerParams);
     }
+
+    private handleResizeWebview() {
+        this._handler.onBridgeResizeWebview();
+    }
 }
