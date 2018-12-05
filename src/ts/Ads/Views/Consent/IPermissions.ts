@@ -1,5 +1,5 @@
 export interface IPermissions {
-    all?: boolean;
+    all?: true;
     personalizedConsent?: IPersonalizedConsent;
     profiling?: boolean;
 }
