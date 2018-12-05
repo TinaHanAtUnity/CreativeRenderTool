@@ -19,6 +19,7 @@ import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
+import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 
 export abstract class AbstractAdUnitFactory {
     private static _forceGDPRBanner: boolean = false;
@@ -132,8 +133,14 @@ export abstract class AbstractAdUnitFactory {
         return video;
     }
 
-    protected createPrivacy(parameters: IAdUnitParameters<Campaign>): Privacy {
-        const privacy = new Privacy(parameters.platform, parameters.campaign, parameters.privacyManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
+    protected createPrivacy(parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
+        let privacy: AbstractPrivacy;
+        if (parameters.adsConfig.getGamePrivacy().isEnabled()) {
+            privacy = new PrivacySettings(parameters.platform, parameters.campaign, parameters.privacyManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
+        } else {
+            privacy = new Privacy(parameters.platform, parameters.campaign, parameters.privacyManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
+        }
+
         const privacyEventHandler = new PrivacyEventHandler(parameters);
 
         privacy.addEventHandler(privacyEventHandler);

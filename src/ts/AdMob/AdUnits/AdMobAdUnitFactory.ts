@@ -4,7 +4,7 @@ import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { AdMobView } from 'AdMob/Views/AdMobView';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export class AdMobAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -40,7 +40,7 @@ export class AdMobAdUnitFactory extends AbstractAdUnitFactory {
             privacyManager: parameters.privacyManager
         });
         view.addEventHandler(eventHandler);
-        Privacy.setupReportListener(privacy, adUnit);
+        AbstractPrivacy.setupReportListener(privacy, adUnit);
 
         return adUnit;
     }

@@ -9,7 +9,7 @@ import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/Performa
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
@@ -93,7 +93,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory {
                 }
             });
         }
-        Privacy.setupReportListener(privacy, performanceAdUnit);
+        AbstractPrivacy.setupReportListener(privacy, performanceAdUnit);
 
         return performanceAdUnit;
     }

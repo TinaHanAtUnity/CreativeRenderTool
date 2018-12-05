@@ -2,15 +2,37 @@ import { View } from 'Core/Views/View';
 import CheckBoxGroupTemplate from 'html/consent/personalization-checkbox-group.html';
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
+import { IPersonalizedConsent } from 'Ads/Views/Consent/IPermissions';
 
 export class PersonalizationCheckboxGroup extends View<{}> {
 
-    constructor(platform: Platform) {
+    private _currentPersonalizedConsent?: IPersonalizedConsent;
+    private _personalizedExpCheckbox: HTMLInputElement;
+    private _personalizedAdsCheckbox: HTMLInputElement;
+    private _personalized3rdPartyCheckbox: HTMLInputElement;
+
+    constructor(platform: Platform, currentConsent?: IPersonalizedConsent) {
         super(platform, 'personalization-checkbox-group');
 
+        this._currentPersonalizedConsent = currentConsent;
         this._template = new Template(CheckBoxGroupTemplate);
 
         this._bindings = [];
+    }
+
+    public render(): void {
+        super.render();
+
+        this._personalizedExpCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-experience-checkbox');
+        this._personalizedAdsCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-checkbox');
+        this._personalized3rdPartyCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-3rd-party');
+
+        if (this._currentPersonalizedConsent) {
+            this._personalizedExpCheckbox.checked = this._currentPersonalizedConsent.gameExp;
+            this._personalizedAdsCheckbox.checked = this._currentPersonalizedConsent.ads;
+            this._personalized3rdPartyCheckbox.checked = this._currentPersonalizedConsent.external;
+        }
+
     }
 
     public show(): void {
@@ -28,41 +50,33 @@ export class PersonalizationCheckboxGroup extends View<{}> {
             }
         }
 
-        const mainCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-checkbox');
-        const subCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-3rd-party');
-        if (subCheckbox) {
-            subCheckbox.onchange = () => {
-                if (subCheckbox.checked) {
-                    mainCheckbox.checked = true;
+        if (this._personalized3rdPartyCheckbox) {
+            this._personalized3rdPartyCheckbox.onchange = () => {
+                if (this._personalized3rdPartyCheckbox.checked) {
+                    this._personalizedAdsCheckbox.checked = true;
                 }
             };
         }
 
-        if (mainCheckbox) {
-            mainCheckbox.onchange = () => {
-                if (!mainCheckbox.checked) {
-                    subCheckbox.checked = false;
+        if (this._personalizedAdsCheckbox) {
+            this._personalizedAdsCheckbox.onchange = () => {
+                if (!this._personalizedAdsCheckbox.checked) {
+                    this._personalized3rdPartyCheckbox.checked = false;
                 }
             };
         }
     }
 
     public isPersonalizedExperienceChecked(): boolean {
-        const experienceCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-experience-checkbox');
-
-        return experienceCheckbox ? experienceCheckbox.checked : false;
+        return this._personalizedExpCheckbox ? this._personalizedExpCheckbox.checked : false;
     }
 
     public isPersonalizedAdsChecked(): boolean {
-        const adsCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-checkbox');
-
-        return adsCheckbox ? adsCheckbox.checked : false;
+        return this._personalizedAdsCheckbox ? this._personalizedAdsCheckbox.checked : false;
     }
 
     public isAds3rdPartyChecked(): boolean {
-        const ads3rdPartyCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-3rd-party');
-
-        return ads3rdPartyCheckbox ? ads3rdPartyCheckbox.checked : false;
+        return this._personalized3rdPartyCheckbox ? this._personalized3rdPartyCheckbox.checked : false;
     }
 
 }

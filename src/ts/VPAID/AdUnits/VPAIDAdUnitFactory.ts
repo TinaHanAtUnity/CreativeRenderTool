@@ -8,7 +8,7 @@ import { VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
 import { VPAIDEndScreenEventHandler } from 'VPAID/EventHandlers/VPAIDEndScreenEventHandler';
 import { Closer } from 'Ads/Views/Closer';
 import { VPAID } from 'VPAID/Views/VPAID';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export class VPAIDAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -47,7 +47,7 @@ export class VPAIDAdUnitFactory extends AbstractAdUnitFactory {
             const endScreenEventHandler = new VPAIDEndScreenEventHandler(vpaidAdUnit, vpaidAdUnitParameters);
             endScreen.addEventHandler(endScreenEventHandler);
         }
-        Privacy.setupReportListener(privacy, vpaidAdUnit);
+        AbstractPrivacy.setupReportListener(privacy, vpaidAdUnit);
 
         return vpaidAdUnit;
     }

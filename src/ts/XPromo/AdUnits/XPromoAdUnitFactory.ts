@@ -9,7 +9,7 @@ import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandle
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { Platform } from 'Core/Constants/Platform';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 import { AndroidBackButtonSkipTest } from 'Core/Models/ABGroup';
@@ -76,7 +76,7 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
                 }
             });
         }
-        Privacy.setupReportListener(privacy, xPromoAdUnit);
+        AbstractPrivacy.setupReportListener(privacy, xPromoAdUnit);
 
         return xPromoAdUnit;
     }

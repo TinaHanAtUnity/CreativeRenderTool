@@ -19,14 +19,13 @@ enum ViewState {
 
 export class PrivacySettings extends AbstractPrivacy {
 
-    private _gdprManager: UserPrivacyManager;
     private _privacyRowItemContainer: PrivacyRowItemContainer;
     private _personalizationCheckBoxGroup: PersonalizationCheckboxGroup;
 
-    constructor(platform: Platform, gdprManager: UserPrivacyManager, campaign?: Campaign,
-                gdprEnabled?: boolean,
-                isCoppaCompliant?: boolean) {
-        super(platform, isCoppaCompliant || false, gdprEnabled || false, 'privacy-settings');
+    constructor(platform: Platform, campaign: Campaign, privacyManager: UserPrivacyManager,
+                gdprEnabled: boolean,
+                isCoppaCompliant: boolean) {
+        super(platform, privacyManager, isCoppaCompliant, gdprEnabled, 'privacy-settings');
 
         this._template = new Template(PrivacySettingsTemplate);
         this._bindings = [
@@ -58,12 +57,13 @@ export class PrivacySettings extends AbstractPrivacy {
             {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.container'
+                selector: '.close-area'
             }
         ];
 
-        this._privacyRowItemContainer = new PrivacyRowItemContainer({ platform: platform, gdprManager: gdprManager });
-        this._personalizationCheckBoxGroup = new PersonalizationCheckboxGroup(platform);
+        this._privacyRowItemContainer = new PrivacyRowItemContainer({ platform: platform, gdprManager: privacyManager });
+        // todo: add user privacy
+        this._personalizationCheckBoxGroup = new PersonalizationCheckboxGroup(platform, { gameExp: true, ads: false, external: true});
     }
 
     public render(): void {

@@ -1,7 +1,5 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { Privacy } from 'Ads/Views/Privacy';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import {
     DisplayInterstitialAdUnit,
     IDisplayInterstitialAdUnitParameters
@@ -9,6 +7,7 @@ import {
 import { DisplayInterstitialEventHandler } from 'Display/EventHandlers/DisplayInterstitialEventHandler';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export class DisplayInterstitialAdUnitFactory extends AbstractAdUnitFactory {
 
@@ -24,7 +23,7 @@ export class DisplayInterstitialAdUnitFactory extends AbstractAdUnitFactory {
         const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(displayInterstitialParameters);
         const displayInterstitialEventHandler = new DisplayInterstitialEventHandler(displayInterstitialAdUnit, displayInterstitialParameters);
         view.addEventHandler(displayInterstitialEventHandler);
-        Privacy.setupReportListener(privacy, displayInterstitialAdUnit);
+        AbstractPrivacy.setupReportListener(privacy, displayInterstitialAdUnit);
 
         return displayInterstitialAdUnit;
     }

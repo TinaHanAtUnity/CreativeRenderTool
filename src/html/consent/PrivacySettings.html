@@ -1,3 +1,4 @@
+<div class="close-area"></div>
 <div class="container">
     <div class="back-button">
         <span class="consent-icon-arrow"></span>
@@ -6,7 +7,7 @@
         <div class="privacy-logo">
             <span class="icon-gdpr"></span>
             <div class="title">
-                <span class="centered-title">Ads privacy settings</span>
+                <span >Ads privacy settings</span>
             </div>
             <div class="description">
                 <p class="text">We always try to deliver the best possible experience for gamers. We collect your
@@ -48,13 +49,24 @@
         </div>
     </div>
     <div class="view-your-data-container">
-
+        <div class="heading"><span>Your data & deletion options</span></div>
+        <div class="text">
+            <p>
+                ???
+            </p>
+        </div>
     </div>
     <div class="report-ad-container">
 
     </div>
     <div class="build-info-container">
-
+        <% for (var k in data.buildInformation) { %>
+        <p class="build-information-item text">
+            <span class="build-information-key">
+                <%= k %>:</span> <span class="build-information-value">
+                <%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>
+        </p>
+        <% } %>
     </div>
 
 </div>

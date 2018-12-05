@@ -1,13 +1,8 @@
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
-import { BlockingReason, CreativeBlocking } from 'Core/Utilities/CreativeBlocking';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Observable2 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import PrivacyTemplate from 'html/Privacy.html';
 
@@ -27,8 +22,6 @@ enum ReportReason {
 
 export class Privacy extends AbstractPrivacy {
 
-    private _onReport: Observable2<Campaign, string> = new Observable2();
-    private _privacyManager: UserPrivacyManager;
     private _dataDeletionConfirmation: boolean = false;
     private _currentState: PrivacyCardState = PrivacyCardState.PRIVACY;
     private _campaign: Campaign;
@@ -40,14 +33,13 @@ export class Privacy extends AbstractPrivacy {
                 privacyManager: UserPrivacyManager, gdprEnabled: boolean,
                 isCoppaCompliant: boolean) {
 
-        super(platform, isCoppaCompliant, gdprEnabled, 'privacy');
+        super(platform, privacyManager, isCoppaCompliant, gdprEnabled, 'privacy');
         this._templateData.reportKeys = Object.keys(ReportReason);
         this._templateData.reportReasons = Object.keys(ReportReason).map((reason: any) => ReportReason[reason]);
 
         this._template = new Template(PrivacyTemplate);
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
-        this._privacyManager = privacyManager;
 
         this._bindings = [
             {
@@ -263,54 +255,5 @@ export class Privacy extends AbstractPrivacy {
                 document.getElementById('sorry-message')!.innerHTML = 'Sorry. We were unable to deliver our collected information at this time.';
             });
         }
-    }
-
-    private static onUserReport(campaign: Campaign, reasonKey: string, ad: AbstractAdUnit | AbstractVideoOverlay): void {
-        let adType;
-        let isCached;
-        let finishState;
-
-        if (ad instanceof AbstractAdUnit) {
-            adType = ad.description();
-            finishState = FinishState[ad.getFinishState()];
-            isCached = ad.isCached();
-            ad.markAsSkipped(); // Don't grant user potential reward to prevent bad reports
-        } else {
-            adType = campaign.getAdType();
-            finishState = 'VIDEO_PROGRESS';
-        }
-
-        const creativeId = campaign.getCreativeId();
-        const seatId = campaign.getSeatId();
-        CreativeBlocking.report(creativeId, seatId, BlockingReason.USER_REPORT, {
-            message: reasonKey
-        });
-
-        const error = {
-            creativeId: creativeId,
-            reason: reasonKey,
-            adType: adType,
-            seatId: seatId,
-            finishState: finishState,
-            isCached: isCached
-        };
-        Diagnostics.trigger('reported_ad', error);
-    }
-
-    // After the report, wait four seconds and close the ad
-    private static timeoutAd(ad: AbstractAdUnit | AbstractVideoOverlay): Promise<void> {
-        return new Promise(() => {
-            setTimeout(() => {
-                return ad.hide();
-            }, 4000);
-        });
-    }
-
-    public static setupReportListener(privacy: Privacy, ad: AbstractAdUnit | AbstractVideoOverlay): void {
-        privacy._onReport.subscribe((campaign: Campaign, reasonKey: string) => {
-            this.onUserReport(campaign, reasonKey, ad);
-            this.timeoutAd(ad);
-            privacy._onReport.unsubscribe();
-        });
     }
 }

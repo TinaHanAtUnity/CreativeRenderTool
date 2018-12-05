@@ -1,7 +1,7 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ExtendedMRAID } from 'MRAID//Views/ExtendedMRAID';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
@@ -78,7 +78,7 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
             });
         }
 
-        Privacy.setupReportListener(privacy, mraidAdUnit);
+        AbstractPrivacy.setupReportListener(privacy, mraidAdUnit);
         return mraidAdUnit;
     }
 
