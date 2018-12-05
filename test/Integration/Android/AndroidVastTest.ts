@@ -104,15 +104,16 @@ describe('AndroidVastTest', () => {
                     }
                 });
 
-                VideoAdUnit.clickCTAForTesting = true;
+                debugger;
+
+                listener.onStart.subscribe((placement) => {
+                    const cta = <HTMLButtonElement>document.querySelector('.call-button');
+                    cta.click();
+                });
+
                 if (UnityAds.isReady('video')) {
                     UnityAds.show('video');
                 }
-            })
-            .then(() => VideoAdUnit.clickCTAForTesting = false)
-            .catch((e) => {
-                VideoAdUnit.clickCTAForTesting = false;
-                throw e;
             });
         });
 
@@ -122,7 +123,7 @@ describe('AndroidVastTest', () => {
 
         it('should not send click event more than once', () => {
             const log = UnityAds.getBackend().Api.Request.getLog('GET');
-            const clicks = log.filter((s) => s.indexOf('event=tracking_click_through') > -1);
+            const clicks = log.filter((s) => s.indexOf('event=tracking_click') > -1);
             assert.equal(clicks.length, 1);
         });
     });

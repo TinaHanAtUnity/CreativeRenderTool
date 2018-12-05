@@ -40,8 +40,6 @@ export enum VideoState {
 
 export abstract class VideoAdUnit<T extends Campaign = Campaign> extends AbstractAdUnit implements IAdUnitContainerListener {
 
-    public static clickCTAForTesting: boolean = false;
-
     private static _progressInterval: number = 250;
 
     protected _options: any;
@@ -83,10 +81,6 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this.setActive(true);
 
         this._container.addEventHandler(this);
-
-        if (VideoAdUnit.clickCTAForTesting) {
-            (<HTMLButtonElement>this._overlay!.container()!.querySelector('.call-button'))!.click();
-        }
 
         return this._container.open(this, ['videoplayer', 'webview'], true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options).then(() => {
             this.onStart.trigger();
