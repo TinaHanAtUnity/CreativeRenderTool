@@ -38,6 +38,10 @@ export class MRAIDBridgeContainer implements IMRAIDHandler {
         this._handler = handler;
     }
 
+    public getHandler() {
+        return this._handler;
+    }
+
     public connect(eventBridge: AbstractMRAIDEventBridge): void {
         this._eventBridge = eventBridge;
         this._eventBridge.connect();

@@ -5,7 +5,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { MraidWebPlayerEventBridge } from 'MRAID/EventBridge/MraidWebPlayerEventBridge';
-import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDBridgeContainer';
+import { IMRAIDHandler, MRAIDEvents, MRAIDBridgeContainer } from 'MRAID/EventBridge/MRAIDBridgeContainer';
 import { Backend } from 'Backend/Backend';
 import { ICoreApi } from 'Core/ICore';
 import { Platform } from 'Core/Constants/Platform';
@@ -17,6 +17,7 @@ import { IAdsApi } from 'Ads/IAds';
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe(`${platform} MraidWebPlayerEventBridge`, () => {
         let handler: IMRAIDHandler;
+        let containerHandler: IMRAIDHandler;
         let mraidBridge: MraidWebPlayerEventBridge;
         let webPlayerAPI: WebPlayerApi;
         let nativeBridge: NativeBridge;
@@ -24,6 +25,7 @@ import { IAdsApi } from 'Ads/IAds';
         let core: ICoreApi;
         let ads: IAdsApi;
         let container: InterstitialWebPlayerContainer;
+        let mraidBridgeContainer: MRAIDBridgeContainer;
 
         beforeEach(() => {
             backend = TestFixtures.getBackend(platform);
@@ -46,8 +48,11 @@ import { IAdsApi } from 'Ads/IAds';
                 onBridgeAREvent: sinon.spy()
             };
 
+            mraidBridgeContainer = new MRAIDBridgeContainer(handler);
+            containerHandler = mraidBridgeContainer.getHandler();
+
             container = new InterstitialWebPlayerContainer(platform, ads);
-            mraidBridge = new MraidWebPlayerEventBridge(core, handler, container);
+            mraidBridge = new MraidWebPlayerEventBridge(core, mraidBridgeContainer, container);
             mraidBridge.connect();
         });
 
@@ -59,12 +64,12 @@ import { IAdsApi } from 'Ads/IAds';
             const tests = [{
                 event: MRAIDEvents.OPEN,
                 data: ['unityads.unity3d.com'],
-                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeOpen, JSON.parse(data)[0])
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>containerHandler.onBridgeOpen, JSON.parse(data)[0])
             },
             {
                 event: MRAIDEvents.CLOSE,
                 data: [],
-                verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>handler.onBridgeClose)
+                verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>containerHandler.onBridgeClose)
             },
             {
                 event: MRAIDEvents.ORIENTATION,
@@ -72,7 +77,7 @@ import { IAdsApi } from 'Ads/IAds';
                         'allowOrientationChange': true,
                         'forceOrientation': 'portrait'
                     }],
-                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeSetOrientationProperties, true, Orientation.PORTRAIT)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>containerHandler.onBridgeSetOrientationProperties, true, Orientation.PORTRAIT)
             },
             {
                 event: MRAIDEvents.ORIENTATION,
@@ -80,22 +85,22 @@ import { IAdsApi } from 'Ads/IAds';
                         'allowOrientationChange': true,
                         'forceOrientation': 'landscape'
                     }],
-                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeSetOrientationProperties, true, Orientation.LANDSCAPE)
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>containerHandler.onBridgeSetOrientationProperties, true, Orientation.LANDSCAPE)
             },
             {
                 event: MRAIDEvents.LOADED,
                 data: [],
-                verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>handler.onBridgeLoad)
+                verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>containerHandler.onBridgeLoad)
             },
             {
                 event: MRAIDEvents.ANALYTICS_EVENT,
                 data: ['x', 'y'],
-                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeAnalyticsEvent, JSON.parse(data)[0], JSON.parse(data)[1])
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>containerHandler.onBridgeAnalyticsEvent, JSON.parse(data)[0], JSON.parse(data)[1])
             },
             {
                 event: MRAIDEvents.STATE_CHANGE,
                 data: ['test'],
-                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onBridgeStateChange, JSON.parse(data)[0])
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>containerHandler.onBridgeStateChange, JSON.parse(data)[0])
             }
             ];
 
