@@ -161,13 +161,6 @@
     "platforms": "all"
   },
   {
-    "key": "gamerId",
-    "type": "string",
-    "description": "Internal gamer identifier",
-    "provider": "Server",
-    "platforms": "all"
-  },
-  {
     "key": "gameSessionId",
     "type": "number",
     "description": "Unique game session identifier. This identifier is shared with analytics events.",

@@ -62,12 +62,6 @@
       "body": false
     },
     {
-      "parameter": "gamerId",
-      "required": "no",
-      "queryString": true,
-      "body": false
-    },
-    {
       "parameter": "deviceMake",
       "required": "android",
       "queryString": true,
