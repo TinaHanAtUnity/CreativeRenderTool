@@ -1,4 +1,4 @@
-# Pending
+# Wed Dec  5 21:38:02 UTC 2018
 
 * More groups to auction v5 test [#7441](https://github.com/Applifier/unity-ads-webview/pull/7441)
 * Clean up gamer ID from codebase [#7437](https://github.com/Applifier/unity-ads-webview/pull/7437)
