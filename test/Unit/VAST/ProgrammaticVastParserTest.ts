@@ -22,7 +22,7 @@ describe('ProgrammaticVastParser', () => {
     const placementId = 'TestPlacement';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const impressionUrl = 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130';
+    const impressionUrl = 'http://sdk.unityads.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http%3A%2F%2Fwww.vastparser.com&C8=vastparser.com&C9=http%3A%2F%2Fwww.programmaticvast.com&C10=xn&rn=-103217130';
 
     let parser: ProgrammaticVastParser;
     let platform: Platform;
