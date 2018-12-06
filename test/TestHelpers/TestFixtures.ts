@@ -128,7 +128,7 @@ import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
 import { UnityInfo } from 'Core/Models/UnityInfo';
-import { PerformanceOverlayEventHandler } from '../../src/ts/Performance/EventHandlers/PerformanceOverlayEventHandler';
+import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
