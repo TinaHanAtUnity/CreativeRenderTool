@@ -12,7 +12,6 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { MraidIFrameEventBridge } from 'MRAID/Views/MraidIFrameEventBridge';
 import { ARMRAIDEventHandler } from 'AR/EventHandlers/ARMRAIDEventHandler';
 import { Platform } from 'Core/Constants/Platform';
 import { AndroidBackButtonSkipTest } from 'Core/Models/ABGroup';
@@ -46,8 +45,6 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
         } else {
             mraid = new MRAID(parameters.platform, parameters.core, parameters.deviceInfo, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
         }
-
-        mraid.setMraidEventBridge(new MraidIFrameEventBridge(parameters.core, mraid));
 
         const mraidAdUnitParameters: IMRAIDAdUnitParameters = {
             ... parameters,
