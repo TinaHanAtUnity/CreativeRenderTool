@@ -36,6 +36,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import { EndScreen } from 'Ads/Views/EndScreen';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -397,6 +398,16 @@ describe('MRAIDEventHandlersTest', () => {
                     assert.equal(expectationMraidView.getCall(0).args[0], false, 'Should block CTA event while processing click event');
                     assert.equal(expectationMraidView.getCall(1).args[0], true, 'Should enable CTA event after processing click event');
                 });
+            });
+        });
+
+        describe('when calling custom impression event multiple times', () => {
+            it('should only send tracking event once', () => {
+                sinon.stub(programmaticMraidAdUnit, 'sendImpression');
+
+                programmaticMraidEventHandler.onCustomImressionEvent();
+                programmaticMraidEventHandler.onCustomImressionEvent();
+                sinon.assert.calledOnce(<sinon.SinonSpy>programmaticMraidAdUnit.sendImpression);
             });
         });
     });

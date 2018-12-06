@@ -83,7 +83,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         });
 
         if (!CustomFeatures.isLoopMeSeat(this._campaign.getSeatId())) {
-            this.sendTrackingEvent('impression');
+            this.sendImpression();
         }
 
         this._container.addEventHandler(this);
@@ -138,6 +138,10 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendClick(): void {
         this.sendTrackingEvent('click');
+    }
+
+    public sendImpression(): void {
+        this.sendTrackingEvent('impression');
     }
 
     public getEndScreen(): EndScreen | undefined {
@@ -195,7 +199,13 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         // EMPTY
     }
 
-    public sendTrackingEvent(eventName: string): void {
+    private unsetReferences() {
+        delete this._mraid;
+        delete this._endScreen;
+        delete this._privacy;
+    }
+
+    private sendTrackingEvent(eventName: string): void {
         const sessionId = this._campaign.getSession().getId();
 
         if(this._additionalTrackingEvents && this._additionalTrackingEvents[eventName]) {
@@ -207,12 +217,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 }
             }
         }
-    }
-
-    private unsetReferences() {
-        delete this._mraid;
-        delete this._endScreen;
-        delete this._privacy;
     }
 
     private getOperativeEventParams(): IOperativeEventParams {
