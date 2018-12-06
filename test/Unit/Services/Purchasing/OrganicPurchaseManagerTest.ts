@@ -5,7 +5,7 @@ import { assert } from 'chai';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { OrganicPurchase, IOrganicPurchase, OrganicPurchaseManager } from 'Purchasing/OrganicPurchaseManager';
 import { Observable2 } from 'Core/Utilities/Observable';
-import { StorageApi } from 'Core/Native/Storage';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { RequestManager } from 'Core/Managers/RequestManager';
 
 describe('OrganicPurchaseManager', () => {
@@ -42,15 +42,26 @@ describe('OrganicPurchaseManager', () => {
     });
 
     it('should subscribe to Storage.onSet in initialize', () => {
-        const subscribeStub = sinon.stub(onSetObservable, 'subscribe');
+        const subscribeSpy = sinon.spy(onSetObservable, 'subscribe');
+        const unsubscribeSpy = sinon.spy(onSetObservable, 'unsubscribe');
         return organicPurchaseManager.initialize().then(() => {
-            sinon.assert.calledOnce(subscribeStub);
+            sinon.assert.calledTwice(unsubscribeSpy);
+            sinon.assert.calledOnce(subscribeSpy);
+        });
+    });
+
+    it('should call storage get once when onSet triggered', () => {
+        return organicPurchaseManager.initialize().then(() => {
+            getStub.resetHistory();
+            onSetObservable.trigger('test', {});
+            sinon.assert.calledOnce(getStub);
         });
     });
 
     it('should not do anything if iap.purchases is undefined', () => {
         return organicPurchaseManager.initialize().then(() => {
             sinon.assert.calledOnce(getStub);
+            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'iap.purchases');
             sinon.assert.notCalled(setStub);
             sinon.assert.notCalled(writeStub);
             sinon.assert.notCalled(postStub);
@@ -62,11 +73,13 @@ describe('OrganicPurchaseManager', () => {
         getStub.resolves([{'productId': 'testId', 'price': 1234, 'currency': 'USD', 'receiptPurchaseData': 'test receipt data', 'signature': 'testSignature'}]);
         return organicPurchaseManager.initialize().then(() => {
             sinon.assert.calledOnce(getStub);
+            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'iap.purchases');
             sinon.assert.calledOnce(setStub);
             sinon.assert.calledOnce(writeStub);
             sinon.assert.calledOnce(postStub);
             sinon.assert.calledOnce(<sinon.SinonStub>promoEvents.onOrganicPurchaseSuccess);
             assert.equal(postStub.firstCall.args[0], 'https://events.iap.unity3d.com/events/v1/organic_purchase?native=false&iap_service=false');
+
         });
     });
 
@@ -74,6 +87,7 @@ describe('OrganicPurchaseManager', () => {
         getStub.resolves([{'productId': 'testId', 'price': 1234, 'currency': 'USD', 'receiptPurchaseData': 'test receipt data', 'signature': 'testSignature'}, {'productId': 'testId', 'price': 1234, 'currency': 'USD', 'receiptPurchaseData': 'test receipt data', 'signature': 'testSignature'}]);
         return organicPurchaseManager.initialize().then(() => {
             sinon.assert.calledOnce(getStub);
+            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'iap.purchases');
             sinon.assert.calledOnce(setStub);
             sinon.assert.calledOnce(writeStub);
             sinon.assert.calledTwice(postStub);

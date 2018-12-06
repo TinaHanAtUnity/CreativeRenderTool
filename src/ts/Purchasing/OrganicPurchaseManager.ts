@@ -68,7 +68,7 @@ export class OrganicPurchase extends Model<IOrganicPurchase> {
 // gets instantiated in Promo.ts and will begin watching for organic purchase events.
 export class OrganicPurchaseManager {
 
-    private static InAppPurchaseStorageKey = 'iap.purchases';
+    private static readonly InAppPurchaseStorageKey = 'iap.purchases';
 
     private _storage: StorageApi;
     private _promoEvents: PromoEvents;
@@ -79,11 +79,11 @@ export class OrganicPurchaseManager {
         this._storage = storage;
         this._promoEvents = promoEvents;
         this._request = request;
-        this._onSetObserver = () => this.getOrganicPurchase();
+        this._onSetObserver = () => this.processOrganicPurchases();
     }
 
     public initialize(): Promise<void> {
-        return Promises.voidResult(this.getOrganicPurchase());
+        return Promises.voidResult(this.processOrganicPurchases());
     }
 
     private subscribe() {
@@ -95,14 +95,15 @@ export class OrganicPurchaseManager {
         this._storage.onSet.unsubscribe(this._onSetObserver);
     }
 
-    private getOrganicPurchase(): Promise<void> {
+    private processOrganicPurchases(): Promise<void> {
         this.unsubscribe();
         return this._storage.get(StorageType.PUBLIC, OrganicPurchaseManager.InAppPurchaseStorageKey).then((data: any) => {
-            const promises: Promise<void>[] = [];
             if (data && data.length && data.length > 0) {
-                for(const event of data) {
+                const promises: Promise<void>[] = [];
+                const organicPurchases: IOrganicPurchase[] = data;
+                for(const event of organicPurchases) {
                     const organicPurchaseEvent = new OrganicPurchase(event);
-                    const promise = this.postOrganicPurchaseEvents(organicPurchaseEvent);
+                    const promise = this.postOrganicPurchaseEvent(organicPurchaseEvent);
                     promises.push(promise);
                 }
                 return Promise.all(promises).then(() => {
@@ -123,7 +124,7 @@ export class OrganicPurchaseManager {
         });
     }
 
-    private postOrganicPurchaseEvents(organicPurchaseEvent: OrganicPurchase): Promise<void> {
+    private postOrganicPurchaseEvent(organicPurchaseEvent: OrganicPurchase): Promise<void> {
         const productId = organicPurchaseEvent.getId();
         return this._promoEvents.onOrganicPurchaseSuccess({
             store: this._promoEvents.getAppStoreFromReceipt(organicPurchaseEvent.getReceipt()),
