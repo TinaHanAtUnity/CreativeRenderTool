@@ -4,7 +4,7 @@
 * Add WebPlayer MraidEvent Bridge (unhooked) [#7272](https://github.com/Applifier/unity-ads-webview/pull/7272)
 * Extend Auction V5 Changes to Banners [#7439](https://github.com/Applifier/unity-ads-webview/pull/7439)
 * Add Organic IAP Purchase [#7129](https://github.com/Applifier/unity-ads-webview/pull/7129)
-* Relax <Impression> url check in Programmatic VAST [#7466](https://github.com/Applifier/unity-ads-webview/pull/7466)
+* Relax \<Impression\> url check in Programmatic VAST [#7466](https://github.com/Applifier/unity-ads-webview/pull/7466)
 
 # Wed Dec  5 21:38:02 UTC 2018
 
