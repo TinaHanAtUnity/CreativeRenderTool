@@ -207,6 +207,8 @@ export class Ads implements IAds {
 
             Promise.all(arAnalyticsPromises).then(([arSupported, permissionInManifest, permissionResult]: [boolean, boolean, CurrentPermission]) => {
                 Diagnostics.trigger('ar_device_support', {arSupported, permissionInManifest, permissionResult});
+            }).catch((error) => {
+                Diagnostics.trigger('ar_device_support_check_error', error);
             });
 
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this._core.JaegerManager, this.BackupCampaignManager);
