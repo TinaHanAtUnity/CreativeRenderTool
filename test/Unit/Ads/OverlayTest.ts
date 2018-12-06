@@ -117,11 +117,7 @@ describe('VideoOverlayTest', () => {
         let perfOverlayHandler: PerformanceOverlayEventHandler;
 
         beforeEach(() => {
-            perfOverlayHandler = new PerformanceOverlayEventHandler(
-                adUnit,
-                TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, ar, purchasing),
-                TestFixtures.getAppStoreDownloadHelper(platform, core, ads, videoOverlayParameters.campaign, adUnit, thirdPartyEventManager, nativeBridge)
-            );
+            perfOverlayHandler = TestFixtures.getPerformanceOverlayEventHandler(platform, core, ads, ar, purchasing, videoOverlayParameters.campaign, adUnit, thirdPartyEventManager, nativeBridge);
             sinon.stub(perfOverlayHandler, 'onOverlayDownload');
         });
 

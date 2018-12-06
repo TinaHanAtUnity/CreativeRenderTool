@@ -401,14 +401,16 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     private fadeIn() {
-        this._container.classList.add('fade-in');
-        this._areControlsVisible = true;
+        if (this._container) {
+            this._container.classList.add('fade-in');
+            this._areControlsVisible = true;
 
-        const isVASTCampaign = this._campaign instanceof VastCampaign;
-        if (isVASTCampaign || (this._skipEnabled && InstantInstallNowTest.isValid(this._abGroup))) {
-            setTimeout(() => {
-                this.showCallButton();
-            }, 500);
+            const isVASTCampaign = this._campaign instanceof VastCampaign;
+            if (isVASTCampaign || (this._skipEnabled && InstantInstallNowTest.isValid(this._abGroup))) {
+                setTimeout(() => {
+                    this.showCallButton();
+                }, 500);
+            }
         }
     }
 
