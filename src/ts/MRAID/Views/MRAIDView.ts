@@ -40,7 +40,7 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onPlayableAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: any): void;
     onMraidShowEndScreen(): void;
     onKeyEvent(keyCode: number): void;
-    onViewableChangeEvent(): void;
+    onDomContentLoaded(): void;
 }
 
 export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler, IMRAIDHandler {

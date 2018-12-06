@@ -16,7 +16,6 @@ import MRAIDContainer from 'html/mraid/container.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -68,7 +67,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         if(this._domContentLoaded) {
 
             if (CustomFeatures.isLoopMeSeat(this._campaign.getSeatId())) {
-                this._handlers.forEach(handler => handler.onViewableChangeEvent());
+                this._handlers.forEach(handler => handler.onDomContentLoaded());
             }
 
             this._mraidBridge.sendViewableEvent(viewable);

@@ -114,7 +114,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         }
     }
 
-    public onViewableChangeEvent(): void {
+    public onDomContentLoaded(): void {
         this._adUnit.sendTrackingEvent('impression');
     }
 
