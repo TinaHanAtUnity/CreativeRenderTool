@@ -145,7 +145,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private sendCustomImpression() {
         if (CustomFeatures.isLoopMeSeat(this._campaign.getSeatId())) {
-            this._handlers.forEach(handler => handler.onCustomImressionEvent());
+            this._handlers.forEach(handler => handler.onCustomImpressionEvent());
         }
     }
 }

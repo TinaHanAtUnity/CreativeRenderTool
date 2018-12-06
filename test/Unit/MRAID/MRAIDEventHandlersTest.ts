@@ -405,8 +405,8 @@ describe('MRAIDEventHandlersTest', () => {
             it('should only send tracking event once', () => {
                 sinon.stub(programmaticMraidAdUnit, 'sendImpression');
 
-                programmaticMraidEventHandler.onCustomImressionEvent();
-                programmaticMraidEventHandler.onCustomImressionEvent();
+                programmaticMraidEventHandler.onCustomImpressionEvent();
+                programmaticMraidEventHandler.onCustomImpressionEvent();
                 sinon.assert.calledOnce(<sinon.SinonSpy>programmaticMraidAdUnit.sendImpression);
             });
         });
