@@ -97,10 +97,9 @@ export class OrganicPurchaseManager {
 
     private processOrganicPurchases(): Promise<void> {
         this.unsubscribe();
-        return this._storage.get(StorageType.PUBLIC, OrganicPurchaseManager.InAppPurchaseStorageKey).then((data: any) => {
-            if (data && data.length && data.length > 0) {
+        return this._storage.get<IOrganicPurchase[] | undefined>(StorageType.PUBLIC, OrganicPurchaseManager.InAppPurchaseStorageKey).then((organicPurchases) => {
+            if (organicPurchases && organicPurchases.length && organicPurchases.length > 0) {
                 const promises: Promise<void>[] = [];
-                const organicPurchases: IOrganicPurchase[] = data;
                 for(const event of organicPurchases) {
                     const organicPurchaseEvent = new OrganicPurchase(event);
                     const promise = this.postOrganicPurchaseEvent(organicPurchaseEvent);
