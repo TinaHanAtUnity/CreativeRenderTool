@@ -27,6 +27,7 @@ export interface IProduct {
     isoCurrencyCode: string | undefined;
     localizedPrice: number | undefined;
 }
+
 export interface IPurchasingAdapter {
     initialize(): Promise<void>;
     purchaseItem(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails>;
