@@ -54,6 +54,11 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         } else {
             const observer = this.onLoaded.subscribe(() => {
                 this.setViewableState(true);
+
+                if (CustomFeatures.isLoopMeSeat(this._campaign.getSeatId())) {
+                    this._handlers.forEach(handler => handler.onDomContentLoaded());
+                }
+
                 this.onLoaded.unsubscribe(observer);
             });
         }
@@ -66,11 +71,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public setViewableState(viewable: boolean) {
         if(this._domContentLoaded) {
-
-            if (CustomFeatures.isLoopMeSeat(this._campaign.getSeatId())) {
-                this._handlers.forEach(handler => handler.onDomContentLoaded());
-            }
-
             this._mraidAdapterContainer.sendViewableEvent(viewable);
         }
         this.setAnalyticsBackgroundTime(viewable);

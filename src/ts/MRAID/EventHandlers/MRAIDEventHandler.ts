@@ -28,6 +28,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _platform: Platform;
     private _core: ICoreApi;
     private _ads: IAdsApi;
+    private _impressionFired: boolean;
     protected _campaign: MRAIDCampaign;
 
     constructor(adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
@@ -42,6 +43,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._platform = parameters.platform;
         this._core = parameters.core;
         this._ads = parameters.ads;
+        this._impressionFired = false;
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -115,7 +117,10 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     public onDomContentLoaded(): void {
-        this._adUnit.sendTrackingEvent('impression');
+        if (!this._impressionFired) {
+            this._adUnit.sendTrackingEvent('impression');
+            this._impressionFired = true;
+        }
     }
 
     private handleClickAttribution() {
