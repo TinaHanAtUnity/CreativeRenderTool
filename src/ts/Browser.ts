@@ -7,6 +7,9 @@ import { Backend } from 'Backend/Backend';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { toAbGroup } from 'Core/Models/ABGroup';
+import { ARUtil } from 'AR/Utilities/ARUtil';
+import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
+import { ICoreApi } from 'Core/ICore';
 
 document.addEventListener('DOMContentLoaded', () => {
     const resizeHandler = (event?: Event) => {
@@ -194,6 +197,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             };
             // tslint:enable:no-console
+
+            ARUtil.isARSupported = (): Promise<boolean> => { return Promise.resolve<boolean>(false); };
+            PermissionsUtil.checkPermissionInManifest = (): Promise<boolean> => { return Promise.resolve<boolean>(false); };
+            PermissionsUtil.checkPermissions = (platform: Platform, core: ICoreApi, permission: PermissionTypes): Promise<CurrentPermission> => { return Promise.resolve<CurrentPermission>(CurrentPermission.DENIED); };
 
             switch(platformElement.value) {
                 case 'android':
