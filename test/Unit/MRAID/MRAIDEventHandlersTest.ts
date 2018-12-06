@@ -36,7 +36,6 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
-import { MraidIFrameEventBridge } from 'MRAID/Views/MraidIFrameEventBridge';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -163,7 +162,6 @@ describe('MRAIDEventHandlersTest', () => {
                 }));
 
                 mraidView = new MRAID(platform, core, deviceInfo, placement, extendedMraidCampaign, extendedMraidAdUnitParams.privacy, true, extendedMraidAdUnitParams.coreConfig.getAbGroup());
-                mraidView.setMraidEventBridge(new MraidIFrameEventBridge(core, mraidView));
                 sinon.stub(mraidView, 'createMRAID').callsFake(() => {
                     return Promise.resolve();
                 });
@@ -325,7 +323,6 @@ describe('MRAIDEventHandlersTest', () => {
 
             privacy = new Privacy(platform, programmaticMraidCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             mraidView = new MRAID(platform, core, <AndroidDeviceInfo>deviceInfo, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup());
-            mraidView.setMraidEventBridge(new MraidIFrameEventBridge(core, mraidView));
 
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 platform,
