@@ -79,6 +79,16 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         this.showView(ViewState.INITIAL);
     }
 
+    // IPrivacyRowItemContainerHandler
+    public onDataDeletion(): void {
+        this._personalizationCheckBoxGroup.checkCheckboxes(false);
+    }
+
+    // IPrivacyRowItemContainerHandler
+    public onPrivacy(url: string): void {
+        this._handlers.forEach(handler => handler.onPrivacy(url));
+    }
+
     protected onCloseEvent(event: Event): void {
         event.preventDefault();
 
@@ -168,10 +178,6 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
                 this.container().classList.remove(state);
             }
         });
-    }
-
-    public onDataDeletion(): void {
-        this._personalizationCheckBoxGroup.checkCheckboxes(false);
     }
 
 }

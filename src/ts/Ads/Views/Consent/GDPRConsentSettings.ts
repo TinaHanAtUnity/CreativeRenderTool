@@ -11,6 +11,7 @@ import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationC
 export interface IGDPRConsentSettingsHandler {
     onPersonalizedConsent(consent: IPersonalizedConsent): void;
     onClose(): void;
+    onPrivacy(url: string): void;
 }
 
 export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> implements IPrivacyRowItemContainerHandler {
@@ -65,6 +66,11 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> imple
     public onDataDeletion(): void {
         // todo: set all checkboxes to unchecked?
         this._checkboxGroup.checkCheckboxes(false);
+    }
+
+    // IPrivacyRowItemContainerHandler
+    public onPrivacy(url: string): void {
+        this._handlers.forEach(handler => handler.onPrivacy(url));
     }
 
     private onBackButtonEvent(event: Event): void {

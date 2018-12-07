@@ -106,4 +106,17 @@ export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConse
     public onClose(): void {
         this.hide();
     }
+
+    // IGDPRConsentSettingsHandler
+    public onPrivacy(url: string): void {
+        // todo:
+        // if (this._platform === Platform.IOS) {
+        //     this._core.iOS!.UrlScheme.open(url);
+        // } else if (this._platform === Platform.ANDROID) {
+        //     this._core.Android!.Intent.launch({
+        //         'action': 'android.intent.action.VIEW',
+        //         'uri': url
+        //     });
+        // }
+    }
 }
