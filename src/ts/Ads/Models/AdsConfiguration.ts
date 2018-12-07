@@ -5,6 +5,7 @@ import {
 } from 'Ads/Models/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
+import {IPermissions} from "../Views/Consent/IPermissions";
 
 export interface IAdsConfiguration {
     cacheMode: CacheMode;
@@ -101,20 +102,22 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
     }
 
     public getPrivacy(): IPrivacy {
+        const userPrivacy = this.getUserPrivacy();
+        let userPermissions;
+        if (userPrivacy) {
+            userPermissions = userPrivacy.getPermissions();
+        } else {
+            userPermissions = {};
+        }
         return {
             'method': this.getPrivacyMethod(),
             'firstRequest': this.isFirstRequest(),
-            'permissions': this.getPermissions()
+            'permissions': userPermissions
         };
     }
 
-    public getPermissions(): IUnityConsentPermissions | IUnityConsentProfiling | {} {
-        const userPrivacy = this.getUserPrivacy();
-        if (userPrivacy) {
-            return userPrivacy.getPermissions();
-        } else {
-            return {};
-        }
+    public addUserConsent(consent: IPermissions): void {
+        // TODO: implement
     }
 
     public getDefaultPlacement(): Placement {
