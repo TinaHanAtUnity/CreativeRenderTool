@@ -101,7 +101,10 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> imple
         this.runAnimation(<HTMLElement>this._container.querySelector('.save-my-choices'));
 
     }
+
     private runAnimation(buttonElement: HTMLElement): void {
+        this.container().classList.add('prevent-clicks');
+
         const buttonSpinner = new ButtonSpinner(this._platform);
         buttonSpinner.render();
         if (buttonElement) {

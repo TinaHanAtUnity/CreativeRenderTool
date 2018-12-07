@@ -5,7 +5,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { Template } from 'Core/Utilities/Template';
 
 import PrivacySettingsTemplate from 'html/consent/PrivacySettings.html';
-import { PrivacyRowItemContainer } from 'Ads/Views/Consent/PrivacyRowItemContainer';
+import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
 import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
@@ -17,7 +17,7 @@ enum ViewState {
     BUILD_INFO
 }
 
-export class PrivacySettings extends AbstractPrivacy {
+export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemContainerHandler {
 
     private _privacyRowItemContainer: PrivacyRowItemContainer;
     private _personalizationCheckBoxGroup: PersonalizationCheckboxGroup;
@@ -62,6 +62,7 @@ export class PrivacySettings extends AbstractPrivacy {
         ];
 
         this._privacyRowItemContainer = new PrivacyRowItemContainer({ platform: platform, gdprManager: privacyManager });
+        this._privacyRowItemContainer.addEventHandler(this);
         // todo: add user privacy
         this._personalizationCheckBoxGroup = new PersonalizationCheckboxGroup(platform, { gameExp: true, ads: false, external: true});
     }
@@ -167,6 +168,10 @@ export class PrivacySettings extends AbstractPrivacy {
                 this.container().classList.remove(state);
             }
         });
+    }
+
+    public onDataDeletion(): void {
+        this._personalizationCheckBoxGroup.checkCheckboxes(false);
     }
 
 }
