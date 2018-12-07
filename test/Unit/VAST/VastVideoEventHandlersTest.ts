@@ -47,8 +47,6 @@ describe('VastVideoEventHandler tests', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let ar: IARApi;
-    let purchasing: IPurchasingApi;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
     let campaign: VastCampaign;
@@ -70,7 +68,7 @@ describe('VastVideoEventHandler tests', () => {
     let vastVideoEventHandler: VastVideoEventHandler;
     let videoEventHandlerParams: IVideoEventHandlerParams;
     let privacyManager: UserPrivacyManager;
-    let privacy: AbstractPrivacy;
+    let privacy: Privacy;
     let programmaticTrackingService: ProgrammaticTrackingService;
 
     before(() => {
@@ -83,8 +81,6 @@ describe('VastVideoEventHandler tests', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
-        ar = TestFixtures.getARApi(nativeBridge);
-        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
         storageBridge = new StorageBridge(core);
         focusManager = new FocusManager(platform, core);
@@ -150,8 +146,6 @@ describe('VastVideoEventHandler tests', () => {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
@@ -169,7 +163,8 @@ describe('VastVideoEventHandler tests', () => {
             overlay: overlay,
             video: campaign.getVideo(),
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService
+            programmaticTrackingService: programmaticTrackingService,
+            privacy
         };
 
         testAdUnit = new VastAdUnit(vastAdUnitParameters);

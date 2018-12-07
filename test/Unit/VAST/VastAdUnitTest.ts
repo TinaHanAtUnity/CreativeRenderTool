@@ -44,8 +44,6 @@ describe('VastAdUnitTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let ar: IARApi;
-    let purchasing: IPurchasingApi;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let vastAdUnit: VastAdUnit;
     let focusManager: FocusManager;
@@ -84,8 +82,6 @@ describe('VastAdUnitTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
-        ar = TestFixtures.getARApi(nativeBridge);
-        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         const storageBridge = new StorageBridge(core);
@@ -144,8 +140,7 @@ describe('VastAdUnitTest', () => {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
+            privacy,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: activity,

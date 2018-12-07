@@ -38,8 +38,6 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -48,8 +46,6 @@ describe('OverlayEventHandlerTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let ar: IARApi;
-    let purchasing: IPurchasingApi;
     let performanceAdUnit: PerformanceAdUnit;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
@@ -77,8 +73,6 @@ describe('OverlayEventHandlerTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
-        ar = TestFixtures.getARApi(nativeBridge);
-        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
         storageBridge = new StorageBridge(core);
         focusManager = new FocusManager(platform, core);
@@ -142,8 +136,6 @@ describe('OverlayEventHandlerTest', () => {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,

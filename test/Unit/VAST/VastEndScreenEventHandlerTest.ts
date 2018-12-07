@@ -34,8 +34,6 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastEndScreenEventHandlerTest', () => {
@@ -44,8 +42,6 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
         let ads: IAdsApi;
-        let ar: IARApi;
-        let purchasing: IPurchasingApi;
         let deviceInfo: DeviceInfo;
         let storageBridge: StorageBridge;
         let container: AdUnitContainer;
@@ -59,8 +55,6 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
-            ar = TestFixtures.getARApi(nativeBridge);
-            purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
             storageBridge = new StorageBridge(core);
             const focusManager = new FocusManager(platform, core);
@@ -122,8 +116,6 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 platform,
                 core,
                 ads,
-                ar,
-                purchasing,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -141,7 +133,8 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 overlay: overlay,
                 video: video,
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService
+                programmaticTrackingService: programmaticTrackingService,
+                privacy
             };
 
             vastEndScreenParameters = {

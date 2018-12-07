@@ -45,8 +45,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let ar: IARApi;
-    let purchasing: IPurchasingApi;
     let container: AdUnitContainer;
     let overlay: NewVideoOverlay;
     let endScreen: XPromoEndScreen;
@@ -75,8 +73,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
-            ar = TestFixtures.getARApi(nativeBridge);
-            purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
             storageBridge = new StorageBridge(core);
             campaign = TestFixtures.getXPromoCampaign();
@@ -145,8 +141,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 platform,
                 core,
                 ads,
-                ar,
-                purchasing,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -312,8 +306,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 platform,
                 core,
                 ads,
-                ar,
-                purchasing,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,

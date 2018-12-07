@@ -48,8 +48,6 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
         let ads: IAdsApi;
-        let ar: IARApi;
-        let purchasing: IPurchasingApi;
         let storageBridge: StorageBridge;
         let vastAdUnit: VastAdUnit;
         let container: AdUnitContainer;
@@ -62,7 +60,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
         let vastOverlayEventHandler: VastOverlayEventHandler;
         let moat: MOAT;
         let sandbox: sinon.SinonSandbox;
-        let privacy: AbstractPrivacy;
+        let privacy: Privacy;
         let programmaticTrackingService: ProgrammaticTrackingService;
 
         before(() => {
@@ -74,8 +72,6 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
-            ar = TestFixtures.getARApi(nativeBridge);
-            purchasing = TestFixtures.getPurchasingApi(nativeBridge);
             storageBridge = new StorageBridge(core);
             focusManager = new FocusManager(platform, core);
             metaDataManager = new MetaDataManager(core);
@@ -140,8 +136,6 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 platform,
                 core,
                 ads,
-                ar,
-                purchasing,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -159,7 +153,8 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 overlay: overlay,
                 video: campaign.getVideo(),
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService
+                programmaticTrackingService: programmaticTrackingService,
+                privacy
             };
 
             vastAdUnit = new VastAdUnit(vastAdUnitParameters);
