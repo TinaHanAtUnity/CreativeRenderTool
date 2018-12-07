@@ -37,12 +37,6 @@ describe('VideoOverlayTest', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let coreConfig: CoreConfiguration;
-    let ar: IARApi;
-    let purchasing: IPurchasingApi;
-    let adUnit: PerformanceAdUnit;
-    let thirdPartyEventManager: ThirdPartyEventManager;
-    let wakeUpManager: WakeUpManager;
-    let request: RequestManager;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -50,12 +44,6 @@ describe('VideoOverlayTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
-        ar = TestFixtures.getARApi(nativeBridge);
-        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
-        adUnit = TestFixtures.getPerformanceAdUnit(platform, core, ads, ar, purchasing);
-        wakeUpManager = new WakeUpManager(core);
-        request = new RequestManager(platform, core, wakeUpManager);
-        thirdPartyEventManager = new ThirdPartyEventManager(core, request);
 
         privacy = new Privacy(platform, TestFixtures.getCampaign(), sinon.createStubInstance(UserPrivacyManager), false, false);
         deviceInfo = <DeviceInfo>{ getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false, getOsVersion: () => '8.0' };
@@ -114,9 +102,22 @@ describe('VideoOverlayTest', () => {
     });
 
     describe('onCallButtonEvent', () => {
+        let ar: IARApi;
+        let purchasing: IPurchasingApi;
+        let adUnit: PerformanceAdUnit;
+        let thirdPartyEventManager: ThirdPartyEventManager;
+        let wakeUpManager: WakeUpManager;
+        let request: RequestManager;
         let perfOverlayHandler: PerformanceOverlayEventHandler;
 
         beforeEach(() => {
+            ar = TestFixtures.getARApi(nativeBridge);
+            purchasing = TestFixtures.getPurchasingApi(nativeBridge);
+            adUnit = TestFixtures.getPerformanceAdUnit(platform, core, ads, ar, purchasing);
+            wakeUpManager = new WakeUpManager(core);
+            request = new RequestManager(platform, core, wakeUpManager);
+            thirdPartyEventManager = new ThirdPartyEventManager(core, request);
+
             perfOverlayHandler = TestFixtures.getPerformanceOverlayEventHandler(platform, core, ads, ar, purchasing, videoOverlayParameters.campaign, adUnit, thirdPartyEventManager, nativeBridge);
             sinon.stub(perfOverlayHandler, 'onOverlayDownload');
         });
