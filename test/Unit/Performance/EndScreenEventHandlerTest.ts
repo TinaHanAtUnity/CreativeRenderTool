@@ -14,7 +14,7 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
@@ -39,6 +39,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { IAppStoreDownloadHelperParameters, AppStoreDownloadHelper } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { Campaign } from 'Ads/Models/Campaign';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -50,7 +51,7 @@ describe('EndScreenEventHandlerTest', () => {
     let ar: IARApi;
     let purchasing: IPurchasingApi;
     let container: AdUnitContainer;
-    let overlay: Overlay;
+    let overlay: NewVideoOverlay;
     let endScreen: PerformanceEndScreen;
     let storageBridge: StorageBridge;
     let sessionManager: SessionManager;
@@ -128,8 +129,18 @@ describe('EndScreenEventHandlerTest', () => {
                 targetGameName: TestFixtures.getCampaign().getGameName()
             };
             endScreen = new PerformanceEndScreen(endScreenParams, TestFixtures.getCampaign());
-            overlay = new Overlay(platform, ads, <AndroidDeviceInfo>deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
             placement = TestFixtures.getPlacement();
+
+            const videoOverlayParameters: IVideoOverlayParameters<Campaign> = {
+                deviceInfo: deviceInfo,
+                campaign: campaign,
+                coreConfig: coreConfig,
+                placement: placement,
+                clientInfo: clientInfo,
+                platform: platform,
+                ads: ads
+            };
+            overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
             const programmticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             performanceAdUnitParameters = {
@@ -381,7 +392,18 @@ describe('EndScreenEventHandlerTest', () => {
                 targetGameName: campaign.getGameName()
             };
             endScreen = new PerformanceEndScreen(endScreenParams, campaign);
-            overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
+
+            placement = TestFixtures.getPlacement();
+            const videoOverlayParameters: IVideoOverlayParameters<Campaign> = {
+                deviceInfo: deviceInfo,
+                campaign: campaign,
+                coreConfig: coreConfig,
+                placement: placement,
+                clientInfo: clientInfo,
+                platform: platform,
+                ads: ads
+            };
+            overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             performanceAdUnitParameters = {
@@ -397,7 +419,7 @@ describe('EndScreenEventHandlerTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                placement: TestFixtures.getPlacement(),
+                placement: placement,
                 campaign: campaign,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,

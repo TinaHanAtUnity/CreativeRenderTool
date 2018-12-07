@@ -40,7 +40,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { Banners } from 'Banners/Banners';
 import { AuctionRequest } from 'Banners/Utilities/AuctionRequest';
 import { FinishState } from 'Core/Constants/FinishState';
@@ -498,7 +498,7 @@ export class Ads implements IAds {
         }
 
         if(TestEnvironment.get('autoSkip')) {
-            Overlay.setAutoSkip(TestEnvironment.get('autoSkip'));
+            NewVideoOverlay.setAutoSkip(TestEnvironment.get('autoSkip'));
         }
 
         if(TestEnvironment.get('autoClose')) {
