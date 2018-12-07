@@ -8,7 +8,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -33,6 +33,8 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
 import EventTestVast from 'xml/EventTestVast.xml';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import { Campaign } from 'Ads/Models/Campaign';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 describe('VastAdUnitTest', () => {
 
@@ -52,6 +54,8 @@ describe('VastAdUnitTest', () => {
     let clientInfo: ClientInfo;
     let placement: Placement;
     let vastCampaign: VastCampaign;
+    let videoOverlayParameters: IVideoOverlayParameters<Campaign>;
+    let coreConfig: CoreConfiguration;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -92,7 +96,7 @@ describe('VastAdUnitTest', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(core, request);
         vastCampaign = TestFixtures.getEventVastCampaign();
         const video = vastCampaign.getVideo();
-        const coreConfig = TestFixtures.getCoreConfiguration();
+        coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
 
         let duration = vastCampaign.getVast().getDuration();
@@ -121,7 +125,19 @@ describe('VastAdUnitTest', () => {
 
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const privacy = new Privacy(platform, vastCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
-        const overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
+
+        const campaign = TestFixtures.getCampaign();
+        videoOverlayParameters = {
+            deviceInfo: deviceInfo,
+            campaign: campaign,
+            coreConfig: coreConfig,
+            placement: placement,
+            clientInfo: clientInfo,
+            platform: platform,
+            ads: ads
+        };
+        const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         vastAdUnitParameters = {
@@ -162,8 +178,16 @@ describe('VastAdUnitTest', () => {
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
             const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false);
-            const overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
-            vastAdUnitParameters.overlay = overlay;
+            videoOverlayParameters = {
+                deviceInfo: deviceInfo,
+                campaign: vastCampaign,
+                coreConfig: coreConfig,
+                placement: placement,
+                clientInfo: clientInfo,
+                platform: platform,
+                ads: ads
+            };
+            vastAdUnitParameters.overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
             vastAdUnitParameters.campaign = vastCampaign;
             vastAdUnit = new VastAdUnit(vastAdUnitParameters);
         });
@@ -235,9 +259,17 @@ describe('VastAdUnitTest', () => {
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
             const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false);
-            const overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
+            videoOverlayParameters = {
+                deviceInfo: deviceInfo,
+                campaign: vastCampaign,
+                coreConfig: coreConfig,
+                placement: placement,
+                clientInfo: clientInfo,
+                platform: platform,
+                ads: ads
+            };
+            vastAdUnitParameters.overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
             vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
-            vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(vastAdUnitParameters);

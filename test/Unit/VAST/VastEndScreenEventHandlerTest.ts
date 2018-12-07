@@ -8,7 +8,7 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -21,6 +21,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { Campaign } from 'Ads/Models/Campaign';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
@@ -51,6 +52,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
         let request: RequestManager;
         let vastAdUnitParameters: IVastAdUnitParameters;
         let vastEndScreenParameters: IVastEndscreenParameters;
+        let videoOverlayParameters: IVideoOverlayParameters<Campaign>;
 
         beforeEach(() => {
             backend = TestFixtures.getBackend(platform);
@@ -102,7 +104,18 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
             const privacy = new Privacy(platform, campaign, privacyManager, false, false);
             const video = new Video('', TestFixtures.getSession());
-            const overlay = new Overlay(platform, ads, deviceInfo, true, 'en', 'testGameId', privacy, false);
+
+            const placement = TestFixtures.getPlacement();
+            videoOverlayParameters = {
+                deviceInfo: deviceInfo,
+                campaign: campaign,
+                coreConfig: coreConfig,
+                placement: placement,
+                clientInfo: clientInfo,
+                platform: platform,
+                ads: ads
+            };
+            const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             vastAdUnitParameters = {
