@@ -64,6 +64,8 @@ export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConse
     }
 
     private runAnimation(): void {
+        this.container().classList.add('prevent-clicks');
+
         const buttonSPinner = new ButtonSpinner(this._platform);
         buttonSPinner.render();
         const agreeButton = <HTMLElement>this._container.querySelector('.agree');

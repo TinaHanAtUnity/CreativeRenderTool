@@ -1,7 +1,7 @@
 import { View } from 'Core/Views/View';
 import GDPRConsentSettingsTemplate from 'html/consent/gdpr-consent-settings.html';
 import { Template } from 'Core/Utilities/Template';
-import { PrivacyRowItemContainer } from 'Ads/Views/Consent/PrivacyRowItemContainer';
+import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { Platform } from 'Core/Constants/Platform';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IPersonalizedConsent } from 'Ads/Views/Consent/IPermissions';
@@ -13,7 +13,7 @@ export interface IGDPRConsentSettingsHandler {
     onClose(): void;
 }
 
-export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
+export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> implements IPrivacyRowItemContainerHandler {
 
     private _infoContainer: PrivacyRowItemContainer;
     private _checkboxGroup: PersonalizationCheckboxGroup;
@@ -41,6 +41,7 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
         ];
 
         this._infoContainer = new PrivacyRowItemContainer({ platform: platform, gdprManager: gdprManager });
+        this._infoContainer.addEventHandler(this);
         this._checkboxGroup = new PersonalizationCheckboxGroup(platform);
     }
 
@@ -60,6 +61,12 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
         this._checkboxGroup.show();
     }
 
+    // IPrivacyRowItemContainerHandler
+    public onDataDeletion(): void {
+        // todo: set all checkboxes to unchecked?
+        this._checkboxGroup.checkCheckboxes(false);
+    }
+
     private onBackButtonEvent(event: Event): void {
         event.preventDefault();
 
@@ -68,6 +75,8 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
 
     private onAcceptAllEvent(event: Event): void {
         event.preventDefault();
+
+        this._checkboxGroup.checkCheckboxes(true);
 
         const consent: IPersonalizedConsent = {
                 gameExp: true,
@@ -94,7 +103,10 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> {
         this.runAnimation(<HTMLElement>this._container.querySelector('.save-my-choices'));
 
     }
+
     private runAnimation(buttonElement: HTMLElement): void {
+        this.container().classList.add('prevent-clicks');
+
         const buttonSpinner = new ButtonSpinner(this._platform);
         buttonSpinner.render();
         if (buttonElement) {

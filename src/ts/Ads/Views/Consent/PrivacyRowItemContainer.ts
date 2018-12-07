@@ -5,8 +5,8 @@ import { Platform } from 'Core/Constants/Platform';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
-interface IPrivacyInfoContainerHandler {
-    todoPlaceholderEventNoBlankInterfacesAllowed(): void;
+export interface IPrivacyRowItemContainerHandler {
+    onDataDeletion(): void;
 }
 
 interface IRowItemContainerParams {
@@ -14,9 +14,10 @@ interface IRowItemContainerParams {
     gdprManager: UserPrivacyManager;
 }
 
-export class PrivacyRowItemContainer extends View<IPrivacyInfoContainerHandler> {
+export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandler> {
 
     private _gdprManager: UserPrivacyManager;
+    private _dataDeletionConfirmation: boolean = false;
 
     constructor(parameters: IRowItemContainerParams) {
         super(parameters.platform, 'privacy-row-item-container');
@@ -44,6 +45,16 @@ export class PrivacyRowItemContainer extends View<IPrivacyInfoContainerHandler> 
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyPolicyEvent(event),
                 selector: '.privacy-policy'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onDataDeletionEvent(event),
+                selector: '.data-deletion-link, .data-deletion-reject'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onDataDeletionConfirmationEvent(event),
+                selector: '#data-deletion-confirm'
             }
         ];
     }
@@ -106,5 +117,30 @@ export class PrivacyRowItemContainer extends View<IPrivacyInfoContainerHandler> 
                 element.parentElement.classList.add('show-description');
             }
         }
+    }
+
+    protected onDataDeletionEvent(event: Event): void {
+        event.preventDefault();
+
+        if (this._dataDeletionConfirmation) {
+            return;
+        }
+
+        const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
+        confirmationContainer.classList.toggle('active');
+    }
+
+    protected onDataDeletionConfirmationEvent(event: Event): void {
+        event.preventDefault();
+        this._dataDeletionConfirmation = true;
+
+        const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
+        confirmationContainer.classList.toggle('active');
+
+        const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
+        requestContainer.classList.add('active');
+
+        this._handlers.forEach(handler => handler.onDataDeletion());
+
     }
 }
