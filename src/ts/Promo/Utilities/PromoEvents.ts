@@ -13,8 +13,8 @@ import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
 // external fields
 export interface IPurchaseCommon {
     store: string;
-    productId: string;
-    storeSpecificId: string;
+    productId: string | undefined;
+    storeSpecificId: string | undefined;
     amount: number | undefined;
     currency: string | undefined;
     native: boolean;
@@ -58,7 +58,7 @@ interface IPurhcaseFailed {
 interface IPurchaseSuccess {
     productType: string | undefined;
     receipt: {
-        data: string;
+        data: string | undefined;
     };
 }
 
@@ -233,7 +233,7 @@ export class PromoEvents {
         });
     }
 
-    public onOrganicPurchaseSuccess(body: IPurchaseCommon, productType: string | undefined, receipt: string): Promise<IOrganicPurchaseSuccess> {
+    public onOrganicPurchaseSuccess(body: IPurchaseCommon, productType: string | undefined, receipt: string | undefined): Promise<IOrganicPurchaseSuccess> {
         return Promise.all([
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight(),
@@ -291,7 +291,7 @@ export class PromoEvents {
 
     private getDeviceId(): string {
         const gdprEnabled: boolean = this._adsConfiguration.isOptOutEnabled() && this._adsConfiguration.isGDPREnabled();
-        if (gdprEnabled) {
+        if (!gdprEnabled) {
             if (this._deviceInfo instanceof AndroidDeviceInfo) {
                 return this._deviceInfo.getDevice();
             } else if (this._deviceInfo instanceof IosDeviceInfo) {
