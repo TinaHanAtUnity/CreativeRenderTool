@@ -3,7 +3,7 @@ import { AssetManager } from 'Ads/Managers/AssetManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
@@ -22,6 +22,8 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
+import { AuctionV5Test } from 'Core/Models/ABGroup';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class NoFillError extends Error {
 }
@@ -92,6 +94,9 @@ export class BannerCampaignManager {
                     if (nativeResponse.responseCode) {
                         jaegerSpan.addTag(JaegerTags.StatusCode, nativeResponse.responseCode.toString());
                     }
+                    if (AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
+                        return this.parseAuctionV5BannerCampaign(nativeResponse, placement);
+                    }
                     return this.parseBannerCampaign(nativeResponse, placement);
                 }
                 throw new Error('Empty campaign response');
@@ -147,6 +152,73 @@ export class BannerCampaignManager {
             this._core.Sdk.logError(e.message);
             return Promise.reject(e);
         }
+    }
+
+    private parseAuctionV5BannerCampaign(response: INativeResponse, placement: Placement): Promise<Campaign> {
+        const json = JsonParser.parse(response.response);
+        const session = new Session(json.auctionId);
+
+        if ('placements' in json) {
+            const placementId = placement.getId();
+            if (placement.isBannerPlacement()) {
+
+                let mediaId: string | undefined;
+                if (json.placements.hasOwnProperty(placementId)) {
+                    if (json.placements[placementId].hasOwnProperty('mediaId')) {
+                        mediaId = json.placements[placementId].mediaId;
+                    } else {
+                        SessionDiagnostics.trigger('missing_auction_v5_banner_mediaid', {
+                            placementId: placement
+                        }, session);
+                    }
+                } else {
+                    SessionDiagnostics.trigger('missing_auction_v5_banner_placement', {
+                        placementId: placement
+                    }, session);
+                }
+
+                if (mediaId) {
+                    let trackingUrls: ICampaignTrackingUrls = {};
+                    if (json.placements[placementId].hasOwnProperty('trackingId')) {
+                        const trackingId: string = json.placements[placementId].trackingId;
+                        if (json.tracking[trackingId]) {
+                            trackingUrls = json.tracking[trackingId];
+                        } else {
+                            SessionDiagnostics.trigger('invalid_auction_v5_banner_tracking_id', {
+                                mediaId: mediaId,
+                                trackingId: trackingId
+                            }, session);
+                            throw new Error('Invalid tracking ID ' + trackingId);
+                        }
+                    } else {
+                        SessionDiagnostics.trigger('missing_auction_v5_banner_tracking_id', {
+                            mediaId: mediaId
+                        }, session);
+                        throw new Error('Missing tracking ID');
+                    }
+
+                    const auctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
+                    const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId);
+                    return this.handleV5BannerCampaign(auctionResponse, session, trackingUrls);
+                }
+            }
+        }
+
+        const e = new Error('No placements found in realtime V5 campaign json.');
+        this._core.Sdk.logError(e.message);
+        return Promise.reject(e);
+    }
+
+    private handleV5BannerCampaign(response: AuctionResponse, session: Session, trackingUrls: ICampaignTrackingUrls): Promise<Campaign> {
+        this._core.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
+
+        const parser: CampaignParser = this.getCampaignParser(response.getContentType());
+
+        return parser.parse(this._platform, this._core, this._request, response, session).then((campaign) => {
+            campaign.setMediaId(response.getMediaId());
+            campaign.setTrackingUrls(trackingUrls);
+            return campaign;
+        });
     }
 
     private handleBannerCampaign(response: AuctionResponse, session: Session): Promise<Campaign> {
