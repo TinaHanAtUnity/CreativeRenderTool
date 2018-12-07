@@ -1,4 +1,4 @@
-# Pending
+# Fri Dec  7 06:02:24 UTC 2018
 
 * Add unit tests for MRAID Ad Unit [#7318](https://github.com/Applifier/unity-ads-webview/pull/7318)
 * Add WebPlayer MraidEvent Bridge (unhooked) [#7272](https://github.com/Applifier/unity-ads-webview/pull/7272)
