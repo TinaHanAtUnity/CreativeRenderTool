@@ -1,3 +1,22 @@
+# Staged
+
+* Disable app sheet on iOS 12 [#7489](https://github.com/Applifier/unity-ads-webview/pull/7489)
+* Make call-button start the transition from further off the screen [#7414](https://github.com/Applifier/unity-ads-webview/pull/7414)
+* Remove the old Overlay [#7413](https://github.com/Applifier/unity-ads-webview/pull/7413)
+
+# Fri Dec  7 06:02:24 UTC 2018
+
+* Add unit tests for MRAID Ad Unit [#7318](https://github.com/Applifier/unity-ads-webview/pull/7318)
+* Add WebPlayer MraidEvent Bridge (unhooked) [#7272](https://github.com/Applifier/unity-ads-webview/pull/7272)
+* Extend Auction V5 Changes to Banners [#7439](https://github.com/Applifier/unity-ads-webview/pull/7439)
+* Add Organic IAP Purchase [#7129](https://github.com/Applifier/unity-ads-webview/pull/7129)
+* Relax \<Impression\> url check in Programmatic VAST [#7466](https://github.com/Applifier/unity-ads-webview/pull/7466)
+
+# Wed Dec  5 21:38:02 UTC 2018
+
+* More groups to auction v5 test [#7441](https://github.com/Applifier/unity-ads-webview/pull/7441)
+* Clean up gamer ID from codebase [#7437](https://github.com/Applifier/unity-ads-webview/pull/7437)
+
 # Mon Dec  3 21:13:08 UTC 2018
 
 * Show install now button after 0,5s experiment [#7382](https://github.com/Applifier/unity-ads-webview/pull/7382)
