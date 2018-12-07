@@ -76,6 +76,8 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> imple
     private onAcceptAllEvent(event: Event): void {
         event.preventDefault();
 
+        this._checkboxGroup.checkCheckboxes(true);
+
         const consent: IPersonalizedConsent = {
                 gameExp: true,
                 ads: true,
