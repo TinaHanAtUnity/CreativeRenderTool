@@ -44,7 +44,7 @@ export class UserPrivacyManager {
     private readonly _core: ICoreApi;
     private readonly _coreConfig: CoreConfiguration;
     private readonly _adsConfig: AdsConfiguration;
-    private readonly _gamePrivacy: GamePrivacy;
+    private readonly _gamePrivacy: GamePrivacy | undefined;
     private readonly _userPrivacy: UserPrivacy | undefined;
     private readonly _clientInfo: ClientInfo;
     private readonly _deviceInfo: DeviceInfo;
@@ -84,7 +84,11 @@ export class UserPrivacyManager {
     }
 
     public sendUnityConsentEvent(permissions: IUnityConsentPermissions, source: GDPREventSource): Promise<void> {
-        const allowed = this._gamePrivacy.isEnabled() && this._gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT;
+        const gamePrivacy = this._gamePrivacy;
+        if (!gamePrivacy) {
+            return Promise.resolve();
+        }
+        const allowed = gamePrivacy.isEnabled() && gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT;
         if (!allowed) {
             return Promise.resolve();
         }
@@ -97,7 +101,7 @@ export class UserPrivacyManager {
             gameId: this._clientInfo.getGameId(),
             source: source,
             method: PrivacyMethod.UNITY_CONSENT,
-            version: this._gamePrivacy.getVersion(),
+            version: gamePrivacy.getVersion(),
             coppa: this._coreConfig.isCoppaCompliant(),
             permissions: permissions
         };

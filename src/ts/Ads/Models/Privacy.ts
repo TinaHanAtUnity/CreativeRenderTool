@@ -13,6 +13,17 @@ export interface IUnityConsentPermissions {
     external: boolean;
 }
 
+export interface IUnityConsentProfiling {
+    profiling: boolean;
+}
+
+export interface IPrivacy {
+    method: PrivacyMethod;
+    firstRequest: boolean;
+    permissions: IUnityConsentPermissions | { profiling: boolean } | {};
+
+}
+
 const CurrentUnityConsentVersion = 20181106;
 
 interface IGamePrivacy {
@@ -57,13 +68,15 @@ export class GamePrivacy extends Model<IGamePrivacy> {
 
 interface IUserPrivacy {
     method: PrivacyMethod; // TODO: should 'default' from PrivacyMethod be allowed?
+    privacy: IUnityConsentPermissions;
 }
 
 export class UserPrivacy extends Model<IUserPrivacy> {
 
     constructor(data: any) {
         super('UserPrivacy', {
-            method: ['string']
+            method: ['string'],
+            privacy: ['object']
         });
 
         this.set('method', data.method);
@@ -83,6 +96,10 @@ export class UserPrivacy extends Model<IUserPrivacy> {
             return CurrentUnityConsentVersion;
         }
         return 0;
+    }
+
+    public getPermissions(): IUnityConsentPermissions | IUnityConsentProfiling {
+        return this.get('privacy');
     }
 
     public getDTO(): { [key: string]: any } {

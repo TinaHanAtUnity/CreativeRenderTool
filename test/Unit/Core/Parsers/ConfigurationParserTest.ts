@@ -73,7 +73,7 @@ describe('configurationParserTest', () => {
         });
 
         it('should have game privacy method parameter from configuration', () => {
-            assert.equal(adsConfig.getGamePrivacy().getMethod(), PrivacyMethod.LEGITIMATE_INTEREST);
+            assert.equal(adsConfig.getGamePrivacy()!.getMethod(), PrivacyMethod.LEGITIMATE_INTEREST);
         });
 
         it('should have server side test mode false when undefined in config', () => {
@@ -111,15 +111,15 @@ describe('configurationParserTest', () => {
             it('should set to DEFAULT if game privacy is missing from configuration', () => {
                 configJson.gamePrivacy = undefined;
                 const config = AdsConfigurationParser.parse(configJson);
-                assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.DEFAULT);
-                assert.equal(config.getGamePrivacy().isEnabled(), false);
+                assert.equal(config.getGamePrivacy()!.getMethod(), PrivacyMethod.DEFAULT);
+                assert.equal(config.getGamePrivacy()!.isEnabled(), false);
             });
 
             it('should set to UNITY_CONSENT', () => {
                 configJson.gamePrivacy.method = PrivacyMethod.UNITY_CONSENT;
                 const config = AdsConfigurationParser.parse(configJson);
-                assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.UNITY_CONSENT);
-                assert.equal(config.getGamePrivacy().isEnabled(), true);
+                assert.equal(config.getGamePrivacy()!.getMethod(), PrivacyMethod.UNITY_CONSENT);
+                assert.equal(config.getGamePrivacy()!.isEnabled(), true);
             });
         });
     });

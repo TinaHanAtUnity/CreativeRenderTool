@@ -1,5 +1,8 @@
 import { Placement } from 'Ads/Models/Placement';
-import { GamePrivacy, UserPrivacy } from 'Ads/Models/Privacy';
+import {
+    GamePrivacy, IPrivacy, IUnityConsentPermissions, IUnityConsentProfiling, PrivacyMethod,
+    UserPrivacy
+} from 'Ads/Models/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
 
@@ -11,7 +14,7 @@ export interface IAdsConfiguration {
     optOutRecorded: boolean;
     optOutEnabled: boolean;
     defaultBannerPlacement: Placement | undefined;
-    gamePrivacy: GamePrivacy;
+    gamePrivacy?: GamePrivacy;
     userPrivacy?: UserPrivacy;
 }
 
@@ -24,7 +27,7 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         optOutRecorded: ['boolean'],
         optOutEnabled: ['boolean'],
         defaultBannerPlacement: ['string', 'undefined'],
-        gamePrivacy: ['object'],
+        gamePrivacy: ['object', 'undefined'],
         userPrivacy: ['object', 'undefined']
     };
 
@@ -78,6 +81,42 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         return count;
     }
 
+    public getPrivacyMethod(): PrivacyMethod {
+        const gamePrivacy = this.getGamePrivacy();
+        if (gamePrivacy) {
+            return gamePrivacy.getMethod();
+        }
+        if (!this.isGDPREnabled()) {
+            return PrivacyMethod.DEFAULT;
+        }
+        // TODO: what other cases are there?
+        throw new Error('getPrivacymethod(): This privacy case has not been implemented');
+    }
+
+    public isFirstRequest() {
+        if (!this.getUserPrivacy()) {
+            return true;
+        }
+        return false;
+    }
+
+    public getPrivacy(): IPrivacy {
+        return {
+            'method': this.getPrivacyMethod(),
+            'firstRequest': this.isFirstRequest(),
+            'permissions': this.getPermissions()
+        };
+    }
+
+    public getPermissions(): IUnityConsentPermissions | IUnityConsentProfiling | {} {
+        const userPrivacy = this.getUserPrivacy();
+        if (userPrivacy) {
+            return userPrivacy.getPermissions();
+        } else {
+            return {};
+        }
+    }
+
     public getDefaultPlacement(): Placement {
         return this.get('defaultPlacement');
     }
@@ -110,11 +149,11 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         this.set('optOutEnabled', optOutEnabled);
     }
 
-    public getGamePrivacy(): GamePrivacy {
+    public getGamePrivacy(): GamePrivacy | undefined {
         return this.get('gamePrivacy');
     }
 
-    public getUserPrivacy(): GamePrivacy | undefined {
+    public getUserPrivacy(): UserPrivacy | undefined {
         return this.get('userPrivacy');
     }
 
