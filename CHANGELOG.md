@@ -1,3 +1,9 @@
+# Staged
+
+* Disable app sheet on iOS 12 [#7489](https://github.com/Applifier/unity-ads-webview/pull/7489)
+* Make call-button start the transition from further off the screen [#7414](https://github.com/Applifier/unity-ads-webview/pull/7414)
+* Remove the old Overlay [#7413](https://github.com/Applifier/unity-ads-webview/pull/7413)
+
 # Fri Dec  7 06:02:24 UTC 2018
 
 * Add unit tests for MRAID Ad Unit [#7318](https://github.com/Applifier/unity-ads-webview/pull/7318)
