@@ -51,21 +51,21 @@ def main() {
 
             ['hybrid-test-android','hybrid-test-ios'].each {
                 stage -> hybridTestBuilders[stage] = {
-                  def jobName = "ads-sdk-$stage"
-                  def build_ = build(
-                    job: "Applifier/unity-ads-sdk-tests/$jobName",
-                    propagate: false,
-                    wait: true,
-                    parameters: [
-                      string(name: 'WEBVIEW_BRANCH', value: webviewBranch),
-                    ]
-                  )
+                    def jobName = "ads-sdk-$stage"
+                    def build_ = build(
+                      job: "Applifier/unity-ads-sdk-tests/$jobName",
+                      propagate: false,
+                      wait: true,
+                      parameters: [
+                        string(name: 'WEBVIEW_BRANCH', value: webviewBranch),
+                      ]
+                    )
 
-                  def artifactFolder = "$jobName/$build_.number"
-                  dir(jobName) {
-                      sharedLibs.downloadFromGcp("$artifactFolder/*")
-                  }
-                  sharedLibs.removeFromGcp(artifactFolder)
+                    def artifactFolder = "$jobName/$build_.number"
+                    dir(jobName) {
+                        sharedLibs.downloadFromGcp("$artifactFolder/*")
+                    }
+                    sharedLibs.removeFromGcp(artifactFolder)
                 }
             }
 
@@ -99,6 +99,9 @@ def main() {
             }
             archiveArtifacts artifacts: "results/**", fingerprint: true
             step ([$class: "JUnitResultArchiver", testResults: "results/**/*.xml"])
+
+            slackChannel = "ads-sdk-notify"
+            sharedLibs.sendTestSummary(slackChannel)
         }
     }
 }
