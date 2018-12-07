@@ -10,7 +10,7 @@ import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { MOAT } from 'Ads/Views/MOAT';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
@@ -23,6 +23,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { Campaign } from 'Ads/Models/Campaign';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
@@ -39,7 +40,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastOverlayEventHandlersTest', () => {
         let campaign: VastCampaign;
-        let overlay: Overlay;
+        let overlay: NewVideoOverlay;
         let metaDataManager: MetaDataManager;
         let focusManager: FocusManager;
 
@@ -92,8 +93,20 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 deviceInfo = TestFixtures.getIosDeviceInfo(core);
                 container = new ViewController(core, ads, <IosDeviceInfo>deviceInfo, focusManager, clientInfo);
             }
+            const placement = TestFixtures.getPlacement();
+            const coreConfig = TestFixtures.getCoreConfiguration();
 
-            overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
+            const videoOverlayParameters: IVideoOverlayParameters<Campaign> = {
+                deviceInfo: deviceInfo,
+                campaign: campaign,
+                coreConfig: coreConfig,
+                placement: placement,
+                clientInfo: clientInfo,
+                platform: platform,
+                ads: ads
+            };
+            overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             const wakeUpManager = new WakeUpManager(core);
@@ -106,7 +119,6 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 return Promise.resolve(url);
             });
 
-            const coreConfig = TestFixtures.getCoreConfiguration();
             const adsConfig = TestFixtures.getAdsConfiguration();
             const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 platform,
@@ -137,7 +149,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                placement: TestFixtures.getPlacement(),
+                placement: placement,
                 campaign: campaign,
                 coreConfig: coreConfig,
                 adsConfig: adsConfig,

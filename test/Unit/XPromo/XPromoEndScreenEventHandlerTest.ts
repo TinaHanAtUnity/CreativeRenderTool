@@ -13,7 +13,7 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
@@ -48,7 +48,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let ar: IARApi;
     let purchasing: IPurchasingApi;
     let container: AdUnitContainer;
-    let overlay: Overlay;
+    let overlay: NewVideoOverlay;
     let endScreen: XPromoEndScreen;
     let storageBridge: StorageBridge;
     let sessionManager: SessionManager;
@@ -128,8 +128,18 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 targetGameName: TestFixtures.getXPromoCampaign().getGameName()
             };
             endScreen = new XPromoEndScreen(endScreenParams, TestFixtures.getXPromoCampaign());
-            overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
             placement = TestFixtures.getPlacement();
+
+            const videoOverlayParameters = {
+                deviceInfo: deviceInfo,
+                campaign: campaign,
+                coreConfig: coreConfig,
+                placement: placement,
+                clientInfo: clientInfo,
+                platform: platform,
+                ads: ads
+            };
+            overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
 
             xPromoAdUnitParameters = {
                 platform,
@@ -287,7 +297,16 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 targetGameName: campaign.getGameName()
             };
             endScreen = new XPromoEndScreen(endScreenParams, campaign);
-            overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
+            const videoOverlayParameters = {
+                deviceInfo: deviceInfo,
+                campaign: campaign,
+                coreConfig: coreConfig,
+                placement: placement,
+                clientInfo: clientInfo,
+                platform: platform,
+                ads: ads
+            };
+            overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
 
             xPromoAdUnitParameters = {
                 platform,

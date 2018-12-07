@@ -18,7 +18,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -65,7 +65,7 @@ describe('VideoEventHandlersTest', () => {
     let ads: IAdsApi;
     let ar: IARApi;
     let purchasing: IPurchasingApi;
-    let overlay: Overlay;
+    let overlay: NewVideoOverlay;
     let endScreen: PerformanceEndScreen;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
@@ -140,8 +140,17 @@ describe('VideoEventHandlersTest', () => {
         placement = TestFixtures.getPlacement();
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const privacy = new Privacy(platform, vastCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
-
-        overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
+        const campaign = TestFixtures.getCampaign();
+        const videoOverlayParameters = {
+            deviceInfo: deviceInfo,
+            campaign: campaign,
+            coreConfig: coreConfig,
+            placement: placement,
+            clientInfo: clientInfo,
+            platform: platform,
+            ads: ads
+        };
+        overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
 
         const endScreenParams : IEndScreenParameters = {
             platform,
