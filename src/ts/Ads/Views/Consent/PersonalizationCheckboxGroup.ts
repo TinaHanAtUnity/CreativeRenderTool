@@ -79,4 +79,12 @@ export class PersonalizationCheckboxGroup extends View<{}> {
         return this._personalized3rdPartyCheckbox ? this._personalized3rdPartyCheckbox.checked : false;
     }
 
+    public checkCheckboxes(checked: boolean) {
+        if (this._personalizedExpCheckbox && this._personalizedAdsCheckbox && this._personalized3rdPartyCheckbox) {
+            this._personalizedExpCheckbox.checked = checked;
+            this._personalizedAdsCheckbox.checked = checked;
+            this._personalized3rdPartyCheckbox.checked = checked;
+        }
+    }
+
 }
