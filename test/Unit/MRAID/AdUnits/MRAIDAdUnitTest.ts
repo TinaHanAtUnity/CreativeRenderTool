@@ -23,6 +23,8 @@ import { Privacy } from 'Ads/Views/Privacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 
 describe('MraidAdUnit', () => {
     const sandbox = sinon.createSandbox();
@@ -31,6 +33,7 @@ describe('MraidAdUnit', () => {
     let mraidView: MRAID;
     let ads: IAdsApi;
     let operativeEventManager: OperativeEventManager;
+    let webPlayerContainer: WebPlayerContainer;
 
     let containerOpen: sinon.SinonSpy;
     let containerClose: sinon.SinonSpy;
@@ -73,6 +76,8 @@ describe('MraidAdUnit', () => {
         const adsConfig = TestFixtures.getAdsConfiguration();
         const mraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
 
+        webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
+
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform: platform,
             core: core,
@@ -111,7 +116,8 @@ describe('MraidAdUnit', () => {
             endScreen: undefined,
             privacy: new Privacy(platform, mraidCampaign, userPrivacyManager, false, false),
             privacyManager: userPrivacyManager,
-            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
+            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
+            webPlayerContainer: webPlayerContainer
         };
 
         containerOpen = (<sinon.SinonStub>mraidAdUnitParameters.container.open).returns(Promise.resolve());

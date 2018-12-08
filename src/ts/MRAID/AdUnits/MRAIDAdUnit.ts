@@ -12,35 +12,44 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { EndScreen } from 'Ads/Views/EndScreen';
 import { IARApi } from 'AR/AR';
-import { ARUtil } from 'AR/Utilities/ARUtil';
 import { FinishState } from 'Core/Constants/FinishState';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { ARUtil } from 'AR/Utilities/ARUtil';
+import { WKAudiovisualMediaTypes } from 'Ads/Native/WebPlayer';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Platform } from 'Core/Constants/Platform';
+import { MRAID } from 'MRAID/Views/MRAID';
 import { Privacy } from 'Ads/Views/Privacy';
+import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
     endScreen?: EndScreen;
     privacy: Privacy;
     ar: IARApi;
+    webPlayerContainer: WebPlayerContainer;
 }
 
 export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _mraid: MRAIDView<IMRAIDViewHandler>;
-    private _ar: IARApi;
-    private _options: any;
-    private _orientationProperties: IOrientationProperties;
     private _endScreen?: EndScreen;
     private _showingMRAID: boolean;
     private _clientInfo: ClientInfo;
     private _placement: Placement;
-    private _campaign: MRAIDCampaign;
     private _privacy: AbstractPrivacy;
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
+    private _webPlayerContainer: WebPlayerContainer;
+
+    protected _ar: IARApi;
+    protected _campaign: MRAIDCampaign;
+    protected _mraid: MRAIDView<IMRAIDViewHandler>;
+    protected _options: any;
+    protected _orientationProperties: IOrientationProperties;
 
     constructor(parameters: IMRAIDAdUnitParameters) {
         super(parameters);
@@ -55,6 +64,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._campaign = parameters.campaign;
         this._privacy = parameters.privacy;
         this._ar = parameters.ar;
+        this._webPlayerContainer = parameters.webPlayerContainer;
 
         this._mraid.render();
         document.body.appendChild(this._mraid.container());
@@ -77,7 +87,9 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public show(): Promise<void> {
         this.setShowing(true);
         this.setShowingMRAID(true);
+
         this._mraid.show();
+
         this._ads.Listener.sendStartEvent(this._placement.getId());
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
@@ -86,20 +98,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         this._container.addEventHandler(this);
 
-        const views: string[] = ['webview'];
-
-        const isARCreative = ARUtil.isARCreative(this._campaign);
-        const isARSupported = isARCreative ? ARUtil.isARSupported(this._ar) : Promise.resolve<boolean>(false);
-
-        return isARSupported.then(arSupported => {
-            if (arSupported) {
-                views.unshift('arview');
-            }
-
-            return this._container.open(this, views, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options).then(() => {
-                this.onStart.trigger();
-            });
-        });
+        return this.setupContainerView();
     }
 
     public hide(): Promise<void> {
@@ -262,5 +261,79 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         } else if(finishState === FinishState.SKIPPED) {
             this._operativeEventManager.sendSkip(operativeEventParams);
         }
+    }
+
+    private setupContainerView(): Promise<void> {
+        // if (this._mraid instanceof MRAID) {
+        //     return this.setupWebPlayerView();
+        // }
+
+        return this.setupIFrameView();
+    }
+
+    private setupIFrameView(): Promise<void> {
+        const views: string[] = ['webview'];
+        const isARCreative = ARUtil.isARCreative(this._campaign);
+        const isARSupported = isARCreative ? ARUtil.isARSupported(this._ar) : Promise.resolve<boolean>(false);
+
+        return isARSupported.then(arSupported => {
+            if (arSupported) {
+                views.unshift('arview');
+            }
+
+            return this.openAdUnitContainer(views);
+        });
+    }
+
+    private setupWebPlayerView(): Promise<void> {
+        return this.setupWebPlayer().then(() => {
+            return this.openAdUnitContainer(['webplayer', 'webview']);
+        });
+    }
+
+    private openAdUnitContainer(views: string[]) {
+        return this._container.open(this, views, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options).then(() => {
+            this.onStart.trigger();
+        });
+    }
+
+    private setupWebPlayer(): Promise<any> {
+        if (this._platform === Platform.ANDROID) {
+            return this.setupAndroidWebPlayer();
+        } else {
+            return this.setupIosWebPlayer();
+        }
+    }
+
+    private setupAndroidWebPlayer(): Promise<{}> {
+        const promises = [];
+        promises.push(this._webPlayerContainer.setSettings({
+            setSupportMultipleWindows: [false],
+            setJavaScriptCanOpenWindowsAutomatically: [true],
+            setMediaPlaybackRequiresUserGesture: [false],
+            setAllowFileAccessFromFileURLs: [true]
+        }, {}));
+        const eventSettings = {
+            'onPageStarted': { 'sendEvent': true },
+            'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': true }
+        };
+        promises.push(this._webPlayerContainer.setEventSettings(eventSettings));
+        return Promise.all(promises);
+    }
+
+    private setupIosWebPlayer(): Promise<any> {
+        const settings = {
+            'allowsPlayback': true,
+            'playbackRequiresAction': false,
+            'typesRequiringAction': WKAudiovisualMediaTypes.NONE
+        };
+        const events = {
+            'onPageStarted': { 'sendEvent': true },
+            'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': true }
+        };
+        return Promise.all([
+            this._webPlayerContainer.setSettings(settings, {}),
+            this._webPlayerContainer.setEventSettings(events)
+        ]);
     }
 }
