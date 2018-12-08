@@ -35,6 +35,7 @@ import { MRAID } from 'MRAID/Views/MRAID';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -61,6 +62,7 @@ describe('MRAIDEventHandlersTest', () => {
     let programmaticMraidCampaign: MRAIDCampaign;
     let privacyManager: UserPrivacyManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let webPlayerContainer: WebPlayerContainer;
 
     describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -95,6 +97,7 @@ describe('MRAIDEventHandlersTest', () => {
             sinon.stub(mraidView, 'container').returns(document.createElement('div'));
             privacyManager = sinon.createStubInstance(UserPrivacyManager);
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+            webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
 
             extendedMraidAdUnitParams = {
             platform,
@@ -118,7 +121,8 @@ describe('MRAIDEventHandlersTest', () => {
                 endScreen: undefined,
                 privacy: new Privacy(platform, extendedMraidCampaign, privacyManager, false, false),
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService
+                programmaticTrackingService: programmaticTrackingService,
+                webPlayerContainer: webPlayerContainer
             };
 
             mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
@@ -358,7 +362,8 @@ describe('MRAIDEventHandlersTest', () => {
                 endScreen: undefined,
                 privacy: new Privacy(platform, programmaticMraidCampaign, privacyManager, false, false),
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService
+                programmaticTrackingService: programmaticTrackingService,
+                webPlayerContainer: webPlayerContainer
             };
 
             programmaticMraidAdUnit = new MRAIDAdUnit(programmaticMraidAdUnitParams);

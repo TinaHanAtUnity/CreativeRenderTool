@@ -24,7 +24,6 @@ import { ARUtil } from 'AR/Utilities/ARUtil';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 
 describe('MraidAdUnit', () => {
     const sandbox = sinon.createSandbox();

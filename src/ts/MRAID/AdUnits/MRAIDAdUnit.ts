@@ -12,18 +12,16 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { EndScreen } from 'Ads/Views/EndScreen';
 import { IARApi } from 'AR/AR';
+import { ARUtil } from 'AR/Utilities/ARUtil';
 import { FinishState } from 'Core/Constants/FinishState';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { ARUtil } from 'AR/Utilities/ARUtil';
 import { WKAudiovisualMediaTypes } from 'Ads/Native/WebPlayer';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
-import { MRAID } from 'MRAID/Views/MRAID';
 import { Privacy } from 'Ads/Views/Privacy';
-import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
+import { MRAID } from 'MRAID/Views/MRAID';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -37,6 +35,10 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _mraid: MRAIDView<IMRAIDViewHandler>;
+    private _ar: IARApi;
+    private _options: any;
+    private _orientationProperties: IOrientationProperties;
     private _endScreen?: EndScreen;
     private _showingMRAID: boolean;
     private _clientInfo: ClientInfo;
@@ -44,12 +46,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _privacy: AbstractPrivacy;
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
     private _webPlayerContainer: WebPlayerContainer;
-
-    protected _ar: IARApi;
-    protected _campaign: MRAIDCampaign;
-    protected _mraid: MRAIDView<IMRAIDViewHandler>;
-    protected _options: any;
-    protected _orientationProperties: IOrientationProperties;
+    private _campaign: MRAIDCampaign;
 
     constructor(parameters: IMRAIDAdUnitParameters) {
         super(parameters);
