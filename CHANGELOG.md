@@ -1,3 +1,34 @@
+# Staged
+
+* Disable app sheet on iOS 12 [#7489](https://github.com/Applifier/unity-ads-webview/pull/7489)
+* Make call-button start the transition from further off the screen [#7414](https://github.com/Applifier/unity-ads-webview/pull/7414)
+* Remove the old Overlay [#7413](https://github.com/Applifier/unity-ads-webview/pull/7413)
+
+# Fri Dec  7 06:02:24 UTC 2018
+
+* Add unit tests for MRAID Ad Unit [#7318](https://github.com/Applifier/unity-ads-webview/pull/7318)
+* Add WebPlayer MraidEvent Bridge (unhooked) [#7272](https://github.com/Applifier/unity-ads-webview/pull/7272)
+* Extend Auction V5 Changes to Banners [#7439](https://github.com/Applifier/unity-ads-webview/pull/7439)
+* Add Organic IAP Purchase [#7129](https://github.com/Applifier/unity-ads-webview/pull/7129)
+* Relax \<Impression\> url check in Programmatic VAST [#7466](https://github.com/Applifier/unity-ads-webview/pull/7466)
+
+# Wed Dec  5 21:38:02 UTC 2018
+
+* More groups to auction v5 test [#7441](https://github.com/Applifier/unity-ads-webview/pull/7441)
+* Clean up gamer ID from codebase [#7437](https://github.com/Applifier/unity-ads-webview/pull/7437)
+
+# Mon Dec  3 21:13:08 UTC 2018
+
+* Show install now button after 0,5s experiment [#7382](https://github.com/Applifier/unity-ads-webview/pull/7382)
+* UADS-1002 : gamerSid should be included on all Operative events [#7173](https://github.com/Applifier/unity-ads-webview/pull/7173)
+* Update dependencies [#7384](https://github.com/Applifier/unity-ads-webview/pull/7384)
+* Fix autoskip, abgroup, country and other settings in the browser tester [#7409](https://github.com/Applifier/unity-ads-webview/pull/7409)
+* Add Unity Analytics identifiers in config request [#7412](https://github.com/Applifier/unity-ads-webview/pull/7412)
+* Add support for Creative Blocking Service [#7100](https://github.com/Applifier/unity-ads-webview/pull/7100)
+* Enable Auction V5 on Group 15 [#7408](https://github.com/Applifier/unity-ads-webview/pull/7408)
+* Style Privacy more Natively for Admob Ads [#7174](https://github.com/Applifier/unity-ads-webview/pull/7174)
+* Android back button experiment [#7386](https://github.com/Applifier/unity-ads-webview/pull/7386)
+
 # Thu Nov 29 22:28:30 UTC 2018
 
 * Fix AR MRAID safety paddings on iPhone X [#6944](https://github.com/Applifier/unity-ads-webview/pull/6944)

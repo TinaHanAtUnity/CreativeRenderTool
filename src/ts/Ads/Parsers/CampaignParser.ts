@@ -9,7 +9,15 @@ import { Url } from 'Core/Utilities/Url';
 
 export abstract class CampaignParser {
 
+    public creativeID: string | undefined;
+    public seatID: number | undefined;
+
     public abstract parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign>;
+
+    public setCreativeIdentification(response: AuctionResponse) {
+        this.creativeID = response.getCreativeId() || undefined;
+        this.seatID = response.getSeatId() || undefined;
+    }
 
     protected getProgrammaticCampaignId(platform: Platform): string {
         switch (platform) {

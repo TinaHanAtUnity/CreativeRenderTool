@@ -17,9 +17,12 @@ import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { Url } from 'Core/Utilities/Url';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
+    privacy: Privacy;
+    webPlayerContainer: WebPlayerContainer;
 }
 
 export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
@@ -54,7 +57,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         this._placement = parameters.placement;
         this._deviceInfo = parameters.deviceInfo;
         this._clientInfo = parameters.clientInfo;
-        this._webPlayerContainer = parameters.webPlayerContainer!;
+        this._webPlayerContainer = parameters.webPlayerContainer;
 
         this._view.render();
         document.body.appendChild(this._view.container());

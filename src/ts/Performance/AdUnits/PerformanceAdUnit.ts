@@ -6,11 +6,12 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;
     adUnitStyle?: AdUnitStyle;
-    privacy: AbstractPrivacy;
+    privacy: Privacy;
 }
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {

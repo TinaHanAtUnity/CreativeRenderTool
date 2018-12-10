@@ -43,6 +43,7 @@ import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
+import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 
 export class CampaignManager {
 
@@ -396,7 +397,7 @@ export class CampaignManager {
                         if(json.placements[placement].hasOwnProperty('mediaId')) {
                             mediaId = json.placements[placement].mediaId;
                         } else {
-                            SessionDiagnostics.trigger('mission_auction_v5_mediaid', {
+                            SessionDiagnostics.trigger('missing_auction_v5_mediaid', {
                                 placementId: placement
                             }, session);
                         }
@@ -535,6 +536,7 @@ export class CampaignManager {
 
         try {
             parser = this.getCampaignParser(response.getContentType());
+            parser.setCreativeIdentification(response);
         } catch (e) {
             return Promise.reject(e);
         }
@@ -549,6 +551,12 @@ export class CampaignManager {
             campaign.setMediaId(response.getMediaId());
 
             return this.setupCampaignAssets(response.getPlacements(), campaign, response.getContentType(), session);
+        }).catch((error) => {
+            CreativeBlocking.report(parser.creativeID, parser.seatID, BlockingReason.VIDEO_PARSE_FAILURE, {
+                errorCode: error.errorCode || undefined,
+                message: error.message || undefined
+            });
+            throw error;
         });
     }
 

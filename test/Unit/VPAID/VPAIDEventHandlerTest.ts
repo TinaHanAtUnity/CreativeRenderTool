@@ -1,34 +1,22 @@
-import { Activity } from 'Ads/AdUnits/Containers/Activity';
-import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IAdsApi } from 'Ads/IAds';
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Closer } from 'Ads/Views/Closer';
-import { Privacy } from 'Ads/Views/Privacy';
+import { IARApi } from 'AR/AR';
 import { Backend } from 'Backend/Backend';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { FocusManager } from 'Core/Managers/FocusManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-
-import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
-import { VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
+import { VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
+import { IVPAIDEventHandlerParameters, VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
-import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('VPAIDEventHandlerTest @skipOnDevice', () => {
     let eventHandler: VPAIDEventHandler;
@@ -37,10 +25,8 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let ar: IARApi;
-    let purchasing: IPurchasingApi;
     let adUnit: VPAIDAdUnit;
-    let parameters: IVPAIDAdUnitParameters;
+    let parameters: IVPAIDEventHandlerParameters;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -48,35 +34,16 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
-        ar = TestFixtures.getARApi(nativeBridge);
-        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
-        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         parameters = {
-            platform,
             core,
             ads,
-            ar,
-            purchasing,
             campaign: sinon.createStubInstance(VPAIDCampaign),
             closer: sinon.createStubInstance(Closer),
-            vpaid: sinon.createStubInstance(VPAID),
             endScreen: sinon.createStubInstance(VPAIDEndScreen),
-            focusManager: sinon.createStubInstance(FocusManager),
-            deviceInfo: sinon.createStubInstance(DeviceInfo),
-            clientInfo: sinon.createStubInstance(ClientInfo),
             thirdPartyEventManager: sinon.createStubInstance(ThirdPartyEventManager),
             operativeEventManager: sinon.createStubInstance(OperativeEventManager),
-            placement: TestFixtures.getPlacement(),
-            container: sinon.createStubInstance(Activity),
-            coreConfig: sinon.createStubInstance(CoreConfiguration),
-            adsConfig: sinon.createStubInstance(AdsConfiguration),
-            request: sinon.createStubInstance(RequestManager),
-            privacy: sinon.createStubInstance(Privacy),
-            forceOrientation: Orientation.NONE,
-            options: {},
-            privacyManager: sinon.createStubInstance(UserPrivacyManager),
-            programmaticTrackingService: programmaticTrackingService
+            placement: TestFixtures.getPlacement()
         };
         adUnit = sinon.createStubInstance(VPAIDAdUnit);
         (<sinon.SinonStub>parameters.campaign.getSession).returns(TestFixtures.getSession());

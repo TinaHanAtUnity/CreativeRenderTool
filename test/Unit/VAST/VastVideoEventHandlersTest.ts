@@ -12,7 +12,7 @@ import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { MOAT } from 'Ads/Views/MOAT';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -31,6 +31,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
+import { Campaign } from 'Ads/Models/Campaign';
 
 import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
@@ -46,15 +47,13 @@ describe('VastVideoEventHandler tests', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let ar: IARApi;
-    let purchasing: IPurchasingApi;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
     let campaign: VastCampaign;
     let placement: Placement;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
-    let overlay: Overlay;
+    let overlay: NewVideoOverlay;
     let vastEndScreen: VastEndScreen;
     let wakeUpManager: WakeUpManager;
     let request: RequestManager;
@@ -69,7 +68,7 @@ describe('VastVideoEventHandler tests', () => {
     let vastVideoEventHandler: VastVideoEventHandler;
     let videoEventHandlerParams: IVideoEventHandlerParams;
     let privacyManager: UserPrivacyManager;
-    let privacy: AbstractPrivacy;
+    let privacy: Privacy;
     let programmaticTrackingService: ProgrammaticTrackingService;
 
     before(() => {
@@ -82,8 +81,6 @@ describe('VastVideoEventHandler tests', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
-        ar = TestFixtures.getARApi(nativeBridge);
-        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
         storageBridge = new StorageBridge(core);
         focusManager = new FocusManager(platform, core);
@@ -92,8 +89,8 @@ describe('VastVideoEventHandler tests', () => {
         clientInfo = TestFixtures.getClientInfo();
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
         privacy = new Privacy(platform, campaign, privacyManager, false, false);
-        overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
-        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+        const coreConfig = TestFixtures.getCoreConfiguration();
 
         placement = new Placement({
             id: '123',
@@ -106,7 +103,18 @@ describe('VastVideoEventHandler tests', () => {
             muteVideo: false
         });
 
-        deviceInfo = new AndroidDeviceInfo(core);
+        const videoOverlayParameters: IVideoOverlayParameters<Campaign> = {
+            deviceInfo: deviceInfo,
+            campaign: campaign,
+            coreConfig: coreConfig,
+            placement: placement,
+            clientInfo: clientInfo,
+            platform: platform,
+            ads: ads
+        };
+        overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+
         wakeUpManager = new WakeUpManager(core);
         request = new RequestManager(platform, core, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(core, request, {
@@ -115,7 +123,6 @@ describe('VastVideoEventHandler tests', () => {
         });
         sessionManager = new SessionManager(core, request, storageBridge);
 
-        const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
@@ -139,8 +146,6 @@ describe('VastVideoEventHandler tests', () => {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
@@ -158,7 +163,8 @@ describe('VastVideoEventHandler tests', () => {
             overlay: overlay,
             video: campaign.getVideo(),
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService
+            programmaticTrackingService: programmaticTrackingService,
+            privacy
         };
 
         testAdUnit = new VastAdUnit(vastAdUnitParameters);
@@ -411,16 +417,16 @@ describe('VastVideoEventHandler tests', () => {
         });
 
         it('should replace "%SDK_VERSION%" in the url with the SDK version as a query parameter', () => {
-            const urlTemplate = 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%';
+            const urlTemplate = 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%';
             campaign.getImpressionUrls = sinon.stub().returns([urlTemplate]);
             const spySendWithGet = sinon.spy(thirdPartyEventManager, 'sendWithGet');
             const spyGetUrl = sinon.spy((<any>thirdPartyEventManager), 'replaceTemplateValuesAndEncodeUrl');
             vastVideoEventHandler.onPlay('https://test.com');
             sinon.assert.calledThrice(spySendWithGet);
             assert.equal(spySendWithGet.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
-            assert.equal(spySendWithGet.getCall(0).args[2], 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%', 'First event url incorrect');
-            sinon.assert.calledWith(spyGetUrl, 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%');
-            assert.isTrue(spyGetUrl.returned('http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=2000'));
+            assert.equal(spySendWithGet.getCall(0).args[2], 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%', 'First event url incorrect');
+            sinon.assert.calledWith(spyGetUrl, 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%');
+            assert.isTrue(spyGetUrl.returned('http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=2000'));
         });
 
         it('should replace both "%ZONE%" and "%SDK_VERSION%" in the url with corresponding parameters', () => {

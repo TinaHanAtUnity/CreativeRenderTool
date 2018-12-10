@@ -127,6 +127,7 @@ import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters, IAppStoreDow
 import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
+import { UnityInfo } from 'Core/Models/UnityInfo';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -642,8 +643,6 @@ export class TestFixtures {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: new FocusManager(platform, core),
             container: new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core)),
@@ -675,8 +674,6 @@ export class TestFixtures {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: new FocusManager(platform, core),
             container: new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core)),
@@ -1000,5 +997,9 @@ export class TestFixtures {
             viewsPerTarget: {},
             latestCampaignsStarts: {}
         };
+    }
+
+    public static getUnityInfo(platform: Platform, core: ICoreApi): UnityInfo {
+        return new UnityInfo(platform, core);
     }
 }

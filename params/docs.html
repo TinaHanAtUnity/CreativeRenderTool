@@ -32,7 +32,6 @@
 <tr><td>forceCampaignId</td><td>string</td><td>Force campaign ID for internal testing purposes</td><td>SDK</td><td>all</td></tr>
 <tr><td>force_country</td><td>string</td><td>Force country targeting for internal testing purposes</td><td>SDK</td><td>all</td></tr>
 <tr><td>gameId</td><td>string</td><td>Source game identifier</td><td>App</td><td>all</td></tr>
-<tr><td>gamerId</td><td>string</td><td>Internal gamer identifier</td><td>Server</td><td>all</td></tr>
 <tr><td>gameSessionId</td><td>number</td><td>Unique game session identifier. This identifier is shared with analytics events.</td><td>SDK</td><td>all</td></tr>
 <tr><td>language</td><td>string</td><td>Device language code (e.g. en_US or fr_CA)</td><td>SDK</td><td>all</td></tr>
 <tr><td>limitAdTracking</td><td>boolean</td><td>boolean if user has limited tracking or not</td><td>SDK</td><td>all</td></tr>
@@ -84,6 +83,8 @@
 <tr><td>optOutEnabled</td><td>boolean</td><td>Whether the user has opted out from behavioral ads targeting in current game</td><td>Server</td><td>all</td></tr>
 <tr><td>abGroup</td><td>number</td><td>AB Group number assigned to this user from configuration</td><td>Server</td><td>all</td></tr>
 <tr><td>unityCreativeId</td><td>string</td><td>Creative id of the shown creative</td><td>SDK</td><td>all</td></tr>
+<tr><td>analyticsUserId</td><td>string</td><td>Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending)</td><td>SDK</td><td>all</td></tr>
+<tr><td>analyticsSessionId</td><td>string</td><td>Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="configuration-request"></a> <h3> Configuration request </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>bundleId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
@@ -96,7 +97,6 @@
 <tr><td>language</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Device language code (e.g. en_US or fr_CA)</td><td>SDK</td><td>all</td></tr>
 <tr><td>test</td><td>all</td><td>True</td><td>False</td><td>boolean</td><td>Test mode</td><td>App</td><td>all</td></tr>
 <tr><td>forceAbGroup</td><td>no</td><td>True</td><td>False</td><td>number</td><td>Force A/B group for internal testing purposes</td><td>SDK</td><td>all</td></tr>
-<tr><td>gamerId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Internal gamer identifier</td><td>Server</td><td>all</td></tr>
 <tr><td>deviceMake</td><td>android</td><td>True</td><td>False</td><td>string</td><td>Android device manufacturer</td><td>SDK</td><td>android</td></tr>
 <tr><td>advertisingTrackingId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Advertising identifier in raw format</td><td>SDK</td><td>all</td></tr>
 <tr><td>limitAdTracking</td><td>no</td><td>True</td><td>False</td><td>boolean</td><td>boolean if user has limited tracking or not</td><td>SDK</td><td>all</td></tr>
@@ -105,6 +105,8 @@
 <tr><td>frameworkVersion</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
 <tr><td>adapterName</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer</td><td>SDK</td><td>all</td></tr>
 <tr><td>adapterVersion</td><td>no</td><td>True</td><td>False</td><td>string</td><td>SDK version name for adapter, should be in sync with SDK version</td><td>SDK</td><td>all</td></tr>
+<tr><td>analyticsUserId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending)</td><td>SDK</td><td>all</td></tr>
+<tr><td>analyticsSessionId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="ad-request"></a> <h3> Ad request </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>advertisingTrackingId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Advertising identifier in raw format</td><td>SDK</td><td>all</td></tr>

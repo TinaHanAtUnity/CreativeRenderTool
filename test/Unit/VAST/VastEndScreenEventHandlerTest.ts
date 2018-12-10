@@ -8,7 +8,7 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -21,6 +21,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { Campaign } from 'Ads/Models/Campaign';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
@@ -33,8 +34,6 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastEndScreenEventHandlerTest', () => {
@@ -43,22 +42,19 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
         let ads: IAdsApi;
-        let ar: IARApi;
-        let purchasing: IPurchasingApi;
         let deviceInfo: DeviceInfo;
         let storageBridge: StorageBridge;
         let container: AdUnitContainer;
         let request: RequestManager;
         let vastAdUnitParameters: IVastAdUnitParameters;
         let vastEndScreenParameters: IVastEndscreenParameters;
+        let videoOverlayParameters: IVideoOverlayParameters<Campaign>;
 
         beforeEach(() => {
             backend = TestFixtures.getBackend(platform);
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
-            ar = TestFixtures.getARApi(nativeBridge);
-            purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
             storageBridge = new StorageBridge(core);
             const focusManager = new FocusManager(platform, core);
@@ -102,15 +98,24 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
             const privacy = new Privacy(platform, campaign, privacyManager, false, false);
             const video = new Video('', TestFixtures.getSession());
-            const overlay = new Overlay(platform, ads, deviceInfo, true, 'en', 'testGameId', privacy, false);
+
+            const placement = TestFixtures.getPlacement();
+            videoOverlayParameters = {
+                deviceInfo: deviceInfo,
+                campaign: campaign,
+                coreConfig: coreConfig,
+                placement: placement,
+                clientInfo: clientInfo,
+                platform: platform,
+                ads: ads
+            };
+            const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             vastAdUnitParameters = {
                 platform,
                 core,
                 ads,
-                ar,
-                purchasing,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -128,7 +133,8 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 overlay: overlay,
                 video: video,
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService
+                programmaticTrackingService: programmaticTrackingService,
+                privacy
             };
 
             vastEndScreenParameters = {

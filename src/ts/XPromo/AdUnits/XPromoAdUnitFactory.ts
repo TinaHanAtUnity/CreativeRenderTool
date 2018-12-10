@@ -12,27 +12,13 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { AndroidBackButtonSkipTest } from 'Core/Models/ABGroup';
 
-export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
+export class XPromoAdUnitFactory extends AbstractAdUnitFactory<XPromoCampaign, IXPromoAdUnitParameters> {
 
-    public createAdUnit(parameters: IAdUnitParameters<XPromoCampaign>): XPromoAdUnit {
-        const privacy = this.createPrivacy(parameters);
-        const showPrivacyDuringVideo = parameters.placement.skipEndCardOnClose() || false;
-        const overlay = this.createOverlay(parameters, privacy, showPrivacyDuringVideo);
+    public createAdUnit(parameters: IXPromoAdUnitParameters): XPromoAdUnit {
 
-        const endScreenParameters = this.createEndScreenParameters(privacy, parameters.campaign.getGameName(), parameters);
-        const endScreen = new XPromoEndScreen(endScreenParameters, parameters.campaign);
-        const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
-
-        const xPromoAdUnitParameters: IXPromoAdUnitParameters = {
-            ... parameters,
-            video: video,
-            overlay: overlay,
-            endScreen: endScreen,
-            privacy: privacy
-        };
-
-        const xPromoAdUnit = new XPromoAdUnit(xPromoAdUnitParameters);
+        const xPromoAdUnit = new XPromoAdUnit(parameters);
 
         const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
             platform: parameters.platform,
@@ -50,18 +36,22 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
 
         const downloadHelper = new AppStoreDownloadHelper(downloadHelperParameters);
 
-        const xPromoOverlayEventHandler = new XPromoOverlayEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadHelper);
-        overlay.addEventHandler(xPromoOverlayEventHandler);
-        const endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, downloadHelper);
-        endScreen.addEventHandler(endScreenEventHandler);
+        const xPromoOverlayEventHandler = new XPromoOverlayEventHandler(xPromoAdUnit, parameters, downloadHelper);
+        parameters.overlay.addEventHandler(xPromoOverlayEventHandler);
+        const endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, parameters, downloadHelper);
+        parameters.endScreen.addEventHandler(endScreenEventHandler);
 
-        const videoEventHandlerParams = this.getVideoEventHandlerParams(xPromoAdUnit, video, undefined, xPromoAdUnitParameters);
+        const videoEventHandlerParams = this.getVideoEventHandlerParams(xPromoAdUnit, parameters.video, undefined, parameters);
         this.prepareVideoPlayer(XPromoVideoEventHandler, <IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>>videoEventHandlerParams);
 
         if (parameters.platform === Platform.ANDROID) {
             const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
                 endScreenEventHandler.onKeyEvent(keyCode);
-                if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+
+                const abGroup = parameters.coreConfig.getAbGroup();
+                const backButtonTestEnabled = AndroidBackButtonSkipTest.isValid(abGroup);
+
+                if(backButtonTestEnabled || CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
                     xPromoOverlayEventHandler.onKeyEvent(keyCode);
                 }
             });
@@ -71,7 +61,7 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory {
                 }
             });
         }
-        Privacy.setupReportListener(privacy, xPromoAdUnit);
+        Privacy.setupReportListener(parameters.privacy, xPromoAdUnit);
 
         return xPromoAdUnit;
     }

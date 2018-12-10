@@ -10,22 +10,13 @@ import { DisplayInterstitialEventHandler } from 'Display/EventHandlers/DisplayIn
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
 
-export class DisplayInterstitialAdUnitFactory extends AbstractAdUnitFactory {
+export class DisplayInterstitialAdUnitFactory extends AbstractAdUnitFactory<DisplayInterstitialCampaign, IDisplayInterstitialAdUnitParameters> {
 
-    public createAdUnit(parameters: IAdUnitParameters<DisplayInterstitialCampaign>): DisplayInterstitialAdUnit {
-        const privacy = this.createPrivacy(parameters);
-
-        const view = new DisplayInterstitial(parameters.platform, parameters.core, parameters.deviceInfo, parameters.placement, parameters.campaign, privacy, this.showGDPRBanner(parameters));
-        const displayInterstitialParameters: IDisplayInterstitialAdUnitParameters = {
-            ... parameters,
-            view: view
-        };
-
-        const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(displayInterstitialParameters);
-        const displayInterstitialEventHandler = new DisplayInterstitialEventHandler(displayInterstitialAdUnit, displayInterstitialParameters);
-        view.addEventHandler(displayInterstitialEventHandler);
-        Privacy.setupReportListener(privacy, displayInterstitialAdUnit);
-
+    public createAdUnit(parameters: IDisplayInterstitialAdUnitParameters): DisplayInterstitialAdUnit {
+        const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(parameters);
+        const displayInterstitialEventHandler = new DisplayInterstitialEventHandler(displayInterstitialAdUnit, parameters);
+        parameters.view.addEventHandler(displayInterstitialEventHandler);
+        Privacy.setupReportListener(parameters.privacy, displayInterstitialAdUnit);
         return displayInterstitialAdUnit;
     }
 
