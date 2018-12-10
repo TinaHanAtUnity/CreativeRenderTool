@@ -1,5 +1,6 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, UserPrivacy, IUnityConsentPermissions, PrivacyMethod } from 'Ads/Models/Privacy';
+import { GamePrivacy, UserPrivacy, PrivacyMethod } from 'Ads/Models/Privacy';
+import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
@@ -83,7 +84,7 @@ export class UserPrivacyManager {
         });
     }
 
-    public sendUnityConsentEvent(permissions: IUnityConsentPermissions, source: GDPREventSource): Promise<void> {
+    public sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource): Promise<void> {
         const gamePrivacy = this._gamePrivacy;
         if (!gamePrivacy) {
             return Promise.resolve();

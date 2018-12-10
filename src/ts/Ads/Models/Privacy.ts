@@ -1,16 +1,11 @@
 import { Model } from 'Core/Models/Model';
+import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 export enum PrivacyMethod {
     DEFAULT = 'default',
     LEGITIMATE_INTEREST = 'legitimate_interest',
     UNITY_CONSENT = 'unity_consent',
     DEVELOPER_CONSENT = 'developer_consent'
-}
-
-export interface IUnityConsentPermissions {
-    gameExp: boolean;
-    ads: boolean;
-    external: boolean;
 }
 
 export interface IUnityConsentProfiling {
@@ -20,7 +15,7 @@ export interface IUnityConsentProfiling {
 export interface IPrivacy {
     method: PrivacyMethod;
     firstRequest: boolean;
-    permissions: IUnityConsentPermissions | { profiling: boolean } | {};
+    permissions: IPermissions;
 
 }
 
@@ -68,7 +63,7 @@ export class GamePrivacy extends Model<IGamePrivacy> {
 
 interface IUserPrivacy {
     method: PrivacyMethod; // TODO: should 'default' from PrivacyMethod be allowed?
-    privacy: IUnityConsentPermissions;
+    privacy: IPermissions;
 }
 
 export class UserPrivacy extends Model<IUserPrivacy> {
@@ -80,6 +75,7 @@ export class UserPrivacy extends Model<IUserPrivacy> {
         });
 
         this.set('method', data.method);
+        this.set('privacy', data.privacy);
     }
 
     public isEnabled(): boolean {
@@ -98,8 +94,12 @@ export class UserPrivacy extends Model<IUserPrivacy> {
         return 0;
     }
 
-    public getPermissions(): IUnityConsentPermissions | IUnityConsentProfiling {
+    public getPrivacy(): IPermissions | IUnityConsentProfiling {
         return this.get('privacy');
+    }
+
+    public setPrivacy(privacy: IPermissions): void {
+        return this.set('privacy', privacy);
     }
 
     public getDTO(): { [key: string]: any } {

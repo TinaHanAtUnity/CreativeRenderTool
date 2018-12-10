@@ -1,6 +1,7 @@
 import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, IUnityConsentPermissions, PrivacyMethod } from 'Ads/Models/Privacy';
+import { GamePrivacy, PrivacyMethod } from 'Ads/Models/Privacy';
+import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -533,10 +534,10 @@ describe('UserPrivacyManagerTest', () => {
 
     describe('sendUnityConsentEvent', () => {
         const sandbox = sinon.sandbox.create();
-        const anyConsent: IUnityConsentPermissions = { gameExp: false, ads: false, external: false };
+        const anyConsent: IPermissions = {personalizedConsent: { gameExp: false, ads: false, external: false }};
 
         describe('when sending event', () => {
-            function sendEvent(permissions: IUnityConsentPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER): Promise<any> {
+            function sendEvent(permissions: IPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER): Promise<any> {
                 return privacyManager.sendUnityConsentEvent(permissions, source).then(() => {
                     sinon.assert.calledOnce(httpKafkaStub);
                     return httpKafkaStub.firstCall.args[2];
@@ -563,7 +564,7 @@ describe('UserPrivacyManagerTest', () => {
             });
 
             it('should send new privacy fields', () => {
-                const expectedPermissions: IUnityConsentPermissions = { gameExp: false, ads: true, external: true };
+                const expectedPermissions: IPermissions = {personalizedConsent: { gameExp: false, ads: true, external: true }};
                 (<sinon.SinonStub>coreConfig.isCoppaCompliant).returns(false);
 
                 return sendEvent(expectedPermissions, GDPREventSource.USER).then((eventData) => {

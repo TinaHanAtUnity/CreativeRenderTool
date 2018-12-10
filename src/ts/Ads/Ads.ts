@@ -233,7 +233,8 @@ export class Ads implements IAds {
             platform: this._core.NativeBridge.getPlatform(),
             gdprManager: this.PrivacyManager,
             adUnitContainer: this.Container,
-            adsConfig: this.Config
+            adsConfig: this.Config,
+            core: this._core
         });
         return consentView.show(options);
     }

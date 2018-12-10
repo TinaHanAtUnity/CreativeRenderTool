@@ -4,12 +4,14 @@ import { Platform } from 'Core/Constants/Platform';
 import { GDPRConsent, IGDPRConsentHandler } from 'Ads/Views/Consent/GDPRConsent';
 import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { ICore } from "Core/ICore";
 
 export interface IConsentUnitParameters {
     platform: Platform;
     gdprManager: UserPrivacyManager;
     adUnitContainer: AdUnitContainer;
     adsConfig: AdsConfiguration;
+    core: ICore;
 }
 
 export class ConsentUnit implements IGDPRConsentHandler {
@@ -19,6 +21,7 @@ export class ConsentUnit implements IGDPRConsentHandler {
     private _gdprConsentView: GDPRConsent;
     private _platform: Platform;
     private _adsConfig: AdsConfiguration;
+    private _core: ICore;
 
     constructor(parameters: IConsentUnitParameters) {
         this._gdprConsentView = new GDPRConsent({
@@ -29,6 +32,7 @@ export class ConsentUnit implements IGDPRConsentHandler {
         this._gdprConsentView.addEventHandler(this);
         this._platform = parameters.platform;
         this._adsConfig = parameters.adsConfig;
+        this._core = parameters.core;
     }
 
     public show(options: any): Promise<void> {
@@ -83,10 +87,8 @@ export class ConsentUnit implements IGDPRConsentHandler {
     }
 
     // IGDPRConsentHandler
-    public onConsent(consent: IPermissions): void {
-        // console.log(JSON.stringify(consent));
-        // TODO: Implement
-        this._adsConfig.addUserConsent(consent);
+    public onConsent(privacy: IPermissions): void {
+        this._adsConfig.addUserConsent(privacy);
     }
 
     // IGDPRConsentHandler

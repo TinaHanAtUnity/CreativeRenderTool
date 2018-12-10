@@ -1,11 +1,8 @@
 import { Placement } from 'Ads/Models/Placement';
-import {
-    GamePrivacy, IPrivacy, IUnityConsentPermissions, IUnityConsentProfiling, PrivacyMethod,
-    UserPrivacy
-} from 'Ads/Models/Privacy';
+import { GamePrivacy, IPrivacy, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
-import {IPermissions} from "../Views/Consent/IPermissions";
+import { IPermissions} from 'Ads/Views/Consent/IPermissions';
 
 export interface IAdsConfiguration {
     cacheMode: CacheMode;
@@ -105,10 +102,15 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         const userPrivacy = this.getUserPrivacy();
         let userPermissions;
         if (userPrivacy) {
-            userPermissions = userPrivacy.getPermissions();
+            userPermissions = userPrivacy.getPrivacy();
         } else {
             userPermissions = {};
         }
+        const obj = {
+            'method': this.getPrivacyMethod(),
+            'firstRequest': this.isFirstRequest(),
+            'permissions': userPermissions
+        };
         return {
             'method': this.getPrivacyMethod(),
             'firstRequest': this.isFirstRequest(),
@@ -116,8 +118,22 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         };
     }
 
-    public addUserConsent(consent: IPermissions): void {
-        // TODO: implement
+    public addUserConsent(privacy: IPermissions): void {
+        let userPrivacy: UserPrivacy | undefined = this.getUserPrivacy();
+        if (userPrivacy) {
+            userPrivacy.setPrivacy(privacy);
+            return;
+        }
+
+        const gamePrivacy: GamePrivacy | undefined = this.getGamePrivacy();
+        let method: PrivacyMethod;
+        if (gamePrivacy) {
+            method = gamePrivacy.getMethod();
+        } else {
+            method = PrivacyMethod.DEFAULT;
+        }
+        userPrivacy = new UserPrivacy({method: method, privacy: privacy});
+        this.setUserPrivacy(userPrivacy);
     }
 
     public getDefaultPlacement(): Placement {
@@ -160,6 +176,10 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         return this.get('userPrivacy');
     }
 
+    public setUserPrivacy(userPrivacy: UserPrivacy): void {
+        this.set('userPrivacy', userPrivacy);
+    }
+
     public getDTO(): { [key: string]: any } {
         const placements = [];
         for(const placement in this.getPlacements()) {
@@ -179,5 +199,4 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
             'defaultPlacement': defaultPlacementId
         };
     }
-
 }
