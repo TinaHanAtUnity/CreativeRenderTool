@@ -94,7 +94,6 @@ describe('MraidAdUnit', () => {
             core: core,
             ads: ads,
             ar: TestFixtures.getARApi(nativeBridge),
-            purchasing: TestFixtures.getPurchasingApi(nativeBridge),
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: new FocusManager(platform, core),
             container: sinon.createStubInstance(Activity),

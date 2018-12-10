@@ -9,6 +9,7 @@ import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { IPurchasing } from 'Purchasing/IPurchasing';
+import { PromoAdUnitParametersFactory } from 'Promo/AdUnits/PromoAdUnitParametersFactory';
 import { OrganicPurchaseManager } from 'Purchasing/OrganicPurchaseManager';
 
 export class Promo extends AbstractParserModule implements IPromo {
@@ -27,7 +28,7 @@ export class Promo extends AbstractParserModule implements IPromo {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         contentTypeHandlerMap[PromoCampaignParser.ContentType] = {
             parser: new PromoCampaignParser(),
-            factory: new PromoAdUnitFactory()
+            factory: new PromoAdUnitFactory(new PromoAdUnitParametersFactory(purchasing.Api, core, ads))
         };
         super(contentTypeHandlerMap);
 

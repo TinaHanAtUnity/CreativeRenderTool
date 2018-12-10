@@ -16,9 +16,13 @@ import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
+    adMobSignalFactory: AdMobSignalFactory;
+    privacy: Privacy;
 }
 
 export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
