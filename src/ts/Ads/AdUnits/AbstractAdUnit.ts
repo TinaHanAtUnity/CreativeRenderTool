@@ -35,15 +35,11 @@ export interface IAdUnitParameters<T extends Campaign> {
     platform: Platform;
     core: ICoreApi;
     ads: IAdsApi;
-    ar: IARApi;
-    purchasing: IPurchasingApi;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
     request: RequestManager;
     options: any;
     privacyManager: UserPrivacyManager;
-    adMobSignalFactory?: AdMobSignalFactory;
-    webPlayerContainer?: WebPlayerContainer;
     programmaticTrackingService: ProgrammaticTrackingService;
     gameSessionId?: number;
 }

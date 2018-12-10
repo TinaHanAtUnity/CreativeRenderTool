@@ -15,11 +15,12 @@ import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Promo } from 'Promo/Views/Promo';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign> {
     purchasing: IPurchasingApi;
     view: Promo;
-    privacy: AbstractPrivacy;
+    privacy: Privacy;
 }
 
 export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {

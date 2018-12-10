@@ -40,7 +40,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { Banners } from 'Banners/Banners';
 import { AuctionRequest } from 'Banners/Utilities/AuctionRequest';
 import { FinishState } from 'Core/Constants/FinishState';
@@ -58,7 +58,6 @@ import { Promises, TimeoutError } from 'Core/Utilities/Promises';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Display } from 'Display/Display';
 import { Monetization } from 'Monetization/Monetization';
-import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
 import { MRAID } from 'MRAID/MRAID';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Performance } from 'Performance/Performance';
@@ -74,6 +73,8 @@ import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
+import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
+import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 
 export class Ads implements IAds {
 
@@ -176,17 +177,6 @@ export class Ads implements IAds {
                 this.AssetManager.setCacheDiagnostics(true);
             }
 
-            const parserModules = [AdMob, Display, MRAID, Performance, VAST, VPAID, XPromo];
-            parserModules.forEach(moduleConstructor => {
-                const module = new moduleConstructor();
-                const contentTypeHandlerMap = module.getContentTypeHandlerMap();
-                for(const contentType in contentTypeHandlerMap) {
-                    if(contentTypeHandlerMap.hasOwnProperty(contentType)) {
-                        this.ContentTypeHandlerManager.addHandler(contentType, contentTypeHandlerMap[contentType]);
-                    }
-                }
-            });
-
             const promo = new Promo(this._core, this, this._core.Purchasing, this._core.Analytics);
             const promoContentTypeHandlerMap = promo.getContentTypeHandlerMap();
             for(const contentType in promoContentTypeHandlerMap) {
@@ -209,6 +199,25 @@ export class Ads implements IAds {
                 Diagnostics.trigger('ar_device_support', {arSupported, permissionInManifest, permissionResult});
             }).catch((error) => {
                 Diagnostics.trigger('ar_device_support_check_error', error);
+            });
+
+            const parserModules: AbstractParserModule[] = [
+                new AdMob(this._core, this),
+                new Display(this._core, this),
+                new MRAID(this.AR.Api, this._core, this),
+                new Performance(this.AR.Api, this._core, this),
+                new VAST(this._core, this),
+                new VPAID(this._core, this),
+                new XPromo(this._core, this)
+            ];
+
+            parserModules.forEach(module => {
+                const contentTypeHandlerMap = module.getContentTypeHandlerMap();
+                for(const contentType in contentTypeHandlerMap) {
+                    if(contentTypeHandlerMap.hasOwnProperty(contentType)) {
+                        this.ContentTypeHandlerManager.addHandler(contentType, contentTypeHandlerMap[contentType]);
+                    }
+                }
             });
 
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this._core.JaegerManager, this.BackupCampaignManager);
@@ -366,49 +375,7 @@ export class Ads implements IAds {
 
             const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
             AbstractPrivacy.createBuildInformation(this._core.NativeBridge.getPlatform(), this._core.ClientInfo, this._core.DeviceInfo, campaign, this._core.Config);
-            this._currentAdUnit = this.getAdUnitFactory(campaign).createAdUnit({
-                platform: this._core.NativeBridge.getPlatform(),
-                core: this._core.Api,
-                ads: this.Api,
-                ar: this.AR.Api,
-                purchasing: this._core.Purchasing.Api,
-                forceOrientation: orientation,
-                focusManager: this._core.FocusManager,
-                container: this.Container,
-                deviceInfo: this._core.DeviceInfo,
-                clientInfo: this._core.ClientInfo,
-                thirdPartyEventManager: this.ThirdPartyEventManagerFactory.create({
-                    [ThirdPartyEventMacro.ZONE]: placement.getId(),
-                    [ThirdPartyEventMacro.SDK_VERSION]: this._core.ClientInfo.getSdkVersion().toString(),
-                    [ThirdPartyEventMacro.GAMER_SID]: playerMetadataServerId || ''
-                }),
-                operativeEventManager: OperativeEventManagerFactory.createOperativeEventManager({
-                    platform: this._core.NativeBridge.getPlatform(),
-                    core: this._core.Api,
-                    ads: this.Api,
-                    request: this._core.RequestManager,
-                    metaDataManager: this._core.MetaDataManager,
-                    sessionManager: this.SessionManager,
-                    clientInfo: this._core.ClientInfo,
-                    deviceInfo: this._core.DeviceInfo,
-                    coreConfig: this._core.Config,
-                    adsConfig: this.Config,
-                    storageBridge: this._core.StorageBridge,
-                    campaign: campaign,
-                    playerMetadataServerId: playerMetadataServerId
-                }),
-                placement: placement,
-                campaign: campaign,
-                coreConfig: this._core.Config,
-                adsConfig: this.Config,
-                request: this._core.RequestManager,
-                options: options,
-                privacyManager: this.PrivacyManager,
-                adMobSignalFactory: this.AdMobSignalFactory,
-                programmaticTrackingService: this.ProgrammaticTrackingService,
-                webPlayerContainer: this.InterstitialWebPlayerContainer,
-                gameSessionId: this.SessionManager.getGameSessionId()
-            });
+            this._currentAdUnit = this.getAdUnitFactory(campaign).create(campaign, placement, orientation, playerMetadataServerId || '', options);
             this.RefreshManager.setCurrentAdUnit(this._currentAdUnit);
             if (this.Monetization.isInitialized()) {
                 this.Monetization.PlacementContentManager.setCurrentAdUnit(placement.getId(), this._currentAdUnit);
@@ -512,7 +479,7 @@ export class Ads implements IAds {
         }
 
         if(TestEnvironment.get('autoSkip')) {
-            Overlay.setAutoSkip(TestEnvironment.get('autoSkip'));
+            NewVideoOverlay.setAutoSkip(TestEnvironment.get('autoSkip'));
         }
 
         if(TestEnvironment.get('autoClose')) {
@@ -528,7 +495,7 @@ export class Ads implements IAds {
         }
 
         if(TestEnvironment.get('forcedPlayableMRAID')) {
-            MRAIDAdUnitFactory.setForcedExtendedMRAID(TestEnvironment.get('forcedPlayableMRAID'));
+            MRAIDAdUnitParametersFactory.setForcedExtendedMRAID(TestEnvironment.get('forcedPlayableMRAID'));
         }
 
         if(TestEnvironment.get('forcedGDPRBanner')) {
@@ -538,7 +505,7 @@ export class Ads implements IAds {
         let forcedARMRAID = false;
         if (TestEnvironment.get('forcedARMRAID')) {
             forcedARMRAID = TestEnvironment.get('forcedARMRAID');
-            MRAIDAdUnitFactory.setForcedARMRAID(forcedARMRAID);
+            MRAIDAdUnitParametersFactory.setForcedARMRAID(forcedARMRAID);
         }
 
         if(TestEnvironment.get('creativeUrl')) {
