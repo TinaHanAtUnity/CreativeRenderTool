@@ -280,7 +280,7 @@ export class VastParser {
                     parseInt(mediaFileElement.getAttribute('maxBitrate') || '0', 10),
                     parseInt(mediaFileElement.getAttribute('width') || '0', 10),
                     parseInt(mediaFileElement.getAttribute('height') || '0', 10),
-                    mediaFileElement.getAttribute('apiFramework')!,
+                    mediaFileElement.getAttribute('apiFramework'),
                     this.parseMediaFileSize(mediaDuration, parseInt(mediaFileElement.getAttribute('bitrate') || '0', 10)));
                 creative.addMediaFile(mediaFile);
             }

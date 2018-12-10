@@ -19,9 +19,9 @@ interface IVastMediaFile {
 export class VastMediaFile extends Model<IVastMediaFile> {
     constructor();
     constructor(fileURL: string, deliveryType: string, codec: string, mimeType: string, bitrate: number,
-                minBitrate: number, maxBitrate: number, width: number, height: number, apiFramework: string, fileSize: number);
+                minBitrate: number, maxBitrate: number, width: number, height: number, apiFramework: string | null, fileSize: number);
     constructor(fileURL?: string, deliveryType?: string, codec?: string, mimeType?: string, bitrate?: number,
-                minBitrate?: number, maxBitrate?: number, width?: number, height?: number, apiFramework?: string, fileSize?: number) {
+                minBitrate?: number, maxBitrate?: number, width?: number, height?: number, apiFramework?: string | null, fileSize?: number) {
         super('VastMediaFile', {
             fileURL: ['string', 'null'],
             deliveryType: ['string'],
