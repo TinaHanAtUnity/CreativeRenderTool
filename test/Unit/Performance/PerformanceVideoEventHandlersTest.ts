@@ -10,7 +10,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { Overlay } from 'Ads/Views/Overlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
@@ -30,8 +29,6 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -40,8 +37,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let ar: IARApi;
-    let purchasing: IPurchasingApi;
     let overlay: NewVideoOverlay;
     let endScreen: PerformanceEndScreen;
     let storageBridge: StorageBridge;
@@ -57,8 +52,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
-        ar = TestFixtures.getARApi(nativeBridge);
-        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
         storageBridge = new StorageBridge(core);
         container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
@@ -121,8 +114,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
+            privacy,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
@@ -139,7 +131,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
             endScreen: endScreen,
             overlay: overlay,
             video: video,
-            privacy: privacy,
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService
         };
