@@ -35,8 +35,6 @@ export class GamePrivacy extends Model<IGamePrivacy> {
         this.set('method', data.method);
     }
 
-    // TODO: in adsConfiguration: If isEnabled === true: userPrivacy should be created if not existing in configuration,
-    // otherwise it should be undefined
     public isEnabled(): boolean {
         // TODO: add support for other privacy methods
         return this.getMethod() === PrivacyMethod.UNITY_CONSENT;

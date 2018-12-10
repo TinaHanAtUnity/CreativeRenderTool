@@ -4,7 +4,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { GDPRConsent, IGDPRConsentHandler } from 'Ads/Views/Consent/GDPRConsent';
 import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { ICore } from "Core/ICore";
+import { ICore } from 'Core/ICore';
 
 export interface IConsentUnitParameters {
     platform: Platform;
