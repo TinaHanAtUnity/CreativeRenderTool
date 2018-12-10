@@ -11,7 +11,6 @@ import { ILimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTim
 import { IProductInfo, ProductInfo, ProductInfoType, IRawProductInfo } from 'Promo/Models/ProductInfo';
 import { IPromoCampaign, IRawPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { promises } from 'fs';
 
 export class PromoCampaignParser extends CampaignParser {
 

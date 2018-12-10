@@ -13,7 +13,8 @@ import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { MraidIFrameEventBridge, IMRAIDHandler } from 'MRAID/Views/MraidIFrameEventBridge';
+import { MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
+import { IMRAIDHandler } from 'MRAID/EventBridge/MRAIDEventAdapter';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -78,7 +79,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _backgroundTime: number = 0;
     protected _backgroundTimestamp: number;
 
-    protected _mraidBridge: MraidIFrameEventBridge;
+    protected _mraidAdapterContainer: MRAIDAdapterContainer;
 
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(platform, id);
@@ -125,6 +126,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         ];
 
         this._gameSessionId = gameSessionId || 0;
+        this._mraidAdapterContainer = new MRAIDAdapterContainer(this);
     }
 
     public abstract setViewableState(viewable: boolean): void;
@@ -159,10 +161,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         if (this._stats !== undefined) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(this._stats.averageFps, this._stats.averagePlayFps, 0, 'playable_performance_stats', this._stats));
         }
-    }
-
-    public setMraidEventBridge(mraidBridge: MraidIFrameEventBridge) {
-        this._mraidBridge = mraidBridge;
     }
 
     public createMRAID(container: string): Promise<string> {

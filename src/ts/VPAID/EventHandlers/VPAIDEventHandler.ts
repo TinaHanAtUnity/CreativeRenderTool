@@ -12,6 +12,17 @@ import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDHandler } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 
+export interface IVPAIDEventHandlerParameters {
+    operativeEventManager: OperativeEventManager;
+    thirdPartyEventManager: ThirdPartyEventManager;
+    campaign: VPAIDCampaign;
+    placement: Placement;
+    closer: Closer;
+    core: ICoreApi;
+    ads: IAdsApi;
+    endScreen: VPAIDEndScreen | undefined;
+}
+
 export class VPAIDEventHandler implements IVPAIDHandler {
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -26,7 +37,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _core: ICoreApi;
     private _ads: IAdsApi;
 
-    constructor(adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
+    constructor(adUnit: VPAIDAdUnit, parameters: IVPAIDEventHandlerParameters) {
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._adUnit = adUnit;

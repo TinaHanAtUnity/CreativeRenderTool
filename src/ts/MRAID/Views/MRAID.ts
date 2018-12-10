@@ -16,6 +16,7 @@ import MRAIDContainer from 'html/mraid/container.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -60,12 +61,12 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public hide() {
         super.hide();
-        this._mraidBridge.disconnect();
+        this._mraidAdapterContainer.disconnect();
     }
 
     public setViewableState(viewable: boolean) {
         if(this._domContentLoaded) {
-            this._mraidBridge.sendViewableEvent(viewable);
+            this._mraidAdapterContainer.sendViewableEvent(viewable);
         }
         this.setAnalyticsBackgroundTime(viewable);
     }
@@ -95,7 +96,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private loadIframe(): void {
         const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-        this._mraidBridge.connect(iframe);
+        this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
 
         this.createMRAID(
             FPSCollectionTest.isValid(this._abGroup) ? MRAIDPerfContainer : MRAIDContainer

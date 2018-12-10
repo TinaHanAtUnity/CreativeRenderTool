@@ -18,6 +18,7 @@ import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { StorageType } from 'Core/Native/Storage';
 import { Url } from 'Core/Utilities/Url';
+import { AuctionV5Test } from 'Core/Models/ABGroup';
 
 export interface IAuctionResponse {
     correlationId: string;
@@ -97,6 +98,7 @@ export class AuctionRequest {
     private static CampaignResponse: string;
     private static AbGroup: number | undefined;
     private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
+    private static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
     private static SessionId: string | undefined;
@@ -117,7 +119,7 @@ export class AuctionRequest {
     private _noFillRetry: boolean;
     private _retryCount: number = 2;
     private _retryDelay: number = 10000;
-    private _baseURL = AuctionRequest.BaseUrl;
+    private _baseURL: string;
     private _timeout: number | undefined;
     private _session: Session;
     private _url: string | null;
@@ -140,6 +142,7 @@ export class AuctionRequest {
         this._metaDataManager = params.metaDataManager;
         this._adMobSignalFactory = params.adMobSignalFactory;
         this._sessionManager = params.sessionManager;
+        this._baseURL = AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;
     }
 
     public request(): Promise<IAuctionResponse> {

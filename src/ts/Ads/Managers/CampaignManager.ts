@@ -402,7 +402,7 @@ export class CampaignManager {
                         if(json.placements[placement].hasOwnProperty('mediaId')) {
                             mediaId = json.placements[placement].mediaId;
                         } else {
-                            SessionDiagnostics.trigger('mission_auction_v5_mediaid', {
+                            SessionDiagnostics.trigger('missing_auction_v5_mediaid', {
                                 placementId: placement
                             }, session);
                         }
