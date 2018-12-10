@@ -11,7 +11,7 @@ export interface IPrivacy {
     method: PrivacyMethod;
     firstRequest: boolean;
     permissions: IPermissions;
-};
+}
 
 export interface IAllPermissions {
     all: boolean;
@@ -25,7 +25,7 @@ export interface IPersonalizedConsent {
 
 export function isIPersonalizedConsent(consent: IPermissions): consent is IPersonalizedConsent {
   return (<IPersonalizedConsent>consent).gameExp !== undefined;
-};
+}
 
 export interface IUnityConsentProfiling {
     profiling: boolean;

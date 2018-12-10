@@ -176,7 +176,8 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
 
     public isConsentShowRequired(): boolean {
         // TODO: Remove before flight
-        if (2 + 2 === 4) {
+        const removeBeforeFlight = true;
+        if (removeBeforeFlight) {
             return true;
         }
 

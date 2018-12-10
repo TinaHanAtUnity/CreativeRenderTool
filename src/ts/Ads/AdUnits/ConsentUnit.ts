@@ -47,7 +47,7 @@ export class ConsentUnit implements IGDPRConsentHandler {
             this._gdprConsentView.show();
             return donePromise;
         }).catch((e: Error) => {
-            // this._core.Api.Sdk.logWarning('Error opening Consent view ' + e);
+            this._core.Sdk.logWarning('Error opening Consent view ' + e);
         });
     }
 
@@ -102,7 +102,6 @@ export class ConsentUnit implements IGDPRConsentHandler {
     }
 
     public onPrivacy(url: string): void {
-        console.log(url);
         if (this._platform === Platform.IOS) {
             this._core.iOS!.UrlScheme.open(url);
         } else if (this._platform === Platform.ANDROID) {
