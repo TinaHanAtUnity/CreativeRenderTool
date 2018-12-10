@@ -166,7 +166,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         const backgroundTime = this._backgroundTime / 1000;
 
         if (this.isKPIDataValid({backgroundTime}, 'ar_playable_show')) {
-            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(0, 0, backgroundTime, 'playable_show', {}));
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(0, 0, backgroundTime, 'ar_playable_show', {}));
         }
 
         this.showLoadingScreen();
@@ -295,7 +295,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
 
         if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, 'ar_' + eventName)) {
-            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, undefined));
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'ar_' + eventName, undefined));
         }
     }
 
@@ -325,7 +325,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         const backgroundTime = this._backgroundTime / 1000;
 
         if (this.isKPIDataValid({timeFromShow, backgroundTime}, 'ar_playable_loading_time')) {
-            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'playable_loading_time', {}));
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'ar_playable_loading_time', {}));
         }
     }
 
@@ -430,7 +430,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 const backgroundTime = this._backgroundTime / 1000;
 
                 if (this.isKPIDataValid({timeFromShow, backgroundTime}, 'ar_playable_start')) {
-                    this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+                    this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'ar_playable_start', undefined));
                 }
 
                 this.setViewableState(true);

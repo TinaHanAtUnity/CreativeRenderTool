@@ -20,6 +20,6 @@ export class ARMRAIDEventHandler extends MRAIDEventHandler implements IMRAIDView
         kafkaObject.auctionId = this._campaign.getSession().getId();
         kafkaObject.abGroup = this._coreConfig.getAbGroup();
 
-        HttpKafka.sendEvent('ads.sdk2.events.ar.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+        HttpKafka.sendEvent('ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
 }
