@@ -13,6 +13,14 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { BlockingReason, CreativeBlocking } from 'Core/Utilities/CreativeBlocking';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
+export enum ReportReason {
+    NOT_SHOWING = 'Ad is not showing',
+    OFFENSIVE = 'Ad is very offensive',
+    MALFORMED = 'Ad does not look right',
+    DISLIKE = 'I don\'t like this ad',
+    OTHER = 'Other'
+}
+
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
     onPrivacyClose(): void;

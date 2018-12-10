@@ -57,8 +57,31 @@
                 </p>
             </div>
         </div>
-        <div class="report-ad-container">
-
+        <div class="report-ad-container page-container">
+            <div class="heading"><span>Report Advertisement</span></div>
+            <div class="text">
+                <p>
+                    Are you experiencing issues with your current advertisement? Report to Unity Ads directly and let us know!
+                </p>
+            </div>
+            <ul class="radio-group-container">
+                <% for (var k in data.reportReasons) { %>
+                <div class="radio-item-container">
+                    <input id="<%= data.reportKeys[k] %>" class="report-choice-radio" name="report-reason" type="radio">
+                    <label for="<%= data.reportKeys[k] %>">
+                        <%= (data.reportReasons[k] === null || typeof data.reportReasons[k] === "undefined") ? "N/A" : data.reportReasons[k] %></label>
+                </div>
+                <% } %>
+            </ul>
+            <div class="text-small">
+                <p>
+                    Disclaimer: Reporting will close your advertisement and forfeit any rewards received from watching it.
+                </p>
+            </div>
+            <div class="report-container">
+                <div class="report-button">Report</div>
+                <span class="report-confirmed-text text"></span>
+            </div>
         </div>
         <div class="build-info-container page-container">
             <% for (var k in data.buildInformation) { %>

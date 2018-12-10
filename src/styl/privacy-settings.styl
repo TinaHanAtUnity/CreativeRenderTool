@@ -67,8 +67,25 @@
     }
   }
 
+  .report-ad-container {
+    .report-button {
+      position: relative;
+      padding: .75 * $default-size $default-size;
+      border-radius: $default-size * .25;
+      border: 1px solid $light-gray;
+      font-size: $privacy-text-font-size;
+      background-color: $blue;
+      color: $white;
+      text-align: center;
+    }
+  }
+
   .checkbox-group-container {
     $checkbox-group-container($default-scale-size, $default-font-size * .65);
+  }
+
+  .radio-group-container {
+    $radio-group-container($default-scale-size, $default-font-size * .65);
   }
 
   &.initial {
@@ -118,6 +135,11 @@
   .text {
     font-weight: $privacy-text-font-weight;
     font-size: $privacy-text-font-size;
+  }
+
+  .text-small {
+    font-size: $default-font-size * .5;
+    font-weight: $privacy-text-font-weight = 300;
   }
 
 }
