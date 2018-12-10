@@ -1,4 +1,4 @@
-# Staged
+# Mon Dec 10 13:52:58 UTC 2018
 
 * Disable app sheet on iOS 12 [#7489](https://github.com/Applifier/unity-ads-webview/pull/7489)
 * Make call-button start the transition from further off the screen [#7414](https://github.com/Applifier/unity-ads-webview/pull/7414)
