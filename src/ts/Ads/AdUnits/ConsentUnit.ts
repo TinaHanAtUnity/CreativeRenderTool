@@ -3,11 +3,13 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPRConsent, IGDPRConsentHandler } from 'Ads/Views/Consent/GDPRConsent';
 import { IPermissions } from 'Ads/Views/Consent/IPermissions';
+import { ICoreApi } from 'Core/ICore';
 
 export interface IConsentUnitParameters {
     platform: Platform;
     gdprManager: UserPrivacyManager;
     adUnitContainer: AdUnitContainer;
+    core: ICoreApi;
 }
 
 export class ConsentUnit implements IGDPRConsentHandler {
@@ -16,6 +18,7 @@ export class ConsentUnit implements IGDPRConsentHandler {
     private _adUnitContainer: AdUnitContainer;
     private _gdprConsentView: GDPRConsent;
     private _platform: Platform;
+    private _core: ICoreApi;
 
     constructor(parameters: IConsentUnitParameters) {
         this._gdprConsentView = new GDPRConsent({
@@ -25,6 +28,7 @@ export class ConsentUnit implements IGDPRConsentHandler {
         this._adUnitContainer = parameters.adUnitContainer;
         this._gdprConsentView.addEventHandler(this);
         this._platform = parameters.platform;
+        this._core = parameters.core;
     }
 
     public show(options: any): Promise<void> {
@@ -81,12 +85,8 @@ export class ConsentUnit implements IGDPRConsentHandler {
     // IGDPRConsentHandler
     public onConsent(consent: IPermissions): void {
         // console.log(JSON.stringify(consent));
-        // TODO: Implement
-    }
+        // this._privacyManager.sendUnityConsentEvent(consent, GDPREventSource.USER);
 
-    // IGDPRConsentHandler
-    public onShowOptions(): void {
-        // TODO: Implement
     }
 
     // IGDPRConsentHandler
@@ -97,5 +97,17 @@ export class ConsentUnit implements IGDPRConsentHandler {
                 this.onContainerDestroy();
             }
         });
+    }
+
+    public onPrivacy(url: string): void {
+        console.log(url);
+        if (this._platform === Platform.IOS) {
+            this._core.iOS!.UrlScheme.open(url);
+        } else if (this._platform === Platform.ANDROID) {
+            this._core.Android!.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
+        }
     }
 }

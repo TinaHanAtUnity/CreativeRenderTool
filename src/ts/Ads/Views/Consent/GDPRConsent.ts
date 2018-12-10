@@ -15,6 +15,7 @@ export interface IGDPRConsentViewParameters {
 export interface IGDPRConsentHandler {
     onConsent(consent: IPermissions): void;
     onConsentHide(): void;
+    onPrivacy(url: string): void;
 }
 
 export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConsentSettingsHandler {
@@ -109,14 +110,6 @@ export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConse
 
     // IGDPRConsentSettingsHandler
     public onPrivacy(url: string): void {
-        // todo:
-        // if (this._platform === Platform.IOS) {
-        //     this._core.iOS!.UrlScheme.open(url);
-        // } else if (this._platform === Platform.ANDROID) {
-        //     this._core.Android!.Intent.launch({
-        //         'action': 'android.intent.action.VIEW',
-        //         'uri': url
-        //     });
-        // }
+        this._handlers.forEach(handler => handler.onPrivacy(url));
     }
 }
