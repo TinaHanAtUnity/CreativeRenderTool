@@ -10,10 +10,12 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
-import { fakeARUtils, unfakeARUtils } from 'TestHelpers/FakeARUtils';
+import { fakeARUtils } from 'TestHelpers/FakeARUtils';
+import * as sinon from 'sinon';
 
 describe('AndroidEventsTest', () => {
 
+    const sandbox = sinon.createSandbox();
     let currentGameId: number;
     const videoEvents = ['video_start', 'first_quartile', 'midpoint', 'third_quartile', 'video_end'];
 
@@ -57,7 +59,7 @@ describe('AndroidEventsTest', () => {
         xhr.open('GET', 'https://fake-ads-backend.unityads.unity3d.com/setup/first_perf_then_vast?token=373a221f4df5c659f2df918f899fa403');
         xhr.send();
 
-        fakeARUtils();
+        fakeARUtils(sandbox);
     });
 
     afterEach(function(done) {
@@ -75,7 +77,7 @@ describe('AndroidEventsTest', () => {
         xhr.open('GET', 'https://fake-ads-backend.unityads.unity3d.com/fabulous/' + currentGameId + '/remove?token=373a221f4df5c659f2df918f899fa403');
         xhr.send();
 
-        unfakeARUtils();
+        sandbox.restore();
     });
 
     it('should include all operational events on Android', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
