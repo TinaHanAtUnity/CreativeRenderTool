@@ -1,11 +1,14 @@
-<div class="close-area"></div>
-<div class="container">
-    <div class="back-button">
-        <span class="consent-icon-arrow"></span>
-    </div>
-    <div class="main-view-container">
-        <div class="privacy-logo">
-            <span class="icon-gdpr"></span>
+<div class="safe-area-content">
+    <div class="close-area"></div>
+    <div class="view-container">
+        <div class="back-button">
+            <span class="consent-icon-arrow"></span>
+        </div>
+        <div class="main-view-container page-container">
+            <div class="privacy-logo">
+                <span class="icon-gdpr"></span>
+            </div>
+
             <div class="title">
                 <span >Ads privacy settings</span>
             </div>
@@ -34,39 +37,60 @@
             <div class="info-container">
 
             </div>
-
         </div>
-    </div>
-    <div class="personalization-container">
-        <div class="heading"><span>Your personalization settings</span></div>
-        <div class="text">
-            <p>
-                You can choose to continue to have a personalized experience, or to have a generic one. This will apply
-                to both advertising that comes from Unity directly as well as from advertising partners.
-            </p>
+        <div class="personalization-container page-container">
+            <div class="heading"><span>Your personalization settings</span></div>
+            <div class="text">
+                <p>
+                    You can choose to continue to have a personalized experience, or to have a generic one. This will apply
+                    to both advertising that comes from Unity directly as well as from advertising partners.
+                </p>
+            </div>
+            <div class="checkbox-group-container">
+            </div>
         </div>
-        <div class="checkbox-group-container">
+        <div class="view-your-data-container page-container">
+            <div class="heading"><span>Your data & deletion options</span></div>
+            <div class="text">
+                <p>
+                    ???
+                </p>
+            </div>
         </div>
-    </div>
-    <div class="view-your-data-container">
-        <div class="heading"><span>Your data & deletion options</span></div>
-        <div class="text">
-            <p>
-                ???
-            </p>
+        <div class="report-ad-container page-container">
+            <div class="heading"><span>Report Advertisement</span></div>
+            <div class="text">
+                <p>
+                    Are you experiencing issues with your current advertisement? Report to Unity Ads directly and let us know!
+                </p>
+            </div>
+            <ul class="radio-group-container">
+                <% for (var k in data.reportReasons) { %>
+                <div class="radio-item-container">
+                    <input id="<%= data.reportKeys[k] %>" class="report-choice-radio" name="report-reason" type="radio">
+                    <label for="<%= data.reportKeys[k] %>">
+                        <%= (data.reportReasons[k] === null || typeof data.reportReasons[k] === "undefined") ? "N/A" : data.reportReasons[k] %></label>
+                </div>
+                <% } %>
+            </ul>
+            <div class="text-small">
+                <p>
+                    Disclaimer: Reporting will close your advertisement and forfeit any rewards received from watching it.
+                </p>
+            </div>
+            <div class="report-container">
+                <div class="report-button">Report</div>
+                <span class="report-confirmed-text text"></span>
+            </div>
         </div>
-    </div>
-    <div class="report-ad-container">
-
-    </div>
-    <div class="build-info-container">
-        <% for (var k in data.buildInformation) { %>
-        <p class="build-information-item text">
+        <div class="build-info-container page-container">
+            <% for (var k in data.buildInformation) { %>
+            <p class="build-information-item text">
             <span class="build-information-key">
                 <%= k %>:</span> <span class="build-information-value">
                 <%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>
-        </p>
-        <% } %>
+            </p>
+            <% } %>
+        </div>
     </div>
-
 </div>

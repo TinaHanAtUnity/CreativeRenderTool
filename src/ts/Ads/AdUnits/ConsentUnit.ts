@@ -4,14 +4,14 @@ import { Platform } from 'Core/Constants/Platform';
 import { GDPRConsent, IGDPRConsentHandler } from 'Ads/Views/Consent/GDPRConsent';
 import { IPermissions } from 'Ads/Models/Privacy';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { ICore } from 'Core/ICore';
+import { ICoreApi } from 'Core/ICore';
 
 export interface IConsentUnitParameters {
     platform: Platform;
     gdprManager: UserPrivacyManager;
     adUnitContainer: AdUnitContainer;
     adsConfig: AdsConfiguration;
-    core: ICore;
+    core: ICoreApi;
 }
 
 export class ConsentUnit implements IGDPRConsentHandler {
@@ -21,7 +21,7 @@ export class ConsentUnit implements IGDPRConsentHandler {
     private _gdprConsentView: GDPRConsent;
     private _platform: Platform;
     private _adsConfig: AdsConfiguration;
-    private _core: ICore;
+    private _core: ICoreApi;
 
     constructor(parameters: IConsentUnitParameters) {
         this._gdprConsentView = new GDPRConsent({
@@ -92,11 +92,6 @@ export class ConsentUnit implements IGDPRConsentHandler {
     }
 
     // IGDPRConsentHandler
-    public onShowOptions(): void {
-        // TODO: Implement
-    }
-
-    // IGDPRConsentHandler
     public onConsentHide(): void {
         this._adUnitContainer.close().then(() => {
             if (this._platform !== Platform.IOS) {
@@ -104,5 +99,17 @@ export class ConsentUnit implements IGDPRConsentHandler {
                 this.onContainerDestroy();
             }
         });
+    }
+
+    public onPrivacy(url: string): void {
+        console.log(url);
+        if (this._platform === Platform.IOS) {
+            this._core.iOS!.UrlScheme.open(url);
+        } else if (this._platform === Platform.ANDROID) {
+            this._core.Android!.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
+        }
     }
 }

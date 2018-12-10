@@ -15,6 +15,7 @@ export interface IGDPRConsentViewParameters {
 export interface IGDPRConsentHandler {
     onConsent(consent: IPermissions): void;
     onConsentHide(): void;
+    onPrivacy(url: string): void;
 }
 
 export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConsentSettingsHandler {
@@ -103,5 +104,10 @@ export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConse
     // IGDPRConsentSettingsHandler
     public onClose(): void {
         this.hide();
+    }
+
+    // IGDPRConsentSettingsHandler
+    public onPrivacy(url: string): void {
+        this._handlers.forEach(handler => handler.onPrivacy(url));
     }
 }

@@ -234,7 +234,7 @@ export class Ads implements IAds {
             gdprManager: this.PrivacyManager,
             adUnitContainer: this.Container,
             adsConfig: this.Config,
-            core: this._core
+            core: this._core.Api
         });
         return consentView.show(options);
     }

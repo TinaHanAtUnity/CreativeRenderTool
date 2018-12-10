@@ -1,6 +1,6 @@
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Campaign } from 'Ads/Models/Campaign';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { AbstractPrivacy, ReportReason } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
@@ -10,14 +10,6 @@ enum PrivacyCardState {
     PRIVACY,
     BUILD,
     REPORT
-}
-
-enum ReportReason {
-    NOT_SHOWING = 'Ad is not showing',
-    OFFENSIVE = 'Ad is very offensive',
-    MALFORMED = 'Ad does not look right',
-    DISLIKE = 'I don\'t like this ad',
-    OTHER = 'Other'
 }
 
 export class Privacy extends AbstractPrivacy {

@@ -7,6 +7,7 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 export interface IPrivacyRowItemContainerHandler {
     onDataDeletion(): void;
+    onPrivacy(url: string): void;
 }
 
 interface IRowItemContainerParams {
@@ -26,6 +27,11 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
         this._template = new Template(PrivacyRowItemContainerTemplate);
 
         this._bindings = [
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: 'a'
+            },
             {
                 event: 'click',
                 listener: (event: Event) => this.onWhatWeCollectEvent(event),
@@ -119,7 +125,7 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
         }
     }
 
-    protected onDataDeletionEvent(event: Event): void {
+    private onDataDeletionEvent(event: Event): void {
         event.preventDefault();
 
         if (this._dataDeletionConfirmation) {
@@ -130,7 +136,7 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
         confirmationContainer.classList.toggle('active');
     }
 
-    protected onDataDeletionConfirmationEvent(event: Event): void {
+    private onDataDeletionConfirmationEvent(event: Event): void {
         event.preventDefault();
         this._dataDeletionConfirmation = true;
 
@@ -142,5 +148,10 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
 
         this._handlers.forEach(handler => handler.onDataDeletion());
 
+    }
+
+    private onPrivacyEvent(event: Event): void {
+        event.preventDefault();
+        this._handlers.forEach(handler => handler.onPrivacy((<HTMLLinkElement>event.target).href));
     }
 }

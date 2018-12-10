@@ -1,6 +1,6 @@
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Campaign } from 'Ads/Models/Campaign';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { AbstractPrivacy, ReportReason } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { Template } from 'Core/Utilities/Template';
 
@@ -19,6 +19,10 @@ enum ViewState {
 
 export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemContainerHandler {
 
+    private _reportSent: boolean = false;
+
+    private _campaign: Campaign;
+
     private _privacyRowItemContainer: PrivacyRowItemContainer;
     private _personalizationCheckBoxGroup: PersonalizationCheckboxGroup;
 
@@ -26,6 +30,11 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
                 gdprEnabled: boolean,
                 isCoppaCompliant: boolean) {
         super(platform, privacyManager, isCoppaCompliant, gdprEnabled, 'privacy-settings');
+
+        this._campaign = campaign;
+
+        this._templateData.reportKeys = Object.keys(ReportReason);
+        this._templateData.reportReasons = Object.keys(ReportReason).map((reason: any) => ReportReason[reason]);
 
         this._template = new Template(PrivacySettingsTemplate);
         this._bindings = [
@@ -58,6 +67,11 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.close-area'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onReportAdEvent(event),
+                selector: '.report-button'
             }
         ];
 
@@ -77,6 +91,16 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         (<HTMLElement>this._container.querySelector('.checkbox-group-container')).appendChild(this._personalizationCheckBoxGroup.container());
 
         this.showView(ViewState.INITIAL);
+    }
+
+    // IPrivacyRowItemContainerHandler
+    public onDataDeletion(): void {
+        this._personalizationCheckBoxGroup.checkCheckboxes(false);
+    }
+
+    // IPrivacyRowItemContainerHandler
+    public onPrivacy(url: string): void {
+        this._handlers.forEach(handler => handler.onPrivacy(url));
     }
 
     protected onCloseEvent(event: Event): void {
@@ -132,6 +156,35 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         this.showView(ViewState.BUILD_INFO);
     }
 
+    private onReportAdEvent(event: Event): void {
+        event.preventDefault();
+        if (!this._reportSent) {
+            const checkedReportButton = <HTMLElement>this._container.querySelector('.report-choice-radio:checked');
+            const reportText = this._container.querySelector('.report-confirmed-text');
+            if (checkedReportButton && checkedReportButton.id) {
+                this._reportSent = true;
+                this.handleReportText(true, reportText);
+                this._onReport.trigger(this._campaign, checkedReportButton.id);
+            } else {
+                this.handleReportText(false, reportText);
+            }
+        }
+    }
+
+    private handleReportText(checked: boolean, reportText: Element | null) {
+        if (reportText) {
+            if (checked) {
+                reportText.innerHTML = 'Thank you for your help. Your Ad will close shortly.';
+                if (!reportText.classList.contains('active')) {
+                    reportText.classList.toggle('active');
+                }
+            } else {
+                reportText.innerHTML = 'Please select an option from the list above.';
+                reportText.classList.toggle('active');
+            }
+        }
+    }
+
     private showView(viewState: ViewState) {
         let classToAdd: string;
 
@@ -168,10 +221,6 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
                 this.container().classList.remove(state);
             }
         });
-    }
-
-    public onDataDeletion(): void {
-        this._personalizationCheckBoxGroup.checkCheckboxes(false);
     }
 
 }
