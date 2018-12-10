@@ -88,6 +88,7 @@
 | unityCreativeId | string | Creative id of the shown creative | SDK | all |
 | analyticsUserId | string | Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending) | SDK | all |
 | analyticsSessionId | string | Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit | SDK | all |
+| privacy | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 
 
 
@@ -176,6 +177,7 @@
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | abGroup | no | False | True | number | AB Group number assigned to this user from configuration | Server | all |
+| privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 
 
 
@@ -223,6 +225,7 @@
 | optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | unityCreativeId | all | False | True | string | Creative id of the shown creative | SDK | all |
+| privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 
 
 
@@ -270,4 +273,5 @@
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | videoOrientation | no | False | True | string | Chosen video orientation | SDK | all |
 | unityCreativeId | all | False | True | string | Creative id of the shown creative | SDK | all |
+| privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 

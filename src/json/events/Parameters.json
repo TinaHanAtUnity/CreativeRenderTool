@@ -537,5 +537,12 @@
     "description": "Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "privacy",
+    "type": "object",
+    "description": "Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]
