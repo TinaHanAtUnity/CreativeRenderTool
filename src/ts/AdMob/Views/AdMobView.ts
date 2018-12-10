@@ -20,7 +20,7 @@ import AdMobContainer from 'html/admob/AdMobContainer.html';
 import AFMAContainer from 'html/admob/AFMAContainer.html';
 import MRAIDContainer from 'html/admob/MRAIDContainer.html';
 import { MRAIDBridge } from 'MRAID/Views/MRAIDBridge';
-import { IPermissions } from 'Ads/Views/Consent/IPermissions';
+import { IPermissions } from 'Ads/Models/Privacy';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;

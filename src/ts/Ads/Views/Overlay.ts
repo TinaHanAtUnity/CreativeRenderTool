@@ -7,7 +7,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
-import { IPermissions } from 'Ads/Views/Consent/IPermissions';
+import { IPermissions } from 'Ads/Models/Privacy';
 import OverlayTemplate from 'html/Overlay.html';
 
 export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {

@@ -1,7 +1,6 @@
 import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, PrivacyMethod } from 'Ads/Models/Privacy';
-import { IPermissions } from 'Ads/Views/Consent/IPermissions';
+import { GamePrivacy, PrivacyMethod, IPermissions } from 'Ads/Models/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';

@@ -1,6 +1,5 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, UserPrivacy, PrivacyMethod } from 'Ads/Models/Privacy';
-import { IPermissions } from 'Ads/Views/Consent/IPermissions';
+import { GamePrivacy, UserPrivacy, PrivacyMethod, IPermissions } from 'Ads/Models/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';

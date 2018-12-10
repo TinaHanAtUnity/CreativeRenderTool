@@ -4,7 +4,7 @@ import { Template } from 'Core/Utilities/Template';
 import { GDPRConsentSettings, IGDPRConsentSettingsHandler } from 'Ads/Views/Consent/GDPRConsentSettings';
 import { Platform } from 'Core/Constants/Platform';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { IPermissions, IPersonalizedConsent } from 'Ads/Views/Consent/IPermissions';
+import { IPermissions, IPersonalizedConsent } from 'Ads/Models/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 
 export interface IGDPRConsentViewParameters {
@@ -95,9 +95,7 @@ export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConse
 
     // IGDPRConsentSettingsHandler
     public onPersonalizedConsent(consent: IPersonalizedConsent): void {
-        const permissions: IPermissions = {
-            personalizedConsent: consent
-        };
+        const permissions: IPermissions = consent;
 
         this._handlers.forEach(handler => handler.onConsent(permissions));
     }

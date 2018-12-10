@@ -2,7 +2,7 @@ import { AdUnitContainer, AdUnitContainerSystemMessage, Orientation } from 'Ads/
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPRConsent, IGDPRConsentHandler } from 'Ads/Views/Consent/GDPRConsent';
-import { IPermissions } from 'Ads/Views/Consent/IPermissions';
+import { IPermissions } from 'Ads/Models/Privacy';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ICore } from 'Core/ICore';
 
@@ -87,8 +87,8 @@ export class ConsentUnit implements IGDPRConsentHandler {
     }
 
     // IGDPRConsentHandler
-    public onConsent(privacy: IPermissions): void {
-        this._adsConfig.addUserConsent(privacy);
+    public onConsent(consent: IPermissions): void {
+        this._adsConfig.addUserConsent(consent);
     }
 
     // IGDPRConsentHandler

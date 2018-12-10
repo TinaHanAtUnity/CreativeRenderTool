@@ -11,7 +11,7 @@ import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialC
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { IPermissions } from 'Ads/Views/Consent/IPermissions';
+import { IPermissions } from 'Ads/Models/Privacy';
 
 export interface IDisplayInterstitialHandler extends IGDPREventHandler {
     onDisplayInterstitialClose(): void;

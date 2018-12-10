@@ -2,7 +2,7 @@ import { View } from 'Core/Views/View';
 import CheckBoxGroupTemplate from 'html/consent/personalization-checkbox-group.html';
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
-import { IPersonalizedConsent } from 'Ads/Views/Consent/IPermissions';
+import { IPersonalizedConsent } from 'Ads/Models/Privacy';
 
 export class PersonalizationCheckboxGroup extends View<{}> {
 

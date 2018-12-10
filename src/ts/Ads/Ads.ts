@@ -226,7 +226,7 @@ export class Ads implements IAds {
     }
 
     public showConsentIfNeeded(options: any): Promise<void> {
-        if (!this.getNeedToShowConsent()) {
+        if (!this.Config.isConsentShowRequired()) {
             return Promise.resolve();
         }
         const consentView = new ConsentUnit({
@@ -281,7 +281,7 @@ export class Ads implements IAds {
             campaign.setTrackingUrls(trackingUrls);
         }
 
-        if (placement.getRealtimeData() && !this.getNeedToShowConsent()) {
+        if (placement.getRealtimeData() && !this.Config.isConsentShowRequired()) {
             this._core.Api.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
             const start = Date.now();
 
@@ -333,11 +333,6 @@ export class Ads implements IAds {
 
         const context = this.Banners.BannerAdContext;
         context.hide();
-    }
-
-    private getNeedToShowConsent(): boolean {
-        // TODO: this info comes from elsewhere
-        return true;
     }
 
     private showAd(placement: Placement, campaign: Campaign, options: any) {

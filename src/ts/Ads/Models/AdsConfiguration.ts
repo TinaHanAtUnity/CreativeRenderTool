@@ -1,8 +1,7 @@
 import { Placement } from 'Ads/Models/Placement';
-import { GamePrivacy, IPrivacy, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import { GamePrivacy, IPermissions, IPrivacy, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
-import { IPermissions} from 'Ads/Views/Consent/IPermissions';
 
 export interface IAdsConfiguration {
     cacheMode: CacheMode;
@@ -106,11 +105,6 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         } else {
             userPermissions = {};
         }
-        const obj = {
-            'method': this.getPrivacyMethod(),
-            'firstRequest': this.isFirstRequest(),
-            'permissions': userPermissions
-        };
         return {
             'method': this.getPrivacyMethod(),
             'firstRequest': this.isFirstRequest(),
@@ -178,6 +172,23 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
 
     public setUserPrivacy(userPrivacy: UserPrivacy): void {
         this.set('userPrivacy', userPrivacy);
+    }
+
+    public isConsentShowRequired(): boolean {
+        // TODO: Remove before flight
+        if (2 + 2 === 4) {
+            return true;
+        }
+
+        // TODO: there was going to be a case where we might have to request consent again, will this be server-side?
+        if (!this.isGDPREnabled()) {
+            return false;
+        }
+        const userPrivacy = this.getUserPrivacy();
+        if(userPrivacy) {
+            return false;
+        }
+        return true;
     }
 
     public getDTO(): { [key: string]: any } {

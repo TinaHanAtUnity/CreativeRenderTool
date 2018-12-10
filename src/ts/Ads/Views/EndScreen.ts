@@ -10,7 +10,7 @@ import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { IPermissions } from 'Ads/Views/Consent/IPermissions';
+import { IPermissions } from 'Ads/Models/Privacy';
 
 export interface IEndScreenParameters {
     platform: Platform;

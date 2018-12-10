@@ -1,5 +1,4 @@
 import { Model } from 'Core/Models/Model';
-import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 export enum PrivacyMethod {
     DEFAULT = 'default',
@@ -8,16 +7,31 @@ export enum PrivacyMethod {
     DEVELOPER_CONSENT = 'developer_consent'
 }
 
-export interface IUnityConsentProfiling {
-    profiling: boolean;
-}
-
 export interface IPrivacy {
     method: PrivacyMethod;
     firstRequest: boolean;
     permissions: IPermissions;
+};
 
+export interface IAllPermissions {
+    all: boolean;
 }
+
+export interface IPersonalizedConsent {
+    gameExp: boolean;
+    ads: boolean;
+    external: boolean;
+}
+
+export function isIPersonalizedConsent(consent: IPermissions): consent is IPersonalizedConsent {
+  return (<IPersonalizedConsent>consent).gameExp !== undefined;
+};
+
+export interface IUnityConsentProfiling {
+    profiling: boolean;
+}
+
+export type IPermissions = IPersonalizedConsent | IUnityConsentProfiling | IAllPermissions | {};
 
 const CurrentUnityConsentVersion = 20181106;
 
@@ -92,7 +106,7 @@ export class UserPrivacy extends Model<IUserPrivacy> {
         return 0;
     }
 
-    public getPrivacy(): IPermissions | IUnityConsentProfiling {
+    public getPrivacy(): IPermissions {
         return this.get('privacy');
     }
 

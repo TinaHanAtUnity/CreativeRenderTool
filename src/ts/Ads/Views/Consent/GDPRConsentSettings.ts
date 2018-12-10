@@ -4,7 +4,7 @@ import { Template } from 'Core/Utilities/Template';
 import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { Platform } from 'Core/Constants/Platform';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { IPersonalizedConsent } from 'Ads/Views/Consent/IPermissions';
+import { IPersonalizedConsent } from 'Ads/Models/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
 
