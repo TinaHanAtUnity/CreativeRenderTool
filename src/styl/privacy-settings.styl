@@ -71,6 +71,25 @@
       font-weight: $privacy-title-font-weight;
     }
 
+    .button-row-container {
+      display: flex;
+      flex-direction: row;
+
+      .row-button {
+        padding: $default-size;
+        border-radius: .25 * $default-size;
+        background: $white-smoke;
+        text-align: center;
+        font-weight: $privacy-title-font-weight;
+        font-size: $privacy-text-font-size;
+        flex-grow: 1;
+      }
+
+      .report-ad-button {
+        margin-right: .5 * $default-size;
+      }
+    }
+
     .info-container {
       padding-top: $default-size;
     }
@@ -110,7 +129,7 @@
   &:not(.initial) {
     .view-container {
       min-height: 0;
-      max-height: 50%;
+      max-height: 90%;
       animation: page-animation-max-to-min .3s ease-out;
     }
     .main-view-container {
@@ -185,7 +204,7 @@
 
     100% {
       min-height: 0;
-      max-height: 50%;
+      max-height: 90%;
     }
   }
 }
