@@ -14,9 +14,21 @@ def waitWebviewDeployed(webviewBranch) {
 }
 
 def main() {
-    webviewBranch = "${env.CHANGE_BRANCH}/${env.revision}"
+    def commitMessage = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
 
     if (env.BRANCH_NAME =~ /^PR-/) {
+        // Jenkins does automatic merge of master to PR branch
+        // producing *local commit* id (var 'env.revision').
+        // That value is equal to commit id of deployed webview
+        // only if master was merged to PR branch in the commit,
+        // otherwise HEAD-1 is the commit id of deployed webview.
+        if (commitMessage =~ /^Merge branch 'master'/) {
+            webviewBranch = "${env.CHANGE_BRANCH}/${env.revision}"
+        } else {
+            def commitId = sh(returnStdout: true, script: 'git rev-parse HEAD^1').trim()
+            webviewBranch = "${env.CHANGE_BRANCH}/${commitId}"
+        }
+
         stage('Wait for webview deployment') {
             parallel (
                 'checkout-helpers': {
