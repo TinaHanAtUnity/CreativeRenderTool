@@ -42,7 +42,7 @@ pipeline {
                     steps {
                         script {
                             try {
-                                def webviewBranch = "$env.BRANCH_NAME/$env.GIT_COMMIT"
+                                def webviewBranch = "$env.CHANGE_BRANCH/$env.GIT_COMMIT"
                                 waitWebviewDeployed(webviewBranch)
                                 runTests = true
                             } catch (FlowInterruptedException interruptEx) {
