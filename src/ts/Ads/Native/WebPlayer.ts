@@ -205,32 +205,32 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setEventSettings', [eventSettings, viewId]);
     }
 
-    public sendEvent(args: any[], viewId: string): Promise<void> {
+    public sendEvent(args: unknown[], viewId: string): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendEvent', [args, viewId]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case WebplayerEvent[WebplayerEvent.PAGE_STARTED]:
-                this.onPageStarted.trigger(parameters.pop(), parameters[0]);
+                this.onPageStarted.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
 
             case WebplayerEvent[WebplayerEvent.PAGE_FINISHED]:
-                this.onPageFinished.trigger(parameters.pop(), parameters[0]);
+                this.onPageFinished.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
 
             case WebplayerEvent[WebplayerEvent.ERROR]:
-                this.onPageFinished.trigger(parameters.pop(), parameters[0]);
+                this.onPageFinished.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
             case WebplayerEvent[WebplayerEvent.WEBPLAYER_EVENT]:
-                this.onWebPlayerEvent.trigger(parameters.pop(), parameters[0]);
+                this.onWebPlayerEvent.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
 
             case WebplayerEvent[WebplayerEvent.SHOULD_OVERRIDE_URL_LOADING]:
-                this.shouldOverrideUrlLoading.trigger(parameters.pop(), parameters[0], parameters[1]);
+                this.shouldOverrideUrlLoading.trigger(<string>parameters.pop(), <string>parameters[0], <string>parameters[1]);
                 break;
             case WebplayerEvent[WebplayerEvent.CREATE_WEBVIEW]:
-                this.onCreateWebView.trigger(parameters.pop(), parameters[0]);
+                this.onCreateWebView.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
             default:
                 super.handleEvent(event, parameters);

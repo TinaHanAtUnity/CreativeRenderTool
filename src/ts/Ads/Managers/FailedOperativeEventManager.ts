@@ -25,7 +25,7 @@ export class FailedOperativeEventManager {
         return SessionUtils.getSessionStorageKey(this._sessionId) + '.operative';
     }
 
-    public storeFailedEvent(storageBridge: StorageBridge, data: { [key: string]: any }): Promise<void> {
+    public storeFailedEvent(storageBridge: StorageBridge, data: { [key: string]: unknown }): Promise<void> {
         if(this._eventId) {
             const operation = new StorageOperation(StorageType.PRIVATE);
             operation.set(this.getEventStorageKey(), data);
@@ -47,9 +47,9 @@ export class FailedOperativeEventManager {
 
     public sendFailedEvent(request: RequestManager, storageBridge: StorageBridge): Promise<void> {
         if(this._eventId) {
-            return this._core.Storage.get<{ [key: string]: any }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
-                const url = eventData.url;
-                const data = eventData.data;
+            return this._core.Storage.get<{ [key: string]: unknown }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
+                const url = <string>eventData.url;
+                const data = <string>eventData.data;
                 return request.post(url, data);
             }).then(() => {
                 return this.deleteFailedEvent(storageBridge);
@@ -61,7 +61,7 @@ export class FailedOperativeEventManager {
         return Promise.resolve();
     }
 
-    public sendFailedEvents(request: RequestManager, storageBridge: StorageBridge): Promise<any[]> {
+    public sendFailedEvents(request: RequestManager, storageBridge: StorageBridge): Promise<unknown[]> {
         return this._core.Storage.getKeys(StorageType.PRIVATE, this.getEventsStorageKey(), false).then(keys => {
             return Promise.all(this.getPromisesForFailedEvents(request, storageBridge, keys));
         }).catch(() => {
@@ -70,8 +70,8 @@ export class FailedOperativeEventManager {
         });
     }
 
-    protected getPromisesForFailedEvents(request: RequestManager, storageBridge: StorageBridge, keys: string[]): Promise<any>[] {
-        const promises: Promise<any>[] = [];
+    protected getPromisesForFailedEvents(request: RequestManager, storageBridge: StorageBridge, keys: string[]): Promise<unknown>[] {
+        const promises: Promise<unknown>[] = [];
         keys.map(eventId => {
             const manager = new FailedOperativeEventManager(this._core, this._sessionId, eventId);
             promises.push(manager.sendFailedEvent(request, storageBridge));

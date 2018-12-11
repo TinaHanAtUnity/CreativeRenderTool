@@ -82,7 +82,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                 if(repeats > repeatTreshold) {
                     this._core.Sdk.logError('Unity Ads video player stuck to ' + progress + 'ms position');
 
-                    const error: any = {
+                    const error: { [key: string]: unknown } = {
                         repeats: repeats,
                         position: progress,
                         duration: this._video.getDuration(),
@@ -100,7 +100,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                             error.fileInfo = fileInfo;
                             if(fileInfo.found) {
                                 return VideoFileInfo.getVideoInfo(this._platform, this._core.Cache, fileId).then(([width, height, duration]) => {
-                                    const videoInfo: any = {
+                                    const videoInfo: { [key: string]: unknown } = {
                                         width: width,
                                         height: height,
                                         duration: duration
