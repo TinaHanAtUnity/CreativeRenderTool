@@ -80,6 +80,7 @@ def main() {
             }
 
             def systemTestBuilders = [:]
+            def nativeBranch = env.CHANGE_BRANCH.replace("staging/", "");
 
             ['systest-android','systest-ios'].each {
                 stage -> systemTestBuilders[stage] = {
@@ -89,7 +90,7 @@ def main() {
                       propagate: false,
                       wait: false,
                       parameters: [
-                        string(name: 'WEBVIEW_BRANCH', value: env.BRANCH_NAME),
+                        string(name: 'WEBVIEW_BRANCH', value: env.CHANGE_BRANCH),
                         string(name: 'UNITY_ADS_ANDROID_BRANCH', value: nativeBranch),
                         string(name: 'UNITY_ADS_IOS_BRANCH', value: nativeBranch)
                       ],
@@ -98,9 +99,7 @@ def main() {
             }
 
             dir('results') {
-                if (env.BRANCH_NAME =~ /^staging/) { // run deployment tests
-                    nativeBranch = env.BRANCH_NAME.replace("staging/", "");
-
+                if (env.CHANGE_BRANCH =~ /^staging/) { // run deployment tests
                     parallel (hybridTestBuilders + systemTestBuilders)
 
                 } else { // run only hybrid tests
