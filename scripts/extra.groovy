@@ -14,6 +14,8 @@ def waitWebviewDeployed(webviewBranch) {
 }
 
 def main() {
+    agent { node { label 'ads_sdk_docker' } }
+
     def commitMessage = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
 
     if (env.BRANCH_NAME =~ /^PR-/) {
