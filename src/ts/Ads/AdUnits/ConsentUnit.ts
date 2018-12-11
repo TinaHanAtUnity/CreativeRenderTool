@@ -100,7 +100,6 @@ export class ConsentUnit implements IGDPRConsentHandler {
     }
 
     public onPrivacy(url: string): void {
-        console.log(url);
         if (this._platform === Platform.IOS) {
             this._core.iOS!.UrlScheme.open(url);
         } else if (this._platform === Platform.ANDROID) {
