@@ -33,7 +33,7 @@ export class AuctionPlacement extends Model<IAuctionPlacement> {
         return this.get('trackingUrls');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             placementId: this.getPlacementId(),
             mediaId: this.getMediaId(),

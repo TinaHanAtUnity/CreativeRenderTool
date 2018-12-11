@@ -1,6 +1,6 @@
 import { ISchema, Model } from 'Core/Models/Model';
 
-interface IAdUnitStyle {
+export interface IAdUnitStyle {
     ctaButtonColor?: string;
 }
 
@@ -33,7 +33,7 @@ export class AdUnitStyle extends Model<IAdUnitStyle> {
         return this.get('ctaButtonColor');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'ctaButtonColor': this.getCTAButtonColor()
         };

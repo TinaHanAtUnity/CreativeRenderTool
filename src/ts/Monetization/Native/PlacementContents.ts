@@ -4,6 +4,7 @@ import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
+import { IPlacementContentParams } from 'Monetization/Managers/PlacementContentManager';
 
 export enum IPlacementContentType {
     SHOW_AD,
@@ -16,13 +17,8 @@ export enum PlacementContentEvent {
     CUSTOM
 }
 
-export interface IPlacementContentParams {
-    [key: string]: any;
-    type: IPlacementContentType;
-}
-
 export class PlacementContentsApi extends NativeApi {
-    public readonly onPlacementContentCustomEvent = new Observable2<string, any>();
+    public readonly onPlacementContentCustomEvent = new Observable2<string, { type: string }>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'PlacementContents', ApiPackage.MONETIZATION_CORE, EventCategory.PLACEMENT_CONTENT);
@@ -47,10 +43,10 @@ export class PlacementContentsApi extends NativeApi {
         return this._nativeBridge.invoke(this._fullApiClassName, 'sendAdStarted', [placementId]);
     }
 
-    public handleEvent(event: string, parameters: any[]) {
+    public handleEvent(event: string, parameters: unknown[]) {
         switch (event) {
         case PlacementContentEvent[PlacementContentEvent.CUSTOM]:
-            this.onPlacementContentCustomEvent.trigger(parameters[0], parameters[1]);
+            this.onPlacementContentCustomEvent.trigger(<string>parameters[0], <{ type: string }>parameters[1]);
             break;
         default:
             super.handleEvent(event, parameters);
