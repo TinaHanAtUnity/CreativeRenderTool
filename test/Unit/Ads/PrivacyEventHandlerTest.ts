@@ -9,7 +9,7 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
@@ -27,8 +27,6 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('PrivacyEventHandlerTest', () => {
@@ -37,9 +35,6 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
         let ads: IAdsApi;
-        let ar: IARApi;
-        let purchasing: IPurchasingApi;
-        let adUnit: PerformanceAdUnit;
         let adUnitParameters: IPerformanceAdUnitParameters;
 
         let privacyEventHandler: PrivacyEventHandler;
@@ -49,14 +44,10 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
-            ar = TestFixtures.getARApi(nativeBridge);
-            purchasing = TestFixtures.getPurchasingApi(nativeBridge);
             adUnitParameters = {
                 platform,
                 core,
                 ads,
-                ar,
-                purchasing,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: sinon.createStubInstance(FocusManager),
                 container: sinon.createStubInstance(ViewController),
@@ -71,14 +62,12 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                 request: sinon.createStubInstance(RequestManager),
                 options: {},
                 endScreen: sinon.createStubInstance(PerformanceEndScreen),
-                overlay: sinon.createStubInstance(Overlay),
+                overlay: sinon.createStubInstance(NewVideoOverlay),
                 video: sinon.createStubInstance(Video),
                 privacy: sinon.createStubInstance(Privacy),
                 privacyManager: sinon.createStubInstance(UserPrivacyManager),
                 programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
             };
-
-            adUnit = sinon.createStubInstance(PerformanceAdUnit);
 
             privacyEventHandler = new PrivacyEventHandler(adUnitParameters);
         });

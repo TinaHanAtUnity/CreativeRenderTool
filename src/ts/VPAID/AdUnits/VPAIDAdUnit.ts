@@ -19,12 +19,14 @@ import { Timer } from 'Core/Utilities/Timer';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
     closer: Closer;
     endScreen?: VPAIDEndScreen | undefined;
-    privacy: AbstractPrivacy;
+    privacy: Privacy;
+    webPlayerContainer: WebPlayerContainer;
 }
 
 export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
@@ -62,7 +64,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._deviceInfo = parameters.deviceInfo;
         this._placement = parameters.placement;
         this._clientInfo = parameters.clientInfo;
-        this._webPlayerContainer = parameters.webPlayerContainer!;
+        this._webPlayerContainer = parameters.webPlayerContainer;
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
         this._endScreen = parameters.endScreen;
 

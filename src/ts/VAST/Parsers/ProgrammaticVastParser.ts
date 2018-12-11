@@ -64,6 +64,13 @@ export class ProgrammaticVastParser extends CampaignParser {
             errorTrackingUrl = vast.getErrorURLTemplate()!;
         }
 
+        const vastImpressionUrls: string[] = [];
+        for (const impUrl of vast.getImpressionUrls()) {
+            if (Url.isValid(impUrl)) {
+                vastImpressionUrls.push(Url.encodeUrlWithQueryParams(impUrl));
+            }
+        }
+
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
         if(portraitUrl) {
@@ -111,7 +118,7 @@ export class ProgrammaticVastParser extends CampaignParser {
             advertiserDomain: response.getAdvertiserDomain() || undefined,
             advertiserCampaignId: response.getAdvertiserCampaignId() || undefined,
             advertiserBundleId: response.getAdvertiserBundleId() || undefined,
-            impressionUrls: this.validateAndEncodeUrls(vast.getImpressionUrls(), session),
+            impressionUrls: vastImpressionUrls,
             isMoatEnabled: response.isMoatEnabled() || undefined
         };
 
