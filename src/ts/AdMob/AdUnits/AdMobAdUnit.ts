@@ -110,7 +110,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public sendStartEvent() {
         this._ads.Listener.sendStartEvent(this._placement.getId());
         this.sendTrackingEvent('start');
-        this._operativeEventManager.sendStart(this.getOperativeEventParams());
+        this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
+            this.onStartProcessed.trigger();
+        });
     }
 
     public sendSkipEvent() {
