@@ -12,7 +12,6 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { MraidIFrameEventBridge } from 'MRAID/Views/MraidIFrameEventBridge';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
     public createAdUnit(parameters: IMRAIDAdUnitParameters): MRAIDAdUnit {

@@ -11,7 +11,6 @@ import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandle
 import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
 import { StreamType } from 'Core/Constants/Android/StreamType';
 import { Privacy } from 'Ads/Views/Privacy';
-import { VastVideoOverlay } from 'Ads/Views/VastVideoOverlay';
 
 export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVastAdUnitParameters> {
 
