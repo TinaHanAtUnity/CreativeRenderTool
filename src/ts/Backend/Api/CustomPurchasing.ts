@@ -5,7 +5,7 @@ export class CustomPurchasing extends BackendApi {
         return false;
     }
 
-    public purchaseItem(productId: string, extras: any) {
+    public purchaseItem(productId: string, extras: unknown) {
         // EMPTY
     }
 

@@ -15,50 +15,15 @@ import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCam
 import { Platform } from 'Core/Constants/Platform';
 import { AndroidBackButtonSkipTest } from 'Core/Models/ABGroup';
 
-export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
-
-    private static _forcedExtendedMRAID: boolean = false;
-    private static _forcedARMRAID: boolean = false;
-
-    public static setForcedExtendedMRAID(value: boolean) {
-        MRAIDAdUnitFactory._forcedExtendedMRAID = value;
-    }
-
-    public static setForcedARMRAID(value: boolean) {
-        MRAIDAdUnitFactory._forcedARMRAID = value;
-    }
-
-    public createAdUnit(parameters: IAdUnitParameters<MRAIDCampaign>): MRAIDAdUnit {
-        const resourceUrl = parameters.campaign.getResourceUrl();
-
-        let mraid: MRAIDView<IMRAIDViewHandler>;
-        const showGDPRBanner = this.showGDPRBanner(parameters);
-        const privacy = this.createPrivacy(parameters);
-
-        parameters.gameSessionId = parameters.gameSessionId || 0;
-
-        if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || MRAIDAdUnitFactory._forcedExtendedMRAID) {
-            mraid = new ExtendedMRAID(parameters.platform, parameters.core, parameters.deviceInfo, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
-        } else if (ARUtil.isARCreative(parameters.campaign) || MRAIDAdUnitFactory._forcedARMRAID) {
-            mraid = new ARMRAID(parameters.platform, parameters.core, parameters.ar, parameters.deviceInfo, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
-        } else {
-            mraid = new MRAID(parameters.platform, parameters.core, parameters.deviceInfo, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
-        }
-
-        const mraidAdUnitParameters: IMRAIDAdUnitParameters = {
-            ... parameters,
-            mraid: mraid,
-            privacy: privacy
-        };
-
-        const mraidAdUnit: MRAIDAdUnit = new MRAIDAdUnit(mraidAdUnitParameters);
-
+export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
+    public createAdUnit(parameters: IMRAIDAdUnitParameters): MRAIDAdUnit {
+        const mraidAdUnit: MRAIDAdUnit = new MRAIDAdUnit(parameters);
         // NOTE: When content type is correct for playables we want to change this to content type check.
         const isPlayable: boolean = parameters.campaign instanceof PerformanceMRAIDCampaign;
         const isSonicPlayable: boolean = CustomFeatures.isSonicPlayable(parameters.campaign.getCreativeId());
         const EventHandler =  (isSonicPlayable || isPlayable) ? PlayableEventHandler : MRAIDEventHandler;
-        const mraidEventHandler: IMRAIDViewHandler = new EventHandler(mraidAdUnit, mraidAdUnitParameters);
-        mraid.addEventHandler(mraidEventHandler);
+        const mraidEventHandler: IMRAIDViewHandler = new EventHandler(mraidAdUnit, parameters);
+        parameters.mraid.addEventHandler(mraidEventHandler);
 
         if (parameters.platform === Platform.ANDROID) {
             const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
@@ -75,8 +40,7 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
             });
         }
 
-        Privacy.setupReportListener(privacy, mraidAdUnit);
+        Privacy.setupReportListener(parameters.privacy, mraidAdUnit);
         return mraidAdUnit;
     }
-
 }

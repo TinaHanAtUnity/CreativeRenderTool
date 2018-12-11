@@ -1,9 +1,11 @@
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
+import { Campaign } from 'Ads/Models/Campaign';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 
 export interface IContentTypeHandler {
     parser: CampaignParser;
-    factory: AbstractAdUnitFactory;
+    factory: AbstractAdUnitFactory<Campaign, IAdUnitParameters<Campaign>>;
 }
 
 export type ContentTypeHandlerMapType = { [key: string]: IContentTypeHandler };

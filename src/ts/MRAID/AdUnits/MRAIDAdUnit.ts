@@ -17,11 +17,12 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
     endScreen?: EndScreen;
-    privacy: AbstractPrivacy;
+    privacy: Privacy;
     ar: IARApi;
 }
 
@@ -31,7 +32,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _mraid: MRAIDView<IMRAIDViewHandler>;
     private _ar: IARApi;
-    private _options: any;
+    private _options: unknown;
     private _orientationProperties: IOrientationProperties;
     private _endScreen?: EndScreen;
     private _showingMRAID: boolean;

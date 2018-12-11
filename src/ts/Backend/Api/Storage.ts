@@ -1,9 +1,13 @@
 import { BackendApi } from 'Backend/BackendApi';
 import { StorageType } from 'Core/Native/Storage';
 
+interface IStorageData {
+    [key: string]: IStorageData;
+}
+
 export class Storage extends BackendApi {
 
-    private _storage: any = {};
+    private _storage: IStorageData = {};
     private _dirty: boolean = false;
 
     public set<T>(storageType: StorageType, key: string, value: T): Promise<void> {
@@ -17,7 +21,7 @@ export class Storage extends BackendApi {
         if(!retValue) {
             return Promise.reject(['COULDNT_GET_VALUE', key]);
         }
-        return Promise.resolve(retValue);
+        return Promise.resolve(<T>retValue);
     }
 
     public getKeys(storageType: StorageType, key: string, recursive: boolean): Promise<string[]> {
@@ -39,7 +43,7 @@ export class Storage extends BackendApi {
         return this._dirty;
     }
 
-    private setInMemoryValue(storage: { [key: string]: any }, key: string, value: any): {} {
+    private setInMemoryValue<T>(storage: IStorageData, key: string, value: T): {} {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -50,12 +54,13 @@ export class Storage extends BackendApi {
             storage[keyArray[0]] = this.setInMemoryValue(storage[keyArray[0]], keyArray.slice(1).join('.'), value);
             return storage;
         } else {
-            storage[keyArray[0]] = value;
+            // tslint:disable-next-line
+            storage[keyArray[0]] = <any>value;
             return storage;
         }
     }
 
-    private getInMemoryValue(storage: { [key: string]: any }, key: string): any {
+    private getInMemoryValue(storage: IStorageData, key: string): unknown {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -69,7 +74,7 @@ export class Storage extends BackendApi {
         }
     }
 
-    private getInMemoryKeys(storage: { [key: string]: any }, key: string): string[] {
+    private getInMemoryKeys(storage: IStorageData, key: string): string[] {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -94,7 +99,7 @@ export class Storage extends BackendApi {
         }
     }
 
-    private deleteInMemoryValue(storage: { [key: string]: any }, key: string): {} {
+    private deleteInMemoryValue(storage: IStorageData, key: string): {} {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -127,7 +132,7 @@ export class Storage extends BackendApi {
         return false;
     }
 
-    public setStorageContents(contents: any): void {
+    public setStorageContents(contents: IStorageData): void {
         this._storage = contents;
     }
 

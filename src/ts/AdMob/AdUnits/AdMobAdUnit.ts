@@ -16,16 +16,20 @@ import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
+    adMobSignalFactory: AdMobSignalFactory;
+    privacy: Privacy;
 }
 
 export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _options: any;
+    private _options: unknown;
     private _keyDownListener: (kc: number) => void;
     private _campaign: AdMobCampaign;
     private _placement: Placement;
@@ -106,7 +110,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public sendStartEvent() {
         this._ads.Listener.sendStartEvent(this._placement.getId());
         this.sendTrackingEvent('start');
-        this._operativeEventManager.sendStart(this.getOperativeEventParams());
+        this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
+            this.onStartProcessed.trigger();
+        });
     }
 
     public sendSkipEvent() {

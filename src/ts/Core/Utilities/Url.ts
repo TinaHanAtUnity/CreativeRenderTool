@@ -78,7 +78,7 @@ export class Url {
         };
     }
 
-    public static addParameters(url: string, parameters: { [key: string]: any }): string {
+    public static addParameters(url: string, parameters: { [key: string]: unknown }): string {
         let newUrl: string = url.toString();
         if(newUrl.indexOf('?') !== -1) {
             newUrl += '&';
@@ -89,7 +89,7 @@ export class Url {
         const pairs: string[] = [];
         for(const key in parameters) {
             if(parameters.hasOwnProperty(key)) {
-                const value: string = parameters[key];
+                const value = <string>parameters[key];
                 if(value !== undefined) {
                     pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
                 }

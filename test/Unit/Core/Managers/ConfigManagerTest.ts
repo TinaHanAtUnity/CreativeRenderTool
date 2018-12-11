@@ -24,7 +24,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
         let backend: Backend;
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
-        let configPromise: Promise<INativeResponse>;
+        let configPromise: Promise<unknown>;
         let wakeUpManager: WakeUpManager;
         let metaDataManager: MetaDataManager;
         let request: RequestManager;

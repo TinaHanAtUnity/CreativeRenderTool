@@ -117,7 +117,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
         this.addCustomTracking(trackingUrls);
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         let portrait;
         const portraitAsset = this.get('portrait');
         if (portraitAsset) {

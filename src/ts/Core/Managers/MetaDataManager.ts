@@ -2,7 +2,8 @@ import { ICoreApi } from 'Core/ICore';
 import { BaseMetaData } from 'Core/Models/MetaData/BaseMetaData';
 
 export class MetaDataManager {
-    private _metaDataCache: { [key: string]: any } = {};
+
+    private _metaDataCache: { [key: string]: unknown } = {};
     private _core: ICoreApi;
 
     constructor(core: ICoreApi) {
@@ -13,7 +14,7 @@ export class MetaDataManager {
         let metaData: T = new MetaDataConstructor();
 
         if (this._metaDataCache[metaData.getCategory()]) {
-            metaData = this._metaDataCache[metaData.getCategory()];
+            metaData = <T>this._metaDataCache[metaData.getCategory()];
             if(!keys) {
                 return Promise.resolve(metaData);
             }

@@ -62,7 +62,7 @@ export abstract class WebPlayerContainer {
         return this._ads.WebPlayer.setEventSettings(eventSettings, this._viewId);
     }
 
-    public sendEvent(args: any[]): Promise<void> {
+    public sendEvent(args: unknown[]): Promise<void> {
         return this._ads.WebPlayer.sendEvent(args, this._viewId);
     }
 
