@@ -24,7 +24,7 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
 
     private _callButtonVisible: boolean = false;
 
-    private _fadeTimer: any;
+    private _fadeTimer?: number;
     private _fadeStatus: boolean = true;
     private _campaign: Campaign;
 
@@ -98,7 +98,7 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
         }
 
         if(this._fadeEnabled && !this._fadeTimer && this._skipRemaining <= 0) {
-            this._fadeTimer = setTimeout(() => {
+            this._fadeTimer = window.setTimeout(() => {
                 this.fade(true);
                 this._fadeTimer = undefined;
             }, 3000);

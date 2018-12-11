@@ -70,8 +70,8 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         this._core = core;
     }
 
-    public fetch(): Promise<any[]> {
-        const promises: Promise<any>[] = [];
+    public fetch(): Promise<unknown[]> {
+        const promises: Promise<unknown>[] = [];
 
         promises.push(this._core.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this.set('advertisingIdentifier', advertisingIdentifier)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._core.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this.set('limitAdTracking', limitAdTracking)).catch(err => this.handleDeviceInfoError(err)));
@@ -231,7 +231,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         return this.get('totalMemory');
     }
 
-    public getDTO(): Promise<any> {
+    public getDTO(): Promise<{ [key: string]: unknown }> {
         return this.getAnonymousDTO().then(dto => {
             if(this.getAdvertisingIdentifier()) {
                 dto.advertisingTrackingId = this.getAdvertisingIdentifier();
@@ -242,8 +242,8 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         });
     }
 
-    public getAnonymousDTO(): Promise<any> {
-        return Promise.all<any>([
+    public getAnonymousDTO(): Promise<{ [key: string]: unknown }> {
+        return Promise.all<unknown>([
             this.getConnectionType().catch(err => this.handleDeviceInfoError(err)),
             this.getNetworkType().catch(err => this.handleDeviceInfoError(err)),
             this.getNetworkOperator().catch(err => this.handleDeviceInfoError(err)),
@@ -297,8 +297,8 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         });
     }
 
-    public getStaticDTO(): any {
-        const dto: any = this.getAnonymousStaticDTO();
+    public getStaticDTO(): { [key: string]: unknown } {
+        const dto = this.getAnonymousStaticDTO();
 
         if(this.getAdvertisingIdentifier()) {
             dto.advertisingTrackingId = this.getAdvertisingIdentifier();
@@ -308,7 +308,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         return dto;
     }
 
-    public getAnonymousStaticDTO(): any {
+    public getAnonymousStaticDTO(): { [key: string]: unknown } {
         return {
             'osVersion': this.getOsVersion(),
             'deviceModel': this.getModel(),
@@ -320,7 +320,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         };
     }
 
-    protected handleDeviceInfoError(error: any) {
+    protected handleDeviceInfoError(error: unknown) {
         this._core.Sdk.logWarning(JSON.stringify(error));
     }
 }

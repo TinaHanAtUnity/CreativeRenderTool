@@ -29,7 +29,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
         });
 
         it('should fetch correctly', () => {
-            backend.Api.Storage.setStorageContents({
+            backend.Api.Storage.setStorageContents(<any>{
                 player: {
                     server_id: {value: 'test_sid'}
                 }
@@ -52,7 +52,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
         });
 
         it('should not fetch when data is undefined', () => {
-            backend.Api.Storage.setStorageContents({
+            backend.Api.Storage.setStorageContents(<any>{
                 player: {
                     server_id: undefined
                 }

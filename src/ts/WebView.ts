@@ -18,7 +18,7 @@ export class WebView {
         this._core.initialize();
     }
 
-    public show(placementId: string, options: any, callback: INativeCallback): void {
+    public show(placementId: string, options: unknown, callback: INativeCallback): void {
         this._core.Ads.show(placementId, options, callback);
     }
 

@@ -28,9 +28,9 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         }, Platform.IOS, core);
     }
 
-    public fetch(): Promise<any[]> {
+    public fetch(): Promise<unknown[]> {
         return super.fetch().then(() => {
-            const promises: Promise<any>[] = [];
+            const promises: Promise<unknown>[] = [];
 
             promises.push(this._core.DeviceInfo.Ios!.getUserInterfaceIdiom().then(userInterfaceIdiom => this.set('userInterfaceIdiom', userInterfaceIdiom)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._core.DeviceInfo.Ios!.getScreenScale().then(screenScale => this.set('screenScale', screenScale)).catch(err => this.handleDeviceInfoError(err)));
@@ -89,7 +89,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         });
     }
 
-    public getDTO(): Promise<any> {
+    public getDTO(): Promise<{ [key: string]: unknown }> {
         return super.getDTO().then((commonDTO) => {
             return {
                 ...commonDTO,
@@ -100,7 +100,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         });
     }
 
-    public getAnonymousDTO(): Promise<any> {
+    public getAnonymousDTO(): Promise<{ [key: string]: unknown }> {
         return super.getAnonymousDTO().then((commonDTO) => {
             return {
                 ...commonDTO,
@@ -111,7 +111,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         });
     }
 
-    public getStaticDTO(): any {
+    public getStaticDTO(): { [key: string]: unknown } {
         return {
             ... super.getStaticDTO(),
             'screenScale': this.getScreenScale(),
@@ -120,7 +120,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         };
     }
 
-    public getAnonymousStaticDTO(): any {
+    public getAnonymousStaticDTO(): { [key: string]: unknown } {
         return {
             ... super.getAnonymousStaticDTO(),
             'screenScale': this.getScreenScale(),

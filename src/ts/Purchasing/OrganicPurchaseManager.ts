@@ -1,4 +1,3 @@
-
 import { StorageType, StorageApi } from 'Core/Native/Storage';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Url } from 'Core/Utilities/Url';
@@ -53,7 +52,7 @@ export class OrganicPurchase extends Model<IOrganicPurchase> {
         return this.get('ts');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'productId': this.getId(),
             'price': this.getPrice(),

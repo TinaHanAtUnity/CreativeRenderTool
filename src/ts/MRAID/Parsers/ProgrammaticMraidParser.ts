@@ -7,13 +7,18 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { IRawPerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+
+export interface IRawMRAIDCampaign extends IRawPerformanceCampaign {
+    markup?: string;
+}
 
 export class ProgrammaticMraidParser extends CampaignParser {
 
     public static ContentType = 'programmatic/mraid';
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
-        const jsonMraid = response.getJsonContent();
+        const jsonMraid = <IRawMRAIDCampaign>response.getJsonContent();
 
         if(!jsonMraid) {
             throw new Error('Corrupted mraid content');

@@ -1,4 +1,4 @@
-import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { AdUnitStyle, IAdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
@@ -12,7 +12,12 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IMRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
+import {
+    IPerformanceCampaign,
+    IRawPerformanceCampaign,
+    PerformanceCampaign,
+    StoreName
+} from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
@@ -38,7 +43,7 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeMRAID = 'comet/mraid-url';
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
-        const json = response.getJsonContent();
+        const json = <IRawPerformanceCampaign>response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;
@@ -165,7 +170,7 @@ export class CometCampaignParser extends CampaignParser {
         return urls;
     }
 
-    private parseAdUnitStyle(adUnitStyleJson: any, session: Session): AdUnitStyle | undefined {
+    private parseAdUnitStyle(adUnitStyleJson: IAdUnitStyle, session: Session): AdUnitStyle | undefined {
         let adUnitStyle: AdUnitStyle | undefined;
         try {
             if (!adUnitStyleJson) {
