@@ -1,6 +1,10 @@
-# Pending
+# Staged
 
+* Use env.revision for commit id [#7510](https://github.com/Applifier/unity-ads-webview/pull/7510)
+* Add AdUnitParametersFactory to reduce clutter of Ads and AdUnitFactory [#7321](https://github.com/Applifier/unity-ads-webview/pull/7321)
 * Remove Show install now button after 0,5s experiment [#7517](https://github.com/Applifier/unity-ads-webview/pull/7517)
+* Add logic to use commit id of deployed webview [#7518](https://github.com/Applifier/unity-ads-webview/pull/7518)
+* Refactor any to unknown [#7319](https://github.com/Applifier/unity-ads-webview/pull/7319)
 
 # Mon Dec 10 22:50:56 UTC 2018
 
