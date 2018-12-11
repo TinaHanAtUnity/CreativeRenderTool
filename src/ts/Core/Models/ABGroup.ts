@@ -47,4 +47,3 @@ export const FPSCollectionTest = new ABTest(8);
 
 export const AuctionV5Test = new ABTest(10, 11, 12, 14, 15, 16, 17, 18, 19);
 export const InstantInstallNowTest = new ABTest(5, 6);
-export const AndroidBackButtonSkipTest = new ABTest(7, 8);

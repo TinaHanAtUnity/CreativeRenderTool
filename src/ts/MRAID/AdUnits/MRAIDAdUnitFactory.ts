@@ -12,8 +12,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { Platform } from 'Core/Constants/Platform';
-import { AndroidBackButtonSkipTest } from 'Core/Models/ABGroup';
+import { MraidIFrameEventBridge } from 'MRAID/Views/MraidIFrameEventBridge';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
     public createAdUnit(parameters: IMRAIDAdUnitParameters): MRAIDAdUnit {
@@ -24,22 +23,6 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMR
         const EventHandler =  (isSonicPlayable || isPlayable) ? PlayableEventHandler : MRAIDEventHandler;
         const mraidEventHandler: IMRAIDViewHandler = new EventHandler(mraidAdUnit, parameters);
         parameters.mraid.addEventHandler(mraidEventHandler);
-
-        if (parameters.platform === Platform.ANDROID) {
-            const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
-                const abGroup = parameters.coreConfig.getAbGroup();
-                const backButtonTestEnabled = AndroidBackButtonSkipTest.isValid(abGroup);
-                if(backButtonTestEnabled) {
-                    mraidEventHandler.onKeyEvent(keyCode);
-                }
-            });
-            mraidAdUnit.onClose.subscribe(() => {
-                if(onBackKeyObserver) {
-                    parameters.ads.Android!.AdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
-                }
-            });
-        }
-
         Privacy.setupReportListener(parameters.privacy, mraidAdUnit);
         return mraidAdUnit;
     }
