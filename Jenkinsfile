@@ -71,7 +71,7 @@ pipeline {
 
             steps {
                 script {
-                    def hybridTestBuilders = [:]
+                    hybridTestBuilders = [:]
 
                     ['hybrid-test-android','hybrid-test-ios'].each {
                         stage -> hybridTestBuilders[stage] = {
@@ -93,7 +93,7 @@ pipeline {
                         }
                     }
 
-                    def systemTestBuilders = [:]
+                    systemTestBuilders = [:]
                     def nativeBranch = env.CHANGE_BRANCH.replace("staging/", "");
 
                     ['systest-android','systest-ios'].each {
