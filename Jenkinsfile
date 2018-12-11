@@ -22,15 +22,16 @@ pipeline {
             when {
                 expression { env.BRANCH_NAME =~ /^PR-/ }
             }
+            steps {
+                script {
+                    def commitMessage = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
 
-            script {
-                def commitMessage = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
-
-                if (commitMessage =~ /^Merge branch 'master'/) {
-                    webviewBranch = "${env.CHANGE_BRANCH}/${env.GIT_COMMIT}"
-                } else {
-                    def commitId = sh(returnStdout: true, script: 'git rev-parse HEAD^1').trim()
-                    webviewBranch = "${env.CHANGE_BRANCH}/${commitId}"
+                    if (commitMessage =~ /^Merge branch 'master'/) {
+                        webviewBranch = "${env.CHANGE_BRANCH}/${env.GIT_COMMIT}"
+                    } else {
+                        def commitId = sh(returnStdout: true, script: 'git rev-parse HEAD^1').trim()
+                        webviewBranch = "${env.CHANGE_BRANCH}/${commitId}"
+                    }
                 }
             }
 
