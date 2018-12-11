@@ -474,7 +474,7 @@ $checkbox-group-container($scale-size = $default-scale-size, $context-font-size 
   }
 
   .checkbox-item-container {
-    margin: $default-size 0 $default-size 0;
+    margin: .75 * $default-size 0 .75 * $default-size 0;
   }
 
   .indented-checkbox {
@@ -488,15 +488,15 @@ $checkbox-group-container($scale-size = $default-scale-size, $context-font-size 
     .sub-box-line {
       position: absolute;
       width: .75 * $default-size;
-      height: 1.25 * $default-size;
+      height: 1 * $default-size;
       border-bottom: 1px solid $light-gray;
       border-left: 1px solid $light-gray;
-      transform: translate(.3 * $default-size, -.9 * $default-size);
+      transform: translate(.3 * $default-size, -.65 * $default-size);
     }
 
     .two-lines.sub-box-line {
-      height: 1.9 * $default-size;
-      transform: translate(.3 * $default-size, -1.6 * $default-size);
+      height: 1.65 * $default-size;
+      transform: translate(.3 * $default-size, -1.35 * $default-size);
     }
   }
 }
