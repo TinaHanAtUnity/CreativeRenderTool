@@ -19,6 +19,7 @@ import {
     StoreName
 } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 // Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
 export enum ICometTrackingUrlEvents {
@@ -137,7 +138,7 @@ export class CometCampaignParser extends CampaignParser {
                 videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
-                adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle)
+                adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle, session)
             };
 
             if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
@@ -169,7 +170,7 @@ export class CometCampaignParser extends CampaignParser {
         return urls;
     }
 
-    private parseAdUnitStyle(adUnitStyleJson: IAdUnitStyle): AdUnitStyle | undefined {
+    private parseAdUnitStyle(adUnitStyleJson: IAdUnitStyle, session: Session): AdUnitStyle | undefined {
         let adUnitStyle: AdUnitStyle | undefined;
         try {
             if (!adUnitStyleJson) {
@@ -177,10 +178,10 @@ export class CometCampaignParser extends CampaignParser {
             }
             adUnitStyle = new AdUnitStyle(adUnitStyleJson);
         } catch(error) {
-            Diagnostics.trigger('configuration_ad_unit_style_parse_error', {
+            SessionDiagnostics.trigger('configuration_ad_unit_style_parse_error', {
                 adUnitStyle: adUnitStyleJson,
                 error: error
-            });
+            }, session);
         }
         return adUnitStyle;
     }
