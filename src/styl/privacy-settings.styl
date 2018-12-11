@@ -34,7 +34,8 @@
   .view-container {
     position: relative;
     overflow: auto;
-    height: 80%;
+    max-height: 90%;
+    min-height: 90%;
     border-top-left-radius: $default-size;
     border-top-right-radius: $default-size;
     background: $white;
@@ -51,8 +52,7 @@
     .privacy-logo {
       padding: $default-size;
       color: $black;
-      font-size: $default-size;
-      opacity: .5;
+      font-size: 1.5 * $default-size;
     }
 
     .settings-button {
@@ -60,10 +60,19 @@
       flex-direction: column;
       margin: .5 * $default-size 0;
       padding: $default-size;
+      border-radius: .25 * $default-size;
       background: $white-smoke;
       text-align: center;
       font-weight: $privacy-title-font-weight;
       font-size: $privacy-text-font-size;
+    }
+
+    .settings-button {
+      font-weight: $privacy-title-font-weight;
+    }
+
+    .info-container {
+      padding-top: $default-size;
     }
   }
 
@@ -77,6 +86,7 @@
       background-color: $blue;
       color: $white;
       text-align: center;
+      font-weight: $privacy-title-font-weight;
     }
   }
 
@@ -92,11 +102,16 @@
     .back-button {
       display: none;
     }
+    .view-container {
+      animation: page-animation-min-to-max .3s ease-out;
+    }
   }
 
   &:not(.initial) {
     .view-container {
-      height: auto;
+      min-height: 0;
+      max-height: 50%;
+      animation: page-animation-max-to-min .3s ease-out;
     }
     .main-view-container {
       display: none;
@@ -142,4 +157,35 @@
     font-weight: $privacy-text-font-weight = 300;
   }
 
+  @keyframes page-animation-min-to-max {
+    0% {
+      min-height: 0;
+      max-height: 50%;
+    }
+    50% {
+      min-height: 10%;
+      max-height: 10%;
+    }
+
+    100% {
+      min-height: 90%;
+      max-height: 90%;
+    }
+  }
+
+  @keyframes page-animation-max-to-min {
+    0% {
+      min-height: 90%;
+      max-height: 90%;
+    }
+    50% {
+      min-height: 10%;
+      max-height: 10%;
+    }
+
+    100% {
+      min-height: 0;
+      max-height: 50%;
+    }
+  }
 }
