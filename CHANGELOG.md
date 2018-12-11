@@ -1,5 +1,19 @@
 # Staged
 
+* Use env.revision for commit id [#7510](https://github.com/Applifier/unity-ads-webview/pull/7510)
+* Add AdUnitParametersFactory to reduce clutter of Ads and AdUnitFactory [#7321](https://github.com/Applifier/unity-ads-webview/pull/7321)
+* Remove Show install now button after 0,5s experiment [#7517](https://github.com/Applifier/unity-ads-webview/pull/7517)
+* Add logic to use commit id of deployed webview [#7518](https://github.com/Applifier/unity-ads-webview/pull/7518)
+* Refactor any to unknown [#7319](https://github.com/Applifier/unity-ads-webview/pull/7319)
+* Send ad plan with configuration_ad_unit_style_parse_error diagnostic error [#7511](https://github.com/Applifier/unity-ads-webview/pull/7511)
+* Use CHANGE_BRANCH instead of BRANCH_NAME [#7540](https://github.com/Applifier/unity-ads-webview/pull/7540)
+
+# Mon Dec 10 22:50:56 UTC 2018
+
+* Ramp up Auction V5 to 45% of traffic [#7514](https://github.com/Applifier/unity-ads-webview/pull/7514)
+
+# Mon Dec 10 13:52:58 UTC 2018
+
 * Disable app sheet on iOS 12 [#7489](https://github.com/Applifier/unity-ads-webview/pull/7489)
 * Make call-button start the transition from further off the screen [#7414](https://github.com/Applifier/unity-ads-webview/pull/7414)
 * Remove the old Overlay [#7413](https://github.com/Applifier/unity-ads-webview/pull/7413)

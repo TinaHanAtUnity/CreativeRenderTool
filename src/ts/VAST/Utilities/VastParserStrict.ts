@@ -56,7 +56,7 @@ export class VastParserStrict {
 
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
-    private _rootWrapperVast: any;
+    private _rootWrapperVast: unknown;
 
     constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH) {
         this._domParser = domParser || VastParserStrict.createDOMParser();
@@ -135,12 +135,18 @@ export class VastParserStrict {
         try {
             parsedVast = this.parseVast(vast);
         } catch (e) {
-            const errorData: any = {
-                vast: vast,
-                wrapperDepth: depth
-            };
+            let errorData: object;
             if (depth > 0) {
-                errorData.rootWrapperVast = this._rootWrapperVast;
+                errorData = {
+                    vast: vast,
+                    wrapperDepth: depth,
+                    rootWrapperVast: this._rootWrapperVast
+                };
+            } else {
+                errorData = {
+                    vast: vast,
+                    wrapperDepth: depth
+                };
             }
             throw new DiagnosticError(e, errorData);
         }

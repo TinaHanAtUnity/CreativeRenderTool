@@ -13,7 +13,7 @@ interface IVastCreativeCompanionAd {
 
 export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
 
-    constructor(id: string | null, height: number | null, width: number | null, creativeType?: string, staticResourceURL?: string, companionClickThroughURLTemplate?: string, trackingEvents?: { [eventName: string]: string[] }) {
+    constructor(id: string | null, height: number | null, width: number | null, creativeType?: string | null, staticResourceURL?: string | null, companionClickThroughURLTemplate?: string | null, trackingEvents?: { [eventName: string]: string[] }) {
         super('VastCreativeCompanionAd', {
             id: ['string', 'null'],
             width: ['number'],
@@ -84,7 +84,7 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
         return this.get('width');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'id': this.getId(),
             'width': this.getWidth(),

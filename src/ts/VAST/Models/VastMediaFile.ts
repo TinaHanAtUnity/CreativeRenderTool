@@ -17,8 +17,9 @@ interface IVastMediaFile {
 }
 
 export class VastMediaFile extends Model<IVastMediaFile> {
+    constructor();
     constructor(fileURL?: string, deliveryType?: string | null, codec?: string | null, mimeType?: string | null, bitrate?: number,
-                minBitrate?: number, maxBitrate?: number, width?: number, height?: number, apiFramework?: string | null, fileSize?: number) {
+        minBitrate?: number, maxBitrate?: number, width?: number, height?: number, apiFramework?: string | null, fileSize?: number) {
         super('VastMediaFile', {
             fileURL: ['string', 'null'],
             deliveryType: ['string'],
@@ -102,7 +103,7 @@ export class VastMediaFile extends Model<IVastMediaFile> {
         return this.get('fileSize');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'fileURL': this.getFileURL(),
             'deliveryType': this.getDeliveryType(),

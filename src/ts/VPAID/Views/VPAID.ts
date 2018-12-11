@@ -22,7 +22,7 @@ interface InitAdOptions {
 export interface IVPAIDHandler {
     onVPAIDCompanionClick(): void;
     onVPAIDCompanionView(): void;
-    onVPAIDEvent(eventType: string, args: any[]): void;
+    onVPAIDEvent(eventType: string, args: unknown[]): void;
     onVPAIDStuck(): void;
     onVPAIDSkip(): void;
     onVPAIDProgress(duration: number, remainingTime: number): void;
@@ -138,7 +138,7 @@ export class VPAID extends View<IVPAIDHandler> {
                     bitrate: 500,
                     viewMode: 'normal',
                     creativeData: {
-                        AdParameters: this.decodeHTMLEntityChars(this._campaign.getVPAID().getCreativeParameters())
+                        AdParameters: this.decodeHTMLEntityChars(<string>this._campaign.getVPAID().getCreativeParameters()!)
                     }
                 };
             });
@@ -150,27 +150,27 @@ export class VPAID extends View<IVPAIDHandler> {
         return textArea.value;
     }
 
-    private sendEvent(event: string, parameters?: any[]): Promise<void> {
-        const webPlayerParams: any[] = [event];
+    private sendEvent(event: string, parameters?: unknown[]): Promise<void> {
+        const webPlayerParams: unknown[] = [event];
         if (parameters) {
             webPlayerParams.push(parameters);
         }
         return this._webPlayerContainer.sendEvent(webPlayerParams);
     }
 
-    private onWebPlayerEvent(args: any[]) {
+    private onWebPlayerEvent(args: unknown[]) {
         const eventType = args.shift();
-        const params = args.shift();
+        const params = <unknown[]>args.shift();
 
         switch (eventType) {
             case 'progress':
-                this._handlers.forEach(handler => handler.onVPAIDProgress(params[0], params[1]));
+                this._handlers.forEach(handler => handler.onVPAIDProgress(<number>params[0], <number>params[1]));
                 if (!this._isPaused) {
                     // this._stuckTimer.reset();
                 }
                 break;
             case 'VPAID':
-                this._handlers.forEach(handler => handler.onVPAIDEvent(params.shift(), params.shift()));
+                this._handlers.forEach(handler => handler.onVPAIDEvent(<string>params.shift(), <unknown[]>params.shift()));
                 break;
             case 'ready':
                 this.onVPAIDContainerReady();

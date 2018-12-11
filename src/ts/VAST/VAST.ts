@@ -1,7 +1,7 @@
 import { AbstractParserModule, IContentTypeHandler } from 'Ads/Modules/AbstractParserModule';
 import { VastAdUnitFactory } from 'VAST/AdUnits/VastAdUnitFactory';
 import { ProgrammaticVastParser, ProgrammaticVastParserStrict } from 'VAST/Parsers/ProgrammaticVastParser';
-import { VastParsingStrictTest, ABGroup } from 'Core/Models/ABGroup';
+import { VastParsingStrictTest } from 'Core/Models/ABGroup';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
 import { VastAdUnitParametersFactory } from 'VAST/AdUnits/VastAdUnitParametersFactory';

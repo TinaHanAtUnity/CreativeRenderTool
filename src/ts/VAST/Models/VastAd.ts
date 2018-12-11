@@ -136,7 +136,7 @@ export class VastAd extends Model<IVastAd> {
         }
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         const vastCreatives = [];
         for (const vastCreative of this.get('creatives')) {
             vastCreatives.push(vastCreative.getDTO());

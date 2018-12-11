@@ -71,7 +71,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this.setAnalyticsBackgroundTime(viewable);
     }
 
-    protected sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
+    protected sendMraidAnalyticsEvent(eventName: string, eventData?: unknown) {
         const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
         const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;
@@ -95,7 +95,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private loadIframe(): void {
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
         this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
 
         this.createMRAID(
@@ -107,7 +107,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             iframe.srcdoc = mraid;
 
             if (CustomFeatures.isSonicPlayable(this._creativeId)) {
-                iframe.sandbox = 'allow-scripts allow-same-origin';
+                iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
             }
         }).catch(e => {
             this._core.Sdk.logError('failed to create mraid: ' + e.message);

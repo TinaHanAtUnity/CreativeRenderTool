@@ -45,7 +45,7 @@ describe('VastLinearCreativeValidatorTest', () => {
             const creative = new VastCreativeLinear(
                 -1,
                 -1,
-                [new VastMediaFile('file://mycoolVideo.mp4', 'video', 'codec', 'mp4', 2000, 100, 5000, 200, 200, 'apiFramework', 20), new VastMediaFile()],
+                [new VastMediaFile('file://mycoolVideo.mp4', 'video', 'codec', 'mp4', 2000, 100, 5000, 200, 200, 'apiFramework', 20)],
                 'com/clickThrough?someQuery=test&other=no',
                 ['htt', 'https://reddit.com/thridparty/click?someQuery=test&other=no'],
                 [''],

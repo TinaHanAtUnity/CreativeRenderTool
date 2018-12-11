@@ -13,12 +13,12 @@ interface IVastCreativeLinear extends IVastCreative {
 
 export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
     constructor();
-    constructor(duration: number, skipDelay: number, mediaFiles: any[],
+    constructor(duration: number, skipDelay: number, mediaFiles: unknown[],
         videoClickThroughURLTemplate: string, videoClickTrackingURLTemplates: string[],
-        videoCustomClickURLTemplates: string[], adParameters: string);
-    constructor(duration?: number, skipDelay?: number, mediaFiles?: any[],
+        videoCustomClickURLTemplates: string[], adParameters: unknown);
+    constructor(duration?: number, skipDelay?: number, mediaFiles?: unknown[],
                 videoClickThroughURLTemplate?: string, videoClickTrackingURLTemplates?: string[],
-                videoCustomClickURLTemplates?: string[], adParameters?: string) {
+                videoCustomClickURLTemplates?: string[], adParameters?: unknown) {
         super('VastCreativeLinear', {
             type: ['string'],
             trackingEvents: ['object'],
@@ -33,11 +33,11 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
 
         this.set('duration', duration || 0);
         this.set('skipDelay', skipDelay || null);
-        this.set('mediaFiles', mediaFiles || []);
+        this.set('mediaFiles', <VastMediaFile[]>mediaFiles || []);
         this.set('videoClickThroughURLTemplate', videoClickThroughURLTemplate || null);
         this.set('videoClickTrackingURLTemplates', videoClickTrackingURLTemplates || []);
         this.set('videoCustomClickURLTemplates', videoCustomClickURLTemplates || []);
-        this.set('adParameters', adParameters || null);
+        this.set('adParameters', <string>adParameters || null);
     }
 
     public setAdParameters(adParameters: string) {
@@ -92,7 +92,7 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
         return this.get('adParameters');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         const mediaFiles = [];
         for (const mediaFile of this.getMediaFiles()) {
             mediaFiles.push(mediaFile.getDTO());

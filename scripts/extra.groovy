@@ -14,9 +14,21 @@ def waitWebviewDeployed(webviewBranch) {
 }
 
 def main() {
-    webviewBranch = "${env.CHANGE_BRANCH}/${env.revision}"
+    def commitMessage = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
 
     if (env.BRANCH_NAME =~ /^PR-/) {
+        // Jenkins does automatic merge of master to PR branch
+        // producing *local commit* id (var 'env.revision').
+        // That value is equal to commit id of deployed webview
+        // only if master was merged to PR branch in the commit,
+        // otherwise HEAD-1 is the commit id of deployed webview.
+        if (commitMessage =~ /^Merge branch 'master'/) {
+            webviewBranch = "${env.CHANGE_BRANCH}/${env.revision}"
+        } else {
+            def commitId = sh(returnStdout: true, script: 'git rev-parse HEAD^1').trim()
+            webviewBranch = "${env.CHANGE_BRANCH}/${commitId}"
+        }
+
         stage('Wait for webview deployment') {
             parallel (
                 'checkout-helpers': {
@@ -68,6 +80,7 @@ def main() {
             }
 
             def systemTestBuilders = [:]
+            def nativeBranch = env.CHANGE_BRANCH.replace("staging/", "");
 
             ['systest-android','systest-ios'].each {
                 stage -> systemTestBuilders[stage] = {
@@ -77,7 +90,7 @@ def main() {
                       propagate: false,
                       wait: false,
                       parameters: [
-                        string(name: 'WEBVIEW_BRANCH', value: env.BRANCH_NAME),
+                        string(name: 'WEBVIEW_BRANCH', value: env.CHANGE_BRANCH),
                         string(name: 'UNITY_ADS_ANDROID_BRANCH', value: nativeBranch),
                         string(name: 'UNITY_ADS_IOS_BRANCH', value: nativeBranch)
                       ],
@@ -86,9 +99,7 @@ def main() {
             }
 
             dir('results') {
-                if (env.BRANCH_NAME =~ /^staging/) { // run deployment tests
-                    nativeBranch = env.BRANCH_NAME.replace("staging/", "");
-
+                if (env.CHANGE_BRANCH =~ /^staging/) { // run deployment tests
                     parallel (hybridTestBuilders + systemTestBuilders)
 
                 } else { // run only hybrid tests
