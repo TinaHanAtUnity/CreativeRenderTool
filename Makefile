@@ -246,12 +246,12 @@ lint:
 	parallel --ungroup ::: \
 		"$(STYLINT) $(SOURCE_DIR)/styl -c stylintrc.json" \
 		"$(TSLINT) --project tsconfig.json $(TS_SOURCES)" \
-		"$(TSLINT) --project tsconfig.json --config tslint.test.json $(TESTS)"
+		"$(TSLINT) --project tsconfig.json --config test/tslint.json $(TESTS)"
 
 lint-fix:
 	parallel --ungroup ::: \
 		"$(TSLINT) --project tsconfig.json --fix $(TS_SOURCES)" \
-		"$(TSLINT) --project tsconfig.json --config tslint.test.json --fix $(TESTS)"
+		"$(TSLINT) --project tsconfig.json --config test/tslint.json --fix $(TESTS)"
 
 setup: clean
 	rm -rf node_modules
