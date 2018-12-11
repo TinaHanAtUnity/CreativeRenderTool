@@ -1,3 +1,7 @@
+# Pending
+
+* Remove Show install now button after 0,5s experiment [#7517](https://github.com/Applifier/unity-ads-webview/pull/7517)
+
 # Mon Dec 10 22:50:56 UTC 2018
 
 * Ramp up Auction V5 to 45% of traffic [#7514](https://github.com/Applifier/unity-ads-webview/pull/7514)
