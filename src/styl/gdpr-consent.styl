@@ -21,15 +21,16 @@
   }
 
   .consent-container {
-    position: absolute;
-    width: 80%;
-    background: white;
+    position: relative;
+    padding: 2 * $default-size 2 * $default-size 1.5 * $default-size 2 * $default-size;
+    margin: 0 2 * $default-size;
     align-self: center;
     border-radius: .5 * $default-size;
+    background: white;
   }
 
   .item {
-    padding: .75 * $default-size $default-size;
+    margin: 0 0 1.5 * $default-size 0;
   }
 
   .privacy-logo {
@@ -37,14 +38,12 @@
     text-align: center;
     color: $black;
     opacity: .5;
-    padding: 2 * $default-size 0 0 0;
   }
 
   .agree,
   .show-options {
   }
   .title {
-    padding-top: $default-size;
     font-weight: $privacy-title-font-weight;
   }
   .description {
@@ -56,11 +55,12 @@
   .agree {
     background-color: $blue;
     color: $white;
-    margin-bottom: .75 * $default-size;
+    margin-bottom: .5 * $default-size;
   }
 
   .consent-button {
     position: relative;
+    padding: $default-size;
     border-radius: $default-size * .25;
     border: 1px solid $light-gray;
     font-size: $privacy-text-font-size;
