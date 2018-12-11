@@ -14,10 +14,10 @@ export class MRAIDWebPlayerEventAdapter extends MRAIDEventAdapter {
         this._container = container;
 
         this._mraidHandlers[MRAIDEvents.RESIZE_WEBVIEW] = () => this.handleResizeWebview();
-        this._mraidHandlers[MRAIDEvents.ORIENTATION] = (msg: any) => this.handleSetOrientationProperties(<IMRAIDOrientationProperties>msg[0]);
-        this._mraidHandlers[MRAIDEvents.OPEN] = (msg: any) => this.handleOpen(msg[0]);
-        this._mraidHandlers[MRAIDEvents.ANALYTICS_EVENT] = (msg: any) => this.handleAnalyticsEvent(msg[0], msg[1]);
-        this._mraidHandlers[MRAIDEvents.STATE_CHANGE] = (msg: any) => this.handleCustomState(msg[0]);
+        this._mraidHandlers[MRAIDEvents.ORIENTATION] = (msg) => this.handleSetOrientationProperties(<IMRAIDOrientationProperties>msg[0]);
+        this._mraidHandlers[MRAIDEvents.OPEN] = (msg) => this.handleOpen(<string>msg[0]);
+        this._mraidHandlers[MRAIDEvents.ANALYTICS_EVENT] = (msg) => this.handleAnalyticsEvent(<string>msg[0], <string>msg[1]);
+        this._mraidHandlers[MRAIDEvents.STATE_CHANGE] = (msg) => this.handleCustomState(<string>msg[0]);
     }
 
     public connect(): void {
@@ -32,19 +32,19 @@ export class MRAIDWebPlayerEventAdapter extends MRAIDEventAdapter {
         this.sendEvent('viewable', [viewable]);
     }
 
-    private onWebPlayerEvent(args: any[]) {
-        const eventType = args.shift();
+    private onWebPlayerEvent(args: unknown[]) {
+        const eventType = <string>args.shift();
         const params = args.shift();
 
         this._core.Sdk.logDebug(`mraid: event=${eventType}, data=${params}`);
         if (eventType in this._mraidHandlers) {
             const handler = this._mraidHandlers[eventType];
-            handler(params);
+            handler(<{ [key: string]: unknown }>params);
         }
     }
 
-    private sendEvent(event: string, parameters?: any[]): Promise<void> {
-        const webPlayerParams: any[] = [event];
+    private sendEvent(event: string, parameters?: unknown[]): Promise<void> {
+        const webPlayerParams: unknown[] = [event];
         if (parameters) {
             webPlayerParams.push(parameters);
         }

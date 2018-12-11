@@ -18,13 +18,13 @@ import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapt
 export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _loadingScreen: HTMLElement;
-    private _loadingScreenTimeout: any;
-    private _prepareTimeout: any;
+    private _loadingScreenTimeout?: number;
+    private _prepareTimeout?: number;
 
     private _iframe: HTMLIFrameElement;
 
     private _localization: Localization;
-    private _configuration: any;
+    private _configuration: unknown;
 
     protected _campaign: PerformanceMRAIDCampaign;
 
@@ -95,7 +95,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private loadIframe(): void {
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
         this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
 
         const container = this.setUpMraidContainer();
@@ -144,12 +144,12 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private showLoadingScreen() {
         this._loadingScreen.style.display = 'block';
-        this._loadingScreenTimeout = setTimeout(() => {
+        this._loadingScreenTimeout = window.setTimeout(() => {
             if(this._isLoaded) {
                 this.showMRAIDAd();
             } else {
                 // start the prepare timeout and wait for the onload event
-                this._prepareTimeout = setTimeout(() => {
+                this._prepareTimeout = window.setTimeout(() => {
                     this._canClose = true;
                     this._closeElement.style.opacity = '1';
                     this._closeElement.style.display = 'block';
@@ -203,7 +203,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    protected sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
+    protected sendMraidAnalyticsEvent(eventName: string, eventData?: unknown) {
         const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
         const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;

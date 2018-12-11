@@ -29,7 +29,7 @@ export interface ICacheCampaignsResponse {
 }
 
 type ICallbackResolveFunction = (value?: [CacheStatus, string]) => void;
-type ICallbackRejectFunction = (reason?: any) => void;
+type ICallbackRejectFunction = (reason?: unknown) => void;
 
 export type HeadersType = [string, string][];
 
@@ -51,6 +51,8 @@ export interface ICacheEvent {
     startTimestamp: number;
     contentLength: number;
 }
+
+export type CachePauseStorageType = { caching: { pause: { value: boolean }}};
 
 export class CacheManager {
 
@@ -105,7 +107,7 @@ export class CacheManager {
         this._core.Cache.onDownloadEnd.subscribe((url, size, totalSize, duration, responseCode, headers) => this.onDownloadEnd(url, size, totalSize, duration, responseCode, headers));
         this._core.Cache.onDownloadStopped.subscribe((url, size, totalSize, duration, responseCode, headers) => this.onDownloadStopped(url, size, totalSize, duration, responseCode, headers));
         this._core.Cache.onDownloadError.subscribe((error, url, message) => this.onDownloadError(error, url, message));
-        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
+        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <CachePauseStorageType>data));
 
         this._core.Storage.get<boolean>(StorageType.PUBLIC, 'caching.pause.value').then(paused => {
             this._paused = paused;
@@ -459,7 +461,7 @@ export class CacheManager {
         }
     }
 
-    private onStorageSet(eventType: string, data: any) {
+    private onStorageSet(eventType: string, data: CachePauseStorageType) {
         let deleteValue: boolean = false;
 
         if(data && data.caching && data.caching.pause && 'value' in data.caching.pause) {

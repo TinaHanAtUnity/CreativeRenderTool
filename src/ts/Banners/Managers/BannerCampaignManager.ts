@@ -2,7 +2,7 @@ import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { AuctionResponse, IAuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
@@ -26,6 +26,22 @@ import { AuctionV5Test } from 'Core/Models/ABGroup';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class NoFillError extends Error {
+}
+
+export interface IRawBannerResponse {
+    auctionId: string;
+    correlationId: string;
+    placements: { [key: string]: string };
+    media: { [key: string]: IAuctionResponse };
+}
+
+export interface IRawBannerV5Response {
+    auctionId: string;
+    correlationId: string;
+    placements: { [key: string]: { mediaId: string; trackingId: string } };
+    realtimeData?: { [key: string]: string };
+    media: { [key: string]: IAuctionResponse };
+    tracking: { [key: string]: ICampaignTrackingUrls };
 }
 
 export class BannerCampaignManager {
@@ -134,7 +150,7 @@ export class BannerCampaignManager {
     }
 
     private parseBannerCampaign(response: INativeResponse, placement: Placement): Promise<Campaign> {
-        const json = JsonParser.parse(response.response);
+        const json = JsonParser.parse<IRawBannerResponse>(response.response);
         const session = new Session(json.auctionId);
 
         if('placements' in json) {
@@ -155,7 +171,7 @@ export class BannerCampaignManager {
     }
 
     private parseAuctionV5BannerCampaign(response: INativeResponse, placement: Placement): Promise<Campaign> {
-        const json = JsonParser.parse(response.response);
+        const json = JsonParser.parse<IRawBannerV5Response>(response.response);
         const session = new Session(json.auctionId);
 
         if ('placements' in json) {

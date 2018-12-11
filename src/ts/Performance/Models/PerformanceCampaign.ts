@@ -1,7 +1,7 @@
-import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { AdUnitStyle, IAdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
-import { Campaign, ICampaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaign, IRawCampaign } from 'Ads/Models/Campaign';
 import { Asset } from 'Ads/Models/Assets/Asset';
 
 export enum StoreName {
@@ -10,6 +10,35 @@ export enum StoreName {
     XIAOMI,
     // for APK campaigns
     STANDALONE_ANDROID
+}
+
+export interface IRawPerformanceCampaign extends IRawCampaign {
+    appStoreId: string;
+    gameId: number;
+    gameName: string;
+    gameIcon: string;
+    rating: number;
+    ratingCount: number;
+    endScreenLandscape?: string;
+    endScreenPortrait?: string;
+    endScreen?: string;
+    trailerDownloadable?: string;
+    trailerDownloadableSize?: number;
+    trailerStreaming?: string;
+    trailerPortraitDownloadable?: string;
+    trailerPortraitDownloadableSize?: number;
+    trailerPortraitStreaming?: string;
+    portraitCreativeId?: string;
+    clickAttributionUrl?: string;
+    clickAttributionUrlFollowsRedirects?: boolean;
+    clickUrl: string;
+    videoEventUrls: { [eventType: string]: string };
+    bypassAppSheet: boolean;
+    store: string;
+    adUnitStyle: IAdUnitStyle;
+    appDownloadUrl?: string;
+    mraidUrl?: string;
+    dynamicMarkup?: string;
 }
 
 export interface IPerformanceCampaign extends ICampaign {
@@ -187,38 +216,38 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('adUnitStyle');
     }
 
-    public getDTO(): { [key: string]: any } {
-        let gameIcon: any;
+    public getDTO(): { [key: string]: unknown } {
+        let gameIcon: unknown;
         const gameIconObject = this.getGameIcon();
         if (gameIconObject) {
             gameIcon = gameIconObject.getDTO();
         }
 
-        let squareImage: any;
+        let squareImage: unknown;
         const squareImageObject = this.getSquare();
         if (squareImageObject) {
             squareImage = squareImageObject.getDTO();
         }
 
-        let landscapeImage: any;
+        let landscapeImage: unknown;
         const landscapeImageObject = this.getLandscape();
         if (landscapeImageObject) {
             landscapeImage = landscapeImageObject.getDTO();
         }
 
-        let portraitImage: any;
+        let portraitImage: unknown;
         const portraitImageObject = this.getPortrait();
         if (portraitImageObject) {
             portraitImage = portraitImageObject.getDTO();
         }
 
-        let video: any;
+        let video: unknown;
         const videoObject = this.getVideo();
         if (videoObject) {
             video = videoObject.getDTO();
         }
 
-        let streamingVideo: any;
+        let streamingVideo: unknown;
         const streamingVideoObject = this.getStreamingVideo();
         if (streamingVideoObject) {
             streamingVideo = streamingVideoObject.getDTO();
