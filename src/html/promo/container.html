@@ -1,6 +1,10 @@
 <html>
 <head>
     <style>
+
+        {DATA_FONT_PORTRAIT}
+        {DATA_FONT_LANDSCAPE}
+
         .noselect {
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -112,6 +116,8 @@
             -webkit-transform: translate(-50%, -50%);
             transform: translate(-50%, -50%);
         }
+
+
         
         #promo .btn-close {
             position: absolute;
@@ -310,7 +316,8 @@
         <span class="animationTimerDuration"><%= data.rewardedPromoTimerDuration %></span>
         <div class="promo-background portrait" style="background-image: url('<%= data.portraitBackgroundImage && data.portraitBackgroundImage.replace("file://", "") %>')">
             <button class="btn-promo" onclick="purchase()" style="background-image: url('<%= data.portraitButtonImage && data.portraitButtonImage.replace("file://", "") %>')">
-                <span class="price-text" style="font-family: <%= data.portraitPriceTextFontFamily %>; color: <%= data.portraitPriceTextFontColor %>; font-size: <%= data.portraitPriceTextFontSize %>vh"><%= data.localizedPrice %></span>
+                <span class="price-text" style="font-family: '<%= data.portraitPriceTextFontFamily  %>'; color: <%= data.portraitPriceTextFontColor %>; font-size: <%= data.portraitPriceTextFontSize %>vh">
+                    <%= data.localizedPrice %></span>
             </button>
 
             <div class="set-size charts-container pie-wrapper progress" style="visibility: hidden">
@@ -328,7 +335,7 @@
 
         <div class="promo-background landscape" style="background-image: url('<%= data.landscapeBackgroundImage && data.landscapeBackgroundImage.replace("file://", "") %>')">
             <button class="btn-promo" onclick="purchase()" style="background-image: url('<%= data.landscapeButtonImage && data.landscapeButtonImage.replace("file://", "") %>')">
-                <span class="price-text" style="font-family: <%= data.landscapePriceTextFontFamily %>; color: <%= data.landscapePriceTextFontColor %>; font-size: <%= data.landscapePriceTextFontSize %>vh"><%= data.localizedPrice %></span>
+                <span class="price-text" style="font-family: '<%= data.landscapePriceTextFontFamily %>'; color: <%= data.landscapePriceTextFontColor %>; font-size: <%= data.landscapePriceTextFontSize %>vh"><%= data.localizedPrice %></span>
             </button>
 
             <div class="set-size charts-container pie-wrapper progress" style="visibility: hidden">

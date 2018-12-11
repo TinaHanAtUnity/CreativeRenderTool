@@ -1,9 +1,14 @@
 import { Model } from 'Core/Models/Model';
-import { PromoAsset } from 'Promo/Models/PromoAsset';
+import { PromoAsset, IRawPromoAsset } from 'Promo/Models/PromoAsset';
 
 export interface IPromoOrientationAsset {
     buttonAsset: PromoAsset;
     backgroundAsset: PromoAsset;
+}
+
+export interface IRawPromoOrientationAsset {
+    button: IRawPromoAsset;
+    background: IRawPromoAsset;
 }
 
 export class PromoOrientationAsset extends Model<IPromoOrientationAsset> {

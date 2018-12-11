@@ -10,7 +10,7 @@ import { View } from 'Core/Views/View';
 import PromoTpl from 'html/Promo.html';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import PromoIndexTpl from 'html/PromoIndex.html';
+import PromoIndexTpl from 'html/promo/container.html';
 
 export class Promo extends View<{}> implements IPrivacyHandler {
 
@@ -29,6 +29,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
     private _privacy: AbstractPrivacy;
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked: boolean = false;
+    private _promoIndexTemplate: string;
 
     constructor(platform: Platform, core: ICoreApi, campaign: PromoCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, placement: Placement) {
         super(platform, 'promo');
@@ -41,6 +42,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
         this._promoCampaign = campaign;
 
         this._messageHandler = (e: Event) => this.onMessage(<MessageEvent>e);
+        this._promoIndexTemplate = PromoIndexTpl;
 
         if(campaign) {
             this._templateData = {
@@ -48,6 +50,8 @@ export class Promo extends View<{}> implements IPrivacyHandler {
                 'isRewardedPromo': !placement.allowSkip(), // Support older promo version
                 'rewardedPromoTimerDuration': !placement.allowSkip() ? 5 : 0
             };
+            let portraitFontURL = '';
+            let landscapeFontURL = '';
             const portraitAssets = campaign.getPortraitAssets();
             if (portraitAssets) {
                 const font = portraitAssets.getButtonAsset().getFont();
@@ -55,8 +59,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
                     this._templateData.portraitPriceTextFontFamily = font.getFamily();
                     this._templateData.portraitPriceTextFontColor = font.getColor();
                     this._templateData.portraitPriceTextFontSize = font.getSize();
-                    const fontURL = font.getUrl();
-                    this._templateData.portraitPriceTextFontURL = fontURL.length > 0 ? fontURL : undefined;
+                    portraitFontURL = font.getUrl();
                 }
                 this._templateData.portraitBackgroundImage = portraitAssets.getBackgroundAsset().getImage().getUrl();
                 this._templateData.portraitButtonImage = portraitAssets.getButtonAsset().getImage().getUrl();
@@ -68,12 +71,13 @@ export class Promo extends View<{}> implements IPrivacyHandler {
                     this._templateData.landscapePriceTextFontFamily = font.getFamily();
                     this._templateData.landscapePriceTextFontColor = font.getColor();
                     this._templateData.landscapePriceTextFontSize = font.getSize();
-                    const fontURL = font.getUrl();
-                    this._templateData.landscapePriceTextFontURL = fontURL.length > 0 ? fontURL : undefined;
+                    landscapeFontURL = font.getUrl();
                 }
                 this._templateData.landscapeBackgroundImage = landscapeAssets.getBackgroundAsset().getImage().getUrl();
                 this._templateData.landscapeButtonImage = landscapeAssets.getButtonAsset().getImage().getUrl();
             }
+            this._promoIndexTemplate = this._promoIndexTemplate.replace('{DATA_FONT_PORTRAIT}', portraitFontURL);
+            this._promoIndexTemplate = this._promoIndexTemplate.replace('{DATA_FONT_LANDSCAPE}', landscapeFontURL);
         }
 
         this._bindings = [
@@ -112,7 +116,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
                 }
             });
         } else {
-            const tpl = new Template(PromoIndexTpl, this._localization);
+            const tpl = new Template(this._promoIndexTemplate, this._localization);
             this._iframe!.setAttribute('srcdoc', tpl.render(this._templateData ? this._templateData : {}));
         }
         this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');

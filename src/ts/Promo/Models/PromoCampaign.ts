@@ -1,21 +1,22 @@
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { IRawLimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
+import { IRawPromoOrientationAsset, PromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
 import { ProductInfo, IRawProductInfo } from 'Promo/Models/ProductInfo';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { PromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
 import { Asset } from 'Ads/Models/Assets/Asset';
 
 export interface IRawPromoCampaign {
     expiry?: string;
     creativeUrl?: string;
     dynamicMarkup: string | undefined;
-    rewardedPromo: boolean;
     limitedTimeOffer: IRawLimitedTimeOfferData | undefined;
     costs: IRawProductInfo[];
     payouts: IRawProductInfo[];
     premiumProduct: IRawProductInfo;
     iapProductId?: string;
+    portrait: IRawPromoOrientationAsset;
+    landscape: IRawPromoOrientationAsset;
 }
 
 export interface IPromoCampaign extends ICampaign {
@@ -153,15 +154,7 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
     }
 
     public getOptionalAssets(): Asset[] {
-        const assetList: Asset[] = [];
-        const orientationResources = this.getOrientationResources();
-        for(const orientationResource of orientationResources) {
-            const font = orientationResource.getButtonAsset().getFont();
-            if (font && font.getOriginalUrl().length > 0) {
-                assetList.push(font);
-            }
-        }
-        return assetList;
+        return [];
     }
 
     public getLimitedTimeOffer(): LimitedTimeOffer | undefined {

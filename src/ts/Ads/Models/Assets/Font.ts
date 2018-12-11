@@ -5,6 +5,7 @@ export interface IFont extends IAsset {
     family: string;
     color: string;
     size: number;
+    url: string;
 }
 
 export class Font extends Asset<IFont> {
@@ -39,7 +40,7 @@ export class Font extends Asset<IFont> {
         return this.get('size');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'family': this.getFamily(),
             'color': this.getColor(),

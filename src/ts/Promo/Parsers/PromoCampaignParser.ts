@@ -11,7 +11,7 @@ import { ILimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTim
 import { IProductInfo, ProductInfo, ProductInfoType, IRawProductInfo } from 'Promo/Models/ProductInfo';
 import { IPromoCampaign, IRawPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { PromoOrientationAsset, IPromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
+import { PromoOrientationAsset, IPromoOrientationAsset, IRawPromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
 import { PromoAsset, IPromoAsset } from 'Promo/Models/PromoAsset';
 import { Image } from 'Ads/Models/Assets/Image';
 import { Font } from 'Ads/Models/Assets/Font';
@@ -54,8 +54,8 @@ export class PromoCampaignParser extends CampaignParser {
                 costs: this.getProductInfoList(promoJson.costs),
                 payouts: this.getProductInfoList(promoJson.payouts),
                 premiumProduct: premiumProduct,
-        portraitAssets: this.getOrientationAssets(promoJson.portrait, session, core),
-        landscapeAssets: this.getOrientationAssets(promoJson.landscape, session, core)
+                portraitAssets: this.getOrientationAssets(promoJson.portrait, session, core),
+                landscapeAssets: this.getOrientationAssets(promoJson.landscape, session, core)
             };
 
             const promoCampaign = new PromoCampaign(promoCampaignParams);
@@ -73,11 +73,14 @@ export class PromoCampaignParser extends CampaignParser {
 
     }
 
-    private getOrientationAssets(orientationJSON: any, session: Session, core: ICoreApi): PromoOrientationAsset | undefined {
+    private getOrientationAssets(orientationJSON: IRawPromoOrientationAsset, session: Session, core: ICoreApi): PromoOrientationAsset | undefined {
         if (orientationJSON === undefined) {
             return undefined;
         }
         const buttonFontJSON = orientationJSON.button.font;
+        if (buttonFontJSON === undefined) {
+            return undefined;
+        }
         const buttonAssetData: IPromoAsset = {
             image: new Image(orientationJSON.button.url, session),
             font: new Font(buttonFontJSON.url, session, buttonFontJSON.family, buttonFontJSON.color, buttonFontJSON.size)

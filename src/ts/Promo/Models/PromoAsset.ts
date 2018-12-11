@@ -1,10 +1,15 @@
 import { Model } from 'Core/Models/Model';
 import { Image } from 'Ads/Models/Assets/Image';
-import { Font } from 'Ads/Models/Assets/Font';
+import { Font, IFont } from 'Ads/Models/Assets/Font';
 
 export interface IPromoAsset {
     image: Image;
     font: Font | undefined;
+}
+
+export interface IRawPromoAsset {
+    url: string;
+    font: IFont | undefined;
 }
 
 export class PromoAsset extends Model<IPromoAsset> {
