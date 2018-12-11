@@ -34,8 +34,9 @@
   .view-container {
     position: relative;
     overflow: auto;
-    max-height: 90%;
+    padding-bottom: 1rem;
     min-height: 90%;
+    max-height: 90%;
     border-top-left-radius: $default-size;
     border-top-right-radius: $default-size;
     background: $white;
@@ -76,13 +77,13 @@
       flex-direction: row;
 
       .row-button {
+        flex-grow: 1;
         padding: $default-size;
         border-radius: .25 * $default-size;
         background: $white-smoke;
         text-align: center;
         font-weight: $privacy-title-font-weight;
         font-size: $privacy-text-font-size;
-        flex-grow: 1;
       }
 
       .report-ad-button {
@@ -99,13 +100,13 @@
     .report-button {
       position: relative;
       padding: .75 * $default-size $default-size;
-      border-radius: $default-size * .25;
       border: 1px solid $light-gray;
-      font-size: $privacy-text-font-size;
+      border-radius: $default-size * .25;
       background-color: $blue;
       color: $white;
       text-align: center;
       font-weight: $privacy-title-font-weight;
+      font-size: $privacy-text-font-size;
     }
   }
 
@@ -172,8 +173,8 @@
   }
 
   .text-small {
-    font-size: $default-font-size * .5;
     font-weight: $privacy-text-font-weight = 300;
+    font-size: $default-font-size * .5;
   }
 
   @keyframes page-animation-min-to-max {
