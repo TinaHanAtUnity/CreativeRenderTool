@@ -22,6 +22,18 @@ pipeline {
             when {
                 expression { env.BRANCH_NAME =~ /^PR-/ }
             }
+
+            script {
+                def commitMessage = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
+
+                if (commitMessage =~ /^Merge branch 'master'/) {
+                    webviewBranch = "${env.CHANGE_BRANCH}/${env.GIT_COMMIT}"
+                } else {
+                    def commitId = sh(returnStdout: true, script: 'git rev-parse HEAD^1').trim()
+                    webviewBranch = "${env.CHANGE_BRANCH}/${commitId}"
+                }
+            }
+
             parallel {
                 stage('checkout-helpers') {
                     steps {
@@ -42,7 +54,6 @@ pipeline {
                     steps {
                         script {
                             try {
-                                def webviewBranch = "$env.CHANGE_BRANCH/$env.GIT_COMMIT"
                                 waitWebviewDeployed(webviewBranch)
                                 runTests = true
                             } catch (FlowInterruptedException interruptEx) {
