@@ -24,6 +24,8 @@ import { ARUtil } from 'AR/Utilities/ARUtil';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { ExtendedMRAID } from 'MRAID/Views/ExtendedMRAID';
+import { MRAIDView, IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
 
 describe('MraidAdUnit', () => {
     const sandbox = sinon.createSandbox();
@@ -58,7 +60,8 @@ describe('MraidAdUnit', () => {
         const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
 
         ads = TestFixtures.getAdsApi(nativeBridge);
-        mraidView = sinon.createStubInstance(MRAID);
+        mraidView = sinon.createStubInstance(ExtendedMRAID);
+        webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
 
         (<sinon.SinonSpy>mraidView.container).restore();
         sandbox.stub(mraidView, 'container').returns(document.createElement('div'));
@@ -74,8 +77,6 @@ describe('MraidAdUnit', () => {
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
         const mraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
-
-        webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform: platform,
@@ -146,6 +147,50 @@ describe('MraidAdUnit', () => {
         });
     });
 
+    [Platform.ANDROID, Platform.IOS].forEach(platform => {
+        describe(`${platform} when ad unit is shown for programmatic MRAID content`, () => {
+
+            let adUnit: MRAIDAdUnit;
+            let webPlayerSetSettings: sinon.SinonSpy;
+            let webPlayerSetEventSettings: sinon.SinonSpy;
+
+            const assertViewsOpened = (views: string[]) => {
+                sinon.assert.calledWith(containerOpen, adUnit, views, true, Orientation.NONE, true, false, true, false, {});
+            };
+
+            const getAdUnitFromView = (view: MRAIDView<IMRAIDViewHandler>, mraidParams: IMRAIDAdUnitParameters, plat: Platform) => {
+                (<sinon.SinonSpy>view.container).restore();
+                sandbox.stub(view, 'container').returns(document.createElement('div'));
+
+                mraidParams.mraid = view;
+                mraidParams.platform = plat;
+                return new MRAIDAdUnit(mraidParams);
+            };
+
+            beforeEach(() => {
+                const view = sinon.createStubInstance(MRAID);
+                adUnit = getAdUnitFromView(view, mraidAdUnitParameters, platform);
+
+                webPlayerSetSettings = <sinon.SinonSpy>webPlayerContainer.setSettings;
+                webPlayerSetEventSettings = <sinon.SinonSpy>webPlayerContainer.setEventSettings;
+
+                return adUnit.show();
+            });
+
+            it('should open the container with webview and webplayer', () => {
+                assertViewsOpened(['webplayer', 'webview']);
+            });
+
+            it('should set the webplayercontainer settings', () => {
+                sinon.assert.called(webPlayerSetSettings);
+            });
+
+            it('should set the webplayercontainer event settings', () => {
+                sinon.assert.called(webPlayerSetEventSettings);
+            });
+        });
+    });
+
     describe('when ad unit is shown', () => {
         let onStartObserver: sinon.SinonSpy;
         let sendStartEventStub: sinon.SinonStub;
@@ -165,7 +210,7 @@ describe('MraidAdUnit', () => {
 
         });
 
-        describe('for MRAID content', () => {
+        describe('for ExtendedMRAID content', () => {
             beforeEach(() => {
                 mraidViewShowSpy = <sinon.SinonSpy>mraidView.show;
                 sendStartEventStub = sandbox.stub(ads.Listener, 'sendStartEvent').returns(Promise.resolve(void(0)));
@@ -184,7 +229,6 @@ describe('MraidAdUnit', () => {
             it('should invoke Listener.sendStartEvent with placementId', () => {
                 sinon.assert.calledWith(sendStartEventStub, 'fooId');
             });
-
             it('should send start operative event', () => {
                 sinon.assert.calledOnce(operativeEventStartStub);
             });

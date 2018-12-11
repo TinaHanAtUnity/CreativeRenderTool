@@ -261,9 +261,9 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private setupContainerView(): Promise<void> {
-        // if (this._mraid instanceof MRAID) {
-        //     return this.setupWebPlayerView();
-        // }
+        if (this._mraid instanceof MRAID) {
+            return this.setupWebPlayerView();
+        }
 
         return this.setupIFrameView();
     }
