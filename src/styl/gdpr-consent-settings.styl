@@ -33,13 +33,13 @@
     opacity: .5;
     width: 2 * $default-size;
     padding: 0 $default-size;
-    height: 8%;
+    height: 6%;
   }
 
   .wrapper {
     display: flex;
+    padding: 1.5 * $default-size;
     height: 92%;
-    width: 100%;
     flex-direction: column;
   }
 
@@ -82,6 +82,7 @@
   }
 
   .accept-all {
+    border: 1px solid $blue;
     background-color: $blue;
     color: $white;
     margin-bottom: .25 * $default-size;
@@ -90,7 +91,8 @@
   .consent-button {
     position: relative;
     border-radius: $default-size * .25;
-    border: 1px solid $light-gray;
+    border: 1px solid $white-smoke;
+    font-weight: $privacy-text-font-weight;
     font-size: $privacy-text-font-size;
 
     &.click-animation {
