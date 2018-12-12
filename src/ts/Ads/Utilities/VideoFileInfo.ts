@@ -16,9 +16,9 @@ export class VideoFileInfo {
         } else {
             const metadataKeys = [VideoMetadata.METADATA_KEY_VIDEO_WIDTH, VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, VideoMetadata.METADATA_KEY_DURATION];
             return cache.Android!.getMetaData(fileId, metadataKeys).then(results => {
-                let width: number = 0;
-                let height: number = 0;
-                let duration: number = 0;
+                let width = 0;
+                let height = 0;
+                let duration = 0;
 
                 for (const entry of results) {
                     const key = entry[0];
@@ -26,15 +26,15 @@ export class VideoFileInfo {
 
                     switch (key) {
                         case VideoMetadata.METADATA_KEY_VIDEO_WIDTH:
-                            width = value;
+                            width = <number>value;
                             break;
 
                         case VideoMetadata.METADATA_KEY_VIDEO_HEIGHT:
-                            height = value;
+                            height = <number>value;
                             break;
 
                         case VideoMetadata.METADATA_KEY_DURATION:
-                            duration = value;
+                            duration = <number>value;
                             break;
 
                         default:

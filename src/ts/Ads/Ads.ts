@@ -18,8 +18,8 @@ import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManager
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { AdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ThirdPartyEventMacro, ThirdPartyEventManagerFactory, IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';
@@ -74,6 +74,7 @@ import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 export class Ads implements IAds {
 
@@ -109,8 +110,8 @@ export class Ads implements IAds {
     public Monetization: Monetization;
     public AR: AR;
 
-    constructor(config: any, core: ICore) {
-        this.Config = AdsConfigurationParser.parse(config, core.ClientInfo);
+    constructor(config: unknown, core: ICore) {
+        this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config, core.ClientInfo);
         this._core = core;
 
         const platform = core.NativeBridge.getPlatform();
@@ -234,7 +235,7 @@ export class Ads implements IAds {
         });
     }
 
-    public show(placementId: string, options: any, callback: INativeCallback): void {
+    public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
 
         if(this._showing) {
@@ -257,6 +258,11 @@ export class Ads implements IAds {
         }
 
         SdkStats.sendShowEvent(placementId);
+
+        if (campaign instanceof PromoCampaign && campaign.getRequiredAssets().length === 0) {
+            this.showError(false, placementId, 'No creatives found for promo campaign');
+            return;
+        }
 
         if(campaign.isExpired()) {
             this.showError(true, placementId, 'Campaign has expired');
@@ -328,7 +334,7 @@ export class Ads implements IAds {
         context.hide();
     }
 
-    private showAd(placement: Placement, campaign: Campaign, options: any) {
+    private showAd(placement: Placement, campaign: Campaign, options: unknown) {
         const testGroup = this._core.Config.getAbGroup();
         const start = Date.now();
 
@@ -496,7 +502,7 @@ export class Ads implements IAds {
         }
 
         if(TestEnvironment.get('creativeUrl')) {
-            const creativeUrl = this._creativeUrl = TestEnvironment.get('creativeUrl');
+            const creativeUrl = this._creativeUrl = TestEnvironment.get<string>('creativeUrl');
             let response: string = '';
             const platform = this._core.NativeBridge.getPlatform();
             if(platform === Platform.ANDROID) {

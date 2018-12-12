@@ -13,12 +13,12 @@ export class MRAIDIFrameEventAdapter extends MRAIDEventAdapter {
         this._iframe = iframe;
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
 
-        this._mraidHandlers[MRAIDEvents.ORIENTATION] = (msg: any) => this.handleSetOrientationProperties(<IMRAIDOrientationProperties>msg.properties);
-        this._mraidHandlers[MRAIDEvents.OPEN] = (msg: any) => this.handleOpen(msg.url);
-        this._mraidHandlers[MRAIDEvents.ANALYTICS_EVENT] = (msg: any) => this.handleAnalyticsEvent(msg.event, msg.eventData);
-        this._mraidHandlers[MRAIDEvents.STATE_CHANGE] = (msg: any) => this.handleCustomState(msg.state);
-        this._mraidHandlers[MRAIDEvents.SEND_STATS] = (msg: any) => this.handleSendStats(msg.totalTime, msg.playTime, msg.frameCount);
-        this._mraidHandlers[MRAIDEvents.AR] = (msg: any) => this.handleAr(msg);
+        this._mraidHandlers[MRAIDEvents.ORIENTATION] = (msg) => this.handleSetOrientationProperties(<IMRAIDOrientationProperties>msg.properties);
+        this._mraidHandlers[MRAIDEvents.OPEN] = (msg) => this.handleOpen(<string>msg.url);
+        this._mraidHandlers[MRAIDEvents.ANALYTICS_EVENT] = (msg) => this.handleAnalyticsEvent(<string>msg.event, <string>msg.eventData);
+        this._mraidHandlers[MRAIDEvents.STATE_CHANGE] = (msg) => this.handleCustomState(<string>msg.state);
+        this._mraidHandlers[MRAIDEvents.SEND_STATS] = (msg) => this.handleSendStats(<number>msg.totalTime, <number>msg.playTime, <number>msg.frameCount);
+        this._mraidHandlers[MRAIDEvents.AR] = (msg) => this.handleAr(<MessageEvent>msg);
     }
 
     public connect() {
@@ -42,7 +42,7 @@ export class MRAIDIFrameEventAdapter extends MRAIDEventAdapter {
         }
     }
 
-    private postMessage(event: string, data?: any) {
+    private postMessage(event: string, data?: unknown) {
         if (this._iframe.contentWindow) {
             this._iframe.contentWindow.postMessage({
                 type: event,

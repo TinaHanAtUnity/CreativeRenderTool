@@ -11,6 +11,12 @@ export interface IProductInfo {
     quantity: number;
 }
 
+export interface IRawProductInfo {
+    productId: string;
+    type: string;
+    quantity: number;
+}
+
 export class ProductInfo extends Model<IProductInfo> {
     constructor(data: IProductInfo) {
         super('ProductInfo', {
@@ -20,9 +26,9 @@ export class ProductInfo extends Model<IProductInfo> {
         }, data);
     }
 
-    public getDTO() {
+    public getDTO(): IRawProductInfo {
         return {
-            'itemId': this.getId(),
+            'productId': this.getId(),
             'type': this.getType(),
             'quantity': this.getQuantity()
         };

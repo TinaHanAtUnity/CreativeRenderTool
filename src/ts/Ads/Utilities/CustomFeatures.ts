@@ -16,6 +16,11 @@ export class CustomFeatures {
                 creativeId === '114617336';   // Hellfest
     }
 
+    public static isLoopMeSeat(seatId: number | undefined): boolean {
+        return seatId === 9119 ||
+               seatId === 9121;
+    }
+
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
         return originalResourceUrl.match(/playables\/production\/unity/);
     }

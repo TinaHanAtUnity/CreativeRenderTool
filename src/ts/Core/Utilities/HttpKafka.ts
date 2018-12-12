@@ -10,6 +10,14 @@ export enum KafkaCommonObjectType {
     PERSONAL
 }
 
+export interface ICommonObject {
+    common: {
+        client: { [key: string]: unknown } | null;
+        device: { [key: string]: unknown } | null;
+        country: string | null;
+    };
+}
+
 export class HttpKafka {
     public static setRequest(request?: RequestManager) {
         HttpKafka._request = request;
@@ -31,8 +39,8 @@ export class HttpKafka {
         HttpKafka._configuration = configuration;
     }
 
-    public static sendEvent(type: string, objectType: KafkaCommonObjectType, data: any): Promise<INativeResponse> {
-        const messages: any[] = [];
+    public static sendEvent(type: string, objectType: KafkaCommonObjectType, data: unknown): Promise<INativeResponse> {
+        const messages: unknown[] = [];
         messages.push({
             'type': type,
             'msg': data
@@ -67,9 +75,9 @@ export class HttpKafka {
     private static _configuration: CoreConfiguration | undefined;
     private static _deviceInfoUpdating: boolean = false;
 
-    private static createCommonObject(objectType: KafkaCommonObjectType, platform?: Platform, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: CoreConfiguration): Promise<any> {
+    private static createCommonObject(objectType: KafkaCommonObjectType, platform?: Platform, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: CoreConfiguration): Promise<unknown> {
         if(objectType === KafkaCommonObjectType.EMPTY) {
-            const emptyCommon: any = {
+            const emptyCommon: unknown = {
                 'common': {
                     'client': null,
                     'device': null,
@@ -78,7 +86,7 @@ export class HttpKafka {
             };
             return Promise.resolve(emptyCommon);
         } else {
-            const common: any = {
+            const common: ICommonObject = {
                 'common': {
                     'client': clientInfo ? clientInfo.getDTO() : null,
                     'device': null,

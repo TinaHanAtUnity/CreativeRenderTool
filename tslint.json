@@ -6,7 +6,7 @@
     "typedef": [false, "call-signature", "arrow-call-signature", "parameter", "arrow-parameter", "property-declaration", "variable-declaration", "member-variable-declaration"],
     "variable-name": false,
     "no-bitwise": false,
-    "no-any": false,
+    "no-any": true,
     "no-typeof-undefined": false,
     "whitespace": [true, "check-decl", "check-operator", "check-separator", "check-type"],
     "prefer-template": false,
