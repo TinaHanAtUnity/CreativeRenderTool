@@ -10,6 +10,7 @@ import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Url } from 'Core/Utilities/Url';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
@@ -34,11 +35,16 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
-            return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
-                return this.openUrlOnCallButton(url);
-            }).catch(() => {
+            const isBrowserTest = CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId());
+            if (isBrowserTest) {
                 return this.openUrlOnCallButton(clickThroughURL);
-            });
+            } else {
+                return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
+                    return this.openUrlOnCallButton(url);
+                }).catch(() => {
+                    return this.openUrlOnCallButton(clickThroughURL);
+                });
+            }
         }
         return Promise.reject(new Error('There is no clickthrough URL for video or companion'));
     }
