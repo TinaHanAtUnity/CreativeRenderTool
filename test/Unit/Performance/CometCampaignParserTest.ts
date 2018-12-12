@@ -187,6 +187,14 @@ describe('CometCampaignParser', () => {
                     });
                 });
 
+                it('is malformed, leaves adUnitStyle undefined ', () => {
+                    campaignJSON.content.adUnitStyle = { 'thisIsNot': 'A Proper stylesheet' };
+                    campaignJSON.content = JSON.stringify(campaignJSON.content);
+                    return parse(campaignJSON).then(() => {
+                        assert.isUndefined((<PerformanceCampaign>campaign).getAdUnitStyle());
+                    });
+                });
+
                 it('has a blank string, returns undefined ctaButtonColor', () => {
                     campaignJSON.content.adUnitStyle.ctaButtonColor = '';
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
@@ -220,6 +228,7 @@ describe('CometCampaignParser', () => {
                     return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
                         assert.equal((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor(), fuchsia);
+                        sinon.assert.notCalled(<sinon.SinonSpy>SessionDiagnostics.trigger);
                     });
                 });
 
@@ -229,6 +238,15 @@ describe('CometCampaignParser', () => {
                     return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
                         assert.equal((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor(), fafafa);
+                    });
+                });
+
+                it('has an empty string, returns undefined ctaButtonColor', () => {
+                    campaignJSON.content.adUnitStyle.ctaButtonColor = '';
+                    campaignJSON.content = JSON.stringify(campaignJSON.content);
+                    return parse(campaignJSON).then(() => {
+                        const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
+                        assert.equal((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor(), undefined);
                     });
                 });
             });

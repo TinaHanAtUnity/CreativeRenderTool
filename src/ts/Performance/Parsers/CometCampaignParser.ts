@@ -138,7 +138,7 @@ export class CometCampaignParser extends CampaignParser {
                 videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
-                adUnitStyle: json.adUnitStyle ? new AdUnitStyle(json.adUnitStyle) : undefined
+                adUnitStyle: json.adUnitStyle ? this.parseAdUnitStyle(json.adUnitStyle, session) : undefined
             };
 
             if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
@@ -168,5 +168,15 @@ export class CometCampaignParser extends CampaignParser {
         }
 
         return urls;
+    }
+
+    private parseAdUnitStyle(adUnitStyleJson: IAdUnitStyle, session: Session): AdUnitStyle | undefined {
+        let adUnitStyle: AdUnitStyle | undefined;
+        try {
+            adUnitStyle = new AdUnitStyle(adUnitStyleJson);
+        } catch(error) {
+            // do nothing
+        }
+        return adUnitStyle;
     }
 }
