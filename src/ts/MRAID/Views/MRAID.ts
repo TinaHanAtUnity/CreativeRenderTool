@@ -3,9 +3,7 @@ import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-
-import { ABGroup, FPSCollectionTest } from 'Core/Models/ABGroup';
-
+import { ABGroup } from 'Core/Models/ABGroup';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import MRAIDTemplate from 'html/MRAID.html';
@@ -29,6 +27,11 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this._campaign = campaign;
 
         this._template = new Template(MRAIDTemplate);
+    }
+
+    public render() {
+        super.render();
+        this._privacyButton.style.top = '0';
     }
 
     public show(): void {
