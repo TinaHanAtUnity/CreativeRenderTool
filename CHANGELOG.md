@@ -7,6 +7,7 @@
 * Refactor any to unknown [#7319](https://github.com/Applifier/unity-ads-webview/pull/7319)
 * Send ad plan with configuration_ad_unit_style_parse_error diagnostic error [#7511](https://github.com/Applifier/unity-ads-webview/pull/7511)
 * Use CHANGE_BRANCH instead of BRANCH_NAME [#7540](https://github.com/Applifier/unity-ads-webview/pull/7540)
+* Revert "Ramp up Auction V5 to 45% of traffic [#7514](https://github.com/Applifier/unity-ads-webview/pull/7514)" (Back to 15% of traffic)
 
 # Mon Dec 10 22:50:56 UTC 2018
 
