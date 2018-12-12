@@ -10,8 +10,6 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestError } from 'Core/Errors/RequestError';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
@@ -30,6 +28,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _platform: Platform;
     private _core: ICoreApi;
     private _ads: IAdsApi;
+    private _customImpressionFired: boolean;
     protected _campaign: MRAIDCampaign;
 
     constructor(adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
@@ -44,6 +43,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._platform = parameters.platform;
         this._core = parameters.core;
         this._ads = parameters.ads;
+        this._customImpressionFired = false;
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -104,6 +104,13 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             this._adUnit.setShowingMRAID(false);
             this._adUnit.getMRAIDView().hide();
             endScreen.show();
+        }
+    }
+
+    public onCustomImpressionEvent(): void {
+        if (!this._customImpressionFired) {
+            this._adUnit.sendImpression();
+            this._customImpressionFired = true;
         }
     }
 

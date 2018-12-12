@@ -74,6 +74,7 @@ import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 export class Ads implements IAds {
 
@@ -257,6 +258,11 @@ export class Ads implements IAds {
         }
 
         SdkStats.sendShowEvent(placementId);
+
+        if (campaign instanceof PromoCampaign && campaign.getRequiredAssets().length === 0) {
+            this.showError(false, placementId, 'No creatives found for promo campaign');
+            return;
+        }
 
         if(campaign.isExpired()) {
             this.showError(true, placementId, 'Campaign has expired');
