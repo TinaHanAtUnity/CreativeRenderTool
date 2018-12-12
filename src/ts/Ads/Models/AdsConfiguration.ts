@@ -11,6 +11,7 @@ export interface IRawAdsConfiguration {
     optOutRecorded: boolean;
     optOutEnabled: boolean;
     defaultBannerPlacement: string | undefined;
+    gamePrivacy: string | undefined;
 }
 
 export interface IAdsConfiguration {
