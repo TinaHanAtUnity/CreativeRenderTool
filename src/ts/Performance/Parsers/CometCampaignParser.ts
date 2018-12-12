@@ -138,7 +138,7 @@ export class CometCampaignParser extends CampaignParser {
                 videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
-                adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle, session)
+                adUnitStyle: json.adUnitStyle ? new AdUnitStyle(json.adUnitStyle) : undefined
             };
 
             if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
@@ -168,21 +168,5 @@ export class CometCampaignParser extends CampaignParser {
         }
 
         return urls;
-    }
-
-    private parseAdUnitStyle(adUnitStyleJson: IAdUnitStyle, session: Session): AdUnitStyle | undefined {
-        let adUnitStyle: AdUnitStyle | undefined;
-        try {
-            if (!adUnitStyleJson) {
-                throw new Error('No adUnitStyle was provided in comet campaign');
-            }
-            adUnitStyle = new AdUnitStyle(adUnitStyleJson);
-        } catch(error) {
-            SessionDiagnostics.trigger('configuration_ad_unit_style_parse_error', {
-                adUnitStyle: adUnitStyleJson,
-                error: error
-            }, session);
-        }
-        return adUnitStyle;
     }
 }

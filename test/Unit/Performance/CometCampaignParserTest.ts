@@ -176,7 +176,6 @@ describe('CometCampaignParser', () => {
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
                     return parse(campaignJSON).then(() => {
                         assert.isUndefined((<PerformanceCampaign>campaign).getAdUnitStyle());
-                        sinon.assert.calledWith(<sinon.SinonSpy>SessionDiagnostics.trigger, 'configuration_ad_unit_style_parse_error');
                     });
                 });
 
@@ -185,16 +184,6 @@ describe('CometCampaignParser', () => {
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
                     return parse(campaignJSON).then(() => {
                         assert.isUndefined((<PerformanceCampaign>campaign).getAdUnitStyle());
-                        sinon.assert.calledWith(<sinon.SinonSpy>SessionDiagnostics.trigger, 'configuration_ad_unit_style_parse_error');
-                    });
-                });
-
-                it('is malformed, leaves adUnitStyle undefined ', () => {
-                    campaignJSON.content.adUnitStyle = { 'thisIsNot': 'A Proper stylesheet' };
-                    campaignJSON.content = JSON.stringify(campaignJSON.content);
-                    return parse(campaignJSON).then(() => {
-                        assert.isUndefined((<PerformanceCampaign>campaign).getAdUnitStyle());
-                        sinon.assert.calledWith(<sinon.SinonSpy>SessionDiagnostics.trigger, 'configuration_ad_unit_style_parse_error');
                     });
                 });
 
@@ -204,7 +193,6 @@ describe('CometCampaignParser', () => {
                     return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
                         assert.isUndefined((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor());
-                        sinon.assert.notCalled(<sinon.SinonSpy>SessionDiagnostics.trigger);
                     });
                 });
 
@@ -214,7 +202,6 @@ describe('CometCampaignParser', () => {
                     return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
                         assert.isUndefined((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor());
-                        sinon.assert.notCalled(<sinon.SinonSpy>SessionDiagnostics.trigger);
                     });
                 });
 
@@ -224,7 +211,6 @@ describe('CometCampaignParser', () => {
                     return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
                         assert.isUndefined((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor());
-                        sinon.assert.notCalled(<sinon.SinonSpy>SessionDiagnostics.trigger);
                     });
                 });
 
@@ -234,7 +220,6 @@ describe('CometCampaignParser', () => {
                     return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
                         assert.equal((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor(), fuchsia);
-                        sinon.assert.notCalled(<sinon.SinonSpy>SessionDiagnostics.trigger);
                     });
                 });
 
@@ -244,7 +229,6 @@ describe('CometCampaignParser', () => {
                     return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
                         assert.equal((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor(), fafafa);
-                        sinon.assert.notCalled(<sinon.SinonSpy>SessionDiagnostics.trigger);
                     });
                 });
             });
