@@ -62,7 +62,7 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
         return this.get('width');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'id': this.getId(),
             'width': this.getWidth(),

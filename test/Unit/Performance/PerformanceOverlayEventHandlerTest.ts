@@ -9,9 +9,8 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
-import { IARApi } from 'AR/AR';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -23,6 +22,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Campaign } from 'Ads/Models/Campaign';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
@@ -30,7 +30,6 @@ import 'mocha';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
@@ -41,10 +40,8 @@ describe('PerformanceOverlayEventHandlerTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let ar: IARApi;
-    let purchasing: IPurchasingApi;
     let storageBridge: StorageBridge;
-    let overlay: Overlay;
+    let overlay: NewVideoOverlay;
     let endScreen: PerformanceEndScreen;
     let container: AdUnitContainer;
     let performanceAdUnit: PerformanceAdUnit;
@@ -62,8 +59,6 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
-        ar = TestFixtures.getARApi(nativeBridge);
-        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
         storageBridge = new StorageBridge(core);
         const metaDataManager = new MetaDataManager(core);
@@ -108,16 +103,24 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             targetGameName: campaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, campaign);
-        overlay = new Overlay(platform, ads, <AndroidDeviceInfo>deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
-        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         const placement = TestFixtures.getPlacement();
+
+        const videoOverlayParameters: IVideoOverlayParameters<Campaign> = {
+            deviceInfo: deviceInfo,
+            campaign: campaign,
+            coreConfig: coreConfig,
+            placement: placement,
+            clientInfo: clientInfo,
+            platform: platform,
+            ads: ads
+        };
+        overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         performanceAdUnitParameters = {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,

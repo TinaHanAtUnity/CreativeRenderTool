@@ -19,7 +19,7 @@ import { View } from 'Core/Views/View';
 import AdMobContainer from 'html/admob/AdMobContainer.html';
 import AFMAContainer from 'html/admob/AFMAContainer.html';
 import MRAIDContainer from 'html/admob/MRAIDContainer.html';
-import { MRAIDBridge } from 'MRAID/Views/MRAIDBridge';
+import { MRAIDBridge } from 'MRAID/EventBridge/MRAIDBridge';
 import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
@@ -31,7 +31,7 @@ export interface IAdMobEventHandler extends IGDPREventHandler {
     onVideoStart(): void;
     onSetOrientationProperties(allowOrientation: boolean, forceOrientation: Orientation): void;
     onOpenableIntentsRequest(request: IOpenableIntentsRequest): void;
-    onTrackingEvent(event: string, data?: any): void;
+    onTrackingEvent(event: string, data?: unknown): void;
     onClickSignalRequest(touchInfo: ITouchInfo): void;
 }
 
@@ -180,7 +180,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private setupIFrame() {
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#admob-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#admob-iframe');
         this._iframe = iframe;
         this.getIFrameSrcDoc().then((markup) => {
             iframe.srcdoc = markup;
@@ -281,7 +281,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._handlers.forEach((h) => h.onClickSignalRequest(touchInfo));
     }
 
-    private onTrackingEvent(event: string, data?: any) {
+    private onTrackingEvent(event: string, data?: unknown) {
         this._handlers.forEach((h) => h.onTrackingEvent(event, data));
     }
 

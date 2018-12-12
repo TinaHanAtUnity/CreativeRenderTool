@@ -13,7 +13,8 @@ import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { MraidIFrameEventBridge, IMRAIDHandler } from 'MRAID/Views/MraidIFrameEventBridge';
+import { MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
+import { IMRAIDHandler } from 'MRAID/EventBridge/MRAIDEventAdapter';
 import { IPermissions } from 'Ads/Views/Consent/IPermissions';
 
 export interface IOrientationProperties {
@@ -38,9 +39,10 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onMraidSkip(): void;
     onMraidClose(): void;
     onMraidOrientationProperties(orientationProperties: IOrientationProperties): void;
-    onPlayableAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: any): void;
+    onPlayableAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: unknown): void;
     onMraidShowEndScreen(): void;
     onKeyEvent(keyCode: number): void;
+    onCustomImpressionEvent(): void;
 }
 
 export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler, IMRAIDHandler {
@@ -70,7 +72,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected _closeElement: HTMLElement;
     protected _didReward = false;
-    protected _updateInterval: any;
+    protected _updateInterval?: number;
     protected _closeRemaining: number;
     protected _CLOSE_LENGTH = 30;
 
@@ -79,7 +81,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _backgroundTime: number = 0;
     protected _backgroundTimestamp: number;
 
-    protected _mraidBridge: MraidIFrameEventBridge;
+    protected _mraidAdapterContainer: MRAIDAdapterContainer;
 
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(platform, id);
@@ -126,6 +128,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         ];
 
         this._gameSessionId = gameSessionId || 0;
+        this._mraidAdapterContainer = new MRAIDAdapterContainer(this);
     }
 
     public abstract setViewableState(viewable: boolean): void;
@@ -162,11 +165,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    public setMraidEventBridge(mraidBridge: MraidIFrameEventBridge) {
-        this._mraidBridge = mraidBridge;
-    }
-
-    public createMRAID(container: any): Promise<string> {
+    public createMRAID(container: string): Promise<string> {
         const fetchingTimestamp = Date.now();
         let fetchingStopTimestamp = Date.now();
         let mraidParseTimestamp = Date.now();
@@ -258,7 +257,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             const skipLength = this._placement.allowSkipInSeconds();
             this._closeRemaining = this._CLOSE_LENGTH;
             let skipRemaining = skipLength;
-            this._updateInterval = setInterval(() => {
+            this._updateInterval = window.setInterval(() => {
                 if(this._closeRemaining > 0) {
                     this._closeRemaining--;
                 }
@@ -278,7 +277,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             }, 1000);
         } else {
             this._closeRemaining = this._CLOSE_LENGTH;
-            this._updateInterval = setInterval(() => {
+            this._updateInterval = window.setInterval(() => {
                 const progress = (this._CLOSE_LENGTH - this._closeRemaining) / this._CLOSE_LENGTH;
                 if(progress >= 0.75 && !this._didReward) {
                     this._handlers.forEach(handler => handler.onMraidReward());
@@ -413,7 +412,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         return Promise.resolve();
     }
 
-    protected abstract sendMraidAnalyticsEvent(eventName: string, eventData?: any): void;
+    protected abstract sendMraidAnalyticsEvent(eventName: string, eventData?: unknown): void;
 
     public onBridgeSetOrientationProperties(allowOrientationChange: boolean, forceOrientation: Orientation) {
         this.onSetOrientationProperties(allowOrientationChange, forceOrientation);

@@ -1,8 +1,6 @@
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
-import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEventHandler';
@@ -13,46 +11,24 @@ import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandle
 import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
 import { StreamType } from 'Core/Constants/Android/StreamType';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { VastVideoOverlay } from 'Ads/Views/VastVideoOverlay';
 import { AndroidBackButtonSkipTest } from 'Core/Models/ABGroup';
 
-export class VastAdUnitFactory extends AbstractAdUnitFactory {
+export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVastAdUnitParameters> {
 
-    public createAdUnit(parameters: IAdUnitParameters<VastCampaign>): VastAdUnit {
-        const privacy = this.createPrivacy(parameters);
-        const overlay = new VastVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters));
-        let vastEndScreen: VastEndScreen | undefined;
-
-        const vastAdUnitParameters: IVastAdUnitParameters = {
-            ... parameters,
-            video: parameters.campaign.getVideo(),
-            overlay: overlay
-        };
-
-        if(parameters.campaign.hasEndscreen()) {
-            const vastEndscreenParameters: IVastEndscreenParameters = {
-                campaign: vastAdUnitParameters.campaign,
-                clientInfo: vastAdUnitParameters.clientInfo,
-                country: vastAdUnitParameters.coreConfig.getCountry()
-            };
-
-            vastEndScreen = new VastEndScreen(parameters.platform, vastEndscreenParameters, privacy);
-            vastAdUnitParameters.endScreen = vastEndScreen;
-        }
-
+    public createAdUnit(parameters: IVastAdUnitParameters): VastAdUnit {
         const hasAdvertiserDomain = parameters.campaign.getAdvertiserDomain() !== undefined;
         if (hasAdvertiserDomain && parameters.campaign.isMoatEnabled()) {
             MoatViewabilityService.initMoat(parameters.platform, parameters.core, parameters.campaign, parameters.clientInfo, parameters.placement, parameters.deviceInfo, parameters.coreConfig);
         }
 
-        const vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+        const vastAdUnit = new VastAdUnit(parameters);
 
-        const vastOverlayHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
-        overlay.addEventHandler(vastOverlayHandler);
+        const vastOverlayHandler = new VastOverlayEventHandler(vastAdUnit, parameters);
+        parameters.overlay.addEventHandler(vastOverlayHandler);
 
-        if(parameters.campaign.hasEndscreen() && vastEndScreen) {
-            const vastEndScreenHandler = new VastEndScreenEventHandler(vastAdUnit, vastAdUnitParameters);
-            vastEndScreen.addEventHandler(vastEndScreenHandler);
+        if(parameters.campaign.hasEndscreen() && parameters.endScreen) {
+            const vastEndScreenHandler = new VastEndScreenEventHandler(vastAdUnit, parameters);
+            parameters.endScreen.addEventHandler(vastEndScreenHandler);
 
             if (parameters.platform === Platform.ANDROID) {
                 const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) =>  {
@@ -72,7 +48,7 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory {
             }
         }
 
-        const videoEventHandlerParams = this.getVideoEventHandlerParams(vastAdUnit, parameters.campaign.getVideo(), undefined, vastAdUnitParameters);
+        const videoEventHandlerParams = this.getVideoEventHandlerParams(vastAdUnit, parameters.campaign.getVideo(), undefined, parameters);
         const vastVideoEventHandler = this.prepareVideoPlayer(VastVideoEventHandler, <IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
 
         let onVolumeChangeObserverAndroid: IObserver3<number, number, number>;
@@ -97,7 +73,7 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory {
             }
         });
 
-        AbstractPrivacy.setupReportListener(privacy, vastAdUnit);
+        AbstractPrivacy.setupReportListener(parameters.privacy, vastAdUnit);
 
         return vastAdUnit;
     }

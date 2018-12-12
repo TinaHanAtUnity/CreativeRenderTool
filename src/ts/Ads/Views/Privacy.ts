@@ -27,6 +27,7 @@ export class Privacy extends AbstractPrivacy {
 
         super(platform, privacyManager, isCoppaCompliant, gdprEnabled, 'privacy');
         this._templateData.reportKeys = Object.keys(ReportReason);
+        // tslint:disable-next-line
         this._templateData.reportReasons = Object.keys(ReportReason).map((reason: any) => ReportReason[reason]);
 
         this._template = new Template(PrivacyTemplate);

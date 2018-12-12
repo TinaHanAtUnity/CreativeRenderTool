@@ -64,8 +64,6 @@ describe('VPAIDAdUnit', () => {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
             webPlayerContainer,
             campaign: sinon.createStubInstance(VPAIDCampaign),
             closer: sinon.createStubInstance(Closer),

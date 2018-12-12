@@ -35,6 +35,8 @@ export enum GDPREventAction {
     OPTIN = 'optin'
 }
 
+export type UserPrivacyStorageData = { gdpr: { consent: { value: unknown }}};
+
 export class UserPrivacyManager {
 
     private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
@@ -58,11 +60,11 @@ export class UserPrivacyManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
-        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
+        this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <UserPrivacyStorageData>data));
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
-        let infoJson: any = {
+        let infoJson: unknown = {
             'adid': this._deviceInfo.getAdvertisingIdentifier(),
             'action': action,
             'projectId': this._coreConfig.getUnityProjectId(),
@@ -136,7 +138,7 @@ export class UserPrivacyManager {
 
         return this._request.get(url).then((response) => {
             return {
-                ... JsonParser.parse(response.response),
+                ... JsonParser.parse<{ gamePlaysThisWeek: number; adsSeenInGameThisWeek: number; installsFromAds: number }>(response.response),
                 ... personalPayload
             };
         }).catch(error => {
@@ -168,7 +170,7 @@ export class UserPrivacyManager {
     }
 
     private getConsent(): Promise<boolean> {
-        return this._core.Storage.get(StorageType.PUBLIC, UserPrivacyManager.GdprConsentStorageKey).then((data: any) => {
+        return this._core.Storage.get(StorageType.PUBLIC, UserPrivacyManager.GdprConsentStorageKey).then((data: unknown) => {
             const value: boolean | undefined = this.getConsentTypeHack(data);
             if(typeof(value) !== 'undefined') {
                 return Promise.resolve(value);
@@ -183,7 +185,7 @@ export class UserPrivacyManager {
         this._adsConfig.setOptOutRecorded(true);
     }
 
-    private onStorageSet(eventType: string, data: any) {
+    private onStorageSet(eventType: string, data: UserPrivacyStorageData) {
         // should only use consent when gdpr is enabled in configuration
         if (this._adsConfig.isGDPREnabled()) {
             if(data && data.gdpr && data.gdpr.consent) {
@@ -200,7 +202,7 @@ export class UserPrivacyManager {
     // Android C# layer will map boolean values to Java primitive boolean types and causes reflection failure
     // with Android Java native layer method that takes Object as value
     // this hack allows anyone use both booleans and string "true" and "false" values
-    private getConsentTypeHack(value: any): boolean | undefined {
+    private getConsentTypeHack(value: unknown): boolean | undefined {
         if(typeof(value) === 'boolean') {
             return value;
         } else if(typeof(value) === 'string') {
