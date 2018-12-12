@@ -394,5 +394,15 @@ describe('MRAIDEventHandlersTest', () => {
                 });
             });
         });
+
+        describe('when calling custom impression event multiple times', () => {
+            it('should only send tracking event once', () => {
+                sinon.stub(programmaticMraidAdUnit, 'sendImpression');
+
+                programmaticMraidEventHandler.onCustomImpressionEvent();
+                programmaticMraidEventHandler.onCustomImpressionEvent();
+                sinon.assert.calledOnce(<sinon.SinonSpy>programmaticMraidAdUnit.sendImpression);
+            });
+        });
     });
 });
