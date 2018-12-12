@@ -1,5 +1,16 @@
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
+@NonCPS
+def checkIfWebhookTriggered() {
+    def causes = currentBuild.rawBuild.getCauses()
+    for(cause in causes) {
+        if (cause.class.toString().contains("UpstreamCause")) {
+            return true
+        }
+    }
+    return false
+}
+
 def waitWebviewDeployed(webviewBranch) {
     // TODO: use Travis build status to detect webview deployment status
     timeout(time: 15, unit: 'MINUTES') {
@@ -115,13 +126,8 @@ pipeline {
 
                 dir('results') {
                     script {
-                        def isWebhookTriggered = false
-                        def causes = currentBuild.rawBuild.getCauses()
-                        for(cause in causes) {
-                            if (cause.class.toString().contains("UpstreamCause")) {
-                                isWebhookTriggered = true
-                            }
-                        }
+                        def isWebhookTriggered = checkIfWebhookTriggered()
+
                         // run all tests unless the job is manually triggered(restarted)
                         if (env.CHANGE_BRANCH =~ /^staging/ && isWebhookTriggered) {
                             parallel (hybridTestBuilders + systemTestBuilders)
