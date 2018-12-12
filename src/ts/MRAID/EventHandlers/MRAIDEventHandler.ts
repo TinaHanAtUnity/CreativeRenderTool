@@ -10,8 +10,6 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestError } from 'Core/Errors/RequestError';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
@@ -114,6 +112,17 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             this._adUnit.getMRAIDView().hide();
             endScreen.show();
         }
+    }
+
+    public onWebViewResize(shouldFullScreen: boolean): Promise<void> {
+        return Promise.all([this._core.DeviceInfo.getScreenWidth(), this._core.DeviceInfo.getScreenHeight()])
+        .then(([width, height]) => {
+            if (shouldFullScreen) {
+                return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, height);
+            } else {
+                return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, 200);
+            }
+        });
     }
 
     private handleClickAttribution() {

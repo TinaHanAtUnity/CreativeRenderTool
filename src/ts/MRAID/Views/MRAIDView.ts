@@ -41,6 +41,7 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onPlayableAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: any): void;
     onMraidShowEndScreen(): void;
     onKeyEvent(keyCode: number): void;
+    onWebViewResize(shouldFullScreen: boolean): Promise<void>;
 }
 
 export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler, IMRAIDHandler {
@@ -374,18 +375,18 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected abstract onCloseEvent(event: Event): void;
 
-    public onPrivacyClose(): void {
+    protected onPrivacyClose(): void {
         if(this._privacy) {
             this._privacy.hide();
         }
     }
 
-    public onPrivacyEvent(event: Event): void {
+    protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._privacy.show();
     }
 
-    public onGDPRPopupEvent(event: Event) {
+    protected onGDPRPopupEvent(event: Event) {
         event.preventDefault();
         this._gdprPopupClicked = true;
         this._privacy.show();
@@ -441,8 +442,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     public onBridgeResizeWebview() {
-        // This will be used to handle rotation changes for webplayer-based mraid
-        // this._handlers.forEach(handler => handler.onWebViewResize(false));
+        this._handlers.forEach(handler => handler.onWebViewResize(false));
     }
 
     public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {

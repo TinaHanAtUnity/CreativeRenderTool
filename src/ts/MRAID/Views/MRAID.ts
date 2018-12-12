@@ -121,6 +121,35 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this._handlers.forEach(handler => handler.onMraidClick(url));
     }
 
+    protected onPrivacyClose(): void {
+        if (this._privacy) {
+            this._handlers.forEach((handler) => {
+                handler.onWebViewResize(false).then(() => {
+                    this._privacy.hide();
+                });
+            });
+        }
+    }
+
+    protected onPrivacyEvent(event: Event): void {
+        event.preventDefault();
+        this._handlers.forEach((handler) => {
+            handler.onWebViewResize(true).then(() => {
+                this._privacy.show();
+            });
+        });
+    }
+
+    protected onGDPRPopupEvent(event: Event) {
+        event.preventDefault();
+        this._gdprPopupClicked = true;
+        this._handlers.forEach((handler) => {
+            handler.onWebViewResize(true).then(() => {
+                this._privacy.show();
+            });
+        });
+    }
+
     private getMraidAsUrl(mraid: string): Promise<string> {
         mraid = this._platform === Platform.ANDROID ? decodeURIComponent(mraid) : mraid;
         return this._core.Cache.setFileContent('webPlayerMraid', 'UTF-8', mraid)
