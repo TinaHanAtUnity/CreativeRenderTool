@@ -115,7 +115,15 @@ pipeline {
 
                 dir('results') {
                     script {
-                        if (env.CHANGE_BRANCH =~ /^staging/) { // run deployment tests
+                        def isWebhookTriggered = false
+                        def causes = currentBuild.rawBuild.getCauses()
+                        for(cause in causes) {
+                            if (cause.class.toString().contains("UpstreamCause")) {
+                                isWebhookTriggered = true
+                            }
+                        }
+                        // run all tests unless the job is manually triggered(restarted)
+                        if (env.CHANGE_BRANCH =~ /^staging/ && isWebhookTriggered) {
                             parallel (hybridTestBuilders + systemTestBuilders)
 
                         } else { // run only hybrid tests
