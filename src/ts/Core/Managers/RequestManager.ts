@@ -46,6 +46,7 @@ export class RequestManager {
     public static AllowedResponseCodes = new RegExp('2[0-9]{2}');
     public static RedirectResponseCodes = new RegExp('30[0-8]');
     public static ErrorResponseCodes = new RegExp('[4-5][0-9]{2}');
+    public static RedirectDurationLong = 2000;  // milliseconds threshold to log followRedirectChain duration
 
     public static getHeader(headers: [string, string][], headerName: string): string | null {
         for(const header of headers) {

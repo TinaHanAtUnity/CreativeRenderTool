@@ -3,14 +3,11 @@ import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
-import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Url } from 'Core/Utilities/Url';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
@@ -36,10 +33,20 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const isBrowserTest = CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId());
+            const ctaClickedTime = Date.now();
             if (isBrowserTest) {
                 return this.openUrlOnCallButton(clickThroughURL);
             } else {
                 return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
+                    const redirectDuration = Date.now() - ctaClickedTime;
+                    if (redirectDuration > RequestManager.RedirectDurationLong && redirectDuration % 100 === 1) {
+                        SessionDiagnostics.trigger('click_delay', {
+                            duration: redirectDuration,
+                            delayedUrl: clickThroughURL,
+                            location: 'vast_endscreen',
+                            seatId: this._vastCampaign.getSeatId()
+                        }, this._vastCampaign.getSession());
+                    }
                     return this.openUrlOnCallButton(url);
                 }).catch(() => {
                     return this.openUrlOnCallButton(clickThroughURL);

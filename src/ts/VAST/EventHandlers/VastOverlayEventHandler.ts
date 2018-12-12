@@ -8,10 +8,8 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { Url } from 'Core/Utilities/Url';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -72,10 +70,20 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if(clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const isBrowserTest = CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId());
+            const ctaClickedTime = Date.now();
             if (isBrowserTest) {
                 return this.openUrlOnCallButton(clickThroughURL);
             } else {
                 return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
+                    const redirectDuration = Date.now() - ctaClickedTime;
+                    if (redirectDuration > RequestManager.RedirectDurationLong && redirectDuration % 100 === 1) {
+                        SessionDiagnostics.trigger('click_delay', {
+                            duration: redirectDuration,
+                            delayedUrl: clickThroughURL,
+                            location: 'vast_overlay',
+                            seatId: this._vastCampaign.getSeatId()
+                        }, this._vastCampaign.getSession());
+                    }
                     return this.openUrlOnCallButton(url);
                 }).catch(() => {
                     return this.openUrlOnCallButton(clickThroughURL);

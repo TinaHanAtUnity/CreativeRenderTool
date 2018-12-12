@@ -14,8 +14,8 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { Url } from 'Core/Utilities/Url';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -59,7 +59,17 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             }
         } else {    // DSP MRAID
             this.setCallButtonEnabled(false);
+            const ctaClickedTime = Date.now();
             return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking()).then((storeUrl) => {
+                const redirectDuration = Date.now() - ctaClickedTime;
+                if (redirectDuration > RequestManager.RedirectDurationLong && redirectDuration % 100 === 1) {
+                    SessionDiagnostics.trigger('click_delay', {
+                        duration: redirectDuration,
+                        delayedUrl: url,
+                        location: 'programmatic_mraid',
+                        seatId: this._campaign.getSeatId()
+                    }, this._campaign.getSession());
+                }
                 return this.openUrlOnCallButton(storeUrl);
             }).catch(() => {
                 return this.openUrlOnCallButton(url);
