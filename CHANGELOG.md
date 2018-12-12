@@ -1,5 +1,6 @@
 # PENDING
 
+* Remove diagnostics logging for click rejection [#7463](https://github.com/Applifier/unity-ads-webview/pull/7463)
 * Fix standalone cta button [#7436](https://github.com/Applifier/unity-ads-webview/pull/7436)
 
 # Wed Dec 12 10:27:59 UTC 2018
