@@ -51,9 +51,12 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
         if(this._domContentLoaded) {
             this.setViewableState(true);
+            this.sendCustomImpression();
         } else {
             const observer = this.onLoaded.subscribe(() => {
                 this.setViewableState(true);
+                this.sendCustomImpression();
+
                 this.onLoaded.unsubscribe(observer);
             });
         }
@@ -138,5 +141,11 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             return;
         }
         this._handlers.forEach(handler => handler.onMraidClick(url));
+    }
+
+    private sendCustomImpression() {
+        if (CustomFeatures.isLoopMeSeat(this._campaign.getSeatId())) {
+            this._handlers.forEach(handler => handler.onCustomImpressionEvent());
+        }
     }
 }

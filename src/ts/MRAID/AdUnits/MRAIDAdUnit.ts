@@ -82,7 +82,10 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });
-        this.sendTrackingEvent('impression');
+
+        if (!CustomFeatures.isLoopMeSeat(this._campaign.getSeatId())) {
+            this.sendImpression();
+        }
 
         this._container.addEventHandler(this);
 
@@ -136,6 +139,10 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendClick(): void {
         this.sendTrackingEvent('click');
+    }
+
+    public sendImpression(): void {
+        this.sendTrackingEvent('impression');
     }
 
     public getEndScreen(): EndScreen | undefined {
