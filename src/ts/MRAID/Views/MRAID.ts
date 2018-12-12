@@ -121,7 +121,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this._handlers.forEach(handler => handler.onMraidClick(url));
     }
 
-    protected onPrivacyClose(): void {
+    public onPrivacyClose(): void {
         if (this._privacy) {
             this._handlers.forEach((handler) => {
                 handler.onWebViewResize(false).then(() => {

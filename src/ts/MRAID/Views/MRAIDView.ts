@@ -375,7 +375,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected abstract onCloseEvent(event: Event): void;
 
-    protected onPrivacyClose(): void {
+    public onPrivacyClose(): void {
         if(this._privacy) {
             this._privacy.hide();
         }
