@@ -96,6 +96,14 @@ import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
 import { PerformanceAdUnitFactory } from 'Performance/AdUnits/PerformanceAdUnitFactory';
 import { XPromoAdUnitFactory } from 'XPromo/AdUnits/XPromoAdUnitFactory';
 import AuctionV5Response from 'json/AuctionV5Response.json';
+import { IAbstractAdUnitParametersFactory, AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { VastAdUnitParametersFactory } from 'VAST/AdUnits/VastAdUnitParametersFactory';
+import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
+import { DisplayInterstitialAdUnitParametersFactory } from 'Display/AdUnits/DisplayInterstitialAdUnitParametersFactory';
+import { PerformanceAdUnitParametersFactory } from 'Performance/AdUnits/PerformanceAdUnitParametersFactory';
+import { XPromoAdUnitParametersFactory } from 'XPromo/AdUnits/XPromoAdUnitParametersFactory';
+import { VPAIDAdUnitParametersFactory } from 'VPAID/AdUnits/VPAIDAdUnitParametersFactory';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { VPAIDAdUnitFactory } from 'VPAID/AdUnits/VPAIDAdUnitFactory';
@@ -126,6 +134,7 @@ describe('CampaignManager', () => {
     let placementManager: PlacementManager;
     let backupCampaignManager: BackupCampaignManager;
     let contentTypeHandlerManager: ContentTypeHandlerManager;
+    let adUnitParametersFactory: IAbstractAdUnitParametersFactory<Campaign, IAdUnitParameters<Campaign>>;
 
     const onShowTrackingUrls: ICampaignTrackingUrls = {
         'start': [
@@ -166,6 +175,7 @@ describe('CampaignManager', () => {
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         backupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig, deviceInfo);
         contentTypeHandlerManager = new ContentTypeHandlerManager();
+        adUnitParametersFactory = sinon.createStubInstance(AbstractAdUnitParametersFactory);
     });
 
     describe('on VAST campaign', () => {
@@ -178,7 +188,7 @@ describe('CampaignManager', () => {
             }));
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: Campaign;
             let triggeredError: any;
@@ -215,7 +225,7 @@ describe('CampaignManager', () => {
             vastParser.setMaxWrapperDepth(1);
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: VastCampaign;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
@@ -294,11 +304,11 @@ describe('CampaignManager', () => {
             vastParser.setMaxWrapperDepth(2);
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: VastCampaign;
             campaignManager.onError.subscribe((error) => {
-                assert.equal(1, 2, error.message);
+                assert.equal(1, 2, (<{ message: string }>error).message);
             });
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
                 triggeredCampaign = <VastCampaign>campaign;
@@ -405,10 +415,10 @@ describe('CampaignManager', () => {
             }));
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
-            campaignManager.onError.subscribe((err: WebViewError) => {
-                assert.equal(err.message, VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
+            campaignManager.onError.subscribe((err) => {
+                assert.equal((<{ message: string }>err).message, VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
                 done();
             });
 
@@ -422,10 +432,10 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredError: any;
-            campaignManager.onError.subscribe((error: WebViewError) => {
+            campaignManager.onError.subscribe((error) => {
                 triggeredError = error;
             });
 
@@ -447,7 +457,7 @@ describe('CampaignManager', () => {
             }
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredError: WebViewError | Error;
             const verify = () => {
@@ -462,8 +472,8 @@ describe('CampaignManager', () => {
                 }
             };
 
-            campaignManager.onError.subscribe((error: WebViewError) => {
-                triggeredError = error;
+            campaignManager.onError.subscribe((error) => {
+                triggeredError = <WebViewError | Error>error;
                 if (done) {
                     // then the onError observable is triggered with an appropriate error
                     verify();
@@ -581,7 +591,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
@@ -612,7 +622,7 @@ describe('CampaignManager', () => {
             }));
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
@@ -667,7 +677,7 @@ describe('CampaignManager', () => {
             const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticMraidUrlParser.ContentType, { parser: new ProgrammaticMraidUrlParser(), factory: new MRAIDAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticMraidUrlParser.ContentType, { parser: new ProgrammaticMraidUrlParser(), factory: new MRAIDAdUnitFactory(<MRAIDAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: MRAIDCampaign;
             let triggeredError: any;
@@ -712,7 +722,7 @@ describe('CampaignManager', () => {
             const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(), factory: new MRAIDAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(), factory: new MRAIDAdUnitFactory(<MRAIDAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: MRAIDCampaign;
             let triggeredError: any;
@@ -753,7 +763,7 @@ describe('CampaignManager', () => {
             let doneCalled = false;
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(), factory: new MRAIDAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(), factory: new MRAIDAdUnitFactory(<MRAIDAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredError: any;
             campaignManager.onNoFill.subscribe(() => {
@@ -781,7 +791,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(), factory: new MRAIDAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(), factory: new MRAIDAdUnitFactory(<MRAIDAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredError: any;
 
@@ -804,7 +814,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticMraidUrlParser.ContentType, { parser: new ProgrammaticMraidUrlParser(), factory: new MRAIDAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticMraidUrlParser.ContentType, { parser: new ProgrammaticMraidUrlParser(), factory: new MRAIDAdUnitFactory(<MRAIDAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredError: any;
 
@@ -827,7 +837,7 @@ describe('CampaignManager', () => {
             }));
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticStaticInterstitialParser.ContentTypeHtml, { parser: new ProgrammaticStaticInterstitialParser(false), factory: new DisplayInterstitialAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticStaticInterstitialParser.ContentTypeHtml, { parser: new ProgrammaticStaticInterstitialParser(false), factory: new DisplayInterstitialAdUnitFactory(<DisplayInterstitialAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: DisplayInterstitialCampaign;
             let triggeredError: any;
@@ -857,7 +867,7 @@ describe('CampaignManager', () => {
             }));
 
             const assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticStaticInterstitialParser.ContentTypeJs, { parser: new ProgrammaticStaticInterstitialParser(true), factory: new DisplayInterstitialAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(ProgrammaticStaticInterstitialParser.ContentTypeJs, { parser: new ProgrammaticStaticInterstitialParser(true), factory: new DisplayInterstitialAdUnitFactory(<DisplayInterstitialAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: DisplayInterstitialCampaign;
             let triggeredError: any;
@@ -891,12 +901,12 @@ describe('CampaignManager', () => {
         beforeEach(() => {
             assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             contentTypeHandlerManager = new ContentTypeHandlerManager();
-            contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(), factory: new PerformanceAdUnitFactory() });
-            contentTypeHandlerManager.addHandler(XPromoCampaignParser.ContentType, { parser: new XPromoCampaignParser(), factory: new XPromoAdUnitFactory() });
-            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory() });
-            contentTypeHandlerManager.addHandler(ProgrammaticMraidUrlParser.ContentType, { parser: new ProgrammaticMraidUrlParser(), factory: new MRAIDAdUnitFactory() });
-            contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(), factory: new MRAIDAdUnitFactory() });
-            contentTypeHandlerManager.addHandler(ProgrammaticVPAIDParser.ContentType, { parser: new ProgrammaticVPAIDParser(), factory: new VPAIDAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
+            contentTypeHandlerManager.addHandler(XPromoCampaignParser.ContentType, { parser: new XPromoCampaignParser(), factory: new XPromoAdUnitFactory(<XPromoAdUnitParametersFactory>adUnitParametersFactory) });
+            contentTypeHandlerManager.addHandler(ProgrammaticVastParser.ContentType, { parser: new ProgrammaticVastParser(), factory: new VastAdUnitFactory(<VastAdUnitParametersFactory>adUnitParametersFactory) });
+            contentTypeHandlerManager.addHandler(ProgrammaticMraidUrlParser.ContentType, { parser: new ProgrammaticMraidUrlParser(), factory: new MRAIDAdUnitFactory(<MRAIDAdUnitParametersFactory>adUnitParametersFactory) });
+            contentTypeHandlerManager.addHandler(ProgrammaticMraidParser.ContentType, { parser: new ProgrammaticMraidParser(), factory: new MRAIDAdUnitFactory(<MRAIDAdUnitParametersFactory>adUnitParametersFactory) });
+            contentTypeHandlerManager.addHandler(ProgrammaticVPAIDParser.ContentType, { parser: new ProgrammaticVPAIDParser(), factory: new VPAIDAdUnitFactory(<VPAIDAdUnitParametersFactory>adUnitParametersFactory) });
             campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
 
             campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
@@ -1189,7 +1199,7 @@ describe('CampaignManager', () => {
         const ConfigurationAuctionPlcJson = JSON.parse(ConfigurationAuctionPlc);
 
         beforeEach(() => {
-            contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(), factory: new PerformanceAdUnitFactory() });
+            contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
             assetManager = new AssetManager(platform, core, new CacheManager(core, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             campaignManager = new CampaignManager(platform, core, CoreConfigurationParser.parse(ConfigurationAuctionPlcJson), AdsConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             mockRequest = sinon.mock(request);

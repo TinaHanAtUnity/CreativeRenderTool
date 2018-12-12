@@ -6,11 +6,11 @@ export class AppSheet extends BackendApi {
         return false;
     }
 
-    public prepare(options: any, timeout: number) {
+    public prepare(options: unknown, timeout: number) {
         return;
     }
 
-    public destroy(options: any) {
+    public destroy(options: unknown) {
         return;
     }
 

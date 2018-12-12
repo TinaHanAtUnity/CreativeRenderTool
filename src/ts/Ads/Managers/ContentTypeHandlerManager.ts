@@ -1,11 +1,13 @@
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { IContentTypeHandler } from 'Ads/Modules/AbstractParserModule';
+import { Campaign } from 'Ads/Models/Campaign';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 
 export class ContentTypeHandlerManager {
 
     private _parsers: { [key: string]: CampaignParser } = {};
-    private _factories: { [key: string]: AbstractAdUnitFactory } = {};
+    private _factories: { [key: string]: AbstractAdUnitFactory<Campaign, IAdUnitParameters<Campaign>> } = {};
 
     public addHandler(contentType: string, handler: IContentTypeHandler) {
         if(!(contentType in this._parsers) && !(contentType in this._factories)) {
@@ -23,7 +25,7 @@ export class ContentTypeHandlerManager {
         throw new Error(`Unsupported content-type: ${contentType}`);
     }
 
-    public getFactory(contentType: string): AbstractAdUnitFactory {
+    public getFactory(contentType: string): AbstractAdUnitFactory<Campaign, IAdUnitParameters<Campaign>> {
         if(contentType in this._factories) {
             return this._factories[contentType];
         }

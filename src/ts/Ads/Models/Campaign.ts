@@ -6,6 +6,18 @@ import { ISchema, Model } from 'Core/Models/Model';
 
 export type ICampaignTrackingUrls = { [key: string]: string[] };
 
+export interface IRawCampaign {
+    id: string;
+    willExpireAt?: number;
+    contentType: string;
+    adType?: string;
+    correlationId?: string;
+    creativeId?: string;
+    seatId?: number;
+    meta?: string;
+    mediaId: string;
+}
+
 export interface ICampaign {
     id: string;
     willExpireAt: number | undefined;
@@ -104,7 +116,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return [];
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'id': this.getId(),
             'willExpireAt': this.getWillExpireAt(),

@@ -106,11 +106,11 @@ Or combine both:
 
 #### Automatic builds for Android
 
-http://qa-jenkins.us-east-1.applifier.info:8080/job/unity_ads_sdk2_android_hybrid_tests/
+http://jenkins.applifier.info/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-hybrid-test-android/
 
 #### Automatic builds for iOS
 
-http://qa-jenkins.us-east-1.applifier.info:8080/job/unity_ads_sdk2_ios_hybrid_tests/
+http://jenkins.applifier.info/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-hybrid-test-ios/
 
 ### Browser build tests
 
@@ -119,8 +119,9 @@ http://qa-jenkins.us-east-1.applifier.info:8080/job/unity_ads_sdk2_ios_hybrid_te
 
 ### Deployment tests
 
-#### iOS
-http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-android-sans-webhook/
-
 #### Android
-http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-ios-sans-webhook/
+http://jenkins.applifier.info/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-systest-android/
+
+#### iOS
+http://jenkins.applifier.info/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-systest-ios/
+

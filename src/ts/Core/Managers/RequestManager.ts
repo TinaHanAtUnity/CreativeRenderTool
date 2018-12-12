@@ -287,13 +287,13 @@ export class RequestManager {
         }
     }
 
-    private finishRequest(id: number, status: RequestStatus, ...parameters: any[]) {
+    private finishRequest(id: number, status: RequestStatus, response: INativeResponse | RequestError) {
         const callbackObject = RequestManager._callbacks[id];
         if(callbackObject) {
             if(status === RequestStatus.COMPLETE) {
-                callbackObject.resolve(...parameters);
+                callbackObject.resolve(<INativeResponse>response);
             } else {
-                callbackObject.reject(...parameters);
+                callbackObject.reject(<RequestError>response);
             }
             delete RequestManager._callbacks[id];
             delete RequestManager._requests[id];

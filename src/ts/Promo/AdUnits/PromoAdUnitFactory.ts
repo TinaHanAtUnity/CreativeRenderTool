@@ -1,32 +1,22 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { Privacy } from 'Ads/Views/Privacy';
-import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
+import { PromoAdUnit, IPromoAdUnitParameters } from 'Promo/AdUnits/PromoAdUnit';
 import { PromoEventHandler } from 'Promo/EventHandlers/PromoEventHandler';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { Promo } from 'Promo/Views/Promo';
 
-export class PromoAdUnitFactory extends AbstractAdUnitFactory {
+export class PromoAdUnitFactory extends AbstractAdUnitFactory<PromoCampaign, IPromoAdUnitParameters> {
 
-    public createAdUnit(parameters: IAdUnitParameters<PromoCampaign>): PromoAdUnit {
-        const privacy = this.createPrivacy(parameters);
-        const showGDPRBanner = this.showGDPRBanner(parameters);
+    public createAdUnit(parameters: IPromoAdUnitParameters): PromoAdUnit {
+        const promoAdUnit = new PromoAdUnit(parameters);
 
-        const promoView = new Promo(parameters.platform, parameters.core, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.placement);
-        const promoAdUnit = new PromoAdUnit({
-            ...parameters,
-            view: promoView,
-            privacy: privacy,
-            purchasing: parameters.purchasing
-        });
+        parameters.view.render();
+        document.body.appendChild(parameters.view.container());
 
-        promoView.render();
-        document.body.appendChild(promoView.container());
-
-        promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.adsConfig, parameters.privacyManager));
-        promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.campaign, parameters.placement.getId()));
-        promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromoClick(promoAdUnit, parameters.campaign, parameters.placement.getId()));
-        Privacy.setupReportListener(privacy, promoAdUnit);
+        parameters.view.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.adsConfig, parameters.privacyManager));
+        parameters.view.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.campaign, parameters.placement.getId()));
+        parameters.view.onPromo.subscribe((productId) => PromoEventHandler.onPromoClick(promoAdUnit, parameters.campaign, parameters.placement.getId()));
+        Privacy.setupReportListener(parameters.privacy, promoAdUnit);
 
         return promoAdUnit;
     }

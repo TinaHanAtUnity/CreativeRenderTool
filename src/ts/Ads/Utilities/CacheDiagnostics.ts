@@ -50,7 +50,7 @@ export class CacheDiagnostics {
     }
 
     private sendDiagnostic(event: CacheDiagnosticEvent, cacheEvent: ICacheEvent) {
-        const msg: any = {
+        const msg: unknown = {
             eventTimestamp: Date.now(),
             eventType: CacheDiagnosticEvent[event],
             creativeType: this._data.creativeType,

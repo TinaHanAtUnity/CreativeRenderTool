@@ -23,7 +23,7 @@ export class BannerAdUnitParametersFactory {
         this._thirdPartyEventManagerFactory = thirdPartyEventManagerFactory;
     }
 
-    public create(campaign: BannerCampaign, placement: Placement, options: any): Promise<IBannerAdUnitParameters> {
+    public create(campaign: BannerCampaign, placement: Placement, options: unknown): Promise<IBannerAdUnitParameters> {
         return Promise.resolve({
             platform: this._platform,
             core: this._core,

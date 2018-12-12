@@ -8,7 +8,7 @@ export enum StorageCommandType {
 export interface IStorageCommand {
     type: StorageCommandType;
     key: string;
-    value?: any;
+    value?: unknown;
 }
 
 export interface IStorageBatch {

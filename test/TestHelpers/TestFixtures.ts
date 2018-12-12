@@ -140,6 +140,9 @@ export class TestFixtures {
             skipInSeconds: 0,
             disableBackButton: false,
             useDeviceOrientationForVideo: false,
+            skipEndCardOnClose: false,
+            disableVideoControlsFade: false,
+            refreshDelay: 1000,
             muteVideo: false,
             adTypes: ['TEST']
         });
@@ -643,8 +646,6 @@ export class TestFixtures {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: new FocusManager(platform, core),
             container: new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core)),
@@ -676,8 +677,6 @@ export class TestFixtures {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: new FocusManager(platform, core),
             container: new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core)),
