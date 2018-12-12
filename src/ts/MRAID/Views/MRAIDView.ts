@@ -226,6 +226,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
+    public isLoaded(): boolean {
+        return this._isLoaded;
+    }
+
     protected choosePrivacyShown(): void {
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._gdprBanner.style.visibility = 'visible';

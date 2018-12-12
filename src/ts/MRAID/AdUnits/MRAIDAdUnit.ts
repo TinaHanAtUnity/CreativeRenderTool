@@ -22,6 +22,8 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Platform } from 'Core/Constants/Platform';
 import { Privacy } from 'Ads/Views/Privacy';
 import { MRAID } from 'MRAID/Views/MRAID';
+import { ExtendedMRAID } from 'MRAID/Views/ExtendedMRAID';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -47,6 +49,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
     private _webPlayerContainer: WebPlayerContainer;
     private _campaign: MRAIDCampaign;
+    private _deviceInfo: DeviceInfo;
 
     constructor(parameters: IMRAIDAdUnitParameters) {
         super(parameters);
@@ -62,6 +65,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._privacy = parameters.privacy;
         this._ar = parameters.ar;
         this._webPlayerContainer = parameters.webPlayerContainer;
+        this._deviceInfo = parameters.deviceInfo;
 
         this._mraid.render();
         document.body.appendChild(this._mraid.container());
@@ -183,10 +187,34 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         if(this.isShowing()) {
             this._mraid.setViewableState(true);
         }
+
+        if (this._mraid instanceof MRAID) {
+            this.startWebPlayers();
+        }
     }
 
     public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
         // EMPTY
+    }
+
+    private startWebPlayers(): Promise<void> {
+        if (!this._mraid.isLoaded()) {
+            return this._deviceInfo.getScreenWidth()
+            .then((width) => {
+                if (this._mraid instanceof ExtendedMRAID) {
+                    Promise.resolve();
+                } else {
+                    this._container.setViewFrame('webview', 0, 0, width, 200);
+                }
+            })
+            .then(() => {
+                if (this._mraid instanceof MRAID) {
+                    this._mraid.loadWebPlayer(this._webPlayerContainer);
+                }
+            });
+        } else {
+            return Promise.resolve();
+        }
     }
 
     private unsetReferences() {

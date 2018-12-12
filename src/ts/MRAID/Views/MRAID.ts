@@ -1,7 +1,5 @@
 import { Placement } from 'Ads/Models/Placement';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -11,20 +9,17 @@ import { ABGroup, FPSCollectionTest } from 'Core/Models/ABGroup';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import MRAIDTemplate from 'html/MRAID.html';
-import MRAIDPerfContainer from 'html/mraid/container-perf.html';
-import MRAIDContainer from 'html/mraid/container.html';
+import MRAIDContainer from 'html/mraid/container-webplayer.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
+import { MRAIDWebPlayerEventAdapter } from 'MRAID/EventBridge/MRAIDWebPlayerEventAdapter';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private readonly onLoaded = new Observable0();
     private _domContentLoaded = false;
-    private _creativeId: string | undefined;
-
-    private _iframe: HTMLIFrameElement;
 
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(platform, core, deviceInfo, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
@@ -32,14 +27,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
-        this._creativeId = campaign.getCreativeId();
 
         this._template = new Template(MRAIDTemplate);
-    }
-
-    public render(): void {
-        super.render();
-        this.loadIframe();
     }
 
     public show(): void {
@@ -71,6 +60,22 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this.setAnalyticsBackgroundTime(viewable);
     }
 
+    public loadWebPlayer(webPlayerContainer: WebPlayerContainer): Promise<void> {
+        this._isLoaded = true;
+        this._mraidAdapterContainer.connect(new MRAIDWebPlayerEventAdapter(this._core, this._mraidAdapterContainer, webPlayerContainer));
+
+        return this.createMRAID(MRAIDContainer).then(mraid => {
+            this._core.Sdk.logDebug('setting webplayer srcdoc (' + mraid.length + ')');
+            SdkStats.setFrameSetStartTimestamp(this._placement.getId());
+            this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set webplayer data started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
+            mraid = this._platform === Platform.ANDROID ? encodeURIComponent(mraid) : mraid;
+
+            this.getMraidAsUrl(mraid).then((url) => {
+                return webPlayerContainer.setUrl(`file://${url}`);
+            });
+        }).catch(e => this._core.Sdk.logError('failed to create mraid: ' + e));
+    }
+
     protected sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
         const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
@@ -94,30 +99,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private loadIframe(): void {
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-        this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
-
-        this.createMRAID(
-            FPSCollectionTest.isValid(this._abGroup) ? MRAIDPerfContainer : MRAIDContainer
-        ).then(mraid => {
-            this._core.Sdk.logDebug('setting iframe srcdoc (' + mraid.length + ')');
-            SdkStats.setFrameSetStartTimestamp(this._placement.getId());
-            this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
-            iframe.srcdoc = mraid;
-
-            if (CustomFeatures.isSonicPlayable(this._creativeId)) {
-                iframe.sandbox = 'allow-scripts allow-same-origin';
-            }
-        }).catch(e => {
-            this._core.Sdk.logError('failed to create mraid: ' + e.message);
-
-            SessionDiagnostics.trigger('create_mraid_error', {
-                message: e.message
-            }, this._campaign.getSession());
-        });
-    }
-
     protected onLoadedEvent(): void {
         this._domContentLoaded = true;
         this.onLoaded.trigger();
@@ -138,5 +119,13 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             return;
         }
         this._handlers.forEach(handler => handler.onMraidClick(url));
+    }
+
+    private getMraidAsUrl(mraid: string): Promise<string> {
+        mraid = this._platform === Platform.ANDROID ? decodeURIComponent(mraid) : mraid;
+        return this._core.Cache.setFileContent('webPlayerMraid', 'UTF-8', mraid)
+        .then(() => {
+            return this._core.Cache.getFilePath('webPlayerMraid');
+        });
     }
 }
