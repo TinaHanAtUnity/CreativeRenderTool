@@ -73,9 +73,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set webplayer data started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             mraid = this._platform === Platform.ANDROID ? encodeURIComponent(mraid) : mraid;
 
-            this.getMraidAsUrl(mraid).then((url) => {
-                return webPlayerContainer.setUrl(`file://${url}`);
-            });
+            return this.setWebPlayerContainerData(webPlayerContainer, mraid);
         }).catch(e => this._core.Sdk.logError('failed to create mraid: ' + e));
     }
 
@@ -153,8 +151,21 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         });
     }
 
+    private setWebPlayerContainerData(webPlayerContainer: WebPlayerContainer, mraid: string): Promise<void> {
+        if (this._platform === Platform.ANDROID) {
+            this.getMraidAsUrl(mraid).then((url) => {
+                return webPlayerContainer.setUrl(`file://${url}`);
+            });
+        } else {
+            return webPlayerContainer.setData(mraid, 'text/html', 'UTF-8');
+        }
+
+        return Promise.resolve();
+    }
+
     private getMraidAsUrl(mraid: string): Promise<string> {
         mraid = this._platform === Platform.ANDROID ? decodeURIComponent(mraid) : mraid;
+
         return this._core.Cache.setFileContent('webPlayerMraid', 'UTF-8', mraid)
         .then(() => {
             return this._core.Cache.getFilePath('webPlayerMraid');

@@ -16,6 +16,8 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { Url } from 'Core/Utilities/Url';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -30,6 +32,9 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _ads: IAdsApi;
     protected _campaign: MRAIDCampaign;
 
+    private _topWebViewAreaHeight: number;
+    private _deviceInfo: DeviceInfo;
+
     constructor(adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
         super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig);
         this._operativeEventManager = parameters.operativeEventManager;
@@ -42,6 +47,8 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._platform = parameters.platform;
         this._core = parameters.core;
         this._ads = parameters.ads;
+        this._deviceInfo = parameters.deviceInfo;
+        this._topWebViewAreaHeight = this.getTopViewHeight();
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -120,7 +127,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             if (shouldFullScreen) {
                 return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, height);
             } else {
-                return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, 200);
+                return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, this._topWebViewAreaHeight);
             }
         });
     }
@@ -228,5 +235,26 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         }
 
         return this._adUnit.getMRAIDView().canClose();
+    }
+
+    private getTopViewHeight(): number {
+        const topWebViewAreaMinHeight = 60;
+
+        if (this._platform === Platform.ANDROID) {
+            return Math.floor(this.getAndroidViewSize(topWebViewAreaMinHeight, this.getScreenDensity()));
+        }
+
+        return topWebViewAreaMinHeight;
+    }
+
+    private getAndroidViewSize(size: number, density: number): number {
+        return size * (density / 160);
+    }
+
+    private getScreenDensity(): number {
+        if (this._platform === Platform.ANDROID) {
+            return (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity();
+        }
+        return 0;
     }
 }

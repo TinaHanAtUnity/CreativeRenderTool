@@ -163,6 +163,10 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 this.hide();
             }, AbstractAdUnit.getAutoCloseDelay());
         }
+
+        if (this._platform === Platform.IOS) {
+            this.onContainerForeground();
+        }
     }
 
     public onContainerDestroy(): void {
