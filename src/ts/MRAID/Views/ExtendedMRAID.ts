@@ -13,17 +13,18 @@ import ExtendedMRAIDTemplate from 'html/ExtendedMRAID.html';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
 
 export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _loadingScreen: HTMLElement;
-    private _loadingScreenTimeout: any;
-    private _prepareTimeout: any;
+    private _loadingScreenTimeout?: number;
+    private _prepareTimeout?: number;
 
     private _iframe: HTMLIFrameElement;
 
     private _localization: Localization;
-    private _configuration: any;
+    private _configuration: unknown;
 
     protected _campaign: PerformanceMRAIDCampaign;
 
@@ -83,19 +84,19 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
 
         super.hide();
-        this._mraidBridge.disconnect();
+        this._mraidAdapterContainer.disconnect();
     }
 
     public setViewableState(viewable: boolean) {
         if(this._isLoaded && !this._loadingScreenTimeout) {
-            this._mraidBridge.sendViewableEvent(viewable);
+            this._mraidAdapterContainer.sendViewableEvent(viewable);
         }
         this.setAnalyticsBackgroundTime(viewable);
     }
 
     private loadIframe(): void {
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-        this._mraidBridge.connect(iframe);
+        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
 
         const container = this.setUpMraidContainer();
         this.createMRAID(container).then(mraid => {
@@ -143,12 +144,12 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private showLoadingScreen() {
         this._loadingScreen.style.display = 'block';
-        this._loadingScreenTimeout = setTimeout(() => {
+        this._loadingScreenTimeout = window.setTimeout(() => {
             if(this._isLoaded) {
                 this.showMRAIDAd();
             } else {
                 // start the prepare timeout and wait for the onload event
-                this._prepareTimeout = setTimeout(() => {
+                this._prepareTimeout = window.setTimeout(() => {
                     this._canClose = true;
                     this._closeElement.style.opacity = '1';
                     this._closeElement.style.display = 'block';
@@ -180,7 +181,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._playableStartTimestamp = Date.now();
                 this.sendMraidAnalyticsEvent('playable_start');
 
-                this._mraidBridge.sendViewableEvent(true);
+                this._mraidAdapterContainer.sendViewableEvent(true);
 
                 this._loadingScreen.style.display = 'none';
             }, false);
@@ -202,7 +203,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    protected sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
+    protected sendMraidAnalyticsEvent(eventName: string, eventData?: unknown) {
         const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
         const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;

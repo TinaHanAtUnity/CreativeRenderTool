@@ -19,12 +19,24 @@ import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
+import { IAbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
+import { Placement } from 'Ads/Models/Placement';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 
-export abstract class AbstractAdUnitFactory {
+export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends IAdUnitParameters<T>> {
     private static _forceGDPRBanner: boolean = false;
+    private _adUnitParametersFactory: IAbstractAdUnitParametersFactory<T, Params>;
 
-    public abstract createAdUnit(parameters: IAdUnitParameters<Campaign>): AbstractAdUnit;
+    constructor(parametersFactory: IAbstractAdUnitParametersFactory<T, Params>) {
+        this._adUnitParametersFactory = parametersFactory;
+    }
+
+    public create(campaign: T, placement: Placement, orientation: Orientation, gamerServerId: string, options: unknown) {
+        const params = this._adUnitParametersFactory.create(campaign, placement, orientation, gamerServerId, options);
+        return this.createAdUnit(params);
+    }
+
+    protected abstract createAdUnit(parameters: Params): AbstractAdUnit;
 
     public static setForcedGDPRBanner(value: boolean) {
         AbstractAdUnitFactory._forceGDPRBanner = value;
@@ -47,7 +59,7 @@ export abstract class AbstractAdUnitFactory {
         };
     }
 
-    protected prepareVideoPlayer<T extends VideoEventHandler, T2 extends VideoAdUnit, T3 extends Campaign, T4 extends OperativeEventManager, ParamsType extends IVideoEventHandlerParams<T2, T3, T4>>(VideoEventHandlerConstructor: { new(p: ParamsType): T }, params: ParamsType): T {
+    protected prepareVideoPlayer<T1 extends VideoEventHandler, T2 extends VideoAdUnit, T3 extends Campaign, T4 extends OperativeEventManager, ParamsType extends IVideoEventHandlerParams<T2, T3, T4>>(VideoEventHandlerConstructor: { new(p: ParamsType): T1 }, params: ParamsType): T1 {
         const adUnit = params.adUnit;
         const videoEventHandler = new VideoEventHandlerConstructor(params);
 
@@ -123,14 +135,6 @@ export abstract class AbstractAdUnitFactory {
             core: params.core,
             ads: params.ads
         };
-    }
-
-    protected getVideo(campaign: Campaign, forceOrientation: Orientation): Video {
-        const video = CampaignAssetInfo.getOrientedVideo(campaign, forceOrientation);
-        if(!video) {
-            throw new WebViewError('Unable to select an oriented video');
-        }
-        return video;
     }
 
     protected createPrivacy(parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {

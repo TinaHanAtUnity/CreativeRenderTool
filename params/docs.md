@@ -34,7 +34,6 @@
 | forceCampaignId | string | Force campaign ID for internal testing purposes | SDK | all |
 | force_country | string | Force country targeting for internal testing purposes | SDK | all |
 | gameId | string | Source game identifier | App | all |
-| gamerId | string | Internal gamer identifier | Server | all |
 | gameSessionId | number | Unique game session identifier. This identifier is shared with analytics events. | SDK | all |
 | language | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | limitAdTracking | boolean | boolean if user has limited tracking or not | SDK | all |
@@ -105,7 +104,6 @@
 | language | all | True | False | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | test | all | True | False | boolean | Test mode | App | all |
 | forceAbGroup | no | True | False | number | Force A/B group for internal testing purposes | SDK | all |
-| gamerId | no | True | False | string | Internal gamer identifier | Server | all |
 | deviceMake | android | True | False | string | Android device manufacturer | SDK | android |
 | advertisingTrackingId | no | True | False | string | Advertising identifier in raw format | SDK | all |
 | limitAdTracking | no | True | False | boolean | boolean if user has limited tracking or not | SDK | all |

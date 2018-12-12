@@ -6,24 +6,11 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
-export class AdMobAdUnitFactory extends AbstractAdUnitFactory {
+export class AdMobAdUnitFactory extends AbstractAdUnitFactory<AdMobCampaign, IAdMobAdUnitParameters> {
 
-    public createAdUnit(parameters: IAdUnitParameters<AdMobCampaign>): AdMobAdUnit {
-        // AdMobSignalFactory will always be defined, checking and throwing just to remove the undefined type.
-        if (!parameters.adMobSignalFactory) {
-            throw new Error('AdMobSignalFactory is undefined, should not get here.');
-        }
+    public createAdUnit(parameters: IAdMobAdUnitParameters): AdMobAdUnit {
 
-        const privacy = this.createPrivacy(parameters);
-        const showGDPRBanner = this.showGDPRBanner(parameters);
-        const view = new AdMobView(parameters.platform, parameters.core, parameters.adMobSignalFactory, parameters.container, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.programmaticTrackingService);
-        view.render();
-
-        const adUnitParameters: IAdMobAdUnitParameters = {
-            ... parameters,
-            view: view
-        };
-        const adUnit = new AdMobAdUnit(adUnitParameters);
+        const adUnit = new AdMobAdUnit(parameters);
 
         const eventHandler = new AdMobEventHandler({
             platform: parameters.platform,
@@ -39,8 +26,9 @@ export class AdMobAdUnitFactory extends AbstractAdUnitFactory {
             adsConfig: parameters.adsConfig,
             privacyManager: parameters.privacyManager
         });
-        view.addEventHandler(eventHandler);
-        AbstractPrivacy.setupReportListener(privacy, adUnit);
+        parameters.view.render();
+        parameters.view.addEventHandler(eventHandler);
+        AbstractPrivacy.setupReportListener(parameters.privacy, adUnit);
 
         return adUnit;
     }

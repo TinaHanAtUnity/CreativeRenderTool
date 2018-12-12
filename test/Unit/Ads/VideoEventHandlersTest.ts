@@ -18,7 +18,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -53,8 +53,6 @@ import { XPromoVideoEventHandler } from 'XPromo/EventHandlers/XPromoVideoEventHa
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -63,9 +61,7 @@ describe('VideoEventHandlersTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let ar: IARApi;
-    let purchasing: IPurchasingApi;
-    let overlay: Overlay;
+    let overlay: NewVideoOverlay;
     let endScreen: PerformanceEndScreen;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
@@ -98,8 +94,6 @@ describe('VideoEventHandlersTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
-        ar = TestFixtures.getARApi(nativeBridge);
-        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
         storageBridge = new StorageBridge(core);
         focusManager = new FocusManager(platform, core);
@@ -140,8 +134,17 @@ describe('VideoEventHandlersTest', () => {
         placement = TestFixtures.getPlacement();
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const privacy = new Privacy(platform, vastCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
-
-        overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false);
+        const campaign = TestFixtures.getCampaign();
+        const videoOverlayParameters = {
+            deviceInfo: deviceInfo,
+            campaign: campaign,
+            coreConfig: coreConfig,
+            placement: placement,
+            clientInfo: clientInfo,
+            platform: platform,
+            ads: ads
+        };
+        overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
 
         const endScreenParams : IEndScreenParameters = {
             platform,
@@ -159,8 +162,7 @@ describe('VideoEventHandlersTest', () => {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
+            privacy,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
@@ -185,8 +187,6 @@ describe('VideoEventHandlersTest', () => {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
@@ -225,8 +225,6 @@ describe('VideoEventHandlersTest', () => {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,

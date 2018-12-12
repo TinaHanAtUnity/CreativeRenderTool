@@ -1,17 +1,15 @@
 @import "components.styl";
 
-// todo: fix lint warnings
-// @stylint off
 #gdpr-consent-settings {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
+  overflow: hidden;
   width: 100%;
   height: 100%;
   background: $white;
-  overflow: hidden;
 
   &.prevent-clicks {
     pointer-events: none;
@@ -28,39 +26,34 @@
   .back-button {
     display: flex;
     align-items: center;
-    font-size: $privacy-text-font-size;
-    color: $black;
-    opacity: .5;
+    padding: $default-size 2 * $default-size;
     width: 2 * $default-size;
-    padding: 0 $default-size;
-    height: 8%;
+    height: 6%;
+    color: $black;
+    font-size: $privacy-text-font-size;
+    opacity: .5;
   }
 
   .wrapper {
     display: flex;
-    height: 92%;
-    width: 100%;
     flex-direction: column;
-  }
-
-
-  .container {
-    padding: 0 $default-size 0 $default-size;
+    padding: 0 2 * $default-size $default-size 2 * $default-size;
+    height: 92%;
   }
 
   .personalization-container {
-    height: 42%;
     overflow: auto;
+    height: 40%;
 
     .privacy-info-title {
       font-weight: $privacy-title-font-weight;
     }
 
     .privacy-info-description {
-      font-size: $default-font-size * .65;
-      text-align: justify;
       color: $privacy-text-color;
+      text-align: justify;
       font-weight: $privacy-text-font-weight;
+      font-size: $default-font-size * .65;
     }
   }
 
@@ -69,28 +62,30 @@
   }
 
   .stripe {
+    margin: .25 * $default-size 1.5 * $default-size .25 * $default-size 1.5 * $default-size;
     height: 1px;
-    margin: 0.25 * $default-size 1.5 * $default-size .25 * $default-size 1.5 * $default-size;
     background-color: $light-gray;
   }
 
   .settings-container {
-    height: 50%;
     display: flex;
     flex-direction: column;
+    height: 50%;
     justify-content: space-evenly;
   }
 
   .accept-all {
+    margin-bottom: .25 * $default-size;
+    border: 1px solid $blue;
     background-color: $blue;
     color: $white;
-    margin-bottom: .25 * $default-size;
   }
 
   .consent-button {
     position: relative;
+    border: 1px solid $white-smoke;
     border-radius: $default-size * .25;
-    border: 1px solid $light-gray;
+    font-weight: $privacy-text-font-weight;
     font-size: $privacy-text-font-size;
 
     &.click-animation {
@@ -98,8 +93,8 @@
     }
   }
   .item {
-    text-align: center;
     padding: .75 * $default-size $default-size;
+    text-align: center;
   }
 
   .checkbox-group-container {
@@ -111,9 +106,9 @@ body {
   &.landscape #gdpr-consent-settings {
     .wrapper {
       display: flex;
-      height: 92%;
-      width: 100%;
       flex-direction: row;
+      width: 100%;
+      height: 92%;
     }
     .personalization-container {
       width: 49%;
@@ -121,16 +116,14 @@ body {
     }
 
     .stripe {
+      margin: .25 * $default-size 1.5 * $default-size .25 * $default-size 1.5 * $default-size;
       width: 1px;
-      margin: 0.25 * $default-size 1.5 * $default-size 0.25 * $default-size 1.5 * $default-size;
       background-color: $light-gray;
     }
 
     .settings-container {
-      height: 100%;
       width: 49%;
+      height: 100%;
     }
-
   }
 }
-// @stylint on

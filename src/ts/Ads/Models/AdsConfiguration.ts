@@ -1,7 +1,19 @@
-import { Placement } from 'Ads/Models/Placement';
+import { IRawPlacement, Placement } from 'Ads/Models/Placement';
 import { GamePrivacy, IPermissions, IPrivacy, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
+
+export interface IRawAdsConfiguration {
+    assetCaching: string;
+    placements: IRawPlacement[];
+    defaultPlacement: string;
+    gdprEnabled: boolean;
+    optOutRecorded: boolean;
+    optOutEnabled: boolean;
+    defaultBannerPlacement: string | undefined;
+    gamePrivacy: string | undefined;
+    userPrivacy: string | undefined;
+}
 
 export interface IAdsConfiguration {
     cacheMode: CacheMode;
@@ -192,7 +204,7 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         return true;
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         const placements = [];
         for(const placement in this.getPlacements()) {
             if(this.getPlacements().hasOwnProperty(placement)) {

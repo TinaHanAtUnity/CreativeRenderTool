@@ -7,7 +7,7 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
-import { ABGroup, InstantInstallNowTest } from 'Core/Models/ABGroup';
+import { ABGroup } from 'Core/Models/ABGroup';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -15,7 +15,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IPermissions } from 'Ads/Models/Privacy';
 
 export interface IVideoOverlayParameters<T extends Campaign> {
@@ -58,7 +57,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _timerElement: HTMLElement;
     private _chinaAdvertisementElement: HTMLElement;
 
-    private _fadeTimer: any;
+    private _fadeTimer?: number;
     private _areControlsVisible: boolean = false;
     private _gameId: string;
 
@@ -192,7 +191,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         }
 
         if (this._fadeEnabled && !this._fadeTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
-            this._fadeTimer = setTimeout(() => {
+            this._fadeTimer = window.setTimeout(() => {
                 this.fadeOut();
                 this._fadeTimer = undefined;
             }, 3000);
@@ -408,12 +407,13 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._container.classList.add('fade-in');
         this._areControlsVisible = true;
 
-        const isVASTCampaign = this._campaign instanceof VastCampaign;
-        if (isVASTCampaign || (this._skipEnabled && InstantInstallNowTest.isValid(this._abGroup))) {
-            setTimeout(() => {
-                this.showCallButton();
-            }, 500);
+        if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
+            return;
         }
+
+        setTimeout(() => {
+            this.showCallButton();
+        }, 500);
     }
 
     private fadeOut() {

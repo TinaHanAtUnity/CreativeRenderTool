@@ -9,7 +9,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { EventType } from 'Ads/Models/Session';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { EndScreen } from 'Ads/Views/EndScreen';
 import { IARApi } from 'AR/AR';
 import { ARUtil } from 'AR/Utilities/ARUtil';
@@ -17,6 +16,7 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -31,7 +31,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _mraid: MRAIDView<IMRAIDViewHandler>;
     private _ar: IARApi;
-    private _options: any;
+    private _options: unknown;
     private _orientationProperties: IOrientationProperties;
     private _endScreen?: EndScreen;
     private _showingMRAID: boolean;
@@ -81,7 +81,10 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });
-        this.sendTrackingEvent('impression');
+
+        if (!CustomFeatures.isLoopMeSeat(this._campaign.getSeatId())) {
+            this.sendImpression();
+        }
 
         this._container.addEventHandler(this);
 
@@ -109,32 +112,12 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowingMRAID(false);
 
         this._mraid.hide();
-        if(this._endScreen) {
-            this._endScreen.hide();
-            this._endScreen.container().parentElement!.removeChild(this._endScreen.container());
-        }
+        this.removeEndScreenContainer();
+        this.removePrivacyContainer();
 
-        if(this._privacy) {
-            this._privacy.hide();
-            this._privacy.container().parentElement!.removeChild(this._privacy.container());
-        }
-
-        const operativeEventParams = this.getOperativeEventParams();
-        const finishState = this.getFinishState();
-        if(finishState === FinishState.COMPLETED) {
-            if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
-                this._operativeEventManager.sendThirdQuartile(operativeEventParams);
-            }
-            if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
-                this._operativeEventManager.sendView(operativeEventParams);
-            }
-            this.sendTrackingEvent('complete');
-        } else if(finishState === FinishState.SKIPPED) {
-            this._operativeEventManager.sendSkip(operativeEventParams);
-        }
-
+        this.sendFinishOperativeEvents();
         this.onFinish.trigger();
-        this._mraid.container().parentElement!.removeChild(this._mraid.container());
+        this.removeMraidContainer();
         this.unsetReferences();
 
         this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
@@ -155,6 +138,10 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendClick(): void {
         this.sendTrackingEvent('click');
+    }
+
+    public sendImpression(): void {
+        this.sendTrackingEvent('impression');
     }
 
     public getEndScreen(): EndScreen | undefined {
@@ -237,5 +224,49 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             placement: this._placement,
             asset: this._campaign.getResourceUrl()
         };
+    }
+
+    private removeEndScreenContainer() {
+        if(this._endScreen) {
+            this._endScreen.hide();
+
+            const endScreenContainer = this._endScreen.container();
+            if (endScreenContainer && endScreenContainer.parentElement) {
+                endScreenContainer.parentElement.removeChild(this._endScreen.container());
+            }
+        }
+    }
+
+    private removePrivacyContainer() {
+        const privacyContainer = this._privacy.container();
+        if (privacyContainer && privacyContainer.parentElement) {
+            privacyContainer.parentElement.removeChild(this._privacy.container());
+        }
+    }
+
+    private removeMraidContainer() {
+        const mraidContainer = this._mraid.container();
+        if (mraidContainer && mraidContainer.parentElement) {
+            mraidContainer.parentElement.removeChild(this._mraid.container());
+        }
+    }
+
+    private sendFinishOperativeEvents() {
+        const operativeEventParams = this.getOperativeEventParams();
+        const finishState = this.getFinishState();
+
+        if(finishState === FinishState.COMPLETED) {
+            if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+                this._operativeEventManager.sendThirdQuartile(operativeEventParams);
+            }
+
+            if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
+                this._operativeEventManager.sendView(operativeEventParams);
+            }
+
+            this.sendTrackingEvent('complete');
+        } else if(finishState === FinishState.SKIPPED) {
+            this._operativeEventManager.sendSkip(operativeEventParams);
+        }
     }
 }
