@@ -2,6 +2,10 @@
 
 * Remove diagnostics logging for click rejection [#7463](https://github.com/Applifier/unity-ads-webview/pull/7463)
 * Fix standalone cta button [#7436](https://github.com/Applifier/unity-ads-webview/pull/7436)
+* Add onStartProcessed trigger for AdMobAdUnit [#7513](https://github.com/Applifier/unity-ads-webview/pull/7513)
+* LoopMe MRAID Impression count experiment [#7468](https://github.com/Applifier/unity-ads-webview/pull/7468)
+* Fix CI limit node label [#7541](https://github.com/Applifier/unity-ads-webview/pull/7541)
+* Log promo error whenever creatives are not found [#7465](https://github.com/Applifier/unity-ads-webview/pull/7465)
 
 # Wed Dec 12 10:27:59 UTC 2018
 
