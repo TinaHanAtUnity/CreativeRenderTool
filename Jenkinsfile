@@ -27,7 +27,7 @@ def waitWebviewDeployed(webviewBranch) {
 def runTests = false
 
 pipeline {
-    agent { label "ads_sdk_docker" }
+    agent { label "ads_sdk_worker" }
     stages {
         stage('Wait for webview deployment') {
             when {
