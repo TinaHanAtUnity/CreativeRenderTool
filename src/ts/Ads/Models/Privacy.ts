@@ -7,7 +7,7 @@ export enum PrivacyMethod {
     DEVELOPER_CONSENT = 'developer_consent'
 }
 
-export interface IPrivacy {
+export interface IRequestPrivacy {
     method: PrivacyMethod;
     firstRequest: boolean;
     permissions: IPermissions;
@@ -17,21 +17,26 @@ export interface IAllPermissions {
     all: boolean;
 }
 
-export interface IPersonalizedConsent {
+export interface IGranularPermissions {
     gameExp: boolean;
     ads: boolean;
     external: boolean;
 }
 
-export function isIPersonalizedConsent(consent: IPermissions): consent is IPersonalizedConsent {
-  return (<IPersonalizedConsent>consent).gameExp !== undefined;
+type IUnityConsentPermissions = IAllPermissions | IGranularPermissions;
+
+export function isUnityConsentPermissions(permissions: IPermissions): permissions is IUnityConsentPermissions {
+    return (<IAllPermissions>permissions).all === true || (
+        (<IGranularPermissions>permissions).gameExp !== undefined &&
+        (<IGranularPermissions>permissions).ads !== undefined &&
+        (<IGranularPermissions>permissions).external !== undefined);
 }
 
-export interface IUnityConsentProfiling {
+export interface IProfilingPermissions {
     profiling: boolean;
 }
 
-export type IPermissions = IPersonalizedConsent | IUnityConsentProfiling | IAllPermissions | {};
+export type IPermissions = IAllPermissions | IGranularPermissions | IProfilingPermissions | {};
 
 const CurrentUnityConsentVersion = 20181106;
 
@@ -74,8 +79,9 @@ export class GamePrivacy extends Model<IGamePrivacy> {
 }
 
 interface IUserPrivacy {
-    method: PrivacyMethod; // TODO: should 'default' from PrivacyMethod be allowed?
-    privacy: IPermissions;
+    method: PrivacyMethod;
+    version: number;
+    permissions: IPermissions;
 }
 
 export class UserPrivacy extends Model<IUserPrivacy> {
@@ -83,15 +89,16 @@ export class UserPrivacy extends Model<IUserPrivacy> {
     constructor(data: any) {
         super('UserPrivacy', {
             method: ['string'],
-            privacy: ['object']
+            version: ['number'],
+            permissions: ['object']
         });
 
         this.set('method', data.method);
-        this.set('privacy', data.privacy);
+        this.set('version', data.version);
+        this.set('permissions', data.permissions);
     }
 
     public isEnabled(): boolean {
-        // TODO: add support for other privacy methods
         return this.getMethod() === PrivacyMethod.UNITY_CONSENT;
     }
 
@@ -100,21 +107,18 @@ export class UserPrivacy extends Model<IUserPrivacy> {
     }
 
     public getVersion(): number {
-        if (this.getMethod() === PrivacyMethod.UNITY_CONSENT) {
-            return CurrentUnityConsentVersion;
-        }
-        return 0;
+        return this.get('version');
     }
 
-    public getPrivacy(): IPermissions {
-        return this.get('privacy');
+    public getPermissions(): IPermissions {
+        return this.get('permissions');
     }
 
-    public setPrivacy(privacy: IPermissions): void {
-        return this.set('privacy', privacy);
+    public setPermissions(permissions: IPermissions): void {
+        return this.set('permissions', permissions);
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'method': this.getMethod(),
             'version': this.getVersion()

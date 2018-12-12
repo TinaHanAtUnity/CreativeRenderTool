@@ -1,5 +1,5 @@
 import { IRawPlacement, Placement } from 'Ads/Models/Placement';
-import { GamePrivacy, IPermissions, IPrivacy, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import { GamePrivacy, IPermissions, IRequestPrivacy, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
 
@@ -23,7 +23,7 @@ export interface IAdsConfiguration {
     optOutRecorded: boolean;
     optOutEnabled: boolean;
     defaultBannerPlacement: Placement | undefined;
-    gamePrivacy?: GamePrivacy;
+    gamePrivacy: GamePrivacy;
     userPrivacy?: UserPrivacy;
 }
 
@@ -36,7 +36,7 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         optOutRecorded: ['boolean'],
         optOutEnabled: ['boolean'],
         defaultBannerPlacement: ['string', 'undefined'],
-        gamePrivacy: ['object', 'undefined'],
+        gamePrivacy: ['object'],
         userPrivacy: ['object', 'undefined']
     };
 
@@ -109,11 +109,11 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         return false;
     }
 
-    public getPrivacy(): IPrivacy {
+    public getPrivacy(): IRequestPrivacy {
         const userPrivacy = this.getUserPrivacy();
         let userPermissions;
         if (userPrivacy) {
-            userPermissions = userPrivacy.getPrivacy();
+            userPermissions = userPrivacy.getPermissions();
         } else {
             userPermissions = {};
         }
@@ -124,10 +124,10 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         };
     }
 
-    public addUserConsent(privacy: IPermissions): void {
+    public addUserConsent(permissions: IPermissions): void {
         let userPrivacy: UserPrivacy | undefined = this.getUserPrivacy();
         if (userPrivacy) {
-            userPrivacy.setPrivacy(privacy);
+            userPrivacy.setPermissions(permissions);
             return;
         }
 
@@ -138,7 +138,7 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         } else {
             method = PrivacyMethod.DEFAULT;
         }
-        userPrivacy = new UserPrivacy({method: method, privacy: privacy});
+        userPrivacy = new UserPrivacy({method: method, permissions: permissions});
         this.setUserPrivacy(userPrivacy);
     }
 
@@ -174,7 +174,7 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         this.set('optOutEnabled', optOutEnabled);
     }
 
-    public getGamePrivacy(): GamePrivacy | undefined {
+    public getGamePrivacy(): GamePrivacy {
         return this.get('gamePrivacy');
     }
 

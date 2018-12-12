@@ -23,7 +23,7 @@ import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { IPrivacy } from 'Ads/Models/Privacy';
+import { IRequestPrivacy } from 'Ads/Models/Privacy';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: RequestManager;
@@ -78,7 +78,7 @@ export interface IInfoJson {
     gdprEnabled: boolean;
     optOutEnabled: boolean;
     optOutRecorded: boolean;
-    privacy: IPrivacy;
+    privacy: IRequestPrivacy;
     gameSessionCounters: IGameSessionCounters;
     apiLevel?: number;
     deviceMake?: string;
