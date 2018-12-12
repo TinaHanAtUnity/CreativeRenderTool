@@ -29,7 +29,7 @@ export abstract class VastCreative<T extends IVastCreative = IVastCreative> exte
         this.get('trackingEvents')[eventName].push(trackingURLTemplate);
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'type': this.getType(),
             'trackingEvents': this.getTrackingEvents()

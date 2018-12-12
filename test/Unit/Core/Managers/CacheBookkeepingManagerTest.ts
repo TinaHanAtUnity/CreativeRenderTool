@@ -58,7 +58,7 @@ class TestHelper {
 
             // add one file, 2 days old
             helper.addFile(fileId, 1000000, 2);
-            backend.Api.Storage.setStorageContents({
+            backend.Api.Storage.setStorageContents(<any>{
                 cache: {
                     files: {
                         test: {
@@ -84,7 +84,7 @@ class TestHelper {
 
             // add one file, 30 days old
             helper.addFile(fileId, 1000000, 30);
-            backend.Api.Storage.setStorageContents({
+            backend.Api.Storage.setStorageContents(<any>{
                 cache: {
                     files: {
                         test: {
@@ -117,7 +117,7 @@ class TestHelper {
             helper.addFile(oldFileId, 1000000, 31); // 31 days old, should be deleted
             helper.addFile(oldFileId2, 1000000, 32); // 32 days old, should be deleted
 
-            backend.Api.Storage.setStorageContents({
+            backend.Api.Storage.setStorageContents(<any>{
                 cache: {
                     files: {
                         new: {
@@ -168,7 +168,7 @@ class TestHelper {
             helper.addFile(smallFileId, 1234, 1); // small file, should be kept
             helper.addFile(largeFileId, 123456789, 2); // large file over 50 megabytes, should be deleted
 
-            backend.Api.Storage.setStorageContents({
+            backend.Api.Storage.setStorageContents(<any>{
                 cache: {
                     files: {
                         small: {
@@ -222,7 +222,7 @@ class TestHelper {
             const storageSpy = sinon.stub(backend.Api.Storage, 'delete').returns(Promise.resolve());
             const cacheSpy = sinon.spy(backend.Api.Cache, 'deleteFile');
 
-            backend.Api.Storage.setStorageContents({
+            backend.Api.Storage.setStorageContents(<any>{
                 cache: {
                     files: {
                         foo: {
@@ -250,7 +250,7 @@ class TestHelper {
 
             // add one partially downloaded file
             helper.addFile(fileId, 1000000, 1);
-            backend.Api.Storage.setStorageContents({
+            backend.Api.Storage.setStorageContents(<any>{
                 cache: {
                     files: {
                         test2: {
@@ -276,7 +276,7 @@ class TestHelper {
             const storageSpy = sinon.spy(backend.Api.Storage, 'delete');
             helper.addFile('test1.mp4', 123456, 2);
             helper.addFile('test2.mp4', 123456, 2);
-            backend.Api.Storage.setStorageContents({
+            backend.Api.Storage.setStorageContents(<any>{
                 cache: {
                     files: {},
                     campaigns: {
@@ -304,7 +304,7 @@ class TestHelper {
         it('should delete campaign without files on disk and without required files in cache', () => {
             const campaignId = '123456';
             const storageSpy = sinon.spy(backend.Api.Storage, 'delete');
-            backend.Api.Storage.setStorageContents({
+            backend.Api.Storage.setStorageContents(<any>{
                 cache: {
                     files: {},
                     campaigns: {
@@ -333,7 +333,7 @@ class TestHelper {
             const storageSpy = sinon.spy(backend.Api.Storage, 'delete');
             helper.addFile('test1.mp4', 123456, 2);
             helper.addFile('test2.mp4', 123456, 2);
-            backend.Api.Storage.setStorageContents({
+            backend.Api.Storage.setStorageContents(<any>{
                 cache: {
                     files: {
                         test1: {
@@ -378,7 +378,7 @@ class TestHelper {
             helper.addFile('test1.mp4', 123456, 2);
             helper.addFile('test2.mp4', 123456, 2);
 
-            backend.Api.Storage.setStorageContents({
+            backend.Api.Storage.setStorageContents(<any>{
                 cache: {
                     test1: {
                         mp4: '{fullyDownloaded: true}'
@@ -403,7 +403,7 @@ class TestHelper {
         it('should delete the whole cache bookkeeping when there is no files on disk and format is old', () => {
             const storageSpy = sinon.spy(backend.Api.Storage, 'delete');
 
-            backend.Api.Storage.setStorageContents({
+            backend.Api.Storage.setStorageContents(<any>{
                 cache: {
                     test1: {
                         mp4: '{fullyDownloaded: true}'

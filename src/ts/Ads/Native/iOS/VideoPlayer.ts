@@ -23,22 +23,22 @@ export class IosVideoPlayerApi extends EventedNativeApi<IIosVideoEventHandler> {
         super(nativeBridge, 'VideoPlayer', ApiPackage.ADS);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case IosVideoPlayerEvent[IosVideoPlayerEvent.LIKELY_TO_KEEP_UP]:
-                this._handlers.forEach(handler => handler.onLikelyToKeepUp(parameters[0], parameters[1]));
+                this._handlers.forEach(handler => handler.onLikelyToKeepUp(<string>parameters[0], <boolean>parameters[1]));
                 break;
 
             case IosVideoPlayerEvent[IosVideoPlayerEvent.BUFFER_EMPTY]:
-                this._handlers.forEach(handler => handler.onBufferEmpty(parameters[0], parameters[1]));
+                this._handlers.forEach(handler => handler.onBufferEmpty(<string>parameters[0], <boolean>parameters[1]));
                 break;
 
             case IosVideoPlayerEvent[IosVideoPlayerEvent.BUFFER_FULL]:
-                this._handlers.forEach(handler => handler.onBufferFull(parameters[0], parameters[1]));
+                this._handlers.forEach(handler => handler.onBufferFull(<string>parameters[0], <boolean>parameters[1]));
                 break;
 
             case IosVideoPlayerEvent[IosVideoPlayerEvent.GENERIC_ERROR]:
-                this._handlers.forEach(handler => handler.onGenericError(parameters[0], parameters[1]));
+                this._handlers.forEach(handler => handler.onGenericError(<string>parameters[0], <string>parameters[1]));
                 break;
 
             default:

@@ -35,7 +35,7 @@ export class PlayerMetaData extends BaseMetaData<IPlayerMetaData> {
         return this.get('server_id');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'sid': this.getServerId()
         };

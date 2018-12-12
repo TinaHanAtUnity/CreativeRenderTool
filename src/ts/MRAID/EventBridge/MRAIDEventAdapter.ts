@@ -42,7 +42,7 @@ export enum MRAIDEvents {
 
 export abstract class MRAIDEventAdapter implements IMRAIDAdapter {
     protected _handler: IMRAIDHandler;
-    protected _mraidHandlers: { [event: string]: (msg: any) => void };
+    protected _mraidHandlers: { [event: string]: (msg: { [key: string]: unknown }) => void };
 
     constructor(handler: IMRAIDHandler) {
         this._handler = handler;

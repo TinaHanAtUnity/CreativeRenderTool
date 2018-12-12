@@ -1,7 +1,7 @@
 import { MetaData } from 'Core/Utilities/MetaData';
 
 export class TestEnvironment {
-    public static setup(metaData: MetaData): Promise<string[]> {
+    public static setup(metaData: MetaData): Promise<void[]> {
         const clearMetaDataPromise = metaData.get('test.clearTestMetaData', false);
         const getKeysPromise = metaData.getKeys('test');
         return Promise.all([clearMetaDataPromise, getKeysPromise]).then(([[clearKeyFound, clearKeyValue], keys]) => {
@@ -10,7 +10,7 @@ export class TestEnvironment {
                 deleteValue = clearKeyValue;
             }
 
-            const promises: any[] = [];
+            const promises: Promise<void>[] = [];
             keys.forEach((key) => {
                 promises.push(metaData.get('test.' + key, deleteValue).then(([found, value]) => {
                     if(found) {
@@ -22,9 +22,9 @@ export class TestEnvironment {
         });
     }
 
-    public static get(key: string): any {
-        return TestEnvironment._testEnvironment[key];
+    public static get<T>(key: string): T {
+        return <T>TestEnvironment._testEnvironment[key];
     }
 
-    private static _testEnvironment: { [key: string]: any } = {};
+    private static _testEnvironment: { [key: string]: unknown } = {};
 }
