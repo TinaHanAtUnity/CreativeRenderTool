@@ -9,7 +9,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { EventType } from 'Ads/Models/Session';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { EndScreen } from 'Ads/Views/EndScreen';
 import { IARApi } from 'AR/AR';
 import { ARUtil } from 'AR/Utilities/ARUtil';
@@ -17,12 +16,12 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
     endScreen?: EndScreen;
-    privacy: Privacy;
+    privacy: AbstractPrivacy;
     ar: IARApi;
 }
 

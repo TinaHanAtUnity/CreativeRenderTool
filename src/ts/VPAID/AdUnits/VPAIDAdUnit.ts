@@ -19,13 +19,12 @@ import { Timer } from 'Core/Utilities/Timer';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
-import { Privacy } from 'Ads/Views/Privacy';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
     closer: Closer;
     endScreen?: VPAIDEndScreen | undefined;
-    privacy: Privacy;
+    privacy: AbstractPrivacy;
     webPlayerContainer: WebPlayerContainer;
 }
 
