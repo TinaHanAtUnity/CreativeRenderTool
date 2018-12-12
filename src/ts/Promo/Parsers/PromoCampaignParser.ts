@@ -3,9 +3,7 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { ICoreApi, ICore } from 'Core/ICore';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ILimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
 import { IProductInfo, ProductInfo, ProductInfoType, IRawProductInfo } from 'Promo/Models/ProductInfo';
@@ -16,7 +14,14 @@ export class PromoCampaignParser extends CampaignParser {
 
     public static ContentType = 'purchasing/iap';
 
-    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
+    private _core: ICoreApi;
+
+    constructor(core: ICore) {
+        super(core.NativeBridge.getPlatform());
+        this._core = core.Api;
+    }
+
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const promoJson = JsonParser.parse<IRawPromoCampaign>(response.getContent());
 
         let willExpireAt: number | undefined;
@@ -62,7 +67,7 @@ export class PromoCampaignParser extends CampaignParser {
 
             return promise.then(() => Promise.resolve(promoCampaign));
         } else {
-            core.Sdk.logError('Product is undefined');
+            this._core.Sdk.logError('Product is undefined');
             return Promise.reject();
         }
 

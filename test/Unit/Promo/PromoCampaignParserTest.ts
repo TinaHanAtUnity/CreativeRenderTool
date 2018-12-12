@@ -4,7 +4,6 @@ import { Session } from 'Ads/Models/Session';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -17,6 +16,7 @@ import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { ICore } from 'Core/ICore';
 
 describe('PromoCampaignParser', () => {
     const placementId = 'TestPlacement';
@@ -27,21 +27,18 @@ describe('PromoCampaignParser', () => {
     let platform: Platform;
     let backend: Backend;
     let nativeBridge: NativeBridge;
-    let core: ICoreApi;
-    let request: RequestManager;
+    let core: ICore;
     let session: Session;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-        core = TestFixtures.getCoreApi(nativeBridge);
-        (<any>core.Sdk) = sinon.createStubInstance(SdkApi);
+        core = TestFixtures.getCoreModule(nativeBridge);
+        (<any>core.Api).Sdk = sinon.createStubInstance(SdkApi);
 
-        request = sinon.createStubInstance(RequestManager);
         session = TestFixtures.getSession();
-
-        parser = new PromoCampaignParser();
+        parser = new PromoCampaignParser(core);
     });
 
     describe('parsing a campaign', () => {
@@ -52,7 +49,7 @@ describe('PromoCampaignParser', () => {
             const parse = (data: any) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
-                return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
+                return parser.parse(response, session).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
             };
@@ -92,7 +89,7 @@ describe('PromoCampaignParser', () => {
             const parse = (data: any) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
-                return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
+                return parser.parse(response, session).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
             };
@@ -125,7 +122,7 @@ describe('PromoCampaignParser', () => {
             const parse = (data: any) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
-                return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
+                return parser.parse(response, session).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
             };
@@ -156,7 +153,7 @@ describe('PromoCampaignParser', () => {
             const parse = (data: any) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
-                return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
+                return parser.parse(response, session).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
             };
@@ -202,7 +199,7 @@ describe('PromoCampaignParser', () => {
                     const parse = (data: any) => {
                         const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                         const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
-                        return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
+                        return parser.parse(response, session).then((parsedCampaign) => {
                             campaign = <PromoCampaign>parsedCampaign;
                             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
                         });
@@ -219,7 +216,7 @@ describe('PromoCampaignParser', () => {
                     const parse = (data: any) => {
                         const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                         const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
-                        return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
+                        return parser.parse(response, session).then((parsedCampaign) => {
                             campaign = <PromoCampaign>parsedCampaign;
                             sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
                         });
@@ -248,7 +245,7 @@ describe('PromoCampaignParser', () => {
                 const parse = (data: any) => {
                     const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                     const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
-                    return parser.parse(platform, core, request, response, session).then((parsedCampaign) => {
+                    return parser.parse(response, session).then((parsedCampaign) => {
                         campaign = <PromoCampaign>parsedCampaign;
                         sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
                     });
