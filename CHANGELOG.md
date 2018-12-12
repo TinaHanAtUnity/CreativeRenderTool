@@ -1,3 +1,7 @@
+# PENDING
+
+* Fix standalone cta button [#7436](https://github.com/Applifier/unity-ads-webview/pull/7436)
+
 # Wed Dec 12 10:27:59 UTC 2018
 
 * Use env.revision for commit id [#7510](https://github.com/Applifier/unity-ads-webview/pull/7510)
