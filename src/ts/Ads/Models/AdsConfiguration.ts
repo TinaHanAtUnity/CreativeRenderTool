@@ -1,5 +1,5 @@
 import { IRawPlacement, Placement } from 'Ads/Models/Placement';
-import { GamePrivacy, IPermissions, IRequestPrivacy, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import { IRawGamePrivacy, GamePrivacy, IPermissions, IRequestPrivacy, PrivacyMethod, IRawUserPrivacy, UserPrivacy } from 'Ads/Models/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
 
@@ -11,8 +11,8 @@ export interface IRawAdsConfiguration {
     optOutRecorded: boolean;
     optOutEnabled: boolean;
     defaultBannerPlacement: string | undefined;
-    gamePrivacy: string | undefined;
-    userPrivacy: string | undefined;
+    gamePrivacy: IRawGamePrivacy | undefined;
+    userPrivacy: IRawUserPrivacy | undefined;
 }
 
 export interface IAdsConfiguration {
@@ -24,7 +24,7 @@ export interface IAdsConfiguration {
     optOutEnabled: boolean;
     defaultBannerPlacement: Placement | undefined;
     gamePrivacy: GamePrivacy;
-    userPrivacy?: UserPrivacy;
+    userPrivacy: UserPrivacy;
 }
 
 export class AdsConfiguration extends Model<IAdsConfiguration> {
@@ -37,7 +37,7 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         optOutEnabled: ['boolean'],
         defaultBannerPlacement: ['string', 'undefined'],
         gamePrivacy: ['object'],
-        userPrivacy: ['object', 'undefined']
+        userPrivacy: ['object']
     };
 
     constructor(data: IAdsConfiguration) {
@@ -90,56 +90,15 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         return count;
     }
 
-    public getPrivacyMethod(): PrivacyMethod {
-        const gamePrivacy = this.getGamePrivacy();
-        if (gamePrivacy) {
-            return gamePrivacy.getMethod();
-        }
-        if (!this.isGDPREnabled()) {
-            return PrivacyMethod.DEFAULT;
-        }
-        // TODO: what other cases are there?
-        throw new Error('getPrivacymethod(): This privacy case has not been implemented');
-    }
-
-    public isFirstRequest() {
-        if (!this.getUserPrivacy()) {
-            return true;
-        }
-        return false;
-    }
-
     public getPrivacy(): IRequestPrivacy {
         const userPrivacy = this.getUserPrivacy();
-        let userPermissions;
-        if (userPrivacy) {
-            userPermissions = userPrivacy.getPermissions();
-        } else {
-            userPermissions = {};
-        }
+        const firstRequest = userPrivacy.isRecorded();
+        const permissions = firstRequest ? userPrivacy.getPermissions() : {};
         return {
-            'method': this.getPrivacyMethod(),
-            'firstRequest': this.isFirstRequest(),
-            'permissions': userPermissions
+            'method': this.getGamePrivacy().getMethod(),
+            'firstRequest': firstRequest,
+            'permissions': permissions
         };
-    }
-
-    public addUserConsent(permissions: IPermissions): void {
-        let userPrivacy: UserPrivacy | undefined = this.getUserPrivacy();
-        if (userPrivacy) {
-            userPrivacy.setPermissions(permissions);
-            return;
-        }
-
-        const gamePrivacy: GamePrivacy | undefined = this.getGamePrivacy();
-        let method: PrivacyMethod;
-        if (gamePrivacy) {
-            method = gamePrivacy.getMethod();
-        } else {
-            method = PrivacyMethod.DEFAULT;
-        }
-        userPrivacy = new UserPrivacy({method: method, permissions: permissions});
-        this.setUserPrivacy(userPrivacy);
     }
 
     public getDefaultPlacement(): Placement {
@@ -178,30 +137,8 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         return this.get('gamePrivacy');
     }
 
-    public getUserPrivacy(): UserPrivacy | undefined {
+    public getUserPrivacy(): UserPrivacy {
         return this.get('userPrivacy');
-    }
-
-    public setUserPrivacy(userPrivacy: UserPrivacy): void {
-        this.set('userPrivacy', userPrivacy);
-    }
-
-    public isConsentShowRequired(): boolean {
-        // TODO: Remove before flight
-        const removeBeforeFlight = true;
-        if (removeBeforeFlight) {
-            return true;
-        }
-
-        // TODO: there was going to be a case where we might have to request consent again, will this be server-side?
-        if (!this.isGDPREnabled()) {
-            return false;
-        }
-        const userPrivacy = this.getUserPrivacy();
-        if(userPrivacy) {
-            return false;
-        }
-        return true;
     }
 
     public getDTO(): { [key: string]: unknown } {

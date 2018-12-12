@@ -3,29 +3,29 @@ import GDPRConsentTemplate from 'html/consent/gdpr-consent.html';
 import { Template } from 'Core/Utilities/Template';
 import { GDPRConsentSettings, IGDPRConsentSettingsHandler } from 'Ads/Views/Consent/GDPRConsentSettings';
 import { Platform } from 'Core/Constants/Platform';
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { IPermissions, IGranularPermissions } from 'Ads/Models/Privacy';
+import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { IPermissions } from 'Ads/Models/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 
 export interface IGDPRConsentViewParameters {
     platform: Platform;
-    gdprManager: UserPrivacyManager;
+    privacyManager: UserPrivacyManager;
 }
 
 export interface IGDPRConsentHandler {
-    onConsent(consent: IPermissions): void;
+    onConsent(consent: IPermissions, source: GDPREventSource): void;
     onConsentHide(): void;
     onPrivacy(url: string): void;
 }
 
 export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConsentSettingsHandler {
-    private _parameters: IGDPRConsentViewParameters;
+    private _privacyManager: UserPrivacyManager;
     private _consentSettingsView: GDPRConsentSettings;
 
     constructor(parameters: IGDPRConsentViewParameters) {
         super(parameters.platform, 'gdpr-consent');
 
-        this._parameters = parameters;
+        this._privacyManager = parameters.privacyManager;
         this._template = new Template(GDPRConsentTemplate);
 
         this._bindings = [
@@ -60,7 +60,7 @@ export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConse
         const permissions: IPermissions = {
             all: true
         };
-        this._handlers.forEach(handler => handler.onConsent(permissions));
+        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
         this.runAnimation();
     }
 
@@ -84,7 +84,7 @@ export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConse
         event.preventDefault();
 
         if (!this._consentSettingsView) {
-            this._consentSettingsView = new GDPRConsentSettings(this._platform, this._parameters.gdprManager);
+            this._consentSettingsView = new GDPRConsentSettings(this._platform, this._privacyManager);
             this._consentSettingsView.addEventHandler(this);
             this._consentSettingsView.render();
 
@@ -95,10 +95,8 @@ export class GDPRConsent extends View<IGDPRConsentHandler> implements IGDPRConse
     }
 
     // IGDPRConsentSettingsHandler
-    public onPersonalizedConsent(consent: IGranularPermissions): void {
-        const permissions: IPermissions = consent;
-
-        this._handlers.forEach(handler => handler.onConsent(permissions));
+    public onPersonalizedConsent(permissions: IPermissions): void {
+        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.USER));
     }
 
     // IGDPRConsentSettingsHandler

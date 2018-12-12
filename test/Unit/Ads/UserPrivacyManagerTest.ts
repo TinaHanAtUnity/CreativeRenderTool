@@ -1,6 +1,6 @@
 import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, PrivacyMethod, IPermissions } from 'Ads/Models/Privacy';
+import { GamePrivacy, PrivacyMethod, IPermissions, UserPrivacy } from 'Ads/Models/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -33,6 +33,7 @@ describe('UserPrivacyManagerTest', () => {
     let adsConfig: AdsConfiguration;
     let privacyManager: UserPrivacyManager;
     let gamePrivacy: GamePrivacy;
+    let userPrivacy: UserPrivacy;
     let request: RequestManager;
 
     let onSetStub: sinon.SinonStub;
@@ -62,9 +63,16 @@ describe('UserPrivacyManagerTest', () => {
         coreConfig = sinon.createStubInstance(CoreConfiguration);
         adsConfig = sinon.createStubInstance(AdsConfiguration);
         gamePrivacy = new GamePrivacy({ method: PrivacyMethod.UNITY_CONSENT });
-        (<sinon.SinonStub>adsConfig.getGamePrivacy).callsFake(() => {
-            return gamePrivacy;
+        (<sinon.SinonStub>adsConfig.getGamePrivacy).returns(gamePrivacy);
+        userPrivacy = new UserPrivacy({
+            method: PrivacyMethod.DEFAULT,
+            version: 0,
+            permissions: {
+                profiling: false
+            }
         });
+        (<sinon.SinonStub>adsConfig.getUserPrivacy).returns(userPrivacy);
+
         request = sinon.createStubInstance(RequestManager);
 
         onSetStub = sinon.stub(core.Storage.onSet, 'subscribe');
@@ -531,19 +539,19 @@ describe('UserPrivacyManagerTest', () => {
         });
     });
 
-    describe('sendUnityConsentEvent', () => {
+    describe('updateUserPrivacy', () => {
         const sandbox = sinon.sandbox.create();
-        const anyConsent: IPermissions = {personalizedConsent: { gameExp: false, ads: false, external: false }};
+        const anyConsent: IPermissions = { gameExp: false, ads: false, external: false };
 
-        describe('when sending event', () => {
+        describe('when updating user privacy', () => {
             function sendEvent(permissions: IPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER): Promise<any> {
-                return privacyManager.sendUnityConsentEvent(permissions, source).then(() => {
+                return privacyManager.updateUserPrivacy(permissions, source).then(() => {
                     sinon.assert.calledOnce(httpKafkaStub);
                     return httpKafkaStub.firstCall.args[2];
                 });
             }
 
-            it('should send event once to correct topic', () => {
+            it('should send event to a correct topic', () => {
                 return sendEvent().then(() => {
                     sinon.assert.calledOnce(httpKafkaStub);
                     sinon.assert.calledWith(httpKafkaStub, 'ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, sinon.match.object);
@@ -563,7 +571,7 @@ describe('UserPrivacyManagerTest', () => {
             });
 
             it('should send new privacy fields', () => {
-                const expectedPermissions: IPermissions = {personalizedConsent: { gameExp: false, ads: true, external: true }};
+                const expectedPermissions: IPermissions = { gameExp: false, ads: true, external: true };
                 (<sinon.SinonStub>coreConfig.isCoppaCompliant).returns(false);
 
                 return sendEvent(expectedPermissions, GDPREventSource.USER).then((eventData) => {
@@ -583,17 +591,17 @@ describe('UserPrivacyManagerTest', () => {
             });
         });
 
-        describe('should not send event', () => {
+        describe('should update user privacy', () => {
             it('if game privacy is disabled', () => {
                 sandbox.stub(gamePrivacy, 'isEnabled').returns(false);
-                return privacyManager.sendUnityConsentEvent(anyConsent, GDPREventSource.USER).then(() => {
+                return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.USER).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });
 
             it('if game privacy method is other than UnityConsent', () => {
                 sandbox.stub(gamePrivacy, 'getMethod').returns(PrivacyMethod.DEVELOPER_CONSENT);
-                return privacyManager.sendUnityConsentEvent(anyConsent, GDPREventSource.USER).then(() => {
+                return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.USER).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });

@@ -31,19 +31,11 @@ export class AdsConfigurationParser {
             throw Error('No default placement in configuration response');
         }
 
-        let gamePrivacy : GamePrivacy;
-        let userPrivacy : UserPrivacy | undefined;
-        const configGamePrivacy = configJson.gamePrivacy;
-        const configUserPrivacy = configJson.userPrivacy;
+        const defaultGamePrivacy = new GamePrivacy({ method: PrivacyMethod.DEFAULT });
+        const gamePrivacy = configJson.gamePrivacy ? new GamePrivacy(configJson.gamePrivacy) : defaultGamePrivacy;
 
-        if (configGamePrivacy) {
-            gamePrivacy = new GamePrivacy(configGamePrivacy);
-        } else {
-            gamePrivacy = new GamePrivacy({ method: PrivacyMethod.DEFAULT });
-        }
-        if (configUserPrivacy) {
-            userPrivacy = new UserPrivacy(configUserPrivacy);
-        }
+        const userPrivacyNotRecorded = new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: { profiling: false} });
+        const userPrivacy = configJson.userPrivacy ? new UserPrivacy(configJson.userPrivacy) : userPrivacyNotRecorded;
 
         const configurationParams: IAdsConfiguration = {
             cacheMode: this.parseCacheMode(configJson),

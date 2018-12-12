@@ -1,5 +1,5 @@
 import { AdUnitContainer, AdUnitContainerSystemMessage, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPRConsent, IGDPRConsentHandler } from 'Ads/Views/Consent/GDPRConsent';
 import { IPermissions } from 'Ads/Models/Privacy';
@@ -8,7 +8,7 @@ import { ICoreApi } from 'Core/ICore';
 
 export interface IConsentUnitParameters {
     platform: Platform;
-    gdprManager: UserPrivacyManager;
+    privacyManager: UserPrivacyManager;
     adUnitContainer: AdUnitContainer;
     adsConfig: AdsConfiguration;
     core: ICoreApi;
@@ -20,22 +20,24 @@ export class ConsentUnit implements IGDPRConsentHandler {
     private _adUnitContainer: AdUnitContainer;
     private _gdprConsentView: GDPRConsent;
     private _platform: Platform;
+    private _privacyManager: UserPrivacyManager;
     private _adsConfig: AdsConfiguration;
     private _core: ICoreApi;
 
     constructor(parameters: IConsentUnitParameters) {
         this._gdprConsentView = new GDPRConsent({
             platform: parameters.platform,
-            gdprManager: parameters.gdprManager
+            privacyManager: parameters.privacyManager
         });
         this._adUnitContainer = parameters.adUnitContainer;
         this._gdprConsentView.addEventHandler(this);
         this._platform = parameters.platform;
+        this._privacyManager = parameters.privacyManager;
         this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
     }
 
-    public show(options: any): Promise<void> {
+    public show(options: unknown): Promise<void> {
         this._showing = true;
         return this._adUnitContainer.open('Consent', ['webview'], false, Orientation.NONE, true, true, true, false, options).then(() => {
             const donePromise = new Promise<void>((resolve) => {
@@ -87,8 +89,8 @@ export class ConsentUnit implements IGDPRConsentHandler {
     }
 
     // IGDPRConsentHandler
-    public onConsent(consent: IPermissions): void {
-        this._adsConfig.addUserConsent(consent);
+    public onConsent(permissions: IPermissions, source: GDPREventSource): void {
+        this._privacyManager.updateUserPrivacy(permissions, source);
     }
 
     // IGDPRConsentHandler

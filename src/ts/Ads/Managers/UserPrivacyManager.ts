@@ -1,5 +1,5 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, UserPrivacy, PrivacyMethod, IPermissions } from 'Ads/Models/Privacy';
+import { GamePrivacy, IPermissions, isUnityConsentPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
@@ -46,8 +46,8 @@ export class UserPrivacyManager {
     private readonly _core: ICoreApi;
     private readonly _coreConfig: CoreConfiguration;
     private readonly _adsConfig: AdsConfiguration;
-    private readonly _gamePrivacy: GamePrivacy | undefined;
-    private readonly _userPrivacy: UserPrivacy | undefined;
+    private readonly _gamePrivacy: GamePrivacy;
+    private readonly _userPrivacy: UserPrivacy;
     private readonly _clientInfo: ClientInfo;
     private readonly _deviceInfo: DeviceInfo;
     private readonly _request: RequestManager;
@@ -85,17 +85,33 @@ export class UserPrivacyManager {
         });
     }
 
-    public sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource): Promise<void> {
+    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource): Promise<void> {
         const gamePrivacy = this._gamePrivacy;
-        if (!gamePrivacy) {
-            return Promise.resolve();
-        }
-        const allowed = gamePrivacy.isEnabled() && gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT;
-        if (!allowed) {
+
+        if (!gamePrivacy.isEnabled() || !isUnityConsentPermissions(permissions)) {
             return Promise.resolve();
         }
 
-        const infoJson: any = {
+        if (gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT && !isUnityConsentPermissions(permissions)) {
+            return Promise.resolve();
+        }
+
+        if (source === GDPREventSource.NO_REVIEW) {
+            permissions = { all : true };
+        }
+
+        //TODO: Check if user privacy has changed
+        const updatedPrivacy = {
+            method: gamePrivacy.getMethod(),
+            version: gamePrivacy.getVersion(),
+            permissions: permissions
+        };
+        this._userPrivacy.update(updatedPrivacy);
+        return this.sendUnityConsentEvent(permissions, source);
+    }
+
+    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource): Promise<void> {
+        const infoJson: unknown = {
             adid: this._deviceInfo.getAdvertisingIdentifier(),
             action: GDPREventAction.CONSENT,
             projectId: this._coreConfig.getUnityProjectId(),
@@ -103,14 +119,10 @@ export class UserPrivacyManager {
             gameId: this._clientInfo.getGameId(),
             source: source,
             method: PrivacyMethod.UNITY_CONSENT,
-            version: gamePrivacy.getVersion(),
+            version: this._gamePrivacy.getVersion(),
             coppa: this._coreConfig.isCoppaCompliant(),
             permissions: permissions
         };
-
-        if (source === GDPREventSource.NO_REVIEW) {
-            infoJson.permissions = { all : true };
-        }
 
         return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson)
             .then(ignoreReturnType);

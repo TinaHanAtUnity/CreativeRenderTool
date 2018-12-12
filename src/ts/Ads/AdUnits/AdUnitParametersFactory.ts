@@ -142,8 +142,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected createPrivacy(parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
         let privacy: AbstractPrivacy;
 
-        const gamePrivacy = parameters.adsConfig.getGamePrivacy();
-        if (gamePrivacy && gamePrivacy.isEnabled()) {
+        if (parameters.adsConfig.getGamePrivacy().isEnabled()) {
             privacy = new PrivacySettings(parameters.platform, parameters.campaign, parameters.privacyManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
         } else {
             privacy = new Privacy(parameters.platform, parameters.campaign, parameters.privacyManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());

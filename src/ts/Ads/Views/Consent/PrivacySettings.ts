@@ -107,11 +107,9 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         event.preventDefault();
 
         const consent: IPermissions = {
-            personalizedConsent: {
-                gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
-                ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
-                external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
-            }
+            gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
+            ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
+            external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
         };
 
         this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));

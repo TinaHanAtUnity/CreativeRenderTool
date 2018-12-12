@@ -10,11 +10,11 @@ export enum PrivacyMethod {
 export interface IRequestPrivacy {
     method: PrivacyMethod;
     firstRequest: boolean;
-    permissions: IPermissions;
+    permissions: IPermissions | {};
 }
 
 export interface IAllPermissions {
-    all: boolean;
+    all: true;
 }
 
 export interface IGranularPermissions {
@@ -36,9 +36,13 @@ export interface IProfilingPermissions {
     profiling: boolean;
 }
 
-export type IPermissions = IAllPermissions | IGranularPermissions | IProfilingPermissions | {};
+export type IPermissions = IUnityConsentPermissions | IProfilingPermissions;
 
 const CurrentUnityConsentVersion = 20181106;
+
+export interface IRawGamePrivacy {
+    method: string;
+}
 
 interface IGamePrivacy {
     method: PrivacyMethod;
@@ -46,12 +50,12 @@ interface IGamePrivacy {
 
 export class GamePrivacy extends Model<IGamePrivacy> {
 
-    constructor(data: any) {
+    constructor(data: IRawGamePrivacy) {
         super('GamePrivacy', {
             method: ['string']
         });
 
-        this.set('method', data.method);
+        this.set('method', <PrivacyMethod>data.method);
     }
 
     public isEnabled(): boolean {
@@ -70,12 +74,18 @@ export class GamePrivacy extends Model<IGamePrivacy> {
         return 0;
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'method': this.getMethod(),
             'version': this.getVersion()
         };
     }
+}
+
+export interface IRawUserPrivacy {
+    method: string;
+    version: number;
+    permissions: IPermissions;
 }
 
 interface IUserPrivacy {
@@ -86,20 +96,20 @@ interface IUserPrivacy {
 
 export class UserPrivacy extends Model<IUserPrivacy> {
 
-    constructor(data: any) {
+    constructor(data: IRawUserPrivacy) {
         super('UserPrivacy', {
             method: ['string'],
             version: ['number'],
             permissions: ['object']
         });
 
-        this.set('method', data.method);
+        this.set('method', <PrivacyMethod>data.method);
         this.set('version', data.version);
         this.set('permissions', data.permissions);
     }
 
-    public isEnabled(): boolean {
-        return this.getMethod() === PrivacyMethod.UNITY_CONSENT;
+    public isRecorded(): boolean {
+        return this.getMethod() !== PrivacyMethod.DEFAULT;
     }
 
     public getMethod(): PrivacyMethod {
@@ -114,8 +124,10 @@ export class UserPrivacy extends Model<IUserPrivacy> {
         return this.get('permissions');
     }
 
-    public setPermissions(permissions: IPermissions): void {
-        return this.set('permissions', permissions);
+    public update(data: IUserPrivacy): void {
+        this.set('method', data.method);
+        this.set('version', data.version);
+        this.set('permissions', data.permissions);
     }
 
     public getDTO(): { [key: string]: unknown } {

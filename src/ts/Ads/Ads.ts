@@ -14,12 +14,11 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { ThirdPartyEventMacro, ThirdPartyEventManagerFactory, IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
+import { IThirdPartyEventManagerFactory, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';
@@ -58,7 +57,6 @@ import { Promises, TimeoutError } from 'Core/Utilities/Promises';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Display } from 'Display/Display';
 import { Monetization } from 'Monetization/Monetization';
-import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
 import { MRAID } from 'MRAID/MRAID';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Performance } from 'Performance/Performance';
@@ -76,6 +74,7 @@ import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
+import { PrivacyMethod } from 'Ads/Models/Privacy';
 
 export class Ads implements IAds {
 
@@ -236,13 +235,31 @@ export class Ads implements IAds {
         });
     }
 
-    public showConsentIfNeeded(options: any): Promise<void> {
-        if (!this.Config.isConsentShowRequired()) {
+    private isConsentShowRequired(): boolean {
+        const gamePrivacy = this.Config.getGamePrivacy();
+        const userPrivacy = this.Config.getUserPrivacy();
+
+        if (!gamePrivacy.isEnabled() && gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
+            return false;
+        }
+
+        if (!userPrivacy.isRecorded()) {
+            return true;
+        }
+
+        const methodChangedSinceConsent = gamePrivacy.getMethod() !== userPrivacy.getMethod();
+        const versionUpdatedSinceConsent = gamePrivacy.getVersion() > userPrivacy.getVersion();
+
+        return methodChangedSinceConsent || versionUpdatedSinceConsent;
+    }
+
+    private showConsentIfNeeded(options: unknown): Promise<void> {
+        if (!this.isConsentShowRequired()) {
             return Promise.resolve();
         }
         const consentView = new ConsentUnit({
             platform: this._core.NativeBridge.getPlatform(),
-            gdprManager: this.PrivacyManager,
+            privacyManager: this.PrivacyManager,
             adUnitContainer: this.Container,
             adsConfig: this.Config,
             core: this._core.Api
@@ -297,7 +314,7 @@ export class Ads implements IAds {
             campaign.setTrackingUrls(trackingUrls);
         }
 
-        if (placement.getRealtimeData() && !this.Config.isConsentShowRequired()) {
+        if (placement.getRealtimeData() && !this.isConsentShowRequired()) {
             this._core.Api.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
             const start = Date.now();
 
