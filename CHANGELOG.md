@@ -1,3 +1,19 @@
+# Pending
+
+* Fix video stuck / skipping ads through multitask button [#7564](https://github.com/Applifier/unity-ads-webview/pull/7564)
+* Since ad unit style is optional field no need to send diagnostics [#7543](https://github.com/Applifier/unity-ads-webview/pull/7543)
+* Add content type to campaign_expired diagnostic [#7565](https://github.com/Applifier/unity-ads-webview/pull/7565)
+* Identify replayed job by ReplayCause [#7567](https://github.com/Applifier/unity-ads-webview/pull/7567)
+
+# Thu Dec 13 11:03:45 UTC 2018
+
+* Remove diagnostics logging for click rejection [#7463](https://github.com/Applifier/unity-ads-webview/pull/7463)
+* Fix standalone cta button [#7436](https://github.com/Applifier/unity-ads-webview/pull/7436)
+* Add onStartProcessed trigger for AdMobAdUnit [#7513](https://github.com/Applifier/unity-ads-webview/pull/7513)
+* LoopMe MRAID Impression count experiment [#7468](https://github.com/Applifier/unity-ads-webview/pull/7468)
+* Fix CI limit node label [#7541](https://github.com/Applifier/unity-ads-webview/pull/7541)
+* Log promo error whenever creatives are not found [#7465](https://github.com/Applifier/unity-ads-webview/pull/7465)
+
 # Wed Dec 12 10:27:59 UTC 2018
 
 * Use env.revision for commit id [#7510](https://github.com/Applifier/unity-ads-webview/pull/7510)
@@ -7,6 +23,7 @@
 * Refactor any to unknown [#7319](https://github.com/Applifier/unity-ads-webview/pull/7319)
 * Send ad plan with configuration_ad_unit_style_parse_error diagnostic error [#7511](https://github.com/Applifier/unity-ads-webview/pull/7511)
 * Use CHANGE_BRANCH instead of BRANCH_NAME [#7540](https://github.com/Applifier/unity-ads-webview/pull/7540)
+* Revert "Ramp up Auction V5 to 45% of traffic [#7514](https://github.com/Applifier/unity-ads-webview/pull/7514)" (Back to 15% of traffic)
 
 # Mon Dec 10 22:50:56 UTC 2018
 
