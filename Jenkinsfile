@@ -127,6 +127,7 @@ pipeline {
                 dir('results') {
                     script {
                         def isJobReplayed = checkIfJobReplayed()
+                        echo "Is job replayed: '$isJobReplayed'"
 
                         // run all tests unless the job is manually triggered(restarted)
                         if (env.CHANGE_BRANCH =~ /^staging/ && !isJobReplayed) {
