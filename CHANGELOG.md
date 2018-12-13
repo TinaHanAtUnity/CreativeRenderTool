@@ -1,4 +1,4 @@
-# Pending
+# Thu Dec 13 23:48:40 UTC 2018
 
 * Fix video stuck / skipping ads through multitask button [#7564](https://github.com/Applifier/unity-ads-webview/pull/7564)
 * Since ad unit style is optional field no need to send diagnostics [#7543](https://github.com/Applifier/unity-ads-webview/pull/7543)
