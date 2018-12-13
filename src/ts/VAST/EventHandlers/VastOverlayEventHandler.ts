@@ -74,7 +74,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             const ctaClickedTime = Date.now();
             return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
                 const redirectDuration = Date.now() - ctaClickedTime;
-                if (this._gameSessionId && this._gameSessionId % 1000 === 99) {
+                if (this.shouldRecordClickLog()) {
                     SessionDiagnostics.trigger('click_delay', {
                         duration: redirectDuration,
                         delayedUrl: clickThroughURL,
@@ -114,6 +114,16 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private setCallButtonEnabled(enabled: boolean): void {
         if (this._vastOverlay) {
             this._vastOverlay.setCallButtonEnabled(enabled);
+        }
+    }
+
+    private shouldRecordClickLog(): boolean {
+        if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+            return true;
+        } else if (this._gameSessionId && this._gameSessionId % 10 === 1) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

@@ -45,4 +45,8 @@ export class CustomFeatures {
             || gameId === '2625703'
             || gameId === '2845426';
     }
+
+    public static isByteDanceSeat(seatId: number | undefined): boolean {
+        return seatId === 9116;
+    }
 }

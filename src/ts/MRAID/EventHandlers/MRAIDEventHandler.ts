@@ -16,6 +16,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -64,7 +65,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             const ctaClickedTime = Date.now();
             return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking()).then((storeUrl) => {
                 const redirectDuration = Date.now() - ctaClickedTime;
-                if (this._gameSessionId && this._gameSessionId % 1000 === 99) {
+                if (this.shouldRecordClickLog()) {
                     SessionDiagnostics.trigger('click_delay', {
                         duration: redirectDuration,
                         delayedUrl: url,
@@ -229,5 +230,13 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         }
 
         return this._adUnit.getMRAIDView().canClose();
+    }
+
+    private shouldRecordClickLog(): boolean {
+        if (this._gameSessionId && this._gameSessionId % 10 === 1) {
+            return true;
+        }
+
+        return false;
     }
 }
