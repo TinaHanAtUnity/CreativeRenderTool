@@ -270,7 +270,8 @@ export class Ads implements IAds {
 
             const error = new DiagnosticError(new Error('Campaign expired'), {
                 id: campaign.getId(),
-                willExpireAt: campaign.getWillExpireAt()
+                willExpireAt: campaign.getWillExpireAt(),
+                contentType: campaign.getContentType()
             });
             SessionDiagnostics.trigger('campaign_expired', error, campaign.getSession());
             return;
