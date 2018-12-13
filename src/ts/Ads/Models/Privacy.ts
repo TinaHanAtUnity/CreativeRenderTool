@@ -10,7 +10,7 @@ export enum PrivacyMethod {
 export interface IRequestPrivacy {
     method: PrivacyMethod;
     firstRequest: boolean;
-    permissions: IPermissions | {};
+    permissions: IPermissions | { [key: string]: never };
 }
 
 export interface IAllPermissions {
