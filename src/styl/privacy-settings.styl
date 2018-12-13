@@ -96,6 +96,19 @@
     }
   }
 
+  .view-your-data-container {
+    .delete-data {
+      padding: $default-size 0;
+      color: $alert-icon-color;
+      text-align: left;
+      font-size: $privacy-text-font-size;
+
+      .consent-icon-alert {
+        padding: 0 .5 * $default-size 0 0;
+      }
+    }
+  }
+
   .report-ad-container {
     .report-button {
       position: relative;
@@ -116,8 +129,8 @@
 
   .radio-group-container {
     $radio-group-container($default-scale-size, $default-font-size * .65);
-    line-height: 1.25 * $default-size;
     font-weight: $privacy-text-font-weight;
+    line-height: 1.25 * $default-size;
   }
 
   &.initial {

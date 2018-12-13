@@ -27,6 +27,10 @@
     background: white;
   }
 
+  .stripe {
+    display: none;
+  }
+
   .item {
     margin: 0 0 1.5 * $default-size 0;
   }
@@ -74,5 +78,36 @@
 
   .click-animation.agree {
     $click-animation();
+  }
+}
+
+body {
+  &.landscape #gdpr-consent {
+    .consent-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin: $default-size 2 * $default-size;
+    }
+
+    .stripe {
+      position: absolute;
+      display: block;
+      margin-top: -.25 * $default-size;
+      width: 1px;
+      height: 100%;
+      background-color: $white-smoke;
+      // todo: find a better way to set the top position
+    }
+
+    .top-container {
+      flex: 0 1 40%;
+      margin-right: 2 * $default-size;
+    }
+
+    .bottom-container {
+      flex: 0 1 40%;
+      margin-left: 2 * $default-size;
+    }
   }
 }
