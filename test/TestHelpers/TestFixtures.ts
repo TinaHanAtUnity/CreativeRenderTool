@@ -131,6 +131,7 @@ import { UnityInfo } from 'Core/Models/UnityInfo';
 import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
+import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -638,6 +639,14 @@ export class TestFixtures {
             placement: TestFixtures.getPlacement()
         };
         return new NewVideoOverlay(overlayParams, TestFixtures.getPrivacy(platform, campaign), false, false);
+    }
+
+    public static getPerformanceOverlayEventHandler(platform: Platform, core: ICoreApi, ads: IAdsApi, ar: IARApi, purchasing: IPurchasingApi, campaign: Campaign, adUnit: PerformanceAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): PerformanceOverlayEventHandler {
+        return new PerformanceOverlayEventHandler(
+            adUnit,
+            TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, ar, purchasing),
+            TestFixtures.getAppStoreDownloadHelper(platform, core, ads, campaign, adUnit, thirdPartyEventManager, nativeBridge)
+        );
     }
 
     public static getXPromoAdUnitParameters(platform: Platform, core: ICoreApi, ads: IAdsApi, ar: IARApi, purchasing: IPurchasingApi): IXPromoAdUnitParameters {
