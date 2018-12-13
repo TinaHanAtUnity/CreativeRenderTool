@@ -1,10 +1,10 @@
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 @NonCPS
-def checkIfWebhookTriggered() {
+def checkIfJobReplayed() {
     def causes = currentBuild.rawBuild.getCauses()
     for(cause in causes) {
-        if (cause.class.toString().contains("UpstreamCause")) {
+        if (cause.class.toString().contains("ReplayCause")) {
             return true
         }
     }
@@ -126,10 +126,10 @@ pipeline {
 
                 dir('results') {
                     script {
-                        def isWebhookTriggered = checkIfWebhookTriggered()
+                        def isJobReplayed = checkIfJobReplayed()
 
                         // run all tests unless the job is manually triggered(restarted)
-                        if (env.CHANGE_BRANCH =~ /^staging/ && isWebhookTriggered) {
+                        if (env.CHANGE_BRANCH =~ /^staging/ && !isJobReplayed) {
                             parallel (hybridTestBuilders + systemTestBuilders)
 
                         } else { // run only hybrid tests
