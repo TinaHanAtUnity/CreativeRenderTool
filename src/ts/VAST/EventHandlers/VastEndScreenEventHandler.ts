@@ -32,26 +32,21 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
-            const isBrowserTest = CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId());
             const ctaClickedTime = Date.now();
-            if (isBrowserTest) {
+            return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
+                const redirectDuration = Date.now() - ctaClickedTime;
+                if (redirectDuration > RequestManager.RedirectDurationLong) {
+                    SessionDiagnostics.trigger('click_delay', {
+                        duration: redirectDuration,
+                        delayedUrl: clickThroughURL,
+                        location: 'vast_endscreen',
+                        seatId: this._vastCampaign.getSeatId()
+                    }, this._vastCampaign.getSession());
+                }
+                return this.openUrlOnCallButton(url);
+            }).catch(() => {
                 return this.openUrlOnCallButton(clickThroughURL);
-            } else {
-                return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
-                    const redirectDuration = Date.now() - ctaClickedTime;
-                    if (redirectDuration > RequestManager.RedirectDurationLong) {
-                        SessionDiagnostics.trigger('click_delay', {
-                            duration: redirectDuration,
-                            delayedUrl: clickThroughURL,
-                            location: 'vast_endscreen',
-                            seatId: this._vastCampaign.getSeatId()
-                        }, this._vastCampaign.getSession());
-                    }
-                    return this.openUrlOnCallButton(url);
-                }).catch(() => {
-                    return this.openUrlOnCallButton(clickThroughURL);
-                });
-            }
+            });
         }
         return Promise.reject(new Error('There is no clickthrough URL for video or companion'));
     }

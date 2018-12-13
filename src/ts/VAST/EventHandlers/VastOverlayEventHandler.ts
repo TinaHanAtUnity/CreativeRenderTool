@@ -69,26 +69,21 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
-            const isBrowserTest = CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId());
             const ctaClickedTime = Date.now();
-            if (isBrowserTest) {
+            return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
+                const redirectDuration = Date.now() - ctaClickedTime;
+                if (redirectDuration > RequestManager.RedirectDurationLong) {
+                    SessionDiagnostics.trigger('click_delay', {
+                        duration: redirectDuration,
+                        delayedUrl: clickThroughURL,
+                        location: 'vast_overlay',
+                        seatId: this._vastCampaign.getSeatId()
+                    }, this._vastCampaign.getSession());
+                }
+                return this.openUrlOnCallButton(url);
+            }).catch(() => {
                 return this.openUrlOnCallButton(clickThroughURL);
-            } else {
-                return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
-                    const redirectDuration = Date.now() - ctaClickedTime;
-                    if (redirectDuration > RequestManager.RedirectDurationLong) {
-                        SessionDiagnostics.trigger('click_delay', {
-                            duration: redirectDuration,
-                            delayedUrl: clickThroughURL,
-                            location: 'vast_overlay',
-                            seatId: this._vastCampaign.getSeatId()
-                        }, this._vastCampaign.getSession());
-                    }
-                    return this.openUrlOnCallButton(url);
-                }).catch(() => {
-                    return this.openUrlOnCallButton(clickThroughURL);
-                });
-            }
+            });
         } else {
             return Promise.reject(new Error('No clickThroughURL was defined'));
         }
