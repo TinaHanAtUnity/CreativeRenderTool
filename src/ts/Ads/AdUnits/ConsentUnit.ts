@@ -107,7 +107,6 @@ export class ConsentUnit implements IConsentViewHandler {
 
     // IConsentViewHandler
     public onConsent(permissions: IPermissions, source: GDPREventSource): void {
-        console.log(JSON.stringify(permissions));
         this._privacyManager.updateUserPrivacy(permissions, source);
     }
 
