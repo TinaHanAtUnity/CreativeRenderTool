@@ -1,4 +1,11 @@
-# PENDING
+# Pending
+
+* Fix video stuck / skipping ads through multitask button [#7564](https://github.com/Applifier/unity-ads-webview/pull/7564)
+* Since ad unit style is optional field no need to send diagnostics [#7543](https://github.com/Applifier/unity-ads-webview/pull/7543)
+* Add content type to campaign_expired diagnostic [#7565](https://github.com/Applifier/unity-ads-webview/pull/7565)
+* Identify replayed job by ReplayCause [#7567](https://github.com/Applifier/unity-ads-webview/pull/7567)
+
+# Thu Dec 13 11:03:45 UTC 2018
 
 * Remove diagnostics logging for click rejection [#7463](https://github.com/Applifier/unity-ads-webview/pull/7463)
 * Fix standalone cta button [#7436](https://github.com/Applifier/unity-ads-webview/pull/7436)
