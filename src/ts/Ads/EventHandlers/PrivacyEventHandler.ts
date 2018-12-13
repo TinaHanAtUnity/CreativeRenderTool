@@ -6,7 +6,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { IPermissions } from 'Ads/Views/Consent/IPermissions';
+import { IPermissions, isUnityConsentPermissions } from 'Ads/Models/Privacy';
 
 export class PrivacyEventHandler implements IPrivacyHandler {
 
@@ -66,9 +66,10 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     }
 
     public onPersonalizedConsent(permissions: IPermissions): void {
-        if (this._configuration.getGamePrivacy().isEnabled() && permissions.personalizedConsent) {
+        const gamePrivacy = this._configuration.getGamePrivacy();
+        if (gamePrivacy.isEnabled() && isUnityConsentPermissions(permissions)) {
             // todo: check are the values changed before sending event
-            this._privacyManager.sendUnityConsentEvent(permissions.personalizedConsent, GDPREventSource.USER);
+            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER);
         }
     }
 }

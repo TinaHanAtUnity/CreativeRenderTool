@@ -7,7 +7,7 @@ import { Template } from 'Core/Utilities/Template';
 import PrivacySettingsTemplate from 'html/consent/PrivacySettings.html';
 import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
-import { IPermissions } from 'Ads/Views/Consent/IPermissions';
+import { IPermissions } from 'Ads/Models/Privacy';
 
 enum ViewState {
     INITIAL,
@@ -34,7 +34,8 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         this._campaign = campaign;
 
         this._templateData.reportKeys = Object.keys(ReportReason);
-        this._templateData.reportReasons = Object.keys(ReportReason).map((reason: any) => ReportReason[reason]);
+        // https://github.com/Microsoft/TypeScript/issues/13775#issuecomment-276381229 explains "keyof typeof EnumType" cast
+        this._templateData.reportReasons = Object.keys(ReportReason).map((reason) => ReportReason[<keyof typeof ReportReason>reason]);
 
         this._template = new Template(PrivacySettingsTemplate);
         this._bindings = [
@@ -107,11 +108,9 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         event.preventDefault();
 
         const consent: IPermissions = {
-            personalizedConsent: {
-                gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
-                ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
-                external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
-            }
+            gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
+            ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
+            external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
         };
 
         this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));

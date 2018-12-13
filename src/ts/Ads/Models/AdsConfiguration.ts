@@ -1,5 +1,5 @@
-import { IPlacement, IRawPlacement, Placement } from 'Ads/Models/Placement';
-import { GamePrivacy } from 'Ads/Models/Privacy';
+import { IRawPlacement, Placement } from 'Ads/Models/Placement';
+import { IRawGamePrivacy, GamePrivacy, IPermissions, IRequestPrivacy, PrivacyMethod, IRawUserPrivacy, UserPrivacy } from 'Ads/Models/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
 
@@ -11,7 +11,8 @@ export interface IRawAdsConfiguration {
     optOutRecorded: boolean;
     optOutEnabled: boolean;
     defaultBannerPlacement: string | undefined;
-    gamePrivacy: string | undefined;
+    gamePrivacy: IRawGamePrivacy | undefined;
+    userPrivacy: IRawUserPrivacy | undefined;
 }
 
 export interface IAdsConfiguration {
@@ -23,6 +24,7 @@ export interface IAdsConfiguration {
     optOutEnabled: boolean;
     defaultBannerPlacement: Placement | undefined;
     gamePrivacy: GamePrivacy;
+    userPrivacy: UserPrivacy;
 }
 
 export class AdsConfiguration extends Model<IAdsConfiguration> {
@@ -34,7 +36,8 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         optOutRecorded: ['boolean'],
         optOutEnabled: ['boolean'],
         defaultBannerPlacement: ['string', 'undefined'],
-        gamePrivacy: ['object']
+        gamePrivacy: ['object'],
+        userPrivacy: ['object']
     };
 
     constructor(data: IAdsConfiguration) {
@@ -87,6 +90,17 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         return count;
     }
 
+    public getPrivacy(): IRequestPrivacy {
+        const userPrivacy = this.getUserPrivacy();
+        const firstRequest = userPrivacy.isRecorded();
+        const permissions = firstRequest ? userPrivacy.getPermissions() : {};
+        return {
+            'method': this.getGamePrivacy().getMethod(),
+            'firstRequest': firstRequest,
+            'permissions': permissions
+        };
+    }
+
     public getDefaultPlacement(): Placement {
         return this.get('defaultPlacement');
     }
@@ -123,6 +137,10 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         return this.get('gamePrivacy');
     }
 
+    public getUserPrivacy(): UserPrivacy {
+        return this.get('userPrivacy');
+    }
+
     public getDTO(): { [key: string]: unknown } {
         const placements = [];
         for(const placement in this.getPlacements()) {
@@ -142,5 +160,4 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
             'defaultPlacement': defaultPlacementId
         };
     }
-
 }

@@ -4,7 +4,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { ITemplateData, View } from 'Core/Views/View';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { IPermissions } from 'Ads/Views/Consent/IPermissions';
+import { IPermissions } from 'Ads/Models/Privacy';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';

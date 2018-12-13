@@ -2,19 +2,19 @@ import { View } from 'Core/Views/View';
 import CheckBoxGroupTemplate from 'html/consent/personalization-checkbox-group.html';
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
-import { IPersonalizedConsent } from 'Ads/Views/Consent/IPermissions';
+import { IGranularPermissions } from 'Ads/Models/Privacy';
 
 export class PersonalizationCheckboxGroup extends View<{}> {
 
-    private _currentPersonalizedConsent?: IPersonalizedConsent;
+    private _currentPermissions?: IGranularPermissions;
     private _personalizedExpCheckbox: HTMLInputElement;
     private _personalizedAdsCheckbox: HTMLInputElement;
     private _personalized3rdPartyCheckbox: HTMLInputElement;
 
-    constructor(platform: Platform, currentConsent?: IPersonalizedConsent) {
+    constructor(platform: Platform, permissions?: IGranularPermissions) {
         super(platform, 'personalization-checkbox-group');
 
-        this._currentPersonalizedConsent = currentConsent;
+        this._currentPermissions = permissions;
         this._template = new Template(CheckBoxGroupTemplate);
 
         this._bindings = [];
@@ -27,10 +27,10 @@ export class PersonalizationCheckboxGroup extends View<{}> {
         this._personalizedAdsCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-checkbox');
         this._personalized3rdPartyCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-3rd-party');
 
-        if (this._currentPersonalizedConsent) {
-            this._personalizedExpCheckbox.checked = this._currentPersonalizedConsent.gameExp;
-            this._personalizedAdsCheckbox.checked = this._currentPersonalizedConsent.ads;
-            this._personalized3rdPartyCheckbox.checked = this._currentPersonalizedConsent.external;
+        if (this._currentPermissions) {
+            this._personalizedExpCheckbox.checked = this._currentPermissions.gameExp;
+            this._personalizedAdsCheckbox.checked = this._currentPermissions.ads;
+            this._personalized3rdPartyCheckbox.checked = this._currentPermissions.external;
         }
 
     }

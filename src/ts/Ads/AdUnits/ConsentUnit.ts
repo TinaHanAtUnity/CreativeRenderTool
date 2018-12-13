@@ -1,14 +1,16 @@
 import { AdUnitContainer, AdUnitContainerSystemMessage, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPRConsent, IGDPRConsentHandler } from 'Ads/Views/Consent/GDPRConsent';
-import { IPermissions } from 'Ads/Views/Consent/IPermissions';
+import { IPermissions } from 'Ads/Models/Privacy';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ICoreApi } from 'Core/ICore';
 
 export interface IConsentUnitParameters {
     platform: Platform;
-    gdprManager: UserPrivacyManager;
+    privacyManager: UserPrivacyManager;
     adUnitContainer: AdUnitContainer;
+    adsConfig: AdsConfiguration;
     core: ICoreApi;
 }
 
@@ -18,16 +20,20 @@ export class ConsentUnit implements IGDPRConsentHandler {
     private _adUnitContainer: AdUnitContainer;
     private _gdprConsentView: GDPRConsent;
     private _platform: Platform;
+    private _privacyManager: UserPrivacyManager;
+    private _adsConfig: AdsConfiguration;
     private _core: ICoreApi;
 
     constructor(parameters: IConsentUnitParameters) {
         this._gdprConsentView = new GDPRConsent({
             platform: parameters.platform,
-            gdprManager: parameters.gdprManager
+            privacyManager: parameters.privacyManager
         });
         this._adUnitContainer = parameters.adUnitContainer;
         this._gdprConsentView.addEventHandler(this);
         this._platform = parameters.platform;
+        this._privacyManager = parameters.privacyManager;
+        this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
     }
 
@@ -43,7 +49,7 @@ export class ConsentUnit implements IGDPRConsentHandler {
             this._gdprConsentView.show();
             return donePromise;
         }).catch((e: Error) => {
-            // this._core.Api.Sdk.logWarning('Error opening Consent view ' + e);
+            this._core.Sdk.logWarning('Error opening Consent view ' + e);
         });
     }
 
@@ -83,10 +89,8 @@ export class ConsentUnit implements IGDPRConsentHandler {
     }
 
     // IGDPRConsentHandler
-    public onConsent(consent: IPermissions): void {
-        // console.log(JSON.stringify(consent));
-        // this._privacyManager.sendUnityConsentEvent(consent, GDPREventSource.USER);
-
+    public onConsent(permissions: IPermissions, source: GDPREventSource): void {
+        this._privacyManager.updateUserPrivacy(permissions, source);
     }
 
     // IGDPRConsentHandler

@@ -116,7 +116,7 @@ describe('configurationParserTest', () => {
             });
 
             it('should set to UNITY_CONSENT', () => {
-                configJson.gamePrivacy.method = PrivacyMethod.UNITY_CONSENT;
+                configJson.gamePrivacy.method = 'unity_consent';
                 const config = AdsConfigurationParser.parse(configJson);
                 assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.UNITY_CONSENT);
                 assert.equal(config.getGamePrivacy().isEnabled(), true);

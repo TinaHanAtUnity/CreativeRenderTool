@@ -15,7 +15,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 import { IMRAIDHandler } from 'MRAID/EventBridge/MRAIDEventAdapter';
-import { IPermissions } from 'Ads/Views/Consent/IPermissions';
+import { IPermissions } from 'Ads/Models/Privacy';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;

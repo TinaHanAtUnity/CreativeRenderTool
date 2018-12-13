@@ -1,6 +1,6 @@
 import { AdsConfiguration, IAdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
-import { GamePrivacy, PrivacyMethod } from 'Ads/Models/Privacy';
+import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 
@@ -31,14 +31,11 @@ export class AdsConfigurationParser {
             throw Error('No default placement in configuration response');
         }
 
-        let gamePrivacy : GamePrivacy;
-        const configGamePrivacy = configJson.gamePrivacy;
+        const defaultGamePrivacy = new GamePrivacy({ method: PrivacyMethod.DEFAULT });
+        const gamePrivacy = configJson.gamePrivacy ? new GamePrivacy(configJson.gamePrivacy) : defaultGamePrivacy;
 
-        if (configGamePrivacy) {
-            gamePrivacy = new GamePrivacy(configGamePrivacy);
-        } else {
-            gamePrivacy = new GamePrivacy({ method: PrivacyMethod.DEFAULT });
-        }
+        const userPrivacyNotRecorded = new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: { profiling: false} });
+        const userPrivacy = configJson.userPrivacy ? new UserPrivacy(configJson.userPrivacy) : userPrivacyNotRecorded;
 
         const configurationParams: IAdsConfiguration = {
             cacheMode: this.parseCacheMode(configJson),
@@ -48,7 +45,8 @@ export class AdsConfigurationParser {
             optOutRecorded: configJson.optOutRecorded,
             optOutEnabled: configJson.optOutEnabled,
             defaultBannerPlacement: defaultBannerPlacement,
-            gamePrivacy: gamePrivacy
+            gamePrivacy: gamePrivacy,
+            userPrivacy: userPrivacy
         };
         return new AdsConfiguration(configurationParams);
     }

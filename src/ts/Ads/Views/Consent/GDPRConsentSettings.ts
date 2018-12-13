@@ -4,12 +4,12 @@ import { Template } from 'Core/Utilities/Template';
 import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { Platform } from 'Core/Constants/Platform';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { IPersonalizedConsent } from 'Ads/Views/Consent/IPermissions';
+import { IGranularPermissions, IPermissions } from 'Ads/Models/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
 
 export interface IGDPRConsentSettingsHandler {
-    onPersonalizedConsent(consent: IPersonalizedConsent): void;
+    onPersonalizedConsent(consent: IPermissions): void;
     onClose(): void;
     onPrivacy(url: string): void;
 }
@@ -84,7 +84,7 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> imple
 
         this._checkboxGroup.checkCheckboxes(true);
 
-        const consent: IPersonalizedConsent = {
+        const consent: IGranularPermissions = {
                 gameExp: true,
                 ads: true,
                 external: true
@@ -99,7 +99,7 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> imple
     private onSaveMyChoicesEvent(event: Event) {
         event.preventDefault();
 
-        const personalizedConsent: IPersonalizedConsent = {
+        const personalizedConsent: IGranularPermissions = {
             gameExp: this._checkboxGroup.isPersonalizedExperienceChecked(),
             ads: this._checkboxGroup.isPersonalizedAdsChecked(),
             external: this._checkboxGroup.isAds3rdPartyChecked()
