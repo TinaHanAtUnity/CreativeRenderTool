@@ -134,7 +134,7 @@ describe('AndroidVastTest', () => {
             const impressions = log.filter((s) => s.indexOf('event=vast-tracking-url') > -1);
             assert.equal(impressions.length, 1);
         });
-        
+
         it('should have finished with COMPLETED', () => {
             assert.equal(finishState, FinishState[FinishState.COMPLETED], 'Finish stats were not equal');
         });
