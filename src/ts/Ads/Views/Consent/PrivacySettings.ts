@@ -34,7 +34,6 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         this._campaign = campaign;
 
         this._templateData.reportKeys = Object.keys(ReportReason);
-        // tslint:disable-next-line
         this._templateData.reportReasons = Object.keys(ReportReason).map((reason: any) => ReportReason[reason]);
 
         this._template = new Template(PrivacySettingsTemplate);
