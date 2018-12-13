@@ -62,7 +62,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             const ctaClickedTime = Date.now();
             return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking()).then((storeUrl) => {
                 const redirectDuration = Date.now() - ctaClickedTime;
-                if (redirectDuration > RequestManager.RedirectDurationLong && redirectDuration % 100 === 1) {
+                if (redirectDuration > RequestManager.RedirectDurationLong) {
                     SessionDiagnostics.trigger('click_delay', {
                         duration: redirectDuration,
                         delayedUrl: url,
