@@ -16,6 +16,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastEndScreen: VastEndScreen | null;
     private _platform: Platform;
     private _core: ICoreApi;
+    private _gameSessionId?: number;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         this._platform = parameters.platform;
@@ -24,6 +25,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._request = parameters.request;
         this._vastCampaign = parameters.campaign;
         this._vastEndScreen = this._vastAdUnit.getEndScreen();
+        this._gameSessionId = parameters.gameSessionId;
     }
 
     public onVastEndScreenClick(): Promise<void> {
@@ -35,7 +37,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
             const ctaClickedTime = Date.now();
             return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
                 const redirectDuration = Date.now() - ctaClickedTime;
-                if (redirectDuration > RequestManager.RedirectDurationLong) {
+                if (this._gameSessionId && this._gameSessionId % 1000 === 99) {
                     SessionDiagnostics.trigger('click_delay', {
                         duration: redirectDuration,
                         delayedUrl: clickThroughURL,

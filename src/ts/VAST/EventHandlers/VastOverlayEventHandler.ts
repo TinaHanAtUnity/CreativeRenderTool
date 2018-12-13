@@ -19,6 +19,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastCampaign: VastCampaign;
     private _moat?: MOAT;
     private _vastOverlay?: AbstractVideoOverlay;
+    private _gameSessionId?: number;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(adUnit, parameters);
@@ -31,6 +32,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._placement = parameters.placement;
         this._moat = MoatViewabilityService.getMoat();
         this._vastOverlay = this._vastAdUnit.getOverlay();
+        this._gameSessionId = parameters.gameSessionId;
     }
 
     public onOverlaySkip(position: number): void {
@@ -72,7 +74,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             const ctaClickedTime = Date.now();
             return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
                 const redirectDuration = Date.now() - ctaClickedTime;
-                if (redirectDuration > RequestManager.RedirectDurationLong) {
+                if (this._gameSessionId && this._gameSessionId % 1000 === 99) {
                     SessionDiagnostics.trigger('click_delay', {
                         duration: redirectDuration,
                         delayedUrl: clickThroughURL,

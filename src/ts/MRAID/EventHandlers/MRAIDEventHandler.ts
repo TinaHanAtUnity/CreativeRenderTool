@@ -29,6 +29,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _core: ICoreApi;
     private _ads: IAdsApi;
     private _customImpressionFired: boolean;
+    private _gameSessionId?: number;
     protected _campaign: MRAIDCampaign;
 
     constructor(adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
@@ -44,6 +45,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._core = parameters.core;
         this._ads = parameters.ads;
         this._customImpressionFired = false;
+        this._gameSessionId = parameters.gameSessionId;
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -62,7 +64,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             const ctaClickedTime = Date.now();
             return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking()).then((storeUrl) => {
                 const redirectDuration = Date.now() - ctaClickedTime;
-                if (redirectDuration > RequestManager.RedirectDurationLong) {
+                if (this._gameSessionId && this._gameSessionId % 1000 === 99) {
                     SessionDiagnostics.trigger('click_delay', {
                         duration: redirectDuration,
                         delayedUrl: url,
