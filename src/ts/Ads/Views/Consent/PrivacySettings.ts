@@ -34,7 +34,8 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         this._campaign = campaign;
 
         this._templateData.reportKeys = Object.keys(ReportReason);
-        this._templateData.reportReasons = Object.keys(ReportReason).map((reason: any) => ReportReason[reason]);
+        // https://github.com/Microsoft/TypeScript/issues/13775#issuecomment-276381229 explains "keyof typeof EnumType" cast
+        this._templateData.reportReasons = Object.keys(ReportReason).map((reason) => ReportReason[<keyof typeof ReportReason>reason]);
 
         this._template = new Template(PrivacySettingsTemplate);
         this._bindings = [
