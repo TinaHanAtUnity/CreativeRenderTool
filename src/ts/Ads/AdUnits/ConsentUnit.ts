@@ -31,7 +31,7 @@ export class ConsentUnit implements IGDPRConsentHandler {
         this._core = parameters.core;
     }
 
-    public show(options: any): Promise<void> {
+    public show(options: unknown): Promise<void> {
         this._showing = true;
         return this._adUnitContainer.open('Consent', ['webview'], false, Orientation.NONE, true, true, true, false, options).then(() => {
             const donePromise = new Promise<void>((resolve) => {

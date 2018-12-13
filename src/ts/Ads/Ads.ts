@@ -236,7 +236,7 @@ export class Ads implements IAds {
         });
     }
 
-    public showConsentIfNeeded(options: any): Promise<void> {
+    public showConsentIfNeeded(options: unknown): Promise<void> {
         if (!this.getNeedToShowConsent()) {
             return Promise.resolve();
         }
