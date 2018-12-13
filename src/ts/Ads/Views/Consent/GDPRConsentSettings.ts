@@ -3,24 +3,20 @@ import GDPRConsentSettingsTemplate from 'html/consent/gdpr-consent-settings.html
 import { Template } from 'Core/Utilities/Template';
 import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { Platform } from 'Core/Constants/Platform';
-import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { IGranularPermissions, IPermissions } from 'Ads/Models/Privacy';
+import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { IGranularPermissions } from 'Ads/Models/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
+import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 
-export interface IGDPRConsentSettingsHandler {
-    onPersonalizedConsent(consent: IPermissions): void;
-    onClose(): void;
-    onPrivacy(url: string): void;
-}
-
-export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> implements IPrivacyRowItemContainerHandler {
+export class GDPRConsentSettings extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler {
 
     private _infoContainer: PrivacyRowItemContainer;
     private _checkboxGroup: PersonalizationCheckboxGroup;
 
     constructor(platform: Platform, gdprManager: UserPrivacyManager) {
         super(platform, 'gdpr-consent-settings');
+
         this._template = new Template(GDPRConsentSettingsTemplate);
 
         this._bindings = [
@@ -90,7 +86,7 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> imple
                 external: true
         };
 
-        this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));
+        this._handlers.forEach(handler => handler.onConsent(consent, GDPREventSource.USER));
 
         this.runAnimation(<HTMLElement>this._container.querySelector('.accept-all'));
 
@@ -105,7 +101,7 @@ export class GDPRConsentSettings extends View<IGDPRConsentSettingsHandler> imple
             external: this._checkboxGroup.isAds3rdPartyChecked()
         };
 
-        this._handlers.forEach(handler => handler.onPersonalizedConsent(personalizedConsent));
+        this._handlers.forEach(handler => handler.onConsent(personalizedConsent, GDPREventSource.USER));
         this.runAnimation(<HTMLElement>this._container.querySelector('.save-my-choices'));
 
     }
