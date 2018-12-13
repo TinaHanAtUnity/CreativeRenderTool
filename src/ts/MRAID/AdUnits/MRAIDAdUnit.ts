@@ -193,32 +193,12 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
 
         if (this._mraid instanceof MRAID) {
-            this.startWebPlayers();
+            this.startWebPlayer();
         }
     }
 
     public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
         // EMPTY
-    }
-
-    private startWebPlayers(): Promise<void> {
-        if (!this._mraid.isLoaded()) {
-            return this._deviceInfo.getScreenWidth()
-            .then((width) => {
-                if (this._mraid instanceof ExtendedMRAID) {
-                    Promise.resolve();
-                } else {
-                    this._container.setViewFrame('webview', 0, 0, width, 200);
-                }
-            })
-            .then(() => {
-                if (this._mraid instanceof MRAID) {
-                    this._mraid.loadWebPlayer(this._webPlayerContainer);
-                }
-            });
-        } else {
-            return Promise.resolve();
-        }
     }
 
     private unsetReferences() {
@@ -290,6 +270,19 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         } else if(finishState === FinishState.SKIPPED) {
             this._operativeEventManager.sendSkip(operativeEventParams);
         }
+    }
+
+    private startWebPlayer(): Promise<void> {
+        if (!this._mraid.isLoaded()) {
+            return this._deviceInfo.getScreenWidth().then((width) => {
+                const topWebViewAreaMinHeight = 60;
+                this._container.setViewFrame('webview', 0, 0, width, topWebViewAreaMinHeight);
+            }).then(() => {
+                this._mraid.loadWebPlayer(this._webPlayerContainer);
+            });
+        }
+
+        return Promise.resolve();
     }
 
     private setupContainerView(): Promise<void> {

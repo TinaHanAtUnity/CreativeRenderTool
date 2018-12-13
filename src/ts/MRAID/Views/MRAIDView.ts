@@ -15,6 +15,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 import { IMRAIDHandler } from 'MRAID/EventBridge/MRAIDEventAdapter';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -463,5 +464,9 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public canClose(): boolean {
         return this._canClose;
+    }
+
+    public loadWebPlayer(webPlayerContainer: WebPlayerContainer): Promise<void> {
+        return Promise.resolve();
     }
 }
