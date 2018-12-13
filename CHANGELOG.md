@@ -2,12 +2,14 @@
 
 * Remove diagnostics logging for click rejection [#7463](https://github.com/Applifier/unity-ads-webview/pull/7463)
 * Fix standalone cta button [#7436](https://github.com/Applifier/unity-ads-webview/pull/7436)
+* Add onStartProcessed trigger for AdMobAdUnit [#7513](https://github.com/Applifier/unity-ads-webview/pull/7513)
+* LoopMe MRAID Impression count experiment [#7468](https://github.com/Applifier/unity-ads-webview/pull/7468)
+* Fix CI limit node label [#7541](https://github.com/Applifier/unity-ads-webview/pull/7541)
+* Log promo error whenever creatives are not found [#7465](https://github.com/Applifier/unity-ads-webview/pull/7465)
 
 # Wed Dec 12 10:27:59 UTC 2018
 
 * Use env.revision for commit id [#7510](https://github.com/Applifier/unity-ads-webview/pull/7510)
-* Log Promo Error whenever creatives not found [#7465](https://github.com/Applifier/unity-ads-webview/pull/7465)
-* LoopMe MRAID impression count fix experiment [#7468](https://github.com/Applifier/unity-ads-webview/pull/7468)
 * Add AdUnitParametersFactory to reduce clutter of Ads and AdUnitFactory [#7321](https://github.com/Applifier/unity-ads-webview/pull/7321)
 * Remove Show install now button after 0,5s experiment [#7517](https://github.com/Applifier/unity-ads-webview/pull/7517)
 * Add logic to use commit id of deployed webview [#7518](https://github.com/Applifier/unity-ads-webview/pull/7518)
