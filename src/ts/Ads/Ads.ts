@@ -417,7 +417,6 @@ export class Ads implements IAds {
 
             this._currentAdUnit.show().then(() => {
                 if(this._core.NativeBridge.getPlatform() === Platform.ANDROID) {
-                    this._core.NativeBridge.setAutoBatchEnabled(true);
                     this._core.Api.Request.Android!.setMaximumPoolSize(8);
                 } else {
                     this._core.Api.Request.setConcurrentRequestCount(8);
@@ -445,7 +444,6 @@ export class Ads implements IAds {
         this._showing = false;
 
         if(this._core.NativeBridge.getPlatform() === Platform.ANDROID) {
-            this._core.NativeBridge.setAutoBatchEnabled(false);
             this._core.Api.Request.Android!.setMaximumPoolSize(1);
         } else {
             this._core.Api.Request.setConcurrentRequestCount(1);
