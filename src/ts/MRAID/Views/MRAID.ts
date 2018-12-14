@@ -124,30 +124,33 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public onPrivacyClose(): void {
         if (this._privacy) {
-            this._handlers.forEach((handler) => {
-                handler.onWebViewResize(false).then(() => {
-                    this._privacy.hide();
-                });
-            });
+            this._privacy.hide();
+
+            // After Privacy screen is hidden, we need to reduce webview overlay size
+            // to allow interactability on the webplayer
+            this.reduceWebViewContainerHeight();
         }
     }
 
     protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        this._handlers.forEach((handler) => {
-            handler.onWebViewResize(true).then(() => {
-                this._privacy.show();
-            });
+
+        // Webview container must be full screened for users to interact with
+        // the full screened Privacy Screen
+        this.fullScreenWebViewContainer().then(() => {
+            this._privacy.show();
         });
+
     }
 
     protected onGDPRPopupEvent(event: Event) {
         event.preventDefault();
         this._gdprPopupClicked = true;
-        this._handlers.forEach((handler) => {
-            handler.onWebViewResize(true).then(() => {
-                this._privacy.show();
-            });
+
+        // Webview container must be full screened for users to interact with
+        // the full screened Privacy Screen
+        this.fullScreenWebViewContainer().then(() => {
+            this._privacy.show();
         });
     }
 

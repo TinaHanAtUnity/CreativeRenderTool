@@ -443,7 +443,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     public onBridgeResizeWebview() {
-        this._handlers.forEach(handler => handler.onWebViewResize(false));
+        this.reduceWebViewContainerHeight();
     }
 
     public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {
@@ -468,5 +468,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public loadWebPlayer(webPlayerContainer: WebPlayerContainer): Promise<void> {
         return Promise.resolve();
+    }
+
+    public reduceWebViewContainerHeight() {
+        return this._handlers[0].onWebViewResize(false);
+    }
+
+    public fullScreenWebViewContainer() {
+        return this._handlers[0].onWebViewResize(true);
     }
 }
