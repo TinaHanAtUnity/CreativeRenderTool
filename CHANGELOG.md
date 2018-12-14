@@ -1,3 +1,7 @@
+# Pending
+
+* Log click delay data for programmatic VAST/MRAID [#7587](https://github.com/Applifier/unity-ads-webview/pull/7587)
+
 # Thu Dec 13 23:48:40 UTC 2018
 
 * Fix video stuck / skipping ads through multitask button [#7564](https://github.com/Applifier/unity-ads-webview/pull/7564)
