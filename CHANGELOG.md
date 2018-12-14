@@ -1,4 +1,4 @@
-# Pending
+# Fri Dec 14 11:32:11 UTC 2018
 
 * Log click delay data for programmatic VAST/MRAID [#7587](https://github.com/Applifier/unity-ads-webview/pull/7587)
 
