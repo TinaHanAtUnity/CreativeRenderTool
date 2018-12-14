@@ -30,7 +30,7 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
         this._adUnitParametersFactory = parametersFactory;
     }
 
-    public create(campaign: T, placement: Placement, orientation: Orientation, gamerServerId: string, options: any) {
+    public create(campaign: T, placement: Placement, orientation: Orientation, gamerServerId: string, options: unknown) {
         const params = this._adUnitParametersFactory.create(campaign, placement, orientation, gamerServerId, options);
         return this.createAdUnit(params);
     }

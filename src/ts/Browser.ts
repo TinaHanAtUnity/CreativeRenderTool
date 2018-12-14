@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const JS_FUNC_NAME_GET_HEADLESS = 'getHeadless';
 
     const setClientInfo = () => {
-        const fields: [string, string, ((element: HTMLInputElement) => any) | undefined][] = [
+        const fields: [string, string, ((element: HTMLInputElement) => unknown) | undefined][] = [
             ['appName', 'setAppName', undefined],
             ['appVersion', 'setAppVersion', undefined],
             ['sdkVersion', 'setSdkVersion', toInt],
@@ -45,14 +45,15 @@ document.addEventListener('DOMContentLoaded', () => {
             ['initTimeStamp', 'setInitTimeStamp', toInt],
             ['reinitialized', 'setReinitialized', toBoolean]
         ];
-        fields.forEach(([field, setter, parser]: [string, string, ((element: HTMLInputElement) => any) | undefined]) => {
+        fields.forEach(([field, setter, parser]: [string, string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById(field);
+            // tslint:disable-next-line
             (<any>UnityAds.getBackend().Api.Sdk)[setter](parser ? parser(element) : element.value);
         });
     };
 
     const setAndroidDeviceInfo = () => {
-        const fields: [string, ((element: HTMLInputElement) => any) | undefined][] = [
+        const fields: [string, ((element: HTMLInputElement) => unknown) | undefined][] = [
             ['AdvertisingTrackingId', undefined],
             ['LimitAdTrackingFlag', toBoolean],
             ['AndroidId', undefined],
@@ -82,14 +83,15 @@ document.addEventListener('DOMContentLoaded', () => {
             ['BatteryStatus', toInt],
             ['RingerMode', toInt]
         ];
-        fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => any) | undefined]) => {
+        fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById('android' + field);
+            // tslint:disable-next-line
             (<any>UnityAds.getBackend().Api.DeviceInfo)['set' + field](parser ? parser(element) : element.value);
         });
     };
 
     const setIosDeviceInfo = () => {
-        const fields: [string, ((element: HTMLInputElement) => any) | undefined][] = [
+        const fields: [string, ((element: HTMLInputElement) => unknown) | undefined][] = [
             ['AdvertisingTrackingId', undefined],
             ['LimitAdTrackingFlag', toBoolean],
             ['Manufacturer', undefined],
@@ -117,8 +119,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ['UserInterfaceIdiom', toInt],
             ['Simulator', toBoolean]
         ];
-        fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => any) | undefined]) => {
+        fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById('ios' + field);
+            // tslint:disable-next-line
             (<any>UnityAds.getBackend().Api.DeviceInfo)['set' + field](parser ? parser(element) : element.value);
         });
     };
@@ -224,6 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
+        // tslint:disable-next-line
         if((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS]()) {
             initialize();
         } else {
@@ -231,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 event.preventDefault();
                 initialize();
             }, false);
+            // tslint:disable-next-line
             (<any>window).parent.document.getElementById('initialize').disabled = false;
         }
     }

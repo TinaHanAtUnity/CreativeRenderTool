@@ -88,7 +88,7 @@ export class PermissionsUtil {
             return Promise.resolve(false);
         }
         return core.iOS!.MainBundle.getDataForKey(key)
-            .then((value: [string, any]) => value[0] !== '')
+            .then((value: [string, unknown]) => value[0] !== '')
             .catch(() => false);
     }
 

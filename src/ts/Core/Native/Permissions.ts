@@ -34,13 +34,13 @@ export class PermissionsApi extends NativeApi {
         this._currentPlatform = currentPlatform;
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch (event) {
             case PermissionsEvent[PermissionsEvent.PERMISSIONS_RESULT]:
                 if (this._currentPlatform === Platform.ANDROID) {
-                    this.onAndroidPermissionsResult(parameters[0], parameters[1], parameters[2]);
+                    this.onAndroidPermissionsResult(<number>parameters[0], <string[]>parameters[1], <number[]>parameters[2]);
                 } else {
-                    this.onIosPermissionsResult(parameters[0], parameters[1]);
+                    this.onIosPermissionsResult(<string>parameters[0], <boolean>parameters[1]);
                 }
                 break;
 

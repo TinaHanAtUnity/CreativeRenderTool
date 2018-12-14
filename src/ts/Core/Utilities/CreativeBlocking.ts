@@ -11,7 +11,7 @@ export enum BlockingReason {
 export class CreativeBlocking {
     public static report(creativeId: string | undefined, seatId: number | undefined, type: BlockingReason, extraFields: {}): Promise<INativeResponse> {
 
-        const kafkaObject: any = {
+        const kafkaObject: { [key: string]: unknown } = {
             ... extraFields,
             type: type,
             creativeId: creativeId,

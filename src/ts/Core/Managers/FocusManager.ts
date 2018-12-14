@@ -72,7 +72,7 @@ export class FocusManager {
         return this._appForeground;
     }
 
-    private onNotification(event: string, parameters: any): void {
+    private onNotification(event: string, parameters: unknown): void {
         if(event === FocusManager._appForegroundNotification) {
             this._appForeground = true;
             this.onAppForeground.trigger();
@@ -100,7 +100,7 @@ export class FocusManager {
         this.onActivityDestroyed.trigger(activity);
     }
 
-    private onBroadcastAction(name: string, action: string, data: string, extra: any) {
+    private onBroadcastAction(name: string, action: string, data: string, extra: unknown) {
         if(name !== this._screenListener) {
             return;
         }

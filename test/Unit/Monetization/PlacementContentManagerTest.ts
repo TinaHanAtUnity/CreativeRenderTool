@@ -14,8 +14,8 @@ import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable
 import 'mocha';
 import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
 import { IMonetizationApi } from 'Monetization/IMonetization';
-import { PlacementContentManager } from 'Monetization/Managers/PlacementContentManager';
-import { IPlacementContentParams, IPlacementContentType } from 'Monetization/Native/PlacementContents';
+import { IPlacementContentParams, PlacementContentManager } from 'Monetization/Managers/PlacementContentManager';
+import { IPlacementContentType } from 'Monetization/Native/PlacementContents';
 import { IPromoApi } from 'Promo/IPromo';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
@@ -97,18 +97,18 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 matcher: (placement, campaign, params) => {
                     if(campaign instanceof PromoCampaign) {
                         assert.equal(params.type, IPlacementContentType.PROMO_AD);
-                        assert.equal(params.product.localizedPrice, PurchasingUtilities.getProductLocalizedPrice(params.productId));
-                        assert.equal(params.product.localizedPriceString, PurchasingUtilities.getProductPrice(params.productId));
-                        assert.equal(params.product.localizedTitle, PurchasingUtilities.getProductName(params.productId));
-                        assert.equal(params.product.productId, campaign.getIapProductId());
-                        assert.equal(params.costs.length, campaign.getCosts().length);
-                        assert.equal(params.costs[0].itemId, campaign.getCosts()[0].getId());
-                        assert.equal(params.costs[0].quantity, campaign.getCosts()[0].getQuantity());
-                        assert.equal(params.costs[0].type, campaign.getCosts()[0].getType());
-                        assert.equal(params.payouts.length, campaign.getPayouts().length);
-                        assert.equal(params.payouts[0].itemId, campaign.getPayouts()[0].getId());
-                        assert.equal(params.payouts[0].type, campaign.getPayouts()[0].getType());
-                        assert.equal(params.payouts[0].quantity, campaign.getPayouts()[0].getQuantity());
+                        assert.equal(params.product!.localizedPrice, PurchasingUtilities.getProductLocalizedPrice(params.productId!));
+                        assert.equal(params.product!.localizedPriceString, PurchasingUtilities.getProductPrice(params.productId!));
+                        assert.equal(params.product!.localizedTitle, PurchasingUtilities.getProductName(params.productId!));
+                        assert.equal(params.product!.productId, campaign.getIapProductId());
+                        assert.equal(params.costs!.length, campaign.getCosts().length);
+                        assert.equal(params.costs![0].productId, campaign.getCosts()[0].getId());
+                        assert.equal(params.costs![0].quantity, campaign.getCosts()[0].getQuantity());
+                        assert.equal(params.costs![0].type, campaign.getCosts()[0].getType());
+                        assert.equal(params.payouts!.length, campaign.getPayouts().length);
+                        assert.equal(params.payouts![0].productId, campaign.getPayouts()[0].getId());
+                        assert.equal(params.payouts![0].type, campaign.getPayouts()[0].getType());
+                        assert.equal(params.payouts![0].quantity, campaign.getPayouts()[0].getQuantity());
                     } else {
                         assert.fail('campaign must be of type PromoCampaign');
                     }
