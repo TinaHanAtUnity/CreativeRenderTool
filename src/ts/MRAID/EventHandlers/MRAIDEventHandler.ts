@@ -65,15 +65,17 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             const ctaClickedTime = Date.now();
             return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking()).then((storeUrl) => {
                 const redirectDuration = Date.now() - ctaClickedTime;
-                if (this.shouldRecordClickLog()) {
-                    SessionDiagnostics.trigger('click_delay', {
-                        duration: redirectDuration,
-                        delayedUrl: url,
-                        location: 'programmatic_mraid',
-                        seatId: this._campaign.getSeatId()
-                    }, this._campaign.getSession());
-                }
-                return this.openUrlOnCallButton(storeUrl);
+                return this.openUrlOnCallButton(storeUrl).then(() => {
+                    if (this.shouldRecordClickLog()) {
+                        SessionDiagnostics.trigger('click_delay', {
+                            duration: redirectDuration,
+                            delayedUrl: url,
+                            location: 'programmatic_mraid',
+                            seatId: this._campaign.getSeatId(),
+                            creativeId: this._campaign.getCreativeId()
+                        }, this._campaign.getSession());
+                    }
+                });
             }).catch(() => {
                 return this.openUrlOnCallButton(url);
             });
