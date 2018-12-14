@@ -42,7 +42,8 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onPlayableAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: any): void;
     onMraidShowEndScreen(): void;
     onKeyEvent(keyCode: number): void;
-    onWebViewResize(shouldFullScreen: boolean): Promise<void>;
+    onWebViewFullScreen(): Promise<void>;
+    onWebViewReduceSize(): Promise<void>;
 }
 
 export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler, IMRAIDHandler {
@@ -470,11 +471,11 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         return Promise.resolve();
     }
 
-    public reduceWebViewContainerHeight() {
-        return this._handlers[0].onWebViewResize(false);
+    public fullScreenWebViewContainer() {
+        return this._handlers[0].onWebViewFullScreen();
     }
 
-    public fullScreenWebViewContainer() {
-        return this._handlers[0].onWebViewResize(true);
+    public reduceWebViewContainerHeight() {
+        return this._handlers[0].onWebViewReduceSize();
     }
 }

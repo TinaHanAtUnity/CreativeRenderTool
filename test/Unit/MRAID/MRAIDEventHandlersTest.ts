@@ -400,7 +400,7 @@ describe('MRAIDEventHandlersTest', () => {
             });
         });
 
-        describe('onWebViewResize', () => {
+        describe('on Webview Resizing for webplayer', () => {
 
             beforeEach(() => {
                 sinon.stub(deviceInfo, 'getScreenWidth').resolves(500);
@@ -408,9 +408,9 @@ describe('MRAIDEventHandlersTest', () => {
                 sinon.stub(container, 'setViewFrame');
             });
 
-            context('if shouldFullScreen is true', () => {
+            context('onWebViewFullScreen', () => {
                 beforeEach(() => {
-                    return programmaticMraidEventHandler.onWebViewResize(true);
+                    return programmaticMraidEventHandler.onWebViewFullScreen();
                 });
 
                 it('should set webview view frame to full screen', () => {
@@ -418,9 +418,9 @@ describe('MRAIDEventHandlersTest', () => {
                 });
             });
 
-            context('if shouldFullScreen is false', () => {
+            context('onWebViewReduceSize', () => {
                 beforeEach(() => {
-                    return programmaticMraidEventHandler.onWebViewResize(false);
+                    return programmaticMraidEventHandler.onWebViewReduceSize();
                 });
 
                 it('should set webview view frame to top of window', () => {
