@@ -73,6 +73,21 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
                 event: 'click',
                 listener: (event: Event) => this.onReportAdEvent(event),
                 selector: '.report-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onDataDeletionEvent(event),
+                selector: '.delete-data-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onDataDeletionConfirmationEvent(event),
+                selector: '#delete-data-yes'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onDataDeletionRejectEvent(event),
+                selector: '#delete-data-no'
             }
         ];
 
@@ -115,9 +130,6 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
 
         this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));
         this._handlers.forEach(handler => handler.onPrivacyClose());
-
-        // todo: for testing, remove
-        this.hide();
     }
 
     protected onPrivacyEvent(event: Event): void {
@@ -220,6 +232,30 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
                 this.container().classList.remove(state);
             }
         });
+    }
+
+    private onDataDeletionEvent(event: Event): void {
+        event.preventDefault();
+
+        const dataDeletionContainer = <HTMLSpanElement>document.getElementById('delete-data');
+        dataDeletionContainer.classList.add('active');
+    }
+
+    private onDataDeletionConfirmationEvent(event: Event): void {
+        event.preventDefault();
+
+        const dataDeletionContainer = <HTMLSpanElement>document.getElementById('delete-data');
+        dataDeletionContainer.classList.remove('active');
+        dataDeletionContainer.classList.add('data-deletion-confirmed');
+
+        this._personalizationCheckBoxGroup.checkCheckboxes(false);
+    }
+
+    private onDataDeletionRejectEvent(event: Event): void {
+        event.preventDefault();
+
+        const dataDeletionContainer = <HTMLSpanElement>document.getElementById('delete-data');
+        dataDeletionContainer.classList.remove('active');
     }
 
 }
