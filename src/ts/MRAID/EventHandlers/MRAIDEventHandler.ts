@@ -123,7 +123,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
 
     // Handles webview resizing when webview is overlaying webplayer
     public onWebViewResize(shouldFullScreen: boolean): Promise<void> {
-        return Promise.all([this._core.DeviceInfo.getScreenWidth(), this._core.DeviceInfo.getScreenHeight()])
+        return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()])
         .then(([width, height]) => {
             if (shouldFullScreen) {
                 return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, height);

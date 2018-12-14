@@ -399,5 +399,34 @@ describe('MRAIDEventHandlersTest', () => {
                 });
             });
         });
+
+        describe('onWebViewResize', () => {
+
+            beforeEach(() => {
+                sinon.stub(deviceInfo, 'getScreenWidth').resolves(500);
+                sinon.stub(deviceInfo, 'getScreenHeight').resolves(600);
+                sinon.stub(container, 'setViewFrame');
+            });
+
+            context('if shouldFullScreen is true', () => {
+                beforeEach(() => {
+                    return programmaticMraidEventHandler.onWebViewResize(true);
+                });
+
+                it('should set webview view frame to full screen', () => {
+                    sinon.assert.calledWith(<sinon.SinonStub>container.setViewFrame, 'webview', 0, 0, 500, 600);
+                });
+            });
+
+            context('if shouldFullScreen is false', () => {
+                beforeEach(() => {
+                    return programmaticMraidEventHandler.onWebViewResize(false);
+                });
+
+                it('should set webview view frame to top of window', () => {
+                    sinon.assert.calledWith(<sinon.SinonStub>container.setViewFrame, 'webview', 0, 0, 500, 120);
+                });
+            });
+        });
     });
 });

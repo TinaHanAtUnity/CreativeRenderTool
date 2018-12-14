@@ -22,7 +22,6 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Platform } from 'Core/Constants/Platform';
 import { Privacy } from 'Ads/Views/Privacy';
 import { MRAID } from 'MRAID/Views/MRAID';
-import { ExtendedMRAID } from 'MRAID/Views/ExtendedMRAID';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
