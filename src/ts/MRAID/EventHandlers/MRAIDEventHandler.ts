@@ -14,8 +14,9 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { Url } from 'Core/Utilities/Url';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -29,6 +30,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _core: ICoreApi;
     private _ads: IAdsApi;
     private _customImpressionFired: boolean;
+    private _gameSessionId?: number;
     protected _campaign: MRAIDCampaign;
 
     constructor(adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
@@ -44,6 +46,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._core = parameters.core;
         this._ads = parameters.ads;
         this._customImpressionFired = false;
+        this._gameSessionId = parameters.gameSessionId;
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -59,7 +62,17 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             }
         } else {    // DSP MRAID
             this.setCallButtonEnabled(false);
+            const ctaClickedTime = Date.now();
             return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking()).then((storeUrl) => {
+                const redirectDuration = Date.now() - ctaClickedTime;
+                if (this.shouldRecordClickLog()) {
+                    SessionDiagnostics.trigger('click_delay', {
+                        duration: redirectDuration,
+                        delayedUrl: url,
+                        location: 'programmatic_mraid',
+                        seatId: this._campaign.getSeatId()
+                    }, this._campaign.getSession());
+                }
                 return this.openUrlOnCallButton(storeUrl);
             }).catch(() => {
                 return this.openUrlOnCallButton(url);
@@ -217,5 +230,13 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         }
 
         return this._adUnit.getMRAIDView().canClose();
+    }
+
+    private shouldRecordClickLog(): boolean {
+        if (this._gameSessionId && this._gameSessionId % 10 === 1) {
+            return true;
+        }
+
+        return false;
     }
 }

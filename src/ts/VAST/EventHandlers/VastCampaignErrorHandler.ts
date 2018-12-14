@@ -53,7 +53,7 @@ export class VastErrorInfo {
         // code 5xx for Non-Linear ads
         [VastErrorCode.COMPANION_GENERAL_ERROR]: 'General error from Companion Ad',
         [VastErrorCode.COMPANION_SIZE_UNSUPPORTED]: 'Companion creative size unsupported',
-        [VastErrorCode.COMPANION_UNABLE_TO_DISPLAY]: 'Companion unable to displayg',
+        [VastErrorCode.COMPANION_UNABLE_TO_DISPLAY]: 'Companion unable to display',
         [VastErrorCode.COMPANION_UNABLE_TO_FETCH]: 'Unable to fetch Companion resource',
         [VastErrorCode.COMPANION_RESOURCE_NOT_FOUND]: 'Supported Companion resource not found',
         [VastErrorCode.UNDEFINED_ERROR]: 'Undefined Error',
