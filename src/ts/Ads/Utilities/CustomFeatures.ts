@@ -43,6 +43,7 @@ export class CustomFeatures {
             || gameId === '2755670'
             || gameId === '2625701'
             || gameId === '2625703'
+            || gameId === '2861297'
             || gameId === '2845426';
     }
 

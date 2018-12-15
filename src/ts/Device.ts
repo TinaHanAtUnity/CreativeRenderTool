@@ -111,12 +111,5 @@ if(typeof location !== 'undefined') {
     const extWindow = <IExtendedWindow> window;
     extWindow.nativebridge = nativeBridge;
     extWindow.webview = new WebView(nativeBridge);
-
-    // SafeDK garbage
-    // tslint:disable-next-line
-    (<any>extWindow.webview)._configuration = {
-        getPlacement: () => { return { getCurrentCampaign: () => 'SafeDK violates Unity Ads SDK internals, please disable your SafeDK integration.' }; }
-    };
-
     document.addEventListener('DOMContentLoaded', () => extWindow.webview.initialize(), false);
 }

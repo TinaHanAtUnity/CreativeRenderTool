@@ -1,3 +1,9 @@
+# Pending
+
+* Add 2861297 as Cheetah game [#7608](https://github.com/Applifier/unity-ads-webview/pull/7608)
+* Ignore external JS errors [#7609](https://github.com/Applifier/unity-ads-webview/pull/7609)
+* ABT-721 : Admob ads going straight to endcard [#7616](https://github.com/Applifier/unity-ads-webview/pull/7616)
+
 # Fri Dec 14 11:32:11 UTC 2018
 
 * Log click delay data for programmatic VAST/MRAID [#7587](https://github.com/Applifier/unity-ads-webview/pull/7587)
