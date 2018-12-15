@@ -94,24 +94,21 @@ export class AnalyticsManager {
 
     public init(): Promise<void> {
         if(this._clientInfo.isReinitialized()) {
-            const promises: Promise<any>[] = [];
-            promises.push(this._storage.getUserId());
-            promises.push(this._storage.getSessionId(this._clientInfo.isReinitialized()));
-
-            return Promise.all(promises).then(([userId, sessionId, appVersion, osVersion]) => {
+            return Promise.all([
+                this._storage.getUserId(),
+                this._storage.getSessionId(this._clientInfo.isReinitialized())
+            ]).then(([userId, sessionId]) => {
                 this._userId = userId;
                 this._sessionId = sessionId;
-
                 this.subscribeListeners();
             });
         } else {
-            const promises: Promise<any>[] = [];
-            promises.push(this._storage.getUserId());
-            promises.push(this._storage.getSessionId(this._clientInfo.isReinitialized()));
-            promises.push(this._storage.getAppVersion());
-            promises.push(this._storage.getOsVersion());
-
-            return Promise.all(promises).then(([userId, sessionId, appVersion, osVersion]) => {
+            return Promise.all([
+                this._storage.getUserId(),
+                this._storage.getSessionId(this._clientInfo.isReinitialized()),
+                this._storage.getAppVersion(),
+                this._storage.getOsVersion()
+            ]).then(([userId, sessionId, appVersion, osVersion]) => {
                 this._userId = userId;
                 this._sessionId = sessionId;
                 this._storage.setIds(userId, sessionId);

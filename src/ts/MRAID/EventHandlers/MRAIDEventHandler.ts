@@ -14,10 +14,11 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { Url } from 'Core/Utilities/Url';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -30,6 +31,8 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _platform: Platform;
     private _core: ICoreApi;
     private _ads: IAdsApi;
+    private _customImpressionFired: boolean;
+    private _gameSessionId?: number;
     protected _campaign: MRAIDCampaign;
 
     private _topWebViewAreaHeight: number;
@@ -49,6 +52,8 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._ads = parameters.ads;
         this._deviceInfo = parameters.deviceInfo;
         this._topWebViewAreaHeight = this.getTopViewHeight();
+        this._customImpressionFired = false;
+        this._gameSessionId = parameters.gameSessionId;
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -64,18 +69,19 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             }
         } else {    // DSP MRAID
             this.setCallButtonEnabled(false);
+            const ctaClickedTime = Date.now();
             return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking()).then((storeUrl) => {
+                const redirectDuration = Date.now() - ctaClickedTime;
+                if (this.shouldRecordClickLog()) {
+                    SessionDiagnostics.trigger('click_delay', {
+                        duration: redirectDuration,
+                        delayedUrl: url,
+                        location: 'programmatic_mraid',
+                        seatId: this._campaign.getSeatId()
+                    }, this._campaign.getSession());
+                }
                 return this.openUrlOnCallButton(storeUrl);
             }).catch(() => {
-                const urlParts = Url.parse(url);
-                const error = new DiagnosticError(new Error('MRAID clickThroughURL error'), {
-                    contentType: 'mraid',
-                    clickUrl: url,
-                    host: urlParts.host,
-                    protocol: urlParts.protocol,
-                    creativeId: this._campaign.getCreativeId()
-                });
-                Diagnostics.trigger('click_request_head_rejected', error);
                 return this.openUrlOnCallButton(url);
             });
         }
@@ -108,7 +114,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         }
     }
 
-    public onPlayableAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, backgroundTime: number, event: string, eventData: any): void {
+    public onPlayableAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, backgroundTime: number, event: string, eventData: unknown): void {
         // no-op
     }
 
@@ -134,6 +140,13 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         return this._deviceInfo.getScreenWidth().then((width) => {
             return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, this._topWebViewAreaHeight);
         });
+    }
+
+    public onCustomImpressionEvent(): void {
+        if (!this._customImpressionFired) {
+            this._adUnit.sendImpression();
+            this._customImpressionFired = true;
+        }
     }
 
     private handleClickAttribution() {
@@ -260,5 +273,13 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             return (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity();
         }
         return 0;
+    }
+
+    private shouldRecordClickLog(): boolean {
+        if (this._gameSessionId && this._gameSessionId % 10 === 1) {
+            return true;
+        }
+
+        return false;
     }
 }

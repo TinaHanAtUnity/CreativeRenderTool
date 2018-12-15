@@ -35,7 +35,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
     request: RequestManager;
-    options: any;
+    options: unknown;
     privacyManager: UserPrivacyManager;
     programmaticTrackingService: ProgrammaticTrackingService;
     gameSessionId?: number;

@@ -38,7 +38,7 @@ export class ConfigManager {
     private _unityInfo: UnityInfo;
     private _request: RequestManager;
 
-    private _rawConfig?: any;
+    private _rawConfig?: unknown;
 
     constructor(platform: Platform, core: ICoreApi, metaDataManager: MetaDataManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, unityInfo: UnityInfo, request: RequestManager) {
         this._platform = platform;
@@ -50,9 +50,9 @@ export class ConfigManager {
         this._request = request;
     }
 
-    public getConfig(jaegerSpan: JaegerSpan): any | Promise<any> {
+    public getConfig(jaegerSpan: JaegerSpan): Promise<unknown> {
         if(this._rawConfig) {
-            return this._rawConfig;
+            return Promise.resolve(this._rawConfig);
         } else {
             return Promise.all([
                 this._metaDataManager.fetch(FrameworkMetaData),
@@ -98,7 +98,7 @@ export class ConfigManager {
                             jaegerSpan.addTag(JaegerTags.StatusCode, requestError.nativeResponse.responseCode.toString());
                         }
                         if(requestError.nativeResponse && requestError.nativeResponse.response) {
-                            const responseObj = JsonParser.parse(requestError.nativeResponse.response);
+                            const responseObj = JsonParser.parse<{ error: string }>(requestError.nativeResponse.response);
                             modifiedError = new ConfigError((new Error(responseObj.error)));
                         }
                     }

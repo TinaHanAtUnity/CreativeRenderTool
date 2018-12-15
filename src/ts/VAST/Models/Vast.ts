@@ -14,7 +14,7 @@ interface IVast {
 
 export class Vast extends Model<IVast> {
 
-    constructor(ads: VastAd[], errorURLTemplates: any[]) {
+    constructor(ads: VastAd[], errorURLTemplates: unknown[]) {
         super('Vast', {
             ads: ['array'],
             errorURLTemplates: ['array'],
@@ -22,7 +22,7 @@ export class Vast extends Model<IVast> {
         });
 
         this.set('ads', ads);
-        this.set('errorURLTemplates', errorURLTemplates);
+        this.set('errorURLTemplates', <string[]>errorURLTemplates);
         this.set('additionalTrackingEvents', {});
     }
 
@@ -252,7 +252,7 @@ export class Vast extends Model<IVast> {
         return mediaFiles;
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         const ads = [];
         for (const ad of this.get('ads')) {
             ads.push(ad.getDTO());

@@ -241,7 +241,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
     }
 
-    private onError(error: WebViewError | Error, placementIds: string[], diagnosticsType: string, session?: Session) {
+    private onError(error: unknown, placementIds: string[], diagnosticsType: string, session?: Session) {
         this.invalidateCampaigns(this._needsRefill, placementIds);
 
         if(error instanceof Error) {

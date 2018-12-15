@@ -9,8 +9,8 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Url } from 'Core/Utilities/Url';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 import OnCometMraidPlcCampaign from 'json/campaigns/performance/CometMraidUrlCampaign.json';
 import OnCometVideoPlcCampaign from 'json/campaigns/performance/CometVideoCampaign.json';
@@ -162,7 +162,7 @@ describe('CometCampaignParser', () => {
 
                 beforeEach(() => {
                     sandbox = sinon.sandbox.create();
-                    sandbox.stub(Diagnostics, 'trigger');
+                    sandbox.stub(SessionDiagnostics, 'trigger');
                     campaignJSON = JSON.parse(OnCometVideoPlcCampaign);
                     campaignJSON.content = JSON.parse(campaignJSON.content);
                 });
@@ -176,7 +176,6 @@ describe('CometCampaignParser', () => {
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
                     return parse(campaignJSON).then(() => {
                         assert.isUndefined((<PerformanceCampaign>campaign).getAdUnitStyle());
-                        sinon.assert.calledWith(<sinon.SinonSpy>Diagnostics.trigger, 'configuration_ad_unit_style_parse_error');
                     });
                 });
 
@@ -185,7 +184,6 @@ describe('CometCampaignParser', () => {
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
                     return parse(campaignJSON).then(() => {
                         assert.isUndefined((<PerformanceCampaign>campaign).getAdUnitStyle());
-                        sinon.assert.calledWith(<sinon.SinonSpy>Diagnostics.trigger, 'configuration_ad_unit_style_parse_error');
                     });
                 });
 
@@ -194,7 +192,6 @@ describe('CometCampaignParser', () => {
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
                     return parse(campaignJSON).then(() => {
                         assert.isUndefined((<PerformanceCampaign>campaign).getAdUnitStyle());
-                        sinon.assert.calledWith(<sinon.SinonSpy>Diagnostics.trigger, 'configuration_ad_unit_style_parse_error');
                     });
                 });
 
@@ -204,7 +201,6 @@ describe('CometCampaignParser', () => {
                     return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
                         assert.isUndefined((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor());
-                        sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
                     });
                 });
 
@@ -214,7 +210,6 @@ describe('CometCampaignParser', () => {
                     return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
                         assert.isUndefined((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor());
-                        sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
                     });
                 });
 
@@ -224,7 +219,6 @@ describe('CometCampaignParser', () => {
                     return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
                         assert.isUndefined((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor());
-                        sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
                     });
                 });
 
@@ -234,7 +228,7 @@ describe('CometCampaignParser', () => {
                     return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
                         assert.equal((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor(), fuchsia);
-                        sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
+                        sinon.assert.notCalled(<sinon.SinonSpy>SessionDiagnostics.trigger);
                     });
                 });
 
@@ -244,7 +238,15 @@ describe('CometCampaignParser', () => {
                     return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
                         assert.equal((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor(), fafafa);
-                        sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
+                    });
+                });
+
+                it('has an empty string, returns undefined ctaButtonColor', () => {
+                    campaignJSON.content.adUnitStyle.ctaButtonColor = '';
+                    campaignJSON.content = JSON.stringify(campaignJSON.content);
+                    return parse(campaignJSON).then(() => {
+                        const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
+                        assert.equal((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor(), undefined);
                     });
                 });
             });

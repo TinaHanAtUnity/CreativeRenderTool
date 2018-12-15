@@ -3,13 +3,11 @@ import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
-import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Url } from 'Core/Utilities/Url';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
@@ -18,6 +16,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastEndScreen: VastEndScreen | null;
     private _platform: Platform;
     private _core: ICoreApi;
+    private _gameSessionId?: number;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         this._platform = parameters.platform;
@@ -26,6 +25,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._request = parameters.request;
         this._vastCampaign = parameters.campaign;
         this._vastEndScreen = this._vastAdUnit.getEndScreen();
+        this._gameSessionId = parameters.gameSessionId;
     }
 
     public onVastEndScreenClick(): Promise<void> {
@@ -34,18 +34,19 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
+            const ctaClickedTime = Date.now();
             return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
+                const redirectDuration = Date.now() - ctaClickedTime;
+                if (this.shouldRecordClickLog()) {
+                    SessionDiagnostics.trigger('click_delay', {
+                        duration: redirectDuration,
+                        delayedUrl: clickThroughURL,
+                        location: 'vast_endscreen',
+                        seatId: this._vastCampaign.getSeatId()
+                    }, this._vastCampaign.getSession());
+                }
                 return this.openUrlOnCallButton(url);
             }).catch(() => {
-                const urlParts = Url.parse(clickThroughURL);
-                const error = new DiagnosticError(new Error('VAST endscreen clickThroughURL error'), {
-                    contentType: 'vast_endscreen',
-                    clickUrl: clickThroughURL,
-                    host: urlParts.host,
-                    protocol: urlParts.protocol,
-                    creativeId: this._vastCampaign.getCreativeId()
-                });
-                Diagnostics.trigger('click_request_head_rejected', error);
                 return this.openUrlOnCallButton(clickThroughURL);
             });
         }
@@ -89,6 +90,16 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private setCallButtonEnabled(enabled: boolean): void {
         if (this._vastEndScreen) {
             this._vastEndScreen.setCallButtonEnabled(enabled);
+        }
+    }
+
+    private shouldRecordClickLog(): boolean {
+        if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+            return true;
+        } else if (this._gameSessionId && this._gameSessionId % 10 === 1) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

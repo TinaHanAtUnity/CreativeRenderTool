@@ -13,6 +13,7 @@ import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDWebPlayerEventAdapter } from 'MRAID/EventBridge/MRAIDWebPlayerEventAdapter';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -43,9 +44,12 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
         if(this._domContentLoaded) {
             this.setViewableState(true);
+            this.sendCustomImpression();
         } else {
             const observer = this.onLoaded.subscribe(() => {
                 this.setViewableState(true);
+                this.sendCustomImpression();
+
                 this.onLoaded.unsubscribe(observer);
             });
         }
@@ -77,7 +81,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }).catch(e => this._core.Sdk.logError('failed to create mraid: ' + e));
     }
 
-    protected sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
+    protected sendMraidAnalyticsEvent(eventName: string, eventData?: unknown) {
         const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
         const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;
@@ -173,5 +177,11 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         .then(() => {
             return this._core.Cache.getFilePath('webPlayerMraid');
         });
+    }
+
+    private sendCustomImpression() {
+        if (CustomFeatures.isLoopMeSeat(this._campaign.getSeatId())) {
+            this._handlers.forEach(handler => handler.onCustomImpressionEvent());
+        }
     }
 }
