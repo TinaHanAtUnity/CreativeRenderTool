@@ -163,7 +163,9 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             }, AbstractAdUnit.getAutoCloseDelay());
         }
 
-        if (this._platform === Platform.IOS) {
+        // IOS does not consistently call onContainerForeground
+        // so we must trigger it in show call
+        if (this._platform === Platform.IOS && this._mraid instanceof MRAID) {
             this.onContainerForeground();
         }
     }
@@ -187,13 +189,20 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerForeground(): void {
-        if(this.isShowing()) {
+        this.onContainerForegroundMRAID();
+    }
+
+    // public for testing
+    public onContainerForegroundMRAID(): Promise<void> {
+        if (this.isShowing()) {
             this._mraid.setViewableState(true);
         }
 
         if (this._mraid instanceof MRAID) {
-            this.startWebPlayer();
+            return this.startWebPlayer();
         }
+
+        return Promise.resolve();
     }
 
     public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
