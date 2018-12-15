@@ -334,7 +334,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         });
     }
 
-    private setupWebPlayer(): Promise<any> {
+    private setupWebPlayer(): Promise<unknown> {
         if (this._platform === Platform.ANDROID) {
             return this.setupAndroidWebPlayer();
         } else {
@@ -358,7 +358,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         return Promise.all(promises);
     }
 
-    private setupIosWebPlayer(): Promise<any> {
+    private setupIosWebPlayer(): Promise<unknown> {
         const settings = {
             'allowsPlayback': true,
             'playbackRequiresAction': false,
