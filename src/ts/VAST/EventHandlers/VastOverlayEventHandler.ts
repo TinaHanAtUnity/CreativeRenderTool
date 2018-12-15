@@ -75,7 +75,9 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if(clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
-            if (!ByteDanceCTATest.isValid(this._abGroup)) {
+            if (ByteDanceCTATest.isValid(this._abGroup)) {
+                return this.openUrlOnCallButton(clickThroughURL);
+            } else {
                 return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
                     const redirectDuration = Date.now() - ctaClickedTime;
                     return this.openUrlOnCallButton(url).then(() => {
@@ -92,8 +94,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                 }).catch(() => {
                     return this.openUrlOnCallButton(clickThroughURL);
                 });
-            } else {
-                return this.openUrlOnCallButton(clickThroughURL);
             }
         } else {
             return Promise.reject(new Error('No clickThroughURL was defined'));

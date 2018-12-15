@@ -41,7 +41,9 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
-            if (!ByteDanceCTATest.isValid(this._abGroup)) {
+            if (ByteDanceCTATest.isValid(this._abGroup)) {
+                return this.openUrlOnCallButton(clickThroughURL);
+            } else {
                 return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
                     const redirectDuration = Date.now() - ctaClickedTime;
                     return this.openUrlOnCallButton(url).then(() => {
@@ -58,8 +60,6 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
                 }).catch(() => {
                     return this.openUrlOnCallButton(clickThroughURL!);
                 });
-            } else {
-                return this.openUrlOnCallButton(clickThroughURL);
             }
         }
         return Promise.reject(new Error('There is no clickthrough URL for video or companion'));
