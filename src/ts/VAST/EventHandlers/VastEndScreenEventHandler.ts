@@ -34,7 +34,10 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     public onVastEndScreenClick(): Promise<void> {
         this.setCallButtonEnabled(false);
 
-        const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
+        let clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
+        if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+            clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
+        }
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
@@ -53,7 +56,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
                         }
                     });
                 }).catch(() => {
-                    return this.openUrlOnCallButton(clickThroughURL);
+                    return this.openUrlOnCallButton(clickThroughURL!);
                 });
             } else {
                 return this.openUrlOnCallButton(clickThroughURL);
@@ -79,6 +82,9 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private openUrlOnCallButton(url: string): Promise<void> {
         return this.onOpenUrl(url).then(() => {
             this.setCallButtonEnabled(true);
+            if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+                this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+            }
             this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._vastCampaign.getSession().getId());
         }).catch(() => {
             this.setCallButtonEnabled(true);
