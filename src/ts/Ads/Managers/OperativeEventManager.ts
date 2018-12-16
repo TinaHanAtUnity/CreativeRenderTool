@@ -6,6 +6,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
+import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { EventType } from 'Ads/Models/Session';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
@@ -23,7 +24,6 @@ import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
-import { IRequestPrivacy } from 'Ads/Models/Privacy';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: RequestManager;
@@ -377,7 +377,7 @@ export class OperativeEventManager {
                 'gdprEnabled': this._adsConfig.isGDPREnabled(),
                 'optOutEnabled': this._adsConfig.isOptOutEnabled(),
                 'optOutRecorded': this._adsConfig.isOptOutRecorded(),
-                'privacy': this._adsConfig.getPrivacy(),
+                'privacy': RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy()),
                 'gameSessionCounters': session.getGameSessionCounters(),
                 'networkType': networkType,
                 'connectionType': connectionType,
