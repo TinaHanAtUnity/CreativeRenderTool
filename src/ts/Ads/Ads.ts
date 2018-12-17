@@ -190,17 +190,19 @@ export class Ads implements IAds {
             this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
             this.AR = new AR(this._core);
 
-            const arAnalyticsPromises: [Promise<boolean>, Promise<boolean>, Promise<CurrentPermission>] = [
-                ARUtil.isARSupported(this.AR.Api),
-                PermissionsUtil.checkPermissionInManifest(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.CAMERA),
-                PermissionsUtil.checkPermissions(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.CAMERA)
-            ];
+            if (this.SessionManager.getGameSessionId() % 1000 === 0) {
+                const arAnalyticsPromises: [Promise<boolean>, Promise<boolean>, Promise<CurrentPermission>] = [
+                    ARUtil.isARSupported(this.AR.Api),
+                    PermissionsUtil.checkPermissionInManifest(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.CAMERA),
+                    PermissionsUtil.checkPermissions(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.CAMERA)
+                ];
 
-            Promise.all(arAnalyticsPromises).then(([arSupported, permissionInManifest, permissionResult]: [boolean, boolean, CurrentPermission]) => {
-                Diagnostics.trigger('ar_device_support', {arSupported, permissionInManifest, permissionResult});
-            }).catch((error) => {
-                Diagnostics.trigger('ar_device_support_check_error', error);
-            });
+                Promise.all(arAnalyticsPromises).then(([arSupported, permissionInManifest, permissionResult]: [boolean, boolean, CurrentPermission]) => {
+                    Diagnostics.trigger('ar_device_support', {arSupported, permissionInManifest, permissionResult});
+                }).catch((error) => {
+                    Diagnostics.trigger('ar_device_support_check_error', error);
+                });
+            }
 
             const parserModules: AbstractParserModule[] = [
                 new AdMob(this._core, this),
