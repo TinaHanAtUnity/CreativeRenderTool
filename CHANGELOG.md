@@ -1,4 +1,4 @@
-# Pending
+# Staged
 
 * Disabled CTA abtest and sending video click events in endcard for ByteDance [#7615](https://github.com/Applifier/unity-ads-webview/pull/7615)
 * Add 2861297 as Cheetah game [#7608](https://github.com/Applifier/unity-ads-webview/pull/7608)
