@@ -74,6 +74,7 @@ import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 export class Ads implements IAds {
 
@@ -258,13 +259,19 @@ export class Ads implements IAds {
 
         SdkStats.sendShowEvent(placementId);
 
+        if (campaign instanceof PromoCampaign && campaign.getRequiredAssets().length === 0) {
+            this.showError(false, placementId, 'No creatives found for promo campaign');
+            return;
+        }
+
         if(campaign.isExpired()) {
             this.showError(true, placementId, 'Campaign has expired');
             this.RefreshManager.refresh();
 
             const error = new DiagnosticError(new Error('Campaign expired'), {
                 id: campaign.getId(),
-                willExpireAt: campaign.getWillExpireAt()
+                willExpireAt: campaign.getWillExpireAt(),
+                contentType: campaign.getContentType()
             });
             SessionDiagnostics.trigger('campaign_expired', error, campaign.getSession());
             return;
@@ -411,7 +418,6 @@ export class Ads implements IAds {
 
             this._currentAdUnit.show().then(() => {
                 if(this._core.NativeBridge.getPlatform() === Platform.ANDROID) {
-                    this._core.NativeBridge.setAutoBatchEnabled(true);
                     this._core.Api.Request.Android!.setMaximumPoolSize(8);
                 } else {
                     this._core.Api.Request.setConcurrentRequestCount(8);
@@ -439,7 +445,6 @@ export class Ads implements IAds {
         this._showing = false;
 
         if(this._core.NativeBridge.getPlatform() === Platform.ANDROID) {
-            this._core.NativeBridge.setAutoBatchEnabled(false);
             this._core.Api.Request.Android!.setMaximumPoolSize(1);
         } else {
             this._core.Api.Request.setConcurrentRequestCount(1);
