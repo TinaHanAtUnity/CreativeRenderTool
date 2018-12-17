@@ -34,8 +34,6 @@ export class PersonalizationCheckboxGroup extends View<{}> {
     public show(): void {
         const permissions: IGranularPermissions = this._userPrivacyManager.getGranularPermissions();
 
-        console.log(JSON.stringify(permissions));
-
         this._personalizedExpCheckbox.checked = permissions.gameExp;
         this._personalizedAdsCheckbox.checked = permissions.ads;
         this._personalized3rdPartyCheckbox.checked = permissions.external;
