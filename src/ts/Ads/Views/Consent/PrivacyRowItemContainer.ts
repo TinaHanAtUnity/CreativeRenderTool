@@ -10,20 +10,15 @@ export interface IPrivacyRowItemContainerHandler {
     onPrivacy(url: string): void;
 }
 
-interface IRowItemContainerParams {
-    platform: Platform;
-    gdprManager: UserPrivacyManager;
-}
-
 export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandler> {
 
-    private _gdprManager: UserPrivacyManager;
+    private _userPrivacyManager: UserPrivacyManager;
     private _dataDeletionConfirmation: boolean = false;
 
-    constructor(parameters: IRowItemContainerParams) {
-        super(parameters.platform, 'privacy-row-item-container');
+    constructor(platform: Platform, userPrivacyManager: UserPrivacyManager) {
+        super(platform, 'privacy-row-item-container');
 
-        this._gdprManager = parameters.gdprManager;
+        this._userPrivacyManager = userPrivacyManager;
         this._template = new Template(PrivacyRowItemContainerTemplate);
 
         this._bindings = [
@@ -72,7 +67,7 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
 
     private fillPersonalInfoFields(): void {
         // todo: manager class should check is the information already available to avoid extra requests
-        this._gdprManager.retrieveUserSummary().then((personalProperties) => {
+        this._userPrivacyManager.retrieveUserSummary().then((personalProperties) => {
             document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
             document.getElementById('phone-type')!.innerHTML = `Using ${personalProperties.deviceModel}`;
             document.getElementById('country')!.innerHTML = `Located in ${personalProperties.country}`;

@@ -1,5 +1,12 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, IPermissions, isUnityConsentPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import { GamePrivacy,
+    IPermissions,
+    isUnityConsentPermissions,
+    PrivacyMethod,
+    UserPrivacy,
+    IAllPermissions,
+    IGranularPermissions
+} from 'Ads/Models/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
@@ -170,6 +177,27 @@ export class UserPrivacyManager {
 
     public isOptOutEnabled(): boolean {
         return this._adsConfig.isOptOutEnabled();
+    }
+
+    public getGranularPermissions(): IGranularPermissions {
+        const permissions = this._adsConfig.getUserPrivacy().getPermissions();
+        if (!isUnityConsentPermissions(permissions)) {
+            return {
+                gameExp: false,
+                ads: false,
+                external: false
+            };
+        }
+
+        if ((<IAllPermissions>permissions).all === true) {
+            return {
+                gameExp: true,
+                ads: true,
+                external: true
+            };
+        } else {
+            return <IGranularPermissions>permissions;
+        }
     }
 
     private pushConsent(consent: boolean): Promise<void> {

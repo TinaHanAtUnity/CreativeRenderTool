@@ -48,13 +48,13 @@ export interface IBuildInformation extends ITemplateData {
 export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
 
     protected _onReport: Observable2<Campaign, string> = new Observable2();
-    protected _privacyManager: UserPrivacyManager;
+    protected _userPrivacyManager: UserPrivacyManager;
     private static buildInformation: IBuildInformation;
 
     constructor(platform: Platform, privacyManager: UserPrivacyManager, isCoppaCompliant: boolean, isGDPREnabled: boolean, id: string) {
         super(platform, id);
 
-        this._privacyManager = privacyManager;
+        this._userPrivacyManager = privacyManager;
         this._templateData = {
             'isCoppaCompliant': isCoppaCompliant,
             'isGDPREnabled': isGDPREnabled,
