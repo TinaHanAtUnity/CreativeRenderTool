@@ -128,6 +128,7 @@ import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
 import { UnityInfo } from 'Core/Models/UnityInfo';
+import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -140,6 +141,9 @@ export class TestFixtures {
             skipInSeconds: 0,
             disableBackButton: false,
             useDeviceOrientationForVideo: false,
+            skipEndCardOnClose: false,
+            disableVideoControlsFade: false,
+            refreshDelay: 1000,
             muteVideo: false,
             adTypes: ['TEST']
         });
@@ -632,6 +636,14 @@ export class TestFixtures {
             placement: TestFixtures.getPlacement()
         };
         return new NewVideoOverlay(overlayParams, TestFixtures.getPrivacy(platform, campaign), false, false);
+    }
+
+    public static getPerformanceOverlayEventHandler(platform: Platform, core: ICoreApi, ads: IAdsApi, ar: IARApi, purchasing: IPurchasingApi, campaign: Campaign, adUnit: PerformanceAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): PerformanceOverlayEventHandler {
+        return new PerformanceOverlayEventHandler(
+            adUnit,
+            TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, ar, purchasing),
+            TestFixtures.getAppStoreDownloadHelper(platform, core, ads, campaign, adUnit, thirdPartyEventManager, nativeBridge)
+        );
     }
 
     public static getXPromoAdUnitParameters(platform: Platform, core: ICoreApi, ads: IAdsApi, ar: IARApi, purchasing: IPurchasingApi): IXPromoAdUnitParameters {

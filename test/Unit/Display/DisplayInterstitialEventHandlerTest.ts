@@ -59,6 +59,10 @@ describe('DisplayInterstitialEventHandler', () => {
                 skipInSeconds: 5,
                 disableBackButton: true,
                 useDeviceOrientationForVideo: false,
+                skipEndCardOnClose: false,
+                disableVideoControlsFade: false,
+                adTypes: [],
+                refreshDelay: 1000,
                 muteVideo: false
             });
 

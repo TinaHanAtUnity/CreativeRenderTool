@@ -7,7 +7,7 @@ import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { StoreName } from 'Performance/Models/PerformanceCampaign';
+import { IRawPerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export class XPromoCampaignParser extends CampaignParser {
@@ -15,7 +15,7 @@ export class XPromoCampaignParser extends CampaignParser {
     public static ContentType = 'xpromo/video';
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
-        const json = response.getJsonContent();
+        const json = <IRawPerformanceCampaign>response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;

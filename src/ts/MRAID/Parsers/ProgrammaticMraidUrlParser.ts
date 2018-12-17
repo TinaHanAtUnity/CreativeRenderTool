@@ -8,13 +8,18 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { IRawPerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+
+export interface IRawMraidUrlCampaign extends IRawPerformanceCampaign {
+    inlinedUrl?: string;
+}
 
 export class ProgrammaticMraidUrlParser extends CampaignParser {
 
     public static ContentType = 'programmatic/mraid-url';
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
-        const jsonMraidUrl = response.getJsonContent();
+        const jsonMraidUrl = <IRawMraidUrlCampaign>response.getJsonContent();
 
         if(!jsonMraidUrl) {
             throw new Error('Corrupted mraid-url content');

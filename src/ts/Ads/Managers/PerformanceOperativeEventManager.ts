@@ -33,7 +33,7 @@ export class PerformanceOperativeEventManager extends OperativeEventManager {
             if(params.asset) {
                 infoJson.unityCreativeId = params.asset.getCreativeId();
             }
-            return <[string, any]>[eventId, infoJson];
+            return <[string, IInfoJson]>[eventId, infoJson];
         });
     }
 }

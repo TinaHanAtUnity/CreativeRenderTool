@@ -21,6 +21,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Promises } from 'Core/Utilities/Promises';
 import { Timer } from 'Core/Utilities/Timer';
 import { Url } from 'Core/Utilities/Url';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -137,10 +138,14 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
         });
     }
 
-    public onTrackingEvent(event: string, data?: any) {
+    public onTrackingEvent(event: string, data?: unknown) {
         this._adUnit.sendTrackingEvent(event);
         if (event === 'error') {
             SessionDiagnostics.trigger('admob_ad_error', data, this._campaign.getSession());
+        } else if (event === 'stalled') {
+            Diagnostics.trigger('admob_ad_video_stalled', {
+                data: data
+            });
         }
     }
 

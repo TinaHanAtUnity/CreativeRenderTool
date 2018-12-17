@@ -46,3 +46,4 @@ export const FakeDisabledABTest = new DisabledABTest(16, 17);
 export const FPSCollectionTest = new ABTest(8);
 
 export const AuctionV5Test = new ABTest(15, 16, 17);
+export const ByteDanceCTATest = new DisabledABTest(15, 16, 17); // will use V5 test group

@@ -8,9 +8,9 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { Url } from 'Core/Utilities/Url';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { ABGroup, ByteDanceCTATest } from 'Core/Models/ABGroup';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -20,6 +20,8 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastCampaign: VastCampaign;
     private _moat?: MOAT;
     private _vastOverlay?: AbstractVideoOverlay;
+    private _gameSessionId?: number;
+    private _abGroup: ABGroup;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(adUnit, parameters);
@@ -32,6 +34,8 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._placement = parameters.placement;
         this._moat = MoatViewabilityService.getMoat();
         this._vastOverlay = this._vastAdUnit.getOverlay();
+        this._gameSessionId = parameters.gameSessionId;
+        this._abGroup = parameters.coreConfig.getAbGroup();
     }
 
     public onOverlaySkip(position: number): void {
@@ -70,20 +74,27 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
-            return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
-                return this.openUrlOnCallButton(url);
-            }).catch(() => {
-                const urlParts = Url.parse(clickThroughURL);
-                const error = new DiagnosticError(new Error('VAST overlay clickThroughURL error'), {
-                    contentType: 'vast_overlay',
-                    clickUrl: clickThroughURL,
-                    host: urlParts.host,
-                    protocol: urlParts.protocol,
-                    creativeId: this._vastCampaign.getCreativeId()
-                });
-                Diagnostics.trigger('click_request_head_rejected', error);
+            const ctaClickedTime = Date.now();
+            if (ByteDanceCTATest.isValid(this._abGroup)) {
                 return this.openUrlOnCallButton(clickThroughURL);
-            });
+            } else {
+                return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
+                    const redirectDuration = Date.now() - ctaClickedTime;
+                    return this.openUrlOnCallButton(url).then(() => {
+                        if (this.shouldRecordClickLog()) {
+                            SessionDiagnostics.trigger('click_delay', {
+                                duration: redirectDuration,
+                                delayedUrl: clickThroughURL,
+                                location: 'vast_overlay',
+                                seatId: this._vastCampaign.getSeatId(),
+                                creativeId: this._vastCampaign.getCreativeId()
+                            }, this._vastCampaign.getSession());
+                        }
+                    });
+                }).catch(() => {
+                    return this.openUrlOnCallButton(clickThroughURL);
+                });
+            }
         } else {
             return Promise.reject(new Error('No clickThroughURL was defined'));
         }
@@ -112,6 +123,16 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private setCallButtonEnabled(enabled: boolean): void {
         if (this._vastOverlay) {
             this._vastOverlay.setCallButtonEnabled(enabled);
+        }
+    }
+
+    private shouldRecordClickLog(): boolean {
+        if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+            return true;
+        } else if (this._gameSessionId && this._gameSessionId % 10 === 1) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

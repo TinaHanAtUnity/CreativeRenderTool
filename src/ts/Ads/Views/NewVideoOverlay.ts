@@ -56,7 +56,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _timerElement: HTMLElement;
     private _chinaAdvertisementElement: HTMLElement;
 
-    private _fadeTimer: any;
+    private _fadeTimer?: number;
     private _areControlsVisible: boolean = false;
     private _gameId: string;
 
@@ -190,7 +190,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         }
 
         if (this._fadeEnabled && !this._fadeTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
-            this._fadeTimer = setTimeout(() => {
+            this._fadeTimer = window.setTimeout(() => {
                 this.fadeOut();
                 this._fadeTimer = undefined;
             }, 3000);
@@ -340,7 +340,8 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
                         bypassAppSheet: campaign.getBypassAppSheet(),
                         appStoreId: campaign.getAppStoreId(),
                         store: campaign.getStore(),
-                        videoProgress: this._videoProgress
+                        videoProgress: this._videoProgress,
+                        appDownloadUrl: campaign instanceof PerformanceCampaign ? campaign.getAppDownloadUrl() : undefined
                     });
                 }
             });
@@ -399,6 +400,9 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     private fadeIn() {
+        if (!this._container) {
+            return;
+        }
         this._container.classList.add('fade-in');
         this._areControlsVisible = true;
 
