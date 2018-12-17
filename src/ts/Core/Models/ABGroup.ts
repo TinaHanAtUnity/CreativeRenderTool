@@ -47,3 +47,4 @@ export const FPSCollectionTest = new ABTest(8);
 
 export const AuctionV5Test = new DisabledABTest(15, 16, 17);
 export const AndroidBackButtonSkipTest = new ABTest(7, 8);
+export const ByteDanceCTATest = new DisabledABTest(15, 16, 17); // will use V5 test group
