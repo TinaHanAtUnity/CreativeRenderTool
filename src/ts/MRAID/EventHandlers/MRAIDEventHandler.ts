@@ -14,13 +14,8 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
-<<<<<<< HEAD
-import { Url } from 'Core/Utilities/Url';
-=======
-import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
->>>>>>> master
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
