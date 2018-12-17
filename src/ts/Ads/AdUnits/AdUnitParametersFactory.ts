@@ -31,7 +31,7 @@ import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
-    create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: any): T2;
+    create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
 }
 
 export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> implements IAbstractAdUnitParametersFactory<T1, T2> {
@@ -59,7 +59,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     private _storageBridge: StorageBridge;
 
     private _playerMetadataServerId: string;
-    private _options: any;
+    private _options: unknown;
 
     constructor(core: ICore, ads: IAds) {
         this._platform = core.NativeBridge.getPlatform();
@@ -80,7 +80,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         this._storageBridge = core.StorageBridge;
     }
 
-    public create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: any): T2 {
+    public create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2 {
         this._campaign = campaign;
         this._placement = placement;
         this._orientation = orientation;

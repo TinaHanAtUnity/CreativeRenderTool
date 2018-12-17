@@ -26,6 +26,8 @@ export class BackupCampaignManager {
     private _coreConfiguration: CoreConfiguration;
     private _deviceInfo: DeviceInfo;
 
+    private _campaignCount: number = 0;
+
     constructor(core: ICoreApi, storageBridge: StorageBridge, coreConfiguration: CoreConfiguration, deviceInfo: DeviceInfo) {
         this._core = core;
         this._storageBridge = storageBridge;
@@ -71,6 +73,11 @@ export class BackupCampaignManager {
             if(this._deviceInfo.getApiLevel() < 19) {
                 return;
             }
+        }
+
+        this._campaignCount++;
+        if(this._campaignCount > 3) {
+            return;
         }
 
         const rootKey: string = 'backupcampaign.campaign.' + campaign.getMediaId();
@@ -139,6 +146,8 @@ export class BackupCampaignManager {
     }
 
     public deleteBackupCampaigns() {
+        this._campaignCount = 0;
+
         const operation = new StorageOperation(StorageType.PRIVATE);
         operation.delete('backupcampaign');
         this._storageBridge.queue(operation);

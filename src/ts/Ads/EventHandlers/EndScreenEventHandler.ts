@@ -44,4 +44,5 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     public abstract onKeyEvent(keyCode: number): void;
+
 }

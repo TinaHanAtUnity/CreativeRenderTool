@@ -23,7 +23,7 @@ export class CustomPurchasingApi extends NativeApi {
         return this._nativeBridge.invoke(this._fullApiClassName, 'available', []);
     }
 
-    public purchaseItem(productId: string, extras: any) {
+    public purchaseItem(productId: string, extras: unknown) {
         return this._nativeBridge.invoke(this._fullApiClassName, 'purchaseItem', [productId, extras]);
     }
 
@@ -31,16 +31,16 @@ export class CustomPurchasingApi extends NativeApi {
         return this._nativeBridge.invoke(this._fullApiClassName, 'refreshCatalog', []);
     }
 
-    public handleEvent(event: string, parameters: any[]) {
+    public handleEvent(event: string, parameters: unknown[]) {
         switch (event) {
         case CustomPurchasingEvent[CustomPurchasingEvent.PRODUCTS_RETRIEVED]:
-            this.onProductsRetrieved.trigger(parameters[0]);
+            this.onProductsRetrieved.trigger(<IProduct[]>parameters[0]);
             break;
         case CustomPurchasingEvent[CustomPurchasingEvent.TRANSACTION_COMPLETE]:
-            this.onTransactionComplete.trigger(parameters[0]);
+            this.onTransactionComplete.trigger(<ITransactionDetails>parameters[0]);
             break;
         case CustomPurchasingEvent[CustomPurchasingEvent.TRANSACTION_ERROR]:
-            const details: ITransactionErrorDetails = parameters[0];
+            const details = <ITransactionErrorDetails>parameters[0];
             details.store = this.translateStore(details.store);
             this.onTransactionError.trigger(details);
             break;

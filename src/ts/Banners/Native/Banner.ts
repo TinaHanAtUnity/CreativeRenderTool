@@ -72,7 +72,7 @@ export class BannerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setViews', [views]);
     }
 
-    public handleEvent(event: string, parameters: any[]) {
+    public handleEvent(event: string, parameters: unknown[]) {
         switch (event) {
             case BannerEvents.BannerEventResized:
                 this.handleBannerResized(parameters);
@@ -100,17 +100,17 @@ export class BannerApi extends NativeApi {
         }
     }
 
-    private handleBannerResized(parameters: any[]) {
-        const x = parameters[0];
-        const y = parameters[1];
-        const width = parameters[2];
-        const height = parameters[3];
-        const alpha = parameters[4];
+    private handleBannerResized(parameters: unknown[]) {
+        const x = <number>parameters[0];
+        const y = <number>parameters[1];
+        const width = <number>parameters[2];
+        const height = <number>parameters[3];
+        const alpha = <number>parameters[4];
         this.onBannerResized.trigger({x, y, width, height, alpha});
     }
 
-    private handleBannerVisibilityChanged(parameters: any[]) {
-        const visibilityAsNumber = parameters[0];
+    private handleBannerVisibilityChanged(parameters: unknown[]) {
+        const visibilityAsNumber = <number>parameters[0];
         const visibility = this.getVisibilityForNumber(visibilityAsNumber);
         this.onBannerVisibilityChanged.trigger(visibility);
     }
@@ -128,12 +128,12 @@ export class BannerApi extends NativeApi {
         }
     }
 
-    private handleBannerAttachedStateEvent(parameters: any[]) {
+    private handleBannerAttachedStateEvent(parameters: unknown[]) {
         if (parameters.length !== 1) {
             throw new WebViewError('Banner attached state event with no attached state parameter');
         } else {
             const attached = parameters[0];
-            this.onBannerAttachedState.trigger(attached);
+            this.onBannerAttachedState.trigger(<boolean>attached);
         }
     }
 

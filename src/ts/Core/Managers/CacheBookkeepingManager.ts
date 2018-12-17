@@ -26,8 +26,8 @@ export class CacheBookkeepingManager {
         this._core = core;
     }
 
-    public cleanCache(): Promise<any[]> {
-        return Promise.all([this.getFilesKeys(), this._core.Cache.getFiles(), this.getCacheCampaigns()]).then(([keys, files, campaigns]: [string[], IFileInfo[], object]): Promise<any> => {
+    public cleanCache(): Promise<unknown> {
+        return Promise.all([this.getFilesKeys(), this._core.Cache.getFiles(), this.getCacheCampaigns()]).then(([keys, files, campaigns]: [string[], IFileInfo[], object]): Promise<unknown> => {
             if (!files || !files.length) {
                 let campaignCount = 0;
                 if (campaigns) {
@@ -46,7 +46,7 @@ export class CacheBookkeepingManager {
 
             return this.cleanCacheBookKeeping().then(() => {
                 // clean files older than three weeks and limit cache size to 50 megabytes
-                const promises: Promise<any>[] = [];
+                const promises: Promise<unknown>[] = [];
                 const timeThreshold: number = new Date().getTime() - 21 * 24 * 60 * 60 * 1000;
                 const sizeThreshold: number = 50 * 1024 * 1024;
 
@@ -96,7 +96,7 @@ export class CacheBookkeepingManager {
 
                 // check consistency of kept files so that bookkeeping and files on device match
                 keepFiles.map(file => {
-                    promises.push(this.getFileInfo(file).then((response): Promise<any[]> => {
+                    promises.push(this.getFileInfo(file).then((response): Promise<unknown[]> => {
                         if (response.fullyDownloaded === true) {
                             // file and bookkeeping ok
                             return Promise.all([]);
@@ -120,7 +120,7 @@ export class CacheBookkeepingManager {
                     }));
                 });
 
-                return Promise.all([this._core.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]: [IFileInfo[], { [key: string]: any }]) => {
+                return Promise.all([this._core.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]: [IFileInfo[], ICacheCampaignsResponse]) => {
                     const cacheFilesLeftIds: string[] = [];
                     cacheFilesLeft.map(currentFile => {
                         cacheFilesLeftIds.push(FileId.getFileIdHash(currentFile.id));
@@ -188,7 +188,7 @@ export class CacheBookkeepingManager {
         this._core.Storage.write(StorageType.PRIVATE);
     }
 
-    public deleteCachedCampaignResponse(): Promise<any> {
+    public deleteCachedCampaignResponse(): Promise<unknown> {
         const cacheCampaignUrlPromise = this._core.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'));
         const cachedCampaignResponsePromise = this._core.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'));
 
@@ -207,7 +207,7 @@ export class CacheBookkeepingManager {
 
     private cleanCacheBookKeeping(): Promise<void> {
         return this.getKeys().then((cacheKeys) => {
-            const promises: Promise<any>[] = cacheKeys
+            const promises: Promise<unknown>[] = cacheKeys
                 .filter(cacheKey => cacheKey && !(cacheKey.toUpperCase() in CacheKey))
                 .map(cacheKey => this._core.Storage.delete(StorageType.PRIVATE, this._rootKey + '.' + cacheKey));
 
@@ -252,7 +252,7 @@ export class CacheBookkeepingManager {
         return finalKey;
     }
 
-    private getCacheCampaigns(): Promise<object> {
+    private getCacheCampaigns(): Promise<ICacheCampaignsResponse> {
         return this._core.Storage.get<ICacheCampaignsResponse>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGNS)).then(campaigns => {
             return campaigns;
         }).catch(() => {

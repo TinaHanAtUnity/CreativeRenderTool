@@ -56,10 +56,10 @@ export class StorageApi extends NativeApi {
         return this._nativeBridge.invoke<string[]>(this._fullApiClassName, 'getKeys', [StorageType[type], key, recursive]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case StorageEvent[StorageEvent.SET]:
-                this.onSet.trigger(parameters[0], parameters[1]);
+                this.onSet.trigger(<string>parameters[0], <object>parameters[1]);
                 break;
 
             default:

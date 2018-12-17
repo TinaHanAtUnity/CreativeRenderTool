@@ -3,7 +3,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export interface IntentExtra {
     key: string;
-    value: any;
+    value: unknown;
 }
 
 export interface IntentData {

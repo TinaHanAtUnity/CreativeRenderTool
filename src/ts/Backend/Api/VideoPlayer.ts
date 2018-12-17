@@ -60,7 +60,7 @@ export class VideoPlayer extends BackendApi {
         } else {
             let currentTime = 0;
             this._backend.sendEvent('VIDEOPLAYER', 'PLAY');
-            this._progressTimer = setInterval(() => {
+            this._progressTimer = window.setInterval(() => {
                 currentTime += 250;
                 if(this._duration && currentTime >= this._duration) {
                     this._backend.sendEvent('VIDEOPLAYER', 'PROGRESS', this._duration);
@@ -99,6 +99,6 @@ export class VideoPlayer extends BackendApi {
     private _height: number | undefined;
 
     private _videoView: HTMLVideoElement;
-    private _progressTimer: any;
+    private _progressTimer: number;
 
 }

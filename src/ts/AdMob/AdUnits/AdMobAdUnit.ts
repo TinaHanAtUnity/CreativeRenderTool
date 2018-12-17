@@ -29,7 +29,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _options: any;
+    private _options: unknown;
     private _keyDownListener: (kc: number) => void;
     private _campaign: AdMobCampaign;
     private _placement: Placement;
@@ -110,7 +110,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public sendStartEvent() {
         this._ads.Listener.sendStartEvent(this._placement.getId());
         this.sendTrackingEvent('start');
-        this._operativeEventManager.sendStart(this.getOperativeEventParams());
+        this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
+            this.onStartProcessed.trigger();
+        });
     }
 
     public sendSkipEvent() {

@@ -7,6 +7,7 @@ import { ScreenOrientation } from 'Core/Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Core/Constants/Android/SystemUiVisibility';
 import { ICoreApi } from 'Core/ICore';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -28,14 +29,14 @@ export class Activity extends AdUnitContainer {
     private _activityId: number;
     private _currentActivityFinished: boolean;
 
-    private _onResumeObserver: any;
-    private _onPauseObserver: any;
-    private _onDestroyObserver: any;
-    private _onCreateObserver: any;
-    private _onRestoreObserver: any;
+    private _onResumeObserver: IObserver1<number>;
+    private _onPauseObserver: IObserver2<boolean, number>;
+    private _onDestroyObserver: IObserver2<boolean, number>;
+    private _onCreateObserver: IObserver1<number>;
+    private _onRestoreObserver: IObserver1<number>;
 
-    private _onFocusGainedObserver: any;
-    private _onFocusLostObserver: any;
+    private _onFocusGainedObserver: IObserver1<number>;
+    private _onFocusLostObserver: IObserver1<number>;
 
     private _androidOptions: IAndroidOptions;
 
@@ -73,7 +74,7 @@ export class Activity extends AdUnitContainer {
             this._lockedOrientation = forceOrientation;
         }
 
-        let keyEvents: any[] = [];
+        let keyEvents: KeyCode[] = [];
         if(disableBackbutton) {
             keyEvents = [KeyCode.BACK];
         }
@@ -99,8 +100,8 @@ export class Activity extends AdUnitContainer {
         }
     }
 
-    public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
-        const promises: Promise<any>[] = [];
+    public reconfigure(configuration: ViewConfiguration): Promise<unknown[]> {
+        const promises: Promise<unknown>[] = [];
 
         return Promise.all([
             this._deviceInfo.getScreenWidth(),
@@ -127,7 +128,7 @@ export class Activity extends AdUnitContainer {
         });
     }
 
-    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any> {
+    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<void> {
         return this._ads.Android!.AdUnit.setOrientation(this.getOrientation(allowRotation, forceOrientation, this._androidOptions));
     }
 

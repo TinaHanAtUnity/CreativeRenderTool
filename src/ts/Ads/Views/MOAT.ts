@@ -19,9 +19,9 @@ export class MOAT extends View<VastCampaign> {
 
     private _core: ICoreApi;
     private _iframe: HTMLIFrameElement;
-    private _resizeHandler: any;
-    private _resizeDelayer: any;
-    private _resizeTimeout: any;
+    private _resizeHandler: EventListener;
+    private _resizeDelayer: EventListener;
+    private _resizeTimeout?: number;
     private _didInitMoat = false;
     private _messageListener: (e: MessageEvent) => void;
     private _state: MoatState = MoatState.STOPPED;
@@ -36,7 +36,7 @@ export class MOAT extends View<VastCampaign> {
 
     public render(): void {
         super.render();
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#moat-iframe');
+        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#moat-iframe');
         iframe.srcdoc = MOATContainer;
     }
 
@@ -81,7 +81,7 @@ export class MOAT extends View<VastCampaign> {
         if (!this._didInitMoat) {
             this._didInitMoat = true;
             this._resizeDelayer = (event: Event) => {
-                this._resizeTimeout = setTimeout(() => {
+                this._resizeTimeout = window.setTimeout(() => {
                     this._resizeHandler(event);
                 }, 200);
             };
@@ -145,7 +145,7 @@ export class MOAT extends View<VastCampaign> {
         }
     }
 
-    public triggerViewabilityEvent(type: string, payload: any) {
+    public triggerViewabilityEvent(type: string, payload: unknown) {
         this._core.Sdk.logDebug('Calling MOAT viewability event "' + type + '" with payload: ' + payload);
         if (this._iframe.contentWindow) {
             this._iframe.contentWindow.postMessage({

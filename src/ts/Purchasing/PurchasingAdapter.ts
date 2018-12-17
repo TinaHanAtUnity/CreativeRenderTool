@@ -8,7 +8,7 @@ export interface ITransactionDetails {
     receipt: string;
     price: number;
     currency: string;
-    extras: any;
+    extras: unknown;
 }
 
 export interface ITransactionErrorDetails {
@@ -16,7 +16,7 @@ export interface ITransactionErrorDetails {
     exceptionMessage: string;
     store: string;
     storeSpecificErrorCode: string;
-    extras: any;
+    extras: unknown;
 }
 
 export interface IProduct {
