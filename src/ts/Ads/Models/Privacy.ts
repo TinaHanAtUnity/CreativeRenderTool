@@ -7,12 +7,6 @@ export enum PrivacyMethod {
     DEVELOPER_CONSENT = 'developer_consent'
 }
 
-export interface IRequestPrivacy {
-    method: PrivacyMethod;
-    firstRequest: boolean;
-    permissions: IPermissions | { [key: string]: never };
-}
-
 export interface IAllPermissions {
     all: true;
 }

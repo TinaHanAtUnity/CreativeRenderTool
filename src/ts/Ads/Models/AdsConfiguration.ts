@@ -1,5 +1,5 @@
 import { IRawPlacement, Placement } from 'Ads/Models/Placement';
-import { IRawGamePrivacy, GamePrivacy, IPermissions, IRequestPrivacy, PrivacyMethod, IRawUserPrivacy, UserPrivacy } from 'Ads/Models/Privacy';
+import { IRawGamePrivacy, GamePrivacy, IRawUserPrivacy, UserPrivacy } from 'Ads/Models/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
 
@@ -88,17 +88,6 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         }
 
         return count;
-    }
-
-    public getPrivacy(): IRequestPrivacy {
-        const userPrivacy = this.getUserPrivacy();
-        const firstRequest = userPrivacy.isRecorded();
-        const permissions = firstRequest ? userPrivacy.getPermissions() : {};
-        return {
-            'method': this.getGamePrivacy().getMethod(),
-            'firstRequest': firstRequest,
-            'permissions': permissions
-        };
     }
 
     public getDefaultPlacement(): Placement {
