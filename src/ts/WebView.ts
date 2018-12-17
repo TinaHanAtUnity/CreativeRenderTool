@@ -31,13 +31,15 @@ export class WebView {
     }
 
     private onError(event: ErrorEvent): boolean {
-        Diagnostics.trigger('js_error', {
-            'message': event.message,
-            'url': event.filename,
-            'line': event.lineno,
-            'column': event.colno,
-            'object': event.error
-        });
+        if(event.lineno && typeof event.lineno === 'number' && event.lineno > 1) {
+            Diagnostics.trigger('js_error', {
+                'message': event.message,
+                'url': event.filename,
+                'line': event.lineno,
+                'column': event.colno,
+                'object': event.error
+            });
+        }
         return true; // returning true from window.onerror will suppress the error (in theory)
     }
 
