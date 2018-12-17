@@ -36,7 +36,7 @@ export class SessionManager {
         this._storageBridge.queue(operation);
     }
 
-    public sendUnsentSessions(): Promise<any[]> {
+    public sendUnsentSessions(): Promise<unknown[]> {
         return this.getUnsentSessions().then(sessions => {
             const promises = sessions.map(sessionId => {
                 return this.isSessionOutdated(sessionId).then(outdated => {
@@ -62,7 +62,7 @@ export class SessionManager {
         return this._gameSessionId;
     }
 
-    private deleteSession(sessionId: string): Promise<any[]> {
+    private deleteSession(sessionId: string): Promise<unknown[]> {
         const operation = new StorageOperation(StorageType.PRIVATE);
         operation.delete(SessionUtils.getSessionStorageKey(sessionId));
         this._storageBridge.queue(operation);
@@ -85,8 +85,8 @@ export class SessionManager {
         });
     }
 
-    private sendUnsentEvents(sessionId: string): Promise<any[]> {
-        const promises: Promise<any>[] = [];
+    private sendUnsentEvents(sessionId: string): Promise<unknown[]> {
+        const promises: Promise<unknown>[] = [];
         const failedOperativeEventManager = new FailedOperativeEventManager(this._core, sessionId);
         promises.push(failedOperativeEventManager.sendFailedEvents(this._request, this._storageBridge));
         const failedXpromoOperativeEventManager = new FailedXpromoOperativeEventManager(this._core, sessionId);

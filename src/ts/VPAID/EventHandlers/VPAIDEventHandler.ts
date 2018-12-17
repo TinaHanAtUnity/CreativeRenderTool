@@ -12,11 +12,22 @@ import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDHandler } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 
+export interface IVPAIDEventHandlerParameters {
+    operativeEventManager: OperativeEventManager;
+    thirdPartyEventManager: ThirdPartyEventManager;
+    campaign: VPAIDCampaign;
+    placement: Placement;
+    closer: Closer;
+    core: ICoreApi;
+    ads: IAdsApi;
+    endScreen: VPAIDEndScreen | undefined;
+}
+
 export class VPAIDEventHandler implements IVPAIDHandler {
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adUnit: VPAIDAdUnit;
-    private _vpaidEventHandlers: { [key: string]: (...args: any[]) => void } = {};
+    private _vpaidEventHandlers: { [key: string]: (...args: unknown[]) => void } = {};
     private _vpaidCampaign: VPAIDCampaign;
     private _placement: Placement;
     private _vpaidEndScreen: VPAIDEndScreen | undefined;
@@ -26,7 +37,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _core: ICoreApi;
     private _ads: IAdsApi;
 
-    constructor(adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
+    constructor(adUnit: VPAIDAdUnit, parameters: IVPAIDEventHandlerParameters) {
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._adUnit = adUnit;
@@ -50,12 +61,12 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._vpaidEventHandlers.AdVideoComplete = this.onAdVideoComplete;
         this._vpaidEventHandlers.AdPaused = this.onAdPaused;
         this._vpaidEventHandlers.AdPlaying = this.onAdPlaying;
-        this._vpaidEventHandlers.AdClickThru = this.onAdClickThru;
+        this._vpaidEventHandlers.AdClickThru = <(...args: unknown[]) => void>this.onAdClickThru;
         this._vpaidEventHandlers.AdDurationChange = this.onAdDurationChange;
     }
 
-    public onVPAIDEvent(eventType: string, args: any[]) {
-        let argsCopy: any[] | undefined;
+    public onVPAIDEvent(eventType: string, args: unknown[]) {
+        let argsCopy: unknown[] | undefined;
         if(args) {
             argsCopy = Array.prototype.slice.call(args);
         }

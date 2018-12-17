@@ -19,12 +19,14 @@ import { Timer } from 'Core/Utilities/Timer';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
+import { Privacy } from 'Ads/Views/Privacy';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
     closer: Closer;
     endScreen?: VPAIDEndScreen | undefined;
-    privacy: AbstractPrivacy;
+    privacy: Privacy;
+    webPlayerContainer: WebPlayerContainer;
 }
 
 export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
@@ -41,7 +43,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _view: VPAID;
     private _vpaidCampaign: VPAIDCampaign;
     private _timer: Timer;
-    private _options: any;
+    private _options: unknown;
     private _deviceInfo: DeviceInfo;
     private _urlLoadingObserver: IObserver2<string, string>;
     private _privacyShowing = false;
@@ -62,7 +64,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._deviceInfo = parameters.deviceInfo;
         this._placement = parameters.placement;
         this._clientInfo = parameters.clientInfo;
-        this._webPlayerContainer = parameters.webPlayerContainer!;
+        this._webPlayerContainer = parameters.webPlayerContainer;
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
         this._endScreen = parameters.endScreen;
 
@@ -205,7 +207,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
     }
 
-    private setupWebPlayer(): Promise<any> {
+    private setupWebPlayer(): Promise<unknown> {
         if (this._platform === Platform.ANDROID) {
             return this.setupAndroidWebPlayer();
         } else {
@@ -233,7 +235,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         return Promise.all(promises);
     }
 
-    private setupIosWebPlayer(): Promise<any> {
+    private setupIosWebPlayer(): Promise<unknown> {
         const settings = {
             allowsPlayback: true,
             playbackRequiresAction: false,

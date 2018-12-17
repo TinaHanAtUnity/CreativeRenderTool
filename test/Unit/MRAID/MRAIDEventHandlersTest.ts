@@ -35,8 +35,6 @@ import { MRAID } from 'MRAID/Views/MRAID';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
-import { MraidIFrameEventBridge } from 'MRAID/Views/MraidIFrameEventBridge';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -47,7 +45,6 @@ describe('MRAIDEventHandlersTest', () => {
     let core: ICoreApi;
     let ads: IAdsApi;
     let ar: IARApi;
-    let purchasing: IPurchasingApi;
     let storageBridge: StorageBridge;
     let mraidAdUnit: MRAIDAdUnit;
     let mraidView: MRAID;
@@ -75,7 +72,6 @@ describe('MRAIDEventHandlersTest', () => {
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
             ar = TestFixtures.getARApi(nativeBridge);
-            purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
             sinon.spy(core.Android!.Intent, 'launch');
             sinon.spy(ads.Listener, 'sendClickEvent');
@@ -105,7 +101,6 @@ describe('MRAIDEventHandlersTest', () => {
                 core,
                 ads,
                 ar,
-                purchasing,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -163,7 +158,6 @@ describe('MRAIDEventHandlersTest', () => {
                 }));
 
                 mraidView = new MRAID(platform, core, deviceInfo, placement, extendedMraidCampaign, extendedMraidAdUnitParams.privacy, true, extendedMraidAdUnitParams.coreConfig.getAbGroup());
-                mraidView.setMraidEventBridge(new MraidIFrameEventBridge(core, mraidView));
                 sinon.stub(mraidView, 'createMRAID').callsFake(() => {
                     return Promise.resolve();
                 });
@@ -325,7 +319,6 @@ describe('MRAIDEventHandlersTest', () => {
 
             privacy = new Privacy(platform, programmaticMraidCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
             mraidView = new MRAID(platform, core, <AndroidDeviceInfo>deviceInfo, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup());
-            mraidView.setMraidEventBridge(new MraidIFrameEventBridge(core, mraidView));
 
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 platform,
@@ -348,7 +341,6 @@ describe('MRAIDEventHandlersTest', () => {
                 core,
                 ads,
                 ar,
-                purchasing,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -400,6 +392,16 @@ describe('MRAIDEventHandlersTest', () => {
                     assert.equal(expectationMraidView.getCall(0).args[0], false, 'Should block CTA event while processing click event');
                     assert.equal(expectationMraidView.getCall(1).args[0], true, 'Should enable CTA event after processing click event');
                 });
+            });
+        });
+
+        describe('when calling custom impression event multiple times', () => {
+            it('should only send tracking event once', () => {
+                sinon.stub(programmaticMraidAdUnit, 'sendImpression');
+
+                programmaticMraidEventHandler.onCustomImpressionEvent();
+                programmaticMraidEventHandler.onCustomImpressionEvent();
+                sinon.assert.calledOnce(<sinon.SinonSpy>programmaticMraidAdUnit.sendImpression);
             });
         });
     });

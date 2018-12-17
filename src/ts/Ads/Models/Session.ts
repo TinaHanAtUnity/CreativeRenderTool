@@ -70,7 +70,7 @@ export class Session extends Model<ISession> {
         return this.get('gameSessionCounters');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'id': this.getId(),
             'eventSent': this.get('eventSent')

@@ -12,7 +12,7 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { Overlay } from 'Ads/Views/Overlay';
+import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -27,6 +27,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Campaign } from 'Ads/Models/Campaign';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
@@ -37,8 +38,6 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -47,8 +46,6 @@ describe('OverlayEventHandlerTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let ar: IARApi;
-    let purchasing: IPurchasingApi;
     let performanceAdUnit: PerformanceAdUnit;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
@@ -62,7 +59,7 @@ describe('OverlayEventHandlerTest', () => {
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: RequestManager;
-    let overlay: Overlay;
+    let overlay: NewVideoOverlay;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let overlayEventHandler: OverlayEventHandler<PerformanceCampaign>;
     let campaign: PerformanceCampaign;
@@ -76,8 +73,6 @@ describe('OverlayEventHandlerTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
-        ar = TestFixtures.getARApi(nativeBridge);
-        purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
         storageBridge = new StorageBridge(core);
         focusManager = new FocusManager(platform, core);
@@ -122,16 +117,25 @@ describe('OverlayEventHandlerTest', () => {
             targetGameName: campaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, campaign);
-        overlay = new Overlay(platform, ads, deviceInfo, false, 'en', clientInfo.getGameId(), privacy, false, true);
         placement = TestFixtures.getPlacement();
+
+        const videoOverlayParameters: IVideoOverlayParameters<Campaign> = {
+            deviceInfo: deviceInfo,
+            campaign: campaign,
+            coreConfig: coreConfig,
+            placement: placement,
+            clientInfo: clientInfo,
+            platform: platform,
+            ads: ads
+        };
+        overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, true);
+
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         performanceAdUnitParameters = {
             platform,
             core,
             ads,
-            ar,
-            purchasing,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
@@ -268,6 +272,7 @@ describe('OverlayEventHandlerTest', () => {
             sinon.stub(placement, 'allowSkip').returns(true);
             sinon.stub(video, 'getPosition').returns(3001);
             sinon.stub(placement, 'skipEndCardOnClose').returns(true);
+            sinon.stub(overlay, 'hide');
 
             overlayEventHandler.onKeyEvent(KeyCode.BACK);
 

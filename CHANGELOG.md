@@ -1,3 +1,64 @@
+# Staged
+
+* Disabled CTA abtest and sending video click events in endcard for ByteDance [#7615](https://github.com/Applifier/unity-ads-webview/pull/7615)
+* Add 2861297 as Cheetah game [#7608](https://github.com/Applifier/unity-ads-webview/pull/7608)
+* Ignore external JS errors [#7609](https://github.com/Applifier/unity-ads-webview/pull/7609)
+* ABT-721 : Admob ads going straight to endcard [#7616](https://github.com/Applifier/unity-ads-webview/pull/7616)
+
+# Fri Dec 14 11:32:11 UTC 2018
+
+* Log click delay data for programmatic VAST/MRAID [#7587](https://github.com/Applifier/unity-ads-webview/pull/7587)
+
+# Thu Dec 13 23:48:40 UTC 2018
+
+* Fix video stuck / skipping ads through multitask button [#7564](https://github.com/Applifier/unity-ads-webview/pull/7564)
+* Since ad unit style is optional field no need to send diagnostics [#7543](https://github.com/Applifier/unity-ads-webview/pull/7543)
+* Add content type to campaign_expired diagnostic [#7565](https://github.com/Applifier/unity-ads-webview/pull/7565)
+* Identify replayed job by ReplayCause [#7567](https://github.com/Applifier/unity-ads-webview/pull/7567)
+
+# Thu Dec 13 11:03:45 UTC 2018
+
+* Remove diagnostics logging for click rejection [#7463](https://github.com/Applifier/unity-ads-webview/pull/7463)
+* Fix standalone cta button [#7436](https://github.com/Applifier/unity-ads-webview/pull/7436)
+* Add onStartProcessed trigger for AdMobAdUnit [#7513](https://github.com/Applifier/unity-ads-webview/pull/7513)
+* LoopMe MRAID Impression count experiment [#7468](https://github.com/Applifier/unity-ads-webview/pull/7468)
+* Fix CI limit node label [#7541](https://github.com/Applifier/unity-ads-webview/pull/7541)
+* Log promo error whenever creatives are not found [#7465](https://github.com/Applifier/unity-ads-webview/pull/7465)
+
+# Wed Dec 12 10:27:59 UTC 2018
+
+* Use env.revision for commit id [#7510](https://github.com/Applifier/unity-ads-webview/pull/7510)
+* Add AdUnitParametersFactory to reduce clutter of Ads and AdUnitFactory [#7321](https://github.com/Applifier/unity-ads-webview/pull/7321)
+* Remove Show install now button after 0,5s experiment [#7517](https://github.com/Applifier/unity-ads-webview/pull/7517)
+* Add logic to use commit id of deployed webview [#7518](https://github.com/Applifier/unity-ads-webview/pull/7518)
+* Refactor any to unknown [#7319](https://github.com/Applifier/unity-ads-webview/pull/7319)
+* Send ad plan with configuration_ad_unit_style_parse_error diagnostic error [#7511](https://github.com/Applifier/unity-ads-webview/pull/7511)
+* Use CHANGE_BRANCH instead of BRANCH_NAME [#7540](https://github.com/Applifier/unity-ads-webview/pull/7540)
+* Revert "Ramp up Auction V5 to 45% of traffic [#7514](https://github.com/Applifier/unity-ads-webview/pull/7514)" (Back to 15% of traffic)
+
+# Mon Dec 10 22:50:56 UTC 2018
+
+* Ramp up Auction V5 to 45% of traffic [#7514](https://github.com/Applifier/unity-ads-webview/pull/7514)
+
+# Mon Dec 10 13:52:58 UTC 2018
+
+* Disable app sheet on iOS 12 [#7489](https://github.com/Applifier/unity-ads-webview/pull/7489)
+* Make call-button start the transition from further off the screen [#7414](https://github.com/Applifier/unity-ads-webview/pull/7414)
+* Remove the old Overlay [#7413](https://github.com/Applifier/unity-ads-webview/pull/7413)
+
+# Fri Dec  7 06:02:24 UTC 2018
+
+* Add unit tests for MRAID Ad Unit [#7318](https://github.com/Applifier/unity-ads-webview/pull/7318)
+* Add WebPlayer MraidEvent Bridge (unhooked) [#7272](https://github.com/Applifier/unity-ads-webview/pull/7272)
+* Extend Auction V5 Changes to Banners [#7439](https://github.com/Applifier/unity-ads-webview/pull/7439)
+* Add Organic IAP Purchase [#7129](https://github.com/Applifier/unity-ads-webview/pull/7129)
+* Relax \<Impression\> url check in Programmatic VAST [#7466](https://github.com/Applifier/unity-ads-webview/pull/7466)
+
+# Wed Dec  5 21:38:02 UTC 2018
+
+* More groups to auction v5 test [#7441](https://github.com/Applifier/unity-ads-webview/pull/7441)
+* Clean up gamer ID from codebase [#7437](https://github.com/Applifier/unity-ads-webview/pull/7437)
+
 # Mon Dec  3 21:13:08 UTC 2018
 
 * Show install now button after 0,5s experiment [#7382](https://github.com/Applifier/unity-ads-webview/pull/7382)

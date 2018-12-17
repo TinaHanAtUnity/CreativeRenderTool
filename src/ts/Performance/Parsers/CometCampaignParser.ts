@@ -1,4 +1,4 @@
-import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { AdUnitStyle, IAdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
@@ -12,8 +12,14 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IMRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
+import {
+    IPerformanceCampaign,
+    IRawPerformanceCampaign,
+    PerformanceCampaign,
+    StoreName
+} from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 // Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
 export enum ICometTrackingUrlEvents {
@@ -37,7 +43,7 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeMRAID = 'comet/mraid-url';
 
     public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
-        const json = response.getJsonContent();
+        const json = <IRawPerformanceCampaign>response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;
@@ -132,7 +138,7 @@ export class CometCampaignParser extends CampaignParser {
                 videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
-                adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle)
+                adUnitStyle: json.adUnitStyle ? this.parseAdUnitStyle(json.adUnitStyle, session) : undefined
             };
 
             if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
@@ -164,18 +170,12 @@ export class CometCampaignParser extends CampaignParser {
         return urls;
     }
 
-    private parseAdUnitStyle(adUnitStyleJson: any): AdUnitStyle | undefined {
+    private parseAdUnitStyle(adUnitStyleJson: IAdUnitStyle, session: Session): AdUnitStyle | undefined {
         let adUnitStyle: AdUnitStyle | undefined;
         try {
-            if (!adUnitStyleJson) {
-                throw new Error('No adUnitStyle was provided in comet campaign');
-            }
             adUnitStyle = new AdUnitStyle(adUnitStyleJson);
         } catch(error) {
-            Diagnostics.trigger('configuration_ad_unit_style_parse_error', {
-                adUnitStyle: adUnitStyleJson,
-                error: error
-            });
+            // do nothing
         }
         return adUnitStyle;
     }

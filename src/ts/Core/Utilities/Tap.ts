@@ -7,9 +7,9 @@ export class Tap {
     private _startX: number;
     private _startY: number;
 
-    private _onTouchMoveListener: ((event: TouchEvent) => any) | undefined;
-    private _onTouchEndListener: ((event: TouchEvent) => any) | undefined;
-    private _onTouchCancelListener: ((event: TouchEvent) => any) | undefined;
+    private _onTouchMoveListener: ((event: TouchEvent) => unknown) | undefined;
+    private _onTouchEndListener: ((event: TouchEvent) => unknown) | undefined;
+    private _onTouchCancelListener: ((event: TouchEvent) => unknown) | undefined;
 
     constructor(element: HTMLElement) {
         this._element = element;
