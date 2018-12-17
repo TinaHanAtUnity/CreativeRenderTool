@@ -124,7 +124,38 @@
 
                 videoEl.addEventListener('stalled', function() {
                     self.postMessage('tracking', {
-                        event: 'stalled'
+                        event: 'stalled',
+                        data: JSON.stringify({
+                            buffered: videoEl.buffered,
+                            currentSrc: videoEl.currentSrc,
+                            currentTime: videoEl.currentTime,
+                            defaultPlaybackRate: videoEl.defaultPlaybackRate,
+                            duration: videoEl.duration,
+                            ended: videoEl.ended,
+                            error: videoEl.error,
+                            hidden: videoEl.hidden,
+                            loop: videoEl.loop,
+                            mediaKeys: videoEl.mediaKeys,
+                            mozAudioCaptured: videoEl.mozAudioCaptured,
+                            mozDecodedFrames: videoEl.mozDecodedFrames,
+                            mozFragmentEnd: videoEl.mozFragmentEnd,
+                            mozFrameDelay: videoEl.mozFrameDelay,
+                            mozHasAudio: videoEl.mozHasAudio,
+                            mozPaintedFrames: videoEl.mozPaintedFrames,
+                            mozPresentedFrames: videoEl.mozPresentedFrames,
+                            mozPreservesPitch: videoEl.mozPreservesPitch,
+                            muted: videoEl.muted,
+                            namespaceURI: videoEl.namespaceURI,
+                            networkState: videoEl.networkState,
+                            paused: videoEl.paused,
+                            playbackRate: videoEl.playbackRate,
+                            played: videoEl.played,
+                            preload: videoEl.preload,
+                            readyState: videoEl.readyState,
+                            seeking: videoEl.seeking,
+                            src: videoEl.src, 
+                            volume: videoEl.volume
+                        })
                     });
                 });
 

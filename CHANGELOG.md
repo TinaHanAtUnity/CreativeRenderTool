@@ -1,3 +1,28 @@
+# Pending
+
+* Disable auction v5 test for holidays from groups 15, 16 and 17 [#7611](https://github.com/Applifier/unity-ads-webview/pull/7611)
+* Only store max three backup campaigns at the same time [#7610](https://github.com/Applifier/unity-ads-webview/pull/7610)
+* Enable Bytedance A/B test [#7657](https://github.com/Applifier/unity-ads-webview/pull/7657)
+* Add more information to Admob Stalled Diagnostic [#7658](https://github.com/Applifier/unity-ads-webview/pull/7658)
+
+# Mon Dec 17 10:46:45 UTC 2018
+
+* Disabled CTA abtest and sending video click events in endcard for ByteDance [#7615](https://github.com/Applifier/unity-ads-webview/pull/7615)
+* Add 2861297 as Cheetah game [#7608](https://github.com/Applifier/unity-ads-webview/pull/7608)
+* Ignore external JS errors [#7609](https://github.com/Applifier/unity-ads-webview/pull/7609)
+* ABT-721 : Admob ads going straight to endcard [#7616](https://github.com/Applifier/unity-ads-webview/pull/7616)
+
+# Fri Dec 14 11:32:11 UTC 2018
+
+* Log click delay data for programmatic VAST/MRAID [#7587](https://github.com/Applifier/unity-ads-webview/pull/7587)
+
+# Thu Dec 13 23:48:40 UTC 2018
+
+* Fix video stuck / skipping ads through multitask button [#7564](https://github.com/Applifier/unity-ads-webview/pull/7564)
+* Since ad unit style is optional field no need to send diagnostics [#7543](https://github.com/Applifier/unity-ads-webview/pull/7543)
+* Add content type to campaign_expired diagnostic [#7565](https://github.com/Applifier/unity-ads-webview/pull/7565)
+* Identify replayed job by ReplayCause [#7567](https://github.com/Applifier/unity-ads-webview/pull/7567)
+
 # Thu Dec 13 11:03:45 UTC 2018
 
 * Remove diagnostics logging for click rejection [#7463](https://github.com/Applifier/unity-ads-webview/pull/7463)
