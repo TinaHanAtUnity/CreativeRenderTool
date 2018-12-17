@@ -1,4 +1,4 @@
-# Pending
+# Mon Dec 17 22:25:49 UTC 2018
 
 * Disable auction v5 test for holidays from groups 15, 16 and 17 [#7611](https://github.com/Applifier/unity-ads-webview/pull/7611)
 * Only store max three backup campaigns at the same time [#7610](https://github.com/Applifier/unity-ads-webview/pull/7610)
