@@ -1,6 +1,6 @@
 import { View } from 'Core/Views/View';
 import { Template } from 'Core/Utilities/Template';
-import { GDPRConsentSettings } from 'Ads/Views/Consent/GDPRConsentSettings';
+import { UnityConsentSettings } from 'Ads/Views/Consent/UnityConsentSettings';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IPermissions } from 'Ads/Models/Privacy';
@@ -8,17 +8,17 @@ import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import GDPRConsentTemplate from 'html/consent/gdpr-consent.html';
 
-export interface IGDPRConsentViewParameters {
+export interface IUnityConsentViewParameters {
     platform: Platform;
     privacyManager: UserPrivacyManager;
-    consentSettingsView: GDPRConsentSettings;
+    consentSettingsView: UnityConsentSettings;
 }
 
-export class GDPRConsent extends View<IConsentViewHandler> {
+export class UnityConsent extends View<IConsentViewHandler> {
     private _privacyManager: UserPrivacyManager;
-    private _consentSettingsView: GDPRConsentSettings;
+    private _consentSettingsView: UnityConsentSettings;
 
-    constructor(parameters: IGDPRConsentViewParameters) {
+    constructor(parameters: IUnityConsentViewParameters) {
         super(parameters.platform, 'gdpr-consent');
 
         this._privacyManager = parameters.privacyManager;

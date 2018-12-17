@@ -9,7 +9,7 @@ import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 
-export class GDPRConsentSettings extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler {
+export class UnityConsentSettings extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler {
 
     private _infoContainer: PrivacyRowItemContainer;
     private _checkboxGroup: PersonalizationCheckboxGroup;
