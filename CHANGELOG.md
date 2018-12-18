@@ -1,6 +1,6 @@
 # Staged
 
-* AR analytics events [#7438]((https://github.com/Applifier/unity-ads-webview/pull/7438)
+* AR analytics events [#7438](https://github.com/Applifier/unity-ads-webview/pull/7438)
 * Remove back button experiment [#7520](https://github.com/Applifier/unity-ads-webview/pull/7520)
 * Add support for cancel animation frame in AR [#7230](https://github.com/Applifier/unity-ads-webview/pull/7230)
 * AR button timer  [#7461](https://github.com/Applifier/unity-ads-webview/pull/7461)
