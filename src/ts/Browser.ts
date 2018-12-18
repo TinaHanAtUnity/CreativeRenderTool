@@ -201,9 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             // tslint:enable:no-console
 
-            ARUtil.isARSupported = (): Promise<boolean> => { return Promise.resolve<boolean>(false); };
-            PermissionsUtil.checkPermissionInManifest = (): Promise<boolean> => { return Promise.resolve<boolean>(false); };
-            PermissionsUtil.checkPermissions = (platform: Platform, core: ICoreApi, permission: PermissionTypes): Promise<CurrentPermission> => { return Promise.resolve<CurrentPermission>(CurrentPermission.DENIED); };
+            ARUtil.isARSupported = () => Promise.resolve(false);
+            PermissionsUtil.checkPermissionInManifest = () => Promise.resolve(false);
+            PermissionsUtil.checkPermissions = (platform: Platform, core: ICoreApi, permission: PermissionTypes) => Promise.resolve(CurrentPermission.DENIED);
 
             switch(platformElement.value) {
                 case 'android':
