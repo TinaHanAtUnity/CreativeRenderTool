@@ -210,6 +210,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._prepareTimeout = undefined;
         }
 
+        if(this._autoBeginTimer) {
+            clearTimeout(this._autoBeginTimer);
+            this._autoBeginTimer = undefined;
+        }
+
         super.hide();
         this._mraidAdapterContainer.disconnect();
     }
