@@ -9,12 +9,12 @@ import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 
-export class GDPRConsentSettings extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler {
+export class UnityConsentSettings extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler {
 
     private _infoContainer: PrivacyRowItemContainer;
     private _checkboxGroup: PersonalizationCheckboxGroup;
 
-    constructor(platform: Platform, gdprManager: UserPrivacyManager) {
+    constructor(platform: Platform, userPrivacyManager: UserPrivacyManager) {
         super(platform, 'gdpr-consent-settings');
 
         this._template = new Template(GDPRConsentSettingsTemplate);
@@ -37,9 +37,9 @@ export class GDPRConsentSettings extends View<IConsentViewHandler> implements IP
             }
         ];
 
-        this._infoContainer = new PrivacyRowItemContainer({ platform: platform, gdprManager: gdprManager });
+        this._infoContainer = new PrivacyRowItemContainer(platform, userPrivacyManager);
         this._infoContainer.addEventHandler(this);
-        this._checkboxGroup = new PersonalizationCheckboxGroup(platform);
+        this._checkboxGroup = new PersonalizationCheckboxGroup(platform, userPrivacyManager);
     }
 
     public render(): void {

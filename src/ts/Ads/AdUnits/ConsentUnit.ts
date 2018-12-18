@@ -1,12 +1,12 @@
 import { AdUnitContainer, AdUnitContainerSystemMessage, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
-import { GDPRConsent } from 'Ads/Views/Consent/GDPRConsent';
+import { UnityConsent } from 'Ads/Views/Consent/UnityConsent';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import { IPermissions } from 'Ads/Models/Privacy';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ICoreApi } from 'Core/ICore';
-import { GDPRConsentSettings } from 'Ads/Views/Consent/GDPRConsentSettings';
+import { UnityConsentSettings } from 'Ads/Views/Consent/UnityConsentSettings';
 
 export interface IConsentUnitParameters {
     platform: Platform;
@@ -20,8 +20,8 @@ export class ConsentUnit implements IConsentViewHandler {
     private _donePromiseResolve: () => void;
     private _showing: boolean;
     private _adUnitContainer: AdUnitContainer;
-    private _gdprConsentView: GDPRConsent;
-    private _consentSettingsView: GDPRConsentSettings;
+    private _unityConsentView: UnityConsent;
+    private _consentSettingsView: UnityConsentSettings;
     private _platform: Platform;
     private _privacyManager: UserPrivacyManager;
     private _adsConfig: AdsConfiguration;
@@ -34,14 +34,14 @@ export class ConsentUnit implements IConsentViewHandler {
         this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
 
-        this._consentSettingsView = new GDPRConsentSettings(this._platform, parameters.privacyManager);
+        this._consentSettingsView = new UnityConsentSettings(this._platform, parameters.privacyManager);
         this._consentSettingsView.addEventHandler(this);
-        this._gdprConsentView = new GDPRConsent({
+        this._unityConsentView = new UnityConsent({
             platform: parameters.platform,
             privacyManager: parameters.privacyManager,
             consentSettingsView: this._consentSettingsView
         });
-        this._gdprConsentView.addEventHandler(this);
+        this._unityConsentView.addEventHandler(this);
 
     }
 
@@ -52,14 +52,14 @@ export class ConsentUnit implements IConsentViewHandler {
                 this._donePromiseResolve = resolve;
             });
             this._adUnitContainer.addEventHandler(this);
-            this._gdprConsentView.render();
-            document.body.appendChild(this._gdprConsentView.container());
+            this._unityConsentView.render();
+            document.body.appendChild(this._unityConsentView.container());
 
             this._consentSettingsView.render();
             this._consentSettingsView.hide();
             document.body.appendChild(this._consentSettingsView.container());
 
-            this._gdprConsentView.show();
+            this._unityConsentView.show();
             return donePromise;
         }).catch((e: Error) => {
             this._core.Sdk.logWarning('Error opening Consent view ' + e);
@@ -76,8 +76,8 @@ export class ConsentUnit implements IConsentViewHandler {
         if (this._showing) {
             this._showing = false;
             this._adUnitContainer.removeEventHandler(this);
-            if (this._gdprConsentView.container().parentElement) {
-                document.body.removeChild(this._gdprConsentView.container());
+            if (this._unityConsentView.container().parentElement) {
+                document.body.removeChild(this._unityConsentView.container());
             }
 
             if (this._consentSettingsView.container().parentElement) {

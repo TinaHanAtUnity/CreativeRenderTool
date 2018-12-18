@@ -91,10 +91,10 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             }
         ];
 
-        this._privacyRowItemContainer = new PrivacyRowItemContainer({ platform: platform, gdprManager: privacyManager });
+        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager);
         this._privacyRowItemContainer.addEventHandler(this);
-        // todo: add user privacy
-        this._personalizationCheckBoxGroup = new PersonalizationCheckboxGroup(platform, { gameExp: true, ads: false, external: true});
+
+        this._personalizationCheckBoxGroup = new PersonalizationCheckboxGroup(platform, this._userPrivacyManager);
     }
 
     public render(): void {

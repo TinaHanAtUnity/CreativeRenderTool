@@ -79,7 +79,7 @@ export class Privacy extends AbstractPrivacy {
         this.populateUserSummary();
 
         if (this._gdprEnabled) {
-            const elId = this._privacyManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
+            const elId = this._userPrivacyManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
             const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
             activeRadioButton.checked = true;
@@ -235,7 +235,7 @@ export class Privacy extends AbstractPrivacy {
 
     private populateUserSummary() {
         if (!this._userSummaryObtained) {
-            this._privacyManager.retrieveUserSummary().then((userSummary) => {
+            this._userPrivacyManager.retrieveUserSummary().then((userSummary) => {
                 this._userSummaryObtained = true;
                 document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
                 document.getElementById('phone-type')!.innerHTML = ` - Using ${userSummary.deviceModel}`;

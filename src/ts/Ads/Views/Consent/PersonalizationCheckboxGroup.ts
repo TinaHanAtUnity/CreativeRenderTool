@@ -3,18 +3,21 @@ import CheckBoxGroupTemplate from 'html/consent/personalization-checkbox-group.h
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
 import { IGranularPermissions } from 'Ads/Models/Privacy';
+import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 export class PersonalizationCheckboxGroup extends View<{}> {
 
-    private _currentPermissions?: IGranularPermissions;
+    private _userPrivacyManager: UserPrivacyManager;
+
     private _personalizedExpCheckbox: HTMLInputElement;
     private _personalizedAdsCheckbox: HTMLInputElement;
     private _personalized3rdPartyCheckbox: HTMLInputElement;
 
-    constructor(platform: Platform, permissions?: IGranularPermissions) {
+    constructor(platform: Platform, userPrivacyManager: UserPrivacyManager) {
         super(platform, 'personalization-checkbox-group');
 
-        this._currentPermissions = permissions;
+        this._userPrivacyManager = userPrivacyManager;
+
         this._template = new Template(CheckBoxGroupTemplate);
 
         this._bindings = [];
@@ -26,17 +29,14 @@ export class PersonalizationCheckboxGroup extends View<{}> {
         this._personalizedExpCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-experience-checkbox');
         this._personalizedAdsCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-checkbox');
         this._personalized3rdPartyCheckbox = <HTMLInputElement>this._container.querySelector('#personalized-ads-3rd-party');
-
-        if (this._currentPermissions) {
-            this._personalizedExpCheckbox.checked = this._currentPermissions.gameExp;
-            this._personalizedAdsCheckbox.checked = this._currentPermissions.ads;
-            this._personalized3rdPartyCheckbox.checked = this._currentPermissions.external;
-        }
-
     }
 
     public show(): void {
-        // todo: set values from configuration
+        const permissions: IGranularPermissions = this._userPrivacyManager.getGranularPermissions();
+
+        this._personalizedExpCheckbox.checked = permissions.gameExp;
+        this._personalizedAdsCheckbox.checked = permissions.ads;
+        this._personalized3rdPartyCheckbox.checked = permissions.external;
 
         // gray line between main and sub checkbox
         // todo: maybe there is some better way to set correct height of the line
