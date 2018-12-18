@@ -290,7 +290,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private startWebPlayer(): Promise<void> {
         if (!this._mraid.isLoaded()) {
             return this._deviceInfo.getScreenWidth().then((width) => {
-                const topWebViewAreaMinHeight = 60;
+                const topWebViewAreaMinHeight = 100;
                 this._container.setViewFrame('webview', 0, 0, width, topWebViewAreaMinHeight);
             }).then(() => {
                 this._mraid.loadWebPlayer(this._webPlayerContainer);

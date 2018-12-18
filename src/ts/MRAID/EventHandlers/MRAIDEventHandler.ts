@@ -255,7 +255,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     private getTopViewHeight(): number {
-        const topWebViewAreaMinHeight = 60;
+        const topWebViewAreaMinHeight = 100;
 
         if (this._platform === Platform.ANDROID) {
             return Math.floor(this.getAndroidViewSize(topWebViewAreaMinHeight, this.getScreenDensity()));

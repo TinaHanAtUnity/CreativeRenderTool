@@ -30,11 +30,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this._template = new Template(MRAIDTemplate);
     }
 
-    public render() {
-        super.render();
-        this._privacyButton.style.top = '0';
-    }
-
     public show(): void {
         super.show();
         this._showTimestamp = Date.now();
