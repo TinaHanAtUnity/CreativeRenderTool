@@ -9,8 +9,6 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { ARMRAIDEventHandler } from 'AR/EventHandlers/ARMRAIDEventHandler';
-import { Platform } from 'Core/Constants/Platform';
-import { AndroidBackButtonSkipTest } from 'Core/Models/ABGroup';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
     public createAdUnit(parameters: IMRAIDAdUnitParameters): MRAIDAdUnit {
