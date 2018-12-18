@@ -151,7 +151,12 @@ pipeline {
                             dir(jobName) {
                                 sharedLibs.downloadFromGcp("$artifactFolder/*")
                             }
-                            sharedLibs.removeFromGcp(artifactFolder)
+
+                            try {
+                                sharedLibs.removeFromGcp(artifactFolder)
+                            } catch(e) {
+                                echo "Could not clean up artifacts from GCP: '$e'"
+                            }
                         }
                     }
 
