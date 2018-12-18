@@ -35,8 +35,8 @@
     position: relative;
     overflow: auto;
     padding-bottom: 1rem;
-    min-height: 90%;
-    max-height: 90%;
+    min-height: 80%;
+    max-height: 80%;
     border-top-left-radius: $default-size;
     border-top-right-radius: $default-size;
     background: $white;
@@ -145,7 +145,7 @@
   &:not(.initial) {
     .view-container {
       min-height: 0;
-      max-height: 90%;
+      max-height: 80%;
       animation: page-animation-max-to-min .3s ease-out;
     }
     .main-view-container {
@@ -246,15 +246,15 @@
     }
 
     100% {
-      min-height: 90%;
-      max-height: 90%;
+      min-height: 80%;
+      max-height: 80%;
     }
   }
 
   @keyframes page-animation-max-to-min {
     0% {
-      min-height: 90%;
-      max-height: 90%;
+      min-height: 80%;
+      max-height: 80%;
     }
     50% {
       min-height: 10%;
@@ -263,7 +263,7 @@
 
     100% {
       min-height: 0;
-      max-height: 90%;
+      max-height: 80%;
     }
   }
 }
