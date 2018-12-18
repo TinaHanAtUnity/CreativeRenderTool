@@ -38,7 +38,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _deviceorientationListener: EventListener;
     private _loadingScreenTimeout?: number;
     private _prepareTimeout?: number;
-    private _autoBeginTimer?: ReturnType<typeof setInterval>;
+    private _autoBeginTimer?: number;
 
     private _arFrameUpdatedObserver: IObserver1<string>;
     private _arPlanesAddedObserver: IObserver1<string>;
@@ -489,7 +489,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         let autoBeginTimeout = ARMRAID.AutoBeginTimeout;
         beginButton.innerHTML = `Begins...${autoBeginTimeout}`;
 
-        this._autoBeginTimer = setInterval(() => {
+        this._autoBeginTimer = window.setInterval(() => {
             const timerPaused = !this._viewable || this._permissionLearnMoreOpen || this._privacyPanelOpen;
             if (timerPaused) {
                 return;
