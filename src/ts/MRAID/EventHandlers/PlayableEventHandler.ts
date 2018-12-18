@@ -4,8 +4,8 @@ import { IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
 
 export class PlayableEventHandler extends MRAIDEventHandler implements IMRAIDViewHandler {
 
-    public onPlayableAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, backgroundTime: number, event: string, eventData: any): void {
-        const kafkaObject: any = {};
+    public onPlayableAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, backgroundTime: number, event: string, eventData: unknown): void {
+        const kafkaObject: { [key: string]: unknown } = {};
         kafkaObject.type = event;
         kafkaObject.eventData = eventData;
         kafkaObject.timeFromShow = timeFromShow;
@@ -18,7 +18,7 @@ export class PlayableEventHandler extends MRAIDEventHandler implements IMRAIDVie
         }
 
         kafkaObject.auctionId = this._campaign.getSession().getId();
-        kafkaObject.abGroup = this._coreConfig.getAbGroup().toNumber();
+        kafkaObject.abGroup = this._coreConfig.getAbGroup();
 
         HttpKafka.sendEvent('ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }

@@ -1,21 +1,20 @@
-
-import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
-import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { AnalyticsProtocol } from 'Analytics/AnalyticsProtocol';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { AnalyticsProtocol } from 'Analytics/AnalyticsProtocol';
+import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { PurchasingFailureReason } from 'Promo/Models/PurchasingFailureReason';
 
 // external fields
 export interface IPurchaseCommon {
     store: string;
-    productId: string;
-    storeSpecificId: string;
+    productId: string | undefined;
+    storeSpecificId: string | undefined;
     amount: number | undefined;
     currency: string | undefined;
     native: boolean;
@@ -39,7 +38,7 @@ interface IPurchase extends IPurchaseCommon {
     userid: string;
     sessionid: number;
     trackingOptOut: boolean; // gdpr opt out
-    ppi: number;
+    ppi: number | undefined;
     deviceid: string; // Not sure how to get this
 
     iapPromo: boolean;
@@ -59,7 +58,7 @@ interface IPurhcaseFailed {
 interface IPurchaseSuccess {
     productType: string | undefined;
     receipt: {
-        data: string;
+        data: string | undefined;
     };
 }
 
@@ -88,20 +87,22 @@ export class PromoEvents {
     public static purchasePathRegex = new RegExp('events\/v1\/purchase');
     public static purchaseHostnameRegex = new RegExp('events\.iap\.unity3d\.com');
 
-    private coreConfiguration: CoreConfiguration;
-    private adsConfiguration: AdsConfiguration;
-    private nativeBridge: NativeBridge;
-    private clientInfo: ClientInfo;
-    private deviceInfo: DeviceInfo;
-    private analyticsStorage: AnalyticsStorage;
+    private _platform: Platform;
+    private _core: ICoreApi;
+    private _coreConfiguration: CoreConfiguration;
+    private _adsConfiguration: AdsConfiguration;
+    private _clientInfo: ClientInfo;
+    private _deviceInfo: DeviceInfo;
+    private _analyticsStorage: AnalyticsStorage;
 
-    constructor(coreConfiguration: CoreConfiguration, adsConfiguration: AdsConfiguration, nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, analyticsStorage: AnalyticsStorage) {
-        this.coreConfiguration = coreConfiguration;
-        this.adsConfiguration = adsConfiguration;
-        this.nativeBridge = nativeBridge;
-        this.clientInfo = clientInfo;
-        this.deviceInfo = deviceInfo;
-        this.analyticsStorage = analyticsStorage;
+    constructor(platform: Platform, core: ICoreApi, coreConfiguration: CoreConfiguration, adsConfiguration: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, analyticsStorage: AnalyticsStorage) {
+        this._platform = platform;
+        this._core = core;
+        this._coreConfiguration = coreConfiguration;
+        this._adsConfiguration = adsConfiguration;
+        this._clientInfo = clientInfo;
+        this._deviceInfo = deviceInfo;
+        this._analyticsStorage = analyticsStorage;
     }
 
     public getAppStoreFromReceipt(receipt: string | undefined): string {
@@ -113,7 +114,7 @@ export class PromoEvents {
                 }
             } catch(error) {
                 // log the error
-                this.nativeBridge.Sdk.logError('PromoEvents.getAppStoreFromReceipt failed to parse json');
+                this._core.Sdk.logError('PromoEvents.getAppStoreFromReceipt failed to parse json');
             }
         }
         return 'unknown';
@@ -121,29 +122,29 @@ export class PromoEvents {
 
     public onPurchaseFailed(body: IPurchaseCommon, failureJson: IFailureJson): Promise<IPromoPurchaseFailed> {
         return Promise.all([
-            this.deviceInfo.getScreenWidth(),
-            this.deviceInfo.getScreenHeight(),
-            this.analyticsStorage.getSessionId(this.clientInfo.isReinitialized()),
-            this.analyticsStorage.getUserId()
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight(),
+            this._analyticsStorage.getSessionId(this._clientInfo.isReinitialized()),
+            this._analyticsStorage.getUserId()
         ]).then(([width, height, sessionId, userId]) => {
             return {
                 ... body,
-                appid: this.coreConfiguration.getUnityProjectId(),
-                platform: this.nativeBridge.getPlatform() === Platform.IOS ? 'Ios' : 'Android',
-                platformid: this.nativeBridge.getPlatform() === Platform.IOS ? 8 : 11,
-                gameId: this.clientInfo.getGameId(),
+                appid: this._coreConfiguration.getUnityProjectId(),
+                platform: this._platform === Platform.IOS ? 'Ios' : 'Android',
+                platformid: this._platform === Platform.IOS ? 8 : 11,
+                gameId: this._clientInfo.getGameId(),
                 sdk_ver: '', // leaving this blank as there is no way to get the unity version
-                ads_sdk_ver: this.clientInfo.getSdkVersionName(),
-                gamerToken: this.coreConfiguration.getToken(),
-                game_ver: this.clientInfo.getApplicationVersion(),
-                osv: AnalyticsProtocol.getOsVersion(this.nativeBridge, this.deviceInfo),
+                ads_sdk_ver: this._clientInfo.getSdkVersionName(),
+                gamerToken: this._coreConfiguration.getToken(),
+                game_ver: this._clientInfo.getApplicationVersion(),
+                osv: AnalyticsProtocol.getOsVersion(this._platform, this._deviceInfo),
                 orient: this.getOrientation(width, height),
                 w: width,
                 h: height,
                 iap_ver: 'ads sdk',
                 sessionid: sessionId,
                 userid: userId,
-                trackingOptOut: this.adsConfiguration.isOptOutEnabled(),
+                trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
                 ppi: this.getPPI(),
                 deviceid: this.getDeviceId(),
                 request: 'purchase',
@@ -158,29 +159,29 @@ export class PromoEvents {
 
     public onPurchaseSuccess(body: IPurchaseCommon, productType: string | undefined, receipt: string): Promise<IPromoPurchaseSucceeded> {
         return Promise.all([
-            this.deviceInfo.getScreenWidth(),
-            this.deviceInfo.getScreenHeight(),
-            this.analyticsStorage.getSessionId(this.clientInfo.isReinitialized()),
-            this.analyticsStorage.getUserId()
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight(),
+            this._analyticsStorage.getSessionId(this._clientInfo.isReinitialized()),
+            this._analyticsStorage.getUserId()
         ]).then(([width, height, sessionId, userId]) => {
             return {
                 ... body,
-                appid: this.coreConfiguration.getUnityProjectId(),
-                platform: this.nativeBridge.getPlatform() === Platform.IOS ? 'Ios' : 'Android',
-                platformid: this.nativeBridge.getPlatform() === Platform.IOS ? 8 : 11,
-                gameId: this.clientInfo.getGameId(),
+                appid: this._coreConfiguration.getUnityProjectId(),
+                platform: this._platform === Platform.IOS ? 'Ios' : 'Android',
+                platformid: this._platform === Platform.IOS ? 8 : 11,
+                gameId: this._clientInfo.getGameId(),
                 sdk_ver: '', // leaving this blank as there is no way to get the unity version
-                ads_sdk_ver: this.clientInfo.getSdkVersionName(),
-                gamerToken: this.coreConfiguration.getToken(),
-                game_ver: this.clientInfo.getApplicationVersion(),
-                osv: AnalyticsProtocol.getOsVersion(this.nativeBridge, this.deviceInfo),
+                ads_sdk_ver: this._clientInfo.getSdkVersionName(),
+                gamerToken: this._coreConfiguration.getToken(),
+                game_ver: this._clientInfo.getApplicationVersion(),
+                osv: AnalyticsProtocol.getOsVersion(this._platform, this._deviceInfo),
                 orient: this.getOrientation(width, height),
                 w: width,
                 h: height,
                 iap_ver: 'ads sdk',
                 sessionid: sessionId,
                 userid: userId,
-                trackingOptOut: this.adsConfiguration.isOptOutEnabled(),
+                trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
                 ppi: this.getPPI(),
                 deviceid: this.getDeviceId(),
                 request: 'purchase',
@@ -198,29 +199,29 @@ export class PromoEvents {
 
     public onOrganicPurchaseFailed(body: IPurchaseCommon, failureJson: IFailureJson): Promise<IOrganicPurchaseFailed> {
         return Promise.all([
-            this.deviceInfo.getScreenWidth(),
-            this.deviceInfo.getScreenHeight(),
-            this.analyticsStorage.getSessionId(this.clientInfo.isReinitialized()),
-            this.analyticsStorage.getUserId()
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight(),
+            this._analyticsStorage.getSessionId(this._clientInfo.isReinitialized()),
+            this._analyticsStorage.getUserId()
         ]).then(([width, height, sessionId, userId]) => {
             return {
                 ... body,
-                appid: this.coreConfiguration.getUnityProjectId(),
-                platform: this.nativeBridge.getPlatform() === Platform.IOS ? 'Ios' : 'Android',
-                platformid: this.nativeBridge.getPlatform() === Platform.IOS ? 8 : 11,
-                gameId: this.clientInfo.getGameId(),
+                appid: this._coreConfiguration.getUnityProjectId(),
+                platform: this._platform === Platform.IOS ? 'Ios' : 'Android',
+                platformid: this._platform === Platform.IOS ? 8 : 11,
+                gameId: this._clientInfo.getGameId(),
                 sdk_ver: '', // leaving this blank as there is no way to get the unity version
-                ads_sdk_ver: this.clientInfo.getSdkVersionName(),
-                gamerToken: this.coreConfiguration.getToken(),
-                game_ver: this.clientInfo.getApplicationVersion(),
-                osv: AnalyticsProtocol.getOsVersion(this.nativeBridge, this.deviceInfo),
+                ads_sdk_ver: this._clientInfo.getSdkVersionName(),
+                gamerToken: this._coreConfiguration.getToken(),
+                game_ver: this._clientInfo.getApplicationVersion(),
+                osv: AnalyticsProtocol.getOsVersion(this._platform, this._deviceInfo),
                 orient: this.getOrientation(width, height),
                 w: width,
                 h: height,
                 iap_ver: 'ads sdk',
                 sessionid: sessionId,
                 userid: userId,
-                trackingOptOut: this.adsConfiguration.isOptOutEnabled(),
+                trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
                 ppi: this.getPPI(),
                 deviceid: this.getDeviceId(),
                 iap_service: false,
@@ -232,31 +233,31 @@ export class PromoEvents {
         });
     }
 
-    public onOrganicPurchaseSuccess(body: IPurchaseCommon, productType: string | undefined, receipt: string): Promise<IOrganicPurchaseSuccess> {
+    public onOrganicPurchaseSuccess(body: IPurchaseCommon, productType: string | undefined, receipt: string | undefined): Promise<IOrganicPurchaseSuccess> {
         return Promise.all([
-            this.deviceInfo.getScreenWidth(),
-            this.deviceInfo.getScreenHeight(),
-            this.analyticsStorage.getSessionId(this.clientInfo.isReinitialized()),
-            this.analyticsStorage.getUserId()
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight(),
+            this._analyticsStorage.getSessionId(this._clientInfo.isReinitialized()),
+            this._analyticsStorage.getUserId()
         ]).then(([width, height, sessionId, userId]) => {
             return {
                 ... body,
-                appid: this.coreConfiguration.getUnityProjectId(),
-                platform: this.nativeBridge.getPlatform() === Platform.IOS ? 'Ios' : 'Android',
-                platformid: this.nativeBridge.getPlatform() === Platform.IOS ? 8 : 11,
-                gameId: this.clientInfo.getGameId(),
+                appid: this._coreConfiguration.getUnityProjectId(),
+                platform: this._platform === Platform.IOS ? 'Ios' : 'Android',
+                platformid: this._platform === Platform.IOS ? 8 : 11,
+                gameId: this._clientInfo.getGameId(),
                 sdk_ver: '', // leaving this blank as there is no way to get the unity version
-                ads_sdk_ver: this.clientInfo.getSdkVersionName(),
-                gamerToken: this.coreConfiguration.getToken(),
-                game_ver: this.clientInfo.getApplicationVersion(),
-                osv: AnalyticsProtocol.getOsVersion(this.nativeBridge, this.deviceInfo),
+                ads_sdk_ver: this._clientInfo.getSdkVersionName(),
+                gamerToken: this._coreConfiguration.getToken(),
+                game_ver: this._clientInfo.getApplicationVersion(),
+                osv: AnalyticsProtocol.getOsVersion(this._platform, this._deviceInfo),
                 orient: this.getOrientation(width, height),
                 w: width,
                 h: height,
                 iap_ver: 'ads sdk',
                 sessionid: sessionId,
                 userid: userId,
-                trackingOptOut: this.adsConfiguration.isOptOutEnabled(),
+                trackingOptOut: this._adsConfiguration.isOptOutEnabled(),
                 ppi: this.getPPI(),
                 deviceid: this.getDeviceId(),
                 iap_service: false,
@@ -281,7 +282,7 @@ export class PromoEvents {
     }
 
     private getPPI(): number {
-        return this.nativeBridge.getPlatform() === Platform.ANDROID ? (<AndroidDeviceInfo>this.deviceInfo).getScreenDensity() : (<IosDeviceInfo>this.deviceInfo).getScreenScale();
+        return this._platform === Platform.ANDROID ? (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity() : (<IosDeviceInfo>this._deviceInfo).getScreenScale();
     }
 
     private getOrientation(width: number, height: number): string {
@@ -289,12 +290,12 @@ export class PromoEvents {
     }
 
     private getDeviceId(): string {
-        const gdprEnabled: boolean = this.adsConfiguration.isOptOutEnabled() && this.adsConfiguration.isGDPREnabled();
-        if (gdprEnabled) {
-            if (this.deviceInfo instanceof AndroidDeviceInfo) {
-                return this.deviceInfo.getDevice();
-            } else if (this.deviceInfo instanceof IosDeviceInfo) {
-                const advertisingIdentifier = this.deviceInfo.getAdvertisingIdentifier();
+        const gdprEnabled: boolean = this._adsConfiguration.isOptOutEnabled() && this._adsConfiguration.isGDPREnabled();
+        if (!gdprEnabled) {
+            if (this._deviceInfo instanceof AndroidDeviceInfo) {
+                return this._deviceInfo.getDevice();
+            } else if (this._deviceInfo instanceof IosDeviceInfo) {
+                const advertisingIdentifier = this._deviceInfo.getAdvertisingIdentifier();
                 if (advertisingIdentifier) {
                     return advertisingIdentifier;
                 }

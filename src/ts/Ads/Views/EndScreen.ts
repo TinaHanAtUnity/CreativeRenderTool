@@ -2,18 +2,19 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHandler';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
-import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
-import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 
 export interface IEndScreenParameters {
-    nativeBridge: NativeBridge;
+    platform: Platform;
+    core: ICoreApi;
+    apiLevel?: number;
     language: string;
     gameId: string;
     targetGameName: string | undefined;
@@ -43,9 +44,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _gdprPopupClicked = false;
     private _campaignId: string | undefined;
     private _osVersion: string | undefined;
+    private _apiLevel?: number;
 
     constructor(parameters : IEndScreenParameters) {
-        super(parameters.nativeBridge, 'end-screen');
+        super(parameters.platform, 'end-screen');
         this._localization = new Localization(parameters.language, 'endscreen');
         this._abGroup = parameters.abGroup;
         this._gameName = parameters.targetGameName;
@@ -54,14 +56,13 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._showGDPRBanner = parameters.showGDPRBanner;
         this._campaignId = parameters.campaignId;
         this._osVersion = parameters.osVersion;
-
-        this._template = new Template(this.getTemplate(), this._localization);
+        this._apiLevel = parameters.apiLevel;
 
         this._bindings = [
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .download-container, .game-icon'
+                selector: '.game-background, .download-container, .game-icon, .game-image'
             },
             {
                 event: 'click',
@@ -106,10 +107,16 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
+            document.documentElement.classList.add(endScreenAlt);
         }
 
         if (this._showGDPRBanner) {
             this._container.classList.add('show-gdpr-banner');
+        }
+
+        // Android <= 4.4.4
+        if (this._platform === Platform.ANDROID && this._apiLevel! <= 19) {
+            this._container.classList.add('old-androids');
         }
     }
 
@@ -160,8 +167,12 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         // do nothing
     }
 
-    protected getEndscreenAlt(campaign?: Campaign) {
+    protected getEndscreenAlt(): string | undefined {
         return undefined;
+    }
+
+    protected getTemplate() {
+        return EndScreenTemplate;
     }
 
     protected abstract onDownloadEvent(event: Event): void;
@@ -180,9 +191,5 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         this._privacy.show();
-    }
-
-    private getTemplate() {
-        return EndScreenTemplate;
     }
 }

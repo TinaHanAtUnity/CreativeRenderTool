@@ -1,6 +1,7 @@
 @import "vars.styl";
 @import "components.styl";
 @import "gdpr-pop-up.styl";
+@import "square-end-screen.styl";
 
 $end-screen-mixin($scale-size = $default-scale-size) {
 
@@ -9,6 +10,16 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       $close-button-default($scale-size);
       padding: $default-size * $scale-size * .25;
     }
+
+    .china-advertisement {
+      $china-overlay($default-scale-size);
+      right: 0;
+      bottom: 0;
+      padding: $default-size * $scale-size * .5;
+      color: $gray;
+      font-size: $default-scale-size * $default-font-size * .60;
+    }
+
     .download-container {
       $download-container-default($scale-size);
     }

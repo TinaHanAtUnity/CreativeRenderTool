@@ -1,6 +1,7 @@
 import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export interface IIosDeviceInfo extends IDeviceInfo {
     userInterfaceIdiom: UIUserInterfaceIdiom;
@@ -13,7 +14,8 @@ export interface IIosDeviceInfo extends IDeviceInfo {
 }
 
 export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
-    constructor(nativeBridge: NativeBridge) {
+
+    constructor(core: ICoreApi) {
         super('IosDeviceInfo', {
             ... DeviceInfo.Schema,
             userInterfaceIdiom: ['number'],
@@ -23,20 +25,20 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
             statusBarHidden: ['boolean'],
             simulator: ['boolean'],
             sensorList: ['array']
-        }, nativeBridge);
+        }, Platform.IOS, core);
     }
 
-    public fetch(): Promise<any[]> {
+    public fetch(): Promise<unknown[]> {
         return super.fetch().then(() => {
-            const promises: Array<Promise<any>> = [];
+            const promises: Promise<unknown>[] = [];
 
-            promises.push(this._nativeBridge.DeviceInfo.Ios.getUserInterfaceIdiom().then(userInterfaceIdiom => this.set('userInterfaceIdiom', userInterfaceIdiom)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Ios.getScreenScale().then(screenScale => this.set('screenScale', screenScale)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Ios.isSimulator().then(simulator => this.set('simulator', simulator)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Ios.getTotalSpace().then(totalSpace => this.set('totalInternalSpace', totalSpace)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Ios.getStatusBarHeight().then(statusBarHeight => this.set('statusBarHeight', statusBarHeight)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Ios.getStatusBarWidth().then(statusBarWidth => this.set('statusBarWidth', statusBarWidth)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Ios.getDeviceMaxVolume().then(maxVolume => this.set('maxVolume', maxVolume)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getUserInterfaceIdiom().then(userInterfaceIdiom => this.set('userInterfaceIdiom', userInterfaceIdiom)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getScreenScale().then(screenScale => this.set('screenScale', screenScale)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.isSimulator().then(simulator => this.set('simulator', simulator)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getTotalSpace().then(totalSpace => this.set('totalInternalSpace', totalSpace)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getStatusBarHeight().then(statusBarHeight => this.set('statusBarHeight', statusBarHeight)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getStatusBarWidth().then(statusBarWidth => this.set('statusBarWidth', statusBarWidth)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._core.DeviceInfo.Ios!.getDeviceMaxVolume().then(maxVolume => this.set('maxVolume', maxVolume)).catch(err => this.handleDeviceInfoError(err)));
 
             return Promise.all(promises);
         });
@@ -67,27 +69,27 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
     }
 
     public isStatusBarHidden(): Promise<boolean> {
-        return this._nativeBridge.DeviceInfo.Ios.isStatusBarHidden().then(isStatusBarHidden => {
+        return this._core.DeviceInfo.Ios!.isStatusBarHidden().then(isStatusBarHidden => {
             this.set('statusBarHidden', isStatusBarHidden);
             return this.get('statusBarHidden');
         });
     }
 
     public getSensorList(): Promise<string[]> {
-        return this._nativeBridge.DeviceInfo.Ios.getSensorList().then(sensorList => {
+        return this._core.DeviceInfo.Ios!.getSensorList().then(sensorList => {
             this.set('sensorList', sensorList);
             return this.get('sensorList');
         });
     }
 
     public getFreeSpace(): Promise<number> {
-        return this._nativeBridge.DeviceInfo.Ios.getFreeSpace().then(freeInternalSpace => {
+        return this._core.DeviceInfo.Ios!.getFreeSpace().then(freeInternalSpace => {
             this.set('freeInternalSpace', freeInternalSpace);
             return this.get('freeInternalSpace');
         });
     }
 
-    public getDTO(): Promise<any> {
+    public getDTO(): Promise<{ [key: string]: unknown }> {
         return super.getDTO().then((commonDTO) => {
             return {
                 ...commonDTO,
@@ -98,7 +100,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         });
     }
 
-    public getAnonymousDTO(): Promise<any> {
+    public getAnonymousDTO(): Promise<{ [key: string]: unknown }> {
         return super.getAnonymousDTO().then((commonDTO) => {
             return {
                 ...commonDTO,
@@ -109,7 +111,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         });
     }
 
-    public getStaticDTO(): any {
+    public getStaticDTO(): { [key: string]: unknown } {
         return {
             ... super.getStaticDTO(),
             'screenScale': this.getScreenScale(),
@@ -118,7 +120,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         };
     }
 
-    public getAnonymousStaticDTO(): any {
+    public getAnonymousStaticDTO(): { [key: string]: unknown } {
         return {
             ... super.getAnonymousStaticDTO(),
             'screenScale': this.getScreenScale(),

@@ -1,7 +1,8 @@
-import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { AdUnitStyle, IAdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
-import { Campaign, ICampaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaign, IRawCampaign } from 'Ads/Models/Campaign';
+import { Asset } from 'Ads/Models/Assets/Asset';
 
 export enum StoreName {
     APPLE,
@@ -11,6 +12,35 @@ export enum StoreName {
     STANDALONE_ANDROID
 }
 
+export interface IRawPerformanceCampaign extends IRawCampaign {
+    appStoreId: string;
+    gameId: number;
+    gameName: string;
+    gameIcon: string;
+    rating: number;
+    ratingCount: number;
+    endScreenLandscape?: string;
+    endScreenPortrait?: string;
+    endScreen?: string;
+    trailerDownloadable?: string;
+    trailerDownloadableSize?: number;
+    trailerStreaming?: string;
+    trailerPortraitDownloadable?: string;
+    trailerPortraitDownloadableSize?: number;
+    trailerPortraitStreaming?: string;
+    portraitCreativeId?: string;
+    clickAttributionUrl?: string;
+    clickAttributionUrlFollowsRedirects?: boolean;
+    clickUrl: string;
+    videoEventUrls: { [eventType: string]: string };
+    bypassAppSheet: boolean;
+    store: string;
+    adUnitStyle: IAdUnitStyle;
+    appDownloadUrl?: string;
+    mraidUrl?: string;
+    dynamicMarkup?: string;
+}
+
 export interface IPerformanceCampaign extends ICampaign {
     appStoreId: string;
     gameId: number;
@@ -18,8 +48,9 @@ export interface IPerformanceCampaign extends ICampaign {
     gameIcon: Image;
     rating: number;
     ratingCount: number;
-    landscapeImage: Image;
-    portraitImage: Image;
+    landscapeImage?: Image;
+    portraitImage?: Image;
+    squareImage?: Image;
     video?: Video;
     streamingVideo?: Video;
     videoPortrait?: Video;
@@ -32,7 +63,6 @@ export interface IPerformanceCampaign extends ICampaign {
     store: StoreName;
     adUnitStyle: AdUnitStyle | undefined;
     appDownloadUrl?: string;
-    trackingUrls: {[key: string]: string[]};
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
@@ -45,8 +75,9 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             gameIcon: ['object'],
             rating: ['number'],
             ratingCount: ['number'],
-            landscapeImage: ['object'],
-            portraitImage: ['object'],
+            landscapeImage: ['object', 'undefined'],
+            portraitImage: ['object', 'undefined'],
+            squareImage: ['object', 'undefined'],
             video: ['object', 'undefined'],
             streamingVideo: ['object', 'undefined'],
             videoPortrait: ['object', 'undefined'],
@@ -58,8 +89,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             bypassAppSheet: ['boolean'],
             store: ['number'],
             adUnitStyle: ['object', 'undefined'],
-            appDownloadUrl: ['string', 'undefined'],
-            trackingUrls: ['object', 'undefined']
+            appDownloadUrl: ['string', 'undefined']
         }, campaign);
     }
 
@@ -91,12 +121,16 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('ratingCount');
     }
 
-    public getPortrait(): Image {
+    public getPortrait(): Image | undefined {
         return this.get('portraitImage');
     }
 
-    public getLandscape(): Image {
+    public getLandscape(): Image | undefined {
         return this.get('landscapeImage');
+    }
+
+    public getSquare(): Image | undefined {
+        return this.get('squareImage');
     }
 
     public getVideo(): Video | undefined {
@@ -148,11 +182,26 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
     }
 
     public getOptionalAssets() {
-        return [
-            this.getGameIcon(),
-            this.getPortrait(),
-            this.getLandscape()
-        ];
+        const assets: Asset[] = [];
+
+        assets.push(this.getGameIcon());
+
+        const square = this.getSquare();
+        if(square) {
+            assets.push(square);
+        }
+
+        const landscape = this.getLandscape();
+        if(landscape) {
+            assets.push(landscape);
+        }
+
+        const portrait = this.getPortrait();
+        if(portrait) {
+            assets.push(portrait);
+        }
+
+        return assets;
     }
 
     public getAppDownloadUrl() {
@@ -167,36 +216,38 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('adUnitStyle');
     }
 
-    public getTrackingUrls(): {[key: string]: string[]} {
-        return this.get('trackingUrls');
-    }
-
-    public getDTO(): { [key: string]: any } {
-        let gameIcon: any;
+    public getDTO(): { [key: string]: unknown } {
+        let gameIcon: unknown;
         const gameIconObject = this.getGameIcon();
         if (gameIconObject) {
             gameIcon = gameIconObject.getDTO();
         }
 
-        let landscapeImage: any;
+        let squareImage: unknown;
+        const squareImageObject = this.getSquare();
+        if (squareImageObject) {
+            squareImage = squareImageObject.getDTO();
+        }
+
+        let landscapeImage: unknown;
         const landscapeImageObject = this.getLandscape();
         if (landscapeImageObject) {
             landscapeImage = landscapeImageObject.getDTO();
         }
 
-        let portraitImage: any;
+        let portraitImage: unknown;
         const portraitImageObject = this.getPortrait();
         if (portraitImageObject) {
             portraitImage = portraitImageObject.getDTO();
         }
 
-        let video: any;
+        let video: unknown;
         const videoObject = this.getVideo();
         if (videoObject) {
             video = videoObject.getDTO();
         }
 
-        let streamingVideo: any;
+        let streamingVideo: unknown;
         const streamingVideoObject = this.getStreamingVideo();
         if (streamingVideoObject) {
             streamingVideo = streamingVideoObject.getDTO();
@@ -210,6 +261,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             'gameIcon': gameIcon,
             'rating': this.getRating(),
             'ratingCount': this.getRatingCount(),
+            'squareImage': squareImage,
             'landscapeImage': landscapeImage,
             'portraitImage': portraitImage,
             'video': video,
@@ -218,8 +270,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             'clickAttributionUrlFollowsRedirects': this.getClickAttributionUrlFollowsRedirects(),
             'bypassAppSheet': this.getBypassAppSheet(),
             'store': StoreName[this.getStore()].toLowerCase(),
-            'appDownloadUrl': this.getAppDownloadUrl(),
-            'trackingUrls': this.getTrackingUrls()
+            'appDownloadUrl': this.getAppDownloadUrl()
         };
     }
 }

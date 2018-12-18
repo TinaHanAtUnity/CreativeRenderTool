@@ -4,9 +4,24 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ISchema, Model } from 'Core/Models/Model';
 
+export type ICampaignTrackingUrls = { [key: string]: string[] };
+
+export interface IRawCampaign {
+    id: string;
+    willExpireAt?: number;
+    contentType: string;
+    adType?: string;
+    correlationId?: string;
+    creativeId?: string;
+    seatId?: number;
+    meta?: string;
+    mediaId: string;
+}
+
 export interface ICampaign {
     id: string;
     willExpireAt: number | undefined;
+    contentType: string;
     adType: string | undefined;
     correlationId: string | undefined;
     creativeId: string | undefined;
@@ -14,19 +29,22 @@ export interface ICampaign {
     meta: string | undefined;
     session: Session;
     mediaId: string;
+    trackingUrls: ICampaignTrackingUrls;
 }
 
 export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
     public static Schema: ISchema<ICampaign> = {
         id: ['string'],
         willExpireAt: ['number', 'undefined'],
+        contentType: ['string'],
         adType: ['string', 'undefined'],
         correlationId: ['string', 'undefined'],
         creativeId: ['string', 'undefined'],
         seatId: ['number', 'undefined'],
         meta: ['string', 'undefined'],
         session: ['object'],
-        mediaId: ['string']
+        mediaId: ['string'],
+        trackingUrls: ['object']
     };
 
     constructor(name: string, schema: ISchema<T>, data: T) {
@@ -43,6 +61,10 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
 
     public getAdType(): string | undefined {
         return this.get('adType');
+    }
+
+    public getContentType(): string {
+        return this.get('contentType');
     }
 
     public getCorrelationId(): string | undefined {
@@ -78,7 +100,23 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return this.get('mediaId');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public setTrackingUrls(trackingUrls: ICampaignTrackingUrls) {
+        this.set('trackingUrls', trackingUrls);
+    }
+
+    public getTrackingUrls(): ICampaignTrackingUrls {
+        return this.get('trackingUrls');
+    }
+
+    public getTrackingUrlsForEvent(event: string): string[] {
+        const urls = this.getTrackingUrls();
+        if (urls) {
+            return urls[event] || [];
+        }
+        return [];
+    }
+
+    public getDTO(): { [key: string]: unknown } {
         return {
             'id': this.getId(),
             'willExpireAt': this.getWillExpireAt(),

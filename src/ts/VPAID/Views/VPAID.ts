@@ -1,8 +1,7 @@
 import { Placement } from 'Ads/Models/Placement';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Platform } from 'Core/Constants/Platform';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/ICore';
 import { IObserver1 } from 'Core/Utilities/IObserver';
 import { Template } from 'Core/Utilities/Template';
 import { Timer } from 'Core/Utilities/Timer';
@@ -23,7 +22,7 @@ interface InitAdOptions {
 export interface IVPAIDHandler {
     onVPAIDCompanionClick(): void;
     onVPAIDCompanionView(): void;
-    onVPAIDEvent(eventType: string, args: any[]): void;
+    onVPAIDEvent(eventType: string, args: unknown[]): void;
     onVPAIDStuck(): void;
     onVPAIDSkip(): void;
     onVPAIDProgress(duration: number, remainingTime: number): void;
@@ -41,6 +40,8 @@ interface IVPAIDTemplateData {
 export class VPAID extends View<IVPAIDHandler> {
     private static stuckDelay = 5 * 1000;
 
+    private _core: ICoreApi;
+
     private vpaidSrcTag = '{{VPAID_SRC_URL}}';
     private _campaign: VPAIDCampaign;
     private _placement: Placement;
@@ -52,10 +53,11 @@ export class VPAID extends View<IVPAIDHandler> {
     private _isCoppaCompliant: boolean;
     private _webPlayerContainer: WebPlayerContainer;
 
-    constructor(nativeBridge: NativeBridge, webPlayerContainer: WebPlayerContainer, campaign: VPAIDCampaign, placement: Placement) {
-        super(nativeBridge, 'vpaid');
+    constructor(platform: Platform, core: ICoreApi, webPlayerContainer: WebPlayerContainer, campaign: VPAIDCampaign, placement: Placement) {
+        super(platform, 'vpaid');
 
         this._template = new Template(VPAIDTemplate);
+        this._core = core;
         this._webPlayerContainer = webPlayerContainer;
         this._campaign = campaign;
         this._placement = placement;
@@ -79,7 +81,7 @@ export class VPAID extends View<IVPAIDHandler> {
         let iframeSrcDoc = new Template(VPAIDContainerTemplate).render(templateData);
 
         this._webplayerEventObserver = this._webPlayerContainer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));
-        iframeSrcDoc = this._nativeBridge.getPlatform() === Platform.ANDROID ? encodeURIComponent(iframeSrcDoc) : iframeSrcDoc;
+        iframeSrcDoc = this._platform === Platform.ANDROID ? encodeURIComponent(iframeSrcDoc) : iframeSrcDoc;
         this._isLoaded = true;
         return this._webPlayerContainer.setData(iframeSrcDoc, 'text/html', 'UTF-8');
     }
@@ -126,15 +128,17 @@ export class VPAID extends View<IVPAIDHandler> {
     }
 
     private getInitAdOptions(): Promise<InitAdOptions> {
-        return Promise.all([this._nativeBridge.DeviceInfo.getScreenWidth(),
-            this._nativeBridge.DeviceInfo.getScreenHeight()]).then(([width, height]) => {
+        return Promise.all([
+            this._core.DeviceInfo.getScreenWidth(),
+            this._core.DeviceInfo.getScreenHeight()
+        ]).then(([width, height]) => {
                 return <InitAdOptions>{
                     width: width,
                     height: height,
                     bitrate: 500,
                     viewMode: 'normal',
                     creativeData: {
-                        AdParameters: this.decodeHTMLEntityChars(this._campaign.getVPAID().getCreativeParameters())
+                        AdParameters: this.decodeHTMLEntityChars(<string>this._campaign.getVPAID().getCreativeParameters()!)
                     }
                 };
             });
@@ -146,33 +150,33 @@ export class VPAID extends View<IVPAIDHandler> {
         return textArea.value;
     }
 
-    private sendEvent(event: string, parameters?: any[]): Promise<void> {
-        const webPlayerParams: any[] = [event];
+    private sendEvent(event: string, parameters?: unknown[]): Promise<void> {
+        const webPlayerParams: unknown[] = [event];
         if (parameters) {
             webPlayerParams.push(parameters);
         }
         return this._webPlayerContainer.sendEvent(webPlayerParams);
     }
 
-    private onWebPlayerEvent(args: any[]) {
+    private onWebPlayerEvent(args: unknown[]) {
         const eventType = args.shift();
-        const params = args.shift();
+        const params = <unknown[]>args.shift();
 
         switch (eventType) {
             case 'progress':
-                this._handlers.forEach(handler => handler.onVPAIDProgress(params[0], params[1]));
+                this._handlers.forEach(handler => handler.onVPAIDProgress(<number>params[0], <number>params[1]));
                 if (!this._isPaused) {
                     // this._stuckTimer.reset();
                 }
                 break;
             case 'VPAID':
-                this._handlers.forEach(handler => handler.onVPAIDEvent(params.shift(), params.shift()));
+                this._handlers.forEach(handler => handler.onVPAIDEvent(<string>params.shift(), <unknown[]>params.shift()));
                 break;
             case 'ready':
                 this.onVPAIDContainerReady();
                 break;
             default:
-                this._nativeBridge.Sdk.logWarning(`VPAID Unknown message type ${eventType}`);
+                this._core.Sdk.logWarning(`VPAID Unknown message type ${eventType}`);
         }
     }
 }

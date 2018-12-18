@@ -3,8 +3,8 @@ import { Analytics } from 'Ads/Utilities/Analytics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestError } from 'Core/Errors/RequestError';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { ICoreApi } from 'Core/ICore';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
@@ -13,38 +13,38 @@ enum ThirdPartyEventMethod {
     POST,
     GET
 }
+
+export enum ThirdPartyEventMacro {
+    ZONE = '%ZONE%',
+    SDK_VERSION = '%SDK_VERSION%',
+    GAMER_SID = '%GAMER_SID%'
+}
+
+export type TemplateValueMap = { [id: string]: string };
+
 export class ThirdPartyEventManager {
 
-    private _nativeBridge: NativeBridge;
-    private _request: Request;
+    private _core: ICoreApi;
+    private _request: RequestManager;
     private _templateValues: { [id: string]: string } = {};
 
-    public static replaceUrlTemplateValues(urls: string[], templateValues: { [id: string]: string }): string[] {
-        const modifiedUrls: string[] = [];
-        for (const url of urls) {
-            if(url) {
-                for(const key in templateValues) {
-                    if(templateValues.hasOwnProperty(key)) {
-                        const modifiedUrl = url.replace(key, templateValues[key]);
-                        modifiedUrls.push(modifiedUrl);
-                    }
-                }
-            }
-        }
-        return modifiedUrls;
-    }
-
-    constructor(nativeBridge: NativeBridge, request: Request, templateValues?: { [id: string]: string }) {
-        this._nativeBridge = nativeBridge;
+    constructor(core: ICoreApi, request: RequestManager, templateValues?: TemplateValueMap) {
+        this._core = core;
         this._request = request;
 
-        if(templateValues) {
+        if (templateValues) {
             this.setTemplateValues(templateValues);
         }
     }
 
+    public replaceTemplateValuesAndEncodeUrls(urls: string[]): string[] {
+        return urls.map((url) => {
+            return this.replaceTemplateValuesAndEncodeUrl(url);
+        });
+    }
+
     public clickAttributionEvent(url: string, redirects: boolean, useWebViewUA?: boolean): Promise<INativeResponse> {
-        const headers: Array<[string, string]> = [];
+        const headers: [string, string][] = [];
         if (typeof navigator !== 'undefined' && navigator.userAgent && useWebViewUA) {
             headers.push(['User-Agent', navigator.userAgent]);
         }
@@ -56,25 +56,25 @@ export class ThirdPartyEventManager {
         });
     }
 
-    public sendWithPost(event: string, sessionId: string, url: string, body?: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
+    public sendWithPost(event: string, sessionId: string, url: string, body?: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][]): Promise<INativeResponse> {
         return this.sendEvent(ThirdPartyEventMethod.POST, event, sessionId, url, body, useWebViewUserAgentForTracking, headers);
     }
 
-    public sendWithGet(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
+    public sendWithGet(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][]): Promise<INativeResponse> {
         return this.sendEvent(ThirdPartyEventMethod.GET, event, sessionId, url, undefined, useWebViewUserAgentForTracking, headers);
     }
 
-    private sendEvent(method: ThirdPartyEventMethod, event: string, sessionId: string, url: string, body?: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
-        const modifiedHeaders = headers || [];
-        if (!Request.getHeader(modifiedHeaders, 'User-Agent')) {
+    private sendEvent(method: ThirdPartyEventMethod, event: string, sessionId: string, url: string, body?: string, useWebViewUserAgentForTracking?: boolean, headers?: [string, string][]): Promise<INativeResponse> {
+        headers = headers || [];
+        if (!RequestManager.getHeader(headers, 'User-Agent')) {
             if (typeof navigator !== 'undefined' && navigator.userAgent && useWebViewUserAgentForTracking === true) {
-                modifiedHeaders.push(['User-Agent', navigator.userAgent]);
+                headers.push(['User-Agent', navigator.userAgent]);
             }
         }
 
-        const urlInternal = this.getUrl(url);
+        url = this.replaceTemplateValuesAndEncodeUrl(url);
 
-        this._nativeBridge.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + urlInternal + ' with headers ' + modifiedHeaders + ' (session ' + sessionId + ')');
+        this._core.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
         const options = {
             retries: 0,
             retryDelay: 0,
@@ -82,37 +82,36 @@ export class ThirdPartyEventManager {
             retryWithConnectionEvents: false
         };
         let request: Promise<INativeResponse>;
-        switch(method) {
+        switch (method) {
             case ThirdPartyEventMethod.POST:
-                request = this._request.post(urlInternal, body, modifiedHeaders, options);
+                request = this._request.post(url, body, headers, options);
                 break;
             case ThirdPartyEventMethod.GET:
             default:
-                request = this._request.get(urlInternal, modifiedHeaders, options);
+                request = this._request.get(url, headers, options);
         }
         return request.catch(error => {
-            let errorInternal = error;
-            const urlParts = Url.parse(urlInternal);
+            const urlParts = Url.parse(url);
             if(error instanceof RequestError) {
-                errorInternal = new DiagnosticError(new Error(error.message), {
+                error = new DiagnosticError(new Error(error.message), {
                     request: error.nativeRequest,
                     event: event,
                     sessionId: sessionId,
-                    url: urlInternal,
+                    url: url,
                     response: error.nativeResponse,
                     host: urlParts.host,
                     protocol: urlParts.protocol
                 });
             }
-            return Analytics.trigger('third_party_event_failed', errorInternal);
+            return Analytics.trigger('third_party_event_failed', error);
         });
     }
 
-    public setTemplateValues(templateValues: { [id: string]: string }): void {
+    public setTemplateValues(templateValues: TemplateValueMap): void {
         this._templateValues = templateValues;
     }
 
-    public setTemplateValue(key: string, value: string): void {
+    public setTemplateValue(key: ThirdPartyEventMacro, value: string): void {
         this._templateValues[key] = value;
     }
 
@@ -137,16 +136,34 @@ export class ThirdPartyEventManager {
         return Promise.resolve();
     }
 
-    private getUrl(url: string): string {
-        let modifiedUrl = url;
-        if(modifiedUrl) {
-            for(const key in this._templateValues) {
-                if(this._templateValues.hasOwnProperty(key)) {
-                    modifiedUrl = modifiedUrl.replace(key, this._templateValues[key]);
+    private replaceTemplateValuesAndEncodeUrl(url: string): string {
+        if (url) {
+            for (const key in this._templateValues) {
+                if (this._templateValues.hasOwnProperty(key)) {
+                    url = url.replace(key, this._templateValues[key]);
                 }
             }
         }
 
-        return modifiedUrl;
+        return Url.encode(url);
+    }
+}
+
+export interface IThirdPartyEventManagerFactory {
+    create(templateValues: TemplateValueMap): ThirdPartyEventManager;
+}
+
+export class ThirdPartyEventManagerFactory implements IThirdPartyEventManagerFactory {
+
+    private _core: ICoreApi;
+    private _requestManager: RequestManager;
+
+    constructor(core: ICoreApi, requestManager: RequestManager) {
+        this._core = core;
+        this._requestManager = requestManager;
+    }
+
+    public create(templateValues: TemplateValueMap): ThirdPartyEventManager {
+        return new ThirdPartyEventManager(this._core, this._requestManager, templateValues);
     }
 }

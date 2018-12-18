@@ -1,8 +1,10 @@
-export class Intent {
+import { BackendApi } from 'Backend/BackendApi';
 
-    public static launch(intentData: any) {
+export class Intent extends BackendApi {
+
+    public launch(intentData: { [key: string]: unknown }) {
         if('uri' in intentData) {
-            window.open(intentData.uri);
+            window.open(<string>intentData.uri);
         }
     }
 

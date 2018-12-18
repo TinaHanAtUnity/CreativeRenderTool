@@ -5,7 +5,7 @@ import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 
 interface IVastAd {
     id: string | null;
-    creatives: Array<VastCreative>;
+    creatives: VastCreative[];
     companionAds: VastCreativeCompanionAd[];
     errorURLTemplates: string[];
     impressionURLTemplates: string[];
@@ -15,7 +15,7 @@ interface IVastAd {
 export class VastAd extends Model<IVastAd> {
 
     constructor();
-    constructor(id?: string, creatives?: Array<VastCreative>, errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeCompanionAd[]) {
+    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeCompanionAd[]) {
         super('VastAd', {
             id: ['string', 'null'],
             creatives: ['array'],
@@ -41,7 +41,7 @@ export class VastAd extends Model<IVastAd> {
         this.set('id', id);
     }
 
-    public getCreatives(): Array<VastCreative> {
+    public getCreatives(): VastCreative[] {
         return this.get('creatives');
     }
 
@@ -135,7 +135,7 @@ export class VastAd extends Model<IVastAd> {
         }
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         const vastCreatives = [];
         for (const vastCreative of this.get('creatives')) {
             vastCreatives.push(vastCreative.getDTO());

@@ -1,3 +1,4 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable2 } from 'Core/Utilities/Observable';
@@ -8,10 +9,10 @@ enum NotificationEvent {
 
 export class NotificationApi extends NativeApi {
 
-    public readonly onNotification = new Observable2<string, any>();
+    public readonly onNotification = new Observable2<string, unknown>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Notification', ApiPackage.CORE);
+        super(nativeBridge, 'Notification', ApiPackage.CORE, EventCategory.NOTIFICATION);
     }
 
     public addNotificationObserver(name: string, keys: string[]): Promise<void> {
@@ -34,10 +35,10 @@ export class NotificationApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'removeAVNotificationObserver', [name]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case NotificationEvent[NotificationEvent.ACTION]:
-                this.onNotification.trigger(parameters[0], parameters[1]);
+                this.onNotification.trigger(<string>parameters[0], parameters[1]);
                 break;
 
             default:

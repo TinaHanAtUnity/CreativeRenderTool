@@ -2,6 +2,7 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
 import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
 import { VPAID } from 'VPAID/Models/VPAID';
+import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 
 export interface IVPAIDCampaign extends IProgrammaticCampaign {
     vpaid: VPAID;
@@ -27,7 +28,7 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
             buyerId: ['string', 'undefined']
         }, campaign);
 
-        this.addTrackingToVAST(campaign.trackingUrls);
+        this.addCustomTracking(campaign.trackingUrls);
     }
 
     public hasEndScreen(): boolean {
@@ -58,10 +59,10 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
         return this.get('vpaid');
     }
 
-    public getRequiredAssets(): Array<Asset> {
+    public getRequiredAssets(): Asset[] {
         return [];
     }
-    public getOptionalAssets(): Array<Asset> {
+    public getOptionalAssets(): Asset[] {
         return [];
     }
 
@@ -109,18 +110,21 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
         return this.get('advertiserBundleId');
     }
 
-    private addTrackingToVAST(tracking: any) {
-        if (tracking) {
-            for (const trackingEventName in tracking) {
-                if (tracking.hasOwnProperty(trackingEventName)) {
-                    const urls = tracking[trackingEventName];
-                    if (urls) {
-                        urls.forEach((url: string) => {
-                            this.getVPAID().addTrackingEventUrl(trackingEventName, url);
-                        });
-                    }
+    public setTrackingUrls(trackingUrls: ICampaignTrackingUrls) {
+        super.setTrackingUrls(trackingUrls);
+        this.addCustomTracking(trackingUrls);
+    }
+
+    private addCustomTracking(trackingUrls: ICampaignTrackingUrls) {
+        if (trackingUrls) {
+            Object.keys(trackingUrls).forEach((event) => {
+                const eventUrls = trackingUrls[event];
+                if (eventUrls) {
+                    eventUrls.forEach((eventUrl) => {
+                        this.getVPAID().addTrackingEventUrl(event, eventUrl);
+                    });
                 }
-            }
+            });
         }
     }
 }

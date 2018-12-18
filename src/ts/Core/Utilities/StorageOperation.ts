@@ -8,7 +8,7 @@ export enum StorageCommandType {
 export interface IStorageCommand {
     type: StorageCommandType;
     key: string;
-    value?: any;
+    value?: unknown;
 }
 
 export interface IStorageBatch {
@@ -26,7 +26,7 @@ export class StorageOperation {
         };
     }
 
-    public set<T>(key: string, value:T) {
+    public set<T>(key: string, value: T) {
         this._batch.commands.push({
             type: StorageCommandType.SET,
             key: key,

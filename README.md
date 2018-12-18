@@ -1,4 +1,4 @@
-# Unity Ads Webview 
+# Unity Ads Webview
 
 ## Requirements
 
@@ -62,9 +62,9 @@ To build continuously (on file changes), use:
 ### Running development builds
 
 - Change SDK configuration URL to point to local build (`http://LOCAL_IP:LOCAL_PORT/build/dev/config.json`)
-  >**iOS:** change the return url of `getDefaultConfigUrl()` in [UADSSdkProperties.m](https://github.com/Applifier/unity-ads-ios/blob/master/UnityAds/Properties/UADSSdkProperties.m)
- 
-  >**Android:** change the return url of `getDefaultConfigUrl()` in [SdkProperties.java](https://github.com/Applifier/unity-ads-android/blob/master/lib/src/main/java/com/unity3d/ads/properties/SdkProperties.java)
+  >**iOS:** change the return url of `getDefaultConfigUrl()` in [USRVSdkProperties.m](https://github.com/Applifier/unity-ads-ios/blob/master/UnityServices/Core/Properties/USRVSdkProperties.m)
+
+  >**Android:** change the return url of `getDefaultConfigUrl()` in [SdkProperties.java](https://github.com/Applifier/unity-ads-android/blob/master/lib/src/main/java/com/unity3d/services/core/properties/SdkProperties.java)
 - Change webview development config to point to local build (is done automagically by `make build-dev`) (`http://LOCAL_IP:LOCAL_PORT/build/dev/index.html`)
 - Start local web server in project root (`make start-server`)
 
@@ -106,11 +106,11 @@ Or combine both:
 
 #### Automatic builds for Android
 
-http://qa-jenkins.us-east-1.applifier.info:8080/job/unity_ads_sdk2_android_hybrid_tests/
+http://jenkins.applifier.info/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-hybrid-test-android/
 
 #### Automatic builds for iOS
 
-http://qa-jenkins.us-east-1.applifier.info:8080/job/unity_ads_sdk2_ios_hybrid_tests/
+http://jenkins.applifier.info/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-hybrid-test-ios/
 
 ### Browser build tests
 
@@ -119,8 +119,9 @@ http://qa-jenkins.us-east-1.applifier.info:8080/job/unity_ads_sdk2_ios_hybrid_te
 
 ### Deployment tests
 
-#### iOS
-http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-android-sans-webhook/
-
 #### Android
-http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-ios-sans-webhook/
+http://jenkins.applifier.info/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-systest-android/
+
+#### iOS
+http://jenkins.applifier.info/job/Applifier/job/unity-ads-sdk-tests/job/ads-sdk-systest-ios/
+

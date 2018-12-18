@@ -1,15 +1,15 @@
 import { Placement } from 'Ads/Models/Placement';
-import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
+import { IBannersApi } from 'Banners/IBanners';
 import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampaignManager';
 import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
+import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { AdUnitActivities, FocusManager } from 'Core/Managers/FocusManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { BannerCampaign } from 'Banners/Models/BannerCampaign';
+import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
 
 const StandardRefreshDelay = 30;
 
@@ -23,8 +23,8 @@ export const StandardBannerWidth = 320;
 export const StandardBannerHeight = 50;
 
 export class BannerAdContext {
-    private _nativeBridge: NativeBridge;
-    private _adUnit: BannerAdUnit;
+    private _banner: IBannersApi;
+    private _adUnit: IBannerAdUnit;
     private _placement: Placement;
     private _campaign: BannerCampaign;
     private _deviceInfo: DeviceInfo;
@@ -38,8 +38,8 @@ export class BannerAdContext {
     private _shouldRefresh = true;
     private _refreshTimeoutID = 0;
 
-    constructor(nativeBridge: NativeBridge, adUnitParametersFactory: BannerAdUnitParametersFactory, campaignManager: BannerCampaignManager, placementManager: BannerPlacementManager, focusManager: FocusManager, deviceInfo: DeviceInfo) {
-        this._nativeBridge = nativeBridge;
+    constructor(banner: IBannersApi, adUnitParametersFactory: BannerAdUnitParametersFactory, campaignManager: BannerCampaignManager, placementManager: BannerPlacementManager, focusManager: FocusManager, deviceInfo: DeviceInfo) {
+        this._banner = banner;
         this._campaignManager = campaignManager;
         this._focusManager = focusManager;
         this._placementManager = placementManager;
@@ -51,16 +51,16 @@ export class BannerAdContext {
         this._focusManager.onActivityPaused.subscribe((activity) => this.onActivityPaused(activity));
         this._focusManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
 
-        this._nativeBridge.Banner.onBannerOpened.subscribe(() => {
-            this._nativeBridge.BannerListener.sendShowEvent(this._placement.getId());
+        this._banner.Banner.onBannerOpened.subscribe(() => {
+            this._banner.Listener.sendShowEvent(this._placement.getId());
             this.onBannerShow();
         });
-        this._nativeBridge.Banner.onBannerClosed.subscribe(() => {
-            this._nativeBridge.BannerListener.sendHideEvent(this._placement.getId());
+        this._banner.Banner.onBannerClosed.subscribe(() => {
+            this._banner.Listener.sendHideEvent(this._placement.getId());
             this.onBannerHide();
         });
-        this._nativeBridge.Banner.onBannerDestroyed.subscribe(() => {
-            this._nativeBridge.BannerListener.sendUnloadEvent(this._placement.getId());
+        this._banner.Banner.onBannerDestroyed.subscribe(() => {
+            this._banner.Listener.sendUnloadEvent(this._placement.getId());
         });
     }
 
@@ -70,7 +70,7 @@ export class BannerAdContext {
 
     public load(placementId: string): Promise<void> {
         if (this.isState(BannerLoadState.Loaded)) {
-            return this._nativeBridge.BannerListener.sendLoadEvent(placementId);
+            return this._banner.Listener.sendLoadEvent(placementId);
         } else if (this.isState(BannerLoadState.Loading)) {
             return Promise.resolve();
         } else {
@@ -95,9 +95,9 @@ export class BannerAdContext {
         this.setState(BannerLoadState.Unloaded);
         this._placementManager.sendBannersReady();
         if (this._adUnit) {
-            return this._adUnit.destroy().then(() => {
+            return this._adUnit.onDestroy().then(() => {
                 delete this._adUnit;
-                return this._nativeBridge.Banner.destroy();
+                return this._banner.Banner.destroy();
             });
         }
         return Promise.resolve();
@@ -108,19 +108,19 @@ export class BannerAdContext {
                 this._campaign = <BannerCampaign>campaign;
                 return this.createAdUnit().then((adUnit) => {
                     if (this._adUnit) {
-                        this._adUnit.destroy();
+                        this._adUnit.onDestroy();
                     }
                     this._adUnit = adUnit;
-                    return this.loadBanner().then(() => this._adUnit.load());
+                    return this.loadBanner().then(() => this._adUnit.onLoad());
                 }).then(() => {
                     if (this.isState(BannerLoadState.Loading)) {
                         this.setState(BannerLoadState.Loaded);
-                        return this._nativeBridge.BannerListener.sendLoadEvent(this._placement.getId());
+                        return this._banner.Listener.sendLoadEvent(this._placement.getId());
                     }
                     return Promise.resolve();
                 }).then(() => {
                     if (this._isShowing) {
-                        return this._adUnit.show();
+                        return this._adUnit.onShow();
                     }
                 });
             }).catch((e) => {
@@ -133,7 +133,7 @@ export class BannerAdContext {
     }
 
     private sendBannerError(e: Error): Promise<void> {
-        this._nativeBridge.BannerListener.sendErrorEvent(e.message);
+        this._banner.Listener.sendErrorEvent(e.message);
         return Promise.reject(e);
     }
 
@@ -144,7 +144,7 @@ export class BannerAdContext {
                 this.loadBannerAdUnit();
             } else {
                 if (this._adUnit) {
-                    this._adUnit.show();
+                    this._adUnit.onShow();
                 }
                 this.setUpBannerRefresh();
             }
@@ -155,7 +155,7 @@ export class BannerAdContext {
         this._isShowing = false;
         window.clearTimeout(this._refreshTimeoutID);
         if (this._adUnit) {
-            this._adUnit.hide();
+            this._adUnit.onHide();
         }
     }
 
@@ -205,7 +205,7 @@ export class BannerAdContext {
     private createAdUnit() {
         return this._adUnitParametersFactory.create(this._campaign, this._placement, {})
             .then((parameters) => {
-                return BannerAdUnitFactory.createAdUnit(this._nativeBridge, parameters);
+                return new BannerAdUnitFactory().createAdUnit(parameters);
             });
     }
 
@@ -220,20 +220,20 @@ export class BannerAdContext {
         const sizePromise = this.getBannerSize();
         if (this.isState(BannerLoadState.Loaded)) {
             return sizePromise.then(([width, height]) => {
-                return this._nativeBridge.Banner.setBannerFrame(
+                return this._banner.Banner.setBannerFrame(
                     this._placement.getBannerStyle() || 'bottomcenter',
                     width,
                     height
-                ).then(() => this._nativeBridge.Banner.setViews(this._adUnit.getViews()));
+                ).then(() => this._banner.Banner.setViews(this._adUnit.getViews()));
             });
         } else {
             return new Promise<void>((resolve, reject) => {
                 sizePromise.then(([width, height]) => {
-                    const observer = this._nativeBridge.Banner.onBannerLoaded.subscribe(() => {
-                        this._nativeBridge.Banner.onBannerLoaded.unsubscribe(observer);
+                    const observer = this._banner.Banner.onBannerLoaded.subscribe(() => {
+                        this._banner.Banner.onBannerLoaded.unsubscribe(observer);
                         resolve();
                     });
-                    this._nativeBridge.Banner.load(this._adUnit.getViews(), this._placement.getBannerStyle() || 'bottomcenter', width, height).catch(reject);
+                    this._banner.Banner.load(this._adUnit.getViews(), this._placement.getBannerStyle() || 'bottomcenter', width, height).catch(reject);
                 });
             });
         }

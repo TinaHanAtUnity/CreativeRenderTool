@@ -1,5 +1,6 @@
 import { ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { VideoAdUnit, VideoState } from 'Ads/AdUnits/VideoAdUnit';
+import { IAdsApi } from 'Ads/IAds';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -9,17 +10,20 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
+import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T2 extends Campaign = Campaign, T3 extends OperativeEventManager = OperativeEventManager> {
-    nativeBrige: NativeBridge;
     adUnit: T;
     campaign: T2;
     operativeEventManager: T3;
     thirdPartyEventManager: ThirdPartyEventManager;
+    platform: Platform;
+    core: ICoreApi;
+    ads: IAdsApi;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
     placement: Placement;
@@ -30,13 +34,17 @@ export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T
 
 export abstract class BaseVideoEventHandler {
 
-    protected _nativeBridge: NativeBridge;
+    protected _platform: Platform;
+    protected _core: ICoreApi;
+    protected _ads: IAdsApi;
     protected _adUnit: VideoAdUnit;
     protected _campaign: Campaign;
     protected _video: Video;
 
     constructor(params: IVideoEventHandlerParams) {
-        this._nativeBridge = params.nativeBrige;
+        this._platform = params.platform;
+        this._core = params.core;
+        this._ads = params.ads;
         this._adUnit = params.adUnit;
         this._campaign = params.campaign;
         this._video = params.video;
@@ -56,14 +64,12 @@ export abstract class BaseVideoEventHandler {
         this._adUnit.onFinish.trigger();
     }
 
-    protected handleVideoError(errorType?: string, errorData?: any) {
+    protected handleVideoError(errorType: string, errorData: unknown) {
         if(this._adUnit.getVideoState() !== VideoState.ERRORED) {
             const previousState = this._adUnit.getVideoState();
             this._adUnit.setVideoState(VideoState.ERRORED);
 
-            if(errorType && errorData) {
-                SessionDiagnostics.trigger(errorType, errorData, this._campaign.getSession());
-            }
+            SessionDiagnostics.trigger(errorType, errorData, this._campaign.getSession());
 
             this._adUnit.setFinishState(FinishState.ERROR);
 
@@ -79,10 +85,10 @@ export abstract class BaseVideoEventHandler {
 
             if(previousState === VideoState.NOT_READY || previousState === VideoState.PREPARING) {
                 this._adUnit.hide();
-                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player prepare error');
+                this._ads.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player prepare error');
             } else {
                 this._adUnit.onVideoError();
-                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
+                this._ads.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
             }
         }
     }

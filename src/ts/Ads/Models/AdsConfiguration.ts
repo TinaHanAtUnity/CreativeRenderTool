@@ -1,6 +1,16 @@
-import { Placement } from 'Ads/Models/Placement';
-import { ISchema, Model } from 'Core/Models/Model';
+import { IPlacement, IRawPlacement, Placement } from 'Ads/Models/Placement';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
+import { ISchema, Model } from 'Core/Models/Model';
+
+export interface IRawAdsConfiguration {
+    assetCaching: string;
+    placements: IRawPlacement[];
+    defaultPlacement: string;
+    gdprEnabled: boolean;
+    optOutRecorded: boolean;
+    optOutEnabled: boolean;
+    defaultBannerPlacement: string | undefined;
+}
 
 export interface IAdsConfiguration {
     cacheMode: CacheMode;
@@ -105,7 +115,7 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         this.set('optOutEnabled', optOutEnabled);
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         const placements = [];
         for(const placement in this.getPlacements()) {
             if(this.getPlacements().hasOwnProperty(placement)) {

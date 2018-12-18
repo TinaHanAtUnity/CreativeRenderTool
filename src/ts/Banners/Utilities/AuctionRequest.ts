@@ -6,7 +6,9 @@ import { Session } from 'Ads/Models/Session';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -14,10 +16,9 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
+import { AuctionV5Test } from 'Core/Models/ABGroup';
 
 export interface IAuctionResponse {
     correlationId: string;
@@ -46,12 +47,13 @@ export interface IPlacementMedia {
 }
 
 export interface IAuctionRequestParams {
-    nativeBridge: NativeBridge;
+    platform: Platform;
+    core: ICoreApi;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
     adMobSignalFactory: AdMobSignalFactory;
     metaDataManager: MetaDataManager;
-    request: Request;
+    request: RequestManager;
     clientInfo: ClientInfo;
     deviceInfo: DeviceInfo;
     sessionManager: SessionManager;
@@ -96,17 +98,19 @@ export class AuctionRequest {
     private static CampaignResponse: string;
     private static AbGroup: number | undefined;
     private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
+    private static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
     private static SessionId: string | undefined;
 
-    protected _nativeBridge: NativeBridge;
+    protected _platform: Platform;
+    protected _core: ICoreApi;
     protected _response: INativeResponse;
     private _coreConfig: CoreConfiguration;
     private _adsConfig: AdsConfiguration;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _metaDataManager: MetaDataManager;
-    private _request: Request;
+    private _request: RequestManager;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _sessionManager: SessionManager;
@@ -115,12 +119,12 @@ export class AuctionRequest {
     private _noFillRetry: boolean;
     private _retryCount: number = 2;
     private _retryDelay: number = 10000;
-    private _baseURL = AuctionRequest.BaseUrl;
+    private _baseURL: string;
     private _timeout: number | undefined;
     private _session: Session;
     private _url: string | null;
-    private _body: any | null;
-    private _headers: Array<[string, string]> = [];
+    private _body: { [key: string]: unknown } | null;
+    private _headers: [string, string][] = [];
 
     private _requestStart: number;
     private _requestDuration: number = 0;
@@ -128,7 +132,8 @@ export class AuctionRequest {
     private _promise: Promise<IAuctionResponse>;
 
     constructor(params: IAuctionRequestParams) {
-        this._nativeBridge = params.nativeBridge;
+        this._platform = params.platform;
+        this._core = params.core;
         this._coreConfig = params.coreConfig;
         this._adsConfig = params.adsConfig;
         this._request = params.request;
@@ -137,17 +142,17 @@ export class AuctionRequest {
         this._metaDataManager = params.metaDataManager;
         this._adMobSignalFactory = params.adMobSignalFactory;
         this._sessionManager = params.sessionManager;
+        this._baseURL = AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;
     }
 
     public request(): Promise<IAuctionResponse> {
         if (this._promise) {
             return this._promise;
         }
-        const promises = [
+        this._promise = Promise.all([
             this.getRequestURL(),
             this.getRequestBody()
-        ];
-        this._promise = Promise.all(promises).then(([url, body]) => {
+        ]).then(([url, body]) => {
             this._url = url;
             this._requestStart = Date.now();
             if (AuctionRequest.CampaignResponse) {
@@ -177,12 +182,12 @@ export class AuctionRequest {
         this._url = url;
     }
 
-    public getBody(): any | null {
+    public getBody(): unknown | null {
         return this._body;
     }
 
     // Overrides the body used in the request.
-    public setBody(body: any) {
+    public setBody(body: { [key: string]: unknown }) {
         this._body = body;
     }
 
@@ -240,7 +245,7 @@ export class AuctionRequest {
                 advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
                 limitAdTracking: this._deviceInfo.getLimitAdTracking()
             });
-        } else if (this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
+        } else if (this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
                 androidId: this._deviceInfo.getAndroidId()
             });
@@ -248,7 +253,7 @@ export class AuctionRequest {
 
         url = Url.addParameters(url, {
             deviceModel: this._deviceInfo.getModel(),
-            platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
+            platform: Platform[this._platform].toLowerCase(),
             sdkVersion: this._clientInfo.getSdkVersion(),
             stores: this._deviceInfo.getStores()
         });
@@ -259,12 +264,12 @@ export class AuctionRequest {
             });
         }
 
-        if (this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
+        if (this._platform === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
             url = Url.addParameters(url, {
                 osVersion: this._deviceInfo.getOsVersion(),
                 screenScale: this._deviceInfo.getScreenScale()
             });
-        } else if (this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
+        } else if (this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
                 deviceMake: this._deviceInfo.getManufacturer(),
                 screenSize: this._deviceInfo.getScreenLayout(),
@@ -301,7 +306,7 @@ export class AuctionRequest {
             });
         }
 
-        const promises: Array<Promise<any>> = [];
+        const promises: Promise<unknown>[] = [];
         promises.push(this._deviceInfo.getScreenWidth());
         promises.push(this._deviceInfo.getScreenHeight());
         promises.push(this._deviceInfo.getConnectionType());
@@ -319,8 +324,8 @@ export class AuctionRequest {
         });
     }
 
-    protected createPlacementRequest(): any {
-        const placementRequest: any = {};
+    protected createPlacementRequest(): unknown {
+        const placementRequest: { [key: string]: unknown } = {};
         Object.keys(this._placements).forEach((placementId) => {
             const placement = this._placements[placementId];
             placementRequest[placementId] = this.createPlacementDTO(placement);
@@ -328,8 +333,8 @@ export class AuctionRequest {
         return placementRequest;
     }
 
-    protected createPlacementDTO(placement: Placement): any {
-        const dto: any = {
+    protected createPlacementDTO(placement: Placement): { [key: string]: unknown } {
+        const dto: { [key: string]: unknown } = {
             adTypes: placement.getAdTypes(),
             allowSkip: placement.allowSkip()
         };
@@ -349,26 +354,12 @@ export class AuctionRequest {
         });
     }
 
-    private getRequestBody(): Promise<any> {
+    private getRequestBody(): Promise<unknown> {
         if (this._body) {
             return Promise.resolve(this._body);
         }
-        const promises: Array<Promise<any>> = [];
-        promises.push(this._deviceInfo.getFreeSpace());
-        promises.push(this._deviceInfo.getNetworkOperator());
-        promises.push(this._deviceInfo.getNetworkOperatorName());
-        promises.push(this._deviceInfo.getHeadset());
-        promises.push(this._deviceInfo.getDeviceVolume());
-        promises.push(this.getFullyCachedCampaigns());
-        promises.push(this.getVersionCode());
-        promises.push(this._adMobSignalFactory.getAdRequestSignal().then(signal => {
-            return signal.getBase64ProtoBufNonEncoded();
-        }));
-        promises.push(this._adMobSignalFactory.getOptionalSignal().then(signal => {
-            return signal.getDTO();
-        }));
 
-        const body: any = {
+        const body: { [key: string]: unknown } = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
             bundleId: this._clientInfo.getApplicationName(),
             coppa: this._coreConfig.isCoppaCompliant(),
@@ -391,7 +382,21 @@ export class AuctionRequest {
             body.nofillRetry = true;
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal, optionalSignal]) => {
+        return Promise.all([
+            this._deviceInfo.getFreeSpace(),
+            this._deviceInfo.getNetworkOperator(),
+            this._deviceInfo.getNetworkOperatorName(),
+            this._deviceInfo.getHeadset(),
+            this._deviceInfo.getDeviceVolume(),
+            this.getFullyCachedCampaigns(),
+            this.getVersionCode(),
+            this._adMobSignalFactory.getAdRequestSignal().then(signal => {
+                return signal.getBase64ProtoBufNonEncoded();
+            }),
+            this._adMobSignalFactory.getOptionalSignal().then(signal => {
+                return signal.getDTO();
+            })
+        ]).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal, optionalSignal]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
@@ -408,11 +413,10 @@ export class AuctionRequest {
                 body.versionCode = versionCode;
             }
 
-            const metaDataPromises: Array<Promise<any>> = [];
-            metaDataPromises.push(this._metaDataManager.fetch(MediationMetaData));
-            metaDataPromises.push(this._metaDataManager.fetch(FrameworkMetaData));
-
-            return Promise.all(metaDataPromises).then(([mediation, framework]) => {
+            return Promise.all([
+                this._metaDataManager.fetch(MediationMetaData),
+                this._metaDataManager.fetch(FrameworkMetaData)
+            ]).then(([mediation, framework]) => {
                 if (mediation) {
                     body.mediationName = mediation.getName();
                     body.mediationVersion = mediation.getVersion();
@@ -432,7 +436,7 @@ export class AuctionRequest {
                 body.properties = this._coreConfig.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
                 body.projectId = this._coreConfig.getUnityProjectId();
-                body.gameSessionCounters = GameSessionCounters.getDTO();
+                body.gameSessionCounters = GameSessionCounters.getCurrentCounters();
                 body.gdprEnabled = this._adsConfig.isGDPREnabled();
                 body.optOutEnabled = this._adsConfig.isOptOutEnabled();
                 body.optOutRecorded = this._adsConfig.isOptOutRecorded();
@@ -448,7 +452,7 @@ export class AuctionRequest {
     }
 
     private getFullyCachedCampaigns(): Promise<string[]> {
-        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
+        return this._core.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
             return campaignKeys;
         }).catch(() => {
             return [];
@@ -456,8 +460,8 @@ export class AuctionRequest {
     }
 
     private getVersionCode(): Promise<number | undefined> {
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
+        if (this._platform === Platform.ANDROID) {
+            return this._core.DeviceInfo.Android!.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
                 if (packageInfo.versionCode) {
                     return packageInfo.versionCode;
                 } else {

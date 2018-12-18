@@ -1,4 +1,4 @@
-import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { AdUnitStyle, IAdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
@@ -7,12 +7,19 @@ import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Request } from 'Core/Utilities/Request';
 import { IMRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
+import {
+    IPerformanceCampaign,
+    IRawPerformanceCampaign,
+    PerformanceCampaign,
+    StoreName
+} from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 // Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
 export enum ICometTrackingUrlEvents {
@@ -35,8 +42,8 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeVideo = 'comet/video';
     public static ContentTypeMRAID = 'comet/mraid-url';
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
-        const json = response.getJsonContent();
+    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
+        const json = <IRawPerformanceCampaign>response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;
@@ -60,13 +67,15 @@ export class CometCampaignParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: json.id,
             willExpireAt: undefined,
+            contentType: CometCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,
-            creativeId: undefined,
-            seatId: undefined,
+            creativeId: response.getCreativeId() || undefined,
+            seatId: response.getSeatId() || undefined,
             meta: json.meta,
             session: session,
-            mediaId: response.getMediaId()
+            mediaId: response.getMediaId(),
+            trackingUrls: response.getTrackingUrls() || {}
         };
 
         if(json && json.mraidUrl) {
@@ -89,9 +98,9 @@ export class CometCampaignParser extends CampaignParser {
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 appStoreId: json.appStoreId,
-                trackingUrls: {},
                 playableConfiguration: undefined
             };
+            parameters.contentType = CometCampaignParser.ContentTypeMRAID;
 
             const mraidCampaign = new PerformanceMRAIDCampaign(parameters);
 
@@ -120,16 +129,16 @@ export class CometCampaignParser extends CampaignParser {
                 gameIcon: new Image(this.validateAndEncodeUrl(json.gameIcon, session), session),
                 rating: json.rating,
                 ratingCount: json.ratingCount,
-                landscapeImage: new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session),
-                portraitImage: new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session),
+                landscapeImage: json.endScreenLandscape ? new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session) : undefined,
+                portraitImage: json.endScreenPortrait ? new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session) : undefined,
+                squareImage: json.endScreen ? new Image(this.validateAndEncodeUrl(json.endScreen, session), session) : undefined,
                 clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl, session) : undefined,
                 clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
                 clickUrl: this.validateAndEncodeUrl(json.clickUrl, session),
                 videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
-                adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle),
-                trackingUrls: response.getTrackingUrls()
+                adUnitStyle: json.adUnitStyle ? this.parseAdUnitStyle(json.adUnitStyle, session) : undefined
             };
 
             if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
@@ -161,18 +170,12 @@ export class CometCampaignParser extends CampaignParser {
         return urls;
     }
 
-    private parseAdUnitStyle(adUnitStyleJson: any): AdUnitStyle | undefined {
+    private parseAdUnitStyle(adUnitStyleJson: IAdUnitStyle, session: Session): AdUnitStyle | undefined {
         let adUnitStyle: AdUnitStyle | undefined;
         try {
-            if (!adUnitStyleJson) {
-                throw new Error('No adUnitStyle was provided in comet campaign');
-            }
             adUnitStyle = new AdUnitStyle(adUnitStyleJson);
         } catch(error) {
-            Diagnostics.trigger('configuration_ad_unit_style_parse_error', {
-                adUnitStyle: adUnitStyleJson,
-                error: error
-            });
+            // do nothing
         }
         return adUnitStyle;
     }
