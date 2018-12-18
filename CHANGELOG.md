@@ -1,4 +1,11 @@
-# Staged
+# Mon Dec 17 22:25:49 UTC 2018
+
+* Disable auction v5 test for holidays from groups 15, 16 and 17 [#7611](https://github.com/Applifier/unity-ads-webview/pull/7611)
+* Only store max three backup campaigns at the same time [#7610](https://github.com/Applifier/unity-ads-webview/pull/7610)
+* Enable Bytedance A/B test [#7657](https://github.com/Applifier/unity-ads-webview/pull/7657)
+* Add more information to Admob Stalled Diagnostic [#7658](https://github.com/Applifier/unity-ads-webview/pull/7658)
+
+# Mon Dec 17 10:46:45 UTC 2018
 
 * Disabled CTA abtest and sending video click events in endcard for ByteDance [#7615](https://github.com/Applifier/unity-ads-webview/pull/7615)
 * Add 2861297 as Cheetah game [#7608](https://github.com/Applifier/unity-ads-webview/pull/7608)
