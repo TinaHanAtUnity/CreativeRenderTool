@@ -30,12 +30,14 @@ export class FailedOperativeEventManager {
         if(this._eventId) {
             const operation = new StorageOperation(StorageType.PRIVATE);
 
-            let url: string = <string>data.url;
-            url = Url.addParameters(url, {
-                eventRetry: true
-            });
+            if(data.url) {
+                let url: string = <string>data.url;
+                url = Url.addParameters(url, {
+                    eventRetry: true
+                });
 
-            data.url = url;
+                data.url = url;
+            }
 
             operation.set(this.getEventStorageKey(), data);
             storageBridge.queue(operation);
