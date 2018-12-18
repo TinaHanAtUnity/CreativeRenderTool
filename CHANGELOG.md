@@ -7,6 +7,7 @@
 * Limit CTA ABTest to ByteDance Seat Only [#7681](https://github.com/Applifier/unity-ads-webview/pull/7681)
 * Shifted Promo Template to Webview [#7467](https://github.com/Applifier/unity-ads-webview/pull/7467)
 * Fire Promo Events in Staging [#7434](https://github.com/Applifier/unity-ads-webview/pull/7434)
+* Fix PTS Endpoint for SDK Stats [#7683](https://github.com/Applifier/unity-ads-webview/pull/7683)
 
 # Mon Dec 17 22:25:49 UTC 2018
 
