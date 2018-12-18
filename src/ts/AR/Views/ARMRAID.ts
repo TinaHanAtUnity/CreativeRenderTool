@@ -21,6 +21,7 @@ import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapt
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;
+    private static AutoBeginTimeout = 5;
 
     private _ar: IARApi;
 
@@ -30,12 +31,14 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _iframe: HTMLIFrameElement;
     private _cameraPermissionPanel: HTMLElement;
     private _permissionLearnMorePanel: HTMLElement;
+    private _permissionLearnMoreOpen: boolean;
 
     private _iframeLoaded = false;
 
     private _deviceorientationListener: EventListener;
     private _loadingScreenTimeout?: number;
     private _prepareTimeout?: number;
+    private _autoBeginTimer?: number;
 
     private _arFrameUpdatedObserver: IObserver1<string>;
     private _arPlanesAddedObserver: IObserver1<string>;
@@ -50,6 +53,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _hasCameraPermission = false;
     private _permissionResultObserver: IObserver2<string, boolean>;
+    private _viewable: boolean;
 
     constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
         super(platform, core, deviceInfo, 'extended-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
@@ -61,6 +65,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._localization = new Localization(language, 'loadingscreen');
 
         this._template = new Template(ExtendedMRAIDTemplate, this._localization);
+        this._permissionLearnMoreOpen = false;
+        this._viewable = false;
 
         this._bindings = this._bindings.concat([
             {
@@ -157,6 +163,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._mraidAdapterContainer.sendViewableEvent(viewable);
         }
 
+        this._viewable = viewable;
         this.setAnalyticsBackgroundTime(viewable);
     }
 
@@ -201,6 +208,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         if(this._prepareTimeout) {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
+        }
+
+        if(this._autoBeginTimer) {
+            clearTimeout(this._autoBeginTimer);
+            this._autoBeginTimer = undefined;
         }
 
         super.hide();
@@ -406,11 +418,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private showARPermissionLearnMore() {
         this._permissionLearnMorePanel.style.display = 'block';
         this._closeElement.style.display = 'none';
+        this._permissionLearnMoreOpen = true;
     }
 
     private hideARPermissionLearnMore() {
         this._permissionLearnMorePanel.style.display = 'none';
         this._closeElement.style.display = 'block';
+        this._permissionLearnMoreOpen = false;
     }
 
     /**
@@ -463,6 +477,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                     if (results === CurrentPermission.ACCEPTED) {
                         this.sendMraidAnalyticsEvent('camera_permission_user_accepted', undefined);
                         requestPermissionText.style.display = 'none';
+                        this.startBeginTimer();
                     }
                     this._cameraPermissionPanel.style.display = 'block';
                     this._iframe.classList.add('mraid-iframe-camera-permission-dialog');
@@ -472,7 +487,34 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         });
     }
 
+    private startBeginTimer() {
+        const beginButton = <HTMLElement>this._cameraPermissionPanel.querySelector('.permission-accept-button');
+        const buttonText = beginButton.innerHTML.trim();
+        let autoBeginTimeout = ARMRAID.AutoBeginTimeout;
+        beginButton.innerHTML = `Begins...${autoBeginTimeout}`;
+
+        this._autoBeginTimer = window.setInterval(() => {
+            const timerPaused = !this._viewable || this._permissionLearnMoreOpen || this._privacyPanelOpen;
+            if (timerPaused) {
+                return;
+            }
+
+            autoBeginTimeout--;
+            beginButton.innerHTML = `Begins...${autoBeginTimeout}`;
+
+            if (autoBeginTimeout <= 0) {
+                this.onCameraPermissionEvent(true);
+                return;
+            }
+        }, 1000);
+    }
+
     private onCameraPermissionEvent(hasCameraPermission: boolean) {
+        if (this._autoBeginTimer) {
+            clearInterval(this._autoBeginTimer);
+            this._autoBeginTimer = undefined;
+        }
+
         this._hasCameraPermission = hasCameraPermission;
         this._iframe.contentWindow!.postMessage({
             type: 'permission',
