@@ -485,7 +485,7 @@ describe('MraidAdUnit', () => {
             });
 
             it('should set the webview view frame with a minimized height', () => {
-                sinon.assert.calledWith(containerSetViewFrame, 'webview', 0, 0, 500, 60);
+                sinon.assert.calledWith(containerSetViewFrame, 'webview', 0, 0, 500, 100);
             });
 
             it('should load the webplayer for the mraid view', () => {

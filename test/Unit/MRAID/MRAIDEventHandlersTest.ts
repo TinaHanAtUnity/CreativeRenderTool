@@ -424,7 +424,7 @@ describe('MRAIDEventHandlersTest', () => {
                 });
 
                 it('should set webview view frame to top of window', () => {
-                    sinon.assert.calledWith(<sinon.SinonStub>container.setViewFrame, 'webview', 0, 0, 500, 120);
+                    sinon.assert.calledWith(<sinon.SinonStub>container.setViewFrame, 'webview', 0, 0, 500, 200);
                 });
             });
         });
