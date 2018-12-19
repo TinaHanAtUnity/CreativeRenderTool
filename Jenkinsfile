@@ -15,7 +15,7 @@ def setupTools() {
       which jq ||
       unameOutput="\$(uname -s)" &&
       case "\${unameOutput}" in
-      Linux*)   apt-get -y update || true
+      Linux*)   apt-get -y update &&
                 apt-get -y install jq
                 ;;
       Darwin*)  if [ -z "\$(which jq)" ]; then
