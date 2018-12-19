@@ -75,7 +75,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if(clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
-            if (ByteDanceCTATest.isValid(this._abGroup)) {
+            if (ByteDanceCTATest.isValid(this._abGroup) && CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
                 return this.openUrlOnCallButton(clickThroughURL);
             } else {
                 return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {

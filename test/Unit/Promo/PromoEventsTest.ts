@@ -196,4 +196,55 @@ describe('PromoEventsTest', () => {
             assert.equal(appstore, 'unknown');
         });
     });
+
+    describe('regex validation for events', () => {
+        it('should pass for production purchase', () => {
+            const result = PromoEvents.purchaseHostnameRegex.test('https://events.iap.unity3d.com/events/v1/purchase');
+            assert.isTrue(result);
+        });
+        it('should pass purchasePathRegex for production purchase', () => {
+            const result = PromoEvents.purchasePathRegex.test('https://events.iap.unity3d.com/events/v1/purchase');
+            assert.isTrue(result);
+        });
+        it('should pass for production click', () => {
+            const result = PromoEvents.purchaseHostnameRegex.test('https://events.iap.unity3d.com/events/v1/click');
+            assert.isTrue(result);
+        });
+        it('should pass for production impression', () => {
+            const result = PromoEvents.purchaseHostnameRegex.test('https://events.iap.unity3d.com/events/v1/impression');
+            assert.isTrue(result);
+        });
+        it('should pass for production complete', () => {
+            const result = PromoEvents.purchaseHostnameRegex.test('https://events.iap.unity3d.com/events/v1/complete');
+            assert.isTrue(result);
+        });
+        it('should pass for staging purchase', () => {
+            const result = PromoEvents.purchaseHostnameRegex.test('https://events-iap.staging.unityads.unity3d.com/events/v1/purchase');
+            assert.isTrue(result);
+        });
+        it('should pass purchasePathRegex for production purchase', () => {
+            const result = PromoEvents.purchasePathRegex.test('https://events-iap.staging.unityads.unity3d.com/events/v1/purchase');
+            assert.isTrue(result);
+        });
+        it('should pass for staging click', () => {
+            const result = PromoEvents.purchaseHostnameRegex.test('https://events-iap.staging.unityads.unity3d.com/events/v1/click');
+            assert.isTrue(result);
+        });
+        it('should pass for staging impression', () => {
+            const result = PromoEvents.purchaseHostnameRegex.test('https://events-iap.staging.unityads.unity3d.com/events/v1/impression');
+            assert.isTrue(result);
+        });
+        it('should pass for staging complete', () => {
+            const result = PromoEvents.purchaseHostnameRegex.test('https://events-iap.staging.unityads.unity3d.com/events/v1/complete');
+            assert.isTrue(result);
+        });
+        it('should pass for production organic purchase', () => {
+            const result = PromoEvents.purchaseHostnameRegex.test('https://events.iap.unity3d.com/events/v1/organic_purchase');
+            assert.isTrue(result);
+        });
+        it('should pass for staging organic purchase', () => {
+            const result = PromoEvents.purchaseHostnameRegex.test('https://events-iap.staging.unityads.unity3d.com/events/v1/organic_purchase');
+            assert.isTrue(result);
+        });
+    });
 });
