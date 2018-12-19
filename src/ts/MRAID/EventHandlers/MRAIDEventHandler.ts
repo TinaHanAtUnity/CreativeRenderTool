@@ -60,37 +60,16 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
                 return this._request.followRedirectChain(url).then((storeUrl) => {
                     const redirectDuration = Date.now() - ctaClickedTime;
                     this.openUrl(storeUrl).then(() => {
-                        if (this.shouldRecordClickLog()) {
-                            SessionDiagnostics.trigger('click_delay', {
-                                duration: redirectDuration,
-                                delayRange: ClickDiagnostics.getClickDelayRange(redirectDuration),
-                                delayedUrl: url,
-                                location: 'performance_mraid',
-                                seatId: this._campaign.getSeatId(),
-                                creativeId: this._campaign.getCreativeId()
-                            }, this._campaign.getSession());
-                        }
+                        ClickDiagnostics.sendClickDiagnosticsEvent(Date.now() - ctaClickedTime, url, 'performance_mraid', this._campaign, this._gameSessionId);
                     });
                 });
             }
         } else {    // DSP MRAID
             this.setCallButtonEnabled(false);
             return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking()).then((storeUrl) => {
-                const redirectDuration = Date.now() - ctaClickedTime;
-                return this.openUrlOnCallButton(storeUrl).then(() => {
-                    if (this.shouldRecordClickLog()) {
-                        SessionDiagnostics.trigger('click_delay', {
-                            duration: redirectDuration,
-                            delayRange: ClickDiagnostics.getClickDelayRange(redirectDuration),
-                            delayedUrl: url,
-                            location: 'programmatic_mraid',
-                            seatId: this._campaign.getSeatId(),
-                            creativeId: this._campaign.getCreativeId()
-                        }, this._campaign.getSession());
-                    }
-                });
+                return this.openUrlOnCallButton(storeUrl, Date.now() - ctaClickedTime, url);
             }).catch(() => {
-                return this.openUrlOnCallButton(url);
+                return this.openUrlOnCallButton(url, Date.now() - ctaClickedTime, url);
             });
         }
         return Promise.resolve();
@@ -189,10 +168,12 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._adUnit.sendClick();
     }
 
-    private openUrlOnCallButton(url: string): Promise<void> {
+    private openUrlOnCallButton(url: string, clickDuration: number, clickUrl: string): Promise<void> {
         return this.openUrl(url).then(() => {
             this.setCallButtonEnabled(true);
             this.sendTrackingEvents();
+
+            ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'programmatic_mraid', this._campaign, this._gameSessionId);
         }).catch(() => {
             this.setCallButtonEnabled(true);
             this.sendTrackingEvents();
@@ -219,13 +200,5 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
 
     private setCallButtonEnabled(enabled: boolean) {
         this._mraidView.setCallButtonEnabled(enabled);
-    }
-
-    private shouldRecordClickLog(): boolean {
-        if (this._gameSessionId && this._gameSessionId % 2 === 1) {
-            return true;
-        }
-
-        return false;
     }
 }
