@@ -1,3 +1,7 @@
+# Pending
+
+* CI travis status update [#7684](https://github.com/Applifier/unity-ads-webview/pull/7684)
+
 # Wed Dec 19 00:50:07 UTC 2018
 
 * AR analytics events [#7438](https://github.com/Applifier/unity-ads-webview/pull/7438)
