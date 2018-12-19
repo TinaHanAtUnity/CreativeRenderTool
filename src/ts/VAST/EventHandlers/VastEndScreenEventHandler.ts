@@ -9,6 +9,7 @@ import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { ABGroup, ByteDanceCTATest } from 'Core/Models/ABGroup';
+import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
@@ -50,6 +51,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
                         if (this.shouldRecordClickLog()) {
                             SessionDiagnostics.trigger('click_delay', {
                                 duration: clickDuration,
+                                delayRange: ClickDiagnostics.getClickDelayRange(clickDuration),
                                 delayedUrl: clickThroughURL,
                                 location: 'vast_endscreen',
                                 seatId: this._vastCampaign.getSeatId(),

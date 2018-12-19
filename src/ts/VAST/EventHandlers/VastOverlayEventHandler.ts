@@ -11,6 +11,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { ABGroup, ByteDanceCTATest } from 'Core/Models/ABGroup';
+import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -84,6 +85,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                         if (this.shouldRecordClickLog()) {
                             SessionDiagnostics.trigger('click_delay', {
                                 duration: redirectDuration,
+                                delayRange: ClickDiagnostics.getClickDelayRange(redirectDuration),
                                 delayedUrl: clickThroughURL,
                                 location: 'vast_overlay',
                                 seatId: this._vastCampaign.getSeatId(),

@@ -16,6 +16,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -62,6 +63,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
                         if (this.shouldRecordClickLog()) {
                             SessionDiagnostics.trigger('click_delay', {
                                 duration: redirectDuration,
+                                delayRange: ClickDiagnostics.getClickDelayRange(redirectDuration),
                                 delayedUrl: url,
                                 location: 'performance_mraid',
                                 seatId: this._campaign.getSeatId(),
@@ -79,6 +81,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
                     if (this.shouldRecordClickLog()) {
                         SessionDiagnostics.trigger('click_delay', {
                             duration: redirectDuration,
+                            delayRange: ClickDiagnostics.getClickDelayRange(redirectDuration),
                             delayedUrl: url,
                             location: 'programmatic_mraid',
                             seatId: this._campaign.getSeatId(),
