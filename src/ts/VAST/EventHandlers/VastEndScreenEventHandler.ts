@@ -41,7 +41,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
-            if (ByteDanceCTATest.isValid(this._abGroup) && CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+            if (!ByteDanceCTATest.isValid(this._abGroup) && CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
                 return this.openUrlOnCallButton(clickThroughURL);
             } else {
                 return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
@@ -111,7 +111,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private shouldRecordClickLog(): boolean {
         if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
             return true;
-        } else if (this._gameSessionId && this._gameSessionId % 10 === 1) {
+        } else if (this._gameSessionId && this._gameSessionId % 2 === 1) {
             return true;
         } else {
             return false;

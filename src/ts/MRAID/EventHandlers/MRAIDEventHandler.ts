@@ -51,17 +51,28 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     public onMraidClick(url: string): Promise<void> {
         this._ads.Listener.sendClickEvent(this._placement.getId());
 
+        const ctaClickedTime = Date.now();
         if (this._campaign.getClickAttributionUrl()) {  // Playable MRAID from Comet
             this.sendTrackingEvents();
             this.handleClickAttribution();
             if(!this._campaign.getClickAttributionUrlFollowsRedirects()) {
                 return this._request.followRedirectChain(url).then((storeUrl) => {
-                    this.openUrl(storeUrl);
+                    const redirectDuration = Date.now() - ctaClickedTime;
+                    this.openUrl(storeUrl).then(() => {
+                        if (this.shouldRecordClickLog()) {
+                            SessionDiagnostics.trigger('click_delay', {
+                                duration: redirectDuration,
+                                delayedUrl: url,
+                                location: 'performance_mraid',
+                                seatId: this._campaign.getSeatId(),
+                                creativeId: this._campaign.getCreativeId()
+                            }, this._campaign.getSession());
+                        }
+                    });
                 });
             }
         } else {    // DSP MRAID
             this.setCallButtonEnabled(false);
-            const ctaClickedTime = Date.now();
             return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking()).then((storeUrl) => {
                 const redirectDuration = Date.now() - ctaClickedTime;
                 return this.openUrlOnCallButton(storeUrl).then(() => {
@@ -208,7 +219,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     private shouldRecordClickLog(): boolean {
-        if (this._gameSessionId && this._gameSessionId % 10 === 1) {
+        if (this._gameSessionId && this._gameSessionId % 2 === 1) {
             return true;
         }
 
