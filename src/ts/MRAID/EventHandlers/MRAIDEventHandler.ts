@@ -58,7 +58,6 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             this.handleClickAttribution();
             if(!this._campaign.getClickAttributionUrlFollowsRedirects()) {
                 return this._request.followRedirectChain(url).then((storeUrl) => {
-                    const redirectDuration = Date.now() - ctaClickedTime;
                     this.openUrl(storeUrl).then(() => {
                         ClickDiagnostics.sendClickDiagnosticsEvent(Date.now() - ctaClickedTime, url, 'performance_mraid', this._campaign, this._gameSessionId);
                     });
