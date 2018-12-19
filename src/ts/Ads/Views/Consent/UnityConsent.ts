@@ -47,6 +47,10 @@ export class UnityConsent extends View<IConsentViewHandler> {
                 event: 'click',
                 listener: (event: Event) => this.onDataLinkEvent(event),
                 selector: '.data-link'
+            },            {
+                event: 'click',
+                listener: (event: Event) => this.onDemographicInfoLinkEvent(event),
+                selector: '.demographic-link'
             },
             {
                 event: 'click',
@@ -104,6 +108,11 @@ export class UnityConsent extends View<IConsentViewHandler> {
     }
 
     private onDataLinkEvent(event: Event): void {
+        event.preventDefault();
+        this._consentSettingsView.showParagraph(PrivacyTextParagraph.DATA);
+    }
+
+    private onDemographicInfoLinkEvent(event: Event): void {
         event.preventDefault();
         this._consentSettingsView.showParagraph(PrivacyTextParagraph.DATA);
     }
