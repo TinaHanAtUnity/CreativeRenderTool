@@ -59,7 +59,7 @@ def waitWebviewDeployed(webviewBranch) {
               """
             ).trim()
 
-            if (buildStatus != "created" || buildStatus != "received" || buildStatus != "started") {
+            if (buildStatus != "created" && buildStatus != "received" && buildStatus != "started") {
                break
             }
 
