@@ -109,6 +109,18 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         this.showView(ViewState.INITIAL);
     }
 
+    public hide(): void {
+        super.hide();
+
+        const consent: IPermissions = {
+            gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
+            ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
+            external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
+        };
+
+        this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));
+    }
+
     // IPrivacyRowItemContainerHandler
     public onDataDeletion(): void {
         this._personalizationCheckBoxGroup.checkCheckboxes(false);
@@ -122,13 +134,6 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     protected onCloseEvent(event: Event): void {
         event.preventDefault();
 
-        const consent: IPermissions = {
-            gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
-            ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
-            external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
-        };
-
-        this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));
         this._handlers.forEach(handler => handler.onPrivacyClose());
     }
 
@@ -139,6 +144,14 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
 
     private onBackButtonEvent(event: Event) {
         event.preventDefault();
+
+        const consent: IPermissions = {
+            gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
+            ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
+            external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
+        };
+
+        this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));
 
         this.showView(ViewState.INITIAL);
     }

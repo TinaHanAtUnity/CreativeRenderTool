@@ -7,6 +7,7 @@ import { IPermissions } from 'Ads/Models/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import GDPRConsentTemplate from 'html/consent/gdpr-consent.html';
+import { PrivacyTextParagraph } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 
 export interface IUnityConsentViewParameters {
     platform: Platform;
@@ -36,6 +37,31 @@ export class UnityConsent extends View<IConsentViewHandler> {
                 event: 'click',
                 listener: (event: Event) => this.onOptionsEvent(event),
                 selector: '.show-options'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onThirdPartiesLinkEvent(event),
+                selector: '.third-parties-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onDataLinkEvent(event),
+                selector: '.data-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onMobileIdentifiersLinkEvent(event),
+                selector: '.mobile-identifiers-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPersonalizationLink(event),
+                selector: '.personalization-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onMeasurementLinkEvent(event),
+                selector: '.measurement-link'
             }
         ];
     }
@@ -70,5 +96,30 @@ export class UnityConsent extends View<IConsentViewHandler> {
         event.preventDefault();
 
         this._consentSettingsView.show();
+    }
+
+    private onThirdPartiesLinkEvent(event: Event): void {
+        event.preventDefault();
+        this._consentSettingsView.showParagraph(PrivacyTextParagraph.THIRD_PARTIES);
+    }
+
+    private onDataLinkEvent(event: Event): void {
+        event.preventDefault();
+        this._consentSettingsView.showParagraph(PrivacyTextParagraph.DATA);
+    }
+
+    private onMobileIdentifiersLinkEvent(event: Event): void {
+        event.preventDefault();
+        this._consentSettingsView.showParagraph(PrivacyTextParagraph.MOBILE_IDENTIFIERS);
+    }
+
+    private onPersonalizationLink(event: Event): void {
+        event.preventDefault();
+        this._consentSettingsView.showParagraph(PrivacyTextParagraph.PERSONALIZATION);
+    }
+
+    private onMeasurementLinkEvent(event: Event): void {
+        event.preventDefault();
+        this._consentSettingsView.showParagraph(PrivacyTextParagraph.MEASUREMENT);
     }
 }

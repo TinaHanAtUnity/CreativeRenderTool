@@ -10,6 +10,14 @@ export interface IPrivacyRowItemContainerHandler {
     onPrivacy(url: string): void;
 }
 
+export enum PrivacyTextParagraph {
+    THIRD_PARTIES,
+    DATA,
+    MOBILE_IDENTIFIERS,
+    PERSONALIZATION,
+    MEASUREMENT
+}
+
 export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandler> {
 
     private _userPrivacyManager: UserPrivacyManager;
@@ -63,6 +71,36 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
     public render(): void {
         super.render();
         this.fillPersonalInfoFields();
+    }
+
+    public showParagraph(paragraph: PrivacyTextParagraph): void {
+        let element: Element | null;
+
+        switch (paragraph) {
+            case PrivacyTextParagraph.THIRD_PARTIES:
+                element = this._container.querySelector('.third-party');
+                break;
+            case PrivacyTextParagraph.DATA:
+                element = this._container.querySelector('.data-protection');
+                break;
+            case PrivacyTextParagraph.MOBILE_IDENTIFIERS:
+                element = this._container.querySelector('.what-we-collect');
+                break;
+            case PrivacyTextParagraph.PERSONALIZATION:
+                element = this._container.querySelector('.what-we-collect');
+                break;
+            case PrivacyTextParagraph.MEASUREMENT:
+                element = this._container.querySelector('.what-we-collect');
+                break;
+            default:
+                element = null;
+        }
+        if (element) {
+            if (element && element.parentElement) {
+                element.parentElement.classList.add('show-description');
+            }
+            element.scrollIntoView(true);
+        }
     }
 
     private fillPersonalInfoFields(): void {

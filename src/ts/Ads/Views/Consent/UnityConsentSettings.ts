@@ -1,7 +1,9 @@
 import { View } from 'Core/Views/View';
 import GDPRConsentSettingsTemplate from 'html/consent/gdpr-consent-settings.html';
 import { Template } from 'Core/Utilities/Template';
-import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Consent/PrivacyRowItemContainer';
+import { PrivacyRowItemContainer,
+    IPrivacyRowItemContainerHandler,
+    PrivacyTextParagraph } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IGranularPermissions } from 'Ads/Models/Privacy';
@@ -56,6 +58,12 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
         super.show();
 
         this._checkboxGroup.show();
+    }
+
+    public showParagraph(paragraph: PrivacyTextParagraph): void {
+        super.show();
+        this._checkboxGroup.show();
+        this._infoContainer.showParagraph(paragraph);
     }
 
     // IPrivacyRowItemContainerHandler
