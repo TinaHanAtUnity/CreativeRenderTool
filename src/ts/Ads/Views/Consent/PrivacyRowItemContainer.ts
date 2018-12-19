@@ -13,6 +13,7 @@ export interface IPrivacyRowItemContainerHandler {
 export enum PrivacyTextParagraph {
     THIRD_PARTIES,
     DATA,
+    DEMOGRAPHIC_INFO,
     MOBILE_IDENTIFIERS,
     PERSONALIZATION,
     MEASUREMENT
