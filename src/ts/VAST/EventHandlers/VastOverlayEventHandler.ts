@@ -11,6 +11,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { ABGroup, ByteDanceCTATest } from 'Core/Models/ABGroup';
+import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -75,24 +76,13 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if(clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
-            if (ByteDanceCTATest.isValid(this._abGroup) && CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
-                return this.openUrlOnCallButton(clickThroughURL);
+            if (!ByteDanceCTATest.isValid(this._abGroup) && CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+                return this.openUrlOnCallButton(clickThroughURL, Date.now() - ctaClickedTime, clickThroughURL);
             } else {
                 return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
-                    const redirectDuration = Date.now() - ctaClickedTime;
-                    return this.openUrlOnCallButton(url).then(() => {
-                        if (this.shouldRecordClickLog()) {
-                            SessionDiagnostics.trigger('click_delay', {
-                                duration: redirectDuration,
-                                delayedUrl: clickThroughURL,
-                                location: 'vast_overlay',
-                                seatId: this._vastCampaign.getSeatId(),
-                                creativeId: this._vastCampaign.getCreativeId()
-                            }, this._vastCampaign.getSession());
-                        }
-                    });
+                    return this.openUrlOnCallButton(url, Date.now() - ctaClickedTime, clickThroughURL);
                 }).catch(() => {
-                    return this.openUrlOnCallButton(clickThroughURL);
+                    return this.openUrlOnCallButton(clickThroughURL, Date.now() - ctaClickedTime, clickThroughURL);
                 });
             }
         } else {
@@ -100,10 +90,12 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         }
     }
 
-    private openUrlOnCallButton(url: string): Promise<void> {
+    private openUrlOnCallButton(url: string, clickDuration: number, clickUrl: string): Promise<void> {
         return this.openUrl(url).then(() => {
             this.setCallButtonEnabled(true);
             this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+
+            ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'vast_overlay', this._vastCampaign, this._gameSessionId!);
         }).catch(() => {
             this.setCallButtonEnabled(true);
         });
@@ -123,16 +115,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private setCallButtonEnabled(enabled: boolean): void {
         if (this._vastOverlay) {
             this._vastOverlay.setCallButtonEnabled(enabled);
-        }
-    }
-
-    private shouldRecordClickLog(): boolean {
-        if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
-            return true;
-        } else if (this._gameSessionId && this._gameSessionId % 10 === 1) {
-            return true;
-        } else {
-            return false;
         }
     }
 }
