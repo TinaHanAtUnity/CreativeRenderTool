@@ -54,7 +54,8 @@ export class ProgrammaticVastParser extends CampaignParser {
             meta: undefined,
             session: session,
             mediaId: response.getMediaId(),
-            trackingUrls: response.getTrackingUrls() || {}
+            trackingUrls: response.getTrackingUrls() || {},
+            backupCampaign: false
         };
 
         let errorTrackingUrl;

@@ -39,7 +39,8 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 meta: undefined,
                 session: session,
                 mediaId: response.getMediaId(),
-                trackingUrls: response.getTrackingUrls() || {}
+                trackingUrls: response.getTrackingUrls() || {},
+                backupCampaign: false
             };
 
             const adMobCampaignParams: IAdMobCampaign = {
