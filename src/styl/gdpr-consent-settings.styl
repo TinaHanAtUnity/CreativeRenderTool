@@ -51,7 +51,7 @@
   }
 
   .personalization-container {
-    flex: 0 1 50%;
+    flex: 0 1 45%;
     overflow: auto;
 
     .privacy-info-title {
@@ -129,19 +129,19 @@ body {
       position: absolute;
       display: block;
       left: 5%;
-      top: 3 * $default-size;
+      top: 2.5 * $default-size;
       width: 40%;
-      height: "calc(100% - 3 * %s)" % $default-size;
+      height: "calc(100% - 2.5 * %s)" % $default-size;
     }
 
     .stripe {
       position: absolute;
 
       left: 50%;
-      top: 3 * $default-size;
+      top: 2.5 * $default-size;
       display: block;
       width: 1px;
-      height: "calc(100% - 3 * %s)" % $default-size;
+      height: "calc(100% - 5 * %s)" % $default-size;
       background-color: $white-smoke;
     }
 
@@ -149,9 +149,11 @@ body {
       position: absolute;
       display: block;
       left: 55%;
-      top: 3 * $default-size;
+      top: 2.5 * $default-size;
       width: 40%;
       height: 100%;
     }
   }
 }
+
+
