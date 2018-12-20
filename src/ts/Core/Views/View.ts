@@ -39,11 +39,8 @@ export abstract class View<T extends object> {
         this._id = id;
 
         if (attachTap !== undefined) {
-            console.log('attachTap 1');
             this._attachTap = attachTap;
         } else {
-            console.log('attachTap 2');
-
             this._attachTap = this._platform === Platform.IOS;
         }
     }
