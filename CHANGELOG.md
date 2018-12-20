@@ -1,4 +1,4 @@
-# Staged
+# Thu Dec 20 01:58:04 UTC 2018
 
 * Increase log sampling to 50% and log performance mraid click delay [#7687](https://github.com/Applifier/unity-ads-webview/pull/7687)
 * CI travis status update [#7684](https://github.com/Applifier/unity-ads-webview/pull/7684)
