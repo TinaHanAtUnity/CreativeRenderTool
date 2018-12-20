@@ -25,7 +25,7 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
     private _dataDeletionConfirmation: boolean = false;
 
     constructor(platform: Platform, userPrivacyManager: UserPrivacyManager) {
-        super(platform, 'privacy-row-item-container');
+        super(platform, 'privacy-row-item-container', false);
 
         this._userPrivacyManager = userPrivacyManager;
         this._template = new Template(PrivacyRowItemContainerTemplate);
