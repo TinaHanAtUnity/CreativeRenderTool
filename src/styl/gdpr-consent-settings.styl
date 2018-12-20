@@ -106,13 +106,13 @@
 body {
   &.landscape #gdpr-consent-settings {
     .back-button {
-      top: $default-size;
-      left: 5%
       position: absolute;
+      top: $default-size;
+      left: 5%;
+      padding: 0;
       width: $default-size;
       height: $default-size;
       color: $black;
-      padding: 0;
     }
 
     .safe-area-content {
@@ -121,35 +121,34 @@ body {
 
     .wrapper {
       display: block;
+      padding: 0;
       width: 100%;
       height: 100%;
-      padding: 0;
     }
     .personalization-container {
       position: absolute;
-      display: block;
-      left: 5%;
       top: 2.5 * $default-size;
+      left: 5%;
+      display: block;
       width: 40%;
       height: "calc(100% - 2.5 * %s)" % $default-size;
     }
 
     .stripe {
       position: absolute;
-
-      left: 50%;
       top: 2.5 * $default-size;
+      left: 50%;
       display: block;
       width: 1px;
-      height: "calc(100% - 5 * %s)" % $default-size;
+      height: "calc(100% - 2.5 * %s)" % $default-size;
       background-color: $white-smoke;
     }
 
     .settings-container {
       position: absolute;
-      display: block;
-      left: 55%;
       top: 2.5 * $default-size;
+      left: 55%;
+      display: block;
       width: 40%;
       height: 100%;
     }
