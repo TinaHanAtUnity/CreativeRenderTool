@@ -10,7 +10,7 @@ import {
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { ProgrammaticTrackingMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 
@@ -20,7 +20,6 @@ import AdMobContainer from 'html/admob/AdMobContainer.html';
 import AFMAContainer from 'html/admob/AFMAContainer.html';
 import MRAIDContainer from 'html/admob/MRAIDContainer.html';
 import { MRAIDBridge } from 'MRAID/EventBridge/MRAIDBridge';
-import { IPermissions } from 'Ads/Models/Privacy';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
@@ -38,7 +37,7 @@ export interface IAdMobEventHandler extends IGDPREventHandler {
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
 const AFMADelayMacro = '{{AFMA_RDVT_PLACEHOLDER}}';
 
-export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandler {
+export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandlerView {
 
     private _campaign: AdMobCampaign;
     private _iframe: HTMLIFrameElement;
@@ -137,22 +136,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         }
     }
 
-    public onPrivacy(url: string): void {
-        // do nothing
-    }
-
     public onPrivacyClose(): void {
         if (this._privacy) {
             this._privacy.hide();
         }
-    }
-
-    public onGDPROptOut(optOutEnabled: boolean): void {
-        // do nothing
-    }
-
-    public onPersonalizedConsent(permissions: IPermissions): void {
-        // do nothing
     }
 
     public onBackPressed() {
