@@ -133,7 +133,6 @@ describe('VideoOverlayTest', () => {
                 store: standaloneCampaign.getStore(),
                 videoProgress: undefined,
                 appDownloadUrl: standaloneCampaign.getAppDownloadUrl(),
-                isBackupCampaign: false
             };
 
             const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
@@ -158,7 +157,6 @@ describe('VideoOverlayTest', () => {
                 store: xPromoCampaign.getStore(),
                 videoProgress: undefined,
                 appDownloadUrl: undefined,
-                isBackupCampaign: false
             };
 
             const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
