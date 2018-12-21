@@ -6,6 +6,8 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 
+import { ABGroup } from 'Core/Models/ABGroup';
+
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import MRAIDTemplate from 'html/MRAID.html';

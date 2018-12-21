@@ -4,6 +4,7 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
+import { ABGroup } from 'Core/Models/ABGroup';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import MRAIDPerfContainer from 'html/mraid/container-perf.html';
