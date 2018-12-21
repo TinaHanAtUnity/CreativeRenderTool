@@ -6,8 +6,6 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 
-import { ABGroup, FPSCollectionTest } from 'Core/Models/ABGroup';
-
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import MRAIDTemplate from 'html/MRAID.html';
@@ -102,7 +100,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
 
         this.createMRAID(
-            FPSCollectionTest.isValid(this._abGroup) ? MRAIDPerfContainer : MRAIDContainer
+            this._gameSessionId % 1000 === 999 ? MRAIDPerfContainer : MRAIDContainer
         ).then(mraid => {
             this._core.Sdk.logDebug('setting iframe srcdoc (' + mraid.length + ')');
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());

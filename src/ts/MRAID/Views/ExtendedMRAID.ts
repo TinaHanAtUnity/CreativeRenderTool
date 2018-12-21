@@ -4,7 +4,6 @@ import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { ABGroup, FPSCollectionTest } from 'Core/Models/ABGroup';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import MRAIDPerfContainer from 'html/mraid/container-perf.html';
@@ -108,7 +107,7 @@ export class ExtendedMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private setUpMraidContainer(): string {
-        let container = FPSCollectionTest.isValid(this._abGroup) ? MRAIDPerfContainer : MRAIDContainer;
+        let container = this._gameSessionId % 1000 === 0 ? MRAIDPerfContainer : MRAIDContainer;
         const playableConfiguration = this._campaign.getPlayableConfiguration();
         if(playableConfiguration) {
             // check configuration based on the ab group
