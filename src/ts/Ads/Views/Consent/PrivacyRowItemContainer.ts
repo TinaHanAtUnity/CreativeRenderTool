@@ -75,32 +75,41 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
     }
 
     public showParagraph(paragraph: PrivacyTextParagraph): void {
-        let element: Element | null;
+        let rowItemElement: Element | null;
+        let paragraphElement: Element | null;
 
         switch (paragraph) {
             case PrivacyTextParagraph.THIRD_PARTIES:
-                element = this._container.querySelector('.third-party');
+                paragraphElement = rowItemElement = this._container.querySelector('.third-party');
                 break;
             case PrivacyTextParagraph.DATA:
-                element = this._container.querySelector('.data-protection');
+                paragraphElement = rowItemElement = this._container.querySelector('.data-protection');
+                break;
+            case PrivacyTextParagraph.DEMOGRAPHIC_INFO:
+                rowItemElement = this._container.querySelector('.what-we-collect');
+                paragraphElement = this._container.querySelector('.measurement-paragraph');
                 break;
             case PrivacyTextParagraph.MOBILE_IDENTIFIERS:
-                element = this._container.querySelector('.what-we-collect');
+                paragraphElement = rowItemElement = this._container.querySelector('.what-we-collect');
                 break;
             case PrivacyTextParagraph.PERSONALIZATION:
-                element = this._container.querySelector('.what-we-collect');
+                paragraphElement = rowItemElement = this._container.querySelector('.what-we-collect');
                 break;
             case PrivacyTextParagraph.MEASUREMENT:
-                element = this._container.querySelector('.what-we-collect');
+                rowItemElement = this._container.querySelector('.what-we-collect');
+                paragraphElement = this._container.querySelector('.measurement-paragraph');
                 break;
             default:
-                element = null;
+                rowItemElement = null;
+                paragraphElement = null;
         }
-        if (element) {
-            if (element && element.parentElement) {
-                element.parentElement.classList.add('show-description');
+        if (rowItemElement) {
+            if (rowItemElement && rowItemElement.parentElement) {
+                rowItemElement.parentElement.classList.add('show-description');
             }
-            element.scrollIntoView(true);
+        }
+        if (paragraphElement) {
+            paragraphElement.scrollIntoView(true);
         }
     }
 

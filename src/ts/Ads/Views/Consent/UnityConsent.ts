@@ -114,7 +114,7 @@ export class UnityConsent extends View<IConsentViewHandler> {
 
     private onDemographicInfoLinkEvent(event: Event): void {
         event.preventDefault();
-        this._consentSettingsView.showParagraph(PrivacyTextParagraph.DATA);
+        this._consentSettingsView.showParagraph(PrivacyTextParagraph.DEMOGRAPHIC_INFO);
     }
 
     private onMobileIdentifiersLinkEvent(event: Event): void {
