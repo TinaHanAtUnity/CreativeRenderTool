@@ -171,7 +171,8 @@ export class TestFixtures {
                 'complete': ['http://localhost:5000/operative?abGroup=0&adType=VIDEO&apiLevel=0&auctionId=&bidBundle=&bundleId=&buyerID=&campaignId=&connectionType=&country=&creativeId=&dealCode=&deviceMake=&deviceModel=&dspId=comet&eventType=complete&frameworkName=&frameworkVersion=&gameId=&limitedAdTracking=false&mediationName=&mediationOrdinal=0&mediationVersion=&networkType=0&osVersion=&platform=&screenDensity=0&screenHeight=0&screenSize=0&screenWidth=0&sdkVersion=0&seatId=9000&token=&webviewUa=a'],
                 'skip': ['http://localhost:5000/operative?abGroup=0&adType=VIDEO&apiLevel=0&auctionId=&bidBundle=&bundleId=&buyerID=&campaignId=&connectionType=&country=&creativeId=&dealCode=&deviceMake=&deviceModel=&dspId=comet&eventType=skip&frameworkName=&frameworkVersion=&gameId=&limitedAdTracking=false&mediationName=&mediationOrdinal=0&mediationVersion=&networkType=0&osVersion=&platform=&screenDensity=0&screenHeight=0&screenSize=0&screenWidth=0&sdkVersion=0&seatId=9000&token=&webviewUa=a'],
                 'error': ['http://localhost:5000/operative?abGroup=0&adType=VIDEO&apiLevel=0&auctionId=&bidBundle=&bundleId=&buyerID=&campaignId=&connectionType=&country=&creativeId=&dealCode=&deviceMake=&deviceModel=&dspId=comet&eventType=skip&frameworkName=&frameworkVersion=&gameId=&limitedAdTracking=false&mediationName=&mediationOrdinal=0&mediationVersion=&networkType=0&osVersion=&platform=&screenDensity=0&screenHeight=0&screenSize=0&screenWidth=0&sdkVersion=0&seatId=9000&token=&webviewUa=a']
-            }
+            },
+            backupCampaign: false
         };
     }
 
@@ -292,7 +293,8 @@ export class TestFixtures {
             meta: mraidJson.meta || undefined,
             session: session,
             mediaId: TestMediaID,
-            trackingUrls: {}
+            trackingUrls: {},
+            backupCampaign: false
         };
     }
 
@@ -339,7 +341,8 @@ export class TestFixtures {
             meta: undefined,
             session: session,
             mediaId: TestMediaID,
-            trackingUrls: {}
+            trackingUrls: {},
+            backupCampaign: false
         };
     }
 
@@ -395,7 +398,8 @@ export class TestFixtures {
             meta: json.meta,
             session: session,
             mediaId: TestMediaID,
-            trackingUrls: {}
+            trackingUrls: {},
+            backupCampaign: false
         };
 
         return {
@@ -421,7 +425,8 @@ export class TestFixtures {
             meta: undefined,
             session: session,
             mediaId: TestMediaID,
-            trackingUrls: {}
+            trackingUrls: {},
+            backupCampaign: false
         };
     }
 
