@@ -58,7 +58,6 @@ import { Promises, TimeoutError } from 'Core/Utilities/Promises';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Display } from 'Display/Display';
 import { Monetization } from 'Monetization/Monetization';
-import { MRAIDAdUnitFactory } from 'MRAID/AdUnits/MRAIDAdUnitFactory';
 import { MRAID } from 'MRAID/MRAID';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Performance } from 'Performance/Performance';
@@ -72,6 +71,8 @@ import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { ARUtil } from 'AR/Utilities/ARUtil';
+import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
@@ -188,6 +189,18 @@ export class Ads implements IAds {
             this.Banners = new Banners(this._core, this);
             this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
             this.AR = new AR(this._core);
+
+            if (this.SessionManager.getGameSessionId() % 1000 === 0) {
+                Promise.all([
+                    ARUtil.isARSupported(this.AR.Api),
+                    PermissionsUtil.checkPermissionInManifest(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.CAMERA),
+                    PermissionsUtil.checkPermissions(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.CAMERA)
+                ]).then(([arSupported, permissionInManifest, permissionResult]) => {
+                    Diagnostics.trigger('ar_device_support', {arSupported, permissionInManifest, permissionResult});
+                }).catch((error) => {
+                    Diagnostics.trigger('ar_device_support_check_error', error);
+                });
+            }
 
             const parserModules: AbstractParserModule[] = [
                 new AdMob(this._core, this),
