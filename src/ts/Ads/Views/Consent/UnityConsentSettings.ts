@@ -6,7 +6,7 @@ import { PrivacyRowItemContainer,
     PrivacyTextParagraph } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { IGranularPermissions } from 'Ads/Models/Privacy';
+import { IGranularPermissions, IPermissions } from 'Ads/Models/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
@@ -77,6 +77,18 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
         this._handlers.forEach(handler => handler.onPrivacy(url));
     }
 
+    public testAutoConsent(consent: IPermissions): void {
+        const event = new Event('testAutoConsent');
+        setTimeout(() => {
+            if('all' in consent) {
+                this.onAcceptAllEvent(event);
+            }
+            if('ads' in consent) {
+                this.triggerOnPersonalizedConsent(consent);
+            }
+        }, 3000);
+    }
+
     private onBackButtonEvent(event: Event): void {
         event.preventDefault();
 
@@ -109,7 +121,7 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
             external: this._checkboxGroup.isAds3rdPartyChecked()
         };
 
-        this._handlers.forEach(handler => handler.onConsent(personalizedConsent, GDPREventSource.USER));
+        this.triggerOnPersonalizedConsent(personalizedConsent);
         this.runAnimation(<HTMLElement>this._container.querySelector('.save-my-choices'));
 
     }
@@ -127,5 +139,9 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
         setTimeout(() => {
             this._handlers.forEach(handler => handler.onClose());
         }, 1500);
+    }
+
+    private triggerOnPersonalizedConsent(consent: IPermissions) {
+        this._handlers.forEach(handler => handler.onConsent(consent, GDPREventSource.USER));
     }
 }

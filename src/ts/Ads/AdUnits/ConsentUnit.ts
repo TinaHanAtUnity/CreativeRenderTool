@@ -7,6 +7,7 @@ import { IPermissions } from 'Ads/Models/Privacy';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ICoreApi } from 'Core/ICore';
 import { UnityConsentSettings } from 'Ads/Views/Consent/UnityConsentSettings';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
 export interface IConsentUnitParameters {
     platform: Platform;
@@ -60,6 +61,11 @@ export class ConsentUnit implements IConsentViewHandler {
             document.body.appendChild(this._consentSettingsView.container());
 
             this._unityConsentView.show();
+
+            if(TestEnvironment.get('autoAcceptConsent')) {
+                const consentSettings = JSON.parse(TestEnvironment.get('autoAcceptConsent'));
+                this._consentSettingsView.testAutoConsent(consentSettings);
+            }
             return donePromise;
         }).catch((e: Error) => {
             this._core.Sdk.logWarning('Error opening Consent view ' + e);

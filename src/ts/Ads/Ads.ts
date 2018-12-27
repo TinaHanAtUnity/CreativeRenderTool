@@ -554,5 +554,4 @@ export class Ads implements IAds {
             CampaignManager.setCampaignResponse(response);
         }
     }
-
 }
