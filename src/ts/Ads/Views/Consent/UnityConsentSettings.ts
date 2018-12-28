@@ -78,15 +78,7 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
     }
 
     public testAutoConsent(consent: IPermissions): void {
-        const event = new Event('testAutoConsent');
-        setTimeout(() => {
-            if('all' in consent) {
-                this.onAcceptAllEvent(event);
-            }
-            if('ads' in consent) {
-                this.triggerOnPersonalizedConsent(consent);
-            }
-        }, 3000);
+        this.triggerOnPersonalizedConsent(consent);
     }
 
     private onBackButtonEvent(event: Event): void {

@@ -63,8 +63,8 @@ export class ConsentUnit implements IConsentViewHandler {
             this._unityConsentView.show();
 
             if(TestEnvironment.get('autoAcceptConsent')) {
-                const consentSettings = JSON.parse(TestEnvironment.get('autoAcceptConsent'));
-                this._consentSettingsView.testAutoConsent(consentSettings);
+                const consentValues = JSON.parse(TestEnvironment.get('autoAcceptConsent'));
+                this.handleAutoConsent(consentValues);
             }
             return donePromise;
         }).catch((e: Error) => {
@@ -135,5 +135,18 @@ export class ConsentUnit implements IConsentViewHandler {
                 'uri': url
             });
         }
+    }
+
+    private handleAutoConsent(consent: IPermissions) {
+        setTimeout(() => {
+            if(consent.hasOwnProperty('all')) {
+                this._core.Sdk.logInfo('setting autoAcceptConsent with All True based on ' + JSON.stringify(consent));
+                this._unityConsentView.testAutoConsent();
+            }
+            if(consent.hasOwnProperty('ads')) {
+                this._core.Sdk.logInfo('setting autoAcceptConsent with Personalized Consent based on ' + JSON.stringify(consent));
+                this._consentSettingsView.testAutoConsent(consent);
+            }
+        }, 3000);
     }
 }
