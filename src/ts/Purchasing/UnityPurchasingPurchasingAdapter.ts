@@ -10,6 +10,8 @@ import { IPromoApi } from 'Promo/IPromo';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { IProduct, IPurchasingAdapter, ITransactionDetails } from 'Purchasing/PurchasingAdapter';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -40,6 +42,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
     private _clientInfo: ClientInfo;
     private _initPromise: Promise<void>;
     private _isInitialized = false;
+    private _metaDataManager: MetaDataManager;
 
     constructor(core: ICoreApi, promo: IPromoApi, coreConfiguration: CoreConfiguration, adsConfiguration: AdsConfiguration, clientInfo: ClientInfo) {
         this._core = core;
@@ -47,12 +50,14 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         this._adsConfiguration = adsConfiguration;
         this._coreConfiguration = coreConfiguration;
         this._clientInfo = clientInfo;
+        this._metaDataManager = new MetaDataManager(core);
         promo.Purchasing.onIAPSendEvent.subscribe((eventJSON) => this.handleSendIAPEvent(eventJSON));
     }
 
     public initialize(): Promise<void> {
         if (this.configurationIncludesPromoPlacement()) {
-            this._initPromise = this.initializeIAPPromo()
+            this._initPromise = this.checkMadeWithUnity()
+            .then(() => this.initializeIAPPromo())
             .then(() => this.checkPromoVersion())
             .then(() => {
                 return this.sendPurchasingCommand(this.getInitializationPayload());
@@ -192,6 +197,16 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
                 this._promo.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
                 reject(this.logIssue('promo_version_check_failed', 'Promo version check failed'));
             });
+        });
+    }
+
+    private checkMadeWithUnity(): Promise<void> {
+        return this._metaDataManager.fetch(FrameworkMetaData).then((framework) => {
+            if (framework && framework.getName() === 'Unity') {
+                return Promise.resolve();
+            } else {
+                return Promise.reject();
+            }
         });
     }
 
