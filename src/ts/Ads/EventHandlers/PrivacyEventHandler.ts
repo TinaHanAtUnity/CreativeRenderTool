@@ -68,7 +68,6 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     public onPersonalizedConsent(permissions: IPermissions): void {
         const gamePrivacy = this._configuration.getGamePrivacy();
         if (gamePrivacy.isEnabled() && isUnityConsentPermissions(permissions)) {
-            // todo: check are the values changed before sending event
             this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER);
         }
     }
