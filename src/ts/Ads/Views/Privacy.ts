@@ -99,6 +99,10 @@ export class Privacy extends AbstractPrivacy {
 
             const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
             activeRadioButton.checked = true;
+
+            // Disables reporting for GDPR Regions by hiding the report screen from being activated
+            const middleLink = <HTMLDivElement>this._container.querySelector('.middle-link');
+            middleLink.style.visibility = 'hidden';
         }
 
         const agreeRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-agree-radio');

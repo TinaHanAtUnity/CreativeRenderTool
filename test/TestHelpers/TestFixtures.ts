@@ -469,11 +469,12 @@ export class TestFixtures {
             trackingUrls: json.promo.tracking ? json.promo.tracking : {}, // Overwrite tracking urls from comet campaign
             dynamicMarkup: json.promo.dynamicMarkup,
             creativeAsset: new HTML(json.promo.creativeUrl, session),
-            rewardedPromo: isRewardedPromo,
             limitedTimeOffer: undefined,
             costs: costProductInfoList,
             payouts: payoutProductInfoList,
-            premiumProduct: new ProductInfo(premiumProduct)
+            premiumProduct: new ProductInfo(premiumProduct),
+            portraitAssets: undefined,
+            landscapeAssets: undefined
         };
     }
 
