@@ -7,6 +7,7 @@ import { IPermissions } from 'Ads/Models/Privacy';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ICoreApi } from 'Core/ICore';
 import { UnityConsentSettings } from 'Ads/Views/Consent/UnityConsentSettings';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
 export interface IConsentUnitParameters {
     platform: Platform;
@@ -60,6 +61,11 @@ export class ConsentUnit implements IConsentViewHandler {
             document.body.appendChild(this._consentSettingsView.container());
 
             this._unityConsentView.show();
+
+            if(TestEnvironment.get('autoAcceptConsent')) {
+                const consentValues = JSON.parse(TestEnvironment.get('autoAcceptConsent'));
+                this.handleAutoConsent(consentValues);
+            }
             return donePromise;
         }).catch((e: Error) => {
             this._core.Sdk.logWarning('Error opening Consent view ' + e);
@@ -129,5 +135,18 @@ export class ConsentUnit implements IConsentViewHandler {
                 'uri': url
             });
         }
+    }
+
+    private handleAutoConsent(consent: IPermissions) {
+        setTimeout(() => {
+            if(consent.hasOwnProperty('all')) {
+                this._core.Sdk.logInfo('setting autoAcceptConsent with All True based on ' + JSON.stringify(consent));
+                this._unityConsentView.testAutoConsent();
+            }
+            if(consent.hasOwnProperty('ads')) {
+                this._core.Sdk.logInfo('setting autoAcceptConsent with Personalized Consent based on ' + JSON.stringify(consent));
+                this._consentSettingsView.testAutoConsent(consent);
+            }
+        }, 3000);
     }
 }
