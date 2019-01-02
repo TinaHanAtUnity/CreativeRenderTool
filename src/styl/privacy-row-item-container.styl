@@ -1,6 +1,4 @@
 #privacy-row-item-container {
-  // todo: fix lint warnings
-  // @stylint off
   .row-item {
     margin: $default-size * .5 0 $default-size * .5 0;
   }
@@ -15,11 +13,11 @@
 
   .description {
     display: none;
-    font-size: $privacy-text-font-size;
-    text-align: justify;
-    color: $privacy-text-color;
-    font-weight: $privacy-text-font-weight;
     padding-right: .5 * $default-size;
+    color: $privacy-text-color;
+    text-align: justify;
+    font-weight: $privacy-text-font-weight;
+    font-size: $privacy-text-font-size;
   }
 
   .row-item.show-description {
@@ -30,8 +28,8 @@
 
   .arrow-icon {
     padding-right: .25 * $default-size;
-    font-size: $default-size * .4;
     color: $black;
+    font-size: $default-size * .4;
     opacity: .5;
   }
 
@@ -73,5 +71,4 @@
     color: $blue;
     cursor: pointer;
   }
-  // @stylint on
 }
