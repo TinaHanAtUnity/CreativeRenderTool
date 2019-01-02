@@ -79,6 +79,7 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
 
     public testAutoConsent(consent: IPermissions): void {
         this.triggerOnPersonalizedConsent(consent);
+        this._handlers.forEach(handler => handler.onClose());
     }
 
     private onBackButtonEvent(event: Event): void {
