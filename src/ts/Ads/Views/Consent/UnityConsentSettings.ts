@@ -17,7 +17,7 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
     private _checkboxGroup: PersonalizationCheckboxGroup;
 
     constructor(platform: Platform, userPrivacyManager: UserPrivacyManager) {
-        super(platform, 'gdpr-consent-settings');
+        super(platform, 'gdpr-consent-settings', false);
 
         this._template = new Template(GDPRConsentSettingsTemplate);
 

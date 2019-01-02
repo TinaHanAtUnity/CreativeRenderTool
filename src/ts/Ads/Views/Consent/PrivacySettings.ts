@@ -29,7 +29,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     constructor(platform: Platform, campaign: Campaign, privacyManager: UserPrivacyManager,
                 gdprEnabled: boolean,
                 isCoppaCompliant: boolean) {
-        super(platform, privacyManager, isCoppaCompliant, gdprEnabled, 'privacy-settings');
+        super(platform, privacyManager, isCoppaCompliant, gdprEnabled, 'privacy-settings', false);
 
         this._campaign = campaign;
 

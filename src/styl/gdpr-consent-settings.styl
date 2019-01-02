@@ -10,6 +10,7 @@
   width: 100%;
   height: 100%;
   background: $white;
+  font-size: $privacy-text-font-size;
 
   &.prevent-clicks {
     pointer-events: none;
@@ -24,36 +25,37 @@
   }
 
   .back-button {
-    display: flex;
-    align-items: center;
-    padding: $default-size 2 * $default-size;
+    position: relative;
+    padding: .5 * $default-size 0 $default-size 0;
     width: 2 * $default-size;
-    height: 6%;
     color: $black;
-    font-size: $privacy-text-font-size;
-    opacity: .5;
   }
 
   .wrapper {
+    position: relative;
     display: flex;
     flex-direction: column;
-    padding: 0 2 * $default-size $default-size 2 * $default-size;
-    height: 92%;
+    padding: 0 2 * $default-size $default-size;
+    height: 100%;
+  }
+
+  .description {
+    color: $privacy-text-color;
+    text-align: left;
+    font-weight: $privacy-text-font-weight;
+  }
+
+  .heading {
+    display: block;
+    font-weight: 400;
   }
 
   .personalization-container {
-    flex: 0 1 40%;
+    flex: 0 1 45%;
     overflow: auto;
 
     .privacy-info-title {
       font-weight: $privacy-title-font-weight;
-    }
-
-    .privacy-info-description {
-      color: $privacy-text-color;
-      text-align: justify;
-      font-weight: $privacy-text-font-weight;
-      font-size: $default-font-size * .65;
     }
   }
 
@@ -62,16 +64,16 @@
   }
 
   .stripe {
-    margin: .25 * $default-size 1.5 * $default-size .25 * $default-size 1.5 * $default-size;
+    margin: .1 * $default-size 0 0 0;
     height: 1px;
     background-color: $light-gray;
   }
 
   .settings-container {
     display: flex;
-    flex: 0 1 40%;
+    flex-grow: 1;
     flex-direction: column;
-    justify-content: space-evenly;
+    justify-content: center;
   }
 
   .accept-all {
@@ -86,7 +88,6 @@
     border: 1px solid $white-smoke;
     border-radius: $default-size * .25;
     font-weight: $privacy-text-font-weight;
-    font-size: $privacy-text-font-size;
 
     &.click-animation {
       $click-animation();
@@ -104,43 +105,54 @@
 
 body {
   &.landscape #gdpr-consent-settings {
-
     .back-button {
-      display: flex;
-      align-items: center;
-      padding: $default-size 4 * $default-size;
-      width: 2 * $default-size;
-      height: 6%;
+      position: absolute;
+      top: $default-size;
+      left: 5%;
+      padding: 0;
+      width: $default-size;
+      height: $default-size;
       color: $black;
-      font-size: $privacy-text-font-size;
-      opacity: .5;
+    }
+
+    .safe-area-content {
+      padding: auto;
     }
 
     .wrapper {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-around;
-      align-items: center;
+      display: block;
+      padding: 0;
+      width: 100%;
+      height: 100%;
     }
     .personalization-container {
-      flex: 0 1 40%;
-      align-self: flex-start;
-      margin-right: $default-size;
+      position: absolute;
+      top: 2.5 * $default-size;
+      left: 5%;
+      display: block;
+      width: 40%;
+      height: "calc(100% - 2.5 * %s)" % $default-size;
     }
 
     .stripe {
       position: absolute;
+      top: 2.5 * $default-size;
+      left: 50%;
       display: block;
-      margin: $default-size 0;
       width: 1px;
+      height: "calc(100% - 2.5 * %s)" % $default-size;
       background-color: $white-smoke;
-      // todo: find a better way to set the top position
     }
 
     .settings-container {
-      flex: 0 1 40%;
-      align-self: flex-start;
-      margin-left: $default-size;
+      position: absolute;
+      top: 2.5 * $default-size;
+      left: 55%;
+      display: block;
+      width: 40%;
+      height: 100%;
     }
   }
 }
+
+

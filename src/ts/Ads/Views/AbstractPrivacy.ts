@@ -51,8 +51,8 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
     protected _userPrivacyManager: UserPrivacyManager;
     private static buildInformation: IBuildInformation;
 
-    constructor(platform: Platform, privacyManager: UserPrivacyManager, isCoppaCompliant: boolean, isGDPREnabled: boolean, id: string) {
-        super(platform, id);
+    constructor(platform: Platform, privacyManager: UserPrivacyManager, isCoppaCompliant: boolean, isGDPREnabled: boolean, id: string, attachTap?: boolean) {
+        super(platform, id, attachTap);
 
         this._userPrivacyManager = privacyManager;
         this._templateData = {
