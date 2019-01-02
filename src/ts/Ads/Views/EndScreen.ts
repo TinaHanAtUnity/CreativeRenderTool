@@ -3,14 +3,13 @@ import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHa
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { Localization } from 'Core/Utilities/Localization';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { IPermissions } from 'Ads/Models/Privacy';
 
 export interface IEndScreenParameters {
     platform: Platform;
@@ -33,7 +32,7 @@ export interface IEndScreenHandler extends IGDPREventHandler {
     onKeyEvent(keyCode: number): void;
 }
 
-export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
+export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandlerView {
 
     protected _localization: Localization;
     protected _adUnitStyle?: AdUnitStyle;
@@ -158,18 +157,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         if (this._privacy) {
             this._privacy.hide();
         }
-    }
-
-    public onPrivacy(url: string): void {
-        // do nothing
-    }
-
-    public onGDPROptOut(optOutEnabled: boolean): void {
-        // do nothing
-    }
-
-    public onPersonalizedConsent(permissions: IPermissions): void {
-        // do nothing
     }
 
     protected getEndscreenAlt(): string | undefined {

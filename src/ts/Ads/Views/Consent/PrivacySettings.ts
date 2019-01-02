@@ -118,7 +118,11 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
         };
 
-        this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));
+        this._handlers.forEach(handler => {
+            if(handler.onPersonalizedConsent) {
+                handler.onPersonalizedConsent(consent);
+            }
+        });
     }
 
     // IPrivacyRowItemContainerHandler
@@ -128,7 +132,11 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
 
     // IPrivacyRowItemContainerHandler
     public onPrivacy(url: string): void {
-        this._handlers.forEach(handler => handler.onPrivacy(url));
+        this._handlers.forEach(handler => {
+            if(handler.onPrivacy) {
+                handler.onPrivacy(url);
+            }
+        });
     }
 
     protected onCloseEvent(event: Event): void {
@@ -139,7 +147,11 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
 
     protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        this._handlers.forEach(handler => handler.onPrivacy((<HTMLLinkElement>event.target).href));
+        this._handlers.forEach(handler => {
+            if(handler.onPrivacy) {
+                handler.onPrivacy((<HTMLLinkElement>event.target).href);
+            }
+        });
     }
 
     private onBackButtonEvent(event: Event) {
@@ -151,7 +163,11 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
         };
 
-        this._handlers.forEach(handler => handler.onPersonalizedConsent(consent));
+        this._handlers.forEach(handler => {
+            if(handler.onPersonalizedConsent) {
+                handler.onPersonalizedConsent(consent);
+            }
+        });
 
         this.showView(ViewState.INITIAL);
     }

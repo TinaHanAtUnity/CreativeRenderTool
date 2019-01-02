@@ -1,13 +1,12 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { IPermissions } from 'Ads/Models/Privacy';
 
 export interface IVastEndScreenHandler {
     onVastEndScreenClick(): void;
@@ -22,7 +21,7 @@ export interface IVastEndscreenParameters {
     country: string | undefined;
 }
 
-export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandler {
+export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandlerView {
 
     private _isSwipeToCloseEnabled: boolean = false;
     private _privacy: AbstractPrivacy;
@@ -118,18 +117,6 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
         if (this._privacy) {
             this._privacy.hide();
         }
-    }
-
-    public onPrivacy(url: string): void {
-        // do nothing
-    }
-
-    public onGDPROptOut(optOutEnabled: boolean) {
-        // do nothing
-    }
-
-    public onPersonalizedConsent(permissions: IPermissions): void {
-        // do nothing
     }
 
     public setCallButtonEnabled(value: boolean) {

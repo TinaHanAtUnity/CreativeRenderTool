@@ -103,14 +103,22 @@ export class Privacy extends AbstractPrivacy {
         event.preventDefault();
         const gdprReduceRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
         if (this._gdprEnabled) {
-            this._handlers.forEach(handler => handler.onGDPROptOut(gdprReduceRadioButton.checked || this._dataDeletionConfirmation));
+            this._handlers.forEach(handler => {
+                if(handler.onGDPROptOut) {
+                    handler.onGDPROptOut(gdprReduceRadioButton.checked || this._dataDeletionConfirmation);
+                }
+            });
         }
         this._handlers.forEach(handler => handler.onPrivacyClose());
     }
 
     protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        this._handlers.forEach(handler => handler.onPrivacy((<HTMLLinkElement>event.target).href));
+        this._handlers.forEach(handler => {
+            if(handler.onPrivacy) {
+                handler.onPrivacy((<HTMLLinkElement>event.target).href);
+            }
+        });
     }
 
     protected onDataDeletion(event: Event): void {

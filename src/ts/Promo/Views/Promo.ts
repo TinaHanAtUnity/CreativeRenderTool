@@ -1,5 +1,5 @@
 import { Placement } from 'Ads/Models/Placement';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { Localization } from 'Core/Utilities/Localization';
@@ -10,9 +10,8 @@ import { View } from 'Core/Views/View';
 import PromoTpl from 'html/Promo.html';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { IPermissions } from 'Ads/Models/Privacy';
 
-export class Promo extends View<{}> implements IPrivacyHandler {
+export class Promo extends View<{}> implements IPrivacyHandlerView {
 
     public readonly onPromo = new Observable1<string>();
     public readonly onClose = new Observable0();
@@ -108,22 +107,10 @@ export class Promo extends View<{}> implements IPrivacyHandler {
         }
     }
 
-    public onPrivacy(url: string): void {
-        // do nothing
-    }
-
     public onPrivacyClose(): void {
         if (this._privacy) {
             this._privacy.hide();
         }
-    }
-
-    public onGDPROptOut(optOutEnabled: boolean): void {
-        // do nothing
-    }
-
-    public onPersonalizedConsent(permissions: IPermissions): void {
-        // do nothing
     }
 
     private choosePrivacyShown() {

@@ -21,9 +21,15 @@ export enum ReportReason {
     OTHER = 'Other'
 }
 
-export interface IPrivacyHandler {
-    onPrivacy(url: string): void;
+export interface IPrivacyHandlerView {
     onPrivacyClose(): void;
+    onPrivacy?(url: string): void;
+    onGDPROptOut?(optOutEnabled: boolean): void;
+    onPersonalizedConsent?(permissions: IPermissions): void;
+}
+
+export interface IPrivacyHandler extends IPrivacyHandlerView {
+    onPrivacy(url: string): void;
     onGDPROptOut(optOutEnabled: boolean): void;
     // todo: replace onGDPROptout with this new method
     onPersonalizedConsent(permissions: IPermissions): void;
@@ -45,7 +51,7 @@ export interface IBuildInformation extends ITemplateData {
     timestamp: string;
 }
 
-export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
+export abstract class AbstractPrivacy extends View<IPrivacyHandlerView> {
 
     protected _onReport: Observable2<Campaign, string> = new Observable2();
     protected _userPrivacyManager: UserPrivacyManager;
