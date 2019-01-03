@@ -69,10 +69,6 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
         ];
     }
 
-    public render(): void {
-        super.render();
-    }
-
     public showParagraph(paragraph: PrivacyTextParagraph): void {
         let rowItemElement: Element | null;
         let paragraphElement: Element | null;
