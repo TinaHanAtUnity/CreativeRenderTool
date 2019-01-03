@@ -61,7 +61,6 @@ export class Swipe {
         } else if (this._swipeType === SwipeType.SWIPE_DOWN) {
             if((Math.abs(yDiff) > Math.abs(xDiff)) && (Math.abs(endY) > Math.abs(this._startY))) {
                 if (Math.abs(yDiff) > Swipe._moveTolerance) {
-                    // left or right swipe
                     const swipeEvent = document.createEvent('MouseEvent');
                     swipeEvent.initMouseEvent('swipedown', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 
