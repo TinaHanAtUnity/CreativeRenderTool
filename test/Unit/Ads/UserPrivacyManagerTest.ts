@@ -384,7 +384,7 @@ describe('UserPrivacyManagerTest', () => {
 
         beforeEach(() => {
             getRequestStub = <sinon.SinonStub>request.get;
-            getRequestStub.resolves({response: '{}'});
+            getRequestStub.resolves({response: '{"adsSeenInGameThisWeek":27,"gamePlaysThisWeek":39,"installsFromAds":0}'});
             diagnosticTriggerStub = sinon.stub(Diagnostics, 'trigger');
             logErrorStub = sinon.stub(core.Sdk, 'logError');
 
@@ -403,6 +403,16 @@ describe('UserPrivacyManagerTest', () => {
         it('should call request.get', () => {
             return privacyManager.retrieveUserSummary().then(() => {
                 sinon.assert.calledWith(getRequestStub, `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=${gameId}&adid=${adId}&projectId=${projectId}&storeId=${stores}`);
+            });
+        });
+
+        it('should cache the result', () => {
+            return privacyManager.retrieveUserSummary().then(() => {
+                sinon.assert.calledOnce(getRequestStub);
+                return privacyManager.retrieveUserSummary().then((response) => {
+                    sinon.assert.calledOnce(getRequestStub);
+                    assert.equal(response.deviceModel, model);
+                });
             });
         });
 

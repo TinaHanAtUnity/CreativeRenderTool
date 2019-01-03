@@ -44,6 +44,9 @@ export enum GDPREventAction {
 
 export type UserPrivacyStorageData = { gdpr: { consent: { value: unknown }}};
 
+type CachedUserSummary = {ts: number; data: IUserSummary | null };
+const CacheTTL = 30 * 1000;
+
 export class UserPrivacyManager {
 
     private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
@@ -58,6 +61,7 @@ export class UserPrivacyManager {
     private readonly _clientInfo: ClientInfo;
     private readonly _deviceInfo: DeviceInfo;
     private readonly _request: RequestManager;
+    private readonly _userSummaryCache: CachedUserSummary;
 
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager) {
         this._platform = platform;
@@ -70,6 +74,7 @@ export class UserPrivacyManager {
         this._deviceInfo = deviceInfo;
         this._request = request;
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <UserPrivacyStorageData>data));
+        this._userSummaryCache = { ts: 0, data: null };
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
@@ -188,6 +193,12 @@ export class UserPrivacyManager {
     }
 
     public retrieveUserSummary(): Promise<IUserSummary> {
+        const ts = Date.now();
+        const cached = this._userSummaryCache;
+        if (ts < cached.ts + CacheTTL && cached.data !== null) {
+            return Promise.resolve(cached.data);
+        }
+        this._userSummaryCache.ts = ts;
         const url = `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._coreConfig.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
 
         // Test url which should respond with : {"adsSeenInGameThisWeek":27,"gamePlaysThisWeek":39,"installsFromAds":0}
@@ -198,10 +209,11 @@ export class UserPrivacyManager {
         };
 
         return this._request.get(url).then((response) => {
-            return {
+            this._userSummaryCache.data = {
                 ... JsonParser.parse<{ gamePlaysThisWeek: number; adsSeenInGameThisWeek: number; installsFromAds: number }>(response.response),
                 ... personalPayload
             };
+            return this._userSummaryCache.data;
         }).catch(error => {
             Diagnostics.trigger('gdpr_request_failed', {
                 url: url
