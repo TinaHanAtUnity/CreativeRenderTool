@@ -3,13 +3,13 @@ import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
-import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Url } from 'Core/Utilities/Url';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { ABGroup, ByteDanceCTATest } from 'Core/Models/ABGroup';
+import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
@@ -18,6 +18,8 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastEndScreen: VastEndScreen | null;
     private _platform: Platform;
     private _core: ICoreApi;
+    private _gameSessionId?: number;
+    private _abGroup: ABGroup;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         this._platform = parameters.platform;
@@ -26,28 +28,29 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._request = parameters.request;
         this._vastCampaign = parameters.campaign;
         this._vastEndScreen = this._vastAdUnit.getEndScreen();
+        this._gameSessionId = parameters.gameSessionId;
+        this._abGroup = parameters.coreConfig.getAbGroup();
     }
 
     public onVastEndScreenClick(): Promise<void> {
         this.setCallButtonEnabled(false);
 
-        const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
+        let clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
+        if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+            clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
+        }
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
-            return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
-                return this.openUrlOnCallButton(url);
-            }).catch(() => {
-                const urlParts = Url.parse(clickThroughURL);
-                const error = new DiagnosticError(new Error('VAST endscreen clickThroughURL error'), {
-                    contentType: 'vast_endscreen',
-                    clickUrl: clickThroughURL,
-                    host: urlParts.host,
-                    protocol: urlParts.protocol,
-                    creativeId: this._vastCampaign.getCreativeId()
+            const ctaClickedTime = Date.now();
+            if (!ByteDanceCTATest.isValid(this._abGroup) && CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+                return this.openUrlOnCallButton(clickThroughURL, Date.now() - ctaClickedTime, clickThroughURL);
+            } else {
+                return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
+                    return this.openUrlOnCallButton(url, Date.now() - ctaClickedTime, clickThroughURL!);
+                }).catch(() => {
+                    return this.openUrlOnCallButton(clickThroughURL!, Date.now() - ctaClickedTime, clickThroughURL!);
                 });
-                Diagnostics.trigger('click_request_head_rejected', error);
-                return this.openUrlOnCallButton(clickThroughURL);
-            });
+            }
         }
         return Promise.reject(new Error('There is no clickthrough URL for video or companion'));
     }
@@ -66,10 +69,15 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._vastAdUnit.sendCompanionTrackingEvent(this._vastCampaign.getSession().getId());
     }
 
-    private openUrlOnCallButton(url: string): Promise<void> {
+    private openUrlOnCallButton(url: string, clickDuration: number, clickUrl: string): Promise<void> {
         return this.onOpenUrl(url).then(() => {
             this.setCallButtonEnabled(true);
+            if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+                this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+            }
             this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._vastCampaign.getSession().getId());
+
+            ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'vast_endscreen', this._vastCampaign, this._gameSessionId);
         }).catch(() => {
             this.setCallButtonEnabled(true);
         });

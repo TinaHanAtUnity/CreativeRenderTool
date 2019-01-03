@@ -12,7 +12,6 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
-import { AndroidBackButtonSkipTest } from 'Core/Models/ABGroup';
 
 export class XPromoAdUnitFactory extends AbstractAdUnitFactory<XPromoCampaign, IXPromoAdUnitParameters> {
 
@@ -47,11 +46,7 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory<XPromoCampaign, I
         if (parameters.platform === Platform.ANDROID) {
             const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
                 endScreenEventHandler.onKeyEvent(keyCode);
-
-                const abGroup = parameters.coreConfig.getAbGroup();
-                const backButtonTestEnabled = AndroidBackButtonSkipTest.isValid(abGroup);
-
-                if(backButtonTestEnabled || CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
                     xPromoOverlayEventHandler.onKeyEvent(keyCode);
                 }
             });

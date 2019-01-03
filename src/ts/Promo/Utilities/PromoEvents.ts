@@ -79,13 +79,16 @@ interface IFailureJson {
 
 /*
 Events for iap should be sent to :
-    - 'https://events.iap.unity3d.com/events/v1/purchase' : regular
-    - 'https://events.iap.unity3d.com/events/v1/organic_purchase' : organic
+    Production:
+        - 'https://events.iap.unity3d.com/events/v1/purchase' : regular
+        - 'https://events.iap.unity3d.com/events/v1/organic_purchase' : organic
+    Staging:
+        - 'https://events-iap.staging.unityads.unity3d.com/events/v1/purchase' : regular
+        - 'https://events-iap.staging.unityads.unity3d.com/events/v1/organic_purchase' : organic
 */
 export class PromoEvents {
-
     public static purchasePathRegex = new RegExp('events\/v1\/purchase');
-    public static purchaseHostnameRegex = new RegExp('events\.iap\.unity3d\.com');
+    public static purchaseHostnameRegex = new RegExp('events\.iap\.unity3d\.com|events-iap\.staging\.unityads\.unity3d\.com');
 
     private _platform: Platform;
     private _core: ICoreApi;

@@ -11,7 +11,6 @@ import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandle
 import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
 import { StreamType } from 'Core/Constants/Android/StreamType';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { AndroidBackButtonSkipTest } from 'Core/Models/ABGroup';
 
 export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVastAdUnitParameters> {
 
@@ -33,11 +32,7 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVast
             if (parameters.platform === Platform.ANDROID) {
                 const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) =>  {
                     vastEndScreenHandler.onKeyEvent(keyCode);
-
-                    const abGroup = parameters.coreConfig.getAbGroup();
-                    const backButtonTestEnabled = AndroidBackButtonSkipTest.isValid(abGroup);
-
-                    if(backButtonTestEnabled || CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                    if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
                         vastOverlayHandler.onKeyEvent(keyCode);
                     }
                 });

@@ -7,8 +7,19 @@ import { UnityAds } from 'Backend/UnityAds';
 import { Platform } from 'Core/Constants/Platform';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
+import { fakeARUtils } from 'TestHelpers/FakeARUtils';
+import * as sinon from 'sinon';
 
 describe('AndroidVastTest', () => {
+    const sandbox = sinon.createSandbox();
+
+    beforeEach(() => {
+        fakeARUtils(sandbox);
+    });
+
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it('should handle happy path on Android', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(10000);
