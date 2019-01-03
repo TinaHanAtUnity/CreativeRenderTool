@@ -1,8 +1,13 @@
+export enum SwipeType {
+    HORIZONTAL,
+    SWIPE_DOWN
+}
+
 export class Swipe {
 
     private static _moveTolerance = 75;
-
     private _element: HTMLElement;
+    private _swipeType: SwipeType;
     private _startX: number;
     private _startY: number;
 
@@ -10,8 +15,9 @@ export class Swipe {
     private _onTouchCancelListener?: ((event: TouchEvent) => unknown);
     private _onTouchMoveListener?: ((event: TouchEvent) => unknown);
 
-    constructor(element: HTMLElement) {
+    constructor(element: HTMLElement, swipeType: SwipeType) {
         this._element = element;
+        this._swipeType = swipeType;
         this._startX = 0;
         this._startY = 0;
         this._element.addEventListener('touchstart', (event) => this.onTouchStart(event), false);
@@ -39,15 +45,30 @@ export class Swipe {
         const xDiff = this._startX - endX;
         const yDiff = this._startY - endY;
 
-        if(Math.abs(xDiff) > Math.abs(yDiff)) {
-            if (Math.abs(xDiff) > Swipe._moveTolerance) {
-                // left or right swipe
-                const swipeEvent = document.createEvent('MouseEvent');
-                swipeEvent.initMouseEvent('swipe', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        if (this._swipeType === SwipeType.HORIZONTAL) {
+            if(Math.abs(xDiff) > Math.abs(yDiff)) {
+                if (Math.abs(xDiff) > Swipe._moveTolerance) {
+                    // left or right swipe
+                    const swipeEvent = document.createEvent('MouseEvent');
+                    swipeEvent.initMouseEvent('swipe', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 
-                event.stopPropagation();
-                if(event.target && !event.target.dispatchEvent(swipeEvent)) {
-                    event.preventDefault();
+                    event.stopPropagation();
+                    if(event.target && !event.target.dispatchEvent(swipeEvent)) {
+                        event.preventDefault();
+                    }
+                }
+            }
+        } else if (this._swipeType === SwipeType.SWIPE_DOWN) {
+            if((Math.abs(yDiff) > Math.abs(xDiff)) && (Math.abs(endY) > Math.abs(this._startY))) {
+                if (Math.abs(yDiff) > Swipe._moveTolerance) {
+                    // left or right swipe
+                    const swipeEvent = document.createEvent('MouseEvent');
+                    swipeEvent.initMouseEvent('swipedown', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+
+                    event.stopPropagation();
+                    if(event.target && !event.target.dispatchEvent(swipeEvent)) {
+                        event.preventDefault();
+                    }
                 }
             }
         }
