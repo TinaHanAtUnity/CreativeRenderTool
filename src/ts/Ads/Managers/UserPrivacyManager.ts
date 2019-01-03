@@ -107,14 +107,50 @@ export class UserPrivacyManager {
             permissions = { all : true };
         }
 
-        //TODO: Check if user privacy has changed
         const updatedPrivacy = {
             method: gamePrivacy.getMethod(),
             version: gamePrivacy.getVersion(),
             permissions: permissions
         };
+
+        if (!this.hasUserPrivacyChanged(updatedPrivacy)) {
+            return Promise.resolve();
+        }
+
         this._userPrivacy.update(updatedPrivacy);
         return this.sendUnityConsentEvent(permissions, source);
+    }
+
+    private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPermissions }) {
+        const currentPrivacy = this._userPrivacy;
+        if (currentPrivacy.getMethod() !== updatedPrivacy.method) {
+            return true;
+        }
+
+        if (currentPrivacy.getVersion() !== updatedPrivacy.version) {
+            return true;
+        }
+
+        const currentPermissions = currentPrivacy.getPermissions();
+        const updatedPermissions = updatedPrivacy.permissions;
+
+        if ((<IGranularPermissions>currentPermissions).gameExp !== (<IGranularPermissions>updatedPermissions).gameExp) {
+            return true;
+        }
+
+        if ((<IGranularPermissions>currentPermissions).ads !== (<IGranularPermissions>updatedPermissions).ads) {
+            return true;
+        }
+
+        if ((<IGranularPermissions>currentPermissions).external !== (<IGranularPermissions>updatedPermissions).external) {
+            return true;
+        }
+
+        if ((<IAllPermissions>currentPermissions).all !== (<IAllPermissions>updatedPermissions).all) {
+            return true;
+        }
+
+        return false;
     }
 
     private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource): Promise<void> {
