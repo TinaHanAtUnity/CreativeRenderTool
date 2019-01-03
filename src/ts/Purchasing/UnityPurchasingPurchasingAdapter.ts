@@ -44,13 +44,13 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
     private _isInitialized = false;
     private _metaDataManager: MetaDataManager;
 
-    constructor(core: ICoreApi, promo: IPromoApi, coreConfiguration: CoreConfiguration, adsConfiguration: AdsConfiguration, clientInfo: ClientInfo) {
+    constructor(core: ICoreApi, promo: IPromoApi, coreConfiguration: CoreConfiguration, adsConfiguration: AdsConfiguration, clientInfo: ClientInfo, metaDataManager: MetaDataManager) {
         this._core = core;
         this._promo = promo;
         this._adsConfiguration = adsConfiguration;
         this._coreConfiguration = coreConfiguration;
         this._clientInfo = clientInfo;
-        this._metaDataManager = new MetaDataManager(core);
+        this._metaDataManager = metaDataManager;
         promo.Purchasing.onIAPSendEvent.subscribe((eventJSON) => this.handleSendIAPEvent(eventJSON));
     }
 

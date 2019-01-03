@@ -47,7 +47,7 @@ export class Promo extends AbstractParserModule implements IPromo {
 
     public initialize() {
         this.OrganicPurchaseManager.initialize();
-        PurchasingUtilities.initialize(this._core.Api, this.Api, this._purchasing.Api, this._core.ClientInfo, this._core.Config, this._ads.Config, this._ads.PlacementManager, this._ads.CampaignManager, this.PromoEvents, this._core.RequestManager, this._analytics.AnalyticsManager);
+        PurchasingUtilities.initialize(this._core.Api, this.Api, this._purchasing.Api, this._core.ClientInfo, this._core.Config, this._ads.Config, this._ads.PlacementManager, this._ads.CampaignManager, this.PromoEvents, this._core.RequestManager, this._core.MetaDataManager, this._analytics.AnalyticsManager);
     }
 
 }
