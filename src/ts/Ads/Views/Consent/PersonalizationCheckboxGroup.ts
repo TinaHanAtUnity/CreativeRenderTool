@@ -50,21 +50,17 @@ export class PersonalizationCheckboxGroup extends View<{}> {
             }
         }
 
-        if (this._personalized3rdPartyCheckbox) {
-            this._personalized3rdPartyCheckbox.onchange = () => {
-                if (this._personalized3rdPartyCheckbox.checked) {
-                    this._personalizedAdsCheckbox.checked = true;
-                }
-            };
-        }
+        this._personalized3rdPartyCheckbox.onchange = () => {
+            if (this._personalized3rdPartyCheckbox.checked) {
+                this._personalizedAdsCheckbox.checked = true;
+            }
+        };
 
-        if (this._personalizedAdsCheckbox) {
-            this._personalizedAdsCheckbox.onchange = () => {
-                if (!this._personalizedAdsCheckbox.checked) {
-                    this._personalized3rdPartyCheckbox.checked = false;
-                }
-            };
-        }
+        this._personalizedAdsCheckbox.onchange = () => {
+            if (!this._personalizedAdsCheckbox.checked) {
+                this._personalized3rdPartyCheckbox.checked = false;
+            }
+        };
     }
 
     public isPersonalizedExperienceChecked(): boolean {
