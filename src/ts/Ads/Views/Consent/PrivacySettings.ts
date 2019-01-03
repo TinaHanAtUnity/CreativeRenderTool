@@ -125,6 +125,14 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         });
     }
 
+    public hide(): void {
+        super.hide();
+
+        if(this._currentViewState === ViewState.PERSONALIZATION) {
+            this.triggerPersonalizedConsent();
+        }
+    }
+
     protected onCloseEvent(event: Event): void {
         event.preventDefault();
 
@@ -143,20 +151,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     private onBackButtonEvent(event: Event) {
         event.preventDefault();
 
-        if (this._currentViewState === ViewState.PERSONALIZATION) {
-            const consent: IPermissions = {
-                gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
-                ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
-                external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
-            };
-
-            this._handlers.forEach(handler => {
-                if(handler.onPersonalizedConsent) {
-                    handler.onPersonalizedConsent(consent);
-                }
-            });
-        }
-
+        this.triggerPersonalizedConsent();
         this.showView(ViewState.INITIAL);
     }
 
@@ -210,6 +205,22 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
                 reportText.innerHTML = 'Please select an option from the list above.';
                 reportText.classList.toggle('active');
             }
+        }
+    }
+
+    private triggerPersonalizedConsent(): void {
+        if (this._currentViewState === ViewState.PERSONALIZATION) {
+            const consent: IPermissions = {
+                gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
+                ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
+                external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
+            };
+
+            this._handlers.forEach(handler => {
+                if(handler.onPersonalizedConsent) {
+                    handler.onPersonalizedConsent(consent);
+                }
+            });
         }
     }
 
