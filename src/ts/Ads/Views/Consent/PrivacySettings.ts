@@ -151,7 +151,9 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     private onBackButtonEvent(event: Event) {
         event.preventDefault();
 
-        this.triggerPersonalizedConsent();
+        if (this._currentViewState === ViewState.PERSONALIZATION) {
+            this.triggerPersonalizedConsent();
+        }
         this.showView(ViewState.INITIAL);
     }
 
@@ -209,19 +211,17 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     }
 
     private triggerPersonalizedConsent(): void {
-        if (this._currentViewState === ViewState.PERSONALIZATION) {
-            const consent: IPermissions = {
-                gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
-                ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
-                external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
-            };
+        const consent: IPermissions = {
+            gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
+            ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
+            external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
+        };
 
-            this._handlers.forEach(handler => {
-                if(handler.onPersonalizedConsent) {
-                    handler.onPersonalizedConsent(consent);
-                }
-            });
-        }
+        this._handlers.forEach(handler => {
+            if(handler.onPersonalizedConsent) {
+                handler.onPersonalizedConsent(consent);
+            }
+        });
     }
 
     private showView(viewState: ViewState) {
