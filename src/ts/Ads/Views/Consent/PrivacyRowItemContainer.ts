@@ -69,11 +69,6 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
         ];
     }
 
-    public render(): void {
-        super.render();
-        this.fillPersonalInfoFields();
-    }
-
     public showParagraph(paragraph: PrivacyTextParagraph): void {
         let rowItemElement: Element | null;
         let paragraphElement: Element | null;
@@ -114,7 +109,6 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
     }
 
     private fillPersonalInfoFields(): void {
-        // todo: manager class should check is the information already available to avoid extra requests
         this._userPrivacyManager.retrieveUserSummary().then((personalProperties) => {
             document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
             document.getElementById('phone-type')!.innerHTML = `Using ${personalProperties.deviceModel}`;
@@ -130,9 +124,7 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
 
     private onWhatWeCollectEvent(event: Event): void {
         event.preventDefault();
-        // if (event.srcElement!.parentElement) {
-        //     event.srcElement!.parentElement!.classList.add('show-description');
-        // }
+        this.fillPersonalInfoFields();
         const element = this._container.querySelector('.what-we-collect');
         this.toggleDescription(element);
     }
