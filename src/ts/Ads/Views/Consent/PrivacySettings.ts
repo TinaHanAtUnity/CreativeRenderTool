@@ -125,6 +125,14 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         });
     }
 
+    public hide(): void {
+        super.hide();
+
+        if(this._currentViewState === ViewState.PERSONALIZATION) {
+            this.triggerPersonalizedConsent();
+        }
+    }
+
     protected onCloseEvent(event: Event): void {
         event.preventDefault();
 
@@ -144,19 +152,8 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         event.preventDefault();
 
         if (this._currentViewState === ViewState.PERSONALIZATION) {
-            const consent: IPermissions = {
-                gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
-                ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
-                external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
-            };
-
-            this._handlers.forEach(handler => {
-                if(handler.onPersonalizedConsent) {
-                    handler.onPersonalizedConsent(consent);
-                }
-            });
+            this.triggerPersonalizedConsent();
         }
-
         this.showView(ViewState.INITIAL);
     }
 
@@ -211,6 +208,20 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
                 reportText.classList.toggle('active');
             }
         }
+    }
+
+    private triggerPersonalizedConsent(): void {
+        const consent: IPermissions = {
+            gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
+            ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
+            external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
+        };
+
+        this._handlers.forEach(handler => {
+            if(handler.onPersonalizedConsent) {
+                handler.onPersonalizedConsent(consent);
+            }
+        });
     }
 
     private showView(viewState: ViewState) {
