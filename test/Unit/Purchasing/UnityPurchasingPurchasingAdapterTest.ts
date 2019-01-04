@@ -63,6 +63,13 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         });
     };
 
+    const setupFrameWorkMetaData = (framework: string) => {
+        const frameWorkMetaData = new FrameworkMetaData();
+        sinon.stub(frameWorkMetaData, 'getName').returns(framework);
+        sinon.stub(frameWorkMetaData, 'getVersion').returns('5.1');
+        sinon.stub(metaDataManager, 'fetch').returns(Promise.resolve(frameWorkMetaData));
+    }
+
     beforeEach(() => {
         platform = Platform.ANDROID;
         backend = TestFixtures.getBackend(platform);
@@ -92,10 +99,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
     describe('initialize non-made with unity project', () => {
         beforeEach(() => {
-            const frameWorkMetaData = new FrameworkMetaData();
-            sinon.stub(frameWorkMetaData, 'getName').returns('Android');
-            sinon.stub(frameWorkMetaData, 'getVersion').returns('5.1');
-            sinon.stub(metaDataManager, 'fetch').returns(Promise.resolve(frameWorkMetaData));
+            setupFrameWorkMetaData('Android');
         });
 
         it('should fail with Game not made with Unity if framework metadata does not have unity as name', () => {
@@ -118,10 +122,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
     describe('initialize', () => {
 
         beforeEach(() => {
-            const frameWorkMetaData = new FrameworkMetaData();
-            sinon.stub(frameWorkMetaData, 'getName').returns('Unity');
-            sinon.stub(frameWorkMetaData, 'getVersion').returns('5.1');
-            sinon.stub(metaDataManager, 'fetch').returns(Promise.resolve(frameWorkMetaData));
+            setupFrameWorkMetaData('Unity');
         });
 
         it('should resolve without calling sendPurchasingCommand if configuration does not include promo', () => {
@@ -414,10 +415,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
 
-            const frameWorkMetaData = new FrameworkMetaData();
-            sinon.stub(frameWorkMetaData, 'getName').returns('Unity');
-            sinon.stub(frameWorkMetaData, 'getVersion').returns('5.1');
-            sinon.stub(metaDataManager, 'fetch').returns(Promise.resolve(frameWorkMetaData));
+            setupFrameWorkMetaData('Unity');
 
             purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
         });
@@ -458,10 +456,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
 
-            const frameWorkMetaData = new FrameworkMetaData();
-            sinon.stub(frameWorkMetaData, 'getName').returns('Unity');
-            sinon.stub(frameWorkMetaData, 'getVersion').returns('5.1');
-            sinon.stub(metaDataManager, 'fetch').returns(Promise.resolve(frameWorkMetaData));
+            setupFrameWorkMetaData('Unity');
 
             purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
         });
