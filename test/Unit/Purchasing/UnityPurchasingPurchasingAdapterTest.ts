@@ -97,197 +97,198 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         sandbox.restore();
     });
 
-    describe('initialize non-made with unity project', () => {
-        beforeEach(() => {
-            setupFrameWorkMetaData('Android');
-        });
-
-        it('should fail with Game not made with Unity if framework metadata does not have unity as name', () => {
-            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
-
-            const initializePromise = purchasingAdapter.initialize();
-
-            return triggerFetchMetaData().then(() => {
-                return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
-                    .catch((e) => {
-                        assert.equal(e.message, 'Game not made with Unity');
-                        sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
-                    });
-            });
-        });
-    });
-
     describe('initialize', () => {
-
-        beforeEach(() => {
-            setupFrameWorkMetaData('Unity');
-        });
-
-        it('should resolve without calling sendPurchasingCommand if configuration does not include promo', () => {
-            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
-
-            return purchasingAdapter.initialize().then(() => {
-                sinon.assert.notCalled(<sinon.SinonSpy>metaDataManager.fetch);
-                sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initializePurchasing);
-                sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.getPromoVersion);
-                sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
+        describe('not made with unity', () => {
+            beforeEach(() => {
+                setupFrameWorkMetaData('Android');
             });
-        });
 
-        it('should fail with IAP Promo was not ready if purchasing is not ready', () => {
-            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+            it('should fail with Game not made with Unity if framework metadata does not have unity as name', () => {
+                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
 
-            const initializePromise = purchasingAdapter.initialize();
+                const initializePromise = purchasingAdapter.initialize();
 
-            return triggerFetchMetaData().then(() => {
-                return triggerInitialize(false).then(() => {
+                return triggerFetchMetaData().then(() => {
                     return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
                         .catch((e) => {
-                            assert.equal(e.message, 'Purchasing SDK not detected. You have likely configured a promo placement but have not included the Unity Purchasing SDK in your game.');
+                            assert.equal(e.message, 'Game not made with Unity');
                             sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
                         });
                 });
             });
         });
 
-        it('should fail with Promo version not supported if promo version is not 1.16 or above', () => {
-            const promoVersion = '1.15';
-            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
-
-            const initializePromise = purchasingAdapter.initialize();
-
-            return triggerFetchMetaData().then(() => {
-                return triggerInitialize(true)
-                    .then(() => triggerGetPromoVersion(promoVersion))
-                    .then(() => {
-                    return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
-                        .catch((e) => {
-                            assert.equal(e.message, `Promo version: ${promoVersion} is not supported. Initialize UnityPurchasing 1.16+ to ensure Promos are marked as ready`);
-                            sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
-                        });
-                    });
+        describe('made with unity', () => {
+            beforeEach(() => {
+                setupFrameWorkMetaData('Unity');
             });
-        });
 
-        it('should fail with Promo version not supported if promo version split length is less than 2', () => {
-            const promoVersion = '1';
-            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+            it('should resolve without calling sendPurchasingCommand if configuration does not include promo', () => {
+                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
 
-            const initializePromise = purchasingAdapter.initialize();
-
-            return triggerFetchMetaData().then(() => {
-                return triggerInitialize(true)
-                    .then(() => triggerGetPromoVersion(promoVersion))
-                    .then(() => {
-                    return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
-                        .catch((e) => {
-                            assert.equal(e.message, `Promo version: ${promoVersion} is not supported. Initialize UnityPurchasing 1.16+ to ensure Promos are marked as ready`);
-                            sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
-                        });
-                    });
-            });
-        });
-
-        it('should fail and not set isInitialized to true if command result is false', () => {
-            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
-
-            const initializePromise = purchasingAdapter.initialize();
-
-            return triggerFetchMetaData().then(() => {
-                return triggerInitialize(true)
-                    .then(() => triggerGetPromoVersion('1.16'))
-                    .then(() => triggerPurchasingCommand(false))
-                    .then(() => {
-                    return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
-                        .catch((e) => {
-                            assert.equal(e.message, 'Purchase command attempt failed with command False');
-                            sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
-                        });
-                    });
-            });
-        });
-
-        it('should fail when initializePurchasing rejects', () => {
-            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
-
-            (<sinon.SinonStub>promo.Purchasing.initializePurchasing).rejects();
-            return purchasingAdapter.initialize().catch((e: any) => {
-                assert.equal(e.message, 'Purchase initialization failed');
-                sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
-            });
-        });
-
-        it('should fail when getPromoVersion rejects', () => {
-            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
-
-            const initializePromise = purchasingAdapter.initialize();
-
-            (<sinon.SinonStub>promo.Purchasing.getPromoVersion).rejects();
-
-            return triggerFetchMetaData().then(() => {
-                return triggerInitialize(true).then(() => {
-                    return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
-                        .catch((e) => {
-                            assert.equal(e.message, 'Promo version check failed');
-                            sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
-                        });
+                return purchasingAdapter.initialize().then(() => {
+                    sinon.assert.notCalled(<sinon.SinonSpy>metaDataManager.fetch);
+                    sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initializePurchasing);
+                    sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.getPromoVersion);
+                    sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
                 });
             });
-        });
 
-        it('should fail when initiatePurchasingCommand rejects', () => {
-            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+            it('should fail with IAP Promo was not ready if purchasing is not ready', () => {
+                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
 
-            const initializePromise = purchasingAdapter.initialize();
+                const initializePromise = purchasingAdapter.initialize();
 
-            (<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand).rejects();
-
-            return triggerFetchMetaData().then(() => {
-                return triggerInitialize(true)
-                    .then(() => triggerGetPromoVersion('1.16'))
-                    .then(() => {
+                return triggerFetchMetaData().then(() => {
+                    return triggerInitialize(false).then(() => {
                         return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
                             .catch((e) => {
-                                assert.equal(e.message, 'Purchase event failed to send');
+                                assert.equal(e.message, 'Purchasing SDK not detected. You have likely configured a promo placement but have not included the Unity Purchasing SDK in your game.');
+                                sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
                             });
+                    });
                 });
             });
-        });
 
-        it('should call SendPurchasingCommand on successful trigger of all underlying promises', () => {
-            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+            it('should fail with Promo version not supported if promo version is not 1.16 or above', () => {
+                const promoVersion = '1.15';
+                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
 
-            const initializePromise = purchasingAdapter.initialize();
+                const initializePromise = purchasingAdapter.initialize();
 
-            return triggerFetchMetaData().then(() => {
-                return triggerInitialize(true)
-                    .then(() => triggerGetPromoVersion('1.16'))
-                    .then(() => triggerPurchasingCommand(true))
-                    .then(() => {
-                        return initializePromise.then(() => {
-                            sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
+                return triggerFetchMetaData().then(() => {
+                    return triggerInitialize(true)
+                        .then(() => triggerGetPromoVersion(promoVersion))
+                        .then(() => {
+                        return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
+                            .catch((e) => {
+                                assert.equal(e.message, `Promo version: ${promoVersion} is not supported. Initialize UnityPurchasing 1.16+ to ensure Promos are marked as ready`);
+                                sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
+                            });
                         });
+                });
+            });
+
+            it('should fail with Promo version not supported if promo version split length is less than 2', () => {
+                const promoVersion = '1';
+                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+
+                const initializePromise = purchasingAdapter.initialize();
+
+                return triggerFetchMetaData().then(() => {
+                    return triggerInitialize(true)
+                        .then(() => triggerGetPromoVersion(promoVersion))
+                        .then(() => {
+                        return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
+                            .catch((e) => {
+                                assert.equal(e.message, `Promo version: ${promoVersion} is not supported. Initialize UnityPurchasing 1.16+ to ensure Promos are marked as ready`);
+                                sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
+                            });
+                        });
+                });
+            });
+
+            it('should fail and not set isInitialized to true if command result is false', () => {
+                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+
+                const initializePromise = purchasingAdapter.initialize();
+
+                return triggerFetchMetaData().then(() => {
+                    return triggerInitialize(true)
+                        .then(() => triggerGetPromoVersion('1.16'))
+                        .then(() => triggerPurchasingCommand(false))
+                        .then(() => {
+                        return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
+                            .catch((e) => {
+                                assert.equal(e.message, 'Purchase command attempt failed with command False');
+                                sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
+                            });
+                        });
+                });
+            });
+
+            it('should fail when initializePurchasing rejects', () => {
+                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+
+                (<sinon.SinonStub>promo.Purchasing.initializePurchasing).rejects();
+                return purchasingAdapter.initialize().catch((e: any) => {
+                    assert.equal(e.message, 'Purchase initialization failed');
+                    sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
+                });
+            });
+
+            it('should fail when getPromoVersion rejects', () => {
+                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+
+                const initializePromise = purchasingAdapter.initialize();
+
+                (<sinon.SinonStub>promo.Purchasing.getPromoVersion).rejects();
+
+                return triggerFetchMetaData().then(() => {
+                    return triggerInitialize(true).then(() => {
+                        return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
+                            .catch((e) => {
+                                assert.equal(e.message, 'Promo version check failed');
+                                sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
+                            });
                     });
+                });
+            });
+
+            it('should fail when initiatePurchasingCommand rejects', () => {
+                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+
+                const initializePromise = purchasingAdapter.initialize();
+
+                (<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand).rejects();
+
+                return triggerFetchMetaData().then(() => {
+                    return triggerInitialize(true)
+                        .then(() => triggerGetPromoVersion('1.16'))
+                        .then(() => {
+                            return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
+                                .catch((e) => {
+                                    assert.equal(e.message, 'Purchase event failed to send');
+                                });
+                    });
+                });
+            });
+
+            it('should call SendPurchasingCommand on successful trigger of all underlying promises', () => {
+                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+
+                const initializePromise = purchasingAdapter.initialize();
+
+                return triggerFetchMetaData().then(() => {
+                    return triggerInitialize(true)
+                        .then(() => triggerGetPromoVersion('1.16'))
+                        .then(() => triggerPurchasingCommand(true))
+                        .then(() => {
+                            return initializePromise.then(() => {
+                                sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
+                            });
+                        });
+                });
             });
         });
     });
