@@ -30,6 +30,7 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
+import { PrivacyMethod } from 'Ads/Models/Privacy';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -158,6 +159,11 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         if (AbstractAdUnitParametersFactory._forceGDPRBanner) {
             return true;
         }
+
+        if (PrivacyMethod.LEGITIMATE_INTEREST !== parameters.adsConfig.getGamePrivacy().getMethod()) {
+            return false;
+        }
+
         return parameters.adsConfig.isGDPREnabled() ? !parameters.adsConfig.isOptOutRecorded() : false;
     }
 

@@ -22,6 +22,7 @@ import { WebViewError } from 'Core/Errors/WebViewError';
 import { IAbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { Placement } from 'Ads/Models/Placement';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
+import { PrivacyMethod } from 'Ads/Models/Privacy';
 
 export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends IAdUnitParameters<T>> {
     private static _forceGDPRBanner: boolean = false;
@@ -155,6 +156,11 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
         if (AbstractAdUnitFactory._forceGDPRBanner) {
             return true;
         }
+
+        if (PrivacyMethod.LEGITIMATE_INTEREST !== parameters.adsConfig.getGamePrivacy().getMethod()) {
+            return false;
+        }
+
         return parameters.adsConfig.isGDPREnabled() ? !parameters.adsConfig.isOptOutRecorded() : false;
     }
 
