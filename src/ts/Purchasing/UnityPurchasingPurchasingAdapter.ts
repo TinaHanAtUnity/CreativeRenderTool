@@ -166,6 +166,16 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         }
     }
 
+    private checkMadeWithUnity(): Promise<void> {
+        return this._metaDataManager.fetch(FrameworkMetaData).then((framework) => {
+            if (framework && framework.getName() === 'Unity') {
+                return Promise.resolve();
+            } else {
+                return Promise.reject(this.logIssue('purchasing_not_made_with_unity', 'Game not made with Unity. You must use BYOP to use IAP Promo.'));
+            }
+        });
+    }
+
     private initializeIAPPromo(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             const observer = this._promo.Purchasing.onInitialize.subscribe((isReady) => {
@@ -197,16 +207,6 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
                 this._promo.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
                 reject(this.logIssue('promo_version_check_failed', 'Promo version check failed'));
             });
-        });
-    }
-
-    private checkMadeWithUnity(): Promise<void> {
-        return this._metaDataManager.fetch(FrameworkMetaData).then((framework) => {
-            if (framework && framework.getName() === 'Unity') {
-                return Promise.resolve();
-            } else {
-                return Promise.reject(new Error('Game not made with Unity. You must use BYOP to use IAP Promo.'));
-            }
         });
     }
 

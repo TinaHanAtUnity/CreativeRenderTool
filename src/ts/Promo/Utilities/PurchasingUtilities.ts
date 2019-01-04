@@ -60,7 +60,9 @@ export class PurchasingUtilities {
                 this.updateCatalog(products);
                 this.setProductPlacementStates();
             });
-            return this._purchasingAdapter.initialize();
+            return this._purchasingAdapter.initialize().catch((e) => {
+                // Logging occurs in the purchasing adapter
+            });
         }).then(() => this._isInitialized = true);
     }
 
