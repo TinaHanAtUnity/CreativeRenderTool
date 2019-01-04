@@ -1,21 +1,19 @@
+import 'mocha';
+import { assert } from 'chai';
+import * as sinon from 'sinon';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { Backend } from 'Backend/Backend';
-
-import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { SdkApi } from 'Core/Native/Sdk';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { Observable1 } from 'Core/Utilities/Observable';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
-import 'mocha';
 import { IPromoApi } from 'Promo/IPromo';
 import { IPurchasingAdapter } from 'Purchasing/PurchasingAdapter';
 import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurchasingAdapter';
-import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
