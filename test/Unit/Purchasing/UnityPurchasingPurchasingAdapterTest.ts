@@ -111,7 +111,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 return triggerFetchMetaData().then(() => {
                     return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
                         .catch((e) => {
-                            assert.equal(e.message, 'Game not made with Unity');
+                            assert.equal(e.message, 'Game not made with Unity. You must use BYOP to use IAP Promo.');
                             sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
                         });
                 });

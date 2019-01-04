@@ -205,7 +205,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
             if (framework && framework.getName() === 'Unity') {
                 return Promise.resolve();
             } else {
-                return Promise.reject(new Error('Game not made with Unity'));
+                return Promise.reject(new Error('Game not made with Unity. You must use BYOP to use IAP Promo.'));
             }
         });
     }
