@@ -66,7 +66,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         sinon.stub(frameWorkMetaData, 'getName').returns(framework);
         sinon.stub(frameWorkMetaData, 'getVersion').returns('5.1');
         sinon.stub(metaDataManager, 'fetch').returns(Promise.resolve(frameWorkMetaData));
-    }
+    };
 
     beforeEach(() => {
         platform = Platform.ANDROID;
