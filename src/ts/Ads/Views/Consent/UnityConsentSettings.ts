@@ -68,7 +68,6 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
 
     // IPrivacyRowItemContainerHandler
     public onDataDeletion(): void {
-        // todo: set all checkboxes to unchecked?
         this._checkboxGroup.checkCheckboxes(false);
     }
 

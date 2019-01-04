@@ -279,6 +279,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         dataDeletionContainer.classList.add('data-deletion-confirmed');
 
         this._personalizationCheckBoxGroup.checkCheckboxes(false);
+        this.triggerPersonalizedConsent();
     }
 
     private onDataDeletionRejectEvent(event: Event): void {
