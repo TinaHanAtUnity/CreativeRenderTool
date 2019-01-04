@@ -13,7 +13,6 @@ import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import 'mocha';
 import { IPromoApi } from 'Promo/IPromo';
-import { IPromoPayload, IPromoRequest } from 'Promo/Utilities/PurchasingUtilities';
 import { IPurchasingAdapter } from 'Purchasing/PurchasingAdapter';
 import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurchasingAdapter';
 import * as sinon from 'sinon';
@@ -21,6 +20,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 
 describe('UnityPurchasingPurchasingAdapter', () => {
     let platform: Platform;
@@ -34,27 +34,6 @@ describe('UnityPurchasingPurchasingAdapter', () => {
     let metaDataManager: MetaDataManager;
 
     let purchasingAdapter: IPurchasingAdapter;
-    const iapPayloadPurchase: IPromoPayload = {
-        productId: 'myPromo',
-        trackingOptOut: false,
-        gamerToken: '111',
-        iapPromo: true,
-        gameId: '222',
-        abGroup: 1,
-        request: IPromoRequest.PURCHASE,
-        purchaseTrackingUrls: ['https://www.scooooooooter.com', 'https://www.scottyboy.com']
-    };
-
-    const iapPayloadSetIds: IPromoPayload = {
-        productId: 'myPromo',
-        trackingOptOut: false,
-        gamerToken: '111',
-        iapPromo: true,
-        gameId: '222',
-        abGroup: 1,
-        request: IPromoRequest.SETIDS,
-        purchaseTrackingUrls: ['https://www.scooooooooter.com', 'https://www.scottyboy.com']
-    };
 
     const triggerInitialize = (initialized: boolean) => {
         return new Promise((resolve) => {
@@ -73,6 +52,13 @@ describe('UnityPurchasingPurchasingAdapter', () => {
     const triggerPurchasingCommand = (success: boolean) => {
         return new Promise((resolve) => {
             promo.Purchasing.onCommandResult.trigger(success ? 'True' : 'False');
+            setTimeout(resolve);
+        });
+    };
+
+    const triggerFetchMetaData = () => {
+        return new Promise((resolve) => {
+            metaDataManager.fetch(FrameworkMetaData);
             setTimeout(resolve);
         });
     };
@@ -104,7 +90,39 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         sandbox.restore();
     });
 
+    describe('initialize non-made with unity project', () => {
+        beforeEach(() => {
+            const frameWorkMetaData = new FrameworkMetaData();
+            sinon.stub(frameWorkMetaData, 'getName').returns('Android');
+            sinon.stub(frameWorkMetaData, 'getVersion').returns('5.1');
+            sinon.stub(metaDataManager, 'fetch').returns(Promise.resolve(frameWorkMetaData));
+        });
+
+        it('should fail with Game not made with Unity if framework metadata does not have unity as name', () => {
+            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+
+            const initializePromise = purchasingAdapter.initialize();
+
+            return triggerFetchMetaData().then(() => {
+                return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
+                    .catch((e) => {
+                        assert.equal(e.message, 'Game not made with Unity');
+                        sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
+                    });
+            });
+        });
+    });
+
     describe('initialize', () => {
+
+        beforeEach(() => {
+            const frameWorkMetaData = new FrameworkMetaData();
+            sinon.stub(frameWorkMetaData, 'getName').returns('Unity');
+            sinon.stub(frameWorkMetaData, 'getVersion').returns('5.1');
+            sinon.stub(metaDataManager, 'fetch').returns(Promise.resolve(frameWorkMetaData));
+        });
 
         it('should resolve without calling sendPurchasingCommand if configuration does not include promo', () => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
@@ -112,6 +130,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
 
             return purchasingAdapter.initialize().then(() => {
+                sinon.assert.notCalled(<sinon.SinonSpy>metaDataManager.fetch);
                 sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initializePurchasing);
                 sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.getPromoVersion);
                 sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
@@ -125,12 +144,14 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
             const initializePromise = purchasingAdapter.initialize();
 
-            return triggerInitialize(false).then(() => {
-                return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
-                    .catch((e) => {
-                        assert.equal(e.message, 'Purchasing SDK not detected. You have likely configured a promo placement but have not included the Unity Purchasing SDK in your game.');
-                        sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
-                    });
+            return triggerFetchMetaData().then(() => {
+                return triggerInitialize(false).then(() => {
+                    return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
+                        .catch((e) => {
+                            assert.equal(e.message, 'Purchasing SDK not detected. You have likely configured a promo placement but have not included the Unity Purchasing SDK in your game.');
+                            sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
+                        });
+                });
             });
         });
 
@@ -142,15 +163,17 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
             const initializePromise = purchasingAdapter.initialize();
 
-            return triggerInitialize(true)
-                .then(() => triggerGetPromoVersion(promoVersion))
-                .then(() => {
-                return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
-                    .catch((e) => {
-                        assert.equal(e.message, `Promo version: ${promoVersion} is not supported. Initialize UnityPurchasing 1.16+ to ensure Promos are marked as ready`);
-                        sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
+            return triggerFetchMetaData().then(() => {
+                return triggerInitialize(true)
+                    .then(() => triggerGetPromoVersion(promoVersion))
+                    .then(() => {
+                    return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
+                        .catch((e) => {
+                            assert.equal(e.message, `Promo version: ${promoVersion} is not supported. Initialize UnityPurchasing 1.16+ to ensure Promos are marked as ready`);
+                            sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
+                        });
                     });
-                });
+            });
         });
 
         it('should fail with Promo version not supported if promo version split length is less than 2', () => {
@@ -161,15 +184,17 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
             const initializePromise = purchasingAdapter.initialize();
 
-            return triggerInitialize(true)
-                .then(() => triggerGetPromoVersion(promoVersion))
-                .then(() => {
-                return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
-                    .catch((e) => {
-                        assert.equal(e.message, `Promo version: ${promoVersion} is not supported. Initialize UnityPurchasing 1.16+ to ensure Promos are marked as ready`);
-                        sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
+            return triggerFetchMetaData().then(() => {
+                return triggerInitialize(true)
+                    .then(() => triggerGetPromoVersion(promoVersion))
+                    .then(() => {
+                    return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
+                        .catch((e) => {
+                            assert.equal(e.message, `Promo version: ${promoVersion} is not supported. Initialize UnityPurchasing 1.16+ to ensure Promos are marked as ready`);
+                            sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
+                        });
                     });
-                });
+            });
         });
 
         it('should fail and not set isInitialized to true if command result is false', () => {
@@ -179,16 +204,18 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
             const initializePromise = purchasingAdapter.initialize();
 
-            return triggerInitialize(true)
-                .then(() => triggerGetPromoVersion('1.16'))
-                .then(() => triggerPurchasingCommand(false))
-                .then(() => {
-                return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
-                    .catch((e) => {
-                        assert.equal(e.message, 'Purchase command attempt failed with command False');
-                        sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
+            return triggerFetchMetaData().then(() => {
+                return triggerInitialize(true)
+                    .then(() => triggerGetPromoVersion('1.16'))
+                    .then(() => triggerPurchasingCommand(false))
+                    .then(() => {
+                    return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
+                        .catch((e) => {
+                            assert.equal(e.message, 'Purchase command attempt failed with command False');
+                            sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
+                        });
                     });
-                });
+            });
         });
 
         it('should fail when initializePurchasing rejects', () => {
@@ -211,12 +238,15 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             const initializePromise = purchasingAdapter.initialize();
 
             (<sinon.SinonStub>promo.Purchasing.getPromoVersion).rejects();
-            return triggerInitialize(true).then(() => {
-                return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
-                    .catch((e) => {
-                        assert.equal(e.message, 'Promo version check failed');
-                        sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
-                    });
+
+            return triggerFetchMetaData().then(() => {
+                return triggerInitialize(true).then(() => {
+                    return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
+                        .catch((e) => {
+                            assert.equal(e.message, 'Promo version check failed');
+                            sinon.assert.notCalled(<sinon.SinonSpy>promo.Purchasing.initiatePurchasingCommand);
+                        });
+                });
             });
         });
 
@@ -228,13 +258,16 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             const initializePromise = purchasingAdapter.initialize();
 
             (<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand).rejects();
-            return triggerInitialize(true)
-                .then(() => triggerGetPromoVersion('1.16'))
-                .then(() => {
-                    return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
-                        .catch((e) => {
-                            assert.equal(e.message, 'Purchase event failed to send');
-                        });
+
+            return triggerFetchMetaData().then(() => {
+                return triggerInitialize(true)
+                    .then(() => triggerGetPromoVersion('1.16'))
+                    .then(() => {
+                        return initializePromise.then(() => assert.fail('Initialized worked when it shouldn\'t\'ve'))
+                            .catch((e) => {
+                                assert.equal(e.message, 'Purchase event failed to send');
+                            });
+                });
             });
         });
 
@@ -245,14 +278,16 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
             const initializePromise = purchasingAdapter.initialize();
 
-            return triggerInitialize(true)
-                .then(() => triggerGetPromoVersion('1.16'))
-                .then(() => triggerPurchasingCommand(true))
-                .then(() => {
-                    return initializePromise.then(() => {
-                        sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
+            return triggerFetchMetaData().then(() => {
+                return triggerInitialize(true)
+                    .then(() => triggerGetPromoVersion('1.16'))
+                    .then(() => triggerPurchasingCommand(true))
+                    .then(() => {
+                        return initializePromise.then(() => {
+                            sinon.assert.called(<sinon.SinonStub>promo.Purchasing.initiatePurchasingCommand);
+                        });
                     });
-                });
+            });
         });
     });
 
@@ -378,6 +413,12 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         beforeEach(() => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+
+            const frameWorkMetaData = new FrameworkMetaData();
+            sinon.stub(frameWorkMetaData, 'getName').returns('Unity');
+            sinon.stub(frameWorkMetaData, 'getVersion').returns('5.1');
+            sinon.stub(metaDataManager, 'fetch').returns(Promise.resolve(frameWorkMetaData));
+
             purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
         });
 
@@ -399,14 +440,16 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             };
             const initializePromise = purchasingAdapter.initialize();
 
-            return triggerInitialize(true)
-                .then(() => triggerGetPromoVersion('1.16'))
-                .then(() => triggerPurchasingCommand(true))
-                .then(() => {
-                    return initializePromise.then(() => {
-                        return callPurchase();
+            return triggerFetchMetaData().then(() => {
+                return triggerInitialize(true)
+                    .then(() => triggerGetPromoVersion('1.16'))
+                    .then(() => triggerPurchasingCommand(true))
+                    .then(() => {
+                        return initializePromise.then(() => {
+                            return callPurchase();
+                        });
                     });
-                });
+            });
         });
     });
 
@@ -414,6 +457,12 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         beforeEach(() => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+
+            const frameWorkMetaData = new FrameworkMetaData();
+            sinon.stub(frameWorkMetaData, 'getName').returns('Unity');
+            sinon.stub(frameWorkMetaData, 'getVersion').returns('5.1');
+            sinon.stub(metaDataManager, 'fetch').returns(Promise.resolve(frameWorkMetaData));
+
             purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
         });
 
@@ -435,14 +484,16 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
             const initializePromise = purchasingAdapter.initialize();
 
-            return triggerInitialize(true)
-                .then(() => triggerGetPromoVersion('1.16'))
-                .then(() => triggerPurchasingCommand(true))
-                .then(() => {
-                    return initializePromise.then(() => {
-                        callPromoClosed();
+            return triggerFetchMetaData().then(() => {
+                return triggerInitialize(true)
+                    .then(() => triggerGetPromoVersion('1.16'))
+                    .then(() => triggerPurchasingCommand(true))
+                    .then(() => {
+                        return initializePromise.then(() => {
+                            callPromoClosed();
+                        });
                     });
-                });
+            });
         });
     });
 });
