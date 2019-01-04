@@ -90,6 +90,11 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
                 event: 'click',
                 listener: (event: Event) => this.onDataDeletionRejectEvent(event),
                 selector: '#delete-data-no'
+            },
+            {
+                event: 'swipedown',
+                listener: (event: Event) => this.onCloseEvent(event),
+                selector: '.close-area'
             }
         ];
 
