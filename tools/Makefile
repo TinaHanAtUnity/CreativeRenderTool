@@ -18,4 +18,17 @@ REVERT_TARGETS := $(SCRIPTS_DIR)/revert_to_lkgs.sh
 
 # Main targets
 
-staging: $(STAGE_TARGETS)
+staging:
+	$(STAGE_TARGETS)
+
+prs:
+	$(STAGED_PR_TARGETS)
+
+deploy:
+	$(DEPLOY_TARGETS)
+
+notify:
+	$(NOTIFY_TARGETS)
+
+revert:
+	$(REVERT_TARGETS)
