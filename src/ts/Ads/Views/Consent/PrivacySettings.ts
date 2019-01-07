@@ -78,8 +78,8 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onDataDeletionEvent(event),
-                selector: '.delete-data-button'
+                listener: (event: Event) => this.onDeleteYourDataButtonEvent(event),
+                selector: '#delete-your-data-button'
             },
             {
                 event: 'click',
@@ -89,7 +89,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             {
                 event: 'click',
                 listener: (event: Event) => this.onDataDeletionRejectEvent(event),
-                selector: '#delete-data-no'
+                selector: '#delete-data-cancel'
             },
             {
                 event: 'swipedown',
@@ -269,17 +269,15 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         });
     }
 
-    private onDataDeletionEvent(event: Event): void {
+    private onDeleteYourDataButtonEvent(event: Event): void {
         event.preventDefault();
-
-        const dataDeletionContainer = <HTMLSpanElement>document.getElementById('delete-data');
-        dataDeletionContainer.classList.add('active');
+        (<HTMLElement>this._container.querySelector('.delete-data-container')).classList.add('active');
     }
 
     private onDataDeletionConfirmationEvent(event: Event): void {
         event.preventDefault();
 
-        const dataDeletionContainer = <HTMLSpanElement>document.getElementById('delete-data');
+        const dataDeletionContainer = (<HTMLElement>this._container.querySelector('.delete-data-container'));
         dataDeletionContainer.classList.remove('active');
         dataDeletionContainer.classList.add('data-deletion-confirmed');
 
@@ -289,9 +287,6 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
 
     private onDataDeletionRejectEvent(event: Event): void {
         event.preventDefault();
-
-        const dataDeletionContainer = <HTMLSpanElement>document.getElementById('delete-data');
-        dataDeletionContainer.classList.remove('active');
+        (<HTMLElement>this._container.querySelector('.delete-data-container')).classList.remove('active');
     }
-
 }
