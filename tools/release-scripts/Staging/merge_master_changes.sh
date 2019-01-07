@@ -3,7 +3,7 @@
 # Merges master into each staging branch. Execution will pause if there is
 # a merge conflict.
 
-releases="release-scripts/releases.txt"
+releases="./tools/release-scripts/releases.txt"
 
 git checkout master
 git pull
