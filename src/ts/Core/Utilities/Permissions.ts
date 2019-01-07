@@ -22,7 +22,7 @@ export class PermissionsUtil {
         const platformPermission = PermissionsUtil.getPlatformPermission(platform, permission);
         if (platform === Platform.ANDROID) {
             return PermissionsUtil.checkAndroidPermissionInManifest(core, platformPermission);
-        } else {
+        } else if (platform === Platform.IOS) {
             return PermissionsUtil.checkIosPermissionInManifest(core, platformPermission);
         }
         return Promise.resolve(false);

@@ -9,6 +9,10 @@ import { ILimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTim
 import { IProductInfo, ProductInfo, ProductInfoType, IRawProductInfo } from 'Promo/Models/ProductInfo';
 import { IPromoCampaign, IRawPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { PromoOrientationAsset, IPromoOrientationAsset, IRawPromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
+import { PromoAsset, IPromoAsset } from 'Promo/Models/PromoAsset';
+import { Image } from 'Ads/Models/Assets/Image';
+import { Font } from 'Ads/Models/Assets/Font';
 
 export class PromoCampaignParser extends CampaignParser {
 
@@ -51,11 +55,12 @@ export class PromoCampaignParser extends CampaignParser {
                 ... baseCampaignParams,
                 dynamicMarkup: promoJson.dynamicMarkup,
                 creativeAsset: promoJson.creativeUrl ? new HTML(promoJson.creativeUrl, session) : undefined,
-                rewardedPromo: promoJson.rewardedPromo || false,
                 limitedTimeOffer: this.getLimitedTimeOffer(promoJson),
                 costs: this.getProductInfoList(promoJson.costs),
                 payouts: this.getProductInfoList(promoJson.payouts),
-                premiumProduct: premiumProduct
+                premiumProduct: premiumProduct,
+                portraitAssets: this.getOrientationAssets(promoJson.portrait, session, this._core),
+                landscapeAssets: this.getOrientationAssets(promoJson.landscape, session, this._core)
             };
 
             const promoCampaign = new PromoCampaign(promoCampaignParams);
@@ -71,6 +76,29 @@ export class PromoCampaignParser extends CampaignParser {
             return Promise.reject();
         }
 
+    }
+
+    private getOrientationAssets(orientationJSON: IRawPromoOrientationAsset, session: Session, core: ICoreApi): PromoOrientationAsset | undefined {
+        if (orientationJSON === undefined) {
+            return undefined;
+        }
+        const buttonFontJSON = orientationJSON.button.font;
+        if (buttonFontJSON === undefined) {
+            return undefined;
+        }
+        const buttonAssetData: IPromoAsset = {
+            image: new Image(orientationJSON.button.url, session),
+            font: new Font(buttonFontJSON.url, session, buttonFontJSON.family, buttonFontJSON.color, buttonFontJSON.size)
+        };
+        const backgroundAssetData: IPromoAsset = {
+            image: new Image(orientationJSON.background.url, session),
+            font: undefined
+        };
+        const PromoOrientationAssetData: IPromoOrientationAsset = {
+            buttonAsset: new PromoAsset(buttonAssetData),
+            backgroundAsset: new PromoAsset(backgroundAssetData)
+        };
+        return new PromoOrientationAsset(PromoOrientationAssetData);
     }
 
     private getLimitedTimeOffer(promoJson: IRawPromoCampaign): LimitedTimeOffer | undefined {

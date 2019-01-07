@@ -58,6 +58,48 @@ describe('VastMediaSelectorTest for getOptimizedVideoUrl', () => {
         });
     });
 
+    describe('selecting lowest bitrate file from media files where file sizes are 0 due to duration 00:00:00', () => {
+        beforeEach(() => {
+            vastMediaFiles = [];
+
+            const vastMedia1 = new VastMediaFile('https://vast_media_url_1', 'progressive', '', 'video/mp4', 15180, 0, 0, 1920, 1080, '', 0);
+            const vastMedia2 = new VastMediaFile('https://vast_media_url_2', 'progressive', '', 'video/mp4', 15180, 0, 0, 1280, 720, '', 0);
+            const vastMedia3 = new VastMediaFile('https://vast_media_url_3', 'progressive', '', 'video/mp4', 11115, 0, 0, 1920, 1080, '', 0);
+            const vastMedia4 = new VastMediaFile('https://vast_media_url_4', 'progressive', '', 'video/mp4', 9255, 0, 0, 1920, 1080, '', 0);
+            const vastMedia5 = new VastMediaFile('https://vast_media_url_5', 'progressive', '', 'video/mp4', 6446, 0, 0, 1920, 1080, '', 0);
+            const vastMedia6 = new VastMediaFile('https://vast_media_url_6', 'progressive', '', 'video/mp4', 2860, 0, 0, 1920, 1080, '', 0);
+            const vastMedia7 = new VastMediaFile('https://vast_media_url_7', 'progressive', '', 'video/mp4', 2487, 0, 0, 640, 360, '', 0);
+            const vastMedia8 = new VastMediaFile('https://vast_media_url_8', 'progressive', '', 'video/mp4', 2261, 0, 0, 1280, 720, '', 0);
+            const vastMedia9 = new VastMediaFile('https://vast_media_url_9', 'progressive', '', 'video/mp4', 1611, 0, 0, 1920, 1080, '', 0);
+            const vastMedia10 = new VastMediaFile('https://vast_media_url_10', 'progressive', '', 'video/mp4', 1588, 0, 0, 1280, 720, '', 0);
+            const vastMedia11 = new VastMediaFile('https://vast_media_url_11', 'progressive', '', 'video/mp4', 1136, 0, 0, 640, 360, '', 0);
+
+            vastMediaFiles.push(vastMedia1);
+            vastMediaFiles.push(vastMedia2);
+            vastMediaFiles.push(vastMedia3);
+            vastMediaFiles.push(vastMedia4);
+            vastMediaFiles.push(vastMedia5);
+            vastMediaFiles.push(vastMedia6);
+            vastMediaFiles.push(vastMedia7);
+            vastMediaFiles.push(vastMedia8);
+            vastMediaFiles.push(vastMedia9);
+            vastMediaFiles.push(vastMedia10);
+            vastMediaFiles.push(vastMedia11);
+        });
+
+        it('should return the lowest bitrate file for wifi connection', () => {
+            assert.equal(VastMediaSelector.getOptimizedVideoUrl(vastMediaFiles, 'wifi'), 'https://vast_media_url_11');
+        });
+
+        it('should return the lowest bitrate file for cellular connection', () => {
+            assert.equal(VastMediaSelector.getOptimizedVideoUrl(vastMediaFiles, 'cellular'), 'https://vast_media_url_11');
+        });
+
+        it('should return the lowest bitrate file if connection info is missing', () => {
+            assert.equal(VastMediaSelector.getOptimizedVideoUrl(vastMediaFiles), 'https://vast_media_url_11');
+        });
+    });
+
     describe('returning null where file sizes are too large', () => {
         beforeEach(() => {
             vastMediaFiles = [];
