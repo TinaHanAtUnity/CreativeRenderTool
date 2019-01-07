@@ -377,7 +377,7 @@ export class OperativeEventManager {
                 'gdprEnabled': this._adsConfig.isGDPREnabled(),
                 'optOutEnabled': this._adsConfig.isOptOutEnabled(),
                 'optOutRecorded': this._adsConfig.isOptOutRecorded(),
-                'privacy': RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy()),
+                'privacy': session.getPrivacy(),
                 'gameSessionCounters': session.getGameSessionCounters(),
                 'networkType': networkType,
                 'connectionType': connectionType,
