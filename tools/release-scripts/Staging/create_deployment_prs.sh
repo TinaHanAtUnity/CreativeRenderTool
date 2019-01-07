@@ -2,7 +2,7 @@
 ##
 # Creates the deployment pull requests.
 
-releases="./tools/release-scripts/releases.txt"
+releases="release-scripts/releases.txt"
 
 hub=$(which hub || (echo "Hub not on PATH" && exit 1))
 
