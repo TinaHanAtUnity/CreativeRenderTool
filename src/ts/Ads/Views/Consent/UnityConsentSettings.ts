@@ -71,6 +71,10 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
         this._checkboxGroup.checkCheckboxes(false);
     }
 
+    public onShowDataDeletionDialog(): void {
+        // do nothing
+    }
+
     // IPrivacyRowItemContainerHandler
     public onPrivacy(url: string): void {
         this._handlers.forEach(handler => handler.onPrivacy(url));

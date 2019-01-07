@@ -8,6 +8,7 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 export interface IPrivacyRowItemContainerHandler {
     onDataDeletion(): void;
     onPrivacy(url: string): void;
+    onShowDataDeletionDialog(): void;
 }
 
 export enum PrivacyTextParagraph {
@@ -24,11 +25,15 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
     private _userPrivacyManager: UserPrivacyManager;
     private _dataDeletionConfirmation: boolean = false;
 
-    constructor(platform: Platform, userPrivacyManager: UserPrivacyManager) {
+    constructor(platform: Platform, userPrivacyManager: UserPrivacyManager, hideDataDeletionDialog: boolean = false) {
         super(platform, 'privacy-row-item-container', false);
 
         this._userPrivacyManager = userPrivacyManager;
         this._template = new Template(PrivacyRowItemContainerTemplate);
+
+        this._templateData = {
+            hideDataDeletionDialog: hideDataDeletionDialog
+        };
 
         this._bindings = [
             {
@@ -59,12 +64,17 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
             {
                 event: 'click',
                 listener: (event: Event) => this.onDataDeletionEvent(event),
-                selector: '.data-deletion-link, .data-deletion-reject'
+                selector: '.data-deletion-dialog-link, .data-deletion-reject'
             },
             {
                 event: 'click',
                 listener: (event: Event) => this.onDataDeletionConfirmationEvent(event),
                 selector: '#data-deletion-confirm'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onOpenDataDeletionEvent(event),
+                selector: '.data-deletion-link'
             }
         ];
     }
@@ -188,5 +198,10 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onPrivacy((<HTMLLinkElement>event.target).href));
+    }
+
+    private onOpenDataDeletionEvent(event: Event): void {
+        event.preventDefault();
+        this._handlers.forEach(handler => handler.onShowDataDeletionDialog());
     }
 }

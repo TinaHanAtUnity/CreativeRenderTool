@@ -88,7 +88,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onDataDeletionRejectEvent(event),
+                listener: (event: Event) => this.onDataDeletionCancelEvent(event),
                 selector: '#delete-data-cancel'
             },
             {
@@ -98,7 +98,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             }
         ];
 
-        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager);
+        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager, true);
         this._privacyRowItemContainer.addEventHandler(this);
 
         this._personalizationCheckBoxGroup = new PersonalizationCheckboxGroup(platform, this._userPrivacyManager);
@@ -119,6 +119,10 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     // IPrivacyRowItemContainerHandler
     public onDataDeletion(): void {
         this._personalizationCheckBoxGroup.checkCheckboxes(false);
+    }
+
+    public onShowDataDeletionDialog(): void {
+        this.showView(ViewState.DATA);
     }
 
     // IPrivacyRowItemContainerHandler
@@ -285,7 +289,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         this.triggerPersonalizedConsent();
     }
 
-    private onDataDeletionRejectEvent(event: Event): void {
+    private onDataDeletionCancelEvent(event: Event): void {
         event.preventDefault();
         (<HTMLElement>this._container.querySelector('.delete-data-container')).classList.remove('active');
     }
