@@ -3,7 +3,7 @@
 # Creates the staging branches for a deployment.
 
 
-releases="tools/release-scripts/releases.txt"
+releases="./tools/release-scripts/releases.txt"
 
 git checkout master
 git pull
