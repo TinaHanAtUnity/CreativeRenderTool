@@ -14,9 +14,9 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -57,32 +57,23 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     public onMraidClick(url: string): Promise<void> {
         this._ads.Listener.sendClickEvent(this._placement.getId());
 
+        const ctaClickedTime = Date.now();
         if (this._campaign.getClickAttributionUrl()) {  // Playable MRAID from Comet
             this.sendTrackingEvents();
             this.handleClickAttribution();
             if(!this._campaign.getClickAttributionUrlFollowsRedirects()) {
                 return this._request.followRedirectChain(url).then((storeUrl) => {
-                    this.openUrl(storeUrl);
+                    this.openUrl(storeUrl).then(() => {
+                        ClickDiagnostics.sendClickDiagnosticsEvent(Date.now() - ctaClickedTime, url, 'performance_mraid', this._campaign, this._gameSessionId);
+                    });
                 });
             }
         } else {    // DSP MRAID
             this.setCallButtonEnabled(false);
-            const ctaClickedTime = Date.now();
             return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking()).then((storeUrl) => {
-                const redirectDuration = Date.now() - ctaClickedTime;
-                return this.openUrlOnCallButton(storeUrl).then(() => {
-                    if (this.shouldRecordClickLog()) {
-                        SessionDiagnostics.trigger('click_delay', {
-                            duration: redirectDuration,
-                            delayedUrl: url,
-                            location: 'programmatic_mraid',
-                            seatId: this._campaign.getSeatId(),
-                            creativeId: this._campaign.getCreativeId()
-                        }, this._campaign.getSession());
-                    }
-                });
+                return this.openUrlOnCallButton(storeUrl, Date.now() - ctaClickedTime, url);
             }).catch(() => {
-                return this.openUrlOnCallButton(url);
+                return this.openUrlOnCallButton(url, Date.now() - ctaClickedTime, url);
             });
         }
         return Promise.resolve();
@@ -196,10 +187,12 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._adUnit.sendClick();
     }
 
-    private openUrlOnCallButton(url: string): Promise<void> {
+    private openUrlOnCallButton(url: string, clickDuration: number, clickUrl: string): Promise<void> {
         return this.openUrl(url).then(() => {
             this.setCallButtonEnabled(true);
             this.sendTrackingEvents();
+
+            ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'programmatic_mraid', this._campaign, this._gameSessionId);
         }).catch(() => {
             this.setCallButtonEnabled(true);
             this.sendTrackingEvents();
@@ -247,12 +240,5 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             return (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity();
         }
         return 0;
-    }
-    private shouldRecordClickLog(): boolean {
-        if (this._gameSessionId && this._gameSessionId % 10 === 1) {
-            return true;
-        }
-
-        return false;
     }
 }
