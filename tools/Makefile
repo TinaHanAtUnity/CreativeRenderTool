@@ -14,7 +14,7 @@ REVERT_TARGETS := $(SCRIPTS_DIR)/revert_to_lkgs.sh
 
 # Built-in targets
 
-.PHONY: staging prs deploy finished revert
+.PHONY: staging prs deploy notify revert
 
 # Main targets
 
