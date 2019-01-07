@@ -48,6 +48,6 @@ export class CustomFeatures {
     }
 
     public static isByteDanceSeat(seatId: number | undefined): boolean {
-        return seatId === 9116;
+        return seatId === 9116 || seatId === 9154;
     }
 }

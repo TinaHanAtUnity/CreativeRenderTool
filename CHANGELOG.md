@@ -2,6 +2,7 @@
 
 * Using gameSessionId to sample fps counters [#7710](https://github.com/Applifier/unity-ads-webview/pull/7710)
 * Reduce click delay log 100%->50% for ByteDance [#7724](https://github.com/Applifier/unity-ads-webview/pull/7724)
+* Add new non-rewarded seatId and update abGroup for ByteDance [#7730](https://github.com/Applifier/unity-ads-webview/pull/7730)
 
 # Thu Dec 20 01:58:04 UTC 2018
 
