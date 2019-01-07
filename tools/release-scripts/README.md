@@ -18,13 +18,15 @@ If everything looks to be in order, the ads-deploys and ads-sdk channels are not
 
 ## Utilizing the Scripts
 
-The scripts should be ran in order:
+The scripts can either be ran individually, or through the use of make steps. The make steps run one or more scripts, and explanations of what each make step and individual script do can be found below.
 
-### Staging/0.create_staging_branches.sh
+### `make staging`
+
+#### Staging/create_staging_branches.sh
 
 Run this script if staging branches do not yet exist.
 
-### Staging/1.merge_master_changes.sh
+#### Staging/merge_master_changes.sh
 
 This should be ran after a PR is merged to the master branch. Have two tabs of terminal opened. Run the script in one of the terminals. In a normal case, there will be merge conflicts to be solved.
 
@@ -44,17 +46,21 @@ Go back to the original tab and hit enter to continue to the next branch, and re
 
 Once the changes have been made, update the CHANGELOG.md in the master webview branch with the PR title and link. Follow the examples shown in the changelog. If there isn't a "# Pending" tag at the top, then go ahead and add it above your PR title.
 
-### Staging/2.push_staging_changes.sh
+#### Staging/push_staging_changes.sh
 
 After finishing execution of the first script, run this script to push up all of the branches. This is separated out into its own script in case there are any issues during merging master changes into the branches, and the merger wishes to stop merging.
 
-### Staging/3.create_deployment_prs.sh
+### `make prs`
+
+#### Staging/create_deployment_prs.sh
 
 This script should be ran once a suitable amount of PRs have been merged. Suitable is hard term to define, but just ensure that critical code changes are deployed by themselves.
 
 This will create the deployment PRs in the Webview branch, notify the ads-sdk channel that a deployment has been staged, and open the Webview PRs so that the user can see that the PRs were created successfully.
 
-### Deployment/4.update_lkgs.sh
+### `make deploy`
+
+#### Deployment/update_lkgs.sh
 
 Run this script once ~3 or more hours have passed since the deployment PRs have been made. The script will start by opening the results of the staging tests for both Android and iOS. The user will then check through the results of the tests by looking at the screenshots for a selection of the branches.
 
@@ -68,7 +74,7 @@ in the terminal, and replace the "Pending" tag with the output. Then, the user s
 
 This script will then run the fire_deploy_json.sh and notify the ads-sdk and ads-deploys of the incoming deployment. Make sure to look in those respective channels to see if anyone is deploying, and wait for them to finish before running the next script.
 
-### Deployment/5.merge_deployment_prs.sh
+#### Deployment/merge_deployment_prs.sh
 
 This script will automatically merge the deployment PRs and delete the branches. It is not recommended to run this unless the user also created the deployment PRs. It is currently unclear why this occurs, but this will be updated when the resolution is found.
 
@@ -82,10 +88,14 @@ When you are monitoring, be sure to look at the rightmost pie chart in kibana. T
 
 If things aren't looking correct, then run the revert script.
 
-### Deployment/6.notify_deployment_finished.sh
+### `make notify`
+
+#### Deployment/notify_deployment_finished.sh
 
 Once all of the builds have finished in Travis, Webview adoption is occurring, and nothing is seemingly broken, run this script. All it will do is notify ads-sdk and ads-deploys that the Webview deployment is finished and being monitored. If anything is broken, it should almost immediately show in the diagnostics, so once adoption occurs in all branches, then the deployment should end successfully.
 
-### revert_to_lkgs.sh
+### `make revert`
+
+#### revert_to_lkgs.sh
 
 Ideally, this script won't be ran, but sometimes incorrect changes slip through the cracks. It's not uncommon and don't feel bad about it. Make sure that the bad diagnostics are definiely coming from the new Webview, run this script, and then devise a plan to fix those changes. The ads-sdk channel will be notified that the deployment was reverted.

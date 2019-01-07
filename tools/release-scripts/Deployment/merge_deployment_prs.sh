@@ -4,6 +4,9 @@
 
 releases="release-scripts/releases.txt"
 
+git checkout master
+git pull
+
 echo "Pull Requests:"
 echo "https://github.com/Applifier/unity-ads-webview/pulls?utf8=%E2%9C%93&q=is%3Apr+is%3Aopen+staged+OR+staging \n"
 

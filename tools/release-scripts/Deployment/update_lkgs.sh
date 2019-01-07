@@ -4,6 +4,9 @@
 
 releases="release-scripts/releases.txt"
 
+git checkout master
+git pull
+
 echo "Staging test endpoints:"
 echo "http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-ios-sans-webhook/"
 echo "http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-android-sans-webhook/"
