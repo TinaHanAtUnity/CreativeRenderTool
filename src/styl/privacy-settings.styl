@@ -98,15 +98,9 @@
 
   .report-ad-container {
     .report-button {
+      $privacy-blue-button-default();
       position: relative;
       padding: .75 * $default-size $default-size;
-      border: 1px solid $light-gray;
-      border-radius: $default-size * .25;
-      background-color: $blue;
-      color: $white;
-      text-align: center;
-      font-weight: $privacy-title-font-weight;
-      font-size: $privacy-text-font-size;
     }
   }
 
@@ -205,23 +199,19 @@
 
   #delete-data-cancel,
   #delete-data-yes {
-    padding: .5 * $default-size $default-size;
-    border: 1px solid $privacy-light-gray;
-    border-radius: .25 * $default-size;
-    text-align: center;
-    font-weight: $privacy-title-font-weight;
-    font-size: $privacy-text-font-size;
+    padding: .75 * $default-size 1.5 * $default-size;
   }
 
   #delete-data-yes {
+    $consent-button-default();
     border: 1px solid $privacy-red;
     background: $privacy-red;
     color: $white;
   }
 
   #delete-data-cancel {
+    $privacy-white-button-default();
     margin-left: .5 * $default-size;
-    color: $black;
   }
 
   .delete-data-confirmed-text {
