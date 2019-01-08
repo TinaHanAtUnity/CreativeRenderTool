@@ -78,13 +78,6 @@
 
   .accept-all {
     margin-bottom: .25 * $default-size;
-    border: 1px solid $blue;
-    background-color: $blue;
-    color: $white;
-  }
-
-  .save-my-choices {
-    border: 1px solid $privacy-light-gray;
   }
 
   .consent-button {
@@ -96,6 +89,15 @@
       $click-animation();
     }
   }
+
+  .blue.consent-button {
+    $privacy-blue-button-default();
+  }
+
+  .white.consent-button {
+    $privacy-white-button-default();
+  }
+
   .item {
     padding: .75 * $default-size $default-size;
     text-align: center;

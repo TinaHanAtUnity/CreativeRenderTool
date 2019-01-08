@@ -8,13 +8,18 @@ import { Platform } from 'Core/Constants/Platform';
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IGranularPermissions, IPermissions } from 'Ads/Models/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
-import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
+import {
+    IPersonalizationCheckboxGroupHandler,
+    PersonalizationCheckboxGroup
+} from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 
-export class UnityConsentSettings extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler {
+export class UnityConsentSettings extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationCheckboxGroupHandler {
 
     private _infoContainer: PrivacyRowItemContainer;
     private _checkboxGroup: PersonalizationCheckboxGroup;
+    private _acceptAllButton: HTMLElement;
+    private _saveMyChoicesButton: HTMLElement;
 
     constructor(platform: Platform, userPrivacyManager: UserPrivacyManager) {
         super(platform, 'gdpr-consent-settings', false);
@@ -42,6 +47,7 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
         this._infoContainer = new PrivacyRowItemContainer(platform, userPrivacyManager);
         this._infoContainer.addEventHandler(this);
         this._checkboxGroup = new PersonalizationCheckboxGroup(platform, userPrivacyManager);
+        this._checkboxGroup.addEventHandler(this);
     }
 
     public render(): void {
@@ -52,12 +58,17 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
 
         this._checkboxGroup.render();
         (<HTMLElement>this._container.querySelector('.checkbox-group-container')).appendChild(this._checkboxGroup.container());
+
+        this._acceptAllButton = <HTMLElement>this._container.querySelector('.accept-all');
+        this._saveMyChoicesButton = <HTMLElement>this._container.querySelector('.save-my-choices');
     }
 
     public show(): void {
         super.show();
 
         this._checkboxGroup.show();
+
+        this.setConsentButtons();
     }
 
     public showParagraph(paragraph: PrivacyTextParagraph): void {
@@ -78,6 +89,11 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
     // IPrivacyRowItemContainerHandler
     public onPrivacy(url: string): void {
         this._handlers.forEach(handler => handler.onPrivacy(url));
+    }
+
+    // IPersonalizationCheckboxGroupHandler
+    public onCheckboxGroupSelectionChange(): void {
+        this.setConsentButtons();
     }
 
     public testAutoConsent(consent: IPermissions): void {
@@ -104,7 +120,7 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
 
         this._handlers.forEach(handler => handler.onConsent(consent, GDPREventSource.USER));
 
-        this.runAnimation(<HTMLElement>this._container.querySelector('.accept-all'));
+        this.runAnimation(this._acceptAllButton);
 
     }
 
@@ -118,8 +134,27 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
         };
 
         this.triggerOnPersonalizedConsent(personalizedConsent);
-        this.runAnimation(<HTMLElement>this._container.querySelector('.save-my-choices'));
+        this.runAnimation(this._saveMyChoicesButton);
 
+    }
+
+    private setConsentButtons() {
+        if (this._checkboxGroup.isPersonalizedExperienceChecked() ||
+            this._checkboxGroup.isPersonalizedAdsChecked() ||
+            this._checkboxGroup.isAds3rdPartyChecked()) {
+
+            this._acceptAllButton.classList.remove('blue');
+            this._acceptAllButton.classList.add('white');
+
+            this._saveMyChoicesButton.classList.remove('white');
+            this._saveMyChoicesButton.classList.add('blue');
+        } else {
+            this._acceptAllButton.classList.remove('white');
+            this._acceptAllButton.classList.add('blue');
+
+            this._saveMyChoicesButton.classList.remove('blue');
+            this._saveMyChoicesButton.classList.add('white');
+        }
     }
 
     private runAnimation(buttonElement: HTMLElement): void {

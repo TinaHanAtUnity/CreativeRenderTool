@@ -5,7 +5,11 @@ import { Platform } from 'Core/Constants/Platform';
 import { IGranularPermissions } from 'Ads/Models/Privacy';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
-export class PersonalizationCheckboxGroup extends View<{}> {
+export interface IPersonalizationCheckboxGroupHandler {
+    onCheckboxGroupSelectionChange(): void;
+}
+
+export class PersonalizationCheckboxGroup extends View<IPersonalizationCheckboxGroupHandler> {
 
     private _userPrivacyManager: UserPrivacyManager;
 
@@ -50,16 +54,23 @@ export class PersonalizationCheckboxGroup extends View<{}> {
             }
         }
 
+        this._personalizedExpCheckbox.onchange = () => {
+            this._handlers.forEach(handler => handler.onCheckboxGroupSelectionChange());
+        };
+
         this._personalized3rdPartyCheckbox.onchange = () => {
             if (this._personalized3rdPartyCheckbox.checked) {
                 this._personalizedAdsCheckbox.checked = true;
             }
+            this._handlers.forEach(handler => handler.onCheckboxGroupSelectionChange());
+
         };
 
         this._personalizedAdsCheckbox.onchange = () => {
             if (!this._personalizedAdsCheckbox.checked) {
                 this._personalized3rdPartyCheckbox.checked = false;
             }
+            this._handlers.forEach(handler => handler.onCheckboxGroupSelectionChange());
         };
     }
 
