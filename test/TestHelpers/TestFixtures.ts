@@ -130,6 +130,9 @@ import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperat
 import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { UnityInfo } from 'Core/Models/UnityInfo';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
+import { ResolveManager } from 'Core/Managers/ResolveManager';
+import { CacheManager } from 'Core/Managers/CacheManager';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
@@ -810,6 +813,34 @@ export class TestFixtures {
         const nativeBridge = new NativeBridge(backend, platform, false);
         backend.setNativeBridge(nativeBridge);
         return nativeBridge;
+    }
+
+    public static getCoreModule(nativeBridge: NativeBridge): ICore {
+        const platform = nativeBridge.getPlatform();
+        const api = this.getCoreApi(nativeBridge);
+
+        const core: Partial<ICore> = {
+            NativeBridge: nativeBridge,
+            Api: api,
+            FocusManager: new FocusManager(platform, api),
+            WakeUpManager: new WakeUpManager(api),
+            CacheBookkeeping: new CacheBookkeepingManager(api),
+            ResolveManager: new ResolveManager(api),
+            MetaDataManager: new MetaDataManager(api),
+            StorageBridge: new StorageBridge(api),
+            ClientInfo: this.getClientInfo(platform)
+        };
+        if (platform === Platform.ANDROID) {
+            core.DeviceInfo = new AndroidDeviceInfo(api);
+            core.RequestManager = new RequestManager(platform, api, core.WakeUpManager!, <AndroidDeviceInfo>core.DeviceInfo);
+        } else if (platform === Platform.IOS) {
+            core.DeviceInfo = new IosDeviceInfo(api);
+            core.RequestManager = new RequestManager(platform, api, core.WakeUpManager!);
+        }
+
+        core.CacheManager = new CacheManager(api, core.WakeUpManager!, core.RequestManager!, core.CacheBookkeeping!);
+
+        return <ICore>core;
     }
 
     public static getCoreApi(nativeBridge: NativeBridge): ICoreApi {

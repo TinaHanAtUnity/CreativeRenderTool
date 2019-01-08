@@ -14,9 +14,9 @@ export class VAST extends AbstractParserModule {
         let parser: ProgrammaticVastParser;
         // switch parsers based on ABGroup
         if (VastParsingStrictTest.isValid(core.Config.getAbGroup())) {
-            parser = new ProgrammaticVastParserStrict();
+            parser = new ProgrammaticVastParserStrict(core);
         } else {
-            parser = new ProgrammaticVastParser();
+            parser = new ProgrammaticVastParser(core);
         }
         contentTypeHandlerMap[ProgrammaticVastParser.ContentType] = {
             parser: parser,
