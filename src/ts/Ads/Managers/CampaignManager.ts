@@ -547,7 +547,7 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        return parser.parse(this._platform, this._core, this._request, response, session, this._deviceInfo.getOsVersion(), this._clientInfo.getGameId(), this._deviceConnectionType).then((campaign) => {
+        return parser.parse(response, session).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
                 SdkStats.setParseDuration(placement.getPlacementId(), parseDuration);
@@ -607,7 +607,7 @@ export class CampaignManager {
 
         const parser: CampaignParser = this.getCampaignParser(response.getContentType());
 
-        return parser.parse(this._platform, this._core, this._request, response, session).then((campaign) => {
+        return parser.parse(response, session).then((campaign) => {
             campaign.setMediaId(response.getMediaId());
 
             return campaign;

@@ -27,7 +27,7 @@ export class Promo extends AbstractParserModule implements IPromo {
     constructor(core: ICore, ads: IAds, purchasing: IPurchasing, analytics: IAnalytics) {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         contentTypeHandlerMap[PromoCampaignParser.ContentType] = {
-            parser: new PromoCampaignParser(),
+            parser: new PromoCampaignParser(core),
             factory: new PromoAdUnitFactory(new PromoAdUnitParametersFactory(purchasing.Api, core, ads))
         };
         super(contentTypeHandlerMap);
