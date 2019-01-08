@@ -6,6 +6,7 @@
 * VAST media selector update to pick the lowest bitrate file [#7725](https://github.com/Applifier/unity-ads-webview/pull/7725)
 * Removes the unnecessary parameters from parse method [#7542](https://github.com/Applifier/unity-ads-webview/pull/7542)
 * Update GDPR text for retention period [#7728](https://github.com/Applifier/unity-ads-webview/pull/7728)
+* Ensure Game was made with Unity before initializing Unity Purchasing Adapter [#7726](https://github.com/Applifier/unity-ads-webview/pull/7726) 
 
 # Thu Dec 20 01:58:04 UTC 2018
 
