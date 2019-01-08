@@ -14,11 +14,11 @@ export class MRAID extends AbstractParserModule {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         const factory = new MRAIDAdUnitFactory(paramsFactory);
         contentTypeHandlerMap[ProgrammaticMraidParser.ContentType] = {
-            parser: new ProgrammaticMraidParser(),
+            parser: new ProgrammaticMraidParser(core.NativeBridge.getPlatform()),
             factory
         };
         contentTypeHandlerMap[ProgrammaticMraidUrlParser.ContentType] = {
-            parser: new ProgrammaticMraidUrlParser(),
+            parser: new ProgrammaticMraidUrlParser(core.NativeBridge.getPlatform()),
             factory
         };
         super(contentTypeHandlerMap);
