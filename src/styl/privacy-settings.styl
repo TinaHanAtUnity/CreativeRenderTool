@@ -105,11 +105,11 @@
   }
 
   .checkbox-group-container {
-    $checkbox-group-container($default-scale-size, $default-font-size * .65);
+    $checkbox-group-container($default-scale-size, $privacy-text-font-size);
   }
 
   .radio-group-container {
-    $radio-group-container($default-scale-size, $default-font-size * .65);
+    $radio-group-container($default-scale-size, $privacy-text-font-size);
     font-weight: $privacy-text-font-weight;
     line-height: 1.25 * $default-size;
   }
@@ -155,10 +155,15 @@
   }
 
   .title {
-    font-weight: $privacy-title-font-weight;
+    font-weight: $privacy-main-title-font-weight;
   }
 
   .heading {
+    font-weight: $privacy-main-title-font-weight;
+    font-size: $privacy-heading-font-size;
+  }
+
+  .heading2 {
     font-weight: $privacy-title-font-weight;
     font-size: $privacy-text-font-size;
   }
@@ -181,7 +186,8 @@
     padding: $default-size 0;
     color: $privacy-red;
     text-align: left;
-    font-size: $privacy-text-font-size;
+    font-size: $privacy-heading-font-size;
+    font-weight: $privacy-title-font-weight
 
     .consent-icon-alert {
       padding: 0 .5 * $default-size 0 0;
