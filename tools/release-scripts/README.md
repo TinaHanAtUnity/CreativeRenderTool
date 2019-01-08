@@ -18,17 +18,17 @@ If everything looks to be in order, the ads-deploys and ads-sdk channels are not
 
 ## Utilizing the Scripts
 
-The scripts can either be ran individually, or through the use of make steps. The make steps run one or more scripts, and explanations of what each make step and individual script do can be found below.
+The scripts can either be run individually, or through the use of make steps. The make steps run one or more scripts, and explanations of what each make step and individual script do can be found below.
 
 ### `make staging`
 
 #### Staging/create_staging_branches.sh
 
-Run this script if staging branches do not yet exist.
+Run this script if staging branches do not yet exist locally. Be sure local staging branches are deleted before continuing to avoid merge conflict issues.
 
 #### Staging/merge_master_changes.sh
 
-This should be ran after a PR is merged to the master branch. Have two tabs of terminal opened. Run the script in one of the terminals. In a normal case, there will be merge conflicts to be solved.
+This should be run after a PR is merged to the master branch. Have two tabs of terminal opened. Run the script in one of the terminals. In a normal case, there will be merge conflicts to be solved.
 
 In the second terminal, fix the merge conflicts appropriately:
 
@@ -54,9 +54,21 @@ After finishing execution of the first script, run this script to push up all of
 
 #### Staging/create_deployment_prs.sh
 
-This script should be ran once a suitable amount of PRs have been merged. Suitable is hard term to define, but just ensure that critical code changes are deployed by themselves.
+This script should be run once a suitable amount of PRs have been merged.
+
+Suitable is hard term to define. Here are four situations for suitable deployments:
+
+Example 1: One pull request against the critical code path along with a few non-critical, small PRs merged.
+
+Example 2: Three to ten non-critical PRs merged.
+
+Example 3: One major refactoring PR merged alone.
+
+Example 4: Any amount of PRs merged, and there aren't any additional PRs waiting to be merged.
 
 This will create the deployment PRs in the Webview branch, notify the ads-sdk channel that a deployment has been staged, and open the Webview PRs so that the user can see that the PRs were created successfully.
+
+Note, if PRs need to merged after this point, it is still possible. It will only delay the deployment time.
 
 ### `make deploy`
 

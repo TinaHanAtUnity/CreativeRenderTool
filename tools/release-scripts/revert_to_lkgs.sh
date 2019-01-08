@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ##
-# Fucked up? Better make sure Ville knows.
+# Messed up? Don't panic. This should fix your problems for now.
 # 
 
 echo -n "This will revert ALL releases to the last known good tag. Do you wish to proceed? [Y/n] "
