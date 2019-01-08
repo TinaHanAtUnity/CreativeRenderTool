@@ -11,7 +11,7 @@ export class VAST extends AbstractParserModule {
         const paramsFactory = new VastAdUnitParametersFactory(core, ads);
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         contentTypeHandlerMap[ProgrammaticVastParser.ContentType] = {
-            parser: new ProgrammaticVastParser(),
+            parser: new ProgrammaticVastParser(core),
             factory: new VastAdUnitFactory(paramsFactory)
         };
         super(contentTypeHandlerMap);

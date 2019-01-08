@@ -4,13 +4,9 @@ import { Session } from 'Ads/Models/Session';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { BannerCampaignParser } from 'Banners/Parsers/BannerCampaignParser';
 import { assert } from 'chai';
-import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import BannerCampaignJSON from 'json/campaigns/banner/ValidBannerCampaign.json';
 import 'mocha';
-import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Platform } from 'Core/Constants/Platform';
 
@@ -20,18 +16,12 @@ describe('BannerCampaignParser', () => {
     const correlationId = '583dfda0d933a3630a53249c';
 
     let parser: BannerCampaignParser;
-    let nativeBridge: NativeBridge;
-    let core: ICoreApi;
-    let request: RequestManager;
     let session: Session;
 
     beforeEach(() => {
-        nativeBridge = sinon.createStubInstance(NativeBridge);
-        core = TestFixtures.getCoreApi(nativeBridge);
-        request = sinon.createStubInstance(RequestManager);
         session = TestFixtures.getSession();
 
-        parser = new BannerCampaignParser();
+        parser = new BannerCampaignParser(Platform.ANDROID);
     });
 
     describe('parsing a campaign', () => {
@@ -41,7 +31,7 @@ describe('BannerCampaignParser', () => {
             const parse = (data: any) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
-                return parser.parse(Platform.ANDROID, core, request, response, session).then((parsedCampaign) => {
+                return parser.parse(response, session).then((parsedCampaign) => {
                     campaign = <BannerCampaign>parsedCampaign;
                 });
             };
