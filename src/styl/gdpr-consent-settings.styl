@@ -77,22 +77,25 @@
   }
 
   .accept-all {
-    margin-bottom: .25 * $default-size;
-    border: 1px solid $blue;
-    background-color: $blue;
-    color: $white;
+    margin-bottom: .5 * $default-size;
   }
 
   .consent-button {
     position: relative;
-    border: 1px solid $white-smoke;
-    border-radius: $default-size * .25;
-    font-weight: $privacy-text-font-weight;
 
     &.click-animation {
       $click-animation();
     }
   }
+
+  .blue.consent-button {
+    $privacy-blue-button-default();
+  }
+
+  .white.consent-button {
+    $privacy-white-button-default();
+  }
+
   .item {
     padding: .75 * $default-size $default-size;
     text-align: center;

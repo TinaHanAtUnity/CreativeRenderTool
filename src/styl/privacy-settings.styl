@@ -96,30 +96,11 @@
     }
   }
 
-  .view-your-data-container {
-    .delete-data-button {
-      padding: $default-size 0;
-      color: $alert-icon-color;
-      text-align: left;
-      font-size: $privacy-text-font-size;
-
-      .consent-icon-alert {
-        padding: 0 .5 * $default-size 0 0;
-      }
-    }
-  }
-
   .report-ad-container {
     .report-button {
+      $privacy-blue-button-default();
       position: relative;
       padding: .75 * $default-size $default-size;
-      border: 1px solid $light-gray;
-      border-radius: $default-size * .25;
-      background-color: $blue;
-      color: $white;
-      text-align: center;
-      font-weight: $privacy-title-font-weight;
-      font-size: $privacy-text-font-size;
     }
   }
 
@@ -192,41 +173,80 @@
     font-size: $default-font-size * .5;
   }
 
-  #delete-data {
-    .page-link {
-      pointer-events: none;
+  .delete-data-container {
+    min-height: 4 * $default-size;
+  }
+
+  #delete-your-data-button {
+    padding: $default-size 0;
+    color: $privacy-red;
+    text-align: left;
+    font-size: $privacy-text-font-size;
+
+    .consent-icon-alert {
+      padding: 0 .5 * $default-size 0 0;
     }
-    #delete-data-confirm-dialog,
-    #delete-data-confirmed-text {
+  }
+
+  .delete-data-confirm {
+    display: none;
+  }
+
+  .delete-data-confirm-buttons {
+    display: flex;
+    align-content: flex-start;
+  }
+
+  #delete-data-cancel,
+  #delete-data-yes {
+    padding: .75 * $default-size 1.5 * $default-size;
+  }
+
+  #delete-data-yes {
+    $consent-button-default();
+    border: 1px solid $privacy-red;
+    background: $privacy-red;
+    color: $white;
+  }
+
+  #delete-data-cancel {
+    $privacy-white-button-default();
+    margin-left: .5 * $default-size;
+  }
+
+  .delete-data-confirmed-text {
+    display: none;
+  }
+
+  .delete-data-container.active {
+    #delete-your-data-button {
       display: none;
-      text-align: center;
-      opacity: 0;
-      transition: opacity 250ms ease-in;
-    }
-    &.active {
-      .delete-data-button {
-        display: none;
-      }
-      .page-link {
-        pointer-events: auto;
-      }
-      #delete-data-confirm-dialog {
-        display: block;
-        opacity: 1;
-      }
     }
 
-    &.data-deletion-confirmed {
-      #delete-data-confirmed-text {
-        display: block;
-        opacity: 1;
-      }
-      .delete-data-button {
-        display: none;
-      }
-      .delete-data-confirm-dialog {
-        display: none;
-      }
+    .delete-data-confirm {
+      display: block;
+    }
+  }
+
+  .delete-data-confirmed-text {
+    display: none;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 100ms ease-in;
+  }
+
+  .delete-data-container.data-deletion-confirmed {
+    #delete-your-data-button {
+      display: none;
+    }
+
+    .delete-data-confirm {
+      display: none;
+    }
+
+    .delete-data-confirmed-text {
+      display: block;
+      opacity: 1;
     }
   }
 

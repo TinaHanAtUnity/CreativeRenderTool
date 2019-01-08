@@ -56,18 +56,27 @@
                     You can delete any data Unity has about you. Doing this will also opt you out of personalized ad experiences.
                 </p>
             </div>
-            <div id="delete-data" class="text">
-                <span id="delete-data-confirmed-text">
-                    We will process your request and your data will be deleted in 30 days. We will also opt you out of
-                    personalized ads; however, we may keep a transactional record using your personal information for
-                    an additional 90 days for billing and fraud prevention purposes.
+            <div class="delete-data-container text">
+                <span class="delete-data-confirmed-text">
+                    We will process your request and your data for profile purposes will be deleted in 30 days. We will
+                    also opt you out of personalized ads immediately. Please note we may retain your data for invoicing
+                    and fraud prevention purposes for 180 days.
                 </span>
-                <div class="delete-data-button">
+                <div id="delete-your-data-button">
                     <span class="consent-icon-alert"></span>
                     <span class="button-text">DELETE YOUR DATA</span>
                 </div>
-                <span id="delete-data-confirm-dialog">Are you sure? <span id="delete-data-yes" class="page-link">Yes</span>
-                    / <span id="delete-data-no" class="page-link">No</span></span>
+                <div class="delete-data-confirm">
+                    <div class="heading">
+                        <p>
+                            Are you sure?
+                        </p>
+                    </div>
+                    <div class="delete-data-confirm-buttons">
+                        <div id="delete-data-yes">Delete data</div>
+                        <div id="delete-data-cancel">Cancel</div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="report-ad-container page-container">
@@ -99,11 +108,11 @@
         </div>
         <div class="build-info-container page-container">
             <div class="heading"><span>Build info</span></div>
+            <p></p>
             <% for (var k in data.buildInformation) { %>
             <p class="build-information-item text">
-            <span class="build-information-key">
-                <%= k %>:</span> <span class="build-information-value">
-                <%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>
+                <span class="build-information-key"><%= k %>:</span>
+                <span class="build-information-value"><%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>
             </p>
             <% } %>
         </div>

@@ -78,8 +78,8 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onDataDeletionEvent(event),
-                selector: '.delete-data-button'
+                listener: (event: Event) => this.onDeleteYourDataButtonEvent(event),
+                selector: '#delete-your-data-button'
             },
             {
                 event: 'click',
@@ -88,8 +88,8 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onDataDeletionRejectEvent(event),
-                selector: '#delete-data-no'
+                listener: (event: Event) => this.onDataDeletionCancelEvent(event),
+                selector: '#delete-data-cancel'
             },
             {
                 event: 'swipedown',
@@ -98,7 +98,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             }
         ];
 
-        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager);
+        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager, true);
         this._privacyRowItemContainer.addEventHandler(this);
 
         this._personalizationCheckBoxGroup = new PersonalizationCheckboxGroup(platform, this._userPrivacyManager);
@@ -119,6 +119,10 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     // IPrivacyRowItemContainerHandler
     public onDataDeletion(): void {
         this._personalizationCheckBoxGroup.checkCheckboxes(false);
+    }
+
+    public onShowDataDeletionDialog(): void {
+        this.showView(ViewState.DATA);
     }
 
     // IPrivacyRowItemContainerHandler
@@ -269,17 +273,15 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         });
     }
 
-    private onDataDeletionEvent(event: Event): void {
+    private onDeleteYourDataButtonEvent(event: Event): void {
         event.preventDefault();
-
-        const dataDeletionContainer = <HTMLSpanElement>document.getElementById('delete-data');
-        dataDeletionContainer.classList.add('active');
+        (<HTMLElement>this._container.querySelector('.delete-data-container')).classList.add('active');
     }
 
     private onDataDeletionConfirmationEvent(event: Event): void {
         event.preventDefault();
 
-        const dataDeletionContainer = <HTMLSpanElement>document.getElementById('delete-data');
+        const dataDeletionContainer = (<HTMLElement>this._container.querySelector('.delete-data-container'));
         dataDeletionContainer.classList.remove('active');
         dataDeletionContainer.classList.add('data-deletion-confirmed');
 
@@ -287,11 +289,8 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         this.triggerPersonalizedConsent();
     }
 
-    private onDataDeletionRejectEvent(event: Event): void {
+    private onDataDeletionCancelEvent(event: Event): void {
         event.preventDefault();
-
-        const dataDeletionContainer = <HTMLSpanElement>document.getElementById('delete-data');
-        dataDeletionContainer.classList.remove('active');
+        (<HTMLElement>this._container.querySelector('.delete-data-container')).classList.remove('active');
     }
-
 }
