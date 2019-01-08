@@ -230,7 +230,7 @@ export class BannerCampaignManager {
 
         const parser: CampaignParser = this.getCampaignParser(response.getContentType());
 
-        return parser.parse(this._platform, this._core, this._request, response, session).then((campaign) => {
+        return parser.parse(response, session).then((campaign) => {
             campaign.setMediaId(response.getMediaId());
             campaign.setTrackingUrls(trackingUrls);
             return campaign;
@@ -242,14 +242,14 @@ export class BannerCampaignManager {
 
         const parser: CampaignParser = this.getCampaignParser(response.getContentType());
 
-        return parser.parse(this._platform, this._core, this._request, response, session).then((campaign) => {
+        return parser.parse(response, session).then((campaign) => {
             campaign.setMediaId(response.getMediaId());
             return campaign;
         });
     }
 
     private getCampaignParser(contentType: string): CampaignParser {
-        return BannerCampaignParserFactory.getCampaignParser(contentType);
+        return BannerCampaignParserFactory.getCampaignParser(this._platform, contentType);
     }
 
     private getAbGroup() {

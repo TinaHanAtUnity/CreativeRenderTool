@@ -43,7 +43,5 @@ export const FakeDisabledABTest = new DisabledABTest(16, 17);
 
 // Add actual A/B tests below
 
-export const FPSCollectionTest = new ABTest(8);
-
 export const AuctionV5Test = new DisabledABTest(15, 16, 17);
-export const ByteDanceCTATest = new ABTest(15, 16, 17);
+export const ByteDanceCTATest = new ABTest(17);

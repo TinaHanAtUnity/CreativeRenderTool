@@ -11,7 +11,7 @@ import { IARApi } from 'AR/AR';
 export class Performance extends AbstractParserModule {
     constructor(ar: IARApi, core: ICore, ads: IAds) {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
-        const parser = new CometCampaignParser();
+        const parser = new CometCampaignParser(core);
         contentTypeHandlerMap[CometCampaignParser.ContentType] = {
             parser,
             factory: new PerformanceAdUnitFactory(new PerformanceAdUnitParametersFactory(core, ads))
