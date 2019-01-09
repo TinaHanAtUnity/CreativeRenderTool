@@ -164,7 +164,7 @@ $radio-group-container($scale-size = $default-scale-size, $context-font-size = 1
   }
 
   [type="radio"]:checked + label:before {
-    background-image: url('./../img/radio_on_blue.png');
+    background-image: url('./../img/radio_on.png');
   }
 
   [type="radio"]:not(:checked) + label:before {
@@ -368,67 +368,54 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
   }
 }
 
-//$checkbox-group-container($scale-size = $default-scale-size, $context-font-size = 1rem) {
-//  $radio-group-default-size = $scale-size * $default-size;
-//
-//  padding: $radio-group-default-size * .5;
-//  font-size: $context-font-size;
-//
-//
-//  // Hide the default checkbox
-//  [type="checkbox"]:checked,
-//  [type="checkbox"]:not(:checked) {
-//    position: absolute;
-//    visibility: hidden;
-//  }
-//
-//  // label texts
-//  [type="checkbox"]:checked + label,
-//  [type="checkbox"]:not(:checked) + label {
-//    position: relative;
-//    cursor: pointer;
-//    padding: 0;
-//    display: inline-block;
-//  }
-//
-//  // Box
-//  [type="checkbox"]:checked + label:before,
-//  [type="checkbox"]:not(:checked) + label:before {
-//    content: '';
-//    margin-right: 10px;
-//    display: inline-block;
-//    vertical-align: text-top;
-//    width: $default-size;
-//    height: $default-size;
-//    box-shadow: 0 0 0 1px $light-gray;
-//  }
-//
-//  // Box checked
-//  [type="checkbox"]:checked + label:before {
-//    background-color: $blue;
-//    box-shadow: 0 0 0 0;
-//  }
-//
-//  // Checkmark
-//  [type="checkbox"]:checked + label:after {
-//    content: '';
-//    position: absolute;
-//    left: .25 * $default-size;
-//    top: .45 * $default-size
-//    background-color: $white;
-//    width: .1 * $default-size;
-//    height: .1 * $default-size;
-//    box-shadow:
-//            .1 * $default-size 0 0 $white,
-//            .2 * $default-size 0 0 $white,
-//            .2 * $default-size -.1 * $default-size 0 $white,
-//            .2 * $default-size -.2 * $default-size 0 $white,
-//            .2 * $default-size -.3 * $default-size 0 $white,
-//            .2 * $default-size -.4 * $default-size 0 $white;
-//    transform: rotate(45deg);
-//  }
-//
-//}
+$radio-group-container-blue($scale-size = $default-scale-size, $context-font-size = 1rem) {
+  $radio-group-default-size = $scale-size * $default-size;
+
+  padding: $radio-group-default-size * .5;
+  font-size: $context-font-size;
+
+  [type="radio"]:checked,
+  [type="radio"]:not(:checked) {
+    position: absolute;
+    visibility: hidden;
+  }
+
+  /* label text*/
+  [type="radio"]:checked + label,
+  [type="radio"]:not(:checked) + label {
+    position: relative;
+    padding-left: $radio-group-default-size * 1.5;
+    cursor: pointer;
+    line-height: $context-font-size * 1.5;
+    display: inline-block;
+  }
+
+  [type="radio"]:checked + label:before,
+  [type="radio"]:not(:checked) + label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: $radio-group-default-size * .75;
+    height: @width;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  [type="radio"]:checked + label:before {
+    background-image: url('./../img/radio_on_blue.png');
+  }
+
+  [type="radio"]:not(:checked) + label:before {
+    background-image: url('./../img/radio_off.png');
+  }
+
+  [type="radio"]:checked + label {
+    font-weight: 500;
+  }
+
+}
 
 $checkbox-group-container($scale-size = $default-scale-size, $context-font-size = 1rem) {
   $radio-group-default-size = $scale-size * $default-size;
@@ -482,7 +469,6 @@ $checkbox-group-container($scale-size = $default-scale-size, $context-font-size 
   }
 
   // line between main and sub checkbox
-  // todo: should be tested carefully
   // todo: on some devices the label is wrapped. Use screen ratio to set height
   #personalization-checkbox-group {
     .sub-box-line {
@@ -522,7 +508,7 @@ $click-animation() {
 $privacy-back-button-default() {
   width: 2 * $default-size;
   color: $black;
-  font-size: $privacy-text-font-size;
+  font-size: $privacy-heading-font-size;
 }
 
 $privacy-blue-button-default() {
@@ -543,5 +529,5 @@ $consent-button-default() {
   border-radius: $default-size * .4;
   text-align: center;
   font-weight: $privacy-title-font-weight;
-  font-size: $privacy-text-font-size;
+  font-size: $privacy-heading-font-size;
 }
