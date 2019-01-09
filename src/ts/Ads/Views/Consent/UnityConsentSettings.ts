@@ -72,7 +72,7 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
     }
 
     public showParagraph(paragraph: PrivacyTextParagraph): void {
-        super.show();
+        this.show();
         this._checkboxGroup.show();
         this._infoContainer.showParagraph(paragraph);
     }
