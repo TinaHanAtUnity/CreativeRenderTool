@@ -128,6 +128,9 @@ import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
 import { UnityInfo } from 'Core/Models/UnityInfo';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
+import { ResolveManager } from 'Core/Managers/ResolveManager';
+import { CacheManager } from 'Core/Managers/CacheManager';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
@@ -467,11 +470,12 @@ export class TestFixtures {
             trackingUrls: json.promo.tracking ? json.promo.tracking : {}, // Overwrite tracking urls from comet campaign
             dynamicMarkup: json.promo.dynamicMarkup,
             creativeAsset: new HTML(json.promo.creativeUrl, session),
-            rewardedPromo: isRewardedPromo,
             limitedTimeOffer: undefined,
             costs: costProductInfoList,
             payouts: payoutProductInfoList,
-            premiumProduct: new ProductInfo(premiumProduct)
+            premiumProduct: new ProductInfo(premiumProduct),
+            portraitAssets: undefined,
+            landscapeAssets: undefined
         };
     }
 
@@ -793,6 +797,34 @@ export class TestFixtures {
         const nativeBridge = new NativeBridge(backend, platform, false);
         backend.setNativeBridge(nativeBridge);
         return nativeBridge;
+    }
+
+    public static getCoreModule(nativeBridge: NativeBridge): ICore {
+        const platform = nativeBridge.getPlatform();
+        const api = this.getCoreApi(nativeBridge);
+
+        const core: Partial<ICore> = {
+            NativeBridge: nativeBridge,
+            Api: api,
+            FocusManager: new FocusManager(platform, api),
+            WakeUpManager: new WakeUpManager(api),
+            CacheBookkeeping: new CacheBookkeepingManager(api),
+            ResolveManager: new ResolveManager(api),
+            MetaDataManager: new MetaDataManager(api),
+            StorageBridge: new StorageBridge(api),
+            ClientInfo: this.getClientInfo(platform)
+        };
+        if (platform === Platform.ANDROID) {
+            core.DeviceInfo = new AndroidDeviceInfo(api);
+            core.RequestManager = new RequestManager(platform, api, core.WakeUpManager!, <AndroidDeviceInfo>core.DeviceInfo);
+        } else if (platform === Platform.IOS) {
+            core.DeviceInfo = new IosDeviceInfo(api);
+            core.RequestManager = new RequestManager(platform, api, core.WakeUpManager!);
+        }
+
+        core.CacheManager = new CacheManager(api, core.WakeUpManager!, core.RequestManager!, core.CacheBookkeeping!);
+
+        return <ICore>core;
     }
 
     public static getCoreApi(nativeBridge: NativeBridge): ICoreApi {

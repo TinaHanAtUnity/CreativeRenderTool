@@ -1,3 +1,30 @@
+# Pending
+
+* Using gameSessionId to sample fps counters [#7710](https://github.com/Applifier/unity-ads-webview/pull/7710)
+* Reduce click delay log 100%->50% for ByteDance [#7724](https://github.com/Applifier/unity-ads-webview/pull/7724)
+* Add new non-rewarded seatId and update abGroup for ByteDance [#7730](https://github.com/Applifier/unity-ads-webview/pull/7730)
+* VAST media selector update to pick the lowest bitrate file [#7725](https://github.com/Applifier/unity-ads-webview/pull/7725)
+* Removes the unnecessary parameters from parse method [#7542](https://github.com/Applifier/unity-ads-webview/pull/7542)
+* Update GDPR text for retention period [#7728](https://github.com/Applifier/unity-ads-webview/pull/7728)
+* Ensure Game was made with Unity before initializing Unity Purchasing Adapter [#7726](https://github.com/Applifier/unity-ads-webview/pull/7726) 
+
+# Thu Dec 20 01:58:04 UTC 2018
+
+* Increase log sampling to 50% and log performance mraid click delay [#7687](https://github.com/Applifier/unity-ads-webview/pull/7687)
+* CI travis status update [#7684](https://github.com/Applifier/unity-ads-webview/pull/7684)
+* Disabling report bad ads feature in GDPR regions [#7686](https://github.com/Applifier/unity-ads-webview/pull/7686)
+
+# Wed Dec 19 00:50:07 UTC 2018
+
+* AR analytics events [#7438](https://github.com/Applifier/unity-ads-webview/pull/7438)
+* Remove back button experiment [#7520](https://github.com/Applifier/unity-ads-webview/pull/7520)
+* Add support for cancel animation frame in AR [#7230](https://github.com/Applifier/unity-ads-webview/pull/7230)
+* AR button timer  [#7461](https://github.com/Applifier/unity-ads-webview/pull/7461)
+* Limit CTA ABTest to ByteDance Seat Only [#7681](https://github.com/Applifier/unity-ads-webview/pull/7681)
+* Shifted Promo Template to Webview [#7467](https://github.com/Applifier/unity-ads-webview/pull/7467)
+* Fire Promo Events in Staging [#7434](https://github.com/Applifier/unity-ads-webview/pull/7434)
+* Fix PTS Endpoint for SDK Stats [#7683](https://github.com/Applifier/unity-ads-webview/pull/7683)
+
 # Mon Dec 17 22:25:49 UTC 2018
 
 * Disable auction v5 test for holidays from groups 15, 16 and 17 [#7611](https://github.com/Applifier/unity-ads-webview/pull/7611)

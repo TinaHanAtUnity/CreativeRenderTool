@@ -3,20 +3,29 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { ICoreApi, ICore } from 'Core/ICore';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ILimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
 import { IProductInfo, ProductInfo, ProductInfoType, IRawProductInfo } from 'Promo/Models/ProductInfo';
 import { IPromoCampaign, IRawPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { PromoOrientationAsset, IPromoOrientationAsset, IRawPromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
+import { PromoAsset, IPromoAsset } from 'Promo/Models/PromoAsset';
+import { Image } from 'Ads/Models/Assets/Image';
+import { Font } from 'Ads/Models/Assets/Font';
 
 export class PromoCampaignParser extends CampaignParser {
 
     public static ContentType = 'purchasing/iap';
 
-    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
+    private _core: ICoreApi;
+
+    constructor(core: ICore) {
+        super(core.NativeBridge.getPlatform());
+        this._core = core.Api;
+    }
+
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const promoJson = JsonParser.parse<IRawPromoCampaign>(response.getContent());
 
         let willExpireAt: number | undefined;
@@ -46,11 +55,12 @@ export class PromoCampaignParser extends CampaignParser {
                 ... baseCampaignParams,
                 dynamicMarkup: promoJson.dynamicMarkup,
                 creativeAsset: promoJson.creativeUrl ? new HTML(promoJson.creativeUrl, session) : undefined,
-                rewardedPromo: promoJson.rewardedPromo || false,
                 limitedTimeOffer: this.getLimitedTimeOffer(promoJson),
                 costs: this.getProductInfoList(promoJson.costs),
                 payouts: this.getProductInfoList(promoJson.payouts),
-                premiumProduct: premiumProduct
+                premiumProduct: premiumProduct,
+                portraitAssets: this.getOrientationAssets(promoJson.portrait, session, this._core),
+                landscapeAssets: this.getOrientationAssets(promoJson.landscape, session, this._core)
             };
 
             const promoCampaign = new PromoCampaign(promoCampaignParams);
@@ -62,10 +72,33 @@ export class PromoCampaignParser extends CampaignParser {
 
             return promise.then(() => Promise.resolve(promoCampaign));
         } else {
-            core.Sdk.logError('Product is undefined');
+            this._core.Sdk.logError('Product is undefined');
             return Promise.reject();
         }
 
+    }
+
+    private getOrientationAssets(orientationJSON: IRawPromoOrientationAsset, session: Session, core: ICoreApi): PromoOrientationAsset | undefined {
+        if (orientationJSON === undefined) {
+            return undefined;
+        }
+        const buttonFontJSON = orientationJSON.button.font;
+        if (buttonFontJSON === undefined) {
+            return undefined;
+        }
+        const buttonAssetData: IPromoAsset = {
+            image: new Image(orientationJSON.button.url, session),
+            font: new Font(buttonFontJSON.url, session, buttonFontJSON.family, buttonFontJSON.color, buttonFontJSON.size)
+        };
+        const backgroundAssetData: IPromoAsset = {
+            image: new Image(orientationJSON.background.url, session),
+            font: undefined
+        };
+        const PromoOrientationAssetData: IPromoOrientationAsset = {
+            buttonAsset: new PromoAsset(buttonAssetData),
+            backgroundAsset: new PromoAsset(backgroundAssetData)
+        };
+        return new PromoOrientationAsset(PromoOrientationAssetData);
     }
 
     private getLimitedTimeOffer(promoJson: IRawPromoCampaign): LimitedTimeOffer | undefined {

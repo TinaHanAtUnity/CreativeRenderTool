@@ -1,5 +1,3 @@
-import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
-
 @NonCPS
 def checkIfJobReplayed() {
     def causes = currentBuild.rawBuild.getCauses()
@@ -11,17 +9,65 @@ def checkIfJobReplayed() {
     return false
 }
 
-def waitWebviewDeployed(webviewBranch) {
-    // TODO: use Travis build status to detect webview deployment status
-    timeout(time: 15, unit: 'MINUTES') {
-        def CONFIG_URL = "https://config.unityads.unity3d.com/webview/${webviewBranch}/release/config.json"
-        echo "Waiting for $CONFIG_URL..."
+def setupTools() {
+    // Job can possibly run on OSX or Linux box
+    sh """
+      which jq ||
+      unameOutput="\$(uname -s)" &&
+      case "\${unameOutput}" in
+      Linux*)   apt-get -y update &&
+                apt-get -y install jq
+                ;;
+      Darwin*)  if [ -z "\$(which jq)" ]; then
+                  brew install jq
+                fi
+                ;;
+      esac
+    """
+}
 
-        waitUntil {
-            def status = sh(returnStdout: true, script: "curl -sL -w \"%{http_code}\\n\" \"$CONFIG_URL\" -o /dev/null").trim()
-            return status == '200'
+def waitWebviewDeployed(webviewBranch) {
+    setupTools()
+
+    def webviewBranchEscaped = webviewBranch.replace("/", "%2F")
+
+    withCredentials([string(credentialsId: 'ADS_SDK_TRAVIS_API_TOKEN', variable: 'TRAVIS_TOKEN')]) {
+        def buildId = sh(
+          returnStdout: true,
+          script: """
+            curl -X GET \
+            -H \"Content-Type: application/json\" \
+            -H \"Travis-API-Version: 3\" \
+            -H \"Accept: application/json\" \
+            -H \"Authorization: token $TRAVIS_TOKEN\" \
+            'https://api.travis-ci.com/repo/Applifier%2Funity-ads-webview/branch/$webviewBranchEscaped' \
+            | jq -r '.last_build.id'
+          """
+        ).trim()
+
+        while (true) {
+            buildStatus = sh(
+              returnStdout: true,
+              script: """
+                curl -X GET \
+                -H \"Content-Type: application/json\" \
+                -H \"Travis-API-Version: 3\" \
+                -H \"Accept: application/json\" \
+                -H \"Authorization: token $TRAVIS_TOKEN\" \
+                'https://api.travis-ci.com/build/$buildId' \
+                | jq -r '.state'
+              """
+            ).trim()
+
+            if (buildStatus != "created" && buildStatus != "received" && buildStatus != "started") {
+               break
+            }
+
+            sleep 10
         }
     }
+
+    return buildStatus == "passed"
 }
 
 def runTests = false
@@ -54,20 +100,25 @@ pipeline {
                     steps {
                         script {
                             def commitMessage = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim()
+                            def gitRepoUrl = sh(returnStdout: true, script: 'git config --get remote.origin.url').trim()
 
-                            if (commitMessage =~ /^Merge branch 'master'/) {
-                                webviewBranch = "${env.CHANGE_BRANCH}/${env.GIT_COMMIT}"
-                            } else {
-                                def commitId = sh(returnStdout: true, script: 'git rev-parse HEAD^1').trim()
-                                webviewBranch = "${env.CHANGE_BRANCH}/${commitId}"
+                            withCredentials([string(credentialsId: 'github_ro_token', variable: 'GITHUB_TOKEN')]) {
+                                commitId = sh(
+                                  returnStdout: true,
+                                  script: """curl -v -H \"Authorization: token ${GITHUB_TOKEN}\" \
+                                    -H \"Accept:application/vnd.github.VERSION.sha\" \
+                                    https://api.github.com/repos/Applifier/unity-ads-webview/commits/refs/pull/${CHANGE_ID}/head"""
+                                ).trim()
                             }
+                            webviewBranch = "${env.CHANGE_BRANCH}/${commitId}"
 
-                            try {
-                                waitWebviewDeployed(webviewBranch)
+                            def webviewDeployed = waitWebviewDeployed(env.CHANGE_BRANCH)
+
+                            if (webviewDeployed) {
                                 runTests = true
-                            } catch (FlowInterruptedException interruptEx) {
+                            } else {
                                 currentBuild.result = 'ABORTED'
-                                error("\n\nWARNING! Webview branch '${webviewBranch}' deployment seems to have not succeeded! Not running tests.\n\n")
+                                error("\n\nWebview branch '${webviewBranch}' deployment seems to have not succeeded! Not running tests.\n\n")
                             }
                         }
                     }
@@ -100,7 +151,12 @@ pipeline {
                             dir(jobName) {
                                 sharedLibs.downloadFromGcp("$artifactFolder/*")
                             }
-                            sharedLibs.removeFromGcp(artifactFolder)
+
+                            try {
+                                sharedLibs.removeFromGcp(artifactFolder)
+                            } catch(e) {
+                                echo "Could not clean up artifacts from GCP: '$e'"
+                            }
                         }
                     }
 

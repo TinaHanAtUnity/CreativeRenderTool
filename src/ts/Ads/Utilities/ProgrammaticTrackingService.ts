@@ -27,8 +27,8 @@ export interface IProgrammaticTrackingMetricData {
 }
 
 export class ProgrammaticTrackingService {
-    private static productionErrorServiceUrl: string = 'https://tracking.adsx.unityads.unity3d.com/tracking/sdk/error';
-    private static productionMetricServiceUrl: string = 'https://tracking.adsx.unityads.unity3d.com/tracking/sdk/metric';
+    private static productionErrorServiceUrl: string = 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/error';
+    private static productionMetricServiceUrl: string = 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric';
 
     private _platform: Platform;
     private _request: RequestManager;

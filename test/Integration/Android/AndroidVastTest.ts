@@ -7,10 +7,14 @@ import { UnityAds } from 'Backend/UnityAds';
 import { Platform } from 'Core/Constants/Platform';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
+
 import { assert } from 'chai';
 import { Observable1, Observable2, Observable3 } from 'Core/Utilities/Observable';
 import { FinishState } from 'Core/Constants/FinishState';
 import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
+import { fakeARUtils } from 'TestHelpers/FakeARUtils';
+import * as sinon from 'sinon';
+
 
 class TestListener implements IUnityAdsListener {
 
@@ -46,6 +50,15 @@ class TestListener implements IUnityAdsListener {
 }
 
 describe('AndroidVastTest', () => {
+    const sandbox = sinon.createSandbox();
+
+    beforeEach(() => {
+        fakeARUtils(sandbox);
+    });
+
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     let listener: TestListener;
     let readyPlacement: string;
