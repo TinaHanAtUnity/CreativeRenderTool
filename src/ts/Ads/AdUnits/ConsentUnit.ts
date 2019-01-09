@@ -1,4 +1,9 @@
-import { AdUnitContainer, AdUnitContainerSystemMessage, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import {
+    AdUnitContainer,
+    AdUnitContainerSystemMessage,
+    IAdUnit,
+    Orientation
+} from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { UnityConsent } from 'Ads/Views/Consent/UnityConsent';
@@ -17,7 +22,7 @@ export interface IConsentUnitParameters {
     core: ICoreApi;
 }
 
-export class ConsentUnit implements IConsentViewHandler {
+export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     private _donePromiseResolve: () => void;
     private _showing: boolean;
     private _adUnitContainer: AdUnitContainer;
@@ -48,7 +53,7 @@ export class ConsentUnit implements IConsentViewHandler {
 
     public show(options: unknown): Promise<void> {
         this._showing = true;
-        return this._adUnitContainer.open('Consent', ['webview'], false, Orientation.NONE, true, true, true, false, options).then(() => {
+        return this._adUnitContainer.open(this, ['webview'], false, Orientation.NONE, true, true, true, false, options).then(() => {
             const donePromise = new Promise<void>((resolve) => {
                 this._donePromiseResolve = resolve;
             });
@@ -148,5 +153,9 @@ export class ConsentUnit implements IConsentViewHandler {
                 this._consentSettingsView.testAutoConsent(consent);
             }
         }, 3000);
+    }
+
+    public description(): string {
+        return 'Consent';
     }
 }

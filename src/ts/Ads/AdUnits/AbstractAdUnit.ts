@@ -1,5 +1,4 @@
-import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
-import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, IAdUnit, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IAdsApi } from 'Ads/IAds';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -9,7 +8,6 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -19,8 +17,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Observable0 } from 'Core/Utilities/Observable';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -44,7 +40,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     gameSessionId?: number;
 }
 
-export abstract class AbstractAdUnit {
+export abstract class AbstractAdUnit implements IAdUnit {
 
     public static setAutoClose(value: boolean) {
         AbstractAdUnit._autoClose = value;

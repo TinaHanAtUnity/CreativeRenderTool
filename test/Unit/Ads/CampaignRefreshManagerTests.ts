@@ -2,7 +2,7 @@ import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
 import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { AdUnitContainer, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, IAdUnit, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
@@ -58,7 +58,7 @@ import { VastParser } from 'VAST/Utilities/VastParser';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export class TestContainer extends AdUnitContainer {
-    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
+    public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
         return Promise.resolve();
     }
     public close(): Promise<void> {
