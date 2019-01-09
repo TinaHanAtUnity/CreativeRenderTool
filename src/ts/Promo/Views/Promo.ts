@@ -54,6 +54,14 @@ export class Promo extends View<{}> implements IPrivacyHandlerView {
             let landscapeFontURL = '';
             const portraitAssets = campaign.getPortraitAssets();
             if (portraitAssets) {
+                const buttonCoordinates = portraitAssets.getButtonAsset().getCoordinates();
+                if (buttonCoordinates) {
+                    this._templateData.portraitButtonCoordinatesTop = buttonCoordinates.getTop();
+                    this._templateData.portraitButtonCoordinatesLeft = buttonCoordinates.getLeft();
+                }
+                const buttonSize = portraitAssets.getButtonAsset().getSize();
+                this._templateData.portraitButtonSizeWidth = buttonSize.getWidth();
+                this._templateData.portraitButtonSizeHeight = buttonSize.getHeight();
                 const font = portraitAssets.getButtonAsset().getFont();
                 if (font) {
                     this._templateData.portraitPriceTextFontFamily = font.getFamily();
@@ -61,11 +69,24 @@ export class Promo extends View<{}> implements IPrivacyHandlerView {
                     this._templateData.portraitPriceTextFontSize = font.getSize();
                     portraitFontURL = font.getUrl();
                 }
+                const backgroundSize = portraitAssets.getBackgroundAsset().getSize();
+                this._templateData.portraitBackgroundImageWidth = backgroundSize.getWidth();
+                this._templateData.portraitBackgroundImageHeight = backgroundSize.getHeight();
                 this._templateData.portraitBackgroundImage = portraitAssets.getBackgroundAsset().getImage().getUrl();
                 this._templateData.portraitButtonImage = portraitAssets.getButtonAsset().getImage().getUrl();
             }
             const landscapeAssets = campaign.getLandscapeAssets();
             if (landscapeAssets) {
+                const buttonCoordinates = landscapeAssets.getButtonAsset().getCoordinates();
+                if (buttonCoordinates) {
+                    this._templateData.landscapeButtonCoordinatesTop = buttonCoordinates.getTop();
+                    this._templateData.landscapeButtonCoordinatesLeft = buttonCoordinates.getLeft();
+                }
+                const buttonSize = landscapeAssets.getButtonAsset().getSize();
+                if (buttonSize) {
+                    this._templateData.landscapeButtonSizeWidth = buttonSize.getWidth();
+                    this._templateData.landscapeButtonSizeHeight = buttonSize.getHeight();
+                }
                 const font = landscapeAssets.getButtonAsset().getFont();
                 if (font) {
                     this._templateData.landscapePriceTextFontFamily = font.getFamily();
@@ -73,6 +94,9 @@ export class Promo extends View<{}> implements IPrivacyHandlerView {
                     this._templateData.landscapePriceTextFontSize = font.getSize();
                     landscapeFontURL = font.getUrl();
                 }
+                const backgroundSize = landscapeAssets.getBackgroundAsset().getSize();
+                this._templateData.landscapeBackgroundImageWidth = backgroundSize.getWidth();
+                this._templateData.landscapeBackgroundImageHeight = backgroundSize.getHeight();
                 this._templateData.landscapeBackgroundImage = landscapeAssets.getBackgroundAsset().getImage().getUrl();
                 this._templateData.landscapeButtonImage = landscapeAssets.getButtonAsset().getImage().getUrl();
             }
