@@ -76,6 +76,12 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }).catch(e => this._core.Sdk.logError('failed to create mraid: ' + e));
     }
 
+    public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {
+        if (this._gameSessionId % 1000 === 999) {
+            super.onBridgeSendStats(totalTime, playTime, frameCount);
+        }
+    }
+
     protected sendMraidAnalyticsEvent(eventName: string, eventData?: unknown) {
         const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
@@ -155,14 +161,12 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private setWebPlayerContainerData(webPlayerContainer: WebPlayerContainer, mraid: string): Promise<void> {
         if (this._platform === Platform.ANDROID) {
-            this.getMraidAsUrl(mraid).then((url) => {
+            return this.getMraidAsUrl(mraid).then((url) => {
                 return webPlayerContainer.setUrl(`file://${url}`);
             });
         } else {
             return webPlayerContainer.setData(mraid, 'text/html', 'UTF-8');
         }
-
-        return Promise.resolve();
     }
 
     private getMraidAsUrl(mraid: string): Promise<string> {
