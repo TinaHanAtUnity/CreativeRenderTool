@@ -12,7 +12,7 @@ export interface ILegacyRequestPrivacy {
     optOutEnabled: boolean;
 }
 
-export function isProfilingPermissions(permissions: IPermissions | { [key: string]: never }): permissions is IProfilingPermissions {
+function isProfilingPermissions(permissions: IPermissions | { [key: string]: never }): permissions is IProfilingPermissions {
     return (<IProfilingPermissions>permissions).profiling !== undefined;
 }
 
@@ -40,14 +40,18 @@ export class RequestPrivacyFactory {
                 optOutEnabled: false
             };
         }
-        let profiling = isProfilingPermissions(privacy.permissions) ? privacy.permissions.profiling : false;
-        if (privacy.method === PrivacyMethod.LEGITIMATE_INTEREST && privacy.firstRequest) {
-            profiling = true;
-        }
         return {
             gdprEnabled: true,
             optOutRecorded: !privacy.firstRequest,
-            optOutEnabled: !profiling
+            optOutEnabled: this.IsOptOutEnabled(privacy)
         };
+    }
+
+    private static IsOptOutEnabled(privacy: IRequestPrivacy) {
+        if (privacy.method === PrivacyMethod.LEGITIMATE_INTEREST && privacy.firstRequest) {
+            return false;
+        }
+
+        return isProfilingPermissions(privacy.permissions) ? !privacy.permissions.profiling : true;
     }
 }
