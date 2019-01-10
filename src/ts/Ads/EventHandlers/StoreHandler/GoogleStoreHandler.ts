@@ -1,8 +1,7 @@
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { Platform } from 'Core/Constants/Platform';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { StoreHandler, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
-import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { StoreHandler, IStoreHandlerDownloadParameters, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
 
 export class GoogleStoreHandler extends StoreHandler {
 
