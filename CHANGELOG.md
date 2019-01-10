@@ -1,4 +1,4 @@
-# PENDING
+# Thu Jan 10 23:34:08 UTC 2019
 
 * Vast parser strict added but disabled through ab groups [#7407](https://github.com/Applifier/unity-ads-webview/pull/7407)
 
