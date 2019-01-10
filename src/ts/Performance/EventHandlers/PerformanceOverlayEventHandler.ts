@@ -3,7 +3,7 @@ import {
     OverlayEventHandlerWithDownloadSupport
 } from 'Ads/EventHandlers/OverlayEventHandlerWithDownloadSupport';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { IAppStoreDownloadHelper } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { IStoreHandler } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
@@ -13,8 +13,8 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownl
     protected _performanceAdUnit: PerformanceAdUnit;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
 
-    constructor(adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters, downloadHelper: IAppStoreDownloadHelper) {
-        super(adUnit, parameters, downloadHelper, parameters.adUnitStyle);
+    constructor(adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters, storeHandler: IStoreHandler) {
+        super(adUnit, parameters, storeHandler, parameters.adUnitStyle);
         this._performanceAdUnit = adUnit;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
     }

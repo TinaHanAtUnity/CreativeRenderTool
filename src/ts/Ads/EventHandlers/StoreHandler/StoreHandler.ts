@@ -19,6 +19,9 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { ICoreApi } from 'Core/ICore';
 import { IAdsApi } from 'Ads/IAds';
+import { AppleStoreHandler } from 'Ads/EventHandlers/StoreHandler/AppleStoreHandler';
+import { GoogleStoreHandler } from 'Ads/EventHandlers/StoreHandler/GoogleStoreHandler';
+import { StandaloneAndroidStoreHandler } from 'Ads/EventHandlers/StoreHandler/StandaloneAndroidStoreHandler';
 
 export interface IStoreHandler {
     onDownload(parameters: IStoreHandlerDownloadParameters): void;
@@ -167,5 +170,9 @@ export abstract class StoreHandler implements IStoreHandler {
             adUnitStyle: parameters.adUnitStyle,
             asset: this.getVideo()
         };
+    }
+
+    public static getStoreHandler(storeHandlerParameters: IStoreHandlerParameters): StoreHandler {
+        return new GoogleStoreHandler(storeHandlerParameters);
     }
 }
