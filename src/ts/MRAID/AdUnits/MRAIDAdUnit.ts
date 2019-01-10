@@ -351,8 +351,8 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             setAllowFileAccessFromFileURLs: [true]
         }, {}));
         const eventSettings = {
-            'onPageStarted': { 'sendEvent': true },
-            'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': true }
+            onPageStarted: { 'sendEvent': true },
+            shouldOverrideUrlLoading: { 'sendEvent': true, 'returnValue': true }
         };
         promises.push(this._webPlayerContainer.setEventSettings(eventSettings));
         return Promise.all(promises);
@@ -360,13 +360,13 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private setupIosWebPlayer(): Promise<unknown> {
         const settings = {
-            'allowsPlayback': true,
-            'playbackRequiresAction': false,
-            'typesRequiringAction': WKAudiovisualMediaTypes.NONE
+            allowsPlayback: true,
+            playbackRequiresAction: false,
+            typesRequiringAction: WKAudiovisualMediaTypes.NONE
         };
         const events = {
-            'onPageStarted': { 'sendEvent': true },
-            'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': true }
+            onPageStarted: { 'sendEvent': true },
+            shouldOverrideUrlLoading: { 'sendEvent': true, 'returnValue': true }
         };
         return Promise.all([
             this._webPlayerContainer.setSettings(settings, {}),
