@@ -148,6 +148,19 @@ export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
 
     protected _vastParserStrict: VastParserStrict = new VastParserStrict();
 
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
+
+        if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
+            this._vastParserStrict.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
+        }
+
+        return this.retrieveVast(response).then((vast): Promise<Campaign> => {
+            return this._deviceInfo.getConnectionType().then((connectionType) => {
+                return this.parseVastToCampaign(vast, session, response, connectionType);
+            });
+        });
+    }
+
     protected retrieveVast(response: AuctionResponse): Promise<Vast> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
         return this._vastParserStrict.retrieveVast(decodedVast, this._core, this._requestManager);

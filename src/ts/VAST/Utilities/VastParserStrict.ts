@@ -27,7 +27,9 @@ enum VastNodeName {
     MEDIA_FILE = 'MediaFile',
     AD_PARAMETERS = 'AdParameters',
     STATIC_RESOURCE = 'StaticResource',
-    COMPANION_CLICK_THROUGH = 'CompanionClickThrough'
+    COMPANION_CLICK_THROUGH = 'CompanionClickThrough',
+    PARSE_ERROR = 'parsererror',
+    VAST = 'VAST'
 }
 
 enum VastAttributeNames {
@@ -50,16 +52,12 @@ export class VastParserStrict {
 
     private static DEFAULT_MAX_WRAPPER_DEPTH = 8;
 
-    private static createDOMParser() {
-        return new DOMParser();
-    }
-
     private _domParser: DOMParser;
     private _maxWrapperDepth: number;
     private _rootWrapperVast: unknown;
 
     constructor(domParser?: DOMParser, maxWrapperDepth: number = VastParserStrict.DEFAULT_MAX_WRAPPER_DEPTH) {
-        this._domParser = domParser || VastParserStrict.createDOMParser();
+        this._domParser = domParser || new DOMParser();
         this._maxWrapperDepth = maxWrapperDepth;
     }
 
@@ -72,12 +70,12 @@ export class VastParserStrict {
             throw new Error('VAST data is missing');
         }
 
-        const xml = (this._domParser).parseFromString(vast, 'text/xml');
+        const xml = this._domParser.parseFromString(vast, 'text/xml');
         const ads: VastAd[] = [];
         const parseErrorURLTemplates: string[] = [];
 
         // use the parsererror tag from DomParser to give accurate error messages
-        const parseErrors = xml.getElementsByTagName('parsererror');
+        const parseErrors = xml.getElementsByTagName(VastNodeName.PARSE_ERROR); // TODO move to enum
         if (parseErrors.length > 0) {
             // then we have failed to parse the xml
             const parseMessages: string[] = [];
@@ -89,7 +87,7 @@ export class VastParserStrict {
             throw new Error(`VAST xml was not parseable:\n   ${parseMessages.join('\n    ')}`);
         }
 
-        if (!xml || !xml.documentElement || xml.documentElement.nodeName !== 'VAST') {
+        if (!xml || !xml.documentElement || xml.documentElement.nodeName !== VastNodeName.VAST) { // TODO move vast to enum
             throw new Error('VAST xml data is missing');
         }
 
@@ -234,19 +232,11 @@ export class VastParserStrict {
     private parseAdElement(adElement: HTMLElement): VastAd {
 
         // use the first 'InLine' ad
-        const inlineElement = this.getFirstNodeWithName(adElement, VastNodeName.INLINE);
-        if (inlineElement) {
-            const inlineAd = this.parseAdContent(inlineElement);
-            inlineAd.setId(adElement.getAttribute(VastAttributeNames.ID));
-            return inlineAd;
-        }
-
-        // use the first 'Wrapper' ad if there is no 'InLine' ad
-        const wrapperElement = this.getFirstNodeWithName(adElement, VastNodeName.WRAPPER);
-        if (wrapperElement) {
-            const wrapperAd = this.parseAdContent(wrapperElement);
-            wrapperAd.setId(adElement.getAttribute(VastAttributeNames.ID));
-            return wrapperAd;
+        const element = this.getFirstNodeWithName(adElement, VastNodeName.INLINE) || this.getFirstNodeWithName(adElement, VastNodeName.WRAPPER);
+        if (element) {
+            const parsedAd = this.parseAdContent(element);
+            parsedAd.setId(adElement.getAttribute(VastAttributeNames.ID));
+            return parsedAd;
         }
 
         // return undefined if there is no inline or wrapper ad

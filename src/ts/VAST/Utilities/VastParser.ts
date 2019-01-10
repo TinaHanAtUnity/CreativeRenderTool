@@ -41,7 +41,7 @@ export class VastParser {
             throw new Error('VAST data is missing');
         }
 
-        const xml = (this._domParser).parseFromString(vast, 'text/xml');
+        const xml = this._domParser.parseFromString(vast, 'text/xml');
         const ads: VastAd[] = [];
         const errorURLTemplates: (string | null)[] = [];
 
