@@ -104,7 +104,7 @@ export class UserPrivacyManager {
             return Promise.resolve();
         }
 
-        if (gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT && !isUnityConsentPermissions(permissions)) {
+        if (gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
             return Promise.resolve();
         }
 
