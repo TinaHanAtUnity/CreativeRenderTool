@@ -11,10 +11,8 @@ import 'mocha';
 import { assert } from 'chai';
 import { Observable1, Observable2, Observable3 } from 'Core/Utilities/Observable';
 import { FinishState } from 'Core/Constants/FinishState';
-import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { fakeARUtils } from 'TestHelpers/FakeARUtils';
 import * as sinon from 'sinon';
-
 
 class TestListener implements IUnityAdsListener {
 
