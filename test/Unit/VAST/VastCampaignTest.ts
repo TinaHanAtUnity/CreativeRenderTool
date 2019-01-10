@@ -46,7 +46,7 @@ describe('VastCampaignTest', () => {
         });
 
         it('should not have an endscreen when both portrait and landscape urls missing', () => {
-            const vastCampaign = TestFixtures.getCompanionVastCampaignWihoutImages();
+            const vastCampaign = TestFixtures.getCompanionVastCampaignWithoutImages();
             assert.equal(vastCampaign.hasEndscreen(), false);
         });
     });
