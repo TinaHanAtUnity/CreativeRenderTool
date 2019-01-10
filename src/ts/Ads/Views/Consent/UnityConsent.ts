@@ -81,17 +81,17 @@ export class UnityConsent extends View<IConsentViewHandler> {
             all: true
         };
         this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
-        this.runAnimation();
+        this.closeWithAnimation();
     }
 
-    private runAnimation(): void {
+    private closeWithAnimation(): void {
         this.container().classList.add('prevent-clicks');
 
-        const buttonSPinner = new ButtonSpinner(this._platform);
-        buttonSPinner.render();
+        const buttonSpinner = new ButtonSpinner(this._platform);
+        buttonSpinner.render();
         const agreeButton = <HTMLElement>this._container.querySelector('.agree');
         if (agreeButton) {
-            agreeButton.appendChild(buttonSPinner.container());
+            agreeButton.appendChild(buttonSpinner.container());
             agreeButton.classList.add('click-animation');
 
         }

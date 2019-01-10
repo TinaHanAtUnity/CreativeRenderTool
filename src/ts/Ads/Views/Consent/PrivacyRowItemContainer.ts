@@ -79,7 +79,7 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
         ];
     }
 
-    public showParagraph(paragraph: PrivacyTextParagraph): void {
+    public showParagraphAndScrollToSection(paragraph: PrivacyTextParagraph): void {
         let rowItemElement: Element | null;
         let paragraphElement: Element | null;
 

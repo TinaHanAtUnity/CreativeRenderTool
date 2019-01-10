@@ -74,10 +74,9 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
     public showParagraph(paragraph: PrivacyTextParagraph): void {
         this.show();
         this._checkboxGroup.show();
-        this._infoContainer.showParagraph(paragraph);
+        this._infoContainer.showParagraphAndScrollToSection(paragraph);
     }
 
-    // IPrivacyRowItemContainerHandler
     public onDataDeletion(): void {
         this._checkboxGroup.checkCheckboxes(false);
     }
@@ -86,12 +85,10 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
         // do nothing
     }
 
-    // IPrivacyRowItemContainerHandler
     public onPrivacy(url: string): void {
         this._handlers.forEach(handler => handler.onPrivacy(url));
     }
 
-    // IPersonalizationCheckboxGroupHandler
     public onCheckboxGroupSelectionChange(): void {
         this.setConsentButtons();
     }
@@ -120,7 +117,7 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
 
         this._handlers.forEach(handler => handler.onConsent(consent, GDPREventSource.USER));
 
-        this.runAnimation(this._acceptAllButton);
+        this.closeWithAnimation(this._acceptAllButton);
 
     }
 
@@ -134,7 +131,7 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
         };
 
         this.triggerOnPersonalizedConsent(personalizedConsent);
-        this.runAnimation(this._saveMyChoicesButton);
+        this.closeWithAnimation(this._saveMyChoicesButton);
 
     }
 
@@ -157,7 +154,7 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
         }
     }
 
-    private runAnimation(buttonElement: HTMLElement): void {
+    private closeWithAnimation(buttonElement: HTMLElement): void {
         this.container().classList.add('prevent-clicks');
 
         const buttonSpinner = new ButtonSpinner(this._platform);
