@@ -400,16 +400,6 @@ describe('UserPrivacyManagerTest', () => {
             });
         });
 
-        it('should cache the result', () => {
-            return privacyManager.retrieveUserSummary().then(() => {
-                sinon.assert.calledOnce(getRequestStub);
-                return privacyManager.retrieveUserSummary().then((response) => {
-                    sinon.assert.calledOnce(getRequestStub);
-                    assert.equal(response.deviceModel, model);
-                });
-            });
-        });
-
         it('verify response has personal payload', () => {
             return privacyManager.retrieveUserSummary().then((response) => {
                 assert.equal(response.deviceModel, model);
