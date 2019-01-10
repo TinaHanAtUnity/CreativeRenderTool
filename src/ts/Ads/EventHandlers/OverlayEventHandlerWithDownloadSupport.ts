@@ -3,7 +3,7 @@ import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
-import { IStoreHandler, IStoreHandlerDownloadParameters} from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { IStoreHandler, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 
 export interface IVideoOverlayDownloadParameters extends IStoreHandlerDownloadParameters {

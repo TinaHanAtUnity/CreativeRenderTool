@@ -1,5 +1,6 @@
 import { StoreHandler, IStoreHandlerParameters, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { StoreName } from 'Performance/Models/PerformanceCampaign';
 
 export class StandaloneAndroidStoreHandler extends StoreHandler {
 
@@ -8,6 +9,10 @@ export class StandaloneAndroidStoreHandler extends StoreHandler {
     }
 
     public onDownload(parameters: IStoreHandlerDownloadParameters) {
+        if (parameters.store !== StoreName.STANDALONE_ANDROID) {
+            return;
+        }
+
         if (parameters.clickAttributionUrl) {
             this.handleClickAttributionWithoutRedirect(parameters.clickAttributionUrl);
         }

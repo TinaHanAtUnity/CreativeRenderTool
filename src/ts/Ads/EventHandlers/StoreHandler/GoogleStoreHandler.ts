@@ -10,6 +10,9 @@ export class GoogleStoreHandler extends StoreHandler {
     }
 
     public onDownload(parameters: IStoreHandlerDownloadParameters): void {
+        if (parameters.store !== StoreName.GOOGLE && parameters.store !== StoreName.XIAOMI) {
+            return;
+        }
         super.onDownload(parameters);
 
         if (parameters.clickAttributionUrl) {
@@ -24,12 +27,9 @@ export class GoogleStoreHandler extends StoreHandler {
     }
 
     private openGoogleAppStore(parameters: IStoreHandlerDownloadParameters, isAppSheetBroken?: boolean) {
-        const platform = this._platform;
         let packageName: string | undefined;
 
-        if (platform === Platform.ANDROID) {
-            packageName = this._clientInfo.getApplicationName();
-        }
+        packageName = this._clientInfo.getApplicationName();
 
         const appStoreUrl = this.getGoogleAppStoreUrl(parameters, packageName);
         if (!appStoreUrl) {
@@ -39,12 +39,10 @@ export class GoogleStoreHandler extends StoreHandler {
             return;
         }
 
-        if (platform === Platform.ANDROID) {
-            this._core.Android!.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': appStoreUrl
-            });
-        }
+        this._core.Android!.Intent.launch({
+            'action': 'android.intent.action.VIEW',
+            'uri': appStoreUrl
+        });
     }
 
     private getGoogleAppStoreUrl(parameters: IStoreHandlerDownloadParameters, packageName?: string): string | undefined {

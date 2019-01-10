@@ -125,6 +125,7 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { StoreHandler, IStoreHandlerDownloadParameters, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandler/StoreHandlerFactory';
 import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
@@ -753,7 +754,7 @@ export class TestFixtures {
             campaign: campaign,
             coreConfig: TestFixtures.getCoreConfiguration()
         };
-        return StoreHandler.getStoreHandler(storeHandlerParameters);
+        return StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
     }
 
     public static getClientInfo(platform?: Platform, gameId?: string): ClientInfo {

@@ -7,6 +7,7 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { StoreHandler, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandler/StoreHandlerFactory';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
@@ -157,7 +158,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             campaign: campaign,
             coreConfig: coreConfig
         };
-        storeHandler = StoreHandler.getStoreHandler(storeHandlerParameters);
+        storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
 
         performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
     });

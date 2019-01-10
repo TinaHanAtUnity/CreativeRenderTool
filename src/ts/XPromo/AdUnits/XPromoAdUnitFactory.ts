@@ -11,7 +11,8 @@ import { Platform } from 'Core/Constants/Platform';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
-import { StoreHandler, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandler/StoreHandlerFactory';
 
 export class XPromoAdUnitFactory extends AbstractAdUnitFactory<XPromoCampaign, IXPromoAdUnitParameters> {
 
@@ -33,7 +34,7 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory<XPromoCampaign, I
             coreConfig: parameters.coreConfig
         };
 
-        const storeHandler = StoreHandler.getStoreHandler(storeHandlerParameters);
+        const storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
 
         const xPromoOverlayEventHandler = new XPromoOverlayEventHandler(xPromoAdUnit, parameters, storeHandler);
         parameters.overlay.addEventHandler(xPromoOverlayEventHandler);

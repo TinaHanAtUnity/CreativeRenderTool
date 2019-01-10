@@ -14,6 +14,9 @@ export class AppleStoreHandler extends StoreHandler {
     }
 
     private onDownloadApple(parameters: IStoreHandlerDownloadParameters): void {
+        if (parameters.store !== StoreName.APPLE) {
+            return;
+        }
         super.onDownload(parameters);
 
         const isAppSheetBroken = IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion(), this._deviceInfo.getModel());
@@ -28,8 +31,6 @@ export class AppleStoreHandler extends StoreHandler {
     }
 
     private openAppleAppStore(parameters: IStoreHandlerDownloadParameters, isAppSheetBroken?: boolean) {
-        const platform = this._platform;
-
         const appStoreUrl = this.getAppleAppStoreUrl(parameters);
         if (!appStoreUrl) {
             Diagnostics.trigger('no_appstore_url', {

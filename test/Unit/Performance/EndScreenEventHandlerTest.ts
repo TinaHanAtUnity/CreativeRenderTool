@@ -38,7 +38,8 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
-import {IStoreHandler, IStoreHandlerParameters, StoreHandler} from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { IStoreHandler, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandler/StoreHandlerFactory';
 import { Campaign } from 'Ads/Models/Campaign';
 
 describe('EndScreenEventHandlerTest', () => {
@@ -179,7 +180,7 @@ describe('EndScreenEventHandlerTest', () => {
                 campaign: campaign,
                 coreConfig: coreConfig
             };
-            storeHandler = StoreHandler.getStoreHandler(storeHandlerParameters);
+            storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
             endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
         });
 
@@ -440,7 +441,7 @@ describe('EndScreenEventHandlerTest', () => {
                 campaign: campaign,
                 coreConfig: coreConfig
             };
-            storeHandler = StoreHandler.getStoreHandler(storeHandlerParameters);
+            storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
             endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
         });
 

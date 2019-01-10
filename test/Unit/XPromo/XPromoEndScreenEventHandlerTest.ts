@@ -37,6 +37,7 @@ import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { IStoreHandlerParameters, StoreHandler } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandler/StoreHandlerFactory';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -177,7 +178,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 campaign: campaign,
                 coreConfig: coreConfig
             };
-            storeHandler = StoreHandler.getStoreHandler(storeHandlerParameters);
+            storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
 
             endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, storeHandler);
         });
@@ -342,7 +343,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 campaign: campaign,
                 coreConfig: coreConfig
             };
-            storeHandler = StoreHandler.getStoreHandler(storeHandlerParameters);
+            storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
 
             endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, xPromoAdUnitParameters, storeHandler);
         });
