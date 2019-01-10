@@ -1,3 +1,7 @@
+# PENDING
+
+* Vast parser strict added but disabled through ab groups [#7407](https://github.com/Applifier/unity-ads-webview/pull/7407)
+
 # Wed Jan 9 19:50:51 UTC 2019
 
 * Using gameSessionId to sample fps counters [#7710](https://github.com/Applifier/unity-ads-webview/pull/7710)
