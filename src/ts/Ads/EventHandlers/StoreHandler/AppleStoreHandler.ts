@@ -4,7 +4,6 @@ import {
     IStoreHandlerDownloadParameters
 } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export class AppleStoreHandler extends StoreHandler {
@@ -65,7 +64,7 @@ export class AppleStoreHandler extends StoreHandler {
     }
 
     private getAppleAppStoreUrl(parameters: IStoreHandlerDownloadParameters): string | undefined {
-        if (!parameters.appStoreId && parameters.store !== StoreName.APPLE) {
+        if (!parameters.appStoreId) {
             return;
         }
 

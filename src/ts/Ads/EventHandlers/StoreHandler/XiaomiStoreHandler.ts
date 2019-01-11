@@ -1,7 +1,7 @@
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { StoreHandler, IStoreHandlerDownloadParameters, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
 
-export class GoogleStoreHandler extends StoreHandler {
+export class XiaomiStoreHandler extends StoreHandler {
 
     constructor(parameters: IStoreHandlerParameters) {
         super(parameters);
@@ -14,19 +14,19 @@ export class GoogleStoreHandler extends StoreHandler {
             this.handleClickAttribution(parameters);
 
             if (!parameters.clickAttributionUrlFollowsRedirects) {
-                this.openGoogleAppStore(parameters);
+                this.openXiaomiAppStore(parameters);
             }
         } else {
-            this.openGoogleAppStore(parameters);
+            this.openXiaomiAppStore(parameters);
         }
     }
 
-    private openGoogleAppStore(parameters: IStoreHandlerDownloadParameters, isAppSheetBroken?: boolean) {
+    private openXiaomiAppStore(parameters: IStoreHandlerDownloadParameters, isAppSheetBroken?: boolean) {
         let packageName: string | undefined;
 
         packageName = this._clientInfo.getApplicationName();
 
-        const appStoreUrl = this.getGoogleAppStoreUrl(parameters, packageName);
+        const appStoreUrl = this.getXiaomiAppStoreUrl(parameters, packageName);
         if (!appStoreUrl) {
             Diagnostics.trigger('no_appstore_url', {
                 message: 'cannot generate appstore url'
@@ -40,11 +40,11 @@ export class GoogleStoreHandler extends StoreHandler {
         });
     }
 
-    private getGoogleAppStoreUrl(parameters: IStoreHandlerDownloadParameters, packageName?: string): string | undefined {
+    private getXiaomiAppStoreUrl(parameters: IStoreHandlerDownloadParameters, packageName?: string): string | undefined {
         if (!parameters.appStoreId) {
             return;
         }
 
-        return 'market://details?id=' + parameters.appStoreId;
+        return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + this._coreConfig.getToken();
     }
 }

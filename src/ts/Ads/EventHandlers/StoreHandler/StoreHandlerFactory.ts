@@ -4,21 +4,32 @@ import { GoogleStoreHandler } from 'Ads/EventHandlers/StoreHandler/GoogleStoreHa
 import { StandaloneAndroidStoreHandler } from 'Ads/EventHandlers/StoreHandler/StandaloneAndroidStoreHandler';
 import { Platform } from 'Core/Constants/Platform';
 import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
+import { XiaomiStoreHandler } from 'Ads/EventHandlers/StoreHandler/XiaomiStoreHandler';
 
 export class StoreHandlerFactory {
 
     public static getNewStoreHandler(storeHandlerParameters: IStoreHandlerParameters): StoreHandler {
-        if (storeHandlerParameters.adUnit instanceof PerformanceCampaign &&
-            storeHandlerParameters.campaign instanceof PerformanceCampaign &&
-            storeHandlerParameters.campaign.getStore() === StoreName.STANDALONE_ANDROID) {
+        if (this.isAPKCampaign(storeHandlerParameters)) {
             return new StandaloneAndroidStoreHandler(storeHandlerParameters);
-        }
-        if (storeHandlerParameters.platform === Platform.IOS) {
+        } else if (storeHandlerParameters.platform === Platform.IOS) {
             return new AppleStoreHandler(storeHandlerParameters);
+        } else if (this.isXiaomi(storeHandlerParameters)) {
+            return new XiaomiStoreHandler(storeHandlerParameters);
         } else if (storeHandlerParameters.platform === Platform.ANDROID) {
             return new GoogleStoreHandler(storeHandlerParameters);
         } else {
             throw new Error('Invalid store for creating new store handler');
         }
+    }
+
+    private static isXiaomi(storeHandlerParameters: IStoreHandlerParameters): boolean {
+        return storeHandlerParameters.campaign instanceof PerformanceCampaign &&
+            storeHandlerParameters.campaign.getStore() === StoreName.XIAOMI;
+    }
+
+    private static isAPKCampaign(storeHandlerParameters: IStoreHandlerParameters): boolean {
+        return storeHandlerParameters.adUnit instanceof PerformanceCampaign &&
+            storeHandlerParameters.campaign instanceof PerformanceCampaign &&
+            storeHandlerParameters.campaign.getStore() === StoreName.STANDALONE_ANDROID;
     }
 }
