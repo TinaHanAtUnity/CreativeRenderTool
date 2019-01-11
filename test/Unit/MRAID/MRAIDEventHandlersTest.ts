@@ -64,7 +64,7 @@ describe('MRAIDEventHandlersTest', () => {
     let programmaticTrackingService: ProgrammaticTrackingService;
     let webPlayerContainer: WebPlayerContainer;
 
-    describe('with onClick', () => {
+    xdescribe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
 
         beforeEach(() => {
