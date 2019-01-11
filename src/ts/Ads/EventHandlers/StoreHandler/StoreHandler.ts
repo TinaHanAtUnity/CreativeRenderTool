@@ -88,7 +88,6 @@ export abstract class StoreHandler implements IStoreHandler {
                 this._thirdPartyEventManager.sendWithGet('xpromo click', this._campaign.getSession().getId(), url);
             }
         }
-        //
     }
 
     protected handleClickAttribution(parameters: IStoreHandlerDownloadParameters) {

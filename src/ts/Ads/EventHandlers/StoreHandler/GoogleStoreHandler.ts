@@ -10,9 +10,6 @@ export class GoogleStoreHandler extends StoreHandler {
     }
 
     public onDownload(parameters: IStoreHandlerDownloadParameters): void {
-        if (parameters.store !== StoreName.GOOGLE && parameters.store !== StoreName.XIAOMI) {
-            return;
-        }
         super.onDownload(parameters);
 
         if (parameters.clickAttributionUrl) {

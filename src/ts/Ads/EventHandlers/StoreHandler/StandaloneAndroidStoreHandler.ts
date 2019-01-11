@@ -9,9 +9,7 @@ export class StandaloneAndroidStoreHandler extends StoreHandler {
     }
 
     public onDownload(parameters: IStoreHandlerDownloadParameters) {
-        if (parameters.store !== StoreName.STANDALONE_ANDROID) {
-            return;
-        }
+        super.onDownload(parameters);
 
         if (parameters.clickAttributionUrl) {
             this.handleClickAttributionWithoutRedirect(parameters.clickAttributionUrl);

@@ -13,10 +13,7 @@ export class AppleStoreHandler extends StoreHandler {
         super(parameters);
     }
 
-    private onDownloadApple(parameters: IStoreHandlerDownloadParameters): void {
-        if (parameters.store !== StoreName.APPLE) {
-            return;
-        }
+    public onDownload(parameters: IStoreHandlerDownloadParameters): void {
         super.onDownload(parameters);
 
         const isAppSheetBroken = IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion(), this._deviceInfo.getModel());
