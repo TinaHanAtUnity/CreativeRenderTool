@@ -1,4 +1,8 @@
-# Staged
+# Thu Jan 10 23:34:08 UTC 2019
+
+* Vast parser strict added but disabled through ab groups [#7407](https://github.com/Applifier/unity-ads-webview/pull/7407)
+
+# Wed Jan 9 19:50:51 UTC 2019
 
 * Using gameSessionId to sample fps counters [#7710](https://github.com/Applifier/unity-ads-webview/pull/7710)
 * Reduce click delay log 100%->50% for ByteDance [#7724](https://github.com/Applifier/unity-ads-webview/pull/7724)

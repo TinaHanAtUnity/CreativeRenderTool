@@ -8,21 +8,21 @@ import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 
 interface IVast {
     ads: VastAd[];
-    errorURLTemplates: string[];
+    parseErrorURLTemplates: string[];
     additionalTrackingEvents: { [eventName: string]: string[] };
 }
 
 export class Vast extends Model<IVast> {
 
-    constructor(ads: VastAd[], errorURLTemplates: unknown[]) {
+    constructor(ads: VastAd[], parseErrorURLTemplates: unknown[]) {
         super('Vast', {
             ads: ['array'],
-            errorURLTemplates: ['array'],
+            parseErrorURLTemplates: ['array'],
             additionalTrackingEvents: ['object']
         });
 
         this.set('ads', ads);
-        this.set('errorURLTemplates', <string[]>errorURLTemplates);
+        this.set('parseErrorURLTemplates', <string[]>parseErrorURLTemplates);
         this.set('additionalTrackingEvents', {});
     }
 
@@ -35,11 +35,11 @@ export class Vast extends Model<IVast> {
         if (ad) {
             const adErrorUrls = ad.getErrorURLTemplates();
             if (adErrorUrls instanceof Array) {
-                return adErrorUrls.concat(this.get('errorURLTemplates') || []);
+                return adErrorUrls.concat(this.get('parseErrorURLTemplates') || []);
             }
         }
 
-        return this.get('errorURLTemplates');
+        return this.get('parseErrorURLTemplates');
     }
 
     public getErrorURLTemplate(): string | null {
@@ -260,7 +260,7 @@ export class Vast extends Model<IVast> {
 
         return {
             'ads': ads,
-            'errorURLTemplates': this.get('errorURLTemplates'),
+            'parseErrorURLTemplates': this.get('parseErrorURLTemplates'),
             'additionalTrackingEvents': this.get('additionalTrackingEvents')
         };
     }

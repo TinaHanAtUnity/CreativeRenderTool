@@ -15,19 +15,21 @@ import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErr
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { ICore, ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class ProgrammaticVastParser extends CampaignParser {
+
     public static ContentType = CampaignContentTypes.ProgrammaticVast;
 
     public static setVastParserMaxDepth(depth: number): void {
         ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH = depth;
     }
 
-    private static VAST_PARSER_MAX_DEPTH: number;
-    private _core: ICoreApi;
-    private _requestManager: RequestManager;
-    private _deviceInfo: DeviceInfo;
+    protected static VAST_PARSER_MAX_DEPTH: number;
+    protected _core: ICoreApi;
+    protected _requestManager: RequestManager;
+    protected _deviceInfo: DeviceInfo;
 
     protected _vastParser: VastParser = new VastParser();
 
@@ -139,5 +141,28 @@ export class ProgrammaticVastParser extends CampaignParser {
         const campaign = new VastCampaign(vastCampaignParms);
 
         return Promise.resolve(campaign);
+    }
+}
+
+export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
+
+    protected _vastParserStrict: VastParserStrict = new VastParserStrict();
+
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
+
+        if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
+            this._vastParserStrict.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
+        }
+
+        return this.retrieveVast(response).then((vast): Promise<Campaign> => {
+            return this._deviceInfo.getConnectionType().then((connectionType) => {
+                return this.parseVastToCampaign(vast, session, response, connectionType);
+            });
+        });
+    }
+
+    protected retrieveVast(response: AuctionResponse): Promise<Vast> {
+        const decodedVast = decodeURIComponent(response.getContent()).trim();
+        return this._vastParserStrict.retrieveVast(decodedVast, this._core, this._requestManager);
     }
 }
