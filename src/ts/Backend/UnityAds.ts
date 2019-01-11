@@ -3,6 +3,7 @@ import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { WebView } from 'WebView';
+import { PlacementState } from 'Ads/Models/Placement';
 
 export class UnityAds {
 
@@ -43,6 +44,10 @@ export class UnityAds {
 
     public static getListener() {
         return UnityAds._listener;
+    }
+
+    public static isReady(placementId: string) {
+        return UnityAds._backend.Api.Placement.getPlacementState(placementId) === PlacementState[PlacementState.READY];
     }
 
     public static setBackend(backend: Backend) {
