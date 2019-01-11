@@ -12,7 +12,6 @@ import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
 import { Platform } from 'Core/Constants/Platform';
-import { WebViewError } from 'Core/Errors/WebViewError';
 import { ICoreApi } from 'Core/ICore';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -24,7 +23,7 @@ import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHan
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
-export class OldCampaignRefreshManager extends RefreshManager {
+export class CampaignRefreshManager extends RefreshManager {
     private _platform: Platform;
     private _core: ICoreApi;
     private _ads: IAdsApi;
