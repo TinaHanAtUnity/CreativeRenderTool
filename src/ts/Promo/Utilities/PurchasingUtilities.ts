@@ -19,6 +19,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { IProduct, IPurchasingAdapter } from 'Purchasing/PurchasingAdapter';
 import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurchasingAdapter';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -39,7 +40,7 @@ export interface IPromoPayload {
 
 export class PurchasingUtilities {
 
-    public static initialize(core: ICoreApi, promo: IPromoApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, placementManager: PlacementManager, campaignManager: CampaignManager, promoEvents: PromoEvents, request: RequestManager, analyticsManager?: AnalyticsManager) {
+    public static initialize(core: ICoreApi, promo: IPromoApi, purchasing: IPurchasingApi, clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, placementManager: PlacementManager, campaignManager: CampaignManager, promoEvents: PromoEvents, request: RequestManager, metaDataManager: MetaDataManager, analyticsManager?: AnalyticsManager) {
         this._core = core;
         this._promo = promo;
         this._purchasing = purchasing;
@@ -50,6 +51,7 @@ export class PurchasingUtilities {
         this._analyticsManager = analyticsManager;
         this._promoEvents = promoEvents;
         this._request = request;
+        this._metaDataManager = metaDataManager;
 
         campaignManager.onAdPlanReceived.subscribe(() => this._placementManager.clear());
         return this.getPurchasingAdapter().then((adapter) => {
@@ -58,7 +60,9 @@ export class PurchasingUtilities {
                 this.updateCatalog(products);
                 this.setProductPlacementStates();
             });
-            return this._purchasingAdapter.initialize();
+            return this._purchasingAdapter.initialize().catch((e) => {
+                // Logging occurs in the purchasing adapter
+            });
         }).then(() => this._isInitialized = true);
     }
 
@@ -156,6 +160,7 @@ export class PurchasingUtilities {
     private static _promoEvents: PromoEvents;
     private static _request: RequestManager;
     private static _isInitialized = false;
+    private static _metaDataManager: MetaDataManager;
 
     private static setProductPlacementStates(): void {
         const placementCampaignMap = this._placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType);
@@ -178,11 +183,11 @@ export class PurchasingUtilities {
                 return new CustomPurchasingAdapter(this._core, this._purchasing, this._promoEvents, this._request, this._analyticsManager);
             } else {
                 this._core.Sdk.logInfo('UnityPurchasing delegate is set');
-                return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._adsConfig, this._clientInfo);
+                return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._adsConfig, this._clientInfo, this._metaDataManager);
             }
         }).catch((e) => {
             this._core.Sdk.logInfo('UnityPurchasing delegate is set');
-            return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._adsConfig, this._clientInfo);
+            return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._adsConfig, this._clientInfo, this._metaDataManager);
         });
     }
 

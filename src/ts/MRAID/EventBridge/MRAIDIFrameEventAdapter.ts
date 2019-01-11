@@ -51,10 +51,6 @@ export class MRAIDIFrameEventAdapter extends MRAIDEventAdapter {
         }
     }
 
-    private handleSendStats(totalTime: number, playTime: number, frameCount: number) {
-        this._handler.onBridgeSendStats(totalTime, playTime, frameCount);
-    }
-
     private handleAr(event: MessageEvent) {
         this._handler.onBridgeAREvent(event);
     }

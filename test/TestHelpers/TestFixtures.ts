@@ -98,6 +98,7 @@ import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 import EventTestVast from 'xml/EventTestVast.xml';
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
+import VastAdWithoutCompanionAdXml from 'xml/VastAdWithoutCompanionAd.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
@@ -127,7 +128,11 @@ import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters, IAppStoreDow
 import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
+import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { UnityInfo } from 'Core/Models/UnityInfo';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
+import { ResolveManager } from 'Core/Managers/ResolveManager';
+import { CacheManager } from 'Core/Managers/CacheManager';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
@@ -557,9 +562,16 @@ export class TestFixtures {
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345', session));
     }
 
-    public static getCompanionVastCampaignWihoutImages(): VastCampaign {
+    public static getCompanionVastCampaignWithoutImages(): VastCampaign {
         const vastParser = TestFixtures.getVastParser();
         const vastXml = VastCompanionAdWithoutImagesXml;
+        const vast = vastParser.parseVast(vastXml);
+        return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
+    }
+
+    public static getCompanionVastCampaignWithoutCompanionAd(): VastCampaign {
+        const vastParser = TestFixtures.getVastParser();
+        const vastXml = VastAdWithoutCompanionAdXml;
         const vast = vastParser.parseVast(vastXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
     }
@@ -791,6 +803,13 @@ export class TestFixtures {
         return vastParser;
     }
 
+    public static getVastParserStrict(): VastParserStrict {
+        let vastParser: VastParserStrict;
+        const domParser = new DOMParser();
+        vastParser = new VastParserStrict(domParser);
+        return vastParser;
+    }
+
     public static getBackend(platform: Platform): Backend {
         return new Backend(platform);
     }
@@ -799,6 +818,34 @@ export class TestFixtures {
         const nativeBridge = new NativeBridge(backend, platform, false);
         backend.setNativeBridge(nativeBridge);
         return nativeBridge;
+    }
+
+    public static getCoreModule(nativeBridge: NativeBridge): ICore {
+        const platform = nativeBridge.getPlatform();
+        const api = this.getCoreApi(nativeBridge);
+
+        const core: Partial<ICore> = {
+            NativeBridge: nativeBridge,
+            Api: api,
+            FocusManager: new FocusManager(platform, api),
+            WakeUpManager: new WakeUpManager(api),
+            CacheBookkeeping: new CacheBookkeepingManager(api),
+            ResolveManager: new ResolveManager(api),
+            MetaDataManager: new MetaDataManager(api),
+            StorageBridge: new StorageBridge(api),
+            ClientInfo: this.getClientInfo(platform)
+        };
+        if (platform === Platform.ANDROID) {
+            core.DeviceInfo = new AndroidDeviceInfo(api);
+            core.RequestManager = new RequestManager(platform, api, core.WakeUpManager!, <AndroidDeviceInfo>core.DeviceInfo);
+        } else if (platform === Platform.IOS) {
+            core.DeviceInfo = new IosDeviceInfo(api);
+            core.RequestManager = new RequestManager(platform, api, core.WakeUpManager!);
+        }
+
+        core.CacheManager = new CacheManager(api, core.WakeUpManager!, core.RequestManager!, core.CacheBookkeeping!);
+
+        return <ICore>core;
     }
 
     public static getCoreApi(nativeBridge: NativeBridge): ICoreApi {

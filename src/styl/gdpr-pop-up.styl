@@ -1,40 +1,58 @@
 @import "vars.styl";
 @import "mixins.styl";
+@import "iphone-x-series.styl";
 
-$gdpr-pop-up($scale-size, $with-styles = true) {
+$gdpr-pop-up($scale-size, $with-styles = true, $top = false) {
   .gdpr-text {
     padding: $scale-size * $default-font-size * .5;
     font-size: $scale-size * $default-font-size * .5;
   }
 
   if($with-styles) {
-    position: absolute;
-    bottom: 0;
-    z-index: 100;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    background-color: $end-screen-background-color;
-    box-shadow: 0 0 15px 0 rgba(0, 0, 0, .1);
-    opacity: 1;
-
-    .icon-gdpr {
-      margin: 0 .5rem;
-      color: $black;
-      opacity: .25;
+    if ($top) {
+      $gdpr-pop-up-top($scale-size);
+    } else {
+      $gdpr-pop-up-bottom($scale-size);
     }
+  }
+}
 
-    .gdpr-text {
-      z-index: 110;
-      padding: $default-size * $scale-size * .5 $default-size * $scale-size * .5 $default-size * $scale-size * .5 0;
-      width: 80%;
-      text-align: center;
+$gdpr-pop-up-bottom($scale-size) {
+  bottom: 0;
+  $gdpr-pop-up-internals($scale-size);
+}
 
-      .gdpr-link {
-        color: $blue;
-      }
+$gdpr-pop-up-top($scale-size) {
+  top: 0;
+  $gdpr-pop-up-internals($scale-size);
+}
+
+$gdpr-pop-up-internals($scale-size) {
+  position: absolute;
+  z-index: 100;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: $end-screen-background-color;
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, .1);
+  opacity: 1;
+
+  .icon-gdpr {
+    margin: 0 .5rem;
+    color: $black;
+    opacity: .25;
+  }
+
+  .gdpr-text {
+    z-index: 110;
+    padding: $default-size * $scale-size * .5 $default-size * $scale-size * .5 $default-size * $scale-size * .5 0;
+    width: 80%;
+    text-align: center;
+
+    .gdpr-link {
+      color: $blue;
     }
   }
 }

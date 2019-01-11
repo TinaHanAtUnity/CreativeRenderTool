@@ -7,8 +7,7 @@ import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
+import { ICore } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IMRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
@@ -42,7 +41,14 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeVideo = 'comet/video';
     public static ContentTypeMRAID = 'comet/mraid-url';
 
-    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
+    private _requestManager: RequestManager;
+
+    constructor(core: ICore) {
+        super(core.NativeBridge.getPlatform());
+        this._requestManager = core.RequestManager;
+    }
+
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const json = <IRawPerformanceCampaign>response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
@@ -107,7 +113,7 @@ export class CometCampaignParser extends CampaignParser {
 
             if (CustomFeatures.isPlayableConfigurationEnabled(json.mraidUrl)) {
                 const playableConfigurationUrl = json.mraidUrl.replace(/index\.html/, 'configuration.json');
-                request.get(playableConfigurationUrl).then(configurationResponse => {
+                this._requestManager.get(playableConfigurationUrl).then(configurationResponse => {
                     try {
                         const playableConfiguration = JSON.parse(configurationResponse.response);
                         mraidCampaign.setPlayableConfiguration(playableConfiguration);

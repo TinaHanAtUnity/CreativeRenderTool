@@ -13,38 +13,56 @@ import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
 import { CampaignError } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
-import { ICoreApi } from 'Core/ICore';
+import { ICore, ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class ProgrammaticVastParser extends CampaignParser {
+
     public static ContentType = CampaignContentTypes.ProgrammaticVast;
 
     public static setVastParserMaxDepth(depth: number): void {
         ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH = depth;
     }
 
-    private static VAST_PARSER_MAX_DEPTH: number;
+    protected static VAST_PARSER_MAX_DEPTH: number;
+    protected _core: ICoreApi;
+    protected _requestManager: RequestManager;
+    protected _deviceInfo: DeviceInfo;
 
     protected _vastParser: VastParser = new VastParser();
 
-    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, connectionType?: string): Promise<Campaign> {
-        const decodedVast = decodeURIComponent(response.getContent()).trim();
+    constructor(core: ICore) {
+        super(core.NativeBridge.getPlatform());
+        this._deviceInfo = core.DeviceInfo;
+        this._core = core.Api;
+        this._requestManager = core.RequestManager;
+    }
+
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
 
         if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
             this._vastParser.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
         }
 
-        return this._vastParser.retrieveVast(decodedVast, core, request).then((vast): Promise<Campaign> => {
-            const campaignId = this.getProgrammaticCampaignId(platform);
-            return this.parseVastToCampaign(vast, platform, campaignId, session, response, connectionType);
+        return this.retrieveVast(response).then((vast): Promise<Campaign> => {
+            return this._deviceInfo.getConnectionType().then((connectionType) => {
+                return this.parseVastToCampaign(vast, session, response, connectionType);
+            });
         });
     }
 
-    protected parseVastToCampaign(vast: Vast, platform: Platform, campaignId: string, session: Session, response: AuctionResponse, connectionType?: string): Promise<Campaign> {
+    protected retrieveVast(response: AuctionResponse): Promise<Vast> {
+        const decodedVast = decodeURIComponent(response.getContent()).trim();
+        return this._vastParser.retrieveVast(decodedVast, this._core, this._requestManager);
+    }
+
+    protected parseVastToCampaign(vast: Vast, session: Session, response: AuctionResponse, connectionType?: string): Promise<Campaign> {
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
-            id: this.getProgrammaticCampaignId(platform),
+            id: this.getProgrammaticCampaignId(),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             contentType: ProgrammaticVastParser.ContentType,
             adType: response.getAdType() || undefined,
@@ -93,7 +111,7 @@ export class ProgrammaticVastParser extends CampaignParser {
             throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND);
         }
 
-        if (platform === Platform.IOS && !mediaVideoUrl.match(/^https:\/\//)) {
+        if (this._platform === Platform.IOS && !mediaVideoUrl.match(/^https:\/\//)) {
             throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS, mediaVideoUrl);
         }
 
@@ -124,5 +142,28 @@ export class ProgrammaticVastParser extends CampaignParser {
         const campaign = new VastCampaign(vastCampaignParms);
 
         return Promise.resolve(campaign);
+    }
+}
+
+export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
+
+    protected _vastParserStrict: VastParserStrict = new VastParserStrict();
+
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
+
+        if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
+            this._vastParserStrict.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
+        }
+
+        return this.retrieveVast(response).then((vast): Promise<Campaign> => {
+            return this._deviceInfo.getConnectionType().then((connectionType) => {
+                return this.parseVastToCampaign(vast, session, response, connectionType);
+            });
+        });
+    }
+
+    protected retrieveVast(response: AuctionResponse): Promise<Vast> {
+        const decodedVast = decodeURIComponent(response.getContent()).trim();
+        return this._vastParserStrict.retrieveVast(decodedVast, this._core, this._requestManager);
     }
 }

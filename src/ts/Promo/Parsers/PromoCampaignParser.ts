@@ -3,9 +3,7 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { ICoreApi, ICore } from 'Core/ICore';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ILimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
 import { IProductInfo, ProductInfo, ProductInfoType, IRawProductInfo } from 'Promo/Models/ProductInfo';
@@ -20,7 +18,14 @@ export class PromoCampaignParser extends CampaignParser {
 
     public static ContentType = 'purchasing/iap';
 
-    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
+    private _core: ICoreApi;
+
+    constructor(core: ICore) {
+        super(core.NativeBridge.getPlatform());
+        this._core = core.Api;
+    }
+
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const promoJson = JsonParser.parse<IRawPromoCampaign>(response.getContent());
 
         let willExpireAt: number | undefined;
@@ -55,8 +60,8 @@ export class PromoCampaignParser extends CampaignParser {
                 costs: this.getProductInfoList(promoJson.costs),
                 payouts: this.getProductInfoList(promoJson.payouts),
                 premiumProduct: premiumProduct,
-                portraitAssets: this.getOrientationAssets(promoJson.portrait, session, core),
-                landscapeAssets: this.getOrientationAssets(promoJson.landscape, session, core)
+                portraitAssets: this.getOrientationAssets(promoJson.portrait, session, this._core),
+                landscapeAssets: this.getOrientationAssets(promoJson.landscape, session, this._core)
             };
 
             const promoCampaign = new PromoCampaign(promoCampaignParams);
@@ -68,7 +73,7 @@ export class PromoCampaignParser extends CampaignParser {
 
             return promise.then(() => Promise.resolve(promoCampaign));
         } else {
-            core.Sdk.logError('Product is undefined');
+            this._core.Sdk.logError('Product is undefined');
             return Promise.reject();
         }
 

@@ -5,7 +5,7 @@ import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
+import { ICoreApi, ICore } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { FileId } from 'Core/Utilities/FileId';
 import { Url } from 'Core/Utilities/Url';
@@ -16,11 +16,20 @@ export class ProgrammaticAdMobParser extends CampaignParser {
 
     public static ContentType = 'programmatic/admob-video';
 
-    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
+    private _core: ICoreApi;
+    private _requestManager: RequestManager;
+
+    constructor(core: ICore) {
+        super(core.NativeBridge.getPlatform());
+        this._core = core.Api;
+        this._requestManager = core.RequestManager;
+    }
+
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
-        const videoPromise = this.getVideoFromMarkup(markup, request, session, platform).catch((e) => {
-            core.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
+        const videoPromise = this.getVideoFromMarkup(markup, session).catch((e) => {
+            this._core.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
             return null;
         });
 
@@ -29,7 +38,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 this.updateFileID(video);
             }
             const baseCampaignParams: ICampaign = {
-                id: this.getProgrammaticCampaignId(platform),
+                id: this.getProgrammaticCampaignId(),
                 willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
                 contentType: ProgrammaticAdMobParser.ContentType,
                 adType: response.getAdType() || undefined,
@@ -55,7 +64,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
 
     }
 
-    private getVideoFromMarkup(markup: string, request: RequestManager, session: Session, platform: Platform): Promise<AdMobVideo> {
+    private getVideoFromMarkup(markup: string, session: Session): Promise<AdMobVideo> {
         try {
             const dom = new DOMParser().parseFromString(markup, 'text/html');
             if (!dom) {
@@ -68,20 +77,20 @@ export class ProgrammaticAdMobParser extends CampaignParser {
             const scriptSrc = scriptTag.textContent;
             const mediaFileURL = this.getVideoFromScriptSource(scriptSrc!);
 
-            return this.getRealVideoURL(mediaFileURL, request).then((realVideoURL: string) => {
+            return this.getRealVideoURL(mediaFileURL).then((realVideoURL: string) => {
                 return new Promise<AdMobVideo>((resolve, reject) => {
                     const mimeType = Url.getQueryParameter(realVideoURL, 'mime');
                     let extension: string | null = null;
                     if (mimeType) {
                         extension = mimeType.split('/')[1];
                     }
-                    if (platform === Platform.ANDROID) {
+                    if (this._platform === Platform.ANDROID) {
                         resolve(new AdMobVideo({
                             mediaFileURL: mediaFileURL,
                             video: new Video(realVideoURL, session),
                             extension: null
                         }));
-                    } else if (extension && platform === Platform.IOS) {
+                    } else if (extension && this._platform === Platform.IOS) {
                         resolve(new AdMobVideo({
                             mediaFileURL: mediaFileURL,
                             video: new Video(realVideoURL, session),
@@ -98,8 +107,8 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         }
     }
 
-    private getRealVideoURL(videoURL: string, request: RequestManager): Promise<string> {
-        return request.followRedirectChain(videoURL);
+    private getRealVideoURL(videoURL: string): Promise<string> {
+        return this._requestManager.followRedirectChain(videoURL);
     }
 
     private getVideoFromScriptSource(src: string): string {

@@ -1,22 +1,37 @@
 import { BackendApi } from 'Backend/BackendApi';
 
+export interface IRequestLogEntry {
+    method: string;
+    url: string;
+}
+
 export class Request extends BackendApi {
 
     private _retryCount: number = 0;
     private _toggleUrl: boolean = false;
     private _passthrough = false;
+    private _requestLog: IRequestLogEntry[] = [];
 
-    public getLog() {
-        return this._requestLog;
+    public getLog(method?: string | RegExp): string[] {
+        let entries: IRequestLogEntry[];
+        if (method) {
+            entries = this._requestLog.filter((entry) => entry.method.match(method));
+        } else {
+            entries = this._requestLog;
+        }
+        return entries.map((entry) => entry.url);
     }
 
-    public setLog(requestLog: string[]) {
+    public setLog(requestLog: IRequestLogEntry[]) {
         this._requestLog = requestLog;
     }
 
     public get(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
         if(this._passthrough) {
-            this._requestLog.push(url);
+            this._requestLog.push({
+                method: 'GET',
+                url: url
+            });
             const xhr = new XMLHttpRequest();
             xhr.onload = (event: Event) => {
                 this._backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
@@ -73,7 +88,10 @@ export class Request extends BackendApi {
 
     public head(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
         if(this._passthrough) {
-            this._requestLog.push(url);
+            this._requestLog.push({
+                method: 'HEAD',
+                url: url
+            });
             const xhr = new XMLHttpRequest();
             xhr.onload = (event: Event) => {
                 this._backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
@@ -100,7 +118,10 @@ export class Request extends BackendApi {
 
     public post(id: string, url: string, body: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
         if(this._passthrough) {
-            this._requestLog.push(url);
+            this._requestLog.push({
+                method: 'POST',
+                url: url
+            });
             const xhr = new XMLHttpRequest();
             xhr.onload = (event: Event) => {
                 this._backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
@@ -151,8 +172,6 @@ export class Request extends BackendApi {
     public setPassthrough(value: boolean) {
         this._passthrough = value;
     }
-
-    private _requestLog: string[] = [];
 
     public setToggleUrl(status: boolean) {
         this._toggleUrl = status;

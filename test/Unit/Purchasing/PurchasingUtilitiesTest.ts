@@ -12,7 +12,6 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { SdkApi } from 'Core/Native/Sdk';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
@@ -27,6 +26,7 @@ import { IProduct, ITransactionDetails } from 'Purchasing/PurchasingAdapter';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 
 describe('PurchasingUtilitiesTest', () => {
     let platform: Platform;
@@ -39,7 +39,6 @@ describe('PurchasingUtilitiesTest', () => {
     let analyticsManager: AnalyticsManager;
     let promoEvents: PromoEvents;
 
-    let sdk: SdkApi;
     let clientInfo: ClientInfo;
     let placementManager: PlacementManager;
     let campaignManager: CampaignManager;
@@ -47,6 +46,7 @@ describe('PurchasingUtilitiesTest', () => {
     let promoCatalog: string;
     let request: RequestManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
+    let metaDataManager: MetaDataManager;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -62,7 +62,6 @@ describe('PurchasingUtilitiesTest', () => {
         promoEvents = sinon.createStubInstance(PromoEvents);
         request = sinon.createStubInstance(RequestManager);
 
-        sdk = sinon.createStubInstance(SdkApi);
         clientInfo = sinon.createStubInstance(ClientInfo);
         sandbox = sinon.createSandbox();
 
@@ -94,8 +93,9 @@ describe('PurchasingUtilitiesTest', () => {
         sinon.stub(purchasing.CustomPurchasing, 'purchaseItem').returns(Promise.resolve());
 
         thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
+        metaDataManager = sinon.createStubInstance(MetaDataManager);
 
-        return PurchasingUtilities.initialize(core, promo, purchasing, clientInfo, coreConfig, adsConfig, placementManager, campaignManager, promoEvents, request, analyticsManager);
+        return PurchasingUtilities.initialize(core, promo, purchasing, clientInfo, coreConfig, adsConfig, placementManager, campaignManager, promoEvents, request, metaDataManager, analyticsManager);
     });
     afterEach(() => {
         sandbox.restore();

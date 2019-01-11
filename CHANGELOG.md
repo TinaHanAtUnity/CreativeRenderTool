@@ -1,6 +1,21 @@
 # Pending
 
+* Hook WebPlayer Programmatic MRAID 3.0 [#7614](https://github.com/Applifier/unity-ads-webview/pull/7614)
+* Vast Events Integration Test [#7462](https://github.com/Applifier/unity-ads-webview/pull/7462)
+
+# Thu Jan 10 23:34:08 UTC 2019
+
+* Vast parser strict added but disabled through ab groups [#7407](https://github.com/Applifier/unity-ads-webview/pull/7407)
+
+# Wed Jan 9 19:50:51 UTC 2019
+
 * Using gameSessionId to sample fps counters [#7710](https://github.com/Applifier/unity-ads-webview/pull/7710)
+* Reduce click delay log 100%->50% for ByteDance [#7724](https://github.com/Applifier/unity-ads-webview/pull/7724)
+* Add new non-rewarded seatId and update abGroup for ByteDance [#7730](https://github.com/Applifier/unity-ads-webview/pull/7730)
+* VAST media selector update to pick the lowest bitrate file [#7725](https://github.com/Applifier/unity-ads-webview/pull/7725)
+* Removes the unnecessary parameters from parse method [#7542](https://github.com/Applifier/unity-ads-webview/pull/7542)
+* Update GDPR text for retention period [#7728](https://github.com/Applifier/unity-ads-webview/pull/7728)
+* Ensure Game was made with Unity before initializing Unity Purchasing Adapter [#7726](https://github.com/Applifier/unity-ads-webview/pull/7726) 
 
 # Thu Dec 20 01:58:04 UTC 2018
 
