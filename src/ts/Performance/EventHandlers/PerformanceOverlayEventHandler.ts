@@ -3,7 +3,7 @@ import {
     OverlayEventHandlerWithDownloadSupport
 } from 'Ads/EventHandlers/OverlayEventHandlerWithDownloadSupport';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { IStoreHandler } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { IStoreHandler } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';

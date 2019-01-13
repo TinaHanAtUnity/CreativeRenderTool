@@ -1,4 +1,4 @@
-import { StoreHandler, IStoreHandlerParameters, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { StoreHandler, IStoreHandlerParameters, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export class StandaloneAndroidStoreHandler extends StoreHandler {

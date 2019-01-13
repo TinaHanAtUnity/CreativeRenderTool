@@ -1,17 +1,17 @@
-import { IStoreHandlerParameters, StoreHandler } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
-import { AppleStoreHandler } from 'Ads/EventHandlers/StoreHandler/AppleStoreHandler';
-import { GoogleStoreHandler } from 'Ads/EventHandlers/StoreHandler/GoogleStoreHandler';
-import { StandaloneAndroidStoreHandler } from 'Ads/EventHandlers/StoreHandler/StandaloneAndroidStoreHandler';
+import { IStoreHandlerParameters, StoreHandler } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
+import { AppleStoreHandler } from 'Ads/EventHandlers/StoreHandlers/AppleStoreHandler';
+import { GoogleStoreHandler } from 'Ads/EventHandlers/StoreHandlers/GoogleStoreHandler';
+import { StandaloneAndroidStoreHandler } from 'Ads/EventHandlers/StoreHandlers/StandaloneAndroidStoreHandler';
 import { Platform } from 'Core/Constants/Platform';
 import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
-import { XiaomiStoreHandler } from 'Ads/EventHandlers/StoreHandler/XiaomiStoreHandler';
+import { XiaomiStoreHandler } from 'Ads/EventHandlers/StoreHandlers/XiaomiStoreHandler';
 
 export class StoreHandlerFactory {
 
     /**
-     * Factory method for constructing instance of StoreHandler concrete class.
+     * Factory method for constructing instance of StoreHandlers concrete class.
      * @param storeHandlerParameters parameters for deciding which concrete class to construct and the construct itself.
-     * @returns the newly created instance of StoreHandler concrete class.
+     * @returns the newly created instance of StoreHandlers concrete class.
      */
     public static getNewStoreHandler(storeHandlerParameters: IStoreHandlerParameters): StoreHandler {
         if (this.isAPKCampaign(storeHandlerParameters)) {

@@ -9,8 +9,8 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
-import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
-import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandler/StoreHandlerFactory';
+import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
+import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 

@@ -71,9 +71,9 @@ export abstract class StoreHandler implements IStoreHandler {
 
     /**
      * The default implementation of onDownload that contains the event tracking of
-     * download click that applies to all concrete StoreHandler class implementations.
+     * download click that applies to all concrete StoreHandlers class implementations.
      * This method must be called with super() by concrete classes that extend the
-     * abstract StoreHandler class.
+     * abstract StoreHandlers class.
      * @param parameters the parameters of the download click
      */
     public onDownload(parameters: IStoreHandlerDownloadParameters): void {

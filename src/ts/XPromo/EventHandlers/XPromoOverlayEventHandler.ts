@@ -1,7 +1,7 @@
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { OverlayEventHandlerWithDownloadSupport } from 'Ads/EventHandlers/OverlayEventHandlerWithDownloadSupport';
-import { IStoreHandler } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { IStoreHandler } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 
 export class XPromoOverlayEventHandler extends OverlayEventHandlerWithDownloadSupport<XPromoCampaign> {
     private _xPromoAdUnit: XPromoAdUnit;

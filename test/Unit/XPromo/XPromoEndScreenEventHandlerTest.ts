@@ -36,8 +36,8 @@ import { StoreName, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
-import { IStoreHandlerParameters, StoreHandler } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
-import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandler/StoreHandlerFactory';
+import { IStoreHandlerParameters, StoreHandler } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
+import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 

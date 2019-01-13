@@ -3,7 +3,7 @@ import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
-import { IStoreHandler, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { IStoreHandler, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<PerformanceCampaign, PerformanceAdUnit> {

@@ -1,5 +1,5 @@
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { StoreHandler, IStoreHandlerDownloadParameters, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { StoreHandler, IStoreHandlerDownloadParameters, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 
 export class GoogleStoreHandler extends StoreHandler {

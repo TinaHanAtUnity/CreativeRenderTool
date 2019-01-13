@@ -2,7 +2,7 @@ import {
     StoreHandler,
     IStoreHandlerParameters,
     IStoreHandlerDownloadParameters
-} from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+} from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';

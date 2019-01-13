@@ -3,7 +3,7 @@ import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { IAdsApi } from 'Ads/IAds';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
-import { IStoreHandler, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { IStoreHandler, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { IEndScreenHandler } from 'Ads/Views/EndScreen';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';

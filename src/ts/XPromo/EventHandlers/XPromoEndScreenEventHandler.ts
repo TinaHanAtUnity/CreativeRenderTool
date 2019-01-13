@@ -2,7 +2,7 @@ import { EndScreenEventHandler } from 'Ads/EventHandlers/EndScreenEventHandler';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { StoreHandler } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { StoreHandler } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 
 export class XPromoEndScreenEventHandler extends EndScreenEventHandler<XPromoCampaign, XPromoAdUnit> {
 
