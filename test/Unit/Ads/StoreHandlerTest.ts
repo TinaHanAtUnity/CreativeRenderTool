@@ -19,7 +19,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 [Platform.ANDROID].forEach(platform => {
-    describe('AppStoreDownloadHelper', () => {
+    describe('StoreHandler', () => {
 
         let backend: Backend;
         let nativeBridge: NativeBridge;
