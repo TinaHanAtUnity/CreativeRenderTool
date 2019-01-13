@@ -38,8 +38,8 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
-import { IStoreHandler, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
-import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandler/StoreHandlerFactory';
+import { IStoreHandler, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
+import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { Campaign } from 'Ads/Models/Campaign';
 
 describe('EndScreenEventHandlerTest', () => {
