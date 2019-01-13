@@ -30,12 +30,12 @@ export interface IStoreHandlerParameters {
     ads: IAdsApi;
     thirdPartyEventManager: ThirdPartyEventManager;
     operativeEventManager: OperativeEventManager;
-    deviceInfo: DeviceInfo;
-    clientInfo: ClientInfo;
+    deviceInfo?: DeviceInfo;
+    clientInfo?: ClientInfo;
     placement: Placement;
     adUnit: VideoAdUnit;
     campaign: Campaign;
-    coreConfig: CoreConfiguration;
+    coreConfig?: CoreConfiguration;
 }
 
 export interface IStoreHandlerDownloadParameters {
@@ -50,34 +50,32 @@ export interface IStoreHandlerDownloadParameters {
 
 export abstract class StoreHandler implements IStoreHandler {
 
-    protected _platform: Platform;
     protected _core: ICoreApi;
     protected _ads: IAdsApi;
-    protected _clientInfo: ClientInfo;
-    protected _deviceInfo: DeviceInfo;
     protected _placement: Placement;
     protected _campaign: Campaign;
     protected _operativeEventManager: OperativeEventManager;
     protected _adUnit: VideoAdUnit;
-    protected _coreConfig: CoreConfiguration;
-    protected _currentDownloadUrl: string;
 
     protected _thirdPartyEventManager: ThirdPartyEventManager;
 
-    constructor(parameters: IStoreHandlerParameters) {
-        this._platform = parameters.platform;
+    protected constructor(parameters: IStoreHandlerParameters) {
         this._core = parameters.core;
         this._ads = parameters.ads;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._operativeEventManager = parameters.operativeEventManager;
-        this._clientInfo = parameters.clientInfo;
-        this._deviceInfo = parameters.deviceInfo;
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
-        this._coreConfig = parameters.coreConfig;
         this._adUnit = parameters.adUnit;
     }
 
+    /**
+     * The default implementation of onDownload that contains the event tracking of
+     * download click that applies to all concrete StoreHandler class implementations.
+     * This method must be called with super() by concrete classes that extend the
+     * abstract StoreHandler class.
+     * @param parameters the parameters of the download click
+     */
     public onDownload(parameters: IStoreHandlerDownloadParameters): void {
         this._ads.Listener.sendClickEvent(this._placement.getId());
         const operativeEventParameters = this.getOperativeEventParams(parameters);
@@ -108,19 +106,10 @@ export abstract class StoreHandler implements IStoreHandler {
     }
 
     protected handleClickAttributionWithRedirects(clickAttributionUrl: string) {
-        const platform = this._platform;
-
         this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
             const location = RequestManager.getHeader(response.headers, 'location');
             if (location) {
-                if (platform === Platform.ANDROID) {
-                    this._core.Android!.Intent.launch({
-                        'action': 'android.intent.action.VIEW',
-                        'uri': location
-                    });
-                } else if (platform === Platform.IOS) {
-                    this._core.iOS!.UrlScheme.open(location);
-                }
+                this.openURL(location);
             } else {
                 Diagnostics.trigger('click_attribution_misconfigured', {
                     url: clickAttributionUrl,
@@ -167,4 +156,6 @@ export abstract class StoreHandler implements IStoreHandler {
             asset: this.getVideo()
         };
     }
+
+    protected abstract openURL(url: string): void;
 }

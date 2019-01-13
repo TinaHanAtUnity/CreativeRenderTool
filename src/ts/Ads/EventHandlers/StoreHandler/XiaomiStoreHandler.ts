@@ -1,10 +1,20 @@
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { StoreHandler, IStoreHandlerDownloadParameters, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 export class XiaomiStoreHandler extends StoreHandler {
 
+    private _clientInfo: ClientInfo;
+    private _coreConfig: CoreConfiguration;
+
     constructor(parameters: IStoreHandlerParameters) {
         super(parameters);
+        if (!parameters.clientInfo || !parameters.coreConfig) {
+            throw new Error('Missing clientInfo or coreConfig for creating XiaomiStoreHandler');
+        }
+        this._clientInfo = parameters.clientInfo;
+        this._coreConfig = parameters.coreConfig;
     }
 
     public onDownload(parameters: IStoreHandlerDownloadParameters): void {
@@ -21,7 +31,7 @@ export class XiaomiStoreHandler extends StoreHandler {
         }
     }
 
-    private openXiaomiAppStore(parameters: IStoreHandlerDownloadParameters, isAppSheetBroken?: boolean) {
+    private openXiaomiAppStore(parameters: IStoreHandlerDownloadParameters) {
         let packageName: string | undefined;
 
         packageName = this._clientInfo.getApplicationName();
@@ -34,10 +44,7 @@ export class XiaomiStoreHandler extends StoreHandler {
             return;
         }
 
-        this._core.Android!.Intent.launch({
-            'action': 'android.intent.action.VIEW',
-            'uri': appStoreUrl
-        });
+        this.openURL(appStoreUrl);
     }
 
     private getXiaomiAppStoreUrl(parameters: IStoreHandlerDownloadParameters, packageName?: string): string | undefined {
@@ -45,6 +52,13 @@ export class XiaomiStoreHandler extends StoreHandler {
             return;
         }
 
-        return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + this._coreConfig.getToken();
+        return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + this. _coreConfig.getToken();
+    }
+
+    protected openURL(url: string): void {
+        this._core.Android!.Intent.launch({
+            'action': 'android.intent.action.VIEW',
+            'uri': url
+        });
     }
 }

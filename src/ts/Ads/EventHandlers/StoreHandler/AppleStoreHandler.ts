@@ -5,11 +5,18 @@ import {
 } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class AppleStoreHandler extends StoreHandler {
 
+    private _deviceInfo: DeviceInfo;
+
     constructor(parameters: IStoreHandlerParameters) {
         super(parameters);
+        if (!parameters.deviceInfo) {
+            throw new Error('Missing deviceInfo for creating AppleStoreHandler');
+        }
+        this._deviceInfo = parameters.deviceInfo;
     }
 
     public onDownload(parameters: IStoreHandlerDownloadParameters): void {
@@ -36,7 +43,7 @@ export class AppleStoreHandler extends StoreHandler {
         }
 
         if (isAppSheetBroken || parameters.bypassAppSheet) {
-            this._core.iOS!.UrlScheme.open(appStoreUrl);
+            this.openURL(appStoreUrl);
         } else {
             this._ads.iOS!.AppSheet.canOpen().then(canOpenAppSheet => {
                 if (canOpenAppSheet) {
@@ -53,11 +60,11 @@ export class AppleStoreHandler extends StoreHandler {
                         this._ads.iOS!.AppSheet.destroy(options);
                     }).catch(([error]) => {
                         if (error === 'APPSHEET_NOT_FOUND') {
-                            this._core.iOS!.UrlScheme.open(appStoreUrl);
+                            this.openURL(appStoreUrl);
                         }
                     });
                 } else {
-                    this._core.iOS!.UrlScheme.open(appStoreUrl);
+                    this.openURL(appStoreUrl);
                 }
             });
         }
@@ -69,5 +76,9 @@ export class AppleStoreHandler extends StoreHandler {
         }
 
         return 'https://itunes.apple.com/app/id' + parameters.appStoreId;
+    }
+
+    protected openURL(url: string): void {
+        this._core.iOS!.UrlScheme.open(url);
     }
 }

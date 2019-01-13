@@ -23,11 +23,14 @@ export class StandaloneAndroidStoreHandler extends StoreHandler {
     }
 
     private handleAppDownloadUrl(appDownloadUrl: string) {
-        appDownloadUrl = decodeURIComponent(appDownloadUrl);
+        const decodedAppDownloadUrl = decodeURIComponent(appDownloadUrl);
+        this.openURL(decodedAppDownloadUrl);
+    }
 
+    protected openURL(url: string): void {
         this._core.Android!.Intent.launch({
             'action': 'android.intent.action.VIEW',
-            'uri': appDownloadUrl
+            'uri': url
         });
     }
 }

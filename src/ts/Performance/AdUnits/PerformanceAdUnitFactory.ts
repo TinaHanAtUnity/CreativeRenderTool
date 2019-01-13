@@ -12,7 +12,6 @@ import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdU
 import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandler/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandler/StoreHandlerFactory';
 
-
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
     public static ContentType = 'comet/campaign';

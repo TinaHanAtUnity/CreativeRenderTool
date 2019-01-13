@@ -8,6 +8,11 @@ import { XiaomiStoreHandler } from 'Ads/EventHandlers/StoreHandler/XiaomiStoreHa
 
 export class StoreHandlerFactory {
 
+    /**
+     * Factory method for constructing instance of StoreHandler concrete class.
+     * @param storeHandlerParameters parameters for deciding which concrete class to construct and the construct itself.
+     * @returns the newly created instance of StoreHandler concrete class.
+     */
     public static getNewStoreHandler(storeHandlerParameters: IStoreHandlerParameters): StoreHandler {
         if (this.isAPKCampaign(storeHandlerParameters)) {
             return new StandaloneAndroidStoreHandler(storeHandlerParameters);
