@@ -1,3 +1,7 @@
+# Pending
+
+* Send diagnostics when programmatic backup campaign gets overwritten with no fill [#7801](https://github.com/Applifier/unity-ads-webview/pull/7801)
+
 # Mon Jan 14 12:40:31 UTC 2019
 
 * Hook WebPlayer Programmatic MRAID 3.0 [#7614](https://github.com/Applifier/unity-ads-webview/pull/7614)
