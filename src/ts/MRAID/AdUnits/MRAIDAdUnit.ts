@@ -23,7 +23,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { Privacy } from 'Ads/Views/Privacy';
 import { MRAID } from 'MRAID/Views/MRAID';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { MRAIDWebViewResizeUtil } from 'MRAID/Views/MRAIDWebViewResizeUtil';
+import { MRAIDWebViewTopCalculator } from 'MRAID/Views/MRAIDWebViewResizeUtil';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -292,8 +292,8 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         if (!this._mraid.isLoaded()) {
             return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()])
             .then(([width, height]) => {
-                const webViewResizer = new MRAIDWebViewResizeUtil(this._deviceInfo, this._platform);
-                const topWebViewAreaMinHeight = webViewResizer.getTopAreaSize(width, height);
+                const webViewResizer = new MRAIDWebViewTopCalculator(this._deviceInfo, this._platform);
+                const topWebViewAreaMinHeight = webViewResizer.getTopPosition(width, height);
                 this._container.setViewFrame('webview', 0, 0, width, topWebViewAreaMinHeight);
             }).then(() => {
                 this._mraid.loadWebPlayer(this._webPlayerContainer);

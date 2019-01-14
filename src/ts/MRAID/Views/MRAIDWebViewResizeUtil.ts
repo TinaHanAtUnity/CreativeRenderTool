@@ -2,7 +2,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
-export class MRAIDWebViewResizeUtil {
+export class MRAIDWebViewTopCalculator {
 
     private _deviceInfo: DeviceInfo;
     private _platform: Platform;
@@ -12,47 +12,45 @@ export class MRAIDWebViewResizeUtil {
         this._platform = platform;
     }
 
-    public getTopAreaSize(width: number, height: number): number {
+    public getTopPosition(width: number, height: number): number {
         let value = 0;
 
         if (width > height) {
             if (this._platform === Platform.IOS) {
-                value = this.calculateIPhoneViewHeightHor(height);
+                value = this.calculateIPhoneTopViewLandscape(height);
             } else {
-                value = this.calculateAndroidViewHeightHor(height);
+                value = this.calculateAndroidTopViewLandscape(height);
             }
         } else {
-            if (this._platform === Platform.IOS && this.isIPhoneXVert(height)) {
-                value = this.calculateIPhoneXViewHeightVert(height);
-            } else if (this._platform === Platform.IOS) {
-                value = this.calculateIPhoneViewHeightVert(height);
+            if (this._platform === Platform.IOS) {
+                value = this.calculateIPhoneTopViewPortrait(height);
             } else {
-                value = this.calculateAndroidViewHeightVert(height);
+                value = this.calculateAndroidTopViewPortrait(height);
             }
         }
 
         return value;
     }
 
-    private calculateAndroidViewHeightVert(height: number): number {
+    private calculateAndroidTopViewPortrait(height: number): number {
         const topWebViewAreaMinHeight = height / 40;
         return Math.floor(this.getAndroidViewSize(topWebViewAreaMinHeight, this.getScreenDensity()));
     }
 
-    private calculateAndroidViewHeightHor(height: number): number {
+    private calculateAndroidTopViewLandscape(height: number): number {
         const topWebViewAreaMinHeight = height / 25;
         return Math.floor(this.getAndroidViewSize(topWebViewAreaMinHeight, this.getScreenDensity()));
     }
 
-    private calculateIPhoneViewHeightVert(height: number): number {
-        return height * 0.06;
+    private calculateIPhoneTopViewPortrait(height: number): number {
+        if (this.isIPhoneX(height)) {
+            return height * 0.11;
+        } else {
+            return height * 0.06;
+        }
     }
 
-    private calculateIPhoneViewHeightHor(height: number) {
-        return height * 0.11;
-    }
-
-    private calculateIPhoneXViewHeightVert(height: number): number {
+    private calculateIPhoneTopViewLandscape(height: number) {
         return height * 0.11;
     }
 
@@ -64,7 +62,7 @@ export class MRAIDWebViewResizeUtil {
         return (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity();
     }
 
-    private isIPhoneXVert(height: number): boolean {
+    private isIPhoneX(height: number): boolean {
         let isIPhonex = false;
         switch(height) {
             case 812:
