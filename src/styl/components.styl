@@ -30,12 +30,12 @@ $game-rating-mask-default($scale-size, $with-styles = true) {
 $game-rating-count-default($scale-size, $with-styles = true) {
   color: $gray;
   if($with-styles) {
-    font-size: $default-font-size * $scale-size;
+    font-size: $default-font-size * $scale-size * .5;
   }
 }
 
 $game-icon-default($scale-size, $radius-size = .75, $with-styles = true) {
-  $set-image($scale-size * $default-size * 4.5, $scale-size * $default-size * 4.5, $scale-size * $default-size * $radius-size);
+  $set-image($scale-size * $default-size, $scale-size * $default-size, $scale-size * $default-size * $radius-size);
 }
 
 $unityads-logo-default($scale-size, $with-styles = true) {
@@ -44,18 +44,22 @@ $unityads-logo-default($scale-size, $with-styles = true) {
 
   if($with-styles) {
     position: absolute;
+    max-height: $scale-size * $default-size * 1;
     z-index: 5;
+    font-size: $scale-size * $default-size * .7;
+    opacity: .6;
   }
 }
 
 $name-container-default($scale-size, $with-styles = true) {
-  max-width: $default-size * $scale-size * 12.5;
-  font-size: $scale-size * $default-font-size * 1.5;
+  max-width: 85%;
+  font-size: $scale-size * $default-font-size * 1;
   if($with-styles) {
     display: -webkit-box;
     overflow: hidden;
-    color: $black;
+    color: $end-screen-game-name-color;
     text-overflow: ellipsis;
+    text-align: center;
 
     -webkit-line-clamp: 2; // @stylint ignore;
     -webkit-box-orient: vertical;
