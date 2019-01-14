@@ -86,9 +86,51 @@ $iphone-x-overlay-styles() {
   display: none;
 }
 
-$iphone-x-styles() {
-  #mraid,
-  #extended-mraid {
+$privacy-button-iphone-x-top() {
+  .privacy-button {
+    top: constant(safe-area-inset-top);
+    left: constant(safe-area-inset-left);
+
+    top: env(safe-area-inset-top);
+    left: env(safe-area-inset-left);
+  }
+}
+
+$privacy-button-iphone-x-bottom() {
+  .privacy-button {
+    bottom: constant(safe-area-inset-bottom);
+    left: constant(safe-area-inset-left);
+
+    bottom: env(safe-area-inset-bottom);
+    left: env(safe-area-inset-left);
+  }
+}
+
+$gdpr-pop-up-top() {
+  .gdpr-pop-up {
+    top: constant(safe-area-inset-top);
+    left: constant(safe-area-inset-left);
+    width: calc(100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+
+    top: env(safe-area-inset-top);
+    left: env(safe-area-inset-left);
+    width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+  }
+}
+
+$gdpr-pop-up-bottom() {
+  .gdpr-pop-up {
+    bottom: constant(safe-area-inset-bottom);
+    left: constant(safe-area-inset-left);
+    width: calc(100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+
+    bottom: env(safe-area-inset-bottom);
+    left: env(safe-area-inset-left);
+    width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+  }
+}
+
+$iphone-x-mraid-styles() {
     #mraid-iframe {
       padding-top: constant(safe-area-inset-top);
       padding-right: constant(safe-area-inset-right);
@@ -165,25 +207,6 @@ $iphone-x-styles() {
       right: env(safe-area-inset-right);
     }
 
-    .privacy-button {
-      bottom: constant(safe-area-inset-bottom);
-      left: constant(safe-area-inset-left);
-
-      bottom: env(safe-area-inset-bottom);
-      left: env(safe-area-inset-left);
-    }
-
-    .gdpr-pop-up {
-      bottom: constant(safe-area-inset-bottom);
-      left: constant(safe-area-inset-left);
-      width: calc(100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right));
-
-
-      bottom: env(safe-area-inset-bottom);
-      left: env(safe-area-inset-left);
-      width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
-    }
-
     .camera-permission-panel {
         .gdpr-link {
           bottom: calc(.5rem + constant(safe-area-inset-bottom));
@@ -196,6 +219,19 @@ $iphone-x-styles() {
           bottom: calc(-.5rem + env(safe-area-inset-bottom));
         }
     }
+}
+
+$iphone-x-styles() {
+  #mraid {
+    $iphone-x-mraid-styles();
+    $privacy-button-iphone-x-top();
+    $gdpr-pop-up-top();
+  }
+
+  #extended-mraid {
+    $iphone-x-mraid-styles();
+    $privacy-button-iphone-x-bottom();
+    $gdpr-pop-up-bottom();
   }
 
   .landscape {

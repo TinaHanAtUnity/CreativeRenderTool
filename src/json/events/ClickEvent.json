@@ -248,6 +248,12 @@
       "body": true
     },
     {
+      "parameter": "isBackupCampaign",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
       "parameter": "privacy",
       "required": "yes",
       "queryString": false,

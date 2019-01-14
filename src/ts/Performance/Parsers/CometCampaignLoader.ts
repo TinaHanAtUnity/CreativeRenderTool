@@ -10,6 +10,8 @@ export class CometCampaignLoader extends CampaignLoader {
             return undefined;
         }
 
+        campaign.backupCampaign = true;
+
         if(campaign.session) {
             campaign.session = this.loadSession(campaign.session);
         }
