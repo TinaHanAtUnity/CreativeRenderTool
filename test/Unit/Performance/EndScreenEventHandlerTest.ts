@@ -205,7 +205,9 @@ describe('EndScreenEventHandlerTest', () => {
             let downloadParameters: IEndScreenDownloadParameters;
 
             beforeEach(() => {
-                performanceAdUnitParameters.campaign = TestFixtures.getCampaignStandaloneAndroid();
+                const standaloneCampaign = TestFixtures.getCampaignStandaloneAndroid();
+
+                performanceAdUnitParameters.campaign = standaloneCampaign;
                 performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
 
                 downloadParameters = <IEndScreenDownloadParameters>{
@@ -217,6 +219,22 @@ describe('EndScreenEventHandlerTest', () => {
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl(),
                     appDownloadUrl: performanceAdUnitParameters.campaign.getAppDownloadUrl()
                 };
+
+                const storeHandlerParameters: IStoreHandlerParameters = {
+                    platform,
+                    core,
+                    ads,
+                    thirdPartyEventManager: thirdPartyEventManager,
+                    operativeEventManager: operativeEventManager,
+                    deviceInfo: deviceInfo,
+                    clientInfo: clientInfo,
+                    placement: placement,
+                    adUnit: performanceAdUnit,
+                    campaign: standaloneCampaign,
+                    coreConfig: coreConfig
+                };
+                storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
+                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
             });
 
             it('should call click attribution if clickAttributionUrl is present', () => {

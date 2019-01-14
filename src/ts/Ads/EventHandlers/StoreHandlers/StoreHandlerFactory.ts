@@ -5,6 +5,7 @@ import { StandaloneAndroidStoreHandler } from 'Ads/EventHandlers/StoreHandlers/S
 import { Platform } from 'Core/Constants/Platform';
 import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { XiaomiStoreHandler } from 'Ads/EventHandlers/StoreHandlers/XiaomiStoreHandler';
+import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 
 export class StoreHandlerFactory {
 
@@ -33,7 +34,7 @@ export class StoreHandlerFactory {
     }
 
     private static isAPKCampaign(storeHandlerParameters: IStoreHandlerParameters): boolean {
-        return storeHandlerParameters.adUnit instanceof PerformanceCampaign &&
+        return storeHandlerParameters.adUnit instanceof PerformanceAdUnit &&
             storeHandlerParameters.campaign instanceof PerformanceCampaign &&
             storeHandlerParameters.campaign.getStore() === StoreName.STANDALONE_ANDROID;
     }
