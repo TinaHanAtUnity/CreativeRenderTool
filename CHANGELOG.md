@@ -1,6 +1,7 @@
 # Pending
 
 * Send diagnostics when programmatic backup campaign gets overwritten with no fill [#7801](https://github.com/Applifier/unity-ads-webview/pull/7801)
+* Rename OldCampaignRefreshManager to CampaignRefreshManager [#7821](https://github.com/Applifier/unity-ads-webview/pull/7821)
 
 # Mon Jan 14 12:40:31 UTC 2019
 
