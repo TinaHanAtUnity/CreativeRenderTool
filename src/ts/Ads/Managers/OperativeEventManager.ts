@@ -96,6 +96,7 @@ export interface IInfoJson {
     frameworkName?: string;
     frameworkVersion?: string;
     skippedAt?: number;
+    isBackupCampaign: boolean;
 }
 
 export class OperativeEventManager {
@@ -379,7 +380,8 @@ export class OperativeEventManager {
                 'networkType': networkType,
                 'connectionType': connectionType,
                 'screenWidth': screenWidth,
-                'screenHeight': screenHeight
+                'screenHeight': screenHeight,
+                'isBackupCampaign': this._campaign.isBackupCampaign()
             };
 
             if(this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {

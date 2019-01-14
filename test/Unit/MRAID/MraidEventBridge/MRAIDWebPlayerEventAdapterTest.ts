@@ -107,6 +107,11 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter'
                 event: MRAIDEvents.RESIZE_WEBVIEW,
                 data: [],
                 verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>containerHandler.onBridgeResizeWebview)
+            },
+            {
+                event: MRAIDEvents.SEND_STATS,
+                data: [1, 3, 4],
+                verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>containerHandler.onBridgeSendStats, JSON.parse(data)[0], JSON.parse(data)[1], JSON.parse(data)[2])
             }
             ];
 
