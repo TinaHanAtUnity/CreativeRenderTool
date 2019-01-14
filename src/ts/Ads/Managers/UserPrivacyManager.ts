@@ -9,7 +9,7 @@ import { GamePrivacy,
 } from 'Ads/Models/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -18,8 +18,6 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ITemplateData } from 'Core/Views/View';
-
-const ignoreReturnType: () => void = () => { return; };
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -92,7 +90,7 @@ export class UserPrivacyManager {
         });
     }
 
-    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource): Promise<void> {
+    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource): Promise<INativeResponse | void> {
         const gamePrivacy = this._gamePrivacy;
 
         if (!gamePrivacy.isEnabled() || !isUnityConsentPermissions(permissions)) {
@@ -153,7 +151,7 @@ export class UserPrivacyManager {
         return false;
     }
 
-    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource): Promise<void> {
+    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource): Promise<INativeResponse> {
         const infoJson: unknown = {
             adid: this._deviceInfo.getAdvertisingIdentifier(),
             action: GDPREventAction.CONSENT,
@@ -167,8 +165,7 @@ export class UserPrivacyManager {
             permissions: permissions
         };
 
-        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson)
-            .then(ignoreReturnType);
+        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
     }
 
     public getConsentAndUpdateConfiguration(): Promise<boolean> {
