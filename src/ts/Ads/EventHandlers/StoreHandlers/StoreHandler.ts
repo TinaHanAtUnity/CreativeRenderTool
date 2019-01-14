@@ -48,6 +48,11 @@ export interface IStoreHandlerDownloadParameters {
     adUnitStyle?: AdUnitStyle;
 }
 
+/**
+ * Base StoreHandler class contains basic, must-have methods for attribution handling and
+ * event tracking for all store handlers. Also provides a onDownload method that is expected
+ * to be called in overridden implementations of concrete classes.
+ */
 export abstract class StoreHandler implements IStoreHandler {
 
     protected _core: ICoreApi;
@@ -73,7 +78,7 @@ export abstract class StoreHandler implements IStoreHandler {
      * The default implementation of onDownload that contains the event tracking of
      * download click that applies to all concrete StoreHandlers class implementations.
      * This method must be called with super() by concrete classes that extend the
-     * abstract StoreHandlers class.
+     * abstract StoreHandler class.
      * @param parameters the parameters of the download click
      */
     public onDownload(parameters: IStoreHandlerDownloadParameters): void {
@@ -157,5 +162,9 @@ export abstract class StoreHandler implements IStoreHandler {
         };
     }
 
+    /**
+     * Open URL in phone with appropriate method.
+     * @param url the URL to be opened
+     */
     protected abstract openURL(url: string): void;
 }
