@@ -23,7 +23,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { Privacy } from 'Ads/Views/Privacy';
 import { MRAID } from 'MRAID/Views/MRAID';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { MRAIDWebViewTopCalculator } from 'MRAID/Views/MRAIDWebViewResizeUtil';
+import { MRAIDWebViewTopCalculator } from 'MRAID/Views/MRAIDWebViewTopCalculator';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;

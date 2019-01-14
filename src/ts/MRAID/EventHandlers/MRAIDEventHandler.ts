@@ -16,7 +16,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
-import { MRAIDWebViewTopCalculator } from 'MRAID/Views/MRAIDWebViewResizeUtil';
+import { MRAIDWebViewTopCalculator } from 'MRAID/Views/MRAIDWebViewTopCalculator';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
