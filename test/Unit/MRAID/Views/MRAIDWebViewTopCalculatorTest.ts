@@ -19,7 +19,7 @@ describe('MRAIDWebViewTopCalculator', () => {
             };
 
             const getScreenDensity = () => {
-                return (<AndroidDeviceInfo>deviceInfo).getScreenDensity();
+                return deviceInfo.getScreenDensity();
             };
 
             beforeEach(() => {
@@ -69,13 +69,13 @@ describe('MRAIDWebViewTopCalculator', () => {
                 const width = 800;
                 const height = 600;
 
-                assert.equal(mraidViewSizer.getTopPosition(width, height), height * 0.11);
+                assert.equal(mraidViewSizer.getTopPosition(width, height), 66);
             });
             it('should scale for portrait', () => {
                 const width = 600;
                 const height = 800;
 
-                assert.equal(mraidViewSizer.getTopPosition(width, height), height * 0.06);
+                assert.equal(mraidViewSizer.getTopPosition(width, height), 48);
             });
         });
 
@@ -97,14 +97,14 @@ describe('MRAIDWebViewTopCalculator', () => {
                 const width = 812;
                 const height = 375;
 
-                assert.equal(mraidViewSizer.getTopPosition(width, height), height * 0.11);
+                assert.equal(mraidViewSizer.getTopPosition(width, height), 41.25);
             });
 
             it('should scale for portrait', () => {
                 const width = 375;
                 const height = 812;
 
-                assert.equal(mraidViewSizer.getTopPosition(width, height), height * 0.11);
+                assert.equal(mraidViewSizer.getTopPosition(width, height), 89.32000000000001);
             });
         });
     });
