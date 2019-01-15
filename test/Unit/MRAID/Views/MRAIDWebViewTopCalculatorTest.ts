@@ -38,7 +38,7 @@ describe('MRAIDWebViewTopCalculator', () => {
 
                 const value = Math.floor(getAndroidViewSize(height / 25, getScreenDensity()));
 
-                assert.equal(mraidViewSizer.getTopPosition(width, height), value);
+                assert.equal(mraidViewSizer.getTopPosition(width, height), 48);
             });
 
             it('should scale for portrait', () => {
@@ -47,7 +47,7 @@ describe('MRAIDWebViewTopCalculator', () => {
 
                 const value = Math.floor(getAndroidViewSize(height / 40, getScreenDensity()));
 
-                assert.equal(mraidViewSizer.getTopPosition(width, height), value);
+                assert.equal(mraidViewSizer.getTopPosition(width, height), 40);
             });
         });
 
@@ -104,7 +104,7 @@ describe('MRAIDWebViewTopCalculator', () => {
                 const width = 375;
                 const height = 812;
 
-                assert.equal(mraidViewSizer.getTopPosition(width, height), 89.32000000000001);
+                assert.equal(Math.round(mraidViewSizer.getTopPosition(width, height)), 89);
             });
         });
     });
