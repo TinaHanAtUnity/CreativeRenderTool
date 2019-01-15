@@ -1,3 +1,7 @@
+# Pending
+
+* Refactor store handlers for China [#7759](https://github.com/Applifier/unity-ads-webview/pull/7759)
+
 # Mon Jan 14 23:27:50 UTC 2019
 
 * Send diagnostics when programmatic backup campaign gets overwritten with no fill [#7801](https://github.com/Applifier/unity-ads-webview/pull/7801)
