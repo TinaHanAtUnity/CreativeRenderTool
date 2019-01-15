@@ -124,7 +124,8 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters, IAppStoreDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { StoreHandler, IStoreHandlerDownloadParameters, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
+import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
@@ -660,7 +661,7 @@ export class TestFixtures {
         return new PerformanceOverlayEventHandler(
             adUnit,
             TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, ar, purchasing),
-            TestFixtures.getAppStoreDownloadHelper(platform, core, ads, campaign, adUnit, thirdPartyEventManager, nativeBridge)
+            TestFixtures.getStoreHandler(platform, core, ads, campaign, adUnit, thirdPartyEventManager, nativeBridge)
         );
     }
 
@@ -734,8 +735,8 @@ export class TestFixtures {
         return new PerformanceAdUnit(TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, ar, purchasing));
     }
 
-    public static getAppStoreDownloadParameters(campaign: PerformanceCampaign|XPromoCampaign): IAppStoreDownloadParameters {
-        return <IAppStoreDownloadParameters>{
+    public static getStoreHandlerDownloadParameters(campaign: PerformanceCampaign|XPromoCampaign): IStoreHandlerDownloadParameters {
+        return <IStoreHandlerDownloadParameters>{
             clickAttributionUrl: campaign.getClickAttributionUrl(),
             clickAttributionUrlFollowsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
             bypassAppSheet: campaign.getBypassAppSheet(),
@@ -744,8 +745,8 @@ export class TestFixtures {
         };
     }
 
-    public static getAppStoreDownloadHelper(platform: Platform, core: ICoreApi, ads: IAdsApi, campaign: Campaign, adUnit: VideoAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): AppStoreDownloadHelper {
-        const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+    public static getStoreHandler(platform: Platform, core: ICoreApi, ads: IAdsApi, campaign: Campaign, adUnit: VideoAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): StoreHandler {
+        const storeHandlerParameters: IStoreHandlerParameters = {
             platform,
             core,
             ads,
@@ -758,7 +759,7 @@ export class TestFixtures {
             campaign: campaign,
             coreConfig: TestFixtures.getCoreConfiguration()
         };
-        return new AppStoreDownloadHelper(downloadHelperParameters);
+        return StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
     }
 
     public static getClientInfo(platform?: Platform, gameId?: string): ClientInfo {
