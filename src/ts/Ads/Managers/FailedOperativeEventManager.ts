@@ -4,6 +4,7 @@ import { StorageType } from 'Core/Native/Storage';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { StorageOperation } from 'Core/Utilities/StorageOperation';
 import { ICoreApi } from 'Core/ICore';
+import { Url } from 'Core/Utilities/Url';
 
 export class FailedOperativeEventManager {
 
@@ -28,6 +29,16 @@ export class FailedOperativeEventManager {
     public storeFailedEvent(storageBridge: StorageBridge, data: { [key: string]: unknown }): Promise<void> {
         if(this._eventId) {
             const operation = new StorageOperation(StorageType.PRIVATE);
+
+            if(data.url) {
+                let url: string = <string>data.url;
+                url = Url.addParameters(url, {
+                    eventRetry: true
+                });
+
+                data.url = url;
+            }
+
             operation.set(this.getEventStorageKey(), data);
             storageBridge.queue(operation);
         }

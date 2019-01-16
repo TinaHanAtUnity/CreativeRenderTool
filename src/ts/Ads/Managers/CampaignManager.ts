@@ -49,6 +49,7 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
+import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 
 export class CampaignManager {
 
@@ -138,6 +139,7 @@ export class CampaignManager {
 
         GameSessionCounters.addAdRequest();
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
+        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy());
 
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
@@ -147,7 +149,7 @@ export class CampaignManager {
         this.resetRealtimeDataForPlacements();
         const jaegerSpan = this._jaegerManager.startSpan('CampaignManagerRequest');
         jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._platform]);
-        return Promise.all([this.createRequestUrl(false, nofillRetry), this.createRequestBody(countersForOperativeEvents, nofillRetry)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(false, nofillRetry), this.createRequestBody(requestPrivacy, countersForOperativeEvents, nofillRetry)]).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
 
@@ -180,11 +182,11 @@ export class CampaignManager {
                     this.setSDKSignalValues(requestTimestamp);
 
                     if(AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
-                        return this.parseAuctionV5Campaigns(response, countersForOperativeEvents).catch((e) => {
+                        return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy).catch((e) => {
                             this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
                         });
                     } else {
-                        return this.parseCampaigns(response, countersForOperativeEvents).catch((e) => {
+                        return this.parseCampaigns(response, countersForOperativeEvents, requestPrivacy).catch((e) => {
                             this.handleGeneralError(e, 'parse_campaigns_error');
                         });
                     }
@@ -215,7 +217,7 @@ export class CampaignManager {
     }
 
     public requestRealtime(placement: Placement, session: Session): Promise<Campaign | void> {
-        return Promise.all([this.createRequestUrl(true, undefined, session), this.createRequestBody(session.getGameSessionCounters(), false, placement)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(true, undefined, session), this.createRequestBody(session.getPrivacy(), session.getGameSessionCounters(), false, placement)]).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Requesting realtime ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             return this._request.post(requestUrl, body, [], {
@@ -256,7 +258,7 @@ export class CampaignManager {
         });
     }
 
-    private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters): Promise<void[]> {
+    private parseCampaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy: IRequestPrivacy): Promise<void[]> {
         let json;
         try {
             json = JsonParser.parse<IRawAuctionResponse>(response.response);
@@ -276,6 +278,7 @@ export class CampaignManager {
         const session: Session = this._sessionManager.create(json.auctionId);
         session.setAdPlan(response.response);
         session.setGameSessionCounters(gameSessionCounters);
+        session.setPrivacy(requestPrivacy);
 
         this._backupCampaignManager.deleteBackupCampaigns();
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
@@ -361,7 +364,7 @@ export class CampaignManager {
         }
     }
 
-    private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters): Promise<void[]> {
+    private parseAuctionV5Campaigns(response: INativeResponse, gameSessionCounters: IGameSessionCounters, requestPrivacy: IRequestPrivacy): Promise<void[]> {
         let json;
         try {
             json = JsonParser.parse<IRawAuctionV5Response>(response.response);
@@ -381,6 +384,7 @@ export class CampaignManager {
         const session: Session = this._sessionManager.create(json.auctionId);
         session.setAdPlan(response.response);
         session.setGameSessionCounters(gameSessionCounters);
+        session.setPrivacy(requestPrivacy);
 
         this._backupCampaignManager.deleteBackupCampaigns();
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
@@ -758,7 +762,7 @@ export class CampaignManager {
         });
     }
 
-    private createRequestBody(gameSessionCounters: IGameSessionCounters, nofillRetry?: boolean, realtimePlacement?: Placement): Promise<unknown> {
+    private createRequestBody(requestPrivacy: IRequestPrivacy, gameSessionCounters: IGameSessionCounters, nofillRetry?: boolean, realtimePlacement?: Placement): Promise<unknown> {
         const placementRequest: { [key: string]: unknown } = {};
 
         if(realtimePlacement && this._realtimeBody) {
@@ -882,6 +886,7 @@ export class CampaignManager {
                 body.gdprEnabled = this._adsConfig.isGDPREnabled();
                 body.optOutEnabled = this._adsConfig.isOptOutEnabled();
                 body.optOutRecorded = this._adsConfig.isOptOutRecorded();
+                body.privacy = requestPrivacy;
                 body.abGroup = this._coreConfig.getAbGroup();
 
                 const organizationId = this._coreConfig.getOrganizationId();

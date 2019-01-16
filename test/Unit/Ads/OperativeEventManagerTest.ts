@@ -138,7 +138,7 @@ describe('OperativeEventManagerTest', () => {
             return storagePromise.then(() => {
                 return core.Storage.get<string>(StorageType.PRIVATE, urlKey);
             }).then(storedUrl => {
-                assert.equal(url, storedUrl, 'Failed operative event url was not correctly stored');
+                assert.equal(url + '?eventRetry=true', storedUrl, 'Failed operative event url was not correctly stored');
             }).then(() => {
                 return core.Storage.get<string>(StorageType.PRIVATE, dataKey);
             }).then(storedData => {

@@ -4,13 +4,17 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export enum ProgrammaticTrackingError {
-    TooLargeFile = 'too_large_file' // a file 20mb and over are considered too large
+    TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
+    BannerRequestError = 'banner_request_error'
 }
 
 export enum ProgrammaticTrackingMetric {
     AdmobUsedCachedVideo = 'admob_used_cached_video',
     AdmobUsedStreamedVideo = 'admob_used_streamed_video',
-    AdmobUserVideoSeeked = 'admob_user_video_seeked'
+    AdmobUserVideoSeeked = 'admob_user_video_seeked',
+
+    BannerAdRequest = 'banner_ad_request',
+    BannerAdImpression = 'banner_ad_impression'
 }
 
 export interface IProgrammaticTrackingErrorData {
@@ -54,7 +58,8 @@ export class ProgrammaticTrackingService {
         return this._request.post(url, data, headers);
     }
 
-    public reportError(errorData: IProgrammaticTrackingErrorData): Promise<INativeResponse> {
+    public reportError(error: ProgrammaticTrackingError, adType: string, seatId?: number | undefined): Promise<INativeResponse> {
+        const errorData = this.buildErrorData(error, adType, seatId);
         const url: string = ProgrammaticTrackingService.productionErrorServiceUrl;
         const data: string = JSON.stringify(errorData);
         const headers: [string, string][] = [];
@@ -64,7 +69,7 @@ export class ProgrammaticTrackingService {
         return this._request.post(url, data, headers);
     }
 
-    public buildErrorData(error: ProgrammaticTrackingError, adType: string, seatId: number | undefined): IProgrammaticTrackingErrorData {
+    private buildErrorData(error: ProgrammaticTrackingError, adType: string, seatId: number | undefined): IProgrammaticTrackingErrorData {
         const platform: Platform = this._platform;
         const osVersion: string = this._deviceInfo.getOsVersion();
         const sdkVersion: string = this._clientInfo.getSdkVersionName();

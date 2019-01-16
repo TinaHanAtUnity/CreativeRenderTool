@@ -26,6 +26,7 @@ import { AuctionV5Test } from 'Core/Models/ABGroup';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class NoFillError extends Error {
+    public response: INativeResponse;
 }
 
 export interface IRawBannerResponse {
@@ -161,7 +162,9 @@ export class BannerCampaignManager {
                 const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId);
                 return this.handleBannerCampaign(auctionResponse, session);
             } else {
-                return Promise.reject(new NoFillError(`No fill for placement ${placement.getId()}`));
+                const e = new NoFillError(`No fill for placement ${placement.getId()}`);
+                e.response = response;
+                return Promise.reject(e);
             }
         } else {
             const e = new Error('No placements found in realtime campaign json.');
