@@ -35,34 +35,27 @@ describe('Ads/Utilities', () => {
         });
     });
 
-    describe('buildErrorData', () => {
-        it('should send correct data for too_large_file', () => {
-            osVersionStub.returns('11.2.1');
-            sdkVersionStub.returns('2.3.0');
-            const errorData = programmaticTrackingService.buildErrorData(ProgrammaticTrackingError.TooLargeFile, 'test', 1234);
-            sinon.assert.calledOnce(osVersionStub);
-            sinon.assert.calledOnce(sdkVersionStub);
-            assert.deepEqual(errorData, {
-                event: ProgrammaticTrackingError.TooLargeFile,
-                platform: 'ANDROID',
-                osVersion: '11.2.1',
-                sdkVersion: '2.3.0',
-                adType: 'test',
-                seatId: 1234
-            });
-        });
-    });
-
     describe('reportError', () => {
         it('should send correct data using request api', () => {
-            osVersionStub.returns('11.2.1');
-            sdkVersionStub.returns('2.3.0');
-            const errorData = programmaticTrackingService.buildErrorData(ProgrammaticTrackingError.TooLargeFile, 'test', 1234);
-            const promise = programmaticTrackingService.reportError(errorData);
+            const osVersion = '11.2.1';
+            const sdkVersion = '2.3.0';
+            osVersionStub.returns(osVersion);
+            sdkVersionStub.returns(sdkVersion);
+            const error = ProgrammaticTrackingError.TooLargeFile;
+            const adType = 'test';
+            const seatId = 1234;
+            const promise = programmaticTrackingService.reportError(error, adType, seatId);
             sinon.assert.calledOnce(postStub);
             assert.equal(postStub.firstCall.args.length, 3);
             assert.equal(postStub.firstCall.args[0], 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/error');
-            assert.equal(postStub.firstCall.args[1], JSON.stringify(errorData));
+            assert.equal(postStub.firstCall.args[1], JSON.stringify({
+                event: error,
+                platform: Platform[Platform.ANDROID],
+                osVersion: osVersion,
+                sdkVersion: sdkVersion,
+                adType: adType,
+                seatId: seatId
+            }));
             assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
             return promise;
         });
