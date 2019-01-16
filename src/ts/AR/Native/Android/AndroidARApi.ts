@@ -28,4 +28,8 @@ export class AndroidARApi extends NativeApi {
     public swapBuffers(): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'swapBuffers');
     }
+
+    public setViewRenderMode(mode: number): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setViewRenderMode', [mode]);
+    }
 }
