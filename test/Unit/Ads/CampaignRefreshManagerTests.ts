@@ -9,7 +9,7 @@ import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
+import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
@@ -212,7 +212,7 @@ describe('CampaignRefreshManager', () => {
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-            campaignRefreshManager = new OldCampaignRefreshManager(platform, core, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
+            campaignRefreshManager = new CampaignRefreshManager(platform, core, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
         it('get campaign should return undefined', () => {
@@ -613,7 +613,7 @@ describe('CampaignRefreshManager', () => {
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-            campaignRefreshManager = new OldCampaignRefreshManager(platform, core, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
+            campaignRefreshManager = new CampaignRefreshManager(platform, core, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
         afterEach(() => {

@@ -6,6 +6,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
+import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { EventType } from 'Ads/Models/Session';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
@@ -77,6 +78,7 @@ export interface IInfoJson {
     gdprEnabled: boolean;
     optOutEnabled: boolean;
     optOutRecorded: boolean;
+    privacy: IRequestPrivacy;
     gameSessionCounters: IGameSessionCounters;
     apiLevel?: number;
     deviceMake?: string;
@@ -96,6 +98,7 @@ export interface IInfoJson {
     frameworkName?: string;
     frameworkVersion?: string;
     skippedAt?: number;
+    isBackupCampaign: boolean;
 }
 
 export class OperativeEventManager {
@@ -375,11 +378,13 @@ export class OperativeEventManager {
                 'gdprEnabled': this._adsConfig.isGDPREnabled(),
                 'optOutEnabled': this._adsConfig.isOptOutEnabled(),
                 'optOutRecorded': this._adsConfig.isOptOutRecorded(),
+                'privacy': session.getPrivacy(),
                 'gameSessionCounters': session.getGameSessionCounters(),
                 'networkType': networkType,
                 'connectionType': connectionType,
                 'screenWidth': screenWidth,
-                'screenHeight': screenHeight
+                'screenHeight': screenHeight,
+                'isBackupCampaign': this._campaign.isBackupCampaign()
             };
 
             if(this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {

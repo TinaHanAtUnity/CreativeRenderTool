@@ -15,6 +15,7 @@ interface IVastAd {
 export class VastAd extends Model<IVastAd> {
 
     constructor();
+    constructor(id: string, creatives: VastCreative[], errorURLTemplates: string[], impressionURLTemplates: string[], wrapperURLs: string[], companionAds: VastCreativeCompanionAd[]);
     constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeCompanionAd[]) {
         super('VastAd', {
             id: ['string', 'null'],
@@ -170,4 +171,5 @@ export class VastAd extends Model<IVastAd> {
 
         return urls;
     }
+
 }

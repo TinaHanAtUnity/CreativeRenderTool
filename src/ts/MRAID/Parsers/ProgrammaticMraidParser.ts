@@ -17,7 +17,7 @@ export class ProgrammaticMraidParser extends CampaignParser {
 
     public static ContentType = 'programmatic/mraid';
 
-    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraid = <IRawMRAIDCampaign>response.getJsonContent();
 
         if(!jsonMraid) {
@@ -35,7 +35,7 @@ export class ProgrammaticMraidParser extends CampaignParser {
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
-            id: this.getProgrammaticCampaignId(platform),
+            id: this.getProgrammaticCampaignId(),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             contentType: ProgrammaticMraidParser.ContentType,
             adType: response.getAdType() || undefined,
@@ -45,7 +45,8 @@ export class ProgrammaticMraidParser extends CampaignParser {
             meta: jsonMraid.meta,
             session: session,
             mediaId: response.getMediaId(),
-            trackingUrls: response.getTrackingUrls() || {}
+            trackingUrls: response.getTrackingUrls() || {},
+            backupCampaign: false
         };
 
         const parameters: IMRAIDCampaign = {

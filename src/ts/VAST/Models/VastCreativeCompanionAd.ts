@@ -12,7 +12,8 @@ interface IVastCreativeCompanionAd {
 }
 
 export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
-    constructor(id: string, creativeType: string, height: number, width: number, staticResourceURL: string, companionClickThroughURLTemplate: string, trackingEvents?: { [eventName: string]: string[] }) {
+
+    constructor(id: string | null, height: number | null, width: number | null, creativeType?: string | null, staticResourceURL?: string | null, companionClickThroughURLTemplate?: string | null, trackingEvents?: { [eventName: string]: string[] }) {
         super('VastCreativeCompanionAd', {
             id: ['string', 'null'],
             width: ['number'],
@@ -32,6 +33,27 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
         this.set('staticResourceURL', staticResourceURL || null);
         this.set('companionClickThroughURLTemplate', companionClickThroughURLTemplate || null);
         this.set('trackingEvents', trackingEvents || {});
+    }
+
+    public setCompanionClickThroughURLTemplate(url: string | null) {
+        this.set('companionClickThroughURLTemplate', url);
+    }
+
+    public setStaticResourceURL(url: string | null) {
+        this.set('staticResourceURL', url);
+    }
+
+    public setCreativeType(type: string | null) {
+        this.set('creativeType', type);
+    }
+
+    public addTrackingEvent(eventName: string, trackingURLTemplate: string) {
+        const trackingEvents = this.get('trackingEvents');
+        if (trackingEvents[eventName]) {
+            trackingEvents[eventName].push(trackingURLTemplate);
+        } else {
+            trackingEvents[eventName] = [trackingURLTemplate];
+        }
     }
 
     public getId(): string | null {
@@ -85,4 +107,5 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
         }
         return [];
     }
+
 }

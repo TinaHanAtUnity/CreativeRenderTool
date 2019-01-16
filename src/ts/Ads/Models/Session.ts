@@ -1,5 +1,6 @@
 import { Model } from 'Core/Models/Model';
 import { IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
+import { IRequestPrivacy } from 'Ads/Models/RequestPrivacy';
 
 export enum EventType {
     START,
@@ -18,6 +19,7 @@ export interface ISession {
     adPlan: string | undefined;
     eventSent: { [key: number]: boolean };
     gameSessionCounters: IGameSessionCounters;
+    privacy: IRequestPrivacy;
 }
 
 export class Session extends Model<ISession> {
@@ -27,7 +29,8 @@ export class Session extends Model<ISession> {
             id: ['string'],
             adPlan: ['string', 'undefined'],
             eventSent: ['object'],
-            gameSessionCounters: ['object']
+            gameSessionCounters: ['object'],
+            privacy: ['object']
         });
 
         this.set('id', id);
@@ -68,6 +71,14 @@ export class Session extends Model<ISession> {
 
     public getGameSessionCounters(): IGameSessionCounters {
         return this.get('gameSessionCounters');
+    }
+
+    public setPrivacy(privacy: IRequestPrivacy) {
+        this.set('privacy', privacy);
+    }
+
+    public getPrivacy(): IRequestPrivacy {
+        return this.get('privacy');
     }
 
     public getDTO(): { [key: string]: unknown } {
