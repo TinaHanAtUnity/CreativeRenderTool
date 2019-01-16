@@ -1,7 +1,7 @@
 import {
     IProgrammaticTrackingMetricData,
-    ProgrammaticTrackingError,
-    ProgrammaticTrackingMetric,
+    ProgrammaticTrackingErrorName,
+    ProgrammaticTrackingMetricName,
     ProgrammaticTrackingService
 } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
@@ -41,20 +41,27 @@ describe('Ads/Utilities', () => {
             const sdkVersion = '2.3.0';
             osVersionStub.returns(osVersion);
             sdkVersionStub.returns(sdkVersion);
-            const error = ProgrammaticTrackingError.TooLargeFile;
+            const error = ProgrammaticTrackingErrorName.TooLargeFile;
             const adType = 'test';
             const seatId = 1234;
             const promise = programmaticTrackingService.reportError(error, adType, seatId);
             sinon.assert.calledOnce(postStub);
             assert.equal(postStub.firstCall.args.length, 3);
-            assert.equal(postStub.firstCall.args[0], 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/error');
+            assert.equal(postStub.firstCall.args[0], 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric');
             assert.equal(postStub.firstCall.args[1], JSON.stringify({
-                event: error,
-                platform: Platform[Platform.ANDROID],
-                osVersion: osVersion,
-                sdkVersion: sdkVersion,
-                adType: adType,
-                seatId: seatId
+                event: undefined,
+                metrics: [
+                    {
+                        tags: [
+                            'ads_sdk2_eevt:too_large_file',
+                            'ads_sdk2_plt:ANDROID',
+                            'ads_sdk2_osv:11.2.1',
+                            'ads_sdk2_sdv:2.3.0',
+                            'ads_sdk2_adt:test',
+                            'ads_sdk2_sid:1234'
+                        ]
+                    }
+                ]
             }));
             assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
             return promise;
@@ -63,17 +70,31 @@ describe('Ads/Utilities', () => {
 
     describe('reportMetric', () => {
         const tests: {
-            input: ProgrammaticTrackingMetric;
+            input: ProgrammaticTrackingMetricName;
             expected: IProgrammaticTrackingMetricData;
         }[] = [{
-            input: ProgrammaticTrackingMetric.AdmobUsedCachedVideo,
+            input: ProgrammaticTrackingMetricName.AdmobUsedCachedVideo,
             expected: {
-                event: ProgrammaticTrackingMetric.AdmobUsedCachedVideo
+                event: undefined,
+                metrics: [
+                    {
+                        tags: [
+                            'ads_sdk2_mevt:admob_used_cached_video'
+                        ]
+                    }
+                ]
             }
         }, {
-            input: ProgrammaticTrackingMetric.AdmobUsedStreamedVideo,
+            input: ProgrammaticTrackingMetricName.AdmobUsedStreamedVideo,
             expected: {
-                event: ProgrammaticTrackingMetric.AdmobUsedStreamedVideo
+                event: undefined,
+                metrics: [
+                    {
+                        tags: [
+                            'ads_sdk2_mevt:admob_used_streamed_video'
+                        ]
+                    }
+                ]
             }
         }];
         tests.forEach((t) => {

@@ -9,7 +9,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { Promises } from 'Core/Utilities/Promises';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos, IWebPlayerEventSettings } from 'Ads/Native/WebPlayer';
-import { ProgrammaticTrackingService, ProgrammaticTrackingMetric } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IBannerAdUnitParameters {
     platform: Platform;
@@ -69,7 +69,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
 
     public onShow(): Promise<void> {
         if (!this._impressionEventsSent) {
-            this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetric.BannerAdImpression);
+            this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.BannerAdImpression);
             this._impressionEventsSent = true;
             this.sendImpressionEvent();
         }
