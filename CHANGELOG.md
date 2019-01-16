@@ -1,3 +1,8 @@
+# Pending
+
+* Using new metric scheme for programmatic tracking events [#7866](https://github.com/Applifier/unity-ads-webview/pull/7866)
+* Adding abGroup to ad_received, ad_ready and click_delay diagnostics log [#7865](https://github.com/Applifier/unity-ads-webview/pull/7865)
+
 # Wed Jan 16 16:08:20 UTC 2019
 
 * add eventRetry=true to the URL parameters [#7659](https://github.com/Applifier/unity-ads-webview/pull/7659)
