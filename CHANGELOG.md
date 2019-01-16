@@ -1,3 +1,9 @@
+# Pending
+
+* add eventRetry=true to the URL parameters [#7659](https://github.com/Applifier/unity-ads-webview/pull/7659)
+* add privacy to adreq and operative events [#7755](https://github.com/Applifier/unity-ads-webview/pull/7755)
+* add gamePrivacy and userPrivacy to configuration [#7754](https://github.com/Applifier/unity-ads-webview/pull/7754)
+
 # Wed Jan 16 11:12:06 UTC 2019
 
 * Refactor store handlers for China [#7759](https://github.com/Applifier/unity-ads-webview/pull/7759)
