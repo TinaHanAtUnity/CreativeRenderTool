@@ -1,4 +1,4 @@
-import { IAdsApi } from 'Ads/IAds';
+import { IAdsApi, IAds } from 'Ads/IAds';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { HTML } from 'Ads/Models/Assets/HTML';
@@ -22,7 +22,7 @@ import { ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
 import { IAnalyticsApi } from 'Analytics/IAnalytics';
 import { AnalyticsApi } from 'Analytics/Native/Analytics';
 import { Backend } from 'Backend/Backend';
-import { IBannersApi } from 'Banners/IBanners';
+import { IBannersApi, IBanners } from 'Banners/IBanners';
 import { BannerApi } from 'Banners/Native/Banner';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
@@ -32,7 +32,7 @@ import { ICore, ICoreApi } from 'Core/ICore';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { CoreConfiguration, CacheMode } from 'Core/Models/CoreConfiguration';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { BroadcastApi } from 'Core/Native/Android/Broadcast';
 import { IPackageInfo } from 'Core/Native/Android/DeviceInfo';
@@ -110,7 +110,7 @@ import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUn
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
@@ -135,6 +135,21 @@ import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
+import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
+import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
+import { PlacementManager } from 'Ads/Managers/PlacementManager';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { AssetManager } from 'Ads/Managers/AssetManager';
+import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
+import { BannerWebPlayerContainer } from 'Ads/Utilities/WebPlayer/BannerWebPlayerContainer';
+import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
+import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
+import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
+import { BannerAdContext } from 'Banners/Context/BannerAdContext';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -847,6 +862,54 @@ export class TestFixtures {
         core.CacheManager = new CacheManager(api, core.WakeUpManager!, core.RequestManager!, core.CacheBookkeeping!);
 
         return <ICore>core;
+    }
+
+    public static getAdsModule(core: ICore): IAds {
+        const platform = core.NativeBridge.getPlatform();
+        const api = this.getAdsApi(core.NativeBridge);
+        const ads: Partial<IAds> = {
+            Api: api,
+            AdMobSignalFactory: new AdMobSignalFactory(platform, core.Api, api, core.ClientInfo, core.DeviceInfo, core.FocusManager),
+            InterstitialWebPlayerContainer: new InterstitialWebPlayerContainer(platform, api),
+            SessionManager: new SessionManager(core.Api, core.RequestManager, core.StorageBridge),
+            MissedImpressionManager: new MissedImpressionManager(core.Api),
+            BackupCampaignManager: new BackupCampaignManager(core.Api, core.StorageBridge, core.Config, core.DeviceInfo),
+            ProgrammaticTrackingService: new ProgrammaticTrackingService(platform, core.RequestManager, core.ClientInfo, core.DeviceInfo),
+            ContentTypeHandlerManager: new ContentTypeHandlerManager(),
+            Config: TestFixtures.getAdsConfiguration(),
+            Container: TestFixtures.getTestContainer(core, api),
+            ThirdPartyEventManagerFactory: new ThirdPartyEventManagerFactory(core.Api, core.RequestManager)
+        };
+        ads.PrivacyManager = new UserPrivacyManager(platform, core.Api, core.Config, ads.Config!, core.ClientInfo, core.DeviceInfo, core.RequestManager);
+        ads.PlacementManager = new PlacementManager(api, ads.Config!);
+        ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, ads.ProgrammaticTrackingService!, ads.BackupCampaignManager!);
+        ads.CampaignManager = new CampaignManager(platform, core.Api, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, core.JaegerManager, ads.BackupCampaignManager!);
+        ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
+        return <IAds>ads;
+    }
+
+    private static getTestContainer(core: ICore, ads: IAdsApi) {
+        switch (core.NativeBridge.getPlatform()) {
+            case Platform.IOS:
+                return new ViewController(core.Api, ads, <IosDeviceInfo>core.DeviceInfo, core.FocusManager, core.ClientInfo);
+            case Platform.ANDROID:
+            default:
+                return new Activity(core.Api, ads, <AndroidDeviceInfo>core.DeviceInfo);
+        }
+    }
+
+    public static getBannerModule(ads: IAds, core: ICore) {
+        const platform = core.NativeBridge.getPlatform();
+        const api = this.getBannersApi(core.NativeBridge);
+        const banners: Partial<IBanners> = {
+            Api: api,
+            PlacementManager: new BannerPlacementManager(ads.Api, ads.Config),
+            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, ads.AssetManager, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager),
+            WebPlayerContainer: new BannerWebPlayerContainer(platform, ads.Api)
+        };
+        banners.AdUnitParametersFactory = new BannerAdUnitParametersFactory(<IBanners>banners, ads, core);
+        banners.AdContext = new BannerAdContext(<IBanners>banners, ads, core);
+        return <IBanners>banners;
     }
 
     public static getCoreApi(nativeBridge: NativeBridge): ICoreApi {

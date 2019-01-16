@@ -1,5 +1,4 @@
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Backend } from 'Backend/Backend';
@@ -10,8 +9,6 @@ import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
@@ -25,6 +22,7 @@ import { asSpy, asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IntentApi } from 'Core/Native/Android/Intent';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('DisplayHTMLBannerAdUnit', () => {
@@ -34,12 +32,10 @@ import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
         let banners: IBannersApi;
-        let deviceInfo: DeviceInfo;
-        let placement: Placement;
         let campaign: BannerCampaign;
-        let clientInfo: ClientInfo;
         let thirdPartyEventManager: ThirdPartyEventManager;
         let webPlayerContainer: WebPlayerContainer;
+        let programmaticTrackingService: ProgrammaticTrackingService;
 
         const getBannerCampaign = (session: Session) => {
             const campaignData = JSON.parse(ValidBannerCampaignJSON);
@@ -70,17 +66,8 @@ import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
                 return Promise.resolve().then(() => banners.Banner.onBannerLoaded.trigger());
             });
 
-            if(platform === Platform.ANDROID) {
-                deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
-            }
-            if(platform === Platform.IOS) {
-                deviceInfo = TestFixtures.getIosDeviceInfo(core);
-            }
-            placement = TestFixtures.getPlacement();
-
             campaign = new BannerCampaign(getBannerCampaign(TestFixtures.getSession()));
 
-            clientInfo = TestFixtures.getClientInfo();
             thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             asStub(thirdPartyEventManager.sendWithGet).resolves();
 
@@ -94,14 +81,15 @@ import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
             asStub(webPlayerContainer.setEventSettings).resolves();
             asStub(webPlayerContainer.setSettings).resolves();
 
+            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+
             adUnit = new DisplayHTMLBannerAdUnit({
                 platform,
                 core,
                 campaign,
-                placement,
-                clientInfo,
                 webPlayerContainer,
-                thirdPartyEventManager
+                thirdPartyEventManager,
+                programmaticTrackingService
             });
         });
 
