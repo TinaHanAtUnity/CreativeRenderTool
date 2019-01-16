@@ -53,12 +53,12 @@ describe('Ads/Utilities', () => {
                 metrics: [
                     {
                         tags: [
-                            'ads_sdk_eevt:too_large_file',
-                            'ads_sdk_plt:ANDROID',
-                            'ads_sdk_osv:11.2.1',
-                            'ads_sdk_sdv:2.3.0',
-                            'ads_sdk_adt:test',
-                            'ads_sdk_sid:1234'
+                            'ads_sdk2_eevt:too_large_file',
+                            'ads_sdk2_plt:ANDROID',
+                            'ads_sdk2_osv:11.2.1',
+                            'ads_sdk2_sdv:2.3.0',
+                            'ads_sdk2_adt:test',
+                            'ads_sdk2_sid:1234'
                         ]
                     }
                 ]
@@ -79,7 +79,7 @@ describe('Ads/Utilities', () => {
                 metrics: [
                     {
                         tags: [
-                            'ads_sdk_mevt:admob_used_cached_video'
+                            'ads_sdk2_mevt:admob_used_cached_video'
                         ]
                     }
                 ]
@@ -91,7 +91,7 @@ describe('Ads/Utilities', () => {
                 metrics: [
                     {
                         tags: [
-                            'ads_sdk_mevt:admob_used_streamed_video'
+                            'ads_sdk2_mevt:admob_used_streamed_video'
                         ]
                     }
                 ]

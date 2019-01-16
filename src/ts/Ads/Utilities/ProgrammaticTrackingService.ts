@@ -59,7 +59,7 @@ export class ProgrammaticTrackingService {
     }
 
     private createAdsSdkTag(suffix: string, tagValue: string): string {
-        return `ads_sdk_${suffix}:${tagValue}`;
+        return `ads_sdk2_${suffix}:${tagValue}`;
     }
 
     public reportError(error: ProgrammaticTrackingErrorName, adType: string, seatId?: number | undefined): Promise<INativeResponse> {
