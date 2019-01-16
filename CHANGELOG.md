@@ -1,6 +1,9 @@
 # Pending
 
 * Refactor store handlers for China [#7759](https://github.com/Applifier/unity-ads-webview/pull/7759)
+* Define Staging/Deployment Process and Add QOL Scripts [#7464] (https://github.com/Applifier/unity-ads-webview/pull/7464)
+* Improved Diagnostics for Banner Lifecycle [#7779](https://github.com/Applifier/unity-ads-webview/pull/7779)
+
 
 # Mon Jan 14 23:27:50 UTC 2019
 
