@@ -50,4 +50,8 @@ export class CustomFeatures {
     public static isByteDanceSeat(seatId: number | undefined): boolean {
         return seatId === 9116 || seatId === 9154;
     }
+
+    public static isTimerExpirationExperiment(gameId: string): boolean {
+        return gameId === '1453434';
+    }
 }
