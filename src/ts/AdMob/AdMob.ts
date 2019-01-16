@@ -11,7 +11,7 @@ export class AdMob extends AbstractParserModule {
         const paramsFactory = new AdMobAdUnitParametersFactory(core, ads);
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         contentTypeHandlerMap[ProgrammaticAdMobParser.ContentType] = {
-            parser: new ProgrammaticAdMobParser(),
+            parser: new ProgrammaticAdMobParser(core),
             factory: new AdMobAdUnitFactory(paramsFactory)
         };
         super(contentTypeHandlerMap);

@@ -26,6 +26,7 @@ import { AuctionV5Test } from 'Core/Models/ABGroup';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class NoFillError extends Error {
+    public response: INativeResponse;
 }
 
 export interface IRawBannerResponse {
@@ -161,7 +162,9 @@ export class BannerCampaignManager {
                 const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId);
                 return this.handleBannerCampaign(auctionResponse, session);
             } else {
-                return Promise.reject(new NoFillError(`No fill for placement ${placement.getId()}`));
+                const e = new NoFillError(`No fill for placement ${placement.getId()}`);
+                e.response = response;
+                return Promise.reject(e);
             }
         } else {
             const e = new Error('No placements found in realtime campaign json.');
@@ -230,7 +233,7 @@ export class BannerCampaignManager {
 
         const parser: CampaignParser = this.getCampaignParser(response.getContentType());
 
-        return parser.parse(this._platform, this._core, this._request, response, session).then((campaign) => {
+        return parser.parse(response, session).then((campaign) => {
             campaign.setMediaId(response.getMediaId());
             campaign.setTrackingUrls(trackingUrls);
             return campaign;
@@ -242,14 +245,14 @@ export class BannerCampaignManager {
 
         const parser: CampaignParser = this.getCampaignParser(response.getContentType());
 
-        return parser.parse(this._platform, this._core, this._request, response, session).then((campaign) => {
+        return parser.parse(response, session).then((campaign) => {
             campaign.setMediaId(response.getMediaId());
             return campaign;
         });
     }
 
     private getCampaignParser(contentType: string): CampaignParser {
-        return BannerCampaignParserFactory.getCampaignParser(contentType);
+        return BannerCampaignParserFactory.getCampaignParser(this._platform, contentType);
     }
 
     private getAbGroup() {

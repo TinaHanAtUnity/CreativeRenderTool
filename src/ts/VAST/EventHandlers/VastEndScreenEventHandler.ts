@@ -9,6 +9,7 @@ import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { ABGroup, ByteDanceCTATest } from 'Core/Models/ABGroup';
+import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
@@ -41,24 +42,13 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
-            if (ByteDanceCTATest.isValid(this._abGroup)) {
-                return this.openUrlOnCallButton(clickThroughURL);
+            if (!ByteDanceCTATest.isValid(this._abGroup) && CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+                return this.openUrlOnCallButton(clickThroughURL, Date.now() - ctaClickedTime, clickThroughURL);
             } else {
                 return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
-                    const clickDuration = Date.now() - ctaClickedTime;
-                    return this.openUrlOnCallButton(url).then(() => {
-                        if (this.shouldRecordClickLog()) {
-                            SessionDiagnostics.trigger('click_delay', {
-                                duration: clickDuration,
-                                delayedUrl: clickThroughURL,
-                                location: 'vast_endscreen',
-                                seatId: this._vastCampaign.getSeatId(),
-                                creativeId: this._vastCampaign.getCreativeId()
-                            }, this._vastCampaign.getSession());
-                        }
-                    });
+                    return this.openUrlOnCallButton(url, Date.now() - ctaClickedTime, clickThroughURL!);
                 }).catch(() => {
-                    return this.openUrlOnCallButton(clickThroughURL!);
+                    return this.openUrlOnCallButton(clickThroughURL!, Date.now() - ctaClickedTime, clickThroughURL!);
                 });
             }
         }
@@ -79,13 +69,15 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._vastAdUnit.sendCompanionTrackingEvent(this._vastCampaign.getSession().getId());
     }
 
-    private openUrlOnCallButton(url: string): Promise<void> {
+    private openUrlOnCallButton(url: string, clickDuration: number, clickUrl: string): Promise<void> {
         return this.onOpenUrl(url).then(() => {
             this.setCallButtonEnabled(true);
             if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
                 this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
             }
             this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._vastCampaign.getSession().getId());
+
+            ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'vast_endscreen', this._vastCampaign, this._gameSessionId);
         }).catch(() => {
             this.setCallButtonEnabled(true);
         });
@@ -105,16 +97,6 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private setCallButtonEnabled(enabled: boolean): void {
         if (this._vastEndScreen) {
             this._vastEndScreen.setCallButtonEnabled(enabled);
-        }
-    }
-
-    private shouldRecordClickLog(): boolean {
-        if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
-            return true;
-        } else if (this._gameSessionId && this._gameSessionId % 10 === 1) {
-            return true;
-        } else {
-            return false;
         }
     }
 }

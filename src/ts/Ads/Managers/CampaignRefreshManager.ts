@@ -12,7 +12,6 @@ import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
 import { Platform } from 'Core/Constants/Platform';
-import { WebViewError } from 'Core/Errors/WebViewError';
 import { ICoreApi } from 'Core/ICore';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -24,7 +23,7 @@ import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHan
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
-export class OldCampaignRefreshManager extends RefreshManager {
+export class CampaignRefreshManager extends RefreshManager {
     private _platform: Platform;
     private _core: ICoreApi;
     private _ads: IAdsApi;
@@ -235,6 +234,20 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
     private onNoFill(placementId: string) {
         this._parsingErrorCount = 0;
+
+        // this code blocks collects data for backup campaign investigation and should be removed once investigation is done
+        const backupCampaign = this._configuration.getPlacement(placementId).getCurrentCampaign();
+        if(this._sessionManager.getGameSessionId() % 100 === 82 && backupCampaign && backupCampaign.isBackupCampaign()) {
+            const contentType = backupCampaign.getContentType();
+
+            if(contentType === 'programmatic/admob-video' || contentType === 'programmatic/mraid' || contentType === 'programmatic/mraid-url') {
+                const willExpireAt = backupCampaign.getWillExpireAt();
+                Diagnostics.trigger('backupcampaign_nofill', {
+                    contentType: contentType,
+                    ttl: willExpireAt ? willExpireAt - Date.now() : undefined
+                });
+            }
+        }
 
         this._core.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
         this.setCampaignForPlacement(placementId, undefined, undefined);

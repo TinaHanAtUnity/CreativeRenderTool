@@ -1,13 +1,13 @@
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { OverlayEventHandlerWithDownloadSupport } from 'Ads/EventHandlers/OverlayEventHandlerWithDownloadSupport';
-import { IAppStoreDownloadHelper } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { IStoreHandler } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 
 export class XPromoOverlayEventHandler extends OverlayEventHandlerWithDownloadSupport<XPromoCampaign> {
     private _xPromoAdUnit: XPromoAdUnit;
 
-    constructor(adUnit: XPromoAdUnit, parameters: IXPromoAdUnitParameters, downloadHelper: IAppStoreDownloadHelper) {
-        super(adUnit, parameters, downloadHelper);
+    constructor(adUnit: XPromoAdUnit, parameters: IXPromoAdUnitParameters, storeHandler: IStoreHandler) {
+        super(adUnit, parameters, storeHandler);
         this._xPromoAdUnit = adUnit;
     }
 

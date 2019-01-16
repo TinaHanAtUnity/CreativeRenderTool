@@ -1,3 +1,54 @@
+# Pending
+
+* Refactor store handlers for China [#7759](https://github.com/Applifier/unity-ads-webview/pull/7759)
+* Define Staging/Deployment Process and Add QOL Scripts [#7464] (https://github.com/Applifier/unity-ads-webview/pull/7464)
+* Improved Diagnostics for Banner Lifecycle [#7779](https://github.com/Applifier/unity-ads-webview/pull/7779)
+
+
+# Mon Jan 14 23:27:50 UTC 2019
+
+* Send diagnostics when programmatic backup campaign gets overwritten with no fill [#7801](https://github.com/Applifier/unity-ads-webview/pull/7801)
+* Rename OldCampaignRefreshManager to CampaignRefreshManager [#7821](https://github.com/Applifier/unity-ads-webview/pull/7821)
+* Enable vast strict on group 16 [#7823](https://github.com/Applifier/unity-ads-webview/pull/7823)
+* Enable auction v5 on group 15 [#7822](https://github.com/Applifier/unity-ads-webview/pull/7822)
+
+# Mon Jan 14 12:40:31 UTC 2019
+
+* Hook WebPlayer Programmatic MRAID 3.0 [#7614](https://github.com/Applifier/unity-ads-webview/pull/7614)
+* Vast Events Integration Test [#7462](https://github.com/Applifier/unity-ads-webview/pull/7462)
+* Add backup campaign flag to operative events [#7711](https://github.com/Applifier/unity-ads-webview/pull/7711)
+
+# Thu Jan 10 23:34:08 UTC 2019
+
+* Vast parser strict added but disabled through ab groups [#7407](https://github.com/Applifier/unity-ads-webview/pull/7407)
+
+# Wed Jan 9 19:50:51 UTC 2019
+
+* Using gameSessionId to sample fps counters [#7710](https://github.com/Applifier/unity-ads-webview/pull/7710)
+* Reduce click delay log 100%->50% for ByteDance [#7724](https://github.com/Applifier/unity-ads-webview/pull/7724)
+* Add new non-rewarded seatId and update abGroup for ByteDance [#7730](https://github.com/Applifier/unity-ads-webview/pull/7730)
+* VAST media selector update to pick the lowest bitrate file [#7725](https://github.com/Applifier/unity-ads-webview/pull/7725)
+* Removes the unnecessary parameters from parse method [#7542](https://github.com/Applifier/unity-ads-webview/pull/7542)
+* Update GDPR text for retention period [#7728](https://github.com/Applifier/unity-ads-webview/pull/7728)
+* Ensure Game was made with Unity before initializing Unity Purchasing Adapter [#7726](https://github.com/Applifier/unity-ads-webview/pull/7726) 
+
+# Thu Dec 20 01:58:04 UTC 2018
+
+* Increase log sampling to 50% and log performance mraid click delay [#7687](https://github.com/Applifier/unity-ads-webview/pull/7687)
+* CI travis status update [#7684](https://github.com/Applifier/unity-ads-webview/pull/7684)
+* Disabling report bad ads feature in GDPR regions [#7686](https://github.com/Applifier/unity-ads-webview/pull/7686)
+
+# Wed Dec 19 00:50:07 UTC 2018
+
+* AR analytics events [#7438](https://github.com/Applifier/unity-ads-webview/pull/7438)
+* Remove back button experiment [#7520](https://github.com/Applifier/unity-ads-webview/pull/7520)
+* Add support for cancel animation frame in AR [#7230](https://github.com/Applifier/unity-ads-webview/pull/7230)
+* AR button timer  [#7461](https://github.com/Applifier/unity-ads-webview/pull/7461)
+* Limit CTA ABTest to ByteDance Seat Only [#7681](https://github.com/Applifier/unity-ads-webview/pull/7681)
+* Shifted Promo Template to Webview [#7467](https://github.com/Applifier/unity-ads-webview/pull/7467)
+* Fire Promo Events in Staging [#7434](https://github.com/Applifier/unity-ads-webview/pull/7434)
+* Fix PTS Endpoint for SDK Stats [#7683](https://github.com/Applifier/unity-ads-webview/pull/7683)
+
 # Mon Dec 17 22:25:49 UTC 2018
 
 * Disable auction v5 test for holidays from groups 15, 16 and 17 [#7611](https://github.com/Applifier/unity-ads-webview/pull/7611)

@@ -30,6 +30,7 @@ export interface ICampaign {
     session: Session;
     mediaId: string;
     trackingUrls: ICampaignTrackingUrls;
+    backupCampaign: boolean;
 }
 
 export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
@@ -44,7 +45,8 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         meta: ['string', 'undefined'],
         session: ['object'],
         mediaId: ['string'],
-        trackingUrls: ['object']
+        trackingUrls: ['object'],
+        backupCampaign: ['boolean']
     };
 
     constructor(name: string, schema: ISchema<T>, data: T) {
@@ -90,6 +92,10 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     public isExpired(): boolean {
         const willExpireAt = this.get('willExpireAt');
         return willExpireAt !== undefined && Date.now() > willExpireAt;
+    }
+
+    public isBackupCampaign(): boolean {
+        return this.get('backupCampaign');
     }
 
     public setMediaId(id: string) {

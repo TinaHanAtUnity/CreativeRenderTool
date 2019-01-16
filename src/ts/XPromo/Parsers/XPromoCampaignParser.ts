@@ -14,7 +14,7 @@ export class XPromoCampaignParser extends CampaignParser {
 
     public static ContentType = 'xpromo/video';
 
-    public parse(platform: Platform, core: ICoreApi, request: RequestManager, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const json = <IRawPerformanceCampaign>response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
@@ -46,7 +46,8 @@ export class XPromoCampaignParser extends CampaignParser {
             meta: json.meta,
             session: session,
             mediaId: response.getMediaId(),
-            trackingUrls: response.getTrackingUrls() ? this.validateAndEncodeTrackingUrls(response.getTrackingUrls(), session) : {}
+            trackingUrls: response.getTrackingUrls() ? this.validateAndEncodeTrackingUrls(response.getTrackingUrls(), session) : {},
+            backupCampaign: false
         };
 
         const parameters: IXPromoCampaign = {

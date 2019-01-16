@@ -1,4 +1,4 @@
-import { IAdsApi } from 'Ads/IAds';
+import { IAdsApi, IAds } from 'Ads/IAds';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { HTML } from 'Ads/Models/Assets/HTML';
@@ -22,7 +22,7 @@ import { ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
 import { IAnalyticsApi } from 'Analytics/IAnalytics';
 import { AnalyticsApi } from 'Analytics/Native/Analytics';
 import { Backend } from 'Backend/Backend';
-import { IBannersApi } from 'Banners/IBanners';
+import { IBannersApi, IBanners } from 'Banners/IBanners';
 import { BannerApi } from 'Banners/Native/Banner';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
@@ -32,7 +32,7 @@ import { ICore, ICoreApi } from 'Core/ICore';
 import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { CoreConfiguration, CacheMode } from 'Core/Models/CoreConfiguration';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { BroadcastApi } from 'Core/Native/Android/Broadcast';
 import { IPackageInfo } from 'Core/Native/Android/DeviceInfo';
@@ -98,6 +98,7 @@ import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 import EventTestVast from 'xml/EventTestVast.xml';
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
+import VastAdWithoutCompanionAdXml from 'xml/VastAdWithoutCompanionAd.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
@@ -109,7 +110,7 @@ import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUn
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
@@ -123,12 +124,32 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters, IAppStoreDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { StoreHandler, IStoreHandlerDownloadParameters, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
+import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
+import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { UnityInfo } from 'Core/Models/UnityInfo';
+import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
+import { ResolveManager } from 'Core/Managers/ResolveManager';
+import { CacheManager } from 'Core/Managers/CacheManager';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
+import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
+import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
+import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
+import { PlacementManager } from 'Ads/Managers/PlacementManager';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { AssetManager } from 'Ads/Managers/AssetManager';
+import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
+import { BannerWebPlayerContainer } from 'Ads/Utilities/WebPlayer/BannerWebPlayerContainer';
+import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
+import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
+import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
+import { BannerAdContext } from 'Banners/Context/BannerAdContext';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -171,7 +192,8 @@ export class TestFixtures {
                 'complete': ['http://localhost:5000/operative?abGroup=0&adType=VIDEO&apiLevel=0&auctionId=&bidBundle=&bundleId=&buyerID=&campaignId=&connectionType=&country=&creativeId=&dealCode=&deviceMake=&deviceModel=&dspId=comet&eventType=complete&frameworkName=&frameworkVersion=&gameId=&limitedAdTracking=false&mediationName=&mediationOrdinal=0&mediationVersion=&networkType=0&osVersion=&platform=&screenDensity=0&screenHeight=0&screenSize=0&screenWidth=0&sdkVersion=0&seatId=9000&token=&webviewUa=a'],
                 'skip': ['http://localhost:5000/operative?abGroup=0&adType=VIDEO&apiLevel=0&auctionId=&bidBundle=&bundleId=&buyerID=&campaignId=&connectionType=&country=&creativeId=&dealCode=&deviceMake=&deviceModel=&dspId=comet&eventType=skip&frameworkName=&frameworkVersion=&gameId=&limitedAdTracking=false&mediationName=&mediationOrdinal=0&mediationVersion=&networkType=0&osVersion=&platform=&screenDensity=0&screenHeight=0&screenSize=0&screenWidth=0&sdkVersion=0&seatId=9000&token=&webviewUa=a'],
                 'error': ['http://localhost:5000/operative?abGroup=0&adType=VIDEO&apiLevel=0&auctionId=&bidBundle=&bundleId=&buyerID=&campaignId=&connectionType=&country=&creativeId=&dealCode=&deviceMake=&deviceModel=&dspId=comet&eventType=skip&frameworkName=&frameworkVersion=&gameId=&limitedAdTracking=false&mediationName=&mediationOrdinal=0&mediationVersion=&networkType=0&osVersion=&platform=&screenDensity=0&screenHeight=0&screenSize=0&screenWidth=0&sdkVersion=0&seatId=9000&token=&webviewUa=a']
-            }
+            },
+            backupCampaign: false
         };
     }
 
@@ -292,7 +314,8 @@ export class TestFixtures {
             meta: mraidJson.meta || undefined,
             session: session,
             mediaId: TestMediaID,
-            trackingUrls: {}
+            trackingUrls: {},
+            backupCampaign: false
         };
     }
 
@@ -339,7 +362,8 @@ export class TestFixtures {
             meta: undefined,
             session: session,
             mediaId: TestMediaID,
-            trackingUrls: {}
+            trackingUrls: {},
+            backupCampaign: false
         };
     }
 
@@ -395,7 +419,8 @@ export class TestFixtures {
             meta: json.meta,
             session: session,
             mediaId: TestMediaID,
-            trackingUrls: {}
+            trackingUrls: {},
+            backupCampaign: false
         };
 
         return {
@@ -421,7 +446,8 @@ export class TestFixtures {
             meta: undefined,
             session: session,
             mediaId: TestMediaID,
-            trackingUrls: {}
+            trackingUrls: {},
+            backupCampaign: false
         };
     }
 
@@ -467,11 +493,12 @@ export class TestFixtures {
             trackingUrls: json.promo.tracking ? json.promo.tracking : {}, // Overwrite tracking urls from comet campaign
             dynamicMarkup: json.promo.dynamicMarkup,
             creativeAsset: new HTML(json.promo.creativeUrl, session),
-            rewardedPromo: isRewardedPromo,
             limitedTimeOffer: undefined,
             costs: costProductInfoList,
             payouts: payoutProductInfoList,
-            premiumProduct: new ProductInfo(premiumProduct)
+            premiumProduct: new ProductInfo(premiumProduct),
+            portraitAssets: undefined,
+            landscapeAssets: undefined
         };
     }
 
@@ -551,9 +578,16 @@ export class TestFixtures {
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345', session));
     }
 
-    public static getCompanionVastCampaignWihoutImages(): VastCampaign {
+    public static getCompanionVastCampaignWithoutImages(): VastCampaign {
         const vastParser = TestFixtures.getVastParser();
         const vastXml = VastCompanionAdWithoutImagesXml;
+        const vast = vastParser.parseVast(vastXml);
+        return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
+    }
+
+    public static getCompanionVastCampaignWithoutCompanionAd(): VastCampaign {
+        const vastParser = TestFixtures.getVastParser();
+        const vastXml = VastAdWithoutCompanionAdXml;
         const vast = vastParser.parseVast(vastXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
     }
@@ -642,7 +676,7 @@ export class TestFixtures {
         return new PerformanceOverlayEventHandler(
             adUnit,
             TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, ar, purchasing),
-            TestFixtures.getAppStoreDownloadHelper(platform, core, ads, campaign, adUnit, thirdPartyEventManager, nativeBridge)
+            TestFixtures.getStoreHandler(platform, core, ads, campaign, adUnit, thirdPartyEventManager, nativeBridge)
         );
     }
 
@@ -716,8 +750,8 @@ export class TestFixtures {
         return new PerformanceAdUnit(TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, ar, purchasing));
     }
 
-    public static getAppStoreDownloadParameters(campaign: PerformanceCampaign|XPromoCampaign): IAppStoreDownloadParameters {
-        return <IAppStoreDownloadParameters>{
+    public static getStoreHandlerDownloadParameters(campaign: PerformanceCampaign|XPromoCampaign): IStoreHandlerDownloadParameters {
+        return <IStoreHandlerDownloadParameters>{
             clickAttributionUrl: campaign.getClickAttributionUrl(),
             clickAttributionUrlFollowsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
             bypassAppSheet: campaign.getBypassAppSheet(),
@@ -726,8 +760,8 @@ export class TestFixtures {
         };
     }
 
-    public static getAppStoreDownloadHelper(platform: Platform, core: ICoreApi, ads: IAdsApi, campaign: Campaign, adUnit: VideoAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): AppStoreDownloadHelper {
-        const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+    public static getStoreHandler(platform: Platform, core: ICoreApi, ads: IAdsApi, campaign: Campaign, adUnit: VideoAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): StoreHandler {
+        const storeHandlerParameters: IStoreHandlerParameters = {
             platform,
             core,
             ads,
@@ -740,7 +774,7 @@ export class TestFixtures {
             campaign: campaign,
             coreConfig: TestFixtures.getCoreConfiguration()
         };
-        return new AppStoreDownloadHelper(downloadHelperParameters);
+        return StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
     }
 
     public static getClientInfo(platform?: Platform, gameId?: string): ClientInfo {
@@ -785,6 +819,13 @@ export class TestFixtures {
         return vastParser;
     }
 
+    public static getVastParserStrict(): VastParserStrict {
+        let vastParser: VastParserStrict;
+        const domParser = new DOMParser();
+        vastParser = new VastParserStrict(domParser);
+        return vastParser;
+    }
+
     public static getBackend(platform: Platform): Backend {
         return new Backend(platform);
     }
@@ -793,6 +834,82 @@ export class TestFixtures {
         const nativeBridge = new NativeBridge(backend, platform, false);
         backend.setNativeBridge(nativeBridge);
         return nativeBridge;
+    }
+
+    public static getCoreModule(nativeBridge: NativeBridge): ICore {
+        const platform = nativeBridge.getPlatform();
+        const api = this.getCoreApi(nativeBridge);
+
+        const core: Partial<ICore> = {
+            NativeBridge: nativeBridge,
+            Api: api,
+            FocusManager: new FocusManager(platform, api),
+            WakeUpManager: new WakeUpManager(api),
+            CacheBookkeeping: new CacheBookkeepingManager(api),
+            ResolveManager: new ResolveManager(api),
+            MetaDataManager: new MetaDataManager(api),
+            StorageBridge: new StorageBridge(api),
+            ClientInfo: this.getClientInfo(platform)
+        };
+        if (platform === Platform.ANDROID) {
+            core.DeviceInfo = new AndroidDeviceInfo(api);
+            core.RequestManager = new RequestManager(platform, api, core.WakeUpManager!, <AndroidDeviceInfo>core.DeviceInfo);
+        } else if (platform === Platform.IOS) {
+            core.DeviceInfo = new IosDeviceInfo(api);
+            core.RequestManager = new RequestManager(platform, api, core.WakeUpManager!);
+        }
+
+        core.CacheManager = new CacheManager(api, core.WakeUpManager!, core.RequestManager!, core.CacheBookkeeping!);
+
+        return <ICore>core;
+    }
+
+    public static getAdsModule(core: ICore): IAds {
+        const platform = core.NativeBridge.getPlatform();
+        const api = this.getAdsApi(core.NativeBridge);
+        const ads: Partial<IAds> = {
+            Api: api,
+            AdMobSignalFactory: new AdMobSignalFactory(platform, core.Api, api, core.ClientInfo, core.DeviceInfo, core.FocusManager),
+            InterstitialWebPlayerContainer: new InterstitialWebPlayerContainer(platform, api),
+            SessionManager: new SessionManager(core.Api, core.RequestManager, core.StorageBridge),
+            MissedImpressionManager: new MissedImpressionManager(core.Api),
+            BackupCampaignManager: new BackupCampaignManager(core.Api, core.StorageBridge, core.Config, core.DeviceInfo),
+            ProgrammaticTrackingService: new ProgrammaticTrackingService(platform, core.RequestManager, core.ClientInfo, core.DeviceInfo),
+            ContentTypeHandlerManager: new ContentTypeHandlerManager(),
+            Config: TestFixtures.getAdsConfiguration(),
+            Container: TestFixtures.getTestContainer(core, api),
+            ThirdPartyEventManagerFactory: new ThirdPartyEventManagerFactory(core.Api, core.RequestManager)
+        };
+        ads.PrivacyManager = new UserPrivacyManager(platform, core.Api, core.Config, ads.Config!, core.ClientInfo, core.DeviceInfo, core.RequestManager);
+        ads.PlacementManager = new PlacementManager(api, ads.Config!);
+        ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, ads.ProgrammaticTrackingService!, ads.BackupCampaignManager!);
+        ads.CampaignManager = new CampaignManager(platform, core.Api, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, core.JaegerManager, ads.BackupCampaignManager!);
+        ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
+        return <IAds>ads;
+    }
+
+    private static getTestContainer(core: ICore, ads: IAdsApi) {
+        switch (core.NativeBridge.getPlatform()) {
+            case Platform.IOS:
+                return new ViewController(core.Api, ads, <IosDeviceInfo>core.DeviceInfo, core.FocusManager, core.ClientInfo);
+            case Platform.ANDROID:
+            default:
+                return new Activity(core.Api, ads, <AndroidDeviceInfo>core.DeviceInfo);
+        }
+    }
+
+    public static getBannerModule(ads: IAds, core: ICore) {
+        const platform = core.NativeBridge.getPlatform();
+        const api = this.getBannersApi(core.NativeBridge);
+        const banners: Partial<IBanners> = {
+            Api: api,
+            PlacementManager: new BannerPlacementManager(ads.Api, ads.Config),
+            CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, ads.AssetManager, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager),
+            WebPlayerContainer: new BannerWebPlayerContainer(platform, ads.Api)
+        };
+        banners.AdUnitParametersFactory = new BannerAdUnitParametersFactory(<IBanners>banners, ads, core);
+        banners.AdContext = new BannerAdContext(<IBanners>banners, ads, core);
+        return <IBanners>banners;
     }
 
     public static getCoreApi(nativeBridge: NativeBridge): ICoreApi {

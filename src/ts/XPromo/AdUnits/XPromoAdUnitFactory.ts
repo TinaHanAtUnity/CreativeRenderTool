@@ -11,8 +11,8 @@ import { Platform } from 'Core/Constants/Platform';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
-import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
-import { AndroidBackButtonSkipTest } from 'Core/Models/ABGroup';
+import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
+import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 
 export class XPromoAdUnitFactory extends AbstractAdUnitFactory<XPromoCampaign, IXPromoAdUnitParameters> {
 
@@ -20,7 +20,7 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory<XPromoCampaign, I
 
         const xPromoAdUnit = new XPromoAdUnit(parameters);
 
-        const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+        const storeHandlerParameters: IStoreHandlerParameters = {
             platform: parameters.platform,
             core: parameters.core,
             ads: parameters.ads,
@@ -34,11 +34,11 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory<XPromoCampaign, I
             coreConfig: parameters.coreConfig
         };
 
-        const downloadHelper = new AppStoreDownloadHelper(downloadHelperParameters);
+        const storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
 
-        const xPromoOverlayEventHandler = new XPromoOverlayEventHandler(xPromoAdUnit, parameters, downloadHelper);
+        const xPromoOverlayEventHandler = new XPromoOverlayEventHandler(xPromoAdUnit, parameters, storeHandler);
         parameters.overlay.addEventHandler(xPromoOverlayEventHandler);
-        const endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, parameters, downloadHelper);
+        const endScreenEventHandler = new XPromoEndScreenEventHandler(xPromoAdUnit, parameters, storeHandler);
         parameters.endScreen.addEventHandler(endScreenEventHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(xPromoAdUnit, parameters.video, undefined, parameters);
@@ -47,11 +47,7 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory<XPromoCampaign, I
         if (parameters.platform === Platform.ANDROID) {
             const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
                 endScreenEventHandler.onKeyEvent(keyCode);
-
-                const abGroup = parameters.coreConfig.getAbGroup();
-                const backButtonTestEnabled = AndroidBackButtonSkipTest.isValid(abGroup);
-
-                if(backButtonTestEnabled || CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
                     xPromoOverlayEventHandler.onKeyEvent(keyCode);
                 }
             });
