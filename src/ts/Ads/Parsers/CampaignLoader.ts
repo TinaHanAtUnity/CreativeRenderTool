@@ -39,6 +39,10 @@ export abstract class CampaignLoader {
             latestCampaignsStarts: {}
         });
 
+        if(rawSession.privacy) {
+            session.setPrivacy(rawSession.privacy);
+        }
+
         return session;
     }
 

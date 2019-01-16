@@ -9,7 +9,7 @@ export class XPromo extends AbstractParserModule {
     constructor(core: ICore, ads: IAds) {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         contentTypeHandlerMap[XPromoCampaignParser.ContentType] = {
-            parser: new XPromoCampaignParser(),
+            parser: new XPromoCampaignParser(core.NativeBridge.getPlatform()),
             factory: new XPromoAdUnitFactory(new XPromoAdUnitParametersFactory(core, ads))
         };
         super(contentTypeHandlerMap);

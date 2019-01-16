@@ -1,52 +1,35 @@
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Session } from 'Ads/Models/Session';
-import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
 
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { SdkApi } from 'Core/Native/Sdk';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { ProgrammaticStaticInterstitialParser } from 'Display/Parsers/ProgrammaticStaticInterstitialParser';
 
 import DisplayStaticInterstitialCampaignHTML from 'json/campaigns/display/DisplayStaticInterstitialCampaignHTML.json';
 import DisplayStaticInterstitialCampaignJS from 'json/campaigns/display/DisplayStaticInterstitialCampaignJS.json';
 import 'mocha';
-import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 
 describe('ProgrammaticVPAIDParser', () => {
     const placementId = 'TestPlacement';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
 
+    let platform: Platform;
     let parser: ProgrammaticStaticInterstitialParser;
-    let backend: Backend;
-    let nativeBridge: NativeBridge;
-    let core: ICoreApi;
-    let request: RequestManager;
     let session: Session;
 
     beforeEach(() => {
-        const platform = Platform.ANDROID;
-        backend = TestFixtures.getBackend(platform);
-        nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-        core = TestFixtures.getCoreApi(nativeBridge);
-
-        (<any>core.Sdk) = sinon.createStubInstance(SdkApi);
-
-        request = sinon.createStubInstance(RequestManager);
+        platform = Platform.ANDROID;
         session = TestFixtures.getSession();
     });
 
     describe('parsing an HTML campaign', () => {
 
         beforeEach(() => {
-            parser = new ProgrammaticStaticInterstitialParser(false);
+            parser = new ProgrammaticStaticInterstitialParser(platform, false);
         });
 
         describe('with proper HTML payload', () => {
@@ -54,7 +37,7 @@ describe('ProgrammaticVPAIDParser', () => {
             const parse = (data: any) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
-                return parser.parse(Platform.ANDROID, core, request, response, session).then((parsedCampaign) => {
+                return parser.parse(response, session).then((parsedCampaign) => {
                     campaign = <DisplayInterstitialCampaign>parsedCampaign;
                 });
             };
@@ -78,7 +61,7 @@ describe('ProgrammaticVPAIDParser', () => {
 
     describe('parsing a JS campaign', () => {
         beforeEach(() => {
-            parser = new ProgrammaticStaticInterstitialParser(true);
+            parser = new ProgrammaticStaticInterstitialParser(platform, true);
         });
 
         describe('with proper JS payload', () => {
@@ -86,7 +69,7 @@ describe('ProgrammaticVPAIDParser', () => {
             const parse = (data: any) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], data, mediaId, correlationId);
-                return parser.parse(Platform.ANDROID, core, request, response, session).then((parsedCampaign) => {
+                return parser.parse(response, session).then((parsedCampaign) => {
                     campaign = <DisplayInterstitialCampaign>parsedCampaign;
                 });
             };

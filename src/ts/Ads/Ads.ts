@@ -12,7 +12,7 @@ import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
-import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
+import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
@@ -97,7 +97,7 @@ export class Ads implements IAds {
     public PlacementManager: PlacementManager;
     public AssetManager: AssetManager;
     public CampaignManager: CampaignManager;
-    public RefreshManager: OldCampaignRefreshManager;
+    public RefreshManager: CampaignRefreshManager;
 
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
@@ -222,7 +222,7 @@ export class Ads implements IAds {
             });
 
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this._core.JaegerManager, this.BackupCampaignManager);
-            this.RefreshManager = new OldCampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
+            this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
 
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
             promo.initialize();

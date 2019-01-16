@@ -42,6 +42,6 @@ export const FakeEnabledABTest = new ABTest(16, 17);
 export const FakeDisabledABTest = new DisabledABTest(16, 17);
 
 // Add actual A/B tests below
-
-export const AuctionV5Test = new DisabledABTest(15, 16, 17);
-export const ByteDanceCTATest = new ABTest(15, 16, 17);
+export const AuctionV5Test = new ABTest(15);
+export const VastParsingStrictTest = new ABTest(16); // Testing new vast parser logic
+export const ByteDanceCTATest = new ABTest(17);

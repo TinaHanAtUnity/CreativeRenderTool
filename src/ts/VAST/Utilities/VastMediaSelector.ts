@@ -21,10 +21,12 @@ export class VastMediaSelector {
     private static getVideoUrlInRange(mediaFiles: VastMediaFile[], minSize: number, maxSize: number): string | null {
         let mediaUrl: string | null = null;
         let mediaMinSize = Number.MAX_SAFE_INTEGER;
+        let mediaMinBitrate = Number.MAX_SAFE_INTEGER;
         let defaultMediaUrl: string | null = null;
         let defaultMinDiff = Number.MAX_SAFE_INTEGER;
         for (const mediaFile of mediaFiles) {
             const fileSize = mediaFile.getFileSize();
+            const bitRate = mediaFile.getBitrate();
             if (fileSize >= minSize && fileSize <= maxSize) {
                 if (fileSize < mediaMinSize) {
                     mediaUrl = mediaFile.getFileURL();
@@ -32,10 +34,11 @@ export class VastMediaSelector {
                 }
             } else if (fileSize <= VASTMediaFileSize.SDK_MAX) {
                 // if there is no media in the range or file size is 0
-                // then pick the closest to minSize below SDK_MAX size
-                if (Math.abs(fileSize - minSize) < defaultMinDiff) {
+                // then pick the closest to minSize or the lowest bitrate file
+                if (Math.abs(fileSize - minSize) < defaultMinDiff || bitRate < mediaMinBitrate) {
                     defaultMediaUrl = mediaFile.getFileURL();
                     defaultMinDiff = Math.abs(fileSize - minSize);
+                    mediaMinBitrate = bitRate;
                 }
             }
         }
