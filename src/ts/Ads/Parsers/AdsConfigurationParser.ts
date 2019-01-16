@@ -1,5 +1,6 @@
 import { AdsConfiguration, IAdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
+import { GamePrivacy, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 
@@ -30,6 +31,12 @@ export class AdsConfigurationParser {
             throw Error('No default placement in configuration response');
         }
 
+        const defaultGamePrivacy = new GamePrivacy({ method: PrivacyMethod.DEFAULT });
+        const gamePrivacy = configJson.gamePrivacy ? new GamePrivacy(configJson.gamePrivacy) : defaultGamePrivacy;
+
+        const userPrivacyNotRecorded = new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: { profiling: false} });
+        const userPrivacy = configJson.userPrivacy ? new UserPrivacy(configJson.userPrivacy) : userPrivacyNotRecorded;
+
         const configurationParams: IAdsConfiguration = {
             cacheMode: this.parseCacheMode(configJson),
             placements: placements,
@@ -37,7 +44,9 @@ export class AdsConfigurationParser {
             gdprEnabled: configJson.gdprEnabled,
             optOutRecorded: configJson.optOutRecorded,
             optOutEnabled: configJson.optOutEnabled,
-            defaultBannerPlacement: defaultBannerPlacement
+            defaultBannerPlacement: defaultBannerPlacement,
+            gamePrivacy: gamePrivacy,
+            userPrivacy: userPrivacy
         };
         return new AdsConfiguration(configurationParams);
     }
