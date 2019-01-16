@@ -8,12 +8,18 @@ import { BannerApi } from 'Banners/Native/Banner';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { ICore } from 'Core/ICore';
 import { IBanners, IBannersApi } from 'Banners/IBanners';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export class Banners implements IBanners {
 
     public readonly Api: Readonly<IBannersApi>;
 
     public BannerAdContext: BannerAdContext;
+    public AdContext: BannerAdContext;
+    public AdUnitParametersFactory: BannerAdUnitParametersFactory;
+    public CampaignManager: BannerCampaignManager;
+    public PlacementManager: BannerPlacementManager;
+    public WebPlayerContainer: WebPlayerContainer;
 
     constructor(core: ICore, ads: IAds) {
         this.Api = {
@@ -21,13 +27,12 @@ export class Banners implements IBanners {
             Listener: new BannerListenerApi(core.NativeBridge)
         };
 
-        const bannerPlacementManager = new BannerPlacementManager(ads.Api, ads.Config);
-        bannerPlacementManager.sendBannersReady();
+        this.PlacementManager = new BannerPlacementManager(ads.Api, ads.Config);
+        this.PlacementManager.sendBannersReady();
 
-        const bannerCampaignManager = new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, ads.AssetManager, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager);
-        const bannerWebPlayerContainer = new BannerWebPlayerContainer(core.NativeBridge.getPlatform(), ads.Api);
-        const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(core.NativeBridge.getPlatform(), core.Api, core.ClientInfo, bannerWebPlayerContainer, ads.ThirdPartyEventManagerFactory);
-        this.BannerAdContext = new BannerAdContext(this.Api, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, core.FocusManager, core.DeviceInfo);
+        this.CampaignManager = new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, ads.AssetManager, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager);
+        this.WebPlayerContainer = new BannerWebPlayerContainer(core.NativeBridge.getPlatform(), ads.Api);
+        this.AdUnitParametersFactory = new BannerAdUnitParametersFactory(this, ads, core);
+        this.BannerAdContext = new BannerAdContext(this, ads, core);
     }
-
 }
