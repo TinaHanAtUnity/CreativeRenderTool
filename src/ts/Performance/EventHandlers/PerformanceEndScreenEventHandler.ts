@@ -3,15 +3,15 @@ import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
-import { IAppStoreDownloadHelper, IAppStoreDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { IStoreHandler, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<PerformanceCampaign, PerformanceAdUnit> {
 
     private _thirdPartyEventManager: ThirdPartyEventManager;
 
-    constructor(adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters, downloadHelper: IAppStoreDownloadHelper) {
-        super(adUnit, parameters, downloadHelper);
+    constructor(adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters, storeHandler: IStoreHandler) {
+        super(adUnit, parameters, storeHandler);
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
     }
 
@@ -21,7 +21,7 @@ export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<Perf
         }
     }
 
-    public onEndScreenDownload(parameters: IAppStoreDownloadParameters): void {
+    public onEndScreenDownload(parameters: IStoreHandlerDownloadParameters): void {
         super.onEndScreenDownload(parameters);
         this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.CLICK);
     }

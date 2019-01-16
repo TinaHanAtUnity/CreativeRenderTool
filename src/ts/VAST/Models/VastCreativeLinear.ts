@@ -109,4 +109,5 @@ export class VastCreativeLinear extends VastCreative<IVastCreativeLinear> {
             'adParameters': this.getAdParameters()
         };
     }
+
 }

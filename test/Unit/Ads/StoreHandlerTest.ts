@@ -1,5 +1,5 @@
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { AppStoreDownloadHelper, IAppStoreDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { StoreHandler, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
@@ -19,7 +19,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
 [Platform.ANDROID].forEach(platform => {
-    describe('AppStoreDownloadHelper', () => {
+    describe('StoreHandler', () => {
 
         let backend: Backend;
         let nativeBridge: NativeBridge;
@@ -31,7 +31,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
         let thirdPartyEventManager: ThirdPartyEventManager;
         let wakeUpManager: WakeUpManager;
         let request: RequestManager;
-        let downloadParameters: IAppStoreDownloadParameters;
+        let downloadParameters: IStoreHandlerDownloadParameters;
 
         beforeEach(() => {
             backend = TestFixtures.getBackend(platform);
@@ -50,18 +50,18 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
             describe('with PerformanceCampaign', () => {
                 let campaign: PerformanceCampaign;
                 let adUnit: PerformanceAdUnit;
-                let downloadHelper: AppStoreDownloadHelper;
+                let storeHandler: StoreHandler;
 
                 beforeEach(() => {
                     campaign = TestFixtures.getCampaign();
                     adUnit = TestFixtures.getPerformanceAdUnit(platform, core, ads, ar, purchasing);
-                    downloadHelper = TestFixtures.getAppStoreDownloadHelper(platform, core, ads, campaign, adUnit, thirdPartyEventManager, nativeBridge);
-                    downloadParameters = TestFixtures.getAppStoreDownloadParameters(campaign);
+                    storeHandler = TestFixtures.getStoreHandler(platform, core, ads, campaign, adUnit, thirdPartyEventManager, nativeBridge);
+                    downloadParameters = TestFixtures.getStoreHandlerDownloadParameters(campaign);
                 });
 
                 it('should call nativeBridge.Listener.sendClickEvent', () => {
                     sinon.spy(ads.Listener, 'sendClickEvent');
-                    downloadHelper.onDownload(downloadParameters);
+                    storeHandler.onDownload(downloadParameters);
                     sinon.assert.calledOnce(<sinon.SinonSpy>ads.Listener.sendClickEvent);
                 });
             });
@@ -69,31 +69,31 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
             describe('with XPromoCampaign', () => {
                 let xPromoAdUnit: XPromoAdUnit;
                 let campaign: XPromoCampaign;
-                let downloadHelper: AppStoreDownloadHelper;
+                let storeHandler: StoreHandler;
 
                 beforeEach(() => {
                     campaign = TestFixtures.getXPromoCampaign();
                     xPromoAdUnit = TestFixtures.getXPromoAdUnit(platform, core, ads, ar, purchasing);
-                    downloadHelper = TestFixtures.getAppStoreDownloadHelper(platform, core, ads, campaign, xPromoAdUnit, thirdPartyEventManager, nativeBridge);
-                    downloadParameters = TestFixtures.getAppStoreDownloadParameters(campaign);
+                    storeHandler = TestFixtures.getStoreHandler(platform, core, ads, campaign, xPromoAdUnit, thirdPartyEventManager, nativeBridge);
+                    downloadParameters = TestFixtures.getStoreHandlerDownloadParameters(campaign);
                 });
 
                 it('should call nativeBridge.Listener.sendClickEvent', () => {
                     sinon.spy(ads.Listener, 'sendClickEvent');
-                    downloadHelper.onDownload(downloadParameters);
+                    storeHandler.onDownload(downloadParameters);
                     sinon.assert.calledOnce(<sinon.SinonSpy>ads.Listener.sendClickEvent);
                 });
 
                 it('should not send a xpromo click when campaign has no tracking urls', () => {
                     sinon.stub(campaign, 'getTrackingUrlsForEvent').returns([]);
                     sinon.spy(thirdPartyEventManager, 'sendWithGet');
-                    downloadHelper.onDownload(downloadParameters);
+                    storeHandler.onDownload(downloadParameters);
                     sinon.assert.notCalled(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet);
                 });
 
                 it('should send a xpromo click when campaign has tracking urls', () => {
                     sinon.spy(thirdPartyEventManager, 'sendWithGet');
-                    downloadHelper.onDownload(downloadParameters);
+                    storeHandler.onDownload(downloadParameters);
                     sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet, 'xpromo click', campaign.getSession().getId());
                 });
             });

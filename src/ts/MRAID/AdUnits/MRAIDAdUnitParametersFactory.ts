@@ -11,6 +11,7 @@ import { MRAID } from 'MRAID/Views/MRAID';
 import { AR, IARApi } from 'AR/AR';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
 
@@ -26,10 +27,12 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
     }
 
     private _ar: IARApi;
+    private _webPlayerContainer: WebPlayerContainer;
 
     constructor(ar: IARApi, core: ICore, ads: IAds) {
         super(core, ads);
         this._ar = ar;
+        this._webPlayerContainer = ads.InterstitialWebPlayerContainer;
     }
 
     protected createParameters(baseParams: IAdUnitParameters<MRAIDCampaign>): IMRAIDAdUnitParameters {
@@ -53,7 +56,8 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
             ... baseParams,
             mraid: mraid,
             privacy: privacy,
-            ar: this._ar
+            ar: this._ar,
+            webPlayerContainer: this._webPlayerContainer
         };
     }
 }

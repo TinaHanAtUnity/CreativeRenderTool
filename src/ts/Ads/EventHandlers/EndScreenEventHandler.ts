@@ -3,7 +3,7 @@ import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { IAdsApi } from 'Ads/IAds';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
-import { IAppStoreDownloadHelper, IAppStoreDownloadParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { IStoreHandler, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { IEndScreenHandler } from 'Ads/Views/EndScreen';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -27,16 +27,16 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     protected _adUnit: T2;
     protected _campaign: T;
 
-    private _downloadHelper: IAppStoreDownloadHelper;
+    private _storeHandler: IStoreHandler;
 
-    constructor(adUnit: T2, parameters: IAdUnitParameters<T>, downloadHelper: IAppStoreDownloadHelper) {
+    constructor(adUnit: T2, parameters: IAdUnitParameters<T>, storeHandler: IStoreHandler) {
         super(parameters.privacyManager, parameters.coreConfig, parameters.adsConfig);
         this._adUnit = adUnit;
-        this._downloadHelper = downloadHelper;
+        this._storeHandler = storeHandler;
     }
 
-    public onEndScreenDownload(parameters: IAppStoreDownloadParameters): void {
-        this._downloadHelper.onDownload(parameters);
+    public onEndScreenDownload(parameters: IStoreHandlerDownloadParameters): void {
+        this._storeHandler.onDownload(parameters);
     }
 
     public onEndScreenClose(): void {
