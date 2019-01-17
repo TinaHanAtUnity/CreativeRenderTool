@@ -380,7 +380,7 @@
 
                     // Now we can call the callbacks as we know that the camera frame is
                     // loaded in the image. This makes the synchronization to be "perfect".
-                    callRafCallbacks();
+                    callRafCallbacks(performance.now());
 
                     // Now we can advance a frame
                     nativeAdvanceFrame();
@@ -1124,7 +1124,7 @@
                 WebARonARKitVRDisplay.projectionMatrix_[i] = data.projectionMatrix[i];
             }
 
-            callRafCallbacks();
+            callRafCallbacks(performance.now());
             nativeAdvanceFrame();
         };
 
@@ -1345,24 +1345,7 @@
             return WebARonARKitVRDisplay.androidEnums;
         };
 
-        function raf(now) {
-            var frameStr = nativeGetFrame();
-            var frame = JSON.parse(frameStr);
-            if (frame.data) {
-                window.WebARonARKitSetData(frame.data);
-
-                if (frame.planes) {
-                    window.WebARonARKitDispatchARDisplayEvent(frame.planes);
-                }
-
-                callRafCallbacks(now);
-
-                // Only on Android!
-                if (window.ARCore) {
-                    forceRedraw();
-                }
-            }
-
+        function raf() {
             oldRequestAnimationFrame(() => {
                 // When we get the first RAF after modifying the DOM, we are guaranteed that
                 // the rendering has actually occurred. This is when we can advance the frame
