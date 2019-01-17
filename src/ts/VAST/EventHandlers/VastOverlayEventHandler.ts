@@ -95,7 +95,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             this.setCallButtonEnabled(true);
             this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
 
-            ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'vast_overlay', this._vastCampaign, this._gameSessionId!);
+            ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'vast_overlay', this._vastCampaign, this._abGroup.valueOf(), this._gameSessionId!);
         }).catch(() => {
             this.setCallButtonEnabled(true);
         });
