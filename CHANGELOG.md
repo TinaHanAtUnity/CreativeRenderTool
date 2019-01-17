@@ -1,4 +1,4 @@
-# Pending
+# Thu Jan 17 18:50:39 UTC 2019
 
 * Using new metric scheme for programmatic tracking events [#7866](https://github.com/Applifier/unity-ads-webview/pull/7866)
 * Adding abGroup to ad_received, ad_ready and click_delay diagnostics log [#7865](https://github.com/Applifier/unity-ads-webview/pull/7865)
