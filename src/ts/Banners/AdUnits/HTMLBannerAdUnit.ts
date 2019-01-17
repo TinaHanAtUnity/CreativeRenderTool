@@ -1,7 +1,6 @@
 import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { Placement } from 'Ads/Models/Placement';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Template } from 'Core/Utilities/Template';
@@ -10,15 +9,15 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { Promises } from 'Core/Utilities/Promises';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos, IWebPlayerEventSettings } from 'Ads/Native/WebPlayer';
+import { ProgrammaticTrackingService, ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IBannerAdUnitParameters {
     platform: Platform;
     core: ICoreApi;
-    placement: Placement;
     campaign: BannerCampaign;
-    clientInfo: ClientInfo;
     thirdPartyEventManager: ThirdPartyEventManager;
     webPlayerContainer: WebPlayerContainer;
+    programmaticTrackingService: ProgrammaticTrackingService;
 }
 
 export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
@@ -26,9 +25,8 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
     protected _campaign: BannerCampaign;
     protected _platform: Platform;
     protected _core: ICoreApi;
-    private _placement: Placement;
-    private _clientInfo: ClientInfo;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _programmaticTrackingService: ProgrammaticTrackingService;
     protected _webPlayerContainer: WebPlayerContainer;
 
     private _clickEventsSent = false;
@@ -37,11 +35,10 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
     constructor(parameters: IBannerAdUnitParameters) {
         this._platform = parameters.platform;
         this._core = parameters.core;
-        this._placement = parameters.placement;
         this._campaign = parameters.campaign;
-        this._clientInfo = parameters.clientInfo;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._webPlayerContainer = parameters.webPlayerContainer;
+        this._programmaticTrackingService = parameters.programmaticTrackingService;
     }
 
     public getViews() {
@@ -49,7 +46,6 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
     }
 
     public onLoad(): Promise<void> {
-
         return this.setUpBannerPlayer()
             .then(() => {
                 return this.getMarkup().then((markup) => {
@@ -73,6 +69,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
 
     public onShow(): Promise<void> {
         if (!this._impressionEventsSent) {
+            this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.BannerAdImpression);
             this._impressionEventsSent = true;
             this.sendImpressionEvent();
         }

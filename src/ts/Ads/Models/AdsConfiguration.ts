@@ -1,4 +1,5 @@
-import { IPlacement, IRawPlacement, Placement } from 'Ads/Models/Placement';
+import { IRawPlacement, Placement } from 'Ads/Models/Placement';
+import { IRawGamePrivacy, GamePrivacy, IRawUserPrivacy, UserPrivacy } from 'Ads/Models/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { ISchema, Model } from 'Core/Models/Model';
 
@@ -10,6 +11,8 @@ export interface IRawAdsConfiguration {
     optOutRecorded: boolean;
     optOutEnabled: boolean;
     defaultBannerPlacement: string | undefined;
+    gamePrivacy: IRawGamePrivacy | undefined;
+    userPrivacy: IRawUserPrivacy | undefined;
 }
 
 export interface IAdsConfiguration {
@@ -20,6 +23,8 @@ export interface IAdsConfiguration {
     optOutRecorded: boolean;
     optOutEnabled: boolean;
     defaultBannerPlacement: Placement | undefined;
+    gamePrivacy: GamePrivacy;
+    userPrivacy: UserPrivacy;
 }
 
 export class AdsConfiguration extends Model<IAdsConfiguration> {
@@ -30,7 +35,9 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         gdprEnabled: ['boolean'],
         optOutRecorded: ['boolean'],
         optOutEnabled: ['boolean'],
-        defaultBannerPlacement: ['string', 'undefined']
+        defaultBannerPlacement: ['string', 'undefined'],
+        gamePrivacy: ['object'],
+        userPrivacy: ['object']
     };
 
     constructor(data: IAdsConfiguration) {
@@ -115,6 +122,14 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         this.set('optOutEnabled', optOutEnabled);
     }
 
+    public getGamePrivacy(): GamePrivacy {
+        return this.get('gamePrivacy');
+    }
+
+    public getUserPrivacy(): UserPrivacy {
+        return this.get('userPrivacy');
+    }
+
     public getDTO(): { [key: string]: unknown } {
         const placements = [];
         for(const placement in this.getPlacements()) {
@@ -134,5 +149,4 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
             'defaultPlacement': defaultPlacementId
         };
     }
-
 }

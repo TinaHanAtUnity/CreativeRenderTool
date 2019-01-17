@@ -1,7 +1,7 @@
 import { Placement } from 'Ads/Models/Placement';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
-import { IBannersApi } from 'Banners/IBanners';
+import { IBannersApi, IBanners } from 'Banners/IBanners';
 import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampaignManager';
 import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
@@ -10,6 +10,9 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
+import { IAds } from 'Ads/IAds';
+import { ICore } from 'Core/ICore';
+import { ProgrammaticTrackingService, ProgrammaticTrackingMetricName, ProgrammaticTrackingErrorName } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 const StandardRefreshDelay = 30;
 
@@ -32,19 +35,21 @@ export class BannerAdContext {
     private _placementManager: BannerPlacementManager;
     private _adUnitParametersFactory: BannerAdUnitParametersFactory;
     private _focusManager: FocusManager;
+    private _programmaticTrackingService: ProgrammaticTrackingService;
 
     private _state = BannerLoadState.Unloaded;
     private _isShowing = false;
     private _shouldRefresh = true;
     private _refreshTimeoutID = 0;
 
-    constructor(banner: IBannersApi, adUnitParametersFactory: BannerAdUnitParametersFactory, campaignManager: BannerCampaignManager, placementManager: BannerPlacementManager, focusManager: FocusManager, deviceInfo: DeviceInfo) {
-        this._banner = banner;
-        this._campaignManager = campaignManager;
-        this._focusManager = focusManager;
-        this._placementManager = placementManager;
-        this._adUnitParametersFactory = adUnitParametersFactory;
-        this._deviceInfo = deviceInfo;
+    constructor(banner: IBanners, ads: IAds, core: ICore) {
+        this._banner = banner.Api;
+        this._focusManager = core.FocusManager;
+        this._campaignManager = banner.CampaignManager;
+        this._placementManager = banner.PlacementManager;
+        this._adUnitParametersFactory = banner.AdUnitParametersFactory;
+        this._deviceInfo = core.DeviceInfo;
+        this._programmaticTrackingService = ads.ProgrammaticTrackingService;
 
         this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
         this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
@@ -104,6 +109,7 @@ export class BannerAdContext {
     }
 
     private loadBannerAdUnit(): Promise<void> {
+        this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.BannerAdRequest);
         return this._campaignManager.request(this._placement).then((campaign) => {
                 this._campaign = <BannerCampaign>campaign;
                 return this.createAdUnit().then((adUnit) => {
@@ -129,6 +135,7 @@ export class BannerAdContext {
     }
 
     private handleBannerRequestError(e: Error): Promise<void> {
+        this._programmaticTrackingService.reportError(ProgrammaticTrackingErrorName.BannerRequestError, 'banner');
         return Promise.reject(e);
     }
 
@@ -203,7 +210,7 @@ export class BannerAdContext {
     }
 
     private createAdUnit() {
-        return this._adUnitParametersFactory.create(this._campaign, this._placement, {})
+        return this._adUnitParametersFactory.create(this._campaign, this._placement)
             .then((parameters) => {
                 return new BannerAdUnitFactory().createAdUnit(parameters);
             });

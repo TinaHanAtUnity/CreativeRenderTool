@@ -17,6 +17,7 @@ import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/View
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { MRAIDWebViewTopCalculator } from 'MRAID/Views/MRAIDWebViewTopCalculator';
+import { ABGroup } from 'Core/Models/ABGroup';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -31,6 +32,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _ads: IAdsApi;
     private _customImpressionFired: boolean;
     private _gameSessionId?: number;
+    private _abGroup: ABGroup;
     protected _campaign: MRAIDCampaign;
     private _deviceInfo: DeviceInfo;
 
@@ -49,6 +51,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._deviceInfo = parameters.deviceInfo;
         this._customImpressionFired = false;
         this._gameSessionId = parameters.gameSessionId;
+        this._abGroup = parameters.coreConfig.getAbGroup();
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -61,7 +64,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             if(!this._campaign.getClickAttributionUrlFollowsRedirects()) {
                 return this._request.followRedirectChain(url).then((storeUrl) => {
                     this.openUrl(storeUrl).then(() => {
-                        ClickDiagnostics.sendClickDiagnosticsEvent(Date.now() - ctaClickedTime, url, 'performance_mraid', this._campaign, this._gameSessionId);
+                        ClickDiagnostics.sendClickDiagnosticsEvent(Date.now() - ctaClickedTime, url, 'performance_mraid', this._campaign, this._abGroup.valueOf(), this._gameSessionId);
                     });
                 });
             }
@@ -190,7 +193,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             this.setCallButtonEnabled(true);
             this.sendTrackingEvents();
 
-            ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'programmatic_mraid', this._campaign, this._gameSessionId);
+            ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'programmatic_mraid', this._campaign, this._abGroup.valueOf(), this._gameSessionId);
         }).catch(() => {
             this.setCallButtonEnabled(true);
             this.sendTrackingEvents();
