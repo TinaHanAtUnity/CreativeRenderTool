@@ -6,7 +6,8 @@ import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManager
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
-import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { StoreHandler, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
+import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
@@ -51,7 +52,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
     let request: RequestManager;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
-    let downloadHelper: AppStoreDownloadHelper;
+    let storeHandler: StoreHandler;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -144,7 +145,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
 
         performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
 
-        const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+        const storeHandlerParameters: IStoreHandlerParameters = {
             platform,
             core,
             ads,
@@ -157,9 +158,9 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             campaign: campaign,
             coreConfig: coreConfig
         };
-        downloadHelper = new AppStoreDownloadHelper(downloadHelperParameters);
+        storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
 
-        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
+        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
     });
 
     describe('with onSkip', () => {

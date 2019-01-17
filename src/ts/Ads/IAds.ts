@@ -7,7 +7,7 @@ import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
-import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
+import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -58,6 +58,6 @@ export interface IAds extends IApiModule {
     PlacementManager: PlacementManager;
     AssetManager: AssetManager;
     CampaignManager: CampaignManager;
-    RefreshManager: OldCampaignRefreshManager;
+    RefreshManager: CampaignRefreshManager;
     ThirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
 }

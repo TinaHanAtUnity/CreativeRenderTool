@@ -9,7 +9,7 @@ import {
 } from 'AdMob/Views/AFMABridge';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
-import { ProgrammaticTrackingMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingMetricName, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -199,10 +199,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
                     const replacedSrc = scriptEl.textContent.replace(mediaFileURL, cachedFileURL);
                     scriptEl.textContent = replacedSrc;
                     // report using cached video
-                    this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetric.AdmobUsedCachedVideo).catch();
+                    this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.AdmobUsedCachedVideo).catch();
                 } else {
                     // report using streaming video
-                    this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetric.AdmobUsedStreamedVideo).catch();
+                    this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.AdmobUsedStreamedVideo).catch();
                 }
             }
         }
@@ -273,7 +273,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private onUserSeeked() {
-        this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetric.AdmobUserVideoSeeked).catch();
+        this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.AdmobUserVideoSeeked).catch();
     }
 
     private onGDPRPopupEvent(event: Event) {

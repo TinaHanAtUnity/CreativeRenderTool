@@ -532,6 +532,13 @@
     "platforms": "all"
   },
   {
+    "key": "isBackupCampaign",
+    "type": "boolean",
+    "description": "Flag describing if the campaign was loaded from server or from backup stored on device",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
     "key": "privacy",
     "type": "object",
     "description": "Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK",

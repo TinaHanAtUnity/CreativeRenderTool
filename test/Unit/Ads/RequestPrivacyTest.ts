@@ -14,9 +14,9 @@ describe('RequestPrivacyFactoryTests', () => {
             gamePrivacy = new GamePrivacy({ method: PrivacyMethod.UNITY_CONSENT });
             result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
         });
-        it('should set firstRequest as true', () => { assert.equal(result.firstRequest, true); });
-        it('should use privacy method set to the game', () => { assert.equal(result.method, PrivacyMethod.UNITY_CONSENT); });
-        it('should set permissions as empty', () => { assert.deepEqual(result.permissions, {}); });
+        it('should set firstRequest as true', () => assert.equal(result.firstRequest, true));
+        it('should use privacy method set to the game', () => assert.equal(result.method, PrivacyMethod.UNITY_CONSENT));
+        it('should set permissions as empty', () => assert.deepEqual(result.permissions, {}));
     });
 
     context('when a recorded user privacy exists', () => {
@@ -27,9 +27,9 @@ describe('RequestPrivacyFactoryTests', () => {
             gamePrivacy = new GamePrivacy({ method: PrivacyMethod.DEVELOPER_CONSENT });
             result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
         });
-        it('should set firstRequest as false', () => { assert.equal(result.firstRequest, false); });
-        it('should set recorded privacy method', () => { assert.equal(result.method, PrivacyMethod.DEVELOPER_CONSENT); });
-        it('should set recorded permissions', () => { assert.deepEqual(result.permissions, expectedPermissions); });
+        it('should set firstRequest as false', () => assert.equal(result.firstRequest, false));
+        it('should set recorded privacy method', () => assert.equal(result.method, PrivacyMethod.DEVELOPER_CONSENT));
+        it('should set recorded permissions', () => assert.deepEqual(result.permissions, expectedPermissions));
     });
 
     context('if game privacy method has changed since last privacy store', () => {
@@ -41,9 +41,7 @@ describe('RequestPrivacyFactoryTests', () => {
             gamePrivacy = new GamePrivacy({ method: newGameMethod });
             result = RequestPrivacyFactory.create(userPrivacy, gamePrivacy);
         });
-        it('should not affect set privacy method', () => {
-            assert.notEqual(result.method, newGameMethod);
-        });
+        it('should not affect set privacy method', () => assert.notEqual(result.method, newGameMethod));
     });
 });
 
@@ -65,12 +63,12 @@ describe('LegacyRequestPrivacyTests', () => {
     context('when privacy method is DEFAULT (e.g. user has never played inside EU)', () => {
         let result: ILegacyRequestPrivacy;
         beforeEach(() => {
-        const requestPrivacy = { method: PrivacyMethod.DEFAULT, firstRequest: true, permissions: {}};
+            const requestPrivacy = { method: PrivacyMethod.DEFAULT, firstRequest: true, permissions: {}};
             result = RequestPrivacyFactory.createLegacy(requestPrivacy);
         });
-        it('should set gdprEnabled false', () => { assert.equal(result.gdprEnabled, false); });
-        it('should set optOutRecorded false', () => { assert.equal(result.optOutEnabled, false); });
-        it('should set optOutEnabled false', () => { assert.equal(result.optOutEnabled, false); });
+        it('should set gdprEnabled false', () => assert.equal(result.gdprEnabled, false));
+        it('should set optOutRecorded false', () => assert.equal(result.optOutEnabled, false));
+        it('should set optOutEnabled false', () => assert.equal(result.optOutEnabled, false));
     });
 
     context('when privacy method is UNITY_CONSENT', () => {
@@ -79,8 +77,8 @@ describe('LegacyRequestPrivacyTests', () => {
             const requestPrivacy = { method: PrivacyMethod.UNITY_CONSENT, firstRequest: false, permissions: {}};
             result = RequestPrivacyFactory.createLegacy(requestPrivacy);
         });
-        it('should set gdprEnabled true', () => { assert.equal(result.gdprEnabled, true); });
-        it('should set optOutEnabled true', () => { assert.equal(result.optOutEnabled, true); });
+        it('should set gdprEnabled true', () => assert.equal(result.gdprEnabled, true));
+        it('should set optOutEnabled true', () => assert.equal(result.optOutEnabled, true));
     });
 
     it('should set optOutEnabled false for first request if LEGITIMATE_INTEREST', () => {
@@ -102,9 +100,9 @@ describe('LegacyRequestPrivacyTests', () => {
                 const requestPrivacy = { method: anyMethod, firstRequest: false, permissions: { profiling: true } };
                 result = RequestPrivacyFactory.createLegacy(requestPrivacy);
             });
-            it('should set gdprEnabled true', () => { assert.equal(result.gdprEnabled, true); });
-            it('should set optOutRecorded true', () => { assert.equal(result.optOutRecorded, true); });
-            it('should set optOutEnabled false', () => { assert.equal(result.optOutEnabled, false); });
+            it('should set gdprEnabled true', () => assert.equal(result.gdprEnabled, true));
+            it('should set optOutRecorded true', () => assert.equal(result.optOutRecorded, true));
+            it('should set optOutEnabled false', () => assert.equal(result.optOutEnabled, false));
         });
 
         context('and user has denied permission for profiling', () => {
@@ -112,9 +110,9 @@ describe('LegacyRequestPrivacyTests', () => {
                 const requestPrivacy = { method: anyMethod, firstRequest: false, permissions: { profiling: false } };
                 result = RequestPrivacyFactory.createLegacy(requestPrivacy);
             });
-            it('should set gdprEnabled true', () => { assert.equal(result.gdprEnabled, true); });
-            it('should set optOutRecorded true', () => { assert.equal(result.optOutRecorded, true); });
-            it('should set optOutEnabled false', () => { assert.equal(result.optOutEnabled, true); });
+            it('should set gdprEnabled true', () => assert.equal(result.gdprEnabled, true));
+            it('should set optOutRecorded true', () => assert.equal(result.optOutRecorded, true));
+            it('should set optOutEnabled false', () => assert.equal(result.optOutEnabled, true));
         });
     });
 });

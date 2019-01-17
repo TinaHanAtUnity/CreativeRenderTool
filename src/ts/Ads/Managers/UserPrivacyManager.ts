@@ -9,7 +9,7 @@ import { GamePrivacy,
 } from 'Ads/Models/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -18,8 +18,6 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ITemplateData } from 'Core/Views/View';
-
-const ignoreReturnType: () => void = () => { return; };
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -44,9 +42,6 @@ export enum GDPREventAction {
 
 export type UserPrivacyStorageData = { gdpr: { consent: { value: unknown }}};
 
-type CachedUserSummary = {ts: number; data: IUserSummary | null };
-const CacheTTL = 30 * 1000;
-
 export class UserPrivacyManager {
 
     private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
@@ -61,7 +56,6 @@ export class UserPrivacyManager {
     private readonly _clientInfo: ClientInfo;
     private readonly _deviceInfo: DeviceInfo;
     private readonly _request: RequestManager;
-    private readonly _userSummaryCache: CachedUserSummary;
 
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, clientInfo: ClientInfo, deviceInfo: DeviceInfo, request: RequestManager) {
         this._platform = platform;
@@ -74,7 +68,6 @@ export class UserPrivacyManager {
         this._deviceInfo = deviceInfo;
         this._request = request;
         this._core.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, <UserPrivacyStorageData>data));
-        this._userSummaryCache = { ts: 0, data: null };
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
@@ -97,14 +90,14 @@ export class UserPrivacyManager {
         });
     }
 
-    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource): Promise<void> {
+    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource): Promise<INativeResponse | void> {
         const gamePrivacy = this._gamePrivacy;
 
         if (!gamePrivacy.isEnabled() || !isUnityConsentPermissions(permissions)) {
             return Promise.resolve();
         }
 
-        if (gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT && !isUnityConsentPermissions(permissions)) {
+        if (gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
             return Promise.resolve();
         }
 
@@ -158,7 +151,7 @@ export class UserPrivacyManager {
         return false;
     }
 
-    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource): Promise<void> {
+    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource): Promise<INativeResponse> {
         const infoJson: unknown = {
             adid: this._deviceInfo.getAdvertisingIdentifier(),
             action: GDPREventAction.CONSENT,
@@ -172,8 +165,7 @@ export class UserPrivacyManager {
             permissions: permissions
         };
 
-        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson)
-            .then(ignoreReturnType);
+        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
     }
 
     public getConsentAndUpdateConfiguration(): Promise<boolean> {
@@ -193,12 +185,6 @@ export class UserPrivacyManager {
     }
 
     public retrieveUserSummary(): Promise<IUserSummary> {
-        const ts = Date.now();
-        const cached = this._userSummaryCache;
-        if (ts < cached.ts + CacheTTL && cached.data !== null) {
-            return Promise.resolve(cached.data);
-        }
-        this._userSummaryCache.ts = ts;
         const url = `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._coreConfig.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
 
         // Test url which should respond with : {"adsSeenInGameThisWeek":27,"gamePlaysThisWeek":39,"installsFromAds":0}
@@ -209,11 +195,10 @@ export class UserPrivacyManager {
         };
 
         return this._request.get(url).then((response) => {
-            this._userSummaryCache.data = {
+            return {
                 ... JsonParser.parse<{ gamePlaysThisWeek: number; adsSeenInGameThisWeek: number; installsFromAds: number }>(response.response),
                 ... personalPayload
             };
-            return this._userSummaryCache.data;
         }).catch(error => {
             Diagnostics.trigger('gdpr_request_failed', {
                 url: url

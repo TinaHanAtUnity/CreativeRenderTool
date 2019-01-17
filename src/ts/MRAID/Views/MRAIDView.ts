@@ -15,6 +15,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 import { IMRAIDHandler } from 'MRAID/EventBridge/MRAIDEventAdapter';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -41,6 +42,8 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onPlayableAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: unknown): void;
     onMraidShowEndScreen(): void;
     onCustomImpressionEvent(): void;
+    onWebViewFullScreen(): Promise<void>;
+    onWebViewReduceSize(): Promise<void>;
 }
 
 export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandlerView, IMRAIDHandler {
@@ -221,6 +224,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
+    public isLoaded(): boolean {
+        return this._isLoaded;
+    }
+
     protected choosePrivacyShown(): void {
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._gdprBanner.style.visibility = 'visible';
@@ -372,13 +379,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    public onPrivacyEvent(event: Event): void {
+    protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._privacy.show();
         this._privacyPanelOpen = true;
     }
 
-    public onGDPRPopupEvent(event: Event) {
+    protected onGDPRPopupEvent(event: Event) {
         event.preventDefault();
         this._gdprPopupClicked = true;
         this._privacy.show();
@@ -435,8 +442,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     public onBridgeResizeWebview() {
-        // This will be used to handle rotation changes for webplayer-based mraid
-        // this._handlers.forEach(handler => handler.onWebViewResize(false));
+        this.reduceWebViewContainerHeight();
     }
 
     public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {
@@ -449,5 +455,17 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public onBridgeAREvent(msg: MessageEvent) {
         this.onAREvent(msg).catch((reason) => this._core.Sdk.logError('AR message error: ' + reason.toString()));
+    }
+
+    public loadWebPlayer(webPlayerContainer: WebPlayerContainer): Promise<void> {
+        return Promise.resolve();
+    }
+
+    public fullScreenWebViewContainer() {
+        return this._handlers[0].onWebViewFullScreen();
+    }
+
+    public reduceWebViewContainerHeight() {
+        return this._handlers[0].onWebViewReduceSize();
     }
 }

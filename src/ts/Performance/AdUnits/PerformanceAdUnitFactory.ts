@@ -9,7 +9,8 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
-import { AppStoreDownloadHelper, IAppStoreDownloadHelperParameters } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
+import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -26,7 +27,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceC
 
         let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
 
-        const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+        const storeHandlerParameters: IStoreHandlerParameters = {
             platform: parameters.platform,
             core: parameters.core,
             ads: parameters.ads,
@@ -39,11 +40,11 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceC
             campaign: parameters.campaign,
             coreConfig: parameters.coreConfig
         };
-        const downloadHelper = new AppStoreDownloadHelper(downloadHelperParameters);
+        const storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
 
-        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, parameters, downloadHelper);
+        performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, parameters, storeHandler);
         parameters.overlay.addEventHandler(performanceOverlayEventHandler);
-        const endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, parameters, downloadHelper);
+        const endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, parameters, storeHandler);
         parameters.endScreen.addEventHandler(endScreenEventHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(performanceAdUnit, parameters.video, parameters.adUnitStyle, parameters);

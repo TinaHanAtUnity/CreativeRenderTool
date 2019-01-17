@@ -32,8 +32,8 @@ describe('UserPrivacyManagerTest', () => {
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
     let privacyManager: UserPrivacyManager;
-    let gamePrivacy: GamePrivacy;
-    let userPrivacy: UserPrivacy;
+    let gamePrivacy: sinon.SinonStubbedInstance<GamePrivacy>;
+    let userPrivacy: sinon.SinonStubbedInstance<UserPrivacy>;
     let request: RequestManager;
 
     let onSetStub: sinon.SinonStub;
@@ -62,15 +62,9 @@ describe('UserPrivacyManagerTest', () => {
         deviceInfo = sinon.createStubInstance(AndroidDeviceInfo);
         coreConfig = sinon.createStubInstance(CoreConfiguration);
         adsConfig = sinon.createStubInstance(AdsConfiguration);
-        gamePrivacy = new GamePrivacy({ method: PrivacyMethod.UNITY_CONSENT });
+        gamePrivacy = sinon.createStubInstance(GamePrivacy);
         (<sinon.SinonStub>adsConfig.getGamePrivacy).returns(gamePrivacy);
-        userPrivacy = new UserPrivacy({
-            method: PrivacyMethod.DEFAULT,
-            version: 0,
-            permissions: {
-                profiling: false
-            }
-        });
+        userPrivacy = sinon.createStubInstance(UserPrivacy);
         (<sinon.SinonStub>adsConfig.getUserPrivacy).returns(userPrivacy);
 
         request = sinon.createStubInstance(RequestManager);
@@ -406,16 +400,6 @@ describe('UserPrivacyManagerTest', () => {
             });
         });
 
-        it('should cache the result', () => {
-            return privacyManager.retrieveUserSummary().then(() => {
-                sinon.assert.calledOnce(getRequestStub);
-                return privacyManager.retrieveUserSummary().then((response) => {
-                    sinon.assert.calledOnce(getRequestStub);
-                    assert.equal(response.deviceModel, model);
-                });
-            });
-        });
-
         it('verify response has personal payload', () => {
             return privacyManager.retrieveUserSummary().then((response) => {
                 assert.equal(response.deviceModel, model);
@@ -550,11 +534,11 @@ describe('UserPrivacyManagerTest', () => {
     });
 
     describe('updateUserPrivacy', () => {
-        const sandbox = sinon.createSandbox();
         const anyConsent: IPermissions = { gameExp: false, ads: false, external: false };
 
-        afterEach(() => {
-            sandbox.restore();
+        beforeEach(() => {
+            gamePrivacy.isEnabled.returns(true);
+            gamePrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
         });
 
         describe('when updating user privacy', () => {
@@ -606,8 +590,13 @@ describe('UserPrivacyManagerTest', () => {
         });
 
         describe('should not update user privacy', () => {
+            beforeEach(() => {
+                gamePrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
+                gamePrivacy.getVersion.returns(25250101);
+            });
+
             it('if game privacy is disabled', () => {
-                sandbox.stub(gamePrivacy, 'isEnabled').returns(false);
+                gamePrivacy.isEnabled.returns(false);
                 return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.USER).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
@@ -615,22 +604,18 @@ describe('UserPrivacyManagerTest', () => {
 
             it('if nothing changed', () => {
                 const permissions = { gameExp: false, ads: true, external: true };
-                sandbox.stub(gamePrivacy, 'getMethod').returns(PrivacyMethod.UNITY_CONSENT);
-                sandbox.stub(userPrivacy, 'getMethod').returns(PrivacyMethod.UNITY_CONSENT);
-                sandbox.stub(gamePrivacy, 'getVersion').returns(25250101);
-                sandbox.stub(userPrivacy, 'getVersion').returns(25250101);
-                sandbox.stub(userPrivacy, 'getPermissions').returns(permissions);
+                userPrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
+                userPrivacy.getVersion.returns(25250101);
+                userPrivacy.getPermissions.returns(permissions);
                 return privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
             });
 
             it('if permissions=all was not changed', () => {
-                sandbox.stub(gamePrivacy, 'getMethod').returns(PrivacyMethod.UNITY_CONSENT);
-                sandbox.stub(userPrivacy, 'getMethod').returns(PrivacyMethod.UNITY_CONSENT);
-                sandbox.stub(gamePrivacy, 'getVersion').returns(25250101);
-                sandbox.stub(userPrivacy, 'getVersion').returns(25250101);
-                sandbox.stub(userPrivacy, 'getPermissions').returns({ all: true });
+                userPrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
+                userPrivacy.getVersion.returns(25250101);
+                userPrivacy.getPermissions.returns({ all: true });
                 return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.NO_REVIEW).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });
@@ -638,7 +623,7 @@ describe('UserPrivacyManagerTest', () => {
 
             //TODO: remove/rephrase when old fields are deprecated
             it('if game privacy method is other than UnityConsent', () => {
-                sandbox.stub(gamePrivacy, 'getMethod').returns(PrivacyMethod.DEVELOPER_CONSENT);
+                gamePrivacy.getMethod.returns(PrivacyMethod.DEVELOPER_CONSENT);
                 return privacyManager.updateUserPrivacy(anyConsent, GDPREventSource.USER).then(() => {
                     sinon.assert.notCalled(httpKafkaStub);
                 });

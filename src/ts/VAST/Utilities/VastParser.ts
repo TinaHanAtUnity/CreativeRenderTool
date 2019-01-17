@@ -41,7 +41,7 @@ export class VastParser {
             throw new Error('VAST data is missing');
         }
 
-        const xml = (this._domParser).parseFromString(vast, 'text/xml');
+        const xml = this._domParser.parseFromString(vast, 'text/xml');
         const ads: VastAd[] = [];
         const errorURLTemplates: (string | null)[] = [];
 
@@ -84,13 +84,20 @@ export class VastParser {
         try {
             parsedVast = this.parseVast(vast);
         } catch (e) {
-            const error = new DiagnosticError(e, { vast: vast, wrapperDepth: depth });
+            let errorData: object;
             if (depth > 0) {
-                // tslint:disable:no-string-literal
-                error.diagnostic['rootWrapperVast'] = this._rootWrapperVast;
-                // tslint:enable
+                errorData = {
+                    vast: vast,
+                    wrapperDepth: depth,
+                    rootWrapperVast: this._rootWrapperVast
+                };
+            } else {
+                errorData = {
+                    vast: vast,
+                    wrapperDepth: depth
+                };
             }
-            throw error;
+            throw new DiagnosticError(e, errorData);
         }
 
         this.applyParentURLs(parsedVast, parent);
@@ -311,7 +318,7 @@ export class VastParser {
 
             const trackingEvents = this.getTrackingEventsFromElement(companionAdElement);
 
-            return new VastCreativeCompanionAd(id!, creativeType!, height, width, staticResourceURL!, companionClickThroughURLTemplate!, trackingEvents);
+            return new VastCreativeCompanionAd(id, height, width, creativeType, staticResourceURL, companionClickThroughURLTemplate, trackingEvents);
         } else {
             return null;
         }

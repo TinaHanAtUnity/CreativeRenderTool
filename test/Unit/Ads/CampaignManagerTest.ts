@@ -270,7 +270,7 @@ describe('CampaignManager', () => {
             campaignManager.request();
         });
 
-        it('should have data from both wrappers and the final wrapped vast for vast with 2 levels of wrapping', (done) => {
+        it('should have data from both wrappers and the final wrapped vast for vast with 2 levels of wrapping', () => {
 
             // given a valid wrapped VAST placement that points at a valid VAST with an inline ad
             const mockRequest = sinon.mock(request);
@@ -367,11 +367,10 @@ describe('CampaignManager', () => {
                 ]);
                 assert.equal(triggeredCampaign.getVast().getVideoClickThroughURL(), 'http://clk.pointroll.com/bc/?a=2183676&c=9001&i=C0350500-4E6E-9A6D-0314-A20018D20101&clickurl=https://ad.doubleclick.net/ddm/clk/302764234%3B129068239%3Bg%3Fhttp://www.choosenissan.com/altima/%3Fdcp=zmm.%25epid!.%26dcc=%25ecid!.%25eaid!%26utm_source=%25esid!%26utm_medium=%25epid!%26utm_content=%25ecid!.%25eaid!%26dcn=1');
                 assert.equal(triggeredCampaign.getVast().getDuration(), 15);
-                done();
-            });
 
-            // when the campaign manager requests the placement
-            campaignManager.request();
+                // when the campaign manager requests the placement
+                campaignManager.request();
+            });
         });
 
         it('should fail when max depth is exceeded', (done) => {
@@ -498,7 +497,7 @@ describe('CampaignManager', () => {
 
             it('should trigger onError after requesting a wrapped vast placement with incorrect document element node name', () => {
                 const response = {
-                    response: OnProgrammaticVastPlcCampaignIncorrectWrapped
+                    response: OnProgrammaticVastPlcCampaignIncorrect
                 };
                 const wrappedUrl = 'http://demo.tremormedia.com/proddev/vast/vast_inline_linear.xml';
                 const wrappedResponse = Promise.resolve({
@@ -512,7 +511,7 @@ describe('CampaignManager', () => {
                 const response = {
                     response: OnProgrammaticVastPlcCampaignNoData
                 };
-                return verifyErrorForResponse(response, VastErrorInfo.errorMap[VastErrorCode.XML_PARSER_ERROR]);
+                return verifyErrorForResponse(response, 'VAST xml data is missing');
             });
 
             it('should trigger onError after requesting a wrapped vast placement when a failure occurred requesting the wrapped VAST', () => {
