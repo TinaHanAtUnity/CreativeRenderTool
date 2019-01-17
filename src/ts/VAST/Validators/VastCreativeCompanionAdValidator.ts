@@ -29,7 +29,7 @@ export class VastCreativeCompanionAdValidator implements IValidator {
         const staticResourceURL = companionAd.getStaticResourceURL();
         if (staticResourceURL === null) {
             this._errors.push(new Error(`VAST Companion ad(${adId}) is missing required StaticResource Element`));
-        } else if (!Url.isValid(staticResourceURL)) {
+        } else if (!Url.isValidProtocol(staticResourceURL)) {
             this._errors.push(VastValidationUtilities.invalidUrlError(`companion ad(${adId}) staticResourceUrl`, staticResourceURL));
         }
     }
@@ -49,7 +49,7 @@ export class VastCreativeCompanionAdValidator implements IValidator {
         const companionClickThroughURLTemplate = companionAd.getCompanionClickThroughURLTemplate();
         if (companionClickThroughURLTemplate === null) {
             this._errors.push(new Error(`VAST Companion ad(${adId}) is missing required CompanionClickThrough Element`));
-        } else if (!Url.isValid(companionClickThroughURLTemplate)) {
+        } else if (!Url.isValidProtocol(companionClickThroughURLTemplate)) {
             this._errors.push(VastValidationUtilities.invalidUrlError(`companion ad(${adId}) companionClickThroughURLTemplate`, companionClickThroughURLTemplate));
         }
     }
@@ -59,7 +59,7 @@ export class VastCreativeCompanionAdValidator implements IValidator {
         Object.keys(trackingEvents).map((key) => {
             const urls = trackingEvents[key];
             urls.map((url) => {
-                if (!Url.isValid(url)) {
+                if (!Url.isValidProtocol(url)) {
                     this._errors.push(VastValidationUtilities.invalidUrlError('companion ad trackingEvents', url));
                 }
             });
