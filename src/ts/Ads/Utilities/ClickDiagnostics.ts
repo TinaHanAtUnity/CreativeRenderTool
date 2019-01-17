@@ -1,5 +1,4 @@
 import { Campaign } from 'Ads/Models/Campaign';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export enum ClickDelayRange {
@@ -21,7 +20,7 @@ export class ClickDiagnostics {
         }
     }
 
-    public static sendClickDiagnosticsEvent(clickDuration: number, clickUrl: string, clickLocation: string, clickedCampaign: Campaign, gameSessionId: number | undefined) {
+    public static sendClickDiagnosticsEvent(clickDuration: number, clickUrl: string, clickLocation: string, clickedCampaign: Campaign, abGroup: number, gameSessionId: number | undefined) {
         if (gameSessionId && gameSessionId % 2 === 1) {
             SessionDiagnostics.trigger('click_delay', {
                 duration: clickDuration,
@@ -29,7 +28,8 @@ export class ClickDiagnostics {
                 delayedUrl: clickUrl,
                 location: clickLocation,
                 seatId: clickedCampaign.getSeatId(),
-                creativeId: clickedCampaign.getCreativeId()
+                creativeId: clickedCampaign.getCreativeId(),
+                abGroup: abGroup
             }, clickedCampaign.getSession());
         }
     }

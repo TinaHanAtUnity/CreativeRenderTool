@@ -12,7 +12,7 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
 import { IAds } from 'Ads/IAds';
 import { ICore } from 'Core/ICore';
-import { ProgrammaticTrackingService, ProgrammaticTrackingMetric, ProgrammaticTrackingError } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, ProgrammaticTrackingMetricName, ProgrammaticTrackingErrorName } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 const StandardRefreshDelay = 30;
 
@@ -109,7 +109,7 @@ export class BannerAdContext {
     }
 
     private loadBannerAdUnit(): Promise<void> {
-        this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetric.BannerAdRequest);
+        this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.BannerAdRequest);
         return this._campaignManager.request(this._placement).then((campaign) => {
                 this._campaign = <BannerCampaign>campaign;
                 return this.createAdUnit().then((adUnit) => {
@@ -135,7 +135,7 @@ export class BannerAdContext {
     }
 
     private handleBannerRequestError(e: Error): Promise<void> {
-        this._programmaticTrackingService.reportError(ProgrammaticTrackingError.BannerRequestError, 'banner');
+        this._programmaticTrackingService.reportError(ProgrammaticTrackingErrorName.BannerRequestError, 'banner');
         return Promise.reject(e);
     }
 
