@@ -136,10 +136,7 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
     }
 
     private setConsentButtons() {
-        if (this._checkboxGroup.isPersonalizedExperienceChecked() ||
-            this._checkboxGroup.isPersonalizedAdsChecked() ||
-            this._checkboxGroup.isAds3rdPartyChecked()) {
-
+        if (this.shouldHighlightSaveMyChoices()) {
             this._acceptAllButton.classList.remove('blue');
             this._acceptAllButton.classList.add('white');
 
@@ -152,6 +149,12 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
             this._saveMyChoicesButton.classList.remove('blue');
             this._saveMyChoicesButton.classList.add('white');
         }
+    }
+
+    private shouldHighlightSaveMyChoices() {
+        return this._checkboxGroup.isPersonalizedExperienceChecked() ||
+            this._checkboxGroup.isPersonalizedAdsChecked() ||
+            this._checkboxGroup.isAds3rdPartyChecked();
     }
 
     private closeWithAnimation(buttonElement: HTMLElement): void {
