@@ -1,7 +1,15 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { GamePrivacy,
+    IPermissions,
+    isUnityConsentPermissions,
+    PrivacyMethod,
+    UserPrivacy,
+    IAllPermissions,
+    IGranularPermissions
+} from 'Ads/Models/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -21,6 +29,7 @@ interface IUserSummary extends ITemplateData {
 
 export enum GDPREventSource {
     METADATA = 'metadata',
+    NO_REVIEW = 'no_review',
     USER = 'user'
 }
 
@@ -42,6 +51,8 @@ export class UserPrivacyManager {
     private readonly _core: ICoreApi;
     private readonly _coreConfig: CoreConfiguration;
     private readonly _adsConfig: AdsConfiguration;
+    private readonly _gamePrivacy: GamePrivacy;
+    private readonly _userPrivacy: UserPrivacy;
     private readonly _clientInfo: ClientInfo;
     private readonly _deviceInfo: DeviceInfo;
     private readonly _request: RequestManager;
@@ -51,6 +62,8 @@ export class UserPrivacyManager {
         this._core = core;
         this._coreConfig = coreConfig;
         this._adsConfig = adsConfig;
+        this._gamePrivacy = adsConfig.getGamePrivacy();
+        this._userPrivacy = adsConfig.getUserPrivacy();
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._request = request;
@@ -75,6 +88,84 @@ export class UserPrivacyManager {
         return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson).then(() => {
             return Promise.resolve();
         });
+    }
+
+    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource): Promise<INativeResponse | void> {
+        const gamePrivacy = this._gamePrivacy;
+
+        if (!gamePrivacy.isEnabled() || !isUnityConsentPermissions(permissions)) {
+            return Promise.resolve();
+        }
+
+        if (gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
+            return Promise.resolve();
+        }
+
+        if (source === GDPREventSource.NO_REVIEW) {
+            permissions = { all : true };
+        }
+
+        const updatedPrivacy = {
+            method: gamePrivacy.getMethod(),
+            version: gamePrivacy.getVersion(),
+            permissions: permissions
+        };
+
+        if (!this.hasUserPrivacyChanged(updatedPrivacy)) {
+            return Promise.resolve();
+        }
+
+        this._userPrivacy.update(updatedPrivacy);
+        return this.sendUnityConsentEvent(permissions, source);
+    }
+
+    private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPermissions }) {
+        const currentPrivacy = this._userPrivacy;
+        if (currentPrivacy.getMethod() !== updatedPrivacy.method) {
+            return true;
+        }
+
+        if (currentPrivacy.getVersion() !== updatedPrivacy.version) {
+            return true;
+        }
+
+        const currentPermissions = currentPrivacy.getPermissions();
+        const updatedPermissions = updatedPrivacy.permissions;
+
+        if ((<IGranularPermissions>currentPermissions).gameExp !== (<IGranularPermissions>updatedPermissions).gameExp) {
+            return true;
+        }
+
+        if ((<IGranularPermissions>currentPermissions).ads !== (<IGranularPermissions>updatedPermissions).ads) {
+            return true;
+        }
+
+        if ((<IGranularPermissions>currentPermissions).external !== (<IGranularPermissions>updatedPermissions).external) {
+            return true;
+        }
+
+        if ((<IAllPermissions>currentPermissions).all !== (<IAllPermissions>updatedPermissions).all) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource): Promise<INativeResponse> {
+        const infoJson: unknown = {
+            adid: this._deviceInfo.getAdvertisingIdentifier(),
+            action: GDPREventAction.CONSENT,
+            projectId: this._coreConfig.getUnityProjectId(),
+            platform: Platform[this._platform].toLowerCase(),
+            gameId: this._clientInfo.getGameId(),
+            source: source,
+            method: PrivacyMethod.UNITY_CONSENT,
+            version: this._gamePrivacy.getVersion(),
+            coppa: this._coreConfig.isCoppaCompliant(),
+            permissions: permissions
+        };
+
+        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
     }
 
     public getConsentAndUpdateConfiguration(): Promise<boolean> {
@@ -119,6 +210,27 @@ export class UserPrivacyManager {
 
     public isOptOutEnabled(): boolean {
         return this._adsConfig.isOptOutEnabled();
+    }
+
+    public getGranularPermissions(): IGranularPermissions {
+        const permissions = this._adsConfig.getUserPrivacy().getPermissions();
+        if (!isUnityConsentPermissions(permissions)) {
+            return {
+                gameExp: false,
+                ads: false,
+                external: false
+            };
+        }
+
+        if ((<IAllPermissions>permissions).all === true) {
+            return {
+                gameExp: true,
+                ads: true,
+                external: true
+            };
+        } else {
+            return <IGranularPermissions>permissions;
+        }
     }
 
     private pushConsent(consent: boolean): Promise<void> {
