@@ -1,26 +1,52 @@
 <div class="content">
     <div class="top-container">
         <div class="left-corner">
-            <div class="skip-button button button-left">
-                <div class="tab">
-                    <div class="icon-container">
-                        <span class="icon icon-skip"></span>
-                    </div>
-                    <div class="icon-container">
-                        <span class="icon icon-close"></span>
+            <% if (data.zyngaInterstitial) { %>
+                <div class="mute-button button button-left <%= data.muted ? 'muted' : '' %>">
+                    <div class="tab">
+                        <div class="icon-container">
+                            <span class="icon icon-volume"></span>
+                        </div>
+                        <div class="icon-container">
+                            <span class="icon icon-volume-mute"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <% } else { %>
+                <div class="skip-button button button-left">
+                    <div class="tab">
+                        <div class="icon-container">
+                            <span class="icon icon-skip"></span>
+                        </div>
+                        <div class="icon-container">
+                            <span class="icon icon-close"></span>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
             <div class="china-advertisement">广告</div>
         </div>
         <div class="right-corner">
-            <div class="timer-button button button-right">
-                <div class="tab">
-                    <div class="timer-container">
-                        <div class="timer"></div>
+            <% if (data.zyngaInterstitial) { %>
+                <div class="skip-button button button-left">
+                    <div class="tab">
+                        <div class="icon-container">
+                            <span class="icon icon-skip"></span>
+                        </div>
+                        <div class="icon-container">
+                            <span class="icon icon-close"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <% } else { %>
+                <div class="timer-button button button-right">
+                    <div class="tab">
+                        <div class="timer-container">
+                            <div class="timer"></div>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
         </div>
     </div>
     <div class="buffering-spinner">
@@ -31,16 +57,26 @@
     </div>
     <div class="bottom-container">
         <div class="left-corner">
-            <div class="mute-button button button-left <%= data.muted ? 'muted' : '' %>">
-                <div class="tab">
-                    <div class="icon-container">
-                        <span class="icon icon-volume"></span>
-                    </div>
-                    <div class="icon-container">
-                        <span class="icon icon-volume-mute"></span>
+            <% if (data.zyngaInterstitial) { %>
+                <div class="timer-button button button-right">
+                    <div class="tab">
+                        <div class="timer-container">
+                            <div class="timer"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <% } else { %>
+                <div class="mute-button button button-left <%= data.muted ? 'muted' : '' %>">
+                    <div class="tab">
+                        <div class="icon-container">
+                            <span class="icon icon-volume"></span>
+                        </div>
+                        <div class="icon-container">
+                            <span class="icon icon-volume-mute"></span>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
             <div class="gdpr-button button">
                 <div class="tab tab-rounded gdpr-tab">
                     <div class="icon-container">

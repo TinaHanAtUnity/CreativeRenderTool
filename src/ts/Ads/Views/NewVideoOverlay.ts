@@ -86,6 +86,14 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             this._templateData.gameIcon = this._campaign.getGameIcon() ? this._campaign.getGameIcon().getUrl() : '';
         }
 
+        // Zynga Interstitial
+        if (CustomFeatures.isZyngaGame(parameters.clientInfo.getGameId()) && parameters.placement.allowSkip()) {
+            this._templateData = {
+                zyngaInterstitial: true
+            };
+            this.setFadeEnabled(false);
+        }
+
         this._bindings = [
             {
                 event: 'click',

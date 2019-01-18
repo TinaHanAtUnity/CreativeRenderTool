@@ -5,15 +5,6 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
-import { Campaign } from 'Ads/Models/Campaign';
-import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { Video } from 'Ads/Models/Assets/Video';
-import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
-import { WebViewError } from 'Core/Errors/WebViewError';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
-import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
