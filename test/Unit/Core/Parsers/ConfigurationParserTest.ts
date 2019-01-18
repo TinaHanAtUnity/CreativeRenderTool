@@ -1,4 +1,4 @@
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { AdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { assert } from 'chai';
@@ -103,23 +103,47 @@ describe('configurationParserTest', () => {
         });
 
         describe('Parsing GamePrivacy', () => {
-            let configJson: any;
+            let configJson: IRawAdsConfiguration;
             beforeEach(() => {
                 configJson = JSON.parse(ConfigurationJson);
             });
 
-            it('should set to DEFAULT if game privacy is missing from configuration', () => {
-                configJson.gamePrivacy = undefined;
-                const config = AdsConfigurationParser.parse(configJson);
-                assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.DEFAULT);
-                assert.equal(config.getGamePrivacy().isEnabled(), false);
+            describe('when game privacy method is undefined', () => {
+                beforeEach(() => configJson.gamePrivacy!.method = undefined);
+
+                it('should set to DEFAULT if GDPR not enabled', () => {
+                    configJson.gdprEnabled = false;
+                    const config = AdsConfigurationParser.parse(configJson);
+                    assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.DEFAULT);
+                    assert.equal(config.getGamePrivacy().isEnabled(), false);
+                });
+
+                it('should set to LEGITIMATE_INTEREST if GDPR enabled', () => {
+                    configJson.gdprEnabled = true;
+                    const config = AdsConfigurationParser.parse(configJson);
+                    assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.LEGITIMATE_INTEREST);
+                    assert.equal(config.getGamePrivacy().isEnabled(), false);
+                });
             });
 
             it('should set to UNITY_CONSENT', () => {
-                configJson.gamePrivacy.method = 'unity_consent';
+                configJson.gamePrivacy!.method = 'unity_consent';
                 const config = AdsConfigurationParser.parse(configJson);
                 assert.equal(config.getGamePrivacy().getMethod(), PrivacyMethod.UNITY_CONSENT);
                 assert.equal(config.getGamePrivacy().isEnabled(), true);
+            });
+        });
+
+        describe('Parsing UserPrivacy', () => {
+            let configJson: IRawAdsConfiguration;
+            beforeEach(() => {
+                configJson = JSON.parse(ConfigurationJson);
+            });
+
+            it('should mark as not recorded if userPrivacy is undefined', () => {
+                configJson.userPrivacy = undefined;
+                const config = AdsConfigurationParser.parse(configJson);
+                assert.equal(config.getUserPrivacy().isRecorded(), false);
             });
         });
     });
