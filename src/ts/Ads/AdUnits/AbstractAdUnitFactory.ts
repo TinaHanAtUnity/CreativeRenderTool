@@ -138,20 +138,6 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
         };
     }
 
-    protected createPrivacy(parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
-        let privacy: AbstractPrivacy;
-        if (parameters.adsConfig.getGamePrivacy().isEnabled()) {
-            privacy = new PrivacySettings(parameters.platform, parameters.campaign, parameters.privacyManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
-        } else {
-            privacy = new Privacy(parameters.platform, parameters.campaign, parameters.privacyManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
-        }
-
-        const privacyEventHandler = new PrivacyEventHandler(parameters);
-
-        privacy.addEventHandler(privacyEventHandler);
-        return privacy;
-    }
-
     protected showGDPRBanner(parameters: IAdUnitParameters<Campaign>): boolean {
         if (AbstractAdUnitFactory._forceGDPRBanner) {
             return true;
