@@ -120,6 +120,94 @@
   }
 }
 
+/* Font size fixes to the end-screen.styl media queries */
+
+#end-screen.square-end-screen .end-screen-info-background {
+  @media (orientation: portrait) {
+    @media (min-height: 0) {
+      font-size: $default-px-size * .3;
+    }
+
+    @media (min-height: 250px) {
+      font-size: $default-px-size * .4;
+    }
+
+    @media (min-height: 320px) {
+      font-size: $default-px-size * .6;
+    }
+
+    @media (min-height: 380px) {
+      font-size: $default-px-size * .7;
+    }
+
+    @media (min-height: 460px) {
+      font-size: $default-px-size * .9;
+    }
+
+    @media (min-height: 560px) {
+      font-size: $default-px-size * 1.1;
+    }
+
+    @media (min-height: 600px) {
+      font-size: $default-px-size * 1.2;
+    }
+
+    @media (min-height: 680px) {
+      font-size: $default-px-size * 1.3;
+    }
+
+    @media (min-height: 780px) {
+      font-size: $default-px-size * 1.4;
+    }
+
+    @media (min-height: 980px) {
+      font-size: $default-px-size * 1.6;
+    }
+
+    @media (min-height: 1050px) {
+      font-size: $default-px-size * 1.8;
+    }
+
+    @media (min-height: 1175px) {
+      font-size: $default-px-size * 2.2;
+    }
+
+    @media (min-height: 1375px) {
+        font-size: $default-px-size * 2.6;
+    }
+
+    @media (min-height: 1675px) {
+      font-size: $default-px-size * 3;
+    }
+
+    @media (min-height: 1975px) {
+      font-size: $default-px-size * 4;
+    }
+
+    @media (min-height: 2275px) {
+      font-size: $default-px-size * 4.6;
+    }
+
+    @media (min-height: 2575px) {
+      font-size: $default-px-size * 5.5;
+    }
+
+    @media (min-height: 2875px) {
+      font-size: $default-px-size * 6.2;
+    }
+
+    @media (min-height: 3475px) {
+      font-size: $default-px-size * 7;
+    }
+  }
+
+  @media (orientation: landscape) {
+    @media (min-width: 580px) {
+      font-size: $default-px-size * 1.1;
+    }
+  }
+}
+
 /* iPhone X fixes */
 @media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3) {
   &.landscape #end-screen.square-end-screen {
