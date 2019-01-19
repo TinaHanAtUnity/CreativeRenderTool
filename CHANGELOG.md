@@ -1,3 +1,7 @@
+# Pending
+
+* Revert Hook Webplayer for MRAID [#7888](https://github.com/Applifier/unity-ads-webview/pull/7888)
+
 # Thu Jan 17 18:50:39 UTC 2019
 
 * Using new metric scheme for programmatic tracking events [#7866](https://github.com/Applifier/unity-ads-webview/pull/7866)
