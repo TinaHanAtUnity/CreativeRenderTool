@@ -1,4 +1,4 @@
-# Pending
+# Sat Jan 19 01:17:37 UTC 2019
 
 * Revert Hook Webplayer for MRAID [#7888](https://github.com/Applifier/unity-ads-webview/pull/7888)
 
