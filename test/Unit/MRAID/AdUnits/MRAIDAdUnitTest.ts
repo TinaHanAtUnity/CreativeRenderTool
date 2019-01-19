@@ -23,10 +23,6 @@ import { Privacy } from 'Ads/Views/Privacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { ExtendedMRAID } from 'MRAID/Views/ExtendedMRAID';
-import { MRAIDView, IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 describe('MraidAdUnit', () => {
     const sandbox = sinon.createSandbox();
@@ -35,8 +31,6 @@ describe('MraidAdUnit', () => {
     let mraidView: MRAID;
     let ads: IAdsApi;
     let operativeEventManager: OperativeEventManager;
-    let webPlayerContainer: WebPlayerContainer;
-    let deviceInfo: DeviceInfo;
 
     let containerOpen: sinon.SinonSpy;
     let containerClose: sinon.SinonSpy;
@@ -57,25 +51,24 @@ describe('MraidAdUnit', () => {
     });
 
     beforeEach(() => {
-        const platform = Platform.IOS;
+        const platform = Platform.ANDROID;
         const backend = TestFixtures.getBackend(platform);
         const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-        const core = TestFixtures.getCoreApi(nativeBridge);
 
         ads = TestFixtures.getAdsApi(nativeBridge);
-        mraidView = sinon.createStubInstance(ExtendedMRAID);
-        webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
-        deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+        mraidView = sinon.createStubInstance(MRAID);
 
         (<sinon.SinonSpy>mraidView.container).restore();
         sandbox.stub(mraidView, 'container').returns(document.createElement('div'));
 
         const userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
+        const core = TestFixtures.getCoreApi(nativeBridge);
         const wakeUpManager = new WakeUpManager(core);
         const request = new RequestManager(platform, core, wakeUpManager);
         const storageBridge = new StorageBridge(core);
         const thirdPartyEventMnager = new ThirdPartyEventManager(core, request);
         const clientInfo = TestFixtures.getClientInfo(platform);
+        const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
         const mraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
@@ -118,8 +111,7 @@ describe('MraidAdUnit', () => {
             endScreen: undefined,
             privacy: new Privacy(platform, mraidCampaign, userPrivacyManager, false, false),
             privacyManager: userPrivacyManager,
-            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService),
-            webPlayerContainer: webPlayerContainer
+            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };
 
         containerOpen = (<sinon.SinonStub>mraidAdUnitParameters.container.open).returns(Promise.resolve());
@@ -149,50 +141,6 @@ describe('MraidAdUnit', () => {
         });
     });
 
-    const getAdUnitFromView = (view: MRAIDView<IMRAIDViewHandler>, mraidParams: IMRAIDAdUnitParameters, plat: Platform) => {
-        (<sinon.SinonSpy>view.container).restore();
-        sandbox.stub(view, 'container').returns(document.createElement('div'));
-
-        mraidParams.mraid = view;
-        mraidParams.platform = plat;
-        return new MRAIDAdUnit(mraidParams);
-    };
-
-    [Platform.ANDROID, Platform.IOS].forEach(platform => {
-        describe(`${platform} when ad unit is shown for programmatic MRAID content`, () => {
-
-            let adUnit: MRAIDAdUnit;
-            let webPlayerSetSettings: sinon.SinonSpy;
-            let webPlayerSetEventSettings: sinon.SinonSpy;
-
-            const assertViewsOpened = (views: string[]) => {
-                sinon.assert.calledWith(containerOpen, adUnit, views, true, Orientation.NONE, true, false, true, false, {});
-            };
-
-            beforeEach(() => {
-                const view = sinon.createStubInstance(MRAID);
-                adUnit = getAdUnitFromView(view, mraidAdUnitParameters, platform);
-
-                webPlayerSetSettings = <sinon.SinonSpy>webPlayerContainer.setSettings;
-                webPlayerSetEventSettings = <sinon.SinonSpy>webPlayerContainer.setEventSettings;
-
-                return adUnit.show();
-            });
-
-            it('should open the container with webview and webplayer', () => {
-                assertViewsOpened(['webplayer', 'webview']);
-            });
-
-            it('should set the webplayercontainer settings', () => {
-                sinon.assert.called(webPlayerSetSettings);
-            });
-
-            it('should set the webplayercontainer event settings', () => {
-                sinon.assert.called(webPlayerSetEventSettings);
-            });
-        });
-    });
-
     describe('when ad unit is shown', () => {
         let onStartObserver: sinon.SinonSpy;
         let sendStartEventStub: sinon.SinonStub;
@@ -212,7 +160,7 @@ describe('MraidAdUnit', () => {
 
         });
 
-        describe('for ExtendedMRAID content', () => {
+        describe('for MRAID content', () => {
             beforeEach(() => {
                 mraidViewShowSpy = <sinon.SinonSpy>mraidView.show;
                 sendStartEventStub = sandbox.stub(ads.Listener, 'sendStartEvent').returns(Promise.resolve(void(0)));
@@ -231,6 +179,7 @@ describe('MraidAdUnit', () => {
             it('should invoke Listener.sendStartEvent with placementId', () => {
                 sinon.assert.calledWith(sendStartEventStub, 'fooId');
             });
+
             it('should send start operative event', () => {
                 sinon.assert.calledOnce(operativeEventStartStub);
             });
@@ -414,6 +363,7 @@ describe('MraidAdUnit', () => {
         let setFinishStateSpy: sinon.SinonSpy;
 
         beforeEach(() => {
+            setViewableSpy = <sinon.SinonSpy>mraidView.setViewableState;
             setFinishStateSpy = sandbox.spy(mraidAdUnit, 'setFinishState');
 
             return mraidAdUnit.show();
@@ -421,75 +371,31 @@ describe('MraidAdUnit', () => {
 
         afterEach(() => mraidAdUnit.hide());
 
-        describe('for viewable state', () => {
-
-            beforeEach(() => {
-                setViewableSpy = <sinon.SinonSpy>mraidView.setViewableState;
-            });
-
-            it('should send the true viewable state event onContainerShow', () => {
+        describe('onContainerShow', () => {
+            it('should send the true viewable state event', () => {
                 mraidAdUnit.onContainerShow();
                 sinon.assert.calledWith(setViewableSpy, true);
-                sinon.assert.calledOnce(setViewableSpy);
-            });
-
-            it('should set finish state to skipped onContainerDestroy', () => {
-                mraidAdUnit.onContainerDestroy();
-                sinon.assert.calledWith(setFinishStateSpy, FinishState.SKIPPED);
-                sinon.assert.calledOnce(setFinishStateSpy);
-            });
-
-            it('should send the false viewable state event onContainerBackground', () => {
-                mraidAdUnit.onContainerBackground();
-                sinon.assert.calledWith(setViewableSpy, false);
-                sinon.assert.calledOnce(setViewableSpy);
-
-            });
-
-            it ('should send the true viewable state event onContainerForeground', () => {
-                mraidAdUnit.onContainerForeground();
-                sinon.assert.calledWith(setViewableSpy, true);
-                sinon.assert.calledOnce(setViewableSpy);
             });
         });
 
-        describe('onContainerShow', () => {
-            it('should call onContainerForeground on IOS', () => {
-                const view = sinon.createStubInstance(MRAID);
-                const adUnit = getAdUnitFromView(view, mraidAdUnitParameters, Platform.IOS);
+        describe('onContainerDestroy', () => {
+            it('should set finish state to skipped', () => {
+                mraidAdUnit.onContainerDestroy();
+                sinon.assert.calledWith(setFinishStateSpy, FinishState.SKIPPED);
+            });
+        });
 
-                const onContainerForegroundSpy = sandbox.spy(adUnit, 'onContainerForeground');
-                adUnit.onContainerShow();
-                sinon.assert.called(onContainerForegroundSpy);
+        describe('onContainerBackground', () => {
+            it('should send the false viewable state event', () => {
+                mraidAdUnit.onContainerBackground();
+                sinon.assert.calledWith(setViewableSpy, false);
             });
         });
 
         describe('onContainerForeground', () => {
-            let adUnit: MRAIDAdUnit;
-            let view: MRAID;
-            let containerSetViewFrame: sinon.SinonSpy;
-            let loadWebplayerSpy: sinon.SinonSpy;
-
-            beforeEach(() => {
-                view = sinon.createStubInstance(MRAID);
-
-                adUnit = getAdUnitFromView(view, mraidAdUnitParameters, Platform.IOS);
-
-                (<sinon.SinonStub>view.isLoaded).returns(false);
-                sandbox.stub(mraidAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(500);
-
-                containerSetViewFrame = <sinon.SinonSpy>mraidAdUnitParameters.container.setViewFrame;
-                loadWebplayerSpy = <sinon.SinonStub>view.loadWebPlayer;
-
-                return adUnit.onContainerForegroundMRAID();
-            });
-
-            it('should set the webview view frame with a minimized height', () => {
-                sinon.assert.calledWith(containerSetViewFrame, 'webview', 0, 0, 500, 100);
-            });
-
-            it('should load the webplayer for the mraid view', () => {
-                sinon.assert.called(loadWebplayerSpy);
+            it ('should send the true viewable state event', () => {
+                mraidAdUnit.onContainerForeground();
+                sinon.assert.calledWith(setViewableSpy, true);
             });
         });
     });
