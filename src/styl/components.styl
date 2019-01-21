@@ -45,8 +45,8 @@ $unityads-logo-default($scale-size, $with-styles = true) {
 
   if($with-styles) {
     position: absolute;
-    max-height: $scale-size * $default-size * 1;
     z-index: 5;
+    max-height: $scale-size * $default-size * 1;
     font-size: $scale-size * $default-size * .7;
     opacity: .6;
   }
@@ -59,8 +59,8 @@ $name-container-default($scale-size, $with-styles = true) {
     display: -webkit-box;
     overflow: hidden;
     color: $end-screen-game-name-color;
-    text-overflow: ellipsis;
     text-align: center;
+    text-overflow: ellipsis;
 
     -webkit-line-clamp: 2; // @stylint ignore;
     -webkit-box-orient: vertical;

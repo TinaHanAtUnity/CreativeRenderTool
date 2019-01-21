@@ -26,28 +26,28 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     }
 
     .download-container {
+      margin: .75 * $default-scale-size * $scale-size auto 0 auto;
       padding: $endscreen-default-size * .6 0;
       width: $endscreen-default-size * 11.2;
       border-radius: $endscreen-default-size * .6;
-      font-size: $endscreen-default-size;
       background: $blue;
       color: $white;
       text-align: center;
-      margin: .75 * $default-scale-size * $scale-size auto 0 auto;
+      font-size: $endscreen-default-size;
     }
 
     .game-rating {
       $game-rating-default($scale-size);
       margin-top: .41 * $endscreen-default-size;
-      font-size: .8 * $endscreen-default-size;
       letter-spacing: 0;
+      font-size: .8 * $endscreen-default-size;
     }
 
     .game-rating-stars-top {
       $game-rating-mask-default($scale-size);
-      z-index: 1;
       position: absolute;
       left: 0;
+      z-index: 1;
     }
 
     .game-rating-stars-bottom {
@@ -60,11 +60,11 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     }
 
     .game-icon {
-      width: 3.5 * $endscreen-default-size;
-      height: 3.5 * $endscreen-default-size;
+      margin-bottom: .8 * $endscreen-default-size;
       min-width: 3.5 * $endscreen-default-size;
       min-height: 3.5 * $endscreen-default-size;
-      margin-bottom: .8 * $endscreen-default-size;
+      width: 3.5 * $endscreen-default-size;
+      height: 3.5 * $endscreen-default-size;
       border-radius: .4 * $endscreen-default-size;
       background-position: center;
       background-size: cover;
@@ -85,8 +85,8 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
     .unityads-logo {
       $unityads-logo-default($scale-size);
-      max-height: 1 * $endscreen-default-size
-      font-size: .7 * $endscreen-default-size
+      max-height: 1 * $endscreen-default-size;
+      font-size: .7 * $endscreen-default-size;
       opacity: .6;
     }
 
@@ -99,10 +99,10 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     }
 
     .bottom-container {
-      margin: 0 .5  * $endscreen-default-size .25 * $endscreen-default-size  .5 * $endscreen-default-size;
       position: absolute;
       bottom: 0;
       left: 0;
+      margin: 0 .5  * $endscreen-default-size .25 * $endscreen-default-size  .5 * $endscreen-default-size;
       width: calc(100% - 1em);
     }
 
@@ -138,12 +138,12 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     }
 
     .column-container {
-      margin-bottom: $endscreen-default-size *.85; 
       display: flex;
       flex: 1;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      margin-bottom: $endscreen-default-size * .85;
     }
   }
 
@@ -192,7 +192,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       }
     }
 
-    &.landscape #end-screen {  
+    &.landscape #end-screen {
       .end-screen-info {
         .download-container  {
           margin: 1 * $endscreen-default-size auto 0 auto;
