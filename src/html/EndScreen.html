@@ -7,7 +7,9 @@
     <div class="game-background game-background-portrait" style="background-image: url('<%= data.endScreenPortrait && data.endScreenPortrait.replace("file://", "") %>')"></div>
     <div class="gdpr-pop-up">
       <div class="icon-gdpr"></div>
-      <div class="gdpr-text">Unity is personalizing your ads experience in this application. <span class="gdpr-link">Tap here</span> to learn more about Unity and your privacy choices.</div>
+      <div class="gdpr-text">Unity is personalizing your ads experience in this application. 
+        <span class="gdpr-link">Tap here</span> to learn more about Unity and your privacy choices.
+      </div>
     </div>
   </div>
   <div class="end-screen-info-background">
@@ -19,29 +21,30 @@
         </div>
         <div class="store-container">
           <% if(!!data.rating) { %>
-          <span class="game-rating">
-            <span class="game-rating-stars-top" style="width: <%= data.rating %>%">
-              <span class="icon-star first-icon-star"></span>
-              <span class="icon-star"></span>
-              <span class="icon-star"></span>
-              <span class="icon-star"></span>
-              <span class="icon-star"></span>
+            <span class="game-rating">
+              <span class="game-rating-stars-top" style="width: <%= data.rating %>%">
+                <span class="icon-star first-icon-star"></span>
+                <span class="icon-star"></span>
+                <span class="icon-star"></span>
+                <span class="icon-star"></span>
+                <span class="icon-star"></span>
+              </span>
+              <span class="game-rating-stars-bottom">
+                <span class="icon-star first-icon-star"></span>
+                <span class="icon-star"></span>
+                <span class="icon-star"></span>
+                <span class="icon-star"></span>
+                <span class="icon-star"></span>
+              </span>
             </span>
-            <span class="game-rating-stars-bottom">
-              <span class="icon-star first-icon-star"></span>
-              <span class="icon-star"></span>
-              <span class="icon-star"></span>
-              <span class="icon-star"></span>
-              <span class="icon-star"></span>
-            </span>
-          </span>
           <% } %>
 
           <% if (!!data.ratingCount && data.ratingCount !== "0") { %>
-          <span class="game-rating-count">
-            (<span class="game-rating-count-number">
-              <%= data.ratingCount %></span>)
-          </span>
+            <span class="game-rating-count">
+              (<span class="game-rating-count-number">
+                <%= data.ratingCount %>
+              </span>)
+            </span>
           <% } %>
         </div>
         <div class="download-container">
@@ -50,8 +53,10 @@
         </div>
       </div>
     </div>
-    <div class="privacy-button"><span class="icon-gdpr"></span></div>
-    <div class="unityads-logo"></div>
-    <div class="china-advertisement">广告</div>
+    <div class="bottom-container">
+      <div class="privacy-button"><span class="icon-gdpr"></span></div>
+      <div class="unityads-logo"></div>
+      <div class="china-advertisement">广告</div>
+    </div>
   </div>
 </div>
