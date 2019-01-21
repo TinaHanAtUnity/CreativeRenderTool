@@ -25,12 +25,13 @@ export class Slider {
     // Container holds image that should be prefilled in infinite scrolling
     private _sliderHead: HTMLElement;
     private _sliderTail: HTMLElement;
-
+    private _scrollDirectionRight: Boolean = false;
+    private _scrollDirection: Number = 0;
     constructor(urls: string[], size: { width: number; height: number } = {width: 0, height: 0}) {
         const {width, height} = size;
 
-        // TODO: Maybe do configurable
-        urls.length = 3;
+        /* TODO: Maybe do configurable */
+       //urls.length = 3;
 
         this._rootEl = this.createElement('div', 'slider-root-container', [], {
             'min-height': '100%',
@@ -61,9 +62,10 @@ export class Slider {
             });
         });
 
-        // Only when all images are loaded
+        /* Only when all images are loaded */
         // TODO: Handle if images are not loaded in time
         this._ready = Promise.all(allSlidesCreatedPromise).then(() => {
+
             this._rootEl.appendChild(this.createPagination());
 
             if (this._infiniteScrolling) {
@@ -85,6 +87,7 @@ export class Slider {
             if (width !== 0 && height !== 0) {
                 this.resize(width, height, true);
             }
+            this.startAnimation();
         });
     }
 
@@ -147,10 +150,28 @@ export class Slider {
 
     private startAnimation() {
         // Simplest auto scrolling implementation
-        const speed = 2;
+        const speed = 1;
+        const targetWidth = this._slidesContainer.offsetWidth;
+
         setInterval(() => {
-            this._sliderScrollableContainer.scrollLeft += speed;
-        }, 20);
+            if (this._scrollDirection > this._sliderScrollableContainer.scrollLeft) {
+                this._scrollDirectionRight = true;
+            }
+            if (this._scrollDirection < this._sliderScrollableContainer.scrollLeft){
+                this._scrollDirectionRight = false;
+            }
+
+            if (this._sliderScrollableContainer.scrollLeft % targetWidth !== 0 && this._scrollDirectionRight == false) {
+                this._sliderScrollableContainer.scrollLeft += speed;
+            }
+            if (this._sliderScrollableContainer.scrollLeft % targetWidth !== 0 && this._scrollDirectionRight == true) {
+                this._sliderScrollableContainer.scrollLeft -= speed;
+            }
+
+            this._scrollDirection = this._sliderScrollableContainer.scrollLeft;
+
+
+        }, 5);
     }
 
     public resize(...args: any[]) {

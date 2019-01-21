@@ -89,30 +89,69 @@ export class CustomFeatures {
         return true;
     }
 
-    public static getScreenshotsUrls(campaignId: string, appdownloadurl: string | undefined): string[] {
-
-        // Create a request variable and assign a new XMLHttpRequest object to it.
-        const request = new XMLHttpRequest();
-        const apptopiaurl = 'http://apptopia-gateway.applifier.info:80/api/1/app/'+appdownloadurl+'?raw=1';
-        // Open a new connection, using the GET request on the URL endpoint
-        request.open('GET', apptopiaurl, true);
-        request.onload = function () {
-            const data = JSON.parse(this.response);
-            screenshoturls = data.screenshot_urls;
-            const screenshots_downloaded: { [key: string]: string[] } = {
-                'test': [
-                    screenshoturls[0],
-                    screenshoturls[1],
-                    screenshoturls[2],
-                    screenshoturls[3]
-                ]
-            };
-            return screenshoturls;
+    private static getSlideshowCampaignIDs(): string {
+        const targetGameIds = [
+            '343200656',
+            'com.supercell.brawlstars',
+            'com.hcg.cok.gp'
+        ];
+        let randomGame = Math.floor(Math.random() * 3);
+        return targetGameIds[randomGame];
         };
 
-        // Send request
-        request.send();
-
-        return screenshoturls;
+    public static getScreenshotsUrls(campaignId: string): string[] {
+        campaignId = CustomFeatures.getSlideshowCampaignIDs();
+        console.log ("campaign id: " + campaignId);
+        const screenshots: { [key: string]: string[] } = {
+            '343200656':[
+                'https://unity-ads-test.s3.amazonaws.com/343200656/0.png',
+                'https://unity-ads-test.s3.amazonaws.com/343200656/4.png',
+                'https://unity-ads-test.s3.amazonaws.com/343200656/1.png',
+                'https://unity-ads-test.s3.amazonaws.com/343200656/2.png',
+                'https://unity-ads-test.s3.amazonaws.com/343200656/3.png'
+            ],
+            'com.supercell.brawlstars':[
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/2.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/7.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/1.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/0.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/4.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/3.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/12.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/5.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/10.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/9.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/14.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/11.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/6.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/8.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/13.png'
+            ],
+            'com.hcg.cok.gp':[
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/5.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/0.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/4.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/2.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/3.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/6.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/1.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/18.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/16.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/15.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/19.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/14.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/17.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/7.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/8.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/11.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/20.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/9.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/13.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/12.png',
+                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/10.png'
+            ]
+        };
+        console.log (screenshots[campaignId]);
+        return screenshots[campaignId];
     }
 }
