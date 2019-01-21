@@ -41,16 +41,12 @@
 
           <% if (!!data.ratingCount && data.ratingCount !== "0") { %>
             <span class="game-rating-count">
-              (<span class="game-rating-count-number">
-                <%= data.ratingCount %>
-              </span>)
+              (<span class="game-rating-count-number"><%= data.ratingCount %></span>)
             </span>
           <% } %>
         </div>
         <div class="download-container">
-          <span class="download-text">
-            <%= data.t("Download For Free") %>
-          </span>
+          <span class="download-text"><%= data.t("Download For Free") %></span>
         </div>
       </div>
     </div>
