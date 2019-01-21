@@ -1,3 +1,8 @@
+# Pending
+
+* Remove backupcampaign no fill investigation [#7886](https://github.com/Applifier/unity-ads-webview/pull/7886)
+* Buffer swapping logic changes for ARView on Android [#7104](https://github.com/Applifier/unity-ads-webview/pull/7104)
+
 # Sat Jan 19 01:17:37 UTC 2019
 
 * Revert Hook Webplayer for MRAID [#7888](https://github.com/Applifier/unity-ads-webview/pull/7888)
