@@ -16,9 +16,10 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
     .china-advertisement {
       $china-overlay($default-scale-size);
+      position: absolute;
       right: 0;
       bottom: 0;
-      padding: 0 $endscreen-default-size * .5 0 0;
+      padding: 0;
       color: $gray;
       font-size: $endscreen-default-size * .60;
       opacity: .6;
@@ -97,9 +98,17 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       font-size: 1 * $endscreen-default-size;
     }
 
+    .bottom-container {
+      margin: 0 .5  * $endscreen-default-size .25 * $endscreen-default-size  .5 * $endscreen-default-size;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: calc(100% - 1em);
+    }
+
     .privacy-button {
       $privacy-button-default($scale-size);
-      margin: 0 0 0 $endscreen-default-size * .25;
+      left: 0;
     }
 
     .icon-gdpr {
@@ -227,10 +236,6 @@ body {
       height: 50%;
     }
 
-    .privacy-button {
-      left: 0;
-    }
-
     .game-icon {
       align-self: center;
     }
@@ -275,10 +280,6 @@ body {
       text-align: center;
     }
 
-    .privacy-button {
-      left: 50%;
-    }
-
     .gdpr-pop-up {
       left: 0;
     }
@@ -319,6 +320,7 @@ body {
   }
 
   .end-screen-info-background {
+    position: relative;
     display: flex;
     flex: 1;
     flex-direction: column;
