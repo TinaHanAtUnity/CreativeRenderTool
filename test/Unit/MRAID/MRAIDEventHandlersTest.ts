@@ -35,7 +35,6 @@ import { MRAID } from 'MRAID/Views/MRAID';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -62,7 +61,6 @@ describe('MRAIDEventHandlersTest', () => {
     let programmaticMraidCampaign: MRAIDCampaign;
     let privacyManager: UserPrivacyManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
-    let webPlayerContainer: WebPlayerContainer;
 
     describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -97,7 +95,6 @@ describe('MRAIDEventHandlersTest', () => {
             sinon.stub(mraidView, 'container').returns(document.createElement('div'));
             privacyManager = sinon.createStubInstance(UserPrivacyManager);
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-            webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
 
             extendedMraidAdUnitParams = {
             platform,
@@ -121,8 +118,7 @@ describe('MRAIDEventHandlersTest', () => {
                 endScreen: undefined,
                 privacy: new Privacy(platform, extendedMraidCampaign, privacyManager, false, false),
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService,
-                webPlayerContainer: webPlayerContainer
+                programmaticTrackingService: programmaticTrackingService
             };
 
             mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
@@ -362,8 +358,7 @@ describe('MRAIDEventHandlersTest', () => {
                 endScreen: undefined,
                 privacy: new Privacy(platform, programmaticMraidCampaign, privacyManager, false, false),
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService,
-                webPlayerContainer: webPlayerContainer
+                programmaticTrackingService: programmaticTrackingService
             };
 
             programmaticMraidAdUnit = new MRAIDAdUnit(programmaticMraidAdUnitParams);
@@ -396,35 +391,6 @@ describe('MRAIDEventHandlersTest', () => {
                     mockMraidView.verify();
                     assert.equal(expectationMraidView.getCall(0).args[0], false, 'Should block CTA event while processing click event');
                     assert.equal(expectationMraidView.getCall(1).args[0], true, 'Should enable CTA event after processing click event');
-                });
-            });
-        });
-
-        describe('on Webview Resizing for webplayer', () => {
-
-            beforeEach(() => {
-                sinon.stub(deviceInfo, 'getScreenWidth').resolves(500);
-                sinon.stub(deviceInfo, 'getScreenHeight').resolves(600);
-                sinon.stub(container, 'setViewFrame');
-            });
-
-            context('onWebViewFullScreen', () => {
-                beforeEach(() => {
-                    return programmaticMraidEventHandler.onWebViewFullScreen();
-                });
-
-                it('should set webview view frame to full screen', () => {
-                    sinon.assert.calledWith(<sinon.SinonStub>container.setViewFrame, 'webview', 0, 0, 500, 600);
-                });
-            });
-
-            context('onWebViewReduceSize', () => {
-                beforeEach(() => {
-                    return programmaticMraidEventHandler.onWebViewReduceSize();
-                });
-
-                it('should set webview view frame to top of window', () => {
-                    sinon.assert.calledWith(<sinon.SinonStub>container.setViewFrame, 'webview', 0, 0, 500, 200);
                 });
             });
         });
