@@ -138,7 +138,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     }
 
     .column-container {
-      margin: 2 * $default-size * $scale-size 0 1 * $default-size * $scale-size 0; 
+      margin-bottom: $endscreen-default-size *.85; 
       display: flex;
       flex: 1;
       flex-direction: column;
@@ -149,22 +149,12 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
   body {
     &.portrait #end-screen {
-      .column-container {
-        margin-top: $endscreen-default-size * .8;
-      }
-
       .download-container {
         margin: 1 * $endscreen-default-size auto 0 auto;
       }
     }
 
     &.landscape #end-screen {
-      /*  Check if this was needed or not
-      .column-container {
-        margin: $default-size * $scale-size * .5 0;
-      }
-      */
-
       .btn-close-region {
         color: $gray;
       }
@@ -197,17 +187,13 @@ $end-screen-mixin($scale-size = $default-scale-size) {
         }
 
         .download-container {
-            border-radius: .6 * $endscreen-default-size;
+          border-radius: .6 * $endscreen-default-size;
         }
       }
     }
 
     &.landscape #end-screen {  
       .end-screen-info {
-        .column-container {
-          margin-top: .8 * $endscreen-default-size;
-        }
-
         .download-container  {
           margin: 1 * $endscreen-default-size auto 0 auto;
         }
