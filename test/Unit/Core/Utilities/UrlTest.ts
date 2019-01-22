@@ -82,7 +82,11 @@ describe('UrlTest', () => {
             assert.equal(Url.getProtocol('http://www.unity3d.com'), 'http:');
             assert.equal(Url.getProtocol('https://www.unity3d.com'), 'https:');
             assert.equal(Url.getProtocol('file://www.unity3d.com'), 'file:');
-            assert.equal(Url.getProtocol('//www.unity3d.com'), 'http:'); // relative url should default to whatever the page is
+            // this needs to be written this way because it will be http: when running webview unit tests
+            // but will be file: when running hybrid tests.
+            const pageProtocol = Url.getProtocol(document.URL);
+            const relativeUrlProtocol = Url.getProtocol('//www.unity3d.com');
+            assert.equal(relativeUrlProtocol, pageProtocol);
         });
     });
 
