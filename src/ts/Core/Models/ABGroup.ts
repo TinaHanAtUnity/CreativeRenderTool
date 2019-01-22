@@ -45,3 +45,4 @@ export const FakeDisabledABTest = new DisabledABTest(16, 17);
 export const AuctionV5Test = new ABTest(15);
 export const VastParsingStrictTest = new ABTest(16); // Testing new vast parser logic
 export const ByteDanceCTATest = new ABTest(17);
+export const WebPlayerMRAIDTest = new DisabledABTest();

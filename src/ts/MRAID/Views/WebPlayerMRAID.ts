@@ -11,18 +11,14 @@ import MRAIDContainer from 'html/mraid/container-webplayer.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import MRAIDPerfContainer from 'html/mraid/container-perf.html';
+import { MRAIDWebPlayerEventAdapter } from 'MRAID/EventBridge/MRAIDWebPlayerEventAdapter';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
-import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
 
-export class MRAID extends MRAIDView<IMRAIDViewHandler> {
+export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private readonly onLoaded = new Observable0();
     private _domContentLoaded = false;
-    private _creativeId: string | undefined;
-    private _iframe: HTMLIFrameElement;
 
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(platform, core, deviceInfo, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
@@ -30,14 +26,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
-        this._creativeId = campaign.getCreativeId();
 
         this._template = new Template(MRAIDTemplate);
-    }
-
-    public render(): void {
-        super.render();
-        this.loadIframe();
     }
 
     public show(): void {
@@ -72,6 +62,20 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this.setAnalyticsBackgroundTime(viewable);
     }
 
+    public loadWebPlayer(webPlayerContainer: WebPlayerContainer): Promise<void> {
+        this._isLoaded = true;
+        this._mraidAdapterContainer.connect(new MRAIDWebPlayerEventAdapter(this._core, this._mraidAdapterContainer, webPlayerContainer));
+
+        return this.createMRAID(MRAIDContainer).then(mraid => {
+            this._core.Sdk.logDebug('setting webplayer srcdoc (' + mraid.length + ')');
+            SdkStats.setFrameSetStartTimestamp(this._placement.getId());
+            this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set webplayer data started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
+            mraid = this._platform === Platform.ANDROID ? encodeURIComponent(mraid) : mraid;
+
+            return this.setWebPlayerContainerData(webPlayerContainer, mraid);
+        }).catch(e => this._core.Sdk.logError('failed to create mraid: ' + e));
+    }
+
     public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {
         if (this._gameSessionId % 1000 === 999) {
             super.onBridgeSendStats(totalTime, playTime, frameCount);
@@ -86,30 +90,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         if (this.isKPIDataValid({timeFromShow, backgroundTime, timeFromPlayableStart}, 'mraid_' + eventName)) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
         }
-    }
-
-    private loadIframe(): void {
-        const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-        this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));	
-
-         this.createMRAID(
-            this._gameSessionId % 1000 === 999 ? MRAIDPerfContainer : MRAIDContainer
-        ).then(mraid => {
-            this._core.Sdk.logDebug('setting iframe srcdoc (' + mraid.length + ')');
-            SdkStats.setFrameSetStartTimestamp(this._placement.getId());
-            this._core.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));	
-            iframe.srcdoc = mraid;
-
-             if (CustomFeatures.isSonicPlayable(this._creativeId)) {
-                iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
-            }
-        }).catch(e => {
-            this._core.Sdk.logError('failed to create mraid: ' + e.message);
-
-             SessionDiagnostics.trigger('create_mraid_error', {
-                message: e.message
-            }, this._campaign.getSession());
-        });
     }
 
     protected onCloseEvent(event: Event): void {
