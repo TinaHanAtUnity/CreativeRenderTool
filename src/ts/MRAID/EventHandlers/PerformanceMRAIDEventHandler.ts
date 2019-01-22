@@ -5,6 +5,8 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { RequestError } from 'Core/Errors/RequestError';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
+import { CTAClickHandlingTest } from 'Core/Models/ABGroup';
 
 export class PerformanceMRAIDEventHandler extends MRAIDEventHandler implements IMRAIDViewHandler {
 
@@ -13,18 +15,24 @@ export class PerformanceMRAIDEventHandler extends MRAIDEventHandler implements I
 
         this.sendTrackingEvents();
 
-        // TODO: Verify if this logic is working for perfomance playables as intended
+        const ctaClickedTime = Date.now();
         if (this._campaign.getClickAttributionUrl()) {
             this.handleClickAttribution();
             if (!this._campaign.getClickAttributionUrlFollowsRedirects()) {
                 return this._request.followRedirectChain(url).then((storeUrl) => {
-                    return this.openUrl(storeUrl);
+                    return this.openUrlOnCallButton(storeUrl, Date.now() - ctaClickedTime, url);
+                }).catch(() => {
+                    return this.openUrlOnCallButton(url, Date.now() - ctaClickedTime, url);
                 });
             }
         } else {
-            return this._request.followRedirectChain(url).then((storeUrl) => {
-                return this.openUrl(storeUrl);
-            });
+            if (CTAClickHandlingTest.isValid(this._abGroup)) {
+                return this.openUrlOnCallButton(url, Date.now() - ctaClickedTime, url);
+            } else {
+                return this._request.followRedirectChain(url).then((storeUrl) => {
+                    return this.openUrlOnCallButton(storeUrl, Date.now() - ctaClickedTime, url);
+                });
+            }
         }
         return Promise.resolve();
     }
@@ -79,4 +87,11 @@ export class PerformanceMRAIDEventHandler extends MRAIDEventHandler implements I
             }
         }
     }
+
+    private openUrlOnCallButton(url: string, clickDuration: number, clickUrl: string): Promise<void> {
+        return this.openUrl(url).then(() => {
+            ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'performance_mraid', this._campaign, this._abGroup.valueOf(), this._gameSessionId);
+        });
+    }
+
 }
