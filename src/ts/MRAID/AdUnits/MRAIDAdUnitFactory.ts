@@ -3,10 +3,10 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { Privacy } from 'Ads/Views/Privacy';
 import { ARMRAID } from 'AR/Views/ARMRAID';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
-import { PlayableEventHandler } from 'MRAID/EventHandlers/PlayableEventHandler';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
+import { PerformanceMRAIDEventHandler } from 'MRAID/EventHandlers/PerformanceMRAIDEventHandler';
 import { ARMRAIDEventHandler } from 'AR/EventHandlers/ARMRAIDEventHandler';
 import { ProgrammaticMRAIDEventHandler } from 'MRAID/EventHandlers/ProgrammaticMRAIDEventHandler';
 
@@ -17,7 +17,7 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMR
         const isPlayable: boolean = parameters.campaign instanceof PerformanceMRAIDCampaign;
         const isAR: boolean = parameters.mraid instanceof ARMRAID;
         const isSonicPlayable: boolean = CustomFeatures.isSonicPlayable(parameters.campaign.getCreativeId());
-        const EventHandler = (isSonicPlayable || isPlayable) ? PlayableEventHandler :
+        const EventHandler = (isSonicPlayable || isPlayable) ? PerformanceMRAIDEventHandler :
             isAR ? ARMRAIDEventHandler : ProgrammaticMRAIDEventHandler;
         const mraidEventHandler: IMRAIDViewHandler = new EventHandler(mraidAdUnit, parameters);
         parameters.mraid.addEventHandler(mraidEventHandler);

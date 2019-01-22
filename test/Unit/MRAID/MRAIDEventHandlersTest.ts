@@ -29,7 +29,7 @@ import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import 'mocha';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
-import { PlayableEventHandler } from 'MRAID/EventHandlers/PlayableEventHandler';
+import { PerformanceMRAIDEventHandler } from 'MRAID/EventHandlers/PerformanceMRAIDEventHandler';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import * as sinon from 'sinon';
@@ -234,11 +234,11 @@ describe('MRAIDEventHandlersTest', () => {
                 });
             });
 
-            describe('PlayableEventHandler', () => {
+            describe('PerformanceMRAIDEventHandler', () => {
                 it('should send a analytics event', () => {
                     mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
                     sinon.stub(mraidAdUnit, 'sendClick');
-                    mraidEventHandler = new PlayableEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
+                    mraidEventHandler = new PerformanceMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
 
                     mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 0, 'win_screen', {'level': 2});
 
@@ -261,7 +261,7 @@ describe('MRAIDEventHandlersTest', () => {
                 it('should send a analytics event without extra event data', () => {
                     mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
                     sinon.stub(mraidAdUnit, 'sendClick');
-                    mraidEventHandler = new PlayableEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
+                    mraidEventHandler = new PerformanceMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
 
                     mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 5, 'win_screen', undefined);
 

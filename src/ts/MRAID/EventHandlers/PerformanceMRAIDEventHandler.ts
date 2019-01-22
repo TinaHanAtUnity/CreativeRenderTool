@@ -6,7 +6,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { RequestError } from 'Core/Errors/RequestError';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 
-export class PlayableEventHandler extends MRAIDEventHandler implements IMRAIDViewHandler {
+export class PerformanceMRAIDEventHandler extends MRAIDEventHandler implements IMRAIDViewHandler {
 
     public onMraidClick(url: string): Promise<void> {
         super.onMraidClick(url);
