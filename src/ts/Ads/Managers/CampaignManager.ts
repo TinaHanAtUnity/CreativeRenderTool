@@ -50,6 +50,8 @@ import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
+import { VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
+import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 
 export class CampaignManager {
 
@@ -552,7 +554,14 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        return parser.parse(response, session).then((campaign) => {
+        return parser.parse(response, session).catch((error) => {
+            if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === VastErrorCode.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
+                parser = this.getCampaignParser(CampaignContentTypes.ProgrammaticVpaid);
+                return parser.parse(response, session);
+            } else {
+                throw error;
+            }
+        }).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
                 SdkStats.setParseDuration(placement.getPlacementId(), parseDuration);

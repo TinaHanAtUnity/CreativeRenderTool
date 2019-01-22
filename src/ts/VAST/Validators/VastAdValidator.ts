@@ -53,7 +53,7 @@ export class VastAdValidator implements IValidator {
 
     private validateImpressionURLTemplates(vastAd: VastAd) {
         vastAd.getImpressionURLTemplates().forEach((url) => {
-            if (!Url.isValid(url)) {
+            if (!Url.isValid(url) && url !== 'about:blank') {
                 this._errors.push(VastValidationUtilities.invalidUrlError('VastAd impressionURLTemplates', url));
             }
         });

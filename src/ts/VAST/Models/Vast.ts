@@ -273,6 +273,23 @@ export class Vast extends Model<IVast> {
         return [];
     }
 
+    public isVPAIDCampaign(): boolean {
+        const ad = this.getAd();
+        if (ad) {
+            const creatives = ad.getCreatives();
+            for (const creative of creatives) {
+                const mediaFiles = creative.getMediaFiles();
+                for (const mediaFile of mediaFiles) {
+                    if (mediaFile.getApiFramework() === 'VPAID') {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     private isValidLandscapeCompanion(creativeType: string | null, height: number, width: number): boolean {
         const minHeight = 320;
         const minWidth = 480;
