@@ -16,7 +16,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
-import { MRAIDWebViewTopCalculator } from 'MRAID/Views/MRAIDWebViewTopCalculator';
+import { WebViewTopCalculator } from 'Ads/Utilities/WebPlayer/WebViewTopCalculator';
 import { ABGroup } from 'Core/Models/ABGroup';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
@@ -223,7 +223,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     private getTopViewHeight(width: number, height: number): number {
-        const webViewResizer = new MRAIDWebViewTopCalculator(this._deviceInfo, this._platform);
+        const webViewResizer = new WebViewTopCalculator(this._deviceInfo, this._platform);
         return webViewResizer.getTopPosition(width, height);
     }
 }

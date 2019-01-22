@@ -2,7 +2,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
-export class MRAIDWebViewTopCalculator {
+export class WebViewTopCalculator {
 
     private _deviceInfo: DeviceInfo;
     private _platform: Platform;

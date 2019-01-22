@@ -2,11 +2,11 @@ import 'mocha';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { MRAIDWebViewTopCalculator } from 'MRAID/Views/MRAIDWebViewTopCalculator';
+import { WebViewTopCalculator } from 'Ads/Utilities/WebPlayer/WebViewTopCalculator';
 
 describe('MRAIDWebViewTopCalculator', () => {
     describe('When device is Android', () => {
-        let mraidViewSizer: MRAIDWebViewTopCalculator;
+        let mraidViewSizer: WebViewTopCalculator;
 
         beforeEach(() => {
             const platform = Platform.ANDROID;
@@ -15,7 +15,7 @@ describe('MRAIDWebViewTopCalculator', () => {
             const core = TestFixtures.getCoreApi(nativeBridge);
 
             const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
-            mraidViewSizer = new MRAIDWebViewTopCalculator(deviceInfo, platform);
+            mraidViewSizer = new WebViewTopCalculator(deviceInfo, platform);
         });
 
         it('should scale for landscape', () => {
@@ -34,7 +34,7 @@ describe('MRAIDWebViewTopCalculator', () => {
     });
 
     describe('When device is iPhone', () => {
-        let mraidViewSizer: MRAIDWebViewTopCalculator;
+        let mraidViewSizer: WebViewTopCalculator;
 
         beforeEach(() => {
             const platform = Platform.IOS;
@@ -43,7 +43,7 @@ describe('MRAIDWebViewTopCalculator', () => {
             const core = TestFixtures.getCoreApi(nativeBridge);
 
             const deviceInfo = TestFixtures.getIosDeviceInfo(core);
-            mraidViewSizer = new MRAIDWebViewTopCalculator(deviceInfo, platform);
+            mraidViewSizer = new WebViewTopCalculator(deviceInfo, platform);
         });
 
         it('should scale for landscape', () => {
@@ -61,7 +61,7 @@ describe('MRAIDWebViewTopCalculator', () => {
     });
 
     describe('When device is iPhoneX', () => {
-        let mraidViewSizer: MRAIDWebViewTopCalculator;
+        let mraidViewSizer: WebViewTopCalculator;
 
         beforeEach(() => {
             const platform = Platform.IOS;
@@ -70,7 +70,7 @@ describe('MRAIDWebViewTopCalculator', () => {
             const core = TestFixtures.getCoreApi(nativeBridge);
 
             const deviceInfo = TestFixtures.getIosDeviceInfo(core);
-            mraidViewSizer = new MRAIDWebViewTopCalculator(deviceInfo, platform);
+            mraidViewSizer = new WebViewTopCalculator(deviceInfo, platform);
         });
 
         it('should scale for landscape', () => {
