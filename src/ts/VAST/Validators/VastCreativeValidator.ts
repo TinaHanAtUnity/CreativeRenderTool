@@ -19,7 +19,7 @@ export class VastCreativeValidator implements IValidator {
         const trackingEvents = creative.getTrackingEvents();
         Object.keys(trackingEvents).map((key) => {
             trackingEvents[key].map((url) => {
-                if (!Url.isValid(url)) {
+                if (!Url.isValidProtocol(url)) {
                     this._errors.push(VastValidationUtilities.invalidUrlError('creative trackingEvents', url));
                 }
             });
