@@ -20,17 +20,7 @@ export enum ProgrammaticTrackingMetricName {
     BannerAdImpression = 'banner_ad_impression'
 }
 
-export interface IProgrammaticTrackingErrorData {
-    event: ProgrammaticTrackingErrorName;
-    platform: string;
-    osVersion: string;
-    sdkVersion: string;
-    adType: string;
-    seatId: number | undefined;
-}
-
-export interface IProgrammaticTrackingMetricData {
-    event: ProgrammaticTrackingMetricName | undefined;
+export interface IProgrammaticTrackingData {
     metrics: IProgrammaticTrackingMetric[] | undefined;
 }
 
@@ -69,8 +59,7 @@ export class ProgrammaticTrackingService {
         const platform: Platform = this._platform;
         const osVersion: string = this._deviceInfo.getOsVersion();
         const sdkVersion: string = this._clientInfo.getSdkVersionName();
-        const metricData: IProgrammaticTrackingMetricData = {
-            event: undefined,
+        const metricData: IProgrammaticTrackingData = {
             metrics: [
                 {
                     tags: [
@@ -94,8 +83,7 @@ export class ProgrammaticTrackingService {
     }
 
     public reportMetric(event: ProgrammaticTrackingMetricName): Promise<INativeResponse> {
-        const metricData: IProgrammaticTrackingMetricData = {
-            event: undefined,
+        const metricData: IProgrammaticTrackingData = {
             metrics: [
                 {
                     tags: [
