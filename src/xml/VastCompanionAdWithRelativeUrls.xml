@@ -7,6 +7,7 @@
             <Error><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=err&mt_id=3203937&error=[ERRORCODE]&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Error>
             <Impression><![CDATA[http://vast.mathtag.com/index.html/notify/img?price=12&nocache=true&id=asfasf&cid=3203937&exch=brx&protocol_version=1&sid=111666111]]></Impression>
             <Impression><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=imp&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Impression>
+            <Impression><![CDATA[]]></Impression>
             <Creatives>
                 <Creative id="3203937" sequence="0">
                     <Linear>

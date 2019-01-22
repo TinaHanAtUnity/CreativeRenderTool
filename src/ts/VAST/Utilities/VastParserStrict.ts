@@ -258,7 +258,9 @@ export class VastParserStrict {
 
         this.getNodesWithName(adElement, VastNodeName.IMPRESSION).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
-            vastAd.addImpressionURLTemplate(url);
+            if (url.length > 0) {
+                vastAd.addImpressionURLTemplate(url);
+            }
         });
 
         this.getNodesWithName(adElement, VastNodeName.LINEAR).forEach((element: HTMLElement) => {
