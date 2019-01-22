@@ -18,7 +18,6 @@ export class MRAIDWebPlayerEventAdapter extends MRAIDEventAdapter {
         this._mraidHandlers[MRAIDEvents.OPEN] = (msg) => this.handleOpen(<string>msg[0]);
         this._mraidHandlers[MRAIDEvents.ANALYTICS_EVENT] = (msg) => this.handleAnalyticsEvent(<string>msg[0], <string>msg[1]);
         this._mraidHandlers[MRAIDEvents.STATE_CHANGE] = (msg) => this.handleCustomState(<string>msg[0]);
-        this._mraidHandlers[MRAIDEvents.SEND_STATS] = (msg) => this.handleSendStats(<number>msg[0], <number>msg[1], <number>msg[2]);
     }
 
     public connect(): void {

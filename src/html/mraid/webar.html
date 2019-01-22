@@ -97,17 +97,32 @@
             callNativeFunction('removeAnchor', identifier);
         }
 
-        function nativeGetFrame() {
-            return callNativeFunction('getFrame');
-        }
-
         function nativeAdvanceFrame() {
             callNativeFunction('advanceFrame');
+        }
+
+        function nativeSwapBuffers() {
+            callNativeFunction('swapBuffers');
         }
 
         function nativeLog(message) {
             callNativeFunction('log', message);
         }
+
+        function getOS() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            if (/android/i.test(userAgent)) {
+                return 'Android';
+            }
+
+            // iOS detection from: http://stackoverflow.com/a/9039885/177710
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                return 'iOS';
+            }
+
+            return 'unknown';
+        }
+        const os = getOS();
 
         /**
          * Checks whether or not an ID exists within an array.
@@ -365,7 +380,7 @@
 
                     // Now we can call the callbacks as we know that the camera frame is
                     // loaded in the image. This makes the synchronization to be "perfect".
-                    callRafCallbacks();
+                    callRafCallbacks(performance.now());
 
                     // Now we can advance a frame
                     nativeAdvanceFrame();
@@ -1109,21 +1124,8 @@
                 WebARonARKitVRDisplay.projectionMatrix_[i] = data.projectionMatrix[i];
             }
 
-            // Did the native side pass the camera frame? Then update the image!
-            if (window.WebARonARKitSendsCameraFrames && data.cameraFrame !== "") {
-                WebARonARKitVRDisplay.passThroughCameraImage_.src = data.cameraFrame;
-                // The raf callbacks and the advance of the frame will be done once the
-                // image is loaded (see the image load event above)
-            }
-            else {
-                // Only on iOS and when there is no camera frame, call the raf callbacks
-                // and advance a frame
-                if (!window.ARCore) {
-                    callRafCallbacks();
-                    nativeAdvanceFrame();
-                }
-            }
-
+            callRafCallbacks(performance.now());
+            nativeAdvanceFrame();
         };
 
         window.WebARonARKitDispatchARDisplayEvent = function(events) {
@@ -1343,31 +1345,14 @@
             return WebARonARKitVRDisplay.androidEnums;
         };
 
-        function raf(now) {
-            var frameStr = nativeGetFrame();
-            var frame = JSON.parse(frameStr);
-            if (frame.data) {
-                window.WebARonARKitSetData(frame.data);
-
-                if (frame.planes) {
-                    window.WebARonARKitDispatchARDisplayEvent(frame.planes);
-                }
-
-                callRafCallbacks(now);
-
-                // Only on Android!
-                if (window.ARCore) {
-                    forceRedraw();
-                }
-            }
-
+        function raf() {
             oldRequestAnimationFrame(() => {
                 // When we get the first RAF after modifying the DOM, we are guaranteed that
                 // the rendering has actually occurred. This is when we can advance the frame
                 // and then schedule our subsequent RAF (double-RAF-trick).
                 nativeAdvanceFrame();
-            oldRequestAnimationFrame(raf);
-        });
+                oldRequestAnimationFrame(raf);
+            });
         }
 
         /**
@@ -1392,12 +1377,13 @@
                 }
                 rafCallbacksCopy[i](now);
             }
+
+            if (os === 'Android') {
+                nativeSwapBuffers();
+            }
         }
 
-        // Only on Android!
-        if (window.ARCore) {
-            oldRequestAnimationFrame(raf);
-        }
+        oldRequestAnimationFrame(raf);
 
         // TODO: Implement cancelAnimationFrame. raf needs to return a unique
         // identifier and use it to cancel the call (remove it from the array).
