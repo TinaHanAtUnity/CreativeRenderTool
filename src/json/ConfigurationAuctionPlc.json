@@ -51,5 +51,8 @@
   "organizationId": "5552368",
   "gdprEnabled": false,
   "optOutRecorded": false,
-  "optOutEnabled": false
+  "optOutEnabled": false,
+  "gamePrivacy": {
+    "method": "legitimate_interest"
+  }
 }

@@ -1,5 +1,42 @@
 # Pending
 
+* Remove backupcampaign no fill investigation [#7886](https://github.com/Applifier/unity-ads-webview/pull/7886)
+* Buffer swapping logic changes for ARView on Android [#7104](https://github.com/Applifier/unity-ads-webview/pull/7104)
+* Fix PREPARE_ERROR missing js_errors from 2.0.5 downwards
+* Add Bitmango game IDs to share Cheetah features [#7910](https://github.com/Applifier/unity-ads-webview/pull/7910)
+
+# Sat Jan 19 01:17:37 UTC 2019
+
+* Revert Hook Webplayer for MRAID [#7888](https://github.com/Applifier/unity-ads-webview/pull/7888)
+
+# Thu Jan 17 18:50:39 UTC 2019
+
+* Using new metric scheme for programmatic tracking events [#7866](https://github.com/Applifier/unity-ads-webview/pull/7866)
+* Adding abGroup to ad_received, ad_ready and click_delay diagnostics log [#7865](https://github.com/Applifier/unity-ads-webview/pull/7865)
+* Try timer based campaign expiration on Wargaming game [#7864](https://github.com/Applifier/unity-ads-webview/pull/7864)
+
+# Wed Jan 16 16:08:20 UTC 2019
+
+* add eventRetry=true to the URL parameters [#7659](https://github.com/Applifier/unity-ads-webview/pull/7659)
+* add privacy to adreq and operative events [#7755](https://github.com/Applifier/unity-ads-webview/pull/7755)
+* add gamePrivacy and userPrivacy to configuration [#7754](https://github.com/Applifier/unity-ads-webview/pull/7754)
+
+# Wed Jan 16 11:12:06 UTC 2019
+
+* Refactor store handlers for China [#7759](https://github.com/Applifier/unity-ads-webview/pull/7759)
+* Define Staging/Deployment Process and Add QOL Scripts [#7464](https://github.com/Applifier/unity-ads-webview/pull/7464)
+* Improved Diagnostics for Banner Lifecycle [#7779](https://github.com/Applifier/unity-ads-webview/pull/7779)
+
+
+# Mon Jan 14 23:27:50 UTC 2019
+
+* Send diagnostics when programmatic backup campaign gets overwritten with no fill [#7801](https://github.com/Applifier/unity-ads-webview/pull/7801)
+* Rename OldCampaignRefreshManager to CampaignRefreshManager [#7821](https://github.com/Applifier/unity-ads-webview/pull/7821)
+* Enable vast strict on group 16 [#7823](https://github.com/Applifier/unity-ads-webview/pull/7823)
+* Enable auction v5 on group 15 [#7822](https://github.com/Applifier/unity-ads-webview/pull/7822)
+
+# Mon Jan 14 12:40:31 UTC 2019
+
 * Hook WebPlayer Programmatic MRAID 3.0 [#7614](https://github.com/Applifier/unity-ads-webview/pull/7614)
 * Vast Events Integration Test [#7462](https://github.com/Applifier/unity-ads-webview/pull/7462)
 * Add backup campaign flag to operative events [#7711](https://github.com/Applifier/unity-ads-webview/pull/7711)

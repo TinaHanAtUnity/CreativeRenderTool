@@ -22,7 +22,7 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
             this._mraidView.setCallButtonEnabled(true);
             this.sendTrackingEvents();
 
-            ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'programmatic_mraid', this._campaign, this._gameSessionId);
+            ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'programmatic_mraid', this._campaign, this._abGroup.valueOf(), this._gameSessionId);
         }).catch(() => {
             this._mraidView.setCallButtonEnabled(true);
             this.sendTrackingEvents();

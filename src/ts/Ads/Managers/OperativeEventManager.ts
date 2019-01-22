@@ -6,6 +6,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
+import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { EventType } from 'Ads/Models/Session';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { GameSessionCounters, IGameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
@@ -77,6 +78,7 @@ export interface IInfoJson {
     gdprEnabled: boolean;
     optOutEnabled: boolean;
     optOutRecorded: boolean;
+    privacy: IRequestPrivacy;
     gameSessionCounters: IGameSessionCounters;
     apiLevel?: number;
     deviceMake?: string;
@@ -376,6 +378,7 @@ export class OperativeEventManager {
                 'gdprEnabled': this._adsConfig.isGDPREnabled(),
                 'optOutEnabled': this._adsConfig.isOptOutEnabled(),
                 'optOutRecorded': this._adsConfig.isOptOutRecorded(),
+                'privacy': session.getPrivacy(),
                 'gameSessionCounters': session.getGameSessionCounters(),
                 'networkType': networkType,
                 'connectionType': connectionType,

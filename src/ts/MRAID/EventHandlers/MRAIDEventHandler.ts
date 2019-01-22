@@ -11,8 +11,8 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { ABGroup } from 'Core/Models/ABGroup';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -23,13 +23,12 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _core: ICoreApi;
     private _ads: IAdsApi;
     private _customImpressionFired: boolean;
-    private _topWebViewAreaHeight: number;
-    private _deviceInfo: DeviceInfo;
 
     protected _mraidView: MRAIDView<IMRAIDViewHandler>;
     protected _request: RequestManager;
     protected _campaign: MRAIDCampaign;
     protected _gameSessionId?: number;
+    protected _abGroup: ABGroup;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
 
     constructor(adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
@@ -44,10 +43,9 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._platform = parameters.platform;
         this._core = parameters.core;
         this._ads = parameters.ads;
-        this._deviceInfo = parameters.deviceInfo;
-        this._topWebViewAreaHeight = this.getTopViewHeight();
         this._customImpressionFired = false;
         this._gameSessionId = parameters.gameSessionId;
+        this._abGroup = parameters.coreConfig.getAbGroup();
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -95,21 +93,6 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         }
     }
 
-    // Handles webview resizing when webview is overlaying webplayer - for privacy modal
-    public onWebViewFullScreen(): Promise<void> {
-        return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()])
-        .then(([width, height]) => {
-            return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, height);
-        });
-    }
-
-    // Handles webview resizing when webview is overlaying webplayer - for privacy modal
-    public onWebViewReduceSize(): Promise<void> {
-        return this._deviceInfo.getScreenWidth().then((width) => {
-            return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, this._topWebViewAreaHeight);
-        });
-    }
-
     public onCustomImpressionEvent(): void {
         if (!this._customImpressionFired) {
             this._adUnit.sendImpression();
@@ -148,26 +131,5 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             placement: this._placement,
             asset: this._campaign.getResourceUrl()
         };
-    }
-
-    private getTopViewHeight(): number {
-        const topWebViewAreaMinHeight = 100;
-
-        if (this._platform === Platform.ANDROID) {
-            return Math.floor(this.getAndroidViewSize(topWebViewAreaMinHeight, this.getScreenDensity()));
-        }
-
-        return topWebViewAreaMinHeight;
-    }
-
-    private getAndroidViewSize(size: number, density: number): number {
-        return size * (density / 160);
-    }
-
-    private getScreenDensity(): number {
-        if (this._platform === Platform.ANDROID) {
-            return (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity();
-        }
-        return 0;
     }
 }

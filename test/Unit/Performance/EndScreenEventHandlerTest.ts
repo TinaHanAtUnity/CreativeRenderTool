@@ -38,7 +38,8 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
-import { IAppStoreDownloadHelperParameters, AppStoreDownloadHelper } from 'Ads/Utilities/AppStoreDownloadHelper';
+import { IStoreHandler, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
+import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { Campaign } from 'Ads/Models/Campaign';
 
 describe('EndScreenEventHandlerTest', () => {
@@ -66,7 +67,7 @@ describe('EndScreenEventHandlerTest', () => {
     let placement: Placement;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
-    let downloadHelper: AppStoreDownloadHelper;
+    let storeHandler: IStoreHandler;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -166,7 +167,7 @@ describe('EndScreenEventHandlerTest', () => {
 
             performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
 
-            const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+            const storeHandlerParameters: IStoreHandlerParameters = {
                 platform,
                 core,
                 ads,
@@ -179,8 +180,8 @@ describe('EndScreenEventHandlerTest', () => {
                 campaign: campaign,
                 coreConfig: coreConfig
             };
-            downloadHelper = new AppStoreDownloadHelper(downloadHelperParameters);
-            endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
+            storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
+            endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
         });
 
         it('should send a click with session manager', () => {
@@ -204,7 +205,9 @@ describe('EndScreenEventHandlerTest', () => {
             let downloadParameters: IEndScreenDownloadParameters;
 
             beforeEach(() => {
-                performanceAdUnitParameters.campaign = TestFixtures.getCampaignStandaloneAndroid();
+                const standaloneCampaign = TestFixtures.getCampaignStandaloneAndroid();
+
+                performanceAdUnitParameters.campaign = standaloneCampaign;
                 performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
 
                 downloadParameters = <IEndScreenDownloadParameters>{
@@ -216,6 +219,22 @@ describe('EndScreenEventHandlerTest', () => {
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl(),
                     appDownloadUrl: performanceAdUnitParameters.campaign.getAppDownloadUrl()
                 };
+
+                const storeHandlerParameters: IStoreHandlerParameters = {
+                    platform,
+                    core,
+                    ads,
+                    thirdPartyEventManager: thirdPartyEventManager,
+                    operativeEventManager: operativeEventManager,
+                    deviceInfo: deviceInfo,
+                    clientInfo: clientInfo,
+                    placement: placement,
+                    adUnit: performanceAdUnit,
+                    campaign: standaloneCampaign,
+                    coreConfig: coreConfig
+                };
+                storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
+                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
             });
 
             it('should call click attribution if clickAttributionUrl is present', () => {
@@ -427,7 +446,7 @@ describe('EndScreenEventHandlerTest', () => {
 
             performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
 
-            const downloadHelperParameters: IAppStoreDownloadHelperParameters = {
+            const storeHandlerParameters: IStoreHandlerParameters = {
                 platform,
                 core,
                 ads,
@@ -440,15 +459,15 @@ describe('EndScreenEventHandlerTest', () => {
                 campaign: campaign,
                 coreConfig: coreConfig
             };
-            downloadHelper = new AppStoreDownloadHelper(downloadHelperParameters);
-            endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
+            storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
+            endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
         });
 
         it('should send a click with session manager', () => {
             sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             performanceAdUnitParameters.deviceInfo = deviceInfo;
             performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
-            endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
+            endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
 
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
@@ -471,7 +490,7 @@ describe('EndScreenEventHandlerTest', () => {
                 sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
                 performanceAdUnitParameters.deviceInfo = deviceInfo;
                 performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
-                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
+                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
 
                 campaign = TestFixtures.getCampaignFollowsRedirects();
                 campaign.set('store', StoreName.APPLE);
@@ -532,7 +551,7 @@ describe('EndScreenEventHandlerTest', () => {
                 performanceAdUnitParameters.deviceInfo = deviceInfo;
                 performanceAdUnitParameters.campaign = campaign;
                 performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
-                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
+                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
 
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
@@ -565,7 +584,7 @@ describe('EndScreenEventHandlerTest', () => {
                 performanceAdUnitParameters.campaign = campaign;
 
                 performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
-                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
+                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
 
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
@@ -587,7 +606,7 @@ describe('EndScreenEventHandlerTest', () => {
                 sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
                 performanceAdUnitParameters.deviceInfo = deviceInfo;
                 performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
-                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, downloadHelper);
+                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
                 sinon.stub(campaign, 'getClickAttributionUrlFollowsRedirects').returns(false);
                 sinon.stub(campaign, 'getBypassAppSheet').returns(false);
                 sinon.stub(ads.iOS!.AppSheet, 'canOpen').returns(Promise.resolve(true));
