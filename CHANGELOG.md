@@ -4,6 +4,7 @@
 * Buffer swapping logic changes for ARView on Android [#7104](https://github.com/Applifier/unity-ads-webview/pull/7104)
 * Fix PREPARE_ERROR missing js_errors from 2.0.5 downwards
 * Add Bitmango game IDs to share Cheetah features [#7910](https://github.com/Applifier/unity-ads-webview/pull/7910)
+* Support relative urls in VAST strict parser [#7887](https://github.com/Applifier/unity-ads-webview/pull/7887)
 
 # Sat Jan 19 01:17:37 UTC 2019
 
