@@ -5,7 +5,10 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export enum ProgrammaticTrackingErrorName {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
-    BannerRequestError = 'banner_request_error'
+    BannerRequestError = 'banner_request_error',
+
+    AuctionV4StartMissing = 'auction_v4_missing_start',
+    AuctionV5StartMissing = 'auction_v5_missing_start'
 }
 
 export enum ProgrammaticTrackingMetricName {
