@@ -10,7 +10,7 @@ import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler'
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
 import { StreamType } from 'Core/Constants/Android/StreamType';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVastAdUnitParameters> {
 
@@ -68,7 +68,7 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVast
             }
         });
 
-        Privacy.setupReportListener(parameters.privacy, vastAdUnit);
+        AbstractPrivacy.setupReportListener(parameters.privacy, vastAdUnit);
 
         return vastAdUnit;
     }

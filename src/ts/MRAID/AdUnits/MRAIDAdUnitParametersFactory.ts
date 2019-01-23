@@ -55,8 +55,6 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
             mraid = new MRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId);
         }
 
-        // const mraid = new WebPlayerMRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId);
-
         return {
             ... baseParams,
             mraid: mraid,

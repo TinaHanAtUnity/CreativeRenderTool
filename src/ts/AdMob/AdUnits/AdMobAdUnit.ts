@@ -17,15 +17,18 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { AuctionV5Test, ABGroup } from 'Core/Models/ABGroup';
+import { ProgrammaticTrackingErrorName, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
     adMobSignalFactory: AdMobSignalFactory;
-    privacy: Privacy;
+    privacy: AbstractPrivacy;
 }
 
 export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
+
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -37,6 +40,8 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _startTime: number = 0;
     private _requestToViewTime: number = 0;
     private _clientInfo: ClientInfo;
+    private _pts: ProgrammaticTrackingService;
+    private _abGroup: ABGroup;
 
     constructor(parameters: IAdMobAdUnitParameters) {
         super(parameters);
@@ -49,6 +54,8 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._clientInfo = parameters.clientInfo;
+        this._pts = parameters.programmaticTrackingService;
+        this._abGroup = parameters.coreConfig.getAbGroup();
 
         // TODO, we skip initial because the AFMA grantReward event tells us the video
         // has been completed. Is there a better way to do this with AFMA right now?
@@ -144,6 +151,10 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendTrackingEvent(event: string) {
         const urls = this._campaign.getTrackingUrlsForEvent(event);
+        if (urls.length === 0 && event === 'start') {
+            this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
+        }
+
         for (const url of urls) {
             this._thirdPartyEventManager.sendWithGet(`admob ${event}`, this._campaign.getSession().getId(), url);
         }

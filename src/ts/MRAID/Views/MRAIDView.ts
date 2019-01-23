@@ -1,7 +1,7 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import {AbstractPrivacy, IPrivacyHandlerView} from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ICoreApi } from 'Core/ICore';
@@ -46,7 +46,7 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onWebViewReduceSize(): Promise<void>;
 }
 
-export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler, IMRAIDHandler {
+export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandlerView, IMRAIDHandler {
 
     protected _core: ICoreApi;
     protected _placement: Placement;
@@ -216,14 +216,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
 
         return valid;
-    }
-
-    public onPrivacy(url: string): void {
-        // do nothing
-    }
-
-    public onGDPROptOut(optOutEnabled: boolean) {
-        // do nothing
     }
 
     public setCallButtonEnabled(value: boolean) {

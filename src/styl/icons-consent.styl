@@ -1,0 +1,53 @@
+@font-face {
+  font-family: "consent-icons";
+  src: url("../fonts/consent/consent-icons.ttf") format("truetype");
+}
+
+
+[data-icon]:before {
+  content: attr(data-icon);
+  font-family: "consent-icons" !important; // @stylint ignore
+}
+
+[class^="consent-icon-"]:before,
+[class*=" consent-icon-"]:before {
+  font-family: "consent-icons" !important; // @stylint ignore
+}
+
+
+/*
+    Dummy icon that won't be rendered on android 4.2 and 4.3,
+    thus always make sure that your font is packed so that first icon will
+    no be visible on those old androids.
+*/
+.consent-icon-a:before {
+  content: "\e020";
+}
+
+.consent-icon-alert:before {
+  content: "\e021";
+}
+
+.consent-icon-arrow:before {
+  content: "\e022";
+}
+
+.consent-icon-checkbox:before {
+  content: "\e023";
+}
+
+.consent-icon-checkbox-checked:before {
+  content: "\e024";
+}
+
+.consent-icon-chevron:before {
+  content: "\e025";
+}
+
+.consent-icon-lock:before {
+  content: "\e026";
+}
+
+.consent-icon-person2:before {
+  content: "\e027";
+}

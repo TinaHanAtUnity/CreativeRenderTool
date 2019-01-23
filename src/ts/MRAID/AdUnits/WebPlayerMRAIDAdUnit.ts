@@ -16,11 +16,12 @@ import { WebViewTopCalculator } from 'Ads/Utilities/WebPlayer/WebViewTopCalculat
 import { MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
     endScreen?: EndScreen;
-    privacy: Privacy;
+    privacy: AbstractPrivacy;
     ar: IARApi;
     webPlayerContainer: WebPlayerContainer;
 }
