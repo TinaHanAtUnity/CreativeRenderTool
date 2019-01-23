@@ -1,5 +1,4 @@
-import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
-import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, IAdUnit, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IAdsApi } from 'Ads/IAds';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -44,7 +43,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     gameSessionId?: number;
 }
 
-export abstract class AbstractAdUnit {
+export abstract class AbstractAdUnit implements IAdUnit {
 
     public static setAutoClose(value: boolean) {
         AbstractAdUnit._autoClose = value;

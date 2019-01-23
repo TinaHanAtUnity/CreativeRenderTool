@@ -552,7 +552,7 @@ describe('UserPrivacyManagerTest', () => {
             it('should send event to a correct topic', () => {
                 return sendEvent().then(() => {
                     sinon.assert.calledOnce(httpKafkaStub);
-                    sinon.assert.calledWith(httpKafkaStub, 'ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, sinon.match.object);
+                    sinon.assert.calledWith(httpKafkaStub, 'ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY);
                 });
             });
 

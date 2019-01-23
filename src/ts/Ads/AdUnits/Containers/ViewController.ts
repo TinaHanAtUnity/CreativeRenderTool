@@ -1,7 +1,7 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import {
     AdUnitContainer,
-    AdUnitContainerSystemMessage,
+    AdUnitContainerSystemMessage, IAdUnit,
     Orientation,
     ViewConfiguration
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
@@ -59,7 +59,7 @@ export class ViewController extends AdUnitContainer {
         this._onNotificationObserver = this._core.iOS!.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
     }
 
-    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IIosOptions): Promise<void> {
+    public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IIosOptions): Promise<void> {
         this._options = options;
         this._showing = true;
 

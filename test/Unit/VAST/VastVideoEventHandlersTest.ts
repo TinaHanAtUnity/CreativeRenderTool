@@ -190,7 +190,8 @@ describe('VastVideoEventHandler tests', () => {
             placement: placement,
             video: campaign.getVideo(),
             adUnitStyle: undefined,
-            clientInfo: clientInfo
+            clientInfo: clientInfo,
+            programmaticTrackingService: programmaticTrackingService
         };
 
         vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);

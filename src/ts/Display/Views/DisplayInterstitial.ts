@@ -1,6 +1,6 @@
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { Observable0 } from 'Core/Utilities/Observable';
@@ -16,7 +16,7 @@ export interface IDisplayInterstitialHandler extends IGDPREventHandler {
     onDisplayInterstitialClose(): void;
 }
 
-export class DisplayInterstitial extends View<IDisplayInterstitialHandler> implements IPrivacyHandler {
+export class DisplayInterstitial extends View<IDisplayInterstitialHandler> implements IPrivacyHandlerView {
 
     public readonly onPrivacyOpened: Observable0 = new Observable0();
     public readonly onPrivacyClosed: Observable0 = new Observable0();
@@ -114,20 +114,12 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
         this.onPrivacyOpened.unsubscribe();
     }
 
-    public onPrivacy(url: string): void {
-        // do nothing
-    }
-
     public onPrivacyClose(): void {
         if (this._privacy) {
             this._privacy.hide();
         }
 
         this.onPrivacyClosed.trigger();
-    }
-
-    public onGDPROptOut(optOutEnabled: boolean): void {
-        // do nothing
     }
 
     private choosePrivacyShown(): void {

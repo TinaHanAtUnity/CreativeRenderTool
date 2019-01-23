@@ -6,7 +6,7 @@ import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/Perfor
 import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
@@ -64,7 +64,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceC
                 }
             });
         }
-        Privacy.setupReportListener(parameters.privacy, performanceAdUnit);
+        AbstractPrivacy.setupReportListener(parameters.privacy, performanceAdUnit);
 
         return performanceAdUnit;
     }

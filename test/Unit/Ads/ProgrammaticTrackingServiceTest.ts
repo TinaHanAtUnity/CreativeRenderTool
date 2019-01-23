@@ -1,8 +1,8 @@
 import {
-    IProgrammaticTrackingMetricData,
     ProgrammaticTrackingErrorName,
     ProgrammaticTrackingMetricName,
-    ProgrammaticTrackingService
+    ProgrammaticTrackingService,
+    IProgrammaticTrackingData
 } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -18,12 +18,14 @@ describe('Ads/Utilities', () => {
     let osVersionStub: sinon.SinonStub;
     let sdkVersionStub: sinon.SinonStub;
     let postStub: sinon.SinonStub;
+    let platform: Platform;
 
     beforeEach(() => {
         const request = sinon.createStubInstance(RequestManager);
         const clientInfo = sinon.createStubInstance(ClientInfo);
         const deviceInfo = sinon.createStubInstance(DeviceInfo);
-        programmaticTrackingService = new ProgrammaticTrackingService(Platform.ANDROID, request, clientInfo, deviceInfo);
+        platform = Platform.ANDROID;
+        programmaticTrackingService = new ProgrammaticTrackingService(platform, request, clientInfo, deviceInfo);
         osVersionStub = deviceInfo.getOsVersion;
         sdkVersionStub = clientInfo.getSdkVersionName;
         postStub = request.post;
@@ -36,46 +38,101 @@ describe('Ads/Utilities', () => {
     });
 
     describe('reportError', () => {
-        it('should send correct data using request api', () => {
-            const osVersion = '11.2.1';
-            const sdkVersion = '2.3.0';
+
+        const osVersion = '11.2.1';
+        const sdkVersion = '2.3.0';
+        const adType = 'test';
+        const seatId = 1234;
+
+        beforeEach(() => {
             osVersionStub.returns(osVersion);
             sdkVersionStub.returns(sdkVersion);
-            const error = ProgrammaticTrackingErrorName.TooLargeFile;
-            const adType = 'test';
-            const seatId = 1234;
-            const promise = programmaticTrackingService.reportError(error, adType, seatId);
-            sinon.assert.calledOnce(postStub);
-            assert.equal(postStub.firstCall.args.length, 3);
-            assert.equal(postStub.firstCall.args[0], 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric');
-            assert.equal(postStub.firstCall.args[1], JSON.stringify({
-                event: undefined,
+        });
+
+        const tagBuilder = [
+            `ads_sdk2_plt:${Platform[Platform.ANDROID]}`,
+            `ads_sdk2_osv:${osVersion}`,
+            `ads_sdk2_sdv:${sdkVersion}`,
+            `ads_sdk2_adt:${adType}`,
+            `ads_sdk2_sid:${seatId}`
+        ];
+
+        const tests: {
+            input: ProgrammaticTrackingErrorName;
+            expected: IProgrammaticTrackingData;
+        }[] = [{
+            input: ProgrammaticTrackingErrorName.TooLargeFile,
+            expected: {
                 metrics: [
                     {
                         tags: [
                             'ads_sdk2_eevt:too_large_file',
-                            'ads_sdk2_plt:ANDROID',
-                            'ads_sdk2_osv:11.2.1',
-                            'ads_sdk2_sdv:2.3.0',
-                            'ads_sdk2_adt:test',
-                            'ads_sdk2_sid:1234'
+                            ...tagBuilder
                         ]
                     }
                 ]
-            }));
-            assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
-            return promise;
+            }
+        },
+        {
+            input: ProgrammaticTrackingErrorName.BannerRequestError,
+            expected: {
+                metrics: [
+                    {
+                        tags: [
+                            'ads_sdk2_eevt:banner_request_error',
+                            ...tagBuilder
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            input: ProgrammaticTrackingErrorName.AuctionV4StartMissing,
+            expected: {
+                metrics: [
+                    {
+                        tags: [
+                            'ads_sdk2_eevt:auction_v4_missing_start',
+                            ...tagBuilder
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            input: ProgrammaticTrackingErrorName.AuctionV5StartMissing,
+            expected: {
+                metrics: [
+                    {
+                        tags: [
+                            'ads_sdk2_eevt:auction_v5_missing_start',
+                            ...tagBuilder
+                        ]
+                    }
+                ]
+            }
+        }];
+
+        tests.forEach((t) => {
+            it(`should send "${t.expected}" when "${t.input}" is passed in`, () => {
+                const promise = programmaticTrackingService.reportError(t.input, adType, seatId);
+                sinon.assert.calledOnce(postStub);
+                assert.equal(postStub.firstCall.args.length, 3);
+                assert.equal(postStub.firstCall.args[0], 'https://tracking.prd.mz.internal.unity3d.com/tracking/sdk/metric');
+                assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
+                assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
+                return promise;
+            });
         });
     });
 
     describe('reportMetric', () => {
         const tests: {
             input: ProgrammaticTrackingMetricName;
-            expected: IProgrammaticTrackingMetricData;
+            expected: IProgrammaticTrackingData;
         }[] = [{
             input: ProgrammaticTrackingMetricName.AdmobUsedCachedVideo,
             expected: {
-                event: undefined,
                 metrics: [
                     {
                         tags: [
@@ -87,7 +144,6 @@ describe('Ads/Utilities', () => {
         }, {
             input: ProgrammaticTrackingMetricName.AdmobUsedStreamedVideo,
             expected: {
-                event: undefined,
                 metrics: [
                     {
                         tags: [
