@@ -20,6 +20,8 @@ import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
+import { AuctionV5Test, ABGroup } from 'Core/Models/ABGroup';
+import { ProgrammaticTrackingErrorName, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
@@ -52,6 +54,8 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _shouldFullScreenWebView = true;
     private _topWebViewAreaHeight: number;
     private readonly _topWebViewAreaMinHeight = 70;
+    private _pts: ProgrammaticTrackingService;
+    private _abGroup: ABGroup;
 
     constructor(parameters: IVPAIDAdUnitParameters) {
         super(parameters);
@@ -67,6 +71,8 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._webPlayerContainer = parameters.webPlayerContainer;
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
         this._endScreen = parameters.endScreen;
+        this._pts = parameters.programmaticTrackingService;
+        this._abGroup = parameters.coreConfig.getAbGroup();
 
         if (this._endScreen) {
             this._endScreen.render();
@@ -119,6 +125,10 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public sendTrackingEvent(eventType: string) {
         const urls = this._vpaidCampaign.getTrackingUrlsForEvent(eventType);
         const sessionId = this._vpaidCampaign.getSession().getId();
+
+        if (urls.length === 0 && eventType === 'start') {
+            this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
+        }
 
         for (const url of urls) {
             this._thirdPartyEventManager.sendWithGet(`vpaid ${eventType}`, sessionId, url);

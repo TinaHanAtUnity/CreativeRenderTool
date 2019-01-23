@@ -18,6 +18,8 @@ import { Url } from 'Core/Utilities/Url';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
 import { Privacy } from 'Ads/Views/Privacy';
+import { ProgrammaticTrackingService, ProgrammaticTrackingErrorName } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ABGroup, AuctionV5Test } from 'Core/Models/ABGroup';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
@@ -40,6 +42,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     private _handlingShouldOverrideUrlLoading: boolean = false;
     private _contentReady: boolean = false;
     private _webPlayerContainer: WebPlayerContainer;
+    private _pts: ProgrammaticTrackingService;
+    private _abGroup: ABGroup;
 
     private _shouldOverrideUrlLoadingObserver: IObserver2<string, string>;
     private _onPageStartedObserver: IObserver1<string>;
@@ -58,6 +62,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         this._deviceInfo = parameters.deviceInfo;
         this._clientInfo = parameters.clientInfo;
         this._webPlayerContainer = parameters.webPlayerContainer;
+        this._pts = parameters.programmaticTrackingService;
+        this._abGroup = parameters.coreConfig.getAbGroup();
 
         this._view.render();
         document.body.appendChild(this._view.container());
@@ -256,9 +262,15 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     }
 
     private sendStartEvents(): void {
+        const trackingUrls = this._campaign.getTrackingUrlsForEvent('impression');
+        if (trackingUrls.length === 0) {
+            this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
+        }
+
         for (const url of (this._campaign).getTrackingUrlsForEvent('impression')) {
             this._thirdPartyEventManager.sendWithGet('display impression', this._campaign.getSession().getId(), url);
         }
+
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });

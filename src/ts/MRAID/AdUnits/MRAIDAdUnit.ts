@@ -18,6 +18,8 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { Privacy } from 'Ads/Views/Privacy';
+import { AuctionV5Test, ABGroup } from 'Core/Models/ABGroup';
+import { ProgrammaticTrackingErrorName, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -41,6 +43,8 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _campaign: MRAIDCampaign;
     private _privacy: AbstractPrivacy;
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
+    private _pts: ProgrammaticTrackingService;
+    private _abGroup: ABGroup;
 
     constructor(parameters: IMRAIDAdUnitParameters) {
         super(parameters);
@@ -55,6 +59,8 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._campaign = parameters.campaign;
         this._privacy = parameters.privacy;
         this._ar = parameters.ar;
+        this._pts = parameters.programmaticTrackingService;
+        this._abGroup = parameters.coreConfig.getAbGroup();
 
         this._mraid.render();
         document.body.appendChild(this._mraid.container());
@@ -213,6 +219,9 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             const trackingEventUrls = this._additionalTrackingEvents[eventName];
 
             if(trackingEventUrls) {
+                if (trackingEventUrls.length === 0 && eventName === 'impression') {
+                    this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
+                }
                 for (const url of trackingEventUrls) {
                     this._thirdPartyEventManager.sendWithGet(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
                 }
