@@ -27,12 +27,12 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import 'mocha';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
-import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
+import { ProgrammaticMRAIDEventHandler } from 'MRAID/EventHandlers/ProgrammaticMRAIDEventHandler';
 
 describe('ProgrammaticMRAIDEventHandlersTest', () => {
 
@@ -54,13 +54,13 @@ describe('ProgrammaticMRAIDEventHandlersTest', () => {
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let extendedMraidAdUnitParams: IMRAIDAdUnitParameters;
-    let mraidEventHandler: MRAIDEventHandler;
+    let programmaticMraidEventHandler: ProgrammaticMRAIDEventHandler;
     let extendedMraidCampaign: MRAIDCampaign;
     let programmaticMraidCampaign: MRAIDCampaign;
     let privacyManager: UserPrivacyManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
 
-    xdescribe('with onClick', () => {
+    describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
 
         beforeEach(() => {
@@ -121,26 +121,11 @@ describe('ProgrammaticMRAIDEventHandlersTest', () => {
 
             mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
             sinon.stub(mraidAdUnit, 'sendClick');
-            mraidEventHandler = new MRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
-        });
-
-        it('should send a click with session manager', () => {
-            mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, asset: extendedMraidAdUnitParams.campaign.getResourceUrl() });
-        });
-
-        it('should send a view with session manager', () => {
-            mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, { placement: placement, asset: extendedMraidAdUnitParams.campaign.getResourceUrl() });
-        });
-
-        it('should send a third quartile event with session manager', () => {
-            mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, { placement: placement, asset: extendedMraidAdUnitParams.campaign.getResourceUrl() });
+            programmaticMraidEventHandler = new ProgrammaticMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
         });
 
         it('should send a native click event', () => {
-            mraidEventHandler.onMraidClick('http://example.net');
+            programmaticMraidEventHandler.onMraidClick('http://example.net');
             sinon.assert.calledWith(<sinon.SinonSpy>ads.Listener.sendClickEvent, placement.getId());
         });
 
@@ -166,9 +151,9 @@ describe('ProgrammaticMRAIDEventHandlersTest', () => {
 
                 mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
                 sinon.stub(mraidAdUnit, 'sendClick');
-                mraidEventHandler = new MRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
+                programmaticMraidEventHandler = new ProgrammaticMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
 
-                mraidEventHandler.onMraidClick('market://foobar.com');
+                programmaticMraidEventHandler.onMraidClick('market://foobar.com');
 
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>core.Android!.Intent.launch, {
@@ -195,8 +180,8 @@ describe('ProgrammaticMRAIDEventHandlersTest', () => {
                 mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
                 sinon.stub(mraidAdUnit, 'sendClick');
 
-                mraidEventHandler = new MRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
-                mraidEventHandler.onMraidClick('http://example.net');
+                programmaticMraidEventHandler = new ProgrammaticMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
+                programmaticMraidEventHandler.onMraidClick('http://example.net');
 
                 return resolvedPromise.then(() => {
                     sinon.assert.notCalled(<sinon.SinonSpy>core.Android!.Intent.launch);
@@ -212,7 +197,6 @@ describe('ProgrammaticMRAIDEventHandlersTest', () => {
         let coreConfig: CoreConfiguration;
         let adsConfig: AdsConfiguration;
         let programmaticMraidAdUnit: MRAIDAdUnit;
-        let programmaticMraidEventHandler: MRAIDEventHandler;
         let privacy: AbstractPrivacy;
 
         beforeEach(() => {
@@ -283,7 +267,7 @@ describe('ProgrammaticMRAIDEventHandlersTest', () => {
             };
 
             programmaticMraidAdUnit = new MRAIDAdUnit(programmaticMraidAdUnitParams);
-            programmaticMraidEventHandler = new MRAIDEventHandler(programmaticMraidAdUnit, programmaticMraidAdUnitParams);
+            programmaticMraidEventHandler = new ProgrammaticMRAIDEventHandler(programmaticMraidAdUnit, programmaticMraidAdUnitParams);
             sinon.stub(programmaticMraidAdUnit, 'sendClick').returns(sinon.spy());
         });
 
@@ -312,6 +296,27 @@ describe('ProgrammaticMRAIDEventHandlersTest', () => {
                     mockMraidView.verify();
                     assert.equal(expectationMraidView.getCall(0).args[0], false, 'Should block CTA event while processing click event');
                     assert.equal(expectationMraidView.getCall(1).args[0], true, 'Should enable CTA event after processing click event');
+                });
+            });
+
+            it('should send a click with session manager', () => {
+                sinon.stub(core.Android!.Intent, 'launch').resolves();
+                programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, asset: programmaticMraidAdUnitParams.campaign.getResourceUrl() });
+                });
+            });
+
+            it('should send a view with session manager', () => {
+                sinon.stub(core.Android!.Intent, 'launch').resolves();
+                programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, { placement: placement, asset: programmaticMraidAdUnitParams.campaign.getResourceUrl() });
+                });
+            });
+
+            it('should send a third quartile event with session manager', () => {
+                sinon.stub(core.Android!.Intent, 'launch').resolves();
+                programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, { placement: placement, asset: programmaticMraidAdUnitParams.campaign.getResourceUrl() });
                 });
             });
         });

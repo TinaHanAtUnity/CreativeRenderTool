@@ -17,10 +17,8 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import 'mocha';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
-import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
 import { PerformanceMRAIDEventHandler } from 'MRAID/EventHandlers/PerformanceMRAIDEventHandler';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
@@ -28,7 +26,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
 
-describe('MRAIDEventHandlersTest', () => {
+describe('PerformanceMRAIDEventHandlersTest', () => {
 
     let platform: Platform;
     let backend: Backend;
@@ -47,12 +45,12 @@ describe('MRAIDEventHandlersTest', () => {
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let extendedMraidAdUnitParams: IMRAIDAdUnitParameters;
-    let mraidEventHandler: MRAIDEventHandler;
+    let performanceMraidEventHandler: PerformanceMRAIDEventHandler;
     let extendedMraidCampaign: MRAIDCampaign;
     let privacyManager: UserPrivacyManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
 
-    xdescribe('with onClick', () => {
+    describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
 
         beforeEach(() => {
@@ -113,26 +111,26 @@ describe('MRAIDEventHandlersTest', () => {
 
             mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
             sinon.stub(mraidAdUnit, 'sendClick');
-            mraidEventHandler = new MRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
+            performanceMraidEventHandler = new PerformanceMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
         });
 
         it('should send a click with session manager', () => {
-            mraidEventHandler.onMraidClick('http://example.net');
+            performanceMraidEventHandler.onMraidClick('http://example.net');
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, asset: extendedMraidAdUnitParams.campaign.getResourceUrl() });
         });
 
         it('should send a view with session manager', () => {
-            mraidEventHandler.onMraidClick('http://example.net');
+            performanceMraidEventHandler.onMraidClick('http://example.net');
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, { placement: placement, asset: extendedMraidAdUnitParams.campaign.getResourceUrl() });
         });
 
         it('should send a third quartile event with session manager', () => {
-            mraidEventHandler.onMraidClick('http://example.net');
+            performanceMraidEventHandler.onMraidClick('http://example.net');
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, { placement: placement, asset: extendedMraidAdUnitParams.campaign.getResourceUrl() });
         });
 
         it('should send a native click event', () => {
-            mraidEventHandler.onMraidClick('http://example.net');
+            performanceMraidEventHandler.onMraidClick('http://example.net');
             sinon.assert.calledWith(<sinon.SinonSpy>ads.Listener.sendClickEvent, placement.getId());
         });
 
@@ -158,9 +156,9 @@ describe('MRAIDEventHandlersTest', () => {
 
                 mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
                 sinon.stub(mraidAdUnit, 'sendClick');
-                mraidEventHandler = new MRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
+                performanceMraidEventHandler = new PerformanceMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
 
-                mraidEventHandler.onMraidClick('market://foobar.com');
+                performanceMraidEventHandler.onMraidClick('market://foobar.com');
 
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>core.Android!.Intent.launch, {
@@ -187,8 +185,8 @@ describe('MRAIDEventHandlersTest', () => {
                 mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
                 sinon.stub(mraidAdUnit, 'sendClick');
 
-                mraidEventHandler = new MRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
-                mraidEventHandler.onMraidClick('http://example.net');
+                performanceMraidEventHandler = new PerformanceMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
+                performanceMraidEventHandler.onMraidClick('http://example.net');
 
                 return resolvedPromise.then(() => {
                     sinon.assert.notCalled(<sinon.SinonSpy>core.Android!.Intent.launch);
@@ -213,24 +211,13 @@ describe('MRAIDEventHandlersTest', () => {
                 sandbox.restore();
             });
 
-            describe('MRAIDEventHandler', () => {
-                it('should not send a analytics event', () => {
-                    mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
-                    sinon.stub(mraidAdUnit, 'sendClick');
-                    mraidEventHandler = new MRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
-
-                    mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 0, 'win_screen', { 'level': 2 });
-                    sinon.assert.notCalled(<sinon.SinonStub>HttpKafka.sendEvent);
-                });
-            });
-
             describe('PerformanceMRAIDEventHandler', () => {
                 it('should send a analytics event', () => {
                     mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
                     sinon.stub(mraidAdUnit, 'sendClick');
-                    mraidEventHandler = new PerformanceMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
+                    performanceMraidEventHandler = new PerformanceMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
 
-                    mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 0, 'win_screen', { 'level': 2 });
+                    performanceMraidEventHandler.onPlayableAnalyticsEvent(15, 12, 0, 'win_screen', { 'level': 2 });
 
                     const kafkaObject: any = {};
                     kafkaObject.type = 'win_screen';
@@ -251,9 +238,9 @@ describe('MRAIDEventHandlersTest', () => {
                 it('should send a analytics event without extra event data', () => {
                     mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
                     sinon.stub(mraidAdUnit, 'sendClick');
-                    mraidEventHandler = new PerformanceMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
+                    performanceMraidEventHandler = new PerformanceMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
 
-                    mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 5, 'win_screen', undefined);
+                    performanceMraidEventHandler.onPlayableAnalyticsEvent(15, 12, 5, 'win_screen', undefined);
 
                     const kafkaObject: any = {};
                     kafkaObject.type = 'win_screen';

@@ -50,7 +50,7 @@ describe('MRAIDEventHandlersTest', () => {
     let privacyManager: UserPrivacyManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
 
-    xdescribe('with onClick', () => {
+    describe('with onClick', () => {
         beforeEach(() => {
             platform = Platform.ANDROID;
             backend = TestFixtures.getBackend(platform);
@@ -59,7 +59,6 @@ describe('MRAIDEventHandlersTest', () => {
             ads = TestFixtures.getAdsApi(nativeBridge);
             ar = TestFixtures.getARApi(nativeBridge);
 
-            sinon.spy(core.Android!.Intent, 'launch');
             sinon.spy(ads.Listener, 'sendClickEvent');
 
             focusManager = new FocusManager(platform, core);
@@ -76,7 +75,7 @@ describe('MRAIDEventHandlersTest', () => {
             extendedMraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
             mraidView = sinon.createStubInstance(MRAID);
             (<sinon.SinonSpy>mraidView.container).restore();
-            sinon.stub(mraidView, 'container').returns(document.createElement('div'));
+            sinon.stub(mraidView, 'container').returns(document.createElement('div')); // mraidView.container
             privacyManager = sinon.createStubInstance(UserPrivacyManager);
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
@@ -119,7 +118,7 @@ describe('MRAIDEventHandlersTest', () => {
             let sandbox: sinon.SinonSandbox;
 
             before(() => {
-                sandbox = sinon.sandbox.create();
+                sandbox = sinon.createSandbox();
             });
 
             beforeEach(() => {
