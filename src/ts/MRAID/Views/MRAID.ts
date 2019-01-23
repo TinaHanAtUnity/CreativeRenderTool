@@ -75,7 +75,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private loadIframe(): void {
         const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
-        this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));	
+        this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
 
          this.createMRAID(
             this._gameSessionId % 1000 === 999 ? MRAIDPerfContainer : MRAIDContainer

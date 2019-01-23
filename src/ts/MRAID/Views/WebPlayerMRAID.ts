@@ -21,7 +21,7 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _domContentLoaded = false;
 
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
-        super(platform, core, deviceInfo, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
+        super(platform, core, deviceInfo, 'webplayer-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
         this._deviceInfo = deviceInfo;
         this._placement = placement;
