@@ -18,7 +18,6 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticVastParser, ProgrammaticVastParserStrict } from 'VAST/Parsers/ProgrammaticVastParser';
 import { VastParser } from 'VAST/Utilities/VastParser';
-import { CampaignError } from 'Ads/Errors/CampaignError';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 
@@ -146,7 +145,7 @@ describe('ProgrammaticVastParserStrict', () => {
                 return parser.parse(response, session).then(() => {
                     assert.fail('An error should have been thrown');
                 }).catch((error) => {
-                    if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === VastErrorCode.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
+                    if (error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === VastErrorCode.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
                         // then the test has passed
                     } else {
                         assert.fail(`Expected MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD error but got ${error.message}`);

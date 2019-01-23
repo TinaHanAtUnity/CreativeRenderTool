@@ -1,3 +1,15 @@
+# Pending
+
+* Remove backupcampaign no fill investigation [#7886](https://github.com/Applifier/unity-ads-webview/pull/7886)
+* Buffer swapping logic changes for ARView on Android [#7104](https://github.com/Applifier/unity-ads-webview/pull/7104)
+* Fix PREPARE_ERROR missing js_errors from 2.0.5 downwards
+* Add Bitmango game IDs to share Cheetah features [#7910](https://github.com/Applifier/unity-ads-webview/pull/7910)
+* Support relative urls in VAST strict parser [#7887](https://github.com/Applifier/unity-ads-webview/pull/7887)
+
+# Sat Jan 19 01:17:37 UTC 2019
+
+* Revert Hook Webplayer for MRAID [#7888](https://github.com/Applifier/unity-ads-webview/pull/7888)
+
 # Thu Jan 17 18:50:39 UTC 2019
 
 * Using new metric scheme for programmatic tracking events [#7866](https://github.com/Applifier/unity-ads-webview/pull/7866)

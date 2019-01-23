@@ -236,20 +236,6 @@ export class CampaignRefreshManager extends RefreshManager {
     private onNoFill(placementId: string) {
         this._parsingErrorCount = 0;
 
-        // this code blocks collects data for backup campaign investigation and should be removed once investigation is done
-        const backupCampaign = this._configuration.getPlacement(placementId).getCurrentCampaign();
-        if(this._sessionManager.getGameSessionId() % 100 === 82 && backupCampaign && backupCampaign.isBackupCampaign()) {
-            const contentType = backupCampaign.getContentType();
-
-            if(contentType === 'programmatic/admob-video' || contentType === 'programmatic/mraid' || contentType === 'programmatic/mraid-url') {
-                const willExpireAt = backupCampaign.getWillExpireAt();
-                Diagnostics.trigger('backupcampaign_nofill', {
-                    contentType: contentType,
-                    ttl: willExpireAt ? willExpireAt - Date.now() : undefined
-                });
-            }
-        }
-
         this._core.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
         this.setCampaignForPlacement(placementId, undefined, undefined);
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
