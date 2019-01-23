@@ -159,6 +159,10 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
         });
     }
 
+    public onBridgeResizeWebview() {
+        this.reduceWebViewContainerHeight();
+    }
+
     private fullScreenWebViewContainer() {
         return this._handlers[0].onWebViewFullScreen();
     }

@@ -455,7 +455,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public onBridgeResizeWebview() {
         // This will be used to handle rotation changes for webplayer-based mraid
-        // this._handlers.forEach(handler => handler.onWebViewResize(false));
     }
 
     public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {

@@ -14,12 +14,14 @@ import { WebPlayerMRAIDTest } from 'Core/Models/ABGroup';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
     public createAdUnit(parameters: IMRAIDAdUnitParameters): MRAIDAdUnit {
-        let mraidAdUnit;
-        if (WebPlayerMRAIDTest.isValid(parameters.coreConfig.getAbGroup())) {
-            mraidAdUnit = new WebPlayerMRAIDAdUnit(parameters);
-        } else {
-            mraidAdUnit = new MRAIDAdUnit(parameters);
-        }
+        // let mraidAdUnit;
+        // if (WebPlayerMRAIDTest.isValid(parameters.coreConfig.getAbGroup())) {
+        //     mraidAdUnit = new WebPlayerMRAIDAdUnit(parameters);
+        // } else {
+        //     mraidAdUnit = new MRAIDAdUnit(parameters);
+        // }
+
+        const mraidAdUnit = new WebPlayerMRAIDAdUnit(parameters);
 
         // NOTE: When content type is correct for playables we want to change this to content type check.
         const isPlayable: boolean = parameters.campaign instanceof PerformanceMRAIDCampaign;
