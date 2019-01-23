@@ -170,11 +170,12 @@ export class VastVideoEventHandler extends VideoEventHandler {
     private sendThirdPartyTrackingEvent(eventName: string): void {
         const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
+            if (trackingEventUrls.length === 0 && eventName === 'impression') {
+                this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this._vastAdUnit.description());
+            }
             for (const url of trackingEventUrls) {
                 this.sendThirdPartyEvent(`vast ${eventName}`, url);
             }
-        } else if (eventName === 'start') {
-            this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this._vastAdUnit.description());
         }
     }
 

@@ -219,11 +219,12 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             const trackingEventUrls = this._additionalTrackingEvents[eventName];
 
             if(trackingEventUrls) {
+                if (trackingEventUrls.length === 0 && eventName === 'impression') {
+                    this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
+                }
                 for (const url of trackingEventUrls) {
                     this._thirdPartyEventManager.sendWithGet(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
                 }
-            } else if (eventName === 'impression') {
-                this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
             }
         }
     }

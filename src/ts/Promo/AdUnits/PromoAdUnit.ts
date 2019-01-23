@@ -155,11 +155,12 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 });
 
                 if(trackingEventUrls) {
+                    if (trackingEventUrls.length === 0 && eventName === 'impression') {
+                        this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
+                    }
                     for (const url of trackingEventUrls) {
                         this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
                     }
-                } else if (eventName === 'impression') {
-                    this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
                 }
             }
         });
