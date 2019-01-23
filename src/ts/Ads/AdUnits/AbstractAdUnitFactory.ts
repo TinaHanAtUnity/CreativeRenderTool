@@ -134,7 +134,8 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
             adUnitStyle: adUnitStyle,
             clientInfo: params.clientInfo,
             core: params.core,
-            ads: params.ads
+            ads: params.ads,
+            programmaticTrackingService: params.programmaticTrackingService
         };
     }
 

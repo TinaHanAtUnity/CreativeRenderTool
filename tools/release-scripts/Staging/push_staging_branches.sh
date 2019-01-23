@@ -7,4 +7,4 @@ do
     git checkout staging/$release
     git push origin staging/$release
     sleep 2
-done;
+done <"$releases"

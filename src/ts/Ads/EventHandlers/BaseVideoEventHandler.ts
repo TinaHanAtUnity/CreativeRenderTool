@@ -15,6 +15,7 @@ import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T2 extends Campaign = Campaign, T3 extends OperativeEventManager = OperativeEventManager> {
     adUnit: T;
@@ -30,6 +31,7 @@ export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T
     video: Video;
     adUnitStyle?: AdUnitStyle;
     clientInfo: ClientInfo;
+    programmaticTrackingService: ProgrammaticTrackingService;
 }
 
 export abstract class BaseVideoEventHandler {

@@ -4,6 +4,7 @@ import { VastCreativeValidator } from 'VAST/Validators/VastCreativeValidator';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
+import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 
 describe('VastCreativeValidatorTest', () => {
     describe('getErrors', () => {
@@ -21,7 +22,7 @@ describe('VastCreativeValidatorTest', () => {
             creative.addTrackingEvent('impression', 'http://localhost:3500/brands/14851/unmute?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=%ZONE%');
 
             const errors = new VastCreativeValidator(creative).getErrors();
-            assert.lengthOf(errors, 0);
+            assert.lengthOf(errors, 0, VastValidationUtilities.formatErrors(errors));
         });
 
         it('should return errors when given an invalid creative', () => {

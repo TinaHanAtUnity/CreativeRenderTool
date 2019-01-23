@@ -261,7 +261,8 @@ describe('VideoEventHandlersTest', () => {
             placement: TestFixtures.getPlacement(),
             video: video,
             adUnitStyle: undefined,
-            clientInfo: clientInfo
+            clientInfo: clientInfo,
+            programmaticTrackingService: programmaticTrackingService
         };
 
         performanceVideoEventHandler = new PerformanceVideoEventHandler(<IVideoEventHandlerParams<PerformanceAdUnit, PerformanceCampaign>>videoEventHandlerParams);
