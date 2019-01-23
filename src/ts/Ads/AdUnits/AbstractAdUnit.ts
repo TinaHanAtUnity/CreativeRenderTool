@@ -20,6 +20,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -41,6 +42,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     privacyManager: UserPrivacyManager;
     programmaticTrackingService: ProgrammaticTrackingService;
     gameSessionId?: number;
+    privacy: AbstractPrivacy;
 }
 
 export abstract class AbstractAdUnit implements IAdUnit {

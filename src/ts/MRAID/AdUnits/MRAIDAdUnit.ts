@@ -23,7 +23,6 @@ import { ProgrammaticTrackingErrorName, ProgrammaticTrackingService } from 'Ads/
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
     endScreen?: EndScreen;
-    privacy: AbstractPrivacy;
     ar: IARApi;
 }
 

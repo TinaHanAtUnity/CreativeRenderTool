@@ -21,7 +21,6 @@ import { ProgrammaticTrackingErrorName, ProgrammaticTrackingService } from 'Ads/
 export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign> {
     purchasing: IPurchasingApi;
     view: Promo;
-    privacy: AbstractPrivacy;
 }
 
 export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {

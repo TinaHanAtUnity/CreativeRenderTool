@@ -34,7 +34,9 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
 
     public create(campaign: T, placement: Placement, orientation: Orientation, gamerServerId: string, options: unknown) {
         const params = this._adUnitParametersFactory.create(campaign, placement, orientation, gamerServerId, options);
-        return this.createAdUnit(params);
+        const adUnit =  this.createAdUnit(params);
+        params.privacy.setupReportListener(adUnit);
+        return adUnit;
     }
 
     protected abstract createAdUnit(parameters: Params): AbstractAdUnit;

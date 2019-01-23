@@ -28,7 +28,6 @@ export class AdMobAdUnitFactory extends AbstractAdUnitFactory<AdMobCampaign, IAd
         });
         parameters.view.render();
         parameters.view.addEventHandler(eventHandler);
-        AbstractPrivacy.setupReportListener(parameters.privacy, adUnit);
 
         return adUnit;
     }

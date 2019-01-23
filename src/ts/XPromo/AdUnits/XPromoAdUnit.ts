@@ -6,7 +6,6 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export interface IXPromoAdUnitParameters extends IVideoAdUnitParameters<XPromoCampaign> {
     endScreen: XPromoEndScreen;
-    privacy: AbstractPrivacy;
 }
 
 export class XPromoAdUnit extends VideoAdUnit<XPromoCampaign> {
