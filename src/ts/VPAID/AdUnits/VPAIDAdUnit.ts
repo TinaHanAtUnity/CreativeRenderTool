@@ -126,12 +126,12 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         const urls = this._vpaidCampaign.getTrackingUrlsForEvent(eventType);
         const sessionId = this._vpaidCampaign.getSession().getId();
 
-        if (urls.length > 0) {
-            for (const url of urls) {
-                this._thirdPartyEventManager.sendWithGet(`vpaid ${eventType}`, sessionId, url);
-            }
-        } else if (eventType === 'start') {
+        if (urls.length === 0 && eventType === 'start') {
             this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
+        }
+
+        for (const url of urls) {
+            this._thirdPartyEventManager.sendWithGet(`vpaid ${eventType}`, sessionId, url);
         }
     }
 

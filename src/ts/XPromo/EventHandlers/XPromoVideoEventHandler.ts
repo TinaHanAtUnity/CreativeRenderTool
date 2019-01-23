@@ -53,12 +53,12 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
         });
 
         const trackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('start');
-        if (trackingUrls.length > 0) {
-            for (const url of trackingUrls) {
-                this._thirdPartyEventManager.sendWithGet('xpromo start', this._xpromoCampaign.getSession().getId(), url);
-            }
-        } else {
+        if (trackingUrls.length === 0) {
             this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this._adUnit.description());
+        }
+
+        for (const url of trackingUrls) {
+            this._thirdPartyEventManager.sendWithGet('xpromo start', this._xpromoCampaign.getSession().getId(), url);
         }
 
         this._ads.Listener.sendStartEvent(this._placement.getId());

@@ -150,13 +150,12 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendTrackingEvent(event: string) {
         const urls = this._campaign.getTrackingUrlsForEvent(event);
-
-        if (urls.length > 0) {
-            for (const url of urls) {
-                this._thirdPartyEventManager.sendWithGet(`admob ${event}`, this._campaign.getSession().getId(), url);
-            }
-        } else if (event === 'start') {
+        if (urls.length === 0 && event === 'start') {
             this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
+        }
+
+        for (const url of urls) {
+            this._thirdPartyEventManager.sendWithGet(`admob ${event}`, this._campaign.getSession().getId(), url);
         }
     }
 

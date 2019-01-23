@@ -263,13 +263,14 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
 
     private sendStartEvents(): void {
         const trackingUrls = this._campaign.getTrackingUrlsForEvent('impression');
-        if (trackingUrls.length > 0) {
-            for (const url of (this._campaign).getTrackingUrlsForEvent('impression')) {
-                this._thirdPartyEventManager.sendWithGet('display impression', this._campaign.getSession().getId(), url);
-            }
-        } else {
+        if (trackingUrls.length === 0) {
             this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
         }
+
+        for (const url of (this._campaign).getTrackingUrlsForEvent('impression')) {
+            this._thirdPartyEventManager.sendWithGet('display impression', this._campaign.getSession().getId(), url);
+        }
+
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });

@@ -52,11 +52,10 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
     protected handleStartEvent(progress: number): void {
         super.handleStartEvent(progress);
         const trackingUrls = this._campaign.getTrackingUrlsForEvent(ICometTrackingUrlEvents.START);
-        if (trackingUrls.length > 0) {
-            this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.START);
-        } else {
+        if (trackingUrls.length === 0) {
             this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this._adUnit.description());
         }
+        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.START);
     }
 
     protected handleFirstQuartileEvent(progress: number): void {
