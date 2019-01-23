@@ -15,6 +15,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { WebViewTopCalculator } from 'Ads/Utilities/WebPlayer/WebViewTopCalculator';
 import { MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -51,6 +52,24 @@ export class WebPlayerMRAIDAdUnit extends MRAIDAdUnit implements IAdUnitContaine
         if (this._platform === Platform.IOS && this._mraid instanceof WebPlayerMRAID) {
             this.onContainerForeground();
         }
+    }
+
+    public show(): Promise<void> {
+        this.setShowing(true);
+        this.setShowingMRAID(true);
+        this._mraid.show();
+        this._ads.Listener.sendStartEvent(this._placement.getId());
+        this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
+            this.onStartProcessed.trigger();
+        });
+
+        if (!CustomFeatures.isLoopMeSeat(this._campaign.getSeatId())) {
+            this.sendImpression();
+        }
+
+        this._container.addEventHandler(this);
+
+        return this.setupContainerView();
     }
 
     public onContainerForeground(): void {

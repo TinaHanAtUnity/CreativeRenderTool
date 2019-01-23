@@ -400,6 +400,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                     return Promise.resolve();
                 }
 
+            case 'swapBuffers':
+                if (this._platform === Platform.ANDROID) {
+                    return this._ar.AR.Android.swapBuffers();
+                } else {
+                    return Promise.resolve();
+                }
+
             case 'log':
                 return this._core.Sdk.logDebug('NATIVELOG ' + JSON.stringify(args));
 

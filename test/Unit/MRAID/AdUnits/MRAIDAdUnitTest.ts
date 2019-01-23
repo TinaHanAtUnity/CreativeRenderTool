@@ -24,8 +24,6 @@ import { ARUtil } from 'AR/Utilities/ARUtil';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { ExtendedMRAID } from 'MRAID/Views/ExtendedMRAID';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 describe('MraidAdUnit', () => {
     const sandbox = sinon.createSandbox();
@@ -35,7 +33,6 @@ describe('MraidAdUnit', () => {
     let ads: IAdsApi;
     let operativeEventManager: OperativeEventManager;
     let webPlayerContainer: WebPlayerContainer;
-    let deviceInfo: DeviceInfo;
 
     let containerOpen: sinon.SinonSpy;
     let containerClose: sinon.SinonSpy;
@@ -56,25 +53,25 @@ describe('MraidAdUnit', () => {
     });
 
     beforeEach(() => {
-        const platform = Platform.IOS;
+        const platform = Platform.ANDROID;
         const backend = TestFixtures.getBackend(platform);
         const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-        const core = TestFixtures.getCoreApi(nativeBridge);
 
         ads = TestFixtures.getAdsApi(nativeBridge);
-        mraidView = sinon.createStubInstance(ExtendedMRAID);
+        mraidView = sinon.createStubInstance(MRAID);
         webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
-        deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
 
         (<sinon.SinonSpy>mraidView.container).restore();
         sandbox.stub(mraidView, 'container').returns(document.createElement('div'));
 
         const userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
+        const core = TestFixtures.getCoreApi(nativeBridge);
         const wakeUpManager = new WakeUpManager(core);
         const request = new RequestManager(platform, core, wakeUpManager);
         const storageBridge = new StorageBridge(core);
         const thirdPartyEventMnager = new ThirdPartyEventManager(core, request);
         const clientInfo = TestFixtures.getClientInfo(platform);
+        const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
         const mraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
@@ -167,7 +164,7 @@ describe('MraidAdUnit', () => {
 
         });
 
-        describe('for ExtendedMRAID content', () => {
+        describe('for MRAID content', () => {
             beforeEach(() => {
                 mraidViewShowSpy = <sinon.SinonSpy>mraidView.show;
                 sendStartEventStub = sandbox.stub(ads.Listener, 'sendStartEvent').returns(Promise.resolve(void(0)));
@@ -186,6 +183,7 @@ describe('MraidAdUnit', () => {
             it('should invoke Listener.sendStartEvent with placementId', () => {
                 sinon.assert.calledWith(sendStartEventStub, 'fooId');
             });
+
             it('should send start operative event', () => {
                 sinon.assert.calledOnce(operativeEventStartStub);
             });
@@ -369,6 +367,7 @@ describe('MraidAdUnit', () => {
         let setFinishStateSpy: sinon.SinonSpy;
 
         beforeEach(() => {
+            setViewableSpy = <sinon.SinonSpy>mraidView.setViewableState;
             setFinishStateSpy = sandbox.spy(mraidAdUnit, 'setFinishState');
 
             return mraidAdUnit.show();
@@ -376,35 +375,31 @@ describe('MraidAdUnit', () => {
 
         afterEach(() => mraidAdUnit.hide());
 
-        describe('for viewable state', () => {
-
-            beforeEach(() => {
-                setViewableSpy = <sinon.SinonSpy>mraidView.setViewableState;
-            });
-
-            it('should send the true viewable state event onContainerShow', () => {
+        describe('onContainerShow', () => {
+            it('should send the true viewable state event', () => {
                 mraidAdUnit.onContainerShow();
                 sinon.assert.calledWith(setViewableSpy, true);
-                sinon.assert.calledOnce(setViewableSpy);
             });
+        });
 
-            it('should set finish state to skipped onContainerDestroy', () => {
+        describe('onContainerDestroy', () => {
+            it('should set finish state to skipped', () => {
                 mraidAdUnit.onContainerDestroy();
                 sinon.assert.calledWith(setFinishStateSpy, FinishState.SKIPPED);
-                sinon.assert.calledOnce(setFinishStateSpy);
             });
+        });
 
-            it('should send the false viewable state event onContainerBackground', () => {
+        describe('onContainerBackground', () => {
+            it('should send the false viewable state event', () => {
                 mraidAdUnit.onContainerBackground();
                 sinon.assert.calledWith(setViewableSpy, false);
-                sinon.assert.calledOnce(setViewableSpy);
-
             });
+        });
 
-            it ('should send the true viewable state event onContainerForeground', () => {
+        describe('onContainerForeground', () => {
+            it ('should send the true viewable state event', () => {
                 mraidAdUnit.onContainerForeground();
                 sinon.assert.calledWith(setViewableSpy, true);
-                sinon.assert.calledOnce(setViewableSpy);
             });
         });
     });

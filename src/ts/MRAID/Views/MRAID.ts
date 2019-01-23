@@ -1,20 +1,21 @@
 import { Placement } from 'Ads/Models/Placement';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
+
 import { ABGroup } from 'Core/Models/ABGroup';
+
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import MRAIDTemplate from 'html/MRAID.html';
-import MRAIDContainer from 'html/mraid/container-webplayer.html';
+import MRAIDPerfContainer from 'html/mraid/container-perf.html';
+import MRAIDContainer from 'html/mraid/container.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import MRAIDPerfContainer from 'html/mraid/container-perf.html';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { MRAIDIFrameEventAdapter } from 'MRAID/EventBridge/MRAIDIFrameEventAdapter';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
@@ -72,22 +73,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this.setAnalyticsBackgroundTime(viewable);
     }
 
-    public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {
-        if (this._gameSessionId % 1000 === 999) {
-            super.onBridgeSendStats(totalTime, playTime, frameCount);
-        }
-    }
-
-    protected sendMraidAnalyticsEvent(eventName: string, eventData?: unknown) {
-        const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
-        const backgroundTime = this._backgroundTime / 1000;
-        const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;
-
-        if (this.isKPIDataValid({timeFromShow, backgroundTime, timeFromPlayableStart}, 'mraid_' + eventName)) {
-            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
-        }
-    }
-
     private loadIframe(): void {
         const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
         this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));	
@@ -110,6 +95,16 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 message: e.message
             }, this._campaign.getSession());
         });
+    }
+
+    protected sendMraidAnalyticsEvent(eventName: string, eventData?: unknown) {
+        const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
+        const backgroundTime = this._backgroundTime / 1000;
+        const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;
+
+        if (this.isKPIDataValid({timeFromShow, backgroundTime, timeFromPlayableStart}, 'mraid_' + eventName)) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
+        }
     }
 
     protected onCloseEvent(event: Event): void {
@@ -145,57 +140,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             return;
         }
         this._handlers.forEach(handler => handler.onMraidClick(url));
-    }
-
-    public onPrivacyClose(): void {
-        if (this._privacy) {
-            this._privacy.hide();
-
-            // After Privacy screen is hidden, we need to reduce webview overlay size
-            // to allow interactability on the webplayer
-            this.reduceWebViewContainerHeight();
-        }
-    }
-
-    protected onPrivacyEvent(event: Event): void {
-        event.preventDefault();
-
-        // Webview container must be full screened for users to interact with
-        // the full screened Privacy Screen
-        this.fullScreenWebViewContainer().then(() => {
-            this._privacy.show();
-        });
-
-    }
-
-    protected onGDPRPopupEvent(event: Event) {
-        event.preventDefault();
-        this._gdprPopupClicked = true;
-
-        // Webview container must be full screened for users to interact with
-        // the full screened Privacy Screen
-        this.fullScreenWebViewContainer().then(() => {
-            this._privacy.show();
-        });
-    }
-
-    private setWebPlayerContainerData(webPlayerContainer: WebPlayerContainer, mraid: string): Promise<void> {
-        if (this._platform === Platform.ANDROID) {
-            return this.getMraidAsUrl(mraid).then((url) => {
-                return webPlayerContainer.setUrl(`file://${url}`);
-            });
-        } else {
-            return webPlayerContainer.setData(mraid, 'text/html', 'UTF-8');
-        }
-    }
-
-    private getMraidAsUrl(mraid: string): Promise<string> {
-        mraid = this._platform === Platform.ANDROID ? decodeURIComponent(mraid) : mraid;
-
-        return this._core.Cache.setFileContent('webPlayerMraid', 'UTF-8', mraid)
-        .then(() => {
-            return this._core.Cache.getFilePath('webPlayerMraid');
-        });
     }
 
     private sendCustomImpression() {

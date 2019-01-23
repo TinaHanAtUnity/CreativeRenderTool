@@ -17,8 +17,8 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Privacy } from 'Ads/Views/Privacy';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -79,9 +79,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public show(): Promise<void> {
         this.setShowing(true);
         this.setShowingMRAID(true);
-
         this._mraid.show();
-
         this._ads.Listener.sendStartEvent(this._placement.getId());
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
@@ -93,7 +91,20 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         this._container.addEventHandler(this);
 
-        return this.setupContainerView();
+        const views: string[] = ['webview'];
+
+        const isARCreative = ARUtil.isARCreative(this._campaign);
+        const isARSupported = isARCreative ? ARUtil.isARSupported(this._ar) : Promise.resolve<boolean>(false);
+
+        return isARSupported.then(arSupported => {
+            if (arSupported) {
+                views.unshift('arview');
+            }
+
+            return this._container.open(this, views, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options).then(() => {
+                this.onStart.trigger();
+            });
+        });
     }
 
     public hide(): Promise<void> {
@@ -182,17 +193,13 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerForeground(): void {
-        if (this.isShowing()) {
+        if(this.isShowing()) {
             this._mraid.setViewableState(true);
         }
     }
 
     public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
         // EMPTY
-    }
-
-    protected setupContainerView(): Promise<void> {
-        return this.setupIFrameView();
     }
 
     protected openAdUnitContainer(views: string[]) {
@@ -270,19 +277,5 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         } else if(finishState === FinishState.SKIPPED) {
             this._operativeEventManager.sendSkip(operativeEventParams);
         }
-    }
-
-    private setupIFrameView(): Promise<void> {
-        const views: string[] = ['webview'];
-        const isARCreative = ARUtil.isARCreative(this._campaign);
-        const isARSupported = isARCreative ? ARUtil.isARSupported(this._ar) : Promise.resolve<boolean>(false);
-
-        return isARSupported.then(arSupported => {
-            if (arSupported) {
-                views.unshift('arview');
-            }
-
-            return this.openAdUnitContainer(views);
-        });
     }
 }

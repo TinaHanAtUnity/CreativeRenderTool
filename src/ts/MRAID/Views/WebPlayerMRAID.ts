@@ -137,7 +137,7 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    protected onPrivacyEvent(event: Event): void {
+    public onPrivacyEvent(event: Event): void {
         event.preventDefault();
 
         // Webview container must be full screened for users to interact with
@@ -148,7 +148,7 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     }
 
-    protected onGDPRPopupEvent(event: Event) {
+    public onGDPRPopupEvent(event: Event) {
         event.preventDefault();
         this._gdprPopupClicked = true;
 
@@ -157,6 +157,14 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
         this.fullScreenWebViewContainer().then(() => {
             this._privacy.show();
         });
+    }
+
+    private fullScreenWebViewContainer() {
+        return this._handlers[0].onWebViewFullScreen();
+    }
+
+    private reduceWebViewContainerHeight() {
+        return this._handlers[0].onWebViewReduceSize();
     }
 
     private setWebPlayerContainerData(webPlayerContainer: WebPlayerContainer, mraid: string): Promise<void> {

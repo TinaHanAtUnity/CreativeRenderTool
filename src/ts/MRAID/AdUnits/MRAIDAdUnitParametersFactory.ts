@@ -7,12 +7,12 @@ import { ExtendedMRAID } from 'MRAID/Views/ExtendedMRAID';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
 import { MRAID } from 'MRAID/Views/MRAID';
-import { AR, IARApi } from 'AR/AR';
+import { IARApi } from 'AR/AR';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
 import { WebPlayerMRAIDTest } from 'Core/Models/ABGroup';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
 
