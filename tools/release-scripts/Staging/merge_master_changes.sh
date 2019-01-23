@@ -16,7 +16,7 @@ do
     if [ "$?" -eq "1" ]; then
         git status | grep 'deleted by us' | sed 's/^.*deleted by us: //g' | xargs git rm
         echo "Resolve merge conflicts then proceed."
-        read
+        read -rsp $'Press any key to continue...\n' -n1 key
     fi
     sleep 1
 done <"$releases"
