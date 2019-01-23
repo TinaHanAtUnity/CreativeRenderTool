@@ -52,6 +52,44 @@ describe('UrlTest', () => {
         });
     });
 
+    describe('isValidProtocol', () => {
+        it('should validate legal url protocols', () => {
+            assert.isTrue(Url.isValidProtocol('https://www.unity3d.com'), 'https:// is a valid protocol');
+            assert.isTrue(Url.isValidProtocol('http://www.unity3d.com'), 'http:// is a valid protocol');
+        });
+
+        it('should not validate illegal url protocols', () => {
+            assert.isFalse(Url.isValidProtocol('//www.unity3d.com'), 'relative url should not pass valid protocol check');
+            assert.isFalse(Url.isValidProtocol('file://www.unity3d.com'), 'file url should not pass valid protocol check');
+        });
+    });
+
+    describe('isRelativeUrl', () => {
+        it('should return true if it is a relative url', () => {
+            assert.isTrue(Url.isRelativeUrl('//www.unity3d.com'), 'should return true for valid relative path');
+            assert.isTrue(Url.isRelativeUrl('//www.google.com'), 'should return true for valid relative path');
+        });
+
+        it('should return false for non relative urls', () => {
+            assert.isFalse(Url.isRelativeUrl('http://www.unity3d.com'));
+            assert.isFalse(Url.isRelativeUrl('https://www.unity3d.com'));
+            assert.isFalse(Url.isRelativeUrl('file://www.unity3d.com'));
+        });
+    });
+
+    describe('getProtocol', () => {
+        it('should get any protocol value', () => {
+            assert.equal(Url.getProtocol('http://www.unity3d.com'), 'http:');
+            assert.equal(Url.getProtocol('https://www.unity3d.com'), 'https:');
+            assert.equal(Url.getProtocol('file://www.unity3d.com'), 'file:');
+            // this needs to be written this way because it will be http: when running webview unit tests
+            // but will be file: when running hybrid tests.
+            const pageProtocol = Url.getProtocol(document.URL);
+            const relativeUrlProtocol = Url.getProtocol('//www.unity3d.com');
+            assert.equal(relativeUrlProtocol, pageProtocol);
+        });
+    });
+
     describe('encoding', () => {
         it('should encode unsafe characters', () => {
             const url = 'http://test.com?param=|Hello[]^\\';

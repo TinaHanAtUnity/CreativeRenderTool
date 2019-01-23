@@ -136,6 +136,28 @@ export class Url {
         return false;
     }
 
+    public static isValidProtocol(url: string): boolean {
+        if (url && (url.match(/^http:./i) || url.match(/^https:./i))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static isRelativeUrl(url: string): boolean {
+        if (url && url.match(/^\/\/./i)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static getProtocol(url: string): string {
+        const urlElement = document.createElement('a');
+        urlElement.setAttribute('href', url);
+        return urlElement.protocol;
+    }
+
     public static isProtocolWhitelisted(url: string, platform: Platform): boolean {
         let whitelisted: string[] = [];
 
