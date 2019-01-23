@@ -75,7 +75,7 @@ describe('MRAIDEventHandlersTest', () => {
             extendedMraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
             mraidView = sinon.createStubInstance(MRAID);
             (<sinon.SinonSpy>mraidView.container).restore();
-            sinon.stub(mraidView, 'container').returns(document.createElement('div')); // mraidView.container
+            sinon.stub(mraidView, 'container').returns(document.createElement('div'));
             privacyManager = sinon.createStubInstance(UserPrivacyManager);
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
