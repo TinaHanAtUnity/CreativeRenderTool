@@ -14,12 +14,11 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { CampaignRefreshManager } from 'Ads/Managers/CampaignRefreshManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration, IRawAdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { ThirdPartyEventMacro, ThirdPartyEventManagerFactory, IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
+import { IThirdPartyEventManagerFactory, ThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';
@@ -76,6 +75,8 @@ import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilit
 import { AbstractParserModule } from 'Ads/Modules/AbstractParserModule';
 import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParametersFactory';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
+import { PrivacyMethod } from 'Ads/Models/Privacy';
 
 export class Ads implements IAds {
 
@@ -248,6 +249,38 @@ export class Ads implements IAds {
         });
     }
 
+    private isConsentShowRequired(): boolean {
+        const gamePrivacy = this.Config.getGamePrivacy();
+        const userPrivacy = this.Config.getUserPrivacy();
+
+        if (!gamePrivacy.isEnabled() && gamePrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
+            return false;
+        }
+
+        if (!userPrivacy.isRecorded()) {
+            return true;
+        }
+
+        const methodChangedSinceConsent = gamePrivacy.getMethod() !== userPrivacy.getMethod();
+        const versionUpdatedSinceConsent = gamePrivacy.getVersion() > userPrivacy.getVersion();
+
+        return methodChangedSinceConsent || versionUpdatedSinceConsent;
+    }
+
+    private showConsentIfNeeded(options: unknown): Promise<void> {
+        if (!this.isConsentShowRequired()) {
+            return Promise.resolve();
+        }
+        const consentView = new ConsentUnit({
+            platform: this._core.NativeBridge.getPlatform(),
+            privacyManager: this.PrivacyManager,
+            adUnitContainer: this.Container,
+            adsConfig: this.Config,
+            core: this._core.Api
+        });
+        return consentView.show(options);
+    }
+
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
 
@@ -296,7 +329,7 @@ export class Ads implements IAds {
             campaign.setTrackingUrls(trackingUrls);
         }
 
-        if (placement.getRealtimeData()) {
+        if (placement.getRealtimeData() && !this.isConsentShowRequired()) {
             this._core.Api.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
             const start = Date.now();
 
@@ -328,7 +361,9 @@ export class Ads implements IAds {
                 this.showAd(placement, campaign, options);
             });
         } else {
-            this.showAd(placement, campaign, options);
+            this.showConsentIfNeeded(options).then(() => {
+                this.showAd(placement, campaign, options);
+            });
         }
     }
 
@@ -532,5 +567,4 @@ export class Ads implements IAds {
             CampaignManager.setCampaignResponse(response);
         }
     }
-
 }

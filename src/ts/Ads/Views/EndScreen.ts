@@ -3,7 +3,7 @@ import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHa
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { Localization } from 'Core/Utilities/Localization';
 import { View } from 'Core/Views/View';
@@ -32,7 +32,7 @@ export interface IEndScreenHandler extends IGDPREventHandler {
     onKeyEvent(keyCode: number): void;
 }
 
-export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
+export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandlerView {
 
     protected _localization: Localization;
     protected _adUnitStyle?: AdUnitStyle;
@@ -157,14 +157,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         if (this._privacy) {
             this._privacy.hide();
         }
-    }
-
-    public onPrivacy(url: string): void {
-        // do nothing
-    }
-
-    public onGDPROptOut(optOutEnabled: boolean): void {
-        // do nothing
     }
 
     protected getEndscreenAlt(): string | undefined {

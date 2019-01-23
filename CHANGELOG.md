@@ -1,10 +1,15 @@
-# Pending
+# Wed Jan 23 19:05:33 UTC 2019
+
+* New GDPR Consent shown before ad show (not enabled in backend yet) [#7753](https://github.com/Applifier/unity-ads-webview/pull/7753)
+
+# Wed Jan 23 02:00:42 UTC 2019
 
 * Remove backupcampaign no fill investigation [#7886](https://github.com/Applifier/unity-ads-webview/pull/7886)
 * Buffer swapping logic changes for ARView on Android [#7104](https://github.com/Applifier/unity-ads-webview/pull/7104)
 * Fix PREPARE_ERROR missing js_errors from 2.0.5 downwards
 * Add Bitmango game IDs to share Cheetah features [#7910](https://github.com/Applifier/unity-ads-webview/pull/7910)
 * Support relative urls in VAST strict parser [#7887](https://github.com/Applifier/unity-ads-webview/pull/7887)
+* Add Diagnostics for Missing Start Events [#7911](https://github.com/Applifier/unity-ads-webview/pull/7911)
 
 # Sat Jan 19 01:17:37 UTC 2019
 

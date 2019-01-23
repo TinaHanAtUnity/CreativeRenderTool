@@ -29,6 +29,8 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
+import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
+import { PrivacyMethod } from 'Ads/Models/Privacy';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -138,8 +140,15 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         });
     }
 
-    protected createPrivacy(parameters: IAdUnitParameters<Campaign>): Privacy {
-        const privacy = new Privacy(parameters.platform, parameters.campaign, parameters.privacyManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
+    protected createPrivacy(parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
+        let privacy: AbstractPrivacy;
+
+        if (parameters.adsConfig.getGamePrivacy().isEnabled()) {
+            privacy = new PrivacySettings(parameters.platform, parameters.campaign, parameters.privacyManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
+        } else {
+            privacy = new Privacy(parameters.platform, parameters.campaign, parameters.privacyManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
+        }
+
         const privacyEventHandler = new PrivacyEventHandler(parameters);
 
         privacy.addEventHandler(privacyEventHandler);
@@ -150,6 +159,11 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         if (AbstractAdUnitParametersFactory._forceGDPRBanner) {
             return true;
         }
+
+        if (PrivacyMethod.LEGITIMATE_INTEREST !== parameters.adsConfig.getGamePrivacy().getMethod()) {
+            return false;
+        }
+
         return parameters.adsConfig.isGDPREnabled() ? !parameters.adsConfig.isOptOutRecorded() : false;
     }
 

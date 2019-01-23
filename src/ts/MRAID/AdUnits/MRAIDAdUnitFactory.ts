@@ -1,6 +1,6 @@
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ARMRAID } from 'AR/Views/ARMRAID';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
@@ -21,7 +21,7 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMR
             isAR ? ARMRAIDEventHandler : MRAIDEventHandler;
         const mraidEventHandler: IMRAIDViewHandler = new EventHandler(mraidAdUnit, parameters);
         parameters.mraid.addEventHandler(mraidEventHandler);
-        Privacy.setupReportListener(parameters.privacy, mraidAdUnit);
+        AbstractPrivacy.setupReportListener(parameters.privacy, mraidAdUnit);
         return mraidAdUnit;
     }
 }

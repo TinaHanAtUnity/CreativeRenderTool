@@ -1,0 +1,39 @@
+@import "vars.styl";
+
+#button-spinner {
+
+  position: absolute;
+  top: 50%;
+  right: 0;
+  padding-right: $default-size * .5;
+  transform: translateY(-50%);
+  animation: show-up 1s ease-in forwards;
+
+  .loader {
+    width: 1.5 * $default-px-size;
+    height: 1.5 * $default-px-size;
+    border: .2 * $default-px-size solid rgba(226, 226, 226, .1);
+    border-top: .2 * $default-px-size solid $light-gray;
+    border-radius: 50%;
+    animation: spin 1s ease-in infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes show-up {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
