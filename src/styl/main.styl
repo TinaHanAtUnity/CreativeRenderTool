@@ -52,8 +52,10 @@ body.android {
 .z-slide-wrap {
     position: relative;
     display: block;
-    height: 180px; // custom as you like
+    min-height: 100%;
+    min-width: 100%
 }
+
 .z-slide-content {
     position: relative;
     width: 100%;
@@ -63,6 +65,7 @@ body.android {
     list-style: none;
     overflow: hidden;
 }
+
 .z-slide-item {
     position: absolute;
     left: 0;
@@ -93,5 +96,30 @@ body.android {
         max-width: 100%;
         max-height: 100%;
         margin: auto;
+    }
+}
+
+$dotColor = #fff;
+$dotActiveColor= #099fde;
+$dotRadius = 0.25rem;
+
+.z-slide-indicator {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 0;
+    z-index: 10;
+    .z-slide-dot {
+        display: block;
+        float: left;
+        width: $dotRadius * 2;
+        height: $dotRadius * 2;
+        margin-left: 0.2rem;
+        margin-right: 0.2rem;
+        border-radius: 50%;
+        background-color: $dotColor;
+
+        &.active {
+            background-color: $dotActiveColor;
+        }
     }
 }

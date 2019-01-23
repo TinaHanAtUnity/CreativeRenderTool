@@ -1,3 +1,5 @@
+import { parse } from 'path';
+
 export interface ISliderOptions {
     current: number;
     duration: number;
@@ -8,12 +10,12 @@ export interface ISliderOptions {
 }
 
     /* tslint:disable:no-function-expression prefer-const no-var-keyword no-parameter-reassignment*/
-
+var nextTick = function(fn: any) {
+        setTimeout(fn, 0);
+};
  var capitalizeFirstLetter = function(text: any) {
     return text.charAt(0).toUpperCase() + text.slice(1);
 };
-
-var setCompatibleStyle: any;
 
 var createEvent = function(type: any, bubbles: any, cancelable: any) {
     var e;
@@ -41,6 +43,8 @@ export class Slider {
     private _timeId: number | null;
     private _resizeTimeId: number | null;
     private _current: number;
+    private _indicatorWrap: HTMLElement;
+    private _indicators: HTMLElement[];
 
     private options: ISliderOptions;
 
@@ -54,55 +58,13 @@ export class Slider {
         direction: 'left',
         interval:5
     }) {
-        /* tslint:disable:no-function-expression prefer-const no-var-keyword no-parameter-reassignment*/
-
-        setCompatibleStyle = (function(style) {
-            var prefixes = ['-moz-', '-webkit-', '-o-', '-ms-'];
-            var domPrefixes = ['Moz', 'Webkit', 'O', 'ms'];
-            var len = prefixes.length;
-            function getGoodProp(prop: any) {
-                if(prop in style) {
-                    return {
-                        prop: prop,
-                        prefix: prefixes[1] // enforce add `-webkit-`
-                    };
-                } else {
-                    prop = capitalizeFirstLetter(prop);
-                    var tmpProp;
-                    var prefix;
-                    for(var i = 0; i < len; i++) {
-                        tmpProp = domPrefixes[i] + prop;
-                        if(tmpProp in style) {
-                            prefix = prefixes[i];
-                            break;
-                        }
-                    }
-                    return {
-                        prop: tmpProp,
-                        prefix: prefix
-                    };
-                }
-            }
-            return function(el: Node, prop: any, value: any) {
-                var res = getGoodProp(prop);
-                (<HTMLElement>el).style[res.prop] = value;
-                if (value) {
-                    (<HTMLElement>el).style[res.prop] = res.prefix + value;
-                }
-            };
-        })(document.body.style);
-        /* tslint:enable:no-function-expression prefer-const no-var-keyword no-parameter-reassignment */
-
         const {width, height} = size;
 
         this.options = options;
 
         this._current = options.current;
 
-        this._rootEl = this.createElement('div', 'slider-root-container', ['z-slide-wrap'], {
-            'min-height': '100%',
-            'min-width': '100%'
-        });
+        this._rootEl = this.createElement('div', 'slider-root-container', ['z-slide-wrap']);
 
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['z-slide-content']);
 
@@ -131,7 +93,7 @@ export class Slider {
             }
 
             Slider.prepareSlideItem(this, this._slidesContainer, this._items, this._count, options.current, width);
-            //prepareIndicator(this, 'z-slide-indicator', 'z-slide-dot', this.realCount || count, this.current, 'active');
+            Slider.prepareIndicator(this, 'z-slide-indicator', 'z-slide-dot', this._count, this._current, 'active');
             Slider.bindEvents(this, Slider.startHandler, Slider.moveHandler, Slider.endHandler);
 
             // auto play
@@ -140,6 +102,16 @@ export class Slider {
             //    this.autoplay();
             //}
         });
+    }
+
+    private static setTransformStyle(el: Node, value: any) {
+        (<HTMLElement>el).style.transform = value;
+        (<HTMLElement>el).style.setProperty('-webkit-transform', value);
+    }
+
+    private static setTransitionStyle(el: Node, value: any) {
+        (<HTMLElement>el).style.transition = value;
+        (<HTMLElement>el).style.setProperty('-webkit-transition', value);
     }
 
     // swipestart handler
@@ -191,11 +163,6 @@ export class Slider {
     private generateSlideHTML = (id: string, image?: HTMLImageElement) => {
         const src = image && image.src;
         const style = {};
-        /*const style = {
-            'display': 'inline-block',
-            'width': `100%`,
-            'height': `100vh`
-        };*/
 
         if (src) {
             Object.assign(style, {
@@ -270,14 +237,14 @@ export class Slider {
         anyNode = <any>list[lastIndex];
         anyNode.uuid = lastIndex;
 
-        setCompatibleStyle(list[0], 'transform', 'translate3d(0, 0, 0)');
-        setCompatibleStyle(list[lastIndex], 'transform', 'translate3d(-' + width + 'px, 0, 0)');
+        Slider.setTransformStyle(list[0], 'translate3d(0, 0, 0)');
+        Slider.setTransformStyle(list[lastIndex], 'translate3d(-' + width + 'px, 0, 0)');
 
         for (i = 1; i < lastIndex; i++) {
             item = list[i];
             anyNode = <any>list[0];
             anyNode.uuid = i;
-            setCompatibleStyle(item, 'transform', 'translate3d(' + width + 'px, 0, 0)');
+            Slider.setTransformStyle(item, 'translate3d(' + width + 'px, 0, 0)');
         }
 
         slider._slidesContainer = container;
@@ -459,13 +426,13 @@ export class Slider {
         var width = slider._width;
         var list = slider._items;
         var i;
-        //var indicatorWrap = slider.indicatorWrap;
+        var indicatorWrap = slider._indicatorWrap;
 
-        setCompatibleStyle(list[lastIndex], 'transform', 'translate3d(-' + width + 'px, 0, 0)');
+        Slider.setTransformStyle(list[lastIndex], 'translate3d(-' + width + 'px, 0, 0)');
         for (i = 1; i < lastIndex; i++) {
-            setCompatibleStyle(list[i], 'transform', 'translate3d(' + width + 'px, 0, 0)');
+            Slider.setTransformStyle(list[i], 'translate3d(' + width + 'px, 0, 0)');
         }
-        //indicatorWrap.style.left = (width - getComputedStyle(indicatorWrap).width.replace('px', '')) / 2 + 'px';
+        indicatorWrap.style.left = (slider._width - parseFloat(getComputedStyle(indicatorWrap)!.width!.replace('px', ''))) / 2 + 'px';
     }
 
     private static setTransition(pre: Node, cur: Node, next: Node, preTransition: String, curTransition: String, nextTransition: String) {
@@ -478,15 +445,15 @@ export class Slider {
         if(typeof nextTransition === 'undefined') {
             nextTransition = curTransition;
         }
-        setCompatibleStyle(pre, 'transition', preTransition);
-        setCompatibleStyle(cur, 'transition', curTransition);
-        setCompatibleStyle(next, 'transition', nextTransition);
+        Slider.setTransitionStyle(pre, preTransition);
+        Slider.setTransitionStyle(cur, curTransition);
+        Slider.setTransitionStyle(next, nextTransition);
     }
 
     private static move(pre: Node, cur: Node, next: Node, distance: number, width: number) {
-        setCompatibleStyle(cur, 'transform', 'translate3d(' + distance + 'px, 0, 0)');
-        setCompatibleStyle(pre, 'transform', 'translate3d(' + (distance - width) + 'px, 0, 0)');
-        setCompatibleStyle(next, 'transform', 'translate3d(' + (distance + width) + 'px, 0, 0)');
+        Slider.setTransformStyle(cur, 'translate3d(' + distance + 'px, 0, 0)');
+        Slider.setTransformStyle(pre, 'translate3d(' + (distance - width) + 'px, 0, 0)');
+        Slider.setTransformStyle(next, 'translate3d(' + (distance + width) + 'px, 0, 0)');
     }
 
     public slide(direction: 'left' | 'right' | 'restore', diffX: number) {
@@ -535,17 +502,47 @@ export class Slider {
         }
         Slider.move(pre, cur, next, 0, width);
 
-        /*if(this.realCount === 2) {
-            this.current = this.current % 2;
-            updateIndicator(this.indicators, current % 2 , this.current);
+        if(this._realCount === 2) {
+            this._current = this._current % 2;
+            Slider.updateIndicator(this._indicators, current % 2 , this._current);
         } else {
-            updateIndicator(this.indicators, current, this.current);
-        }*/
+            Slider.updateIndicator(this._indicators, current, this._current);
+        }
 
         customEvent = createEvent('slideend', true, true);
         (<any>customEvent).slider = this;
         (<any>customEvent).currentItem = cur;
         this._slidesContainer.dispatchEvent(customEvent);
+    }
+
+    private static prepareIndicator(slider: Slider, wrapClassName: String, className: String, howMany: number, activeIndex: number, activeClass: String) {
+        const item = document.createElement('span');
+        const indicatorWrap = document.createElement('div');
+        var indicators = [];
+        var i;
+
+        indicatorWrap.className = 'z-slide-indicator';
+
+        item.className = 'z-slide-dot';
+        for(i = 1; i < howMany; i++) {
+            indicators.push(indicatorWrap.appendChild(<HTMLElement>item.cloneNode(false)));
+        }
+        indicators.push(indicatorWrap.appendChild(item));
+        indicators[activeIndex].className = 'z-slide-dot ' + activeClass;
+
+        slider._indicatorWrap = indicatorWrap;
+        slider._indicators = indicators;
+        slider._rootEl.appendChild(indicatorWrap);
+
+        nextTick(function() {
+            indicatorWrap.style.left = (slider._width - parseFloat(getComputedStyle(indicatorWrap)!.width!.replace('px', ''))) / 2 + 'px';
+        });
+    }
+
+    // update indicator style
+    private static updateIndicator(indicators: HTMLElement[], pre: number, cur: number) {
+        indicators[pre].className = 'z-slide-dot';
+        indicators[cur].className = 'z-slide-dot active';
     }
 
     /* tslint:enable:no-function-expression prefer-const no-var-keyword no-parameter-reassignment */
