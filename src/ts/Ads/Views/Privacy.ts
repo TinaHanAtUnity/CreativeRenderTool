@@ -1,13 +1,8 @@
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Campaign } from 'Ads/Models/Campaign';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-import { FinishState } from 'Core/Constants/FinishState';
+import { AbstractPrivacy, ReportReason } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
-import { BlockingReason, CreativeBlocking } from 'Core/Utilities/CreativeBlocking';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Observable2 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import PrivacyTemplate from 'html/Privacy.html';
 
@@ -17,18 +12,8 @@ enum PrivacyCardState {
     REPORT
 }
 
-enum ReportReason {
-    NOT_SHOWING = 'Ad is not showing',
-    OFFENSIVE = 'Ad is very offensive',
-    MALFORMED = 'Ad does not look right',
-    DISLIKE = 'I don\'t like this ad',
-    OTHER = 'Other'
-}
-
 export class Privacy extends AbstractPrivacy {
 
-    private _onReport: Observable2<Campaign, string> = new Observable2();
-    private _privacyManager: UserPrivacyManager;
     private _dataDeletionConfirmation: boolean = false;
     private _currentState: PrivacyCardState = PrivacyCardState.PRIVACY;
     private _campaign: Campaign;
@@ -40,7 +25,7 @@ export class Privacy extends AbstractPrivacy {
                 privacyManager: UserPrivacyManager, gdprEnabled: boolean,
                 isCoppaCompliant: boolean) {
 
-        super(platform, isCoppaCompliant, gdprEnabled, 'privacy');
+        super(platform, privacyManager, isCoppaCompliant, gdprEnabled, 'privacy');
         this._templateData.reportKeys = Object.keys(ReportReason);
         // tslint:disable-next-line
         this._templateData.reportReasons = Object.keys(ReportReason).map((reason: any) => ReportReason[reason]);
@@ -48,7 +33,6 @@ export class Privacy extends AbstractPrivacy {
         this._template = new Template(PrivacyTemplate);
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
-        this._privacyManager = privacyManager;
 
         this._bindings = [
             {
@@ -95,7 +79,7 @@ export class Privacy extends AbstractPrivacy {
         this.populateUserSummary();
 
         if (this._gdprEnabled) {
-            const elId = this._privacyManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
+            const elId = this._userPrivacyManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
             const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
             activeRadioButton.checked = true;
@@ -123,14 +107,22 @@ export class Privacy extends AbstractPrivacy {
         event.preventDefault();
         const gdprReduceRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
         if (this._gdprEnabled) {
-            this._handlers.forEach(handler => handler.onGDPROptOut(gdprReduceRadioButton.checked || this._dataDeletionConfirmation));
+            this._handlers.forEach(handler => {
+                if(handler.onGDPROptOut) {
+                    handler.onGDPROptOut(gdprReduceRadioButton.checked || this._dataDeletionConfirmation);
+                }
+            });
         }
         this._handlers.forEach(handler => handler.onPrivacyClose());
     }
 
     protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        this._handlers.forEach(handler => handler.onPrivacy((<HTMLLinkElement>event.target).href));
+        this._handlers.forEach(handler => {
+            if(handler.onPrivacy) {
+                handler.onPrivacy((<HTMLLinkElement>event.target).href);
+            }
+        });
     }
 
     protected onDataDeletion(event: Event): void {
@@ -255,7 +247,7 @@ export class Privacy extends AbstractPrivacy {
 
     private populateUserSummary() {
         if (!this._userSummaryObtained) {
-            this._privacyManager.retrieveUserSummary().then((userSummary) => {
+            this._userPrivacyManager.retrieveUserSummary().then((userSummary) => {
                 this._userSummaryObtained = true;
                 document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
                 document.getElementById('phone-type')!.innerHTML = ` - Using ${userSummary.deviceModel}`;
@@ -268,54 +260,5 @@ export class Privacy extends AbstractPrivacy {
                 document.getElementById('sorry-message')!.innerHTML = 'Sorry. We were unable to deliver our collected information at this time.';
             });
         }
-    }
-
-    private static onUserReport(campaign: Campaign, reasonKey: string, ad: AbstractAdUnit | AbstractVideoOverlay): void {
-        let adType;
-        let isCached;
-        let finishState;
-
-        if (ad instanceof AbstractAdUnit) {
-            adType = ad.description();
-            finishState = FinishState[ad.getFinishState()];
-            isCached = ad.isCached();
-            ad.markAsSkipped(); // Don't grant user potential reward to prevent bad reports
-        } else {
-            adType = campaign.getAdType();
-            finishState = 'VIDEO_PROGRESS';
-        }
-
-        const creativeId = campaign.getCreativeId();
-        const seatId = campaign.getSeatId();
-        CreativeBlocking.report(creativeId, seatId, BlockingReason.USER_REPORT, {
-            message: reasonKey
-        });
-
-        const error = {
-            creativeId: creativeId,
-            reason: reasonKey,
-            adType: adType,
-            seatId: seatId,
-            finishState: finishState,
-            isCached: isCached
-        };
-        Diagnostics.trigger('reported_ad', error);
-    }
-
-    // After the report, wait four seconds and close the ad
-    private static timeoutAd(ad: AbstractAdUnit | AbstractVideoOverlay): Promise<void> {
-        return new Promise(() => {
-            setTimeout(() => {
-                return ad.hide();
-            }, 4000);
-        });
-    }
-
-    public static setupReportListener(privacy: Privacy, ad: AbstractAdUnit | AbstractVideoOverlay): void {
-        privacy._onReport.subscribe((campaign: Campaign, reasonKey: string) => {
-            this.onUserReport(campaign, reasonKey, ad);
-            this.timeoutAd(ad);
-            privacy._onReport.unsubscribe();
-        });
     }
 }

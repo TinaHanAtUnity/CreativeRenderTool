@@ -17,13 +17,13 @@ import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { Url } from 'Core/Utilities/Url';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ProgrammaticTrackingService, ProgrammaticTrackingErrorName } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ABGroup, AuctionV5Test } from 'Core/Models/ABGroup';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
-    privacy: Privacy;
+    privacy: AbstractPrivacy;
     webPlayerContainer: WebPlayerContainer;
 }
 

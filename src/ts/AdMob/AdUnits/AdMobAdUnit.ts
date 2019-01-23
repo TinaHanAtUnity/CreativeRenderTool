@@ -17,17 +17,18 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AuctionV5Test, ABGroup } from 'Core/Models/ABGroup';
 import { ProgrammaticTrackingErrorName, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
     adMobSignalFactory: AdMobSignalFactory;
-    privacy: Privacy;
+    privacy: AbstractPrivacy;
 }
 
 export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
+
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;

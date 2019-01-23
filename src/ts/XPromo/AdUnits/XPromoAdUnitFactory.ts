@@ -9,7 +9,7 @@ import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandle
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { Platform } from 'Core/Constants/Platform';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
@@ -57,7 +57,7 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory<XPromoCampaign, I
                 }
             });
         }
-        Privacy.setupReportListener(parameters.privacy, xPromoAdUnit);
+        AbstractPrivacy.setupReportListener(parameters.privacy, xPromoAdUnit);
 
         return xPromoAdUnit;
     }

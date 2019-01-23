@@ -1,5 +1,4 @@
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { AdUnitContainer, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, IAdUnit, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IAdsApi } from 'Ads/IAds';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
 import { Rotation } from 'Core/Constants/Android/Rotation';
@@ -57,7 +56,7 @@ export class Activity extends AdUnitContainer {
         this._onRestoreObserver = this._ads.Android!.AdUnit.onRestore.subscribe((activityId) => this.onRestore(activityId));
     }
 
-    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IAndroidOptions): Promise<void> {
+    public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IAndroidOptions): Promise<void> {
         this._activityId++;
         this._currentActivityFinished = false;
         this._androidOptions = options;
@@ -80,7 +79,6 @@ export class Activity extends AdUnitContainer {
         }
 
         const hardwareAccel: boolean = this.isHardwareAccelerationAllowed();
-
         this._core.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + Orientation[this._lockedOrientation] + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
         this._onFocusGainedObserver = this._ads.Android!.AdUnit.onFocusGained.subscribe(() => this.onFocusGained());
