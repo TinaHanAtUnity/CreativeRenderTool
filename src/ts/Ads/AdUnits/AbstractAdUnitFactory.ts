@@ -103,7 +103,7 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
         });
     }
 
-    protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
+    protected createOverlay(parameters: IAdUnitParameters<Campaign>, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
 
         let overlay: AbstractVideoOverlay;
 
@@ -112,7 +112,7 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(parameters.platform, parameters.campaign, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            overlay = new NewVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+            overlay = new NewVideoOverlay(parameters, parameters.privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
