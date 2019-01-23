@@ -1,13 +1,12 @@
 import { IVideoAdUnitParameters, VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export interface IXPromoAdUnitParameters extends IVideoAdUnitParameters<XPromoCampaign> {
     endScreen: XPromoEndScreen;
-    privacy: Privacy;
+    privacy: AbstractPrivacy;
 }
 
 export class XPromoAdUnit extends VideoAdUnit<XPromoCampaign> {

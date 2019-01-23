@@ -31,12 +31,6 @@ export class AdsConfigurationParser {
             throw Error('No default placement in configuration response');
         }
 
-        const defaultGamePrivacy = new GamePrivacy({ method: PrivacyMethod.DEFAULT });
-        const gamePrivacy = configJson.gamePrivacy ? new GamePrivacy(configJson.gamePrivacy) : defaultGamePrivacy;
-
-        const userPrivacyNotRecorded = new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: { profiling: false} });
-        const userPrivacy = configJson.userPrivacy ? new UserPrivacy(configJson.userPrivacy) : userPrivacyNotRecorded;
-
         const configurationParams: IAdsConfiguration = {
             cacheMode: this.parseCacheMode(configJson),
             placements: placements,
@@ -45,10 +39,27 @@ export class AdsConfigurationParser {
             optOutRecorded: configJson.optOutRecorded,
             optOutEnabled: configJson.optOutEnabled,
             defaultBannerPlacement: defaultBannerPlacement,
-            gamePrivacy: gamePrivacy,
-            userPrivacy: userPrivacy
+            gamePrivacy: this.parseGamePrivacy(configJson),
+            userPrivacy: this.parseUserPrivacy(configJson)
         };
         return new AdsConfiguration(configurationParams);
+    }
+
+    private static parseGamePrivacy(configJson: IRawAdsConfiguration) {
+        if (configJson.gamePrivacy && configJson.gamePrivacy.method) {
+            return new GamePrivacy(configJson.gamePrivacy);
+        } else if (configJson.gdprEnabled === true) {
+            // TODO: Remove when all games have a correct method in dashboard and configuration always contains correct method
+            return new GamePrivacy({ method: PrivacyMethod.LEGITIMATE_INTEREST });
+        }
+        return new GamePrivacy({ method: PrivacyMethod.DEFAULT });
+    }
+
+    private static parseUserPrivacy(configJson: IRawAdsConfiguration) {
+        if (configJson.userPrivacy) {
+            return new UserPrivacy(configJson.userPrivacy);
+        }
+        return new UserPrivacy({ method: PrivacyMethod.DEFAULT, version: 0, permissions: { profiling: false} });
     }
 
     private static parseCacheMode(configJson: IRawAdsConfiguration): CacheMode {
