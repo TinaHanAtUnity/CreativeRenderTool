@@ -21,8 +21,6 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMR
             mraidAdUnit = new MRAIDAdUnit(parameters);
         }
 
-        // const mraidAdUnit = new WebPlayerMRAIDAdUnit(parameters);
-
         // NOTE: When content type is correct for playables we want to change this to content type check.
         const isPlayable: boolean = parameters.campaign instanceof PerformanceMRAIDCampaign;
         const isAR: boolean = parameters.mraid instanceof ARMRAID;

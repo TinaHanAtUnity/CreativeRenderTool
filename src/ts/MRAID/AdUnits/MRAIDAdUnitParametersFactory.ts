@@ -10,9 +10,9 @@ import { MRAID } from 'MRAID/Views/MRAID';
 import { IARApi } from 'AR/AR';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
-import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
-import { WebPlayerMRAIDTest } from 'Core/Models/ABGroup';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { WebPlayerMRAIDTest } from 'Core/Models/ABGroup';
+import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
 
 export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
 
@@ -44,7 +44,6 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
         const privacy = this.createPrivacy(baseParams);
 
         baseParams.gameSessionId = baseParams.gameSessionId || 0;
-        const a = true;
 
         if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || MRAIDAdUnitParametersFactory._forcedExtendedMRAID) {
             mraid = new ExtendedMRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.deviceInfo.getLanguage(), privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId);
