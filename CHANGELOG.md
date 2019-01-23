@@ -1,3 +1,7 @@
+# Pending
+
+* Staging Scripts Fixes [#7912](https://github.com/Applifier/unity-ads-webview/pull/7912)
+
 # Wed Jan 23 19:05:33 UTC 2019
 
 * New GDPR Consent shown before ad show (not enabled in backend yet) [#7753](https://github.com/Applifier/unity-ads-webview/pull/7753)
