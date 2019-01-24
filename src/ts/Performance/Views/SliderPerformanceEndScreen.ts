@@ -45,6 +45,7 @@ export class SliderPerformanceEndScreen extends EndScreen {
     public show(): void {
         super.show();
         this.resize();
+        this._slider.show();
         window.addEventListener('resize', this.resize.bind(this), false);
     }
 

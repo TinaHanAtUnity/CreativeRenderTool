@@ -9,31 +9,9 @@ export interface ISliderOptions {
     interval: number;
 }
 
-    /* tslint:disable:no-function-expression prefer-const no-var-keyword no-parameter-reassignment*/
-var nextTick = function(fn: any) {
-        setTimeout(fn, 0);
-};
- var capitalizeFirstLetter = function(text: any) {
-    return text.charAt(0).toUpperCase() + text.slice(1);
-};
-
-var createEvent = function(type: any, bubbles: any, cancelable: any) {
-    var e;
-
-    e = document.createEvent('Event');
-    e.initEvent(type, bubbles, cancelable);
-
-    return e;
-};
-/* tslint:enable:no-function-expression prefer-const no-var-keyword no-parameter-reassignment */
-
 export class Slider {
     private _rootEl: HTMLElement;
 
-    // Evetyhing scrollable should be inside this container
-    private _sliderScrollableContainer: HTMLElement;
-
-    // Slides shown to user including head, tail and duplicated slides
     private _slidesContainer: HTMLElement;
     private _items: Node[];
     private _count: number;
@@ -45,12 +23,13 @@ export class Slider {
     private _current: number;
     private _indicatorWrap: HTMLElement;
     private _indicators: HTMLElement[];
+    private _interval: number;
 
     private options: ISliderOptions;
 
-    private _ready: Promise<void>;
+    private _ready: Promise<void> | null;
 
-    constructor(urls: string[], size: { width: number; height: number } = {width: 0, height: 0}, options: ISliderOptions = {
+    constructor(urls: string[], options: ISliderOptions = {
         current: 0,
         duration: 0.8,
         minPercentToSlide: null,
@@ -58,15 +37,13 @@ export class Slider {
         direction: 'left',
         interval:5
     }) {
-        const {width, height} = size;
-
         this.options = options;
 
         this._current = options.current;
 
-        this._rootEl = this.createElement('div', 'slider-root-container', ['z-slide-wrap']);
+        this._rootEl = this.createElement('div', 'slider-root-container', ['slider-wrap']);
 
-        this._slidesContainer = this.createElement('div', 'slider-slides-container', ['z-slide-content']);
+        this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
 
         this._rootEl.appendChild(this._slidesContainer);
 
@@ -92,16 +69,43 @@ export class Slider {
                 this._compareDistance = this._width * options.minPercentToSlide;
             }
 
-            Slider.prepareSlideItem(this, this._slidesContainer, this._items, this._count, options.current, width);
-            Slider.prepareIndicator(this, 'z-slide-indicator', 'z-slide-dot', this._count, this._current, 'active');
+            Slider.prepareSlideItem(this, this._slidesContainer, this._items, this._count, options.current, this._width);
+            Slider.prepareIndicator(this, 'slider-indicator', 'slider-dot', this._count, this._current, 'active');
             Slider.bindEvents(this, Slider.startHandler, Slider.moveHandler, Slider.endHandler);
 
-            // auto play
-            //if(options.autoplay) {
-            ///    this.interval = Math.max(2000, options.interval * 1000);
-            //    this.autoplay();
-            //}
+            this._ready = null;
         });
+    }
+
+    public attachTo(container: HTMLElement) {
+        container.appendChild(this._rootEl);
+    }
+
+    public show() {
+        if(this.options.autoplay) {
+            this._interval = Math.max(2000, this.options.interval * 1000);
+            this.autoplay();
+        }
+    }
+
+    public resize(...args: any[]) {
+        if (this._ready === null) {
+            Slider.resizeHandler(this);
+        } else {
+            this._ready.then(() => Slider.resizeHandler(this));
+        }
+    }
+
+    public autoplay() {
+        if (this._timeId !== null) {
+            window.clearTimeout(this._timeId);
+        }
+
+        const interval = this._interval;
+        this._timeId = window.setTimeout(() => {
+            this.slide(this.options.direction, 0);
+            this.autoplay();
+        }, interval);
     }
 
     private static setTransformStyle(el: Node, value: any) {
@@ -114,14 +118,13 @@ export class Slider {
         (<HTMLElement>el).style.setProperty('-webkit-transition', value);
     }
 
-    // swipestart handler
     private static startHandler(ev: Event, slider: Slider) {
         if(slider.options.autoplay && slider._timeId !== null) {
             clearTimeout(slider._timeId);
+            slider._timeId = 0;
         }
     }
 
-    // swipemove handler
     private static moveHandler(ev: Event, slider: Slider, diffX: number) {
         const list = slider._items;
         const cur = list[0];
@@ -131,7 +134,6 @@ export class Slider {
         Slider.move(pre, cur, next, diffX, slider._width);
     }
 
-    // swipeend handler
     private static endHandler(ev: Event, slider: Slider, diffX: number) {
         let direction: 'left' | 'right' | 'restore';
         if(Math.abs(diffX) < slider._compareDistance) {
@@ -140,9 +142,9 @@ export class Slider {
             direction = diffX < 0 ? 'left' : 'right';
         }
         slider.slide(direction, diffX);
-        //if(slider.options.autoplay) {
-        //    slider.autoplay();
-        //}
+        if(slider.options.autoplay) {
+            slider.autoplay();
+        }
     }
 
     private createSlide(url: string, id: string): Promise<HTMLElement> {
@@ -152,7 +154,6 @@ export class Slider {
                 image.onload = () => {
                     resolve(this.generateSlideHTML(id, image));
                 };
-
                 image.src = url;
             } else {
                 resolve(this.generateSlideHTML(id));
@@ -170,20 +171,12 @@ export class Slider {
             });
         }
 
-        const item = this.createElement('div', id, ['slider-item', 'z-slide-item']);
+        const item = this.createElement('div', id, ['slider-item', 'slider-item']);
         const span = this.createElement('span', id+'img', ['slider-item-image'], style);
 
         item.appendChild(span);
 
         return item;
-    }
-
-    public attachTo(container: HTMLElement) {
-        container.appendChild(this._rootEl);
-    }
-
-    public resize(...args: any[]) {
-        Slider.resizeHandler(this);
     }
 
     private createElement(name: string, id: string, className: string[] = [], style: { [key: string]: any } = {}): HTMLElement {
@@ -202,7 +195,7 @@ export class Slider {
         });
     }
 
-    /* tslint:disable:no-function-expression prefer-const no-var-keyword no-parameter-reassignment */
+    /* tslint:disable:no-parameter-reassignment */
     private static prepareSlideItem(slider: Slider, container: HTMLElement, list: Node[], count: number, index: number, width: number) {
         const realCount: number = count;
         let lastIndex: number;
@@ -210,7 +203,7 @@ export class Slider {
         let clone: Node;
         let i;
 
-        if(count === 2) { // clone and insert to dom
+        if(count === 2) {
             clone = list[0].cloneNode(true);
             container.appendChild(clone);
             list.push(clone);
@@ -255,19 +248,19 @@ export class Slider {
     }
 
     private static bindEvents(slider: Slider, startHandler: any, moveHandler: any, endHandler: any) {
-        var container = slider._slidesContainer;
-        var startX: number;
-        var startY: number;
-        var endX: number;
-        var endY: number;
-        var diffX: number;
-        var diffY: number;
-        var touch: boolean;
-        var action: any;
-        var scroll: boolean;
-        var sort: boolean;
-        var swipe: boolean;
-        var sortTimer: number;
+        const container = slider._slidesContainer;
+        let startX: number;
+        let startY: number;
+        let endX: number;
+        let endY: number;
+        let diffX: number;
+        let diffY: number;
+        let touch: boolean;
+        let action: any;
+        let  scroll: boolean;
+        let sort: boolean;
+        let swipe: boolean;
+        let sortTimer: number;
 
         function getCoord(e: any, c: String) {
             return /touch/.test(e.type) ? e.changedTouches[0]['page' + c] : e['page' + c];
@@ -292,15 +285,10 @@ export class Slider {
             startY = getCoord(ev, 'Y');
             diffX = 0;
             diffY = 0;
-            sortTimer = window.setTimeout(function() {
+            sortTimer = window.setTimeout(() => {
                 sort = true;
             }, 200);
             startHandler(ev, slider);
-
-            // swipestart
-            if (ev.target !== null) {
-                ev.target.dispatchEvent(createEvent('swipestart', true, true));
-            }
 
             if (ev.type === 'mousedown') {
                 ev.preventDefault();
@@ -310,7 +298,6 @@ export class Slider {
         }
 
         function onMove(ev: Event) {
-            var customEvent;
             if(!action) {
                 return;
             }
@@ -320,31 +307,23 @@ export class Slider {
             diffY = endY - startY;
 
             if (!sort && !swipe && !scroll) {
-                if (Math.abs(diffY) > 10) { // It's a scroll
+                if (Math.abs(diffY) > 10) {
                     scroll = true;
                     // Android 4.0(maybe more?) will not fire touchend event
-                    customEvent = createEvent('touchend', true, true);
+                    const customEvent = document.createEvent('Event');
                     if (ev.target !== null) {
                         ev.target.dispatchEvent(customEvent);
                     }
-                } else if (Math.abs(diffX) > 7) { // It's a swipe
+                } else if (Math.abs(diffX) > 7) {
                     swipe = true;
                 }
             }
             if (swipe) {
-                ev.preventDefault(); // Kill page scroll
-                moveHandler(ev, slider, diffX); // Handle swipe
-                customEvent = createEvent('swipe', true, true);
-                (<any>customEvent).movement = {
-                    diffX: diffX,
-                    diffY: diffY
-                };
-                container.dispatchEvent(customEvent);
+                ev.preventDefault();
+                moveHandler(ev, slider, diffX);
             }
             if(sort) {
                 ev.preventDefault();
-                customEvent = createEvent('sort', true, true);
-                container.dispatchEvent(customEvent);
             }
 
             if (Math.abs(diffX) > 5 || Math.abs(diffY) > 5) {
@@ -353,34 +332,12 @@ export class Slider {
         }
 
         function onEnd(ev: Event) {
-            var customEvent;
             if(!action) {
                 return;
             }
             action = false;
             if (swipe) {
-                // Handle swipe end
                 endHandler(ev, slider, diffX);
-
-                // trigger 'swipeend'
-                customEvent = createEvent('swipeend', true, true);
-                (<any>customEvent).customData = {
-                    diffX: diffX,
-                    diffY: diffY
-                };
-                container.dispatchEvent(customEvent);
-            } else if (sort) {
-                // trigger 'sortend'
-                customEvent = createEvent('sortend', true, true);
-                container.dispatchEvent(customEvent);
-            } else if (!scroll && Math.abs(diffX) < 5 && Math.abs(diffY) < 5) { // Tap
-                if (ev.type === 'touchend') { // Prevent phantom clicks
-                    // ev.preventDefault();
-                    // let elements like `a` do default behavior
-                }
-                // trigger 'tap'
-                customEvent = createEvent('tap', true, true);
-                container.dispatchEvent(customEvent);
             }
             swipe = false;
             sort = false;
@@ -409,24 +366,24 @@ export class Slider {
         if(slider._resizeTimeId) {
             clearTimeout(slider._resizeTimeId);
         }
-        slider._resizeTimeId = window.setTimeout(function() {
+        slider._resizeTimeId = window.setTimeout(() => {
             slider._width = slider._slidesContainer.clientWidth;
             if(slider.options.minPercentToSlide) {
                 slider._compareDistance = slider._width * slider.options.minPercentToSlide;
             }
             Slider.resetStyle(slider);
-            //if(slider.options.autoplay) {
-            //    slider.autoplay();
-            //}
+            if(slider.options.autoplay) {
+                slider.autoplay();
+            }
         }, 200);
     }
 
     private static resetStyle(slider: Slider) {
-        var lastIndex = slider._count - 1;
-        var width = slider._width;
-        var list = slider._items;
-        var i;
-        var indicatorWrap = slider._indicatorWrap;
+        const lastIndex = slider._count - 1;
+        const width = slider._width;
+        const list = slider._items;
+        let i;
+        const indicatorWrap = slider._indicatorWrap;
 
         Slider.setTransformStyle(list[lastIndex], 'translate3d(-' + width + 'px, 0, 0)');
         for (i = 1; i < lastIndex; i++) {
@@ -466,7 +423,6 @@ export class Slider {
         let cur: Node;
         let pre: Node;
         let next: Node;
-        let customEvent: Event;
 
         direction = direction || this.options.direction;
         diffX = diffX || 0;
@@ -508,42 +464,36 @@ export class Slider {
         } else {
             Slider.updateIndicator(this._indicators, current, this._current);
         }
-
-        customEvent = createEvent('slideend', true, true);
-        (<any>customEvent).slider = this;
-        (<any>customEvent).currentItem = cur;
-        this._slidesContainer.dispatchEvent(customEvent);
     }
 
     private static prepareIndicator(slider: Slider, wrapClassName: String, className: String, howMany: number, activeIndex: number, activeClass: String) {
         const item = document.createElement('span');
         const indicatorWrap = document.createElement('div');
-        var indicators = [];
-        var i;
+        const indicators = [];
+        let i;
 
-        indicatorWrap.className = 'z-slide-indicator';
+        indicatorWrap.className = 'slider-indicator';
 
-        item.className = 'z-slide-dot';
+        item.className = 'slider-dot';
         for(i = 1; i < howMany; i++) {
             indicators.push(indicatorWrap.appendChild(<HTMLElement>item.cloneNode(false)));
         }
         indicators.push(indicatorWrap.appendChild(item));
-        indicators[activeIndex].className = 'z-slide-dot ' + activeClass;
+        indicators[activeIndex].className = 'slider-dot ' + activeClass;
 
         slider._indicatorWrap = indicatorWrap;
         slider._indicators = indicators;
         slider._rootEl.appendChild(indicatorWrap);
 
-        nextTick(function() {
+        setTimeout(() => {
             indicatorWrap.style.left = (slider._width - parseFloat(getComputedStyle(indicatorWrap)!.width!.replace('px', ''))) / 2 + 'px';
-        });
+        }, 0);
     }
 
-    // update indicator style
     private static updateIndicator(indicators: HTMLElement[], pre: number, cur: number) {
-        indicators[pre].className = 'z-slide-dot';
-        indicators[cur].className = 'z-slide-dot active';
+        indicators[pre].className = 'slider-dot';
+        indicators[cur].className = 'slider-dot active';
     }
 
-    /* tslint:enable:no-function-expression prefer-const no-var-keyword no-parameter-reassignment */
+    /* tslint:enable:no-parameter-reassignment */
 }
