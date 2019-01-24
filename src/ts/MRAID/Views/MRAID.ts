@@ -73,6 +73,29 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this.setAnalyticsBackgroundTime(viewable);
     }
 
+    protected sendMraidAnalyticsEvent(eventName: string, eventData?: unknown) {
+        const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
+        const backgroundTime = this._backgroundTime / 1000;
+        const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;
+
+        if (this.isKPIDataValid({timeFromShow, backgroundTime, timeFromPlayableStart}, 'mraid_' + eventName)) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
+        }
+    }
+
+    protected onCloseEvent(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if(this._canSkip && !this._canClose) {
+            this._handlers.forEach(handler => handler.onMraidSkip());
+            this.sendMraidAnalyticsEvent('playable_skip');
+        } else if(this._canClose) {
+            this._handlers.forEach(handler => handler.onMraidClose());
+            this.sendMraidAnalyticsEvent('playable_close');
+        }
+    }
+
     private loadIframe(): void {
         const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
         this._mraidAdapterContainer.connect(new MRAIDIFrameEventAdapter(this._core, this._mraidAdapterContainer, iframe));
@@ -95,29 +118,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 message: e.message
             }, this._campaign.getSession());
         });
-    }
-
-    protected sendMraidAnalyticsEvent(eventName: string, eventData?: unknown) {
-        const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
-        const backgroundTime = this._backgroundTime / 1000;
-        const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;
-
-        if (this.isKPIDataValid({timeFromShow, backgroundTime, timeFromPlayableStart}, 'mraid_' + eventName)) {
-            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
-        }
-    }
-
-    protected onCloseEvent(event: Event): void {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if(this._canSkip && !this._canClose) {
-            this._handlers.forEach(handler => handler.onMraidSkip());
-            this.sendMraidAnalyticsEvent('playable_skip');
-        } else if(this._canClose) {
-            this._handlers.forEach(handler => handler.onMraidClose());
-            this.sendMraidAnalyticsEvent('playable_close');
-        }
     }
 
     protected onLoadedEvent(): void {

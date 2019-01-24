@@ -207,12 +207,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         // EMPTY
     }
 
-    protected openAdUnitContainer(views: string[]) {
-        return this._container.open(this, views, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options).then(() => {
-            this.onStart.trigger();
-        });
-    }
-
     protected unsetReferences() {
         delete this._mraid;
         delete this._endScreen;

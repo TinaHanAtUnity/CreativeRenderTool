@@ -111,6 +111,12 @@ export class WebPlayerMRAIDAdUnit extends MRAIDAdUnit implements IAdUnitContaine
         });
     }
 
+    private openAdUnitContainer(views: string[]) {
+        return this._container.open(this, views, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options).then(() => {
+            this.onStart.trigger();
+        });
+    }
+
     protected setupContainerView(): Promise<void> {
         return this.setupWebPlayerView();
     }
