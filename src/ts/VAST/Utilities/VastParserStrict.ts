@@ -258,7 +258,9 @@ export class VastParserStrict {
 
         this.getNodesWithName(adElement, VastNodeName.IMPRESSION).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
-            if (url.length > 0) {
+            // ignore empty urls and about:blank
+            // about:blank needs to be ignored so that VPAID ads can be parsed
+            if (url.length > 0 && url !== 'about:blank') {
                 vastAd.addImpressionURLTemplate(url);
             }
         });
