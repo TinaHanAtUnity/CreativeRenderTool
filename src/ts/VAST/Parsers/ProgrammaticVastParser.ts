@@ -150,7 +150,6 @@ export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
     public static readonly MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD_MESSAGE: string = 'VAST ad contains media files meant for VPAID';
     public static readonly MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD: number = 499;
 
-
     protected _vastParserStrict: VastParserStrict = new VastParserStrict();
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
