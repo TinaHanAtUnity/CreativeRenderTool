@@ -67,20 +67,6 @@
             background-position: center;
         }
         
-        #promo .portrait .btn-promo {
-            top: 80%;
-            left: 25%;
-            width: 46%;
-            height: 11%;
-        }
-        
-        #promo .landscape .btn-promo {
-            top: 80%;
-            left: 25%;
-            width: 46%;
-            height: 11%;
-        }
-        
         .hide {
             display: none !important;
         }
@@ -213,10 +199,6 @@
             display: none;
         }
         
-        .animationTimerDuration {
-            display: none
-        }
-        
         @media all and (orientation: portrait) {
             .promo-background.landscape {
                 display: none;
@@ -312,10 +294,8 @@
 <body id="promo" class="noselect">
     <div class="backdrop"></div>
     <div class="promo-container">
-
-        <span class="animationTimerDuration"><%= data.rewardedPromoTimerDuration %></span>
         <div class="promo-background portrait" style="background-image: url('<%= data.portraitBackgroundImage && data.portraitBackgroundImage.replace("file://", "") %>')">
-            <button class="btn-promo" onclick="purchase()" style="background-image: url('<%= data.portraitButtonImage && data.portraitButtonImage.replace("file://", "") %>')">
+            <button class="btn-promo" onclick="purchase()" style="top: <%= data.portraitButtonCoordinatesTop %>; left: <%= data.portraitButtonCoordinatesLeft %>; width: <%= data.portraitButtonSizeWidth %>; height: <%= data.portraitButtonSizeHeight %>; background-image: url('<%= data.portraitButtonImage && data.portraitButtonImage.replace("file://", "") %>')">
                 <span class="price-text" style="font-family: '<%= data.portraitPriceTextFontFamily  %>'; color: <%= data.portraitPriceTextFontColor %>; font-size: <%= data.portraitPriceTextFontSize %>vh">
                     <%= data.localizedPrice %></span>
             </button>
@@ -334,7 +314,7 @@
         </div>
 
         <div class="promo-background landscape" style="background-image: url('<%= data.landscapeBackgroundImage && data.landscapeBackgroundImage.replace("file://", "") %>')">
-            <button class="btn-promo" onclick="purchase()" style="background-image: url('<%= data.landscapeButtonImage && data.landscapeButtonImage.replace("file://", "") %>')">
+            <button class="btn-promo" onclick="purchase()" style="top: <%= data.landscapeButtonCoordinatesTop %>; left: <%= data.landscapeButtonCoordinatesLeft %>; width: <%= data.landscapeButtonSizeWidth %>; height: <%= data.landscapeButtonSizeHeight %>; background-image: url('<%= data.landscapeButtonImage && data.landscapeButtonImage.replace("file://", "") %>')">
                 <span class="price-text" style="font-family: '<%= data.landscapePriceTextFontFamily %>'; color: <%= data.landscapePriceTextFontColor %>; font-size: <%= data.landscapePriceTextFontSize %>vh"><%= data.localizedPrice %></span>
             </button>
 
@@ -355,16 +335,6 @@
 </body>
 
 <script type="text/javascript">
-    var portraitImageSize = {
-        width: 580,
-        height: 1035
-    };
-    var landscapeImageSize = {
-        width: 580,
-        height: 1035
-    };
-    var portraitImageAspectRatio = round(portraitImageSize.width / portraitImageSize.height);
-    var landscapeImageAspectRatio = round(landscapeImageSize.width / landscapeImageSize.height);
     var currentOrientation;
     var animationMaxDuration = 5;
     var animationTimePassed = 0;
@@ -387,7 +357,7 @@
     function initialize() {
         setCurrentOrientation();
         setStylesBasedOnAspectRatio();
-        var animationTime = parseInt(document.querySelector(".animationTimerDuration").innerHTML);
+        var animationTime = '<%=data.rewardedPromoTimerDuration%>';
         if (animationTime > 0) {
             startTimerAnimation(animationTime)
         }
@@ -401,8 +371,14 @@
         if (currentOrientation == 'landscape') {
             screenAspectRatio = 1 / screenAspectRatio;
         }
-        setContainerStyles(screenAspectRatio, portraitContainer, portraitImageAspectRatio);
-        setContainerStyles(1 / screenAspectRatio, landscapeContainer, landscapeImageAspectRatio);
+        var portraitBackgroundImageWidth = '<%=data.portraitBackgroundImageWidth%>';
+        var portraitBackgroundImageHeight = '<%=data.portraitBackgroundImageHeight%>'
+        var portraitBackgroundImageAspectRatio = round(portraitBackgroundImageWidth/portraitBackgroundImageHeight);
+        var landscapeBackgroundImageWidth = '<%=data.landscapeBackgroundImageWidth%>';
+        var landscapeBackgroundImageHeight = '<%=data.landscapeBackgroundImageHeight%>';
+        var landscapeBackgroundImageAspectRatio = round(landscapeBackgroundImageWidth/landscapeBackgroundImageHeight);
+        setContainerStyles(screenAspectRatio, portraitContainer, portraitBackgroundImageAspectRatio);
+        setContainerStyles(1 / screenAspectRatio, landscapeContainer, landscapeBackgroundImageAspectRatio);
     }
 
     function setContainerStyles(screenAspectRatio, container, imageAspectRatio) {
