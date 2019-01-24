@@ -1,5 +1,5 @@
 import { Platform } from 'Core/Constants/Platform';
-import { Swipe } from 'Core/Utilities/Swipe';
+import { Swipe, SwipeType } from 'Core/Utilities/Swipe';
 import { Tap } from 'Core/Utilities/Tap';
 import { Template } from 'Core/Utilities/Template';
 import { IViewBinding } from 'Core/Views/IViewBinding';
@@ -14,7 +14,11 @@ export abstract class View<T extends object> {
 
     private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
         if(binding.event === 'swipe') {
-            binding.swipe = new Swipe(element);
+            binding.swipe = new Swipe(element, SwipeType.HORIZONTAL);
+        }
+
+        if(binding.event === 'swipedown') {
+            binding.swipe = new Swipe(element, SwipeType.SWIPE_DOWN);
         }
 
         if(attachTap && binding.event === 'click') {
@@ -32,9 +36,17 @@ export abstract class View<T extends object> {
 
     protected _id: string;
 
-    constructor(platform: Platform, id: string) {
+    private _attachTap: boolean = false;
+
+    constructor(platform: Platform, id: string, attachTap?: boolean) {
         this._platform = platform;
         this._id = id;
+
+        if (attachTap !== undefined) {
+            this._attachTap = attachTap;
+        } else {
+            this._attachTap = this._platform === Platform.IOS;
+        }
     }
 
     public addEventHandler(handler: T): T {
@@ -57,19 +69,17 @@ export abstract class View<T extends object> {
         container.id = this._id;
         container.innerHTML = this._template.render(this._templateData ? this._templateData : {});
 
-        const attachTap = this._platform === Platform.IOS;
-
         this._bindings.forEach((binding: IViewBinding) => {
             if(binding.selector) {
                 const elements: NodeList = container.querySelectorAll(binding.selector);
                 // tslint:disable:prefer-for-of
                 for(let i = 0; i < elements.length; ++i) {
                     const element = elements[i];
-                    View.addEventListener(binding, <HTMLElement>element, attachTap);
+                    View.addEventListener(binding, <HTMLElement>element, this._attachTap);
                 }
                 // tslint:enable:prefer-for-of
             } else {
-                View.addEventListener(binding, container, attachTap);
+                View.addEventListener(binding, container, this._attachTap);
             }
         });
     }

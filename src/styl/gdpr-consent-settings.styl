@@ -1,0 +1,163 @@
+@import "components.styl";
+
+#gdpr-consent-settings {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background: $white;
+  font-size: $privacy-text-font-size;
+
+  &.prevent-clicks {
+    pointer-events: none;
+  }
+
+  .safe-area-content {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  .back-button {
+    position: relative;
+    padding: .5 * $default-size 0 $default-size 0;
+    width: 2 * $default-size;
+    color: $black;
+  }
+
+  .wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 0 2 * $default-size $default-size;
+    height: 100%;
+  }
+
+  .description {
+    color: $privacy-text-color;
+    text-align: left;
+    font-weight: $privacy-text-font-weight;
+  }
+
+  .heading {
+    display: block;
+    font-weight: 400;
+  }
+
+  .personalization-container {
+    flex: 0 1 45%;
+    overflow: auto;
+
+    .privacy-info-title {
+      font-weight: $privacy-main-title-font-weight;
+      font-size: $default-font-size;
+    }
+  }
+
+  .info-container {
+    position: relative;
+  }
+
+  .stripe {
+    margin: .1 * $default-size 0 0 0;
+    height: 1px;
+    background-color: $light-gray;
+  }
+
+  .settings-container {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .accept-all {
+    margin-bottom: .5 * $default-size;
+  }
+
+  .consent-button {
+    position: relative;
+
+    &.click-animation {
+      $click-animation();
+    }
+  }
+
+  .blue.consent-button {
+    $privacy-blue-button-default();
+  }
+
+  .white.consent-button {
+    $privacy-white-button-default();
+  }
+
+  .item {
+    padding: .75 * $default-size $default-size;
+    text-align: center;
+  }
+
+  .checkbox-group-container {
+    $checkbox-group-container($default-scale-size, $privacy-text-font-size);
+  }
+}
+
+body {
+  &.landscape #gdpr-consent-settings {
+    .back-button {
+      position: absolute;
+      top: $default-size;
+      left: 5%;
+      padding: 0;
+      width: $default-size;
+      height: $default-size;
+      color: $black;
+    }
+
+    .safe-area-content {
+      position: fixed;
+      padding: auto;
+    }
+
+    .wrapper {
+      display: block;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .personalization-container {
+      position: absolute;
+      top: 2.5 * $default-size;
+      left: 5%;
+      display: block;
+      width: 40%;
+      height: "calc(100% - 2.5 * %s)" % $default-size;
+    }
+
+    .stripe {
+      position: absolute;
+      top: 2.5 * $default-size;
+      left: 50%;
+      display: block;
+      width: 1px;
+      height: "calc(100% - 2.5 * %s)" % $default-size;
+      background-color: $white-smoke;
+    }
+
+    .settings-container {
+      position: absolute;
+      top: 2.5 * $default-size;
+      left: 55%;
+      display: block;
+      width: 40%;
+      height: 100%;
+    }
+  }
+}
+
+
