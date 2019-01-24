@@ -52,6 +52,7 @@ import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlockin
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { ProgrammaticVastParserStrict } from 'VAST/Parsers/ProgrammaticVastParser';
 
 export class CampaignManager {
 
@@ -555,7 +556,7 @@ export class CampaignManager {
 
         const parseTimestamp = Date.now();
         return parser.parse(response, session).catch((error) => {
-            if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === VastErrorCode.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
+            if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === ProgrammaticVastParserStrict.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
                 parser = this.getCampaignParser(CampaignContentTypes.ProgrammaticVpaid);
                 return parser.parse(response, session);
             } else {

@@ -139,13 +139,13 @@ describe('ProgrammaticVastParserStrict', () => {
         });
 
         describe('with a VPAID ad inside a VAST ad', () => {
-            it('should throw VastErrorCode.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD error', () => {
+            it('should throw ProgrammaticVastParserStrict.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD error', () => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
                 const response = new AuctionResponse([auctionPlacement], JSON.parse(ProgrammaticVastCampaignWithVpaidAd), mediaId, correlationId);
                 return parser.parse(response, session).then(() => {
                     assert.fail('An error should have been thrown');
                 }).catch((error) => {
-                    if (error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === VastErrorCode.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
+                    if (error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === ProgrammaticVastParserStrict.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
                         // then the test has passed
                     } else {
                         assert.fail(`Expected MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD error but got ${error.message}`);

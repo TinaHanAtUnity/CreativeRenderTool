@@ -6,6 +6,7 @@ import { Url } from 'Core/Utilities/Url';
 
 // VAST Error code defined in 3.0
 // https://wiki.iabtechlab.com/index.php?title=VAST_Error_Code_Troubleshooting_Matrix
+// https://iabtechlab.com/wp-content/uploads/2018/11/VAST4.1-final-Nov-8-2018.pdf   Page 28 for error codes
 export enum VastErrorCode {
     XML_PARSER_ERROR = 100,
     SCHEMA_VAL_ERROR = 101,
@@ -23,7 +24,6 @@ export enum VastErrorCode {
     MEDIA_FILE_UNSUPPORTED = 403,
     MEDIA_FILE_UNSUPPORTED_IOS = 404,
     MEDIA_FILE_PLAY_ERROR = 405,
-    MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD = 406,
     COMPANION_GENERAL_ERROR = 600,   // code 5xx for Non-Linear ads
     COMPANION_SIZE_UNSUPPORTED = 601,
     COMPANION_UNABLE_TO_DISPLAY = 602,
@@ -51,7 +51,6 @@ export class VastErrorInfo {
         [VastErrorCode.MEDIA_FILE_UNSUPPORTED]: 'No Media file found supported in Video Player',
         [VastErrorCode.MEDIA_FILE_UNSUPPORTED_IOS]: 'Campaign video url needs to be https for iOS',
         [VastErrorCode.MEDIA_FILE_PLAY_ERROR]: 'Problem displaying Media file',
-        [VastErrorCode.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD]: 'VAST ad contains media files meant for VPAID',
         // code 5xx for Non-Linear ads
         [VastErrorCode.COMPANION_GENERAL_ERROR]: 'General error from Companion Ad',
         [VastErrorCode.COMPANION_SIZE_UNSUPPORTED]: 'Companion creative size unsupported',

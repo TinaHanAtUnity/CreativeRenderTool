@@ -147,6 +147,10 @@ export class ProgrammaticVastParser extends CampaignParser {
 
 export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
 
+    public static readonly MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD_MESSAGE: string = 'VAST ad contains media files meant for VPAID';
+    public static readonly MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD: number = 499;
+
+
     protected _vastParserStrict: VastParserStrict = new VastParserStrict();
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -159,7 +163,7 @@ export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
             // if the vast campaign is accidentally a vpaid campaign parse it as such
             if (vast.isVPAIDCampaign()) {
                 // throw appropriate campaign error to be caught and handled in campaign manager
-                throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD], CampaignContentTypes.ProgrammaticVast, undefined, VastErrorCode.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD);
+                throw new CampaignError(ProgrammaticVastParserStrict.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD_MESSAGE, CampaignContentTypes.ProgrammaticVast, undefined, ProgrammaticVastParserStrict.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD);
             }
             return this._deviceInfo.getConnectionType().then((connectionType) => {
                 return this.parseVastToCampaign(vast, session, response, connectionType);

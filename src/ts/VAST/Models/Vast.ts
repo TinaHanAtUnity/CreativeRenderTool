@@ -290,7 +290,7 @@ export class Vast extends Model<IVast> {
             }
         }
 
-        if (vpaidMediaCount > 0 && mediaCount > 0 && vpaidMediaCount === mediaCount) {
+        if (vpaidMediaCount > 0 && vpaidMediaCount === mediaCount) {
             // then all mediaFiles are VPAID
             return true;
         }
