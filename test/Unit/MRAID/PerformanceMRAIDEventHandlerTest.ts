@@ -62,8 +62,6 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
             ar = TestFixtures.getARApi(nativeBridge);
 
             sinon.spy(core.Android!.Intent, 'launch');
-            sinon.spy(ads.Listener, 'sendClickEvent');
-
             focusManager = new FocusManager(platform, core);
             container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
             request = sinon.createStubInstance(RequestManager);
@@ -129,11 +127,6 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, { placement: placement, asset: extendedMraidAdUnitParams.campaign.getResourceUrl() });
         });
 
-        it('should send a native click event', () => {
-            performanceMraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>ads.Listener.sendClickEvent, placement.getId());
-        });
-
         describe('with follow redirects', () => {
             it('with response that contains location, it should launch intent', () => {
                 extendedMraidCampaign = TestFixtures.getExtendedMRAIDCampaignFollowsRedirects();
@@ -145,13 +138,7 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
                     headers: [['location', 'market://foobar.com']]
                 }));
 
-                mraidView = new MRAID(platform, core, deviceInfo, placement, extendedMraidCampaign, extendedMraidAdUnitParams.privacy, true, extendedMraidAdUnitParams.coreConfig.getAbGroup());
-                sinon.stub(mraidView, 'createMRAID').callsFake(() => {
-                    return Promise.resolve();
-                });
-
                 extendedMraidAdUnitParams.campaign = extendedMraidCampaign;
-                extendedMraidAdUnitParams.mraid = mraidView;
                 extendedMraidAdUnitParams.thirdPartyEventManager = thirdPartyEventManager;
 
                 mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
@@ -198,7 +185,7 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
             let sandbox: sinon.SinonSandbox;
 
             before(() => {
-                sandbox = sinon.sandbox.create();
+                sandbox = sinon.createSandbox();
             });
 
             beforeEach(() => {
