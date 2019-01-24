@@ -3,7 +3,7 @@
     position: relative;
     display: block;
     min-height: 100%;
-    min-width: 100%
+    min-width: 100%;
     height: 180px;
 }
 
@@ -50,27 +50,27 @@
     }
 }
 
-$dotColor = #fff;
-$dotActiveColor= #099fde;
-$dotRadius = 0.25rem;
+$dot-color = #fff;
+$dot-active-color = #099fde;
+$dot-radius = .25rem;
 
 .slider-indicator {
     position: absolute;
-    bottom: 0.5rem;
+    bottom: .5rem;
     left: 0;
     z-index: 10;
     .slider-dot {
         display: block;
         float: left;
-        width: $dotRadius * 2;
-        height: $dotRadius * 2;
-        margin-left: 0.2rem;
-        margin-right: 0.2rem;
+        width: $dot-radius * 2;
+        height: $dot-radius * 2;
+        margin-left: .2rem;
+        margin-right: .2rem;
         border-radius: 50%;
-        background-color: $dotColor;
+        background-color: $dot-color;
 
         &.active {
-            background-color: $dotActiveColor;
+            background-color: $dot-active-color;
         }
     }
 }

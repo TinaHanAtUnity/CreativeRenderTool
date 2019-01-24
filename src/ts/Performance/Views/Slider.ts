@@ -195,56 +195,59 @@ export class Slider {
         });
     }
 
-    /* tslint:disable:no-parameter-reassignment */
     private static prepareSlideItem(slider: Slider, container: HTMLElement, list: Node[], count: number, index: number, width: number) {
         const realCount: number = count;
         let lastIndex: number;
         let item;
         let clone: Node;
         let i;
+        let _count = count;
+        let _index = index;
+        const _width = width;
+        let _list = list;
 
-        if(count === 2) {
-            clone = list[0].cloneNode(true);
+        if(_count === 2) {
+            clone = _list[0].cloneNode(true);
             container.appendChild(clone);
-            list.push(clone);
+            _list.push(clone);
 
-            clone = list[1].cloneNode(true);
+            clone = _list[1].cloneNode(true);
             container.appendChild(clone);
-            list.push(clone);
+            _list.push(clone);
 
-            count = 4;
+            _count = 4;
         }
 
-        lastIndex = count - 1;
+        lastIndex = _count - 1;
 
-        if(index > lastIndex || index < 0) {
-            index = 0;
+        if(_index > lastIndex || _index < 0) {
+            _index = 0;
         }
-        if(index !== 0) {
-            list = list.splice(index, count - index).concat(list);
+        if(_index !== 0) {
+            _list = _list.splice(_index, _count - _index).concat(_list);
         }
 
-        let anyNode = <any>list[0];
+        let anyNode = <any>_list[0];
         anyNode.uuid = 0;
 
-        anyNode = <any>list[lastIndex];
+        anyNode = <any>_list[lastIndex];
         anyNode.uuid = lastIndex;
 
-        Slider.setTransformStyle(list[0], 'translate3d(0, 0, 0)');
-        Slider.setTransformStyle(list[lastIndex], 'translate3d(-' + width + 'px, 0, 0)');
+        Slider.setTransformStyle(_list[0], 'translate3d(0, 0, 0)');
+        Slider.setTransformStyle(_list[lastIndex], 'translate3d(-' + _width + 'px, 0, 0)');
 
         for (i = 1; i < lastIndex; i++) {
-            item = list[i];
-            anyNode = <any>list[0];
+            item = _list[i];
+            anyNode = <any>_list[0];
             anyNode.uuid = i;
-            Slider.setTransformStyle(item, 'translate3d(' + width + 'px, 0, 0)');
+            Slider.setTransformStyle(item, 'translate3d(' + _width + 'px, 0, 0)');
         }
 
         slider._slidesContainer = container;
-        slider._items = list;
+        slider._items = _list;
         slider._realCount = realCount;
-        slider._count = count;
-        slider._current = index;
+        slider._count = _count;
+        slider._current = _index;
     }
 
     private static bindEvents(slider: Slider, startHandler: any, moveHandler: any, endHandler: any) {
@@ -389,22 +392,26 @@ export class Slider {
         for (i = 1; i < lastIndex; i++) {
             Slider.setTransformStyle(list[i], 'translate3d(' + width + 'px, 0, 0)');
         }
-        indicatorWrap.style.left = (slider._width - parseFloat(getComputedStyle(indicatorWrap)!.width!.replace('px', ''))) / 2 + 'px';
+        indicatorWrap.style.left = (slider._width - parseFloat(getComputedStyle(indicatorWrap).width!.replace('px', ''))) / 2 + 'px';
     }
 
     private static setTransition(pre: Node, cur: Node, next: Node, preTransition: String, curTransition: String, nextTransition: String) {
-        if(typeof preTransition === 'undefined') {
-            preTransition = '';
+        let _preTransition = preTransition;
+        let _curTransition = curTransition;
+        let _nextTransition = nextTransition;
+
+        if(typeof _preTransition === 'undefined') {
+            _preTransition = '';
         }
-        if(typeof curTransition === 'undefined') {
-            curTransition = preTransition;
+        if(typeof _curTransition === 'undefined') {
+            _curTransition = preTransition;
         }
-        if(typeof nextTransition === 'undefined') {
-            nextTransition = curTransition;
+        if(typeof _nextTransition === 'undefined') {
+            _nextTransition = _curTransition;
         }
-        Slider.setTransitionStyle(pre, preTransition);
-        Slider.setTransitionStyle(cur, curTransition);
-        Slider.setTransitionStyle(next, nextTransition);
+        Slider.setTransitionStyle(pre, _preTransition);
+        Slider.setTransitionStyle(cur, _curTransition);
+        Slider.setTransitionStyle(next, _nextTransition);
     }
 
     private static move(pre: Node, cur: Node, next: Node, distance: number, width: number) {
@@ -414,6 +421,8 @@ export class Slider {
     }
 
     public slide(direction: 'left' | 'right' | 'restore', diffX: number) {
+        let _direction = direction;
+        let _diffX = diffX;
         const list = this._items;
         const current = this._current;
         const count = this._count;
@@ -424,36 +433,36 @@ export class Slider {
         let pre: Node;
         let next: Node;
 
-        direction = direction || this.options.direction;
-        diffX = diffX || 0;
+        _direction = _direction || this.options.direction;
+        _diffX = _diffX || 0;
 
-        if(direction === 'left') {
+        if(_direction === 'left') {
             const element = list.shift();
             if (element === undefined) {
                 throw new Error('list cannot be empty');
             }
             list.push(element);
             this._current = (current + 1) % count;
-            duration *= 1 - Math.abs(diffX) / width;
-        } else if(direction === 'right') {
+            duration *= 1 - Math.abs(_diffX) / width;
+        } else if(_direction === 'right') {
             const element = list.pop();
             if (element === undefined) {
                 throw new Error('list cannot be empty');
             }
             list.unshift(element);
             this._current = (current - 1 + count) % count;
-            duration *= 1 - Math.abs(diffX) / width;
+            duration *= 1 - Math.abs(_diffX) / width;
         } else {
-            duration *= Math.abs(diffX) / width;
+            duration *= Math.abs(_diffX) / width;
         }
         cur = list[0];
         pre = list[count - 1];
         next = list[1];
 
         transitionText = 'transform ' + duration + 's linear';
-        if(direction === 'left' || (direction === 'restore' && diffX > 0)) {
+        if(_direction === 'left' || (_direction === 'restore' && _diffX > 0)) {
             Slider.setTransition(pre, cur, next, transitionText, transitionText, '');
-        } else if(direction === 'right' || (direction === 'restore' && diffX < 0)) {
+        } else if(_direction === 'right' || (_direction === 'restore' && _diffX < 0)) {
             Slider.setTransition(pre, cur, next, '', transitionText, transitionText);
         }
         Slider.move(pre, cur, next, 0, width);
@@ -486,7 +495,7 @@ export class Slider {
         slider._rootEl.appendChild(indicatorWrap);
 
         setTimeout(() => {
-            indicatorWrap.style.left = (slider._width - parseFloat(getComputedStyle(indicatorWrap)!.width!.replace('px', ''))) / 2 + 'px';
+            indicatorWrap.style.left = (slider._width - parseFloat(getComputedStyle(indicatorWrap).width!.replace('px', ''))) / 2 + 'px';
         }, 0);
     }
 
@@ -495,5 +504,4 @@ export class Slider {
         indicators[cur].className = 'slider-dot active';
     }
 
-    /* tslint:enable:no-parameter-reassignment */
 }
