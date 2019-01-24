@@ -13,6 +13,8 @@ import { PromoOrientationAsset, IPromoOrientationAsset, IRawPromoOrientationAsse
 import { PromoAsset, IPromoAsset } from 'Promo/Models/PromoAsset';
 import { Image } from 'Ads/Models/Assets/Image';
 import { Font } from 'Ads/Models/Assets/Font';
+import { PromoCoordinates } from 'Promo/Models/PromoCoordinatesAsset';
+import { PromoSize } from 'Promo/Models/PromoSize';
 
 export class PromoCampaignParser extends CampaignParser {
 
@@ -87,13 +89,29 @@ export class PromoCampaignParser extends CampaignParser {
         if (buttonFontJSON === undefined) {
             return undefined;
         }
+        const buttonCoordinates = orientationJSON.button.coordinates;
+        if (buttonCoordinates === undefined) {
+            return undefined;
+        }
+        const buttonSize = orientationJSON.button.size;
+        if (buttonSize === undefined) {
+            return undefined;
+        }
+        const backgroundImageSize = orientationJSON.background.size;
+        if (backgroundImageSize === undefined) {
+            return undefined;
+        }
         const buttonAssetData: IPromoAsset = {
             image: new Image(orientationJSON.button.url, session),
-            font: new Font(buttonFontJSON.url, session, buttonFontJSON.family, buttonFontJSON.color, buttonFontJSON.size)
+            font: new Font(buttonFontJSON.url, session, buttonFontJSON.family, buttonFontJSON.color, buttonFontJSON.size),
+            coordinates: new PromoCoordinates(buttonCoordinates),
+            size: new PromoSize(buttonSize)
         };
         const backgroundAssetData: IPromoAsset = {
             image: new Image(orientationJSON.background.url, session),
-            font: undefined
+            font: undefined,
+            coordinates: undefined,
+            size: new PromoSize(backgroundImageSize)
         };
         const PromoOrientationAssetData: IPromoOrientationAsset = {
             buttonAsset: new PromoAsset(buttonAssetData),
