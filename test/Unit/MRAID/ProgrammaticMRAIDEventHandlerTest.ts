@@ -17,7 +17,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -33,301 +33,251 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
 import { ProgrammaticMRAIDEventHandler } from 'MRAID/EventHandlers/ProgrammaticMRAIDEventHandler';
+import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 
-describe('ProgrammaticMRAIDEventHandlersTest', () => {
+[Platform.ANDROID, Platform.IOS].forEach(platform => {
 
-    let platform: Platform;
-    let backend: Backend;
-    let nativeBridge: NativeBridge;
-    let container: AdUnitContainer;
-    let core: ICoreApi;
-    let ads: IAdsApi;
-    let ar: IARApi;
-    let storageBridge: StorageBridge;
-    let mraidAdUnit: MRAIDAdUnit;
-    let mraidView: MRAID;
-    let placement: Placement;
-    let focusManager: FocusManager;
-    let request: RequestManager;
-    let operativeEventManager: OperativeEventManager;
-    let deviceInfo: DeviceInfo;
-    let clientInfo: ClientInfo;
-    let thirdPartyEventManager: ThirdPartyEventManager;
-    let extendedMraidAdUnitParams: IMRAIDAdUnitParameters;
-    let programmaticMraidEventHandler: ProgrammaticMRAIDEventHandler;
-    let extendedMraidCampaign: MRAIDCampaign;
-    let programmaticMraidCampaign: MRAIDCampaign;
-    let privacyManager: UserPrivacyManager;
-    let programmaticTrackingService: ProgrammaticTrackingService;
+    describe('ProgrammaticMRAIDEventHandlersTest', () => {
+        let backend: Backend;
+        let nativeBridge: NativeBridge;
+        let container: AdUnitContainer;
+        let core: ICoreApi;
+        let ads: IAdsApi;
+        let ar: IARApi;
+        let storageBridge: StorageBridge;
+        let mraidView: MRAID;
+        let placement: Placement;
+        let focusManager: FocusManager;
+        let request: RequestManager;
+        let operativeEventManager: OperativeEventManager;
+        let deviceInfo: DeviceInfo;
+        let clientInfo: ClientInfo;
+        let thirdPartyEventManager: ThirdPartyEventManager;
+        let programmaticMraidEventHandler: ProgrammaticMRAIDEventHandler;
+        let programmaticMraidCampaign: MRAIDCampaign;
+        let privacyManager: UserPrivacyManager;
+        let programmaticTrackingService: ProgrammaticTrackingService;
 
-    describe('with onClick', () => {
-        let resolvedPromise: Promise<INativeResponse>;
+        describe('with Programmatic MRAID', () => {
+            let programmaticMraidAdUnitParams: IMRAIDAdUnitParameters;
+            let metaDataManager: MetaDataManager;
+            let sessionManager: SessionManager;
+            let coreConfig: CoreConfiguration;
+            let adsConfig: AdsConfiguration;
+            let programmaticMraidAdUnit: MRAIDAdUnit;
+            let privacy: AbstractPrivacy;
+            let clickDestinationUrl: string;
 
-        beforeEach(() => {
-            platform = Platform.ANDROID;
-            backend = TestFixtures.getBackend(platform);
-            nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-            core = TestFixtures.getCoreApi(nativeBridge);
-            ads = TestFixtures.getAdsApi(nativeBridge);
-            ar = TestFixtures.getARApi(nativeBridge);
+            beforeEach(() => {
+                backend = TestFixtures.getBackend(platform);
+                nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+                core = TestFixtures.getCoreApi(nativeBridge);
+                ads = TestFixtures.getAdsApi(nativeBridge);
+                ar = TestFixtures.getARApi(nativeBridge);
+                storageBridge = new StorageBridge(core);
+                focusManager = new FocusManager(platform, core);
+                metaDataManager = new MetaDataManager(core);
+                request = new RequestManager(platform, core, new WakeUpManager(core));
+                clickDestinationUrl = 'https://market_url.com';
+                sinon.stub(request, 'followRedirectChain').resolves(clickDestinationUrl);
+                placement = TestFixtures.getPlacement();
+                privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
-            sinon.spy(core.Android!.Intent, 'launch');
-            sinon.spy(ads.Listener, 'sendClickEvent');
+                clientInfo = TestFixtures.getClientInfo(platform);
 
-            focusManager = new FocusManager(platform, core);
-            container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
-            request = sinon.createStubInstance(RequestManager);
-            placement = TestFixtures.getPlacement();
-            request = new RequestManager(platform, core, new WakeUpManager(core));
-            clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+                if (platform === Platform.ANDROID) {
+                    deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
+                    container = new Activity(core, ads, <AndroidDeviceInfo>deviceInfo);
+                } else if (platform === Platform.IOS) {
+                    deviceInfo = TestFixtures.getIosDeviceInfo(core);
+                    container = new ViewController(core, ads, <IosDeviceInfo>deviceInfo, focusManager, clientInfo);
+                }
+                thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
+                sessionManager = new SessionManager(core, request, storageBridge);
+                coreConfig = TestFixtures.getCoreConfiguration();
+                adsConfig = TestFixtures.getAdsConfiguration();
+                programmaticMraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
 
-            thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
-            operativeEventManager = sinon.createStubInstance(OperativeEventManager);
+                programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
-            resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
+                privacy = new Privacy(platform, programmaticMraidCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
+                mraidView = new MRAID(platform, core, deviceInfo, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup());
 
-            extendedMraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
-            mraidView = sinon.createStubInstance(MRAID);
-            (<sinon.SinonSpy>mraidView.container).restore();
-            sinon.stub(mraidView, 'container').returns(document.createElement('div'));
-            privacyManager = sinon.createStubInstance(UserPrivacyManager);
-            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-
-            extendedMraidAdUnitParams = {
-                platform,
-                core,
-                ads,
-                ar,
-                forceOrientation: Orientation.LANDSCAPE,
-                focusManager: focusManager,
-                container: container,
-                deviceInfo: deviceInfo,
-                clientInfo: clientInfo,
-                thirdPartyEventManager: thirdPartyEventManager,
-                operativeEventManager: operativeEventManager,
-                placement: TestFixtures.getPlacement(),
-                campaign: extendedMraidCampaign,
-                coreConfig: TestFixtures.getCoreConfiguration(),
-                adsConfig: TestFixtures.getAdsConfiguration(),
-                request: request,
-                options: {},
-                mraid: mraidView,
-                endScreen: undefined,
-                privacy: new Privacy(platform, extendedMraidCampaign, privacyManager, false, false),
-                privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService
-            };
-
-            mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
-            sinon.stub(mraidAdUnit, 'sendClick');
-            programmaticMraidEventHandler = new ProgrammaticMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
-        });
-
-        it('should send a native click event', () => {
-            programmaticMraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>ads.Listener.sendClickEvent, placement.getId());
-        });
-
-        describe('with follow redirects', () => {
-            it('with response that contains location, it should launch intent', () => {
-                extendedMraidCampaign = TestFixtures.getExtendedMRAIDCampaignFollowsRedirects();
-                (<sinon.SinonSpy>thirdPartyEventManager.clickAttributionEvent).restore();
-                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
-                    url: 'http://foo.url.com',
-                    response: 'foo response',
-                    responseCode: 200,
-                    headers: [['location', 'market://foobar.com']]
-                }));
-
-                mraidView = new MRAID(platform, core, deviceInfo, placement, extendedMraidCampaign, extendedMraidAdUnitParams.privacy, true, extendedMraidAdUnitParams.coreConfig.getAbGroup());
-                sinon.stub(mraidView, 'createMRAID').callsFake(() => {
-                    return Promise.resolve();
+                operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+                    platform,
+                    core,
+                    ads,
+                    request: request,
+                    metaDataManager: metaDataManager,
+                    sessionManager: sessionManager,
+                    clientInfo: clientInfo,
+                    deviceInfo: deviceInfo,
+                    coreConfig: coreConfig,
+                    adsConfig: adsConfig,
+                    storageBridge: storageBridge,
+                    campaign: programmaticMraidCampaign,
+                    playerMetadataServerId: 'test-gamerSid'
                 });
 
-                extendedMraidAdUnitParams.campaign = extendedMraidCampaign;
-                extendedMraidAdUnitParams.mraid = mraidView;
-                extendedMraidAdUnitParams.thirdPartyEventManager = thirdPartyEventManager;
+                programmaticMraidAdUnitParams = {
+                    platform,
+                    core,
+                    ads,
+                    ar,
+                    forceOrientation: Orientation.LANDSCAPE,
+                    focusManager: focusManager,
+                    container: container,
+                    deviceInfo: deviceInfo,
+                    clientInfo: clientInfo,
+                    thirdPartyEventManager: thirdPartyEventManager,
+                    operativeEventManager: operativeEventManager,
+                    placement: TestFixtures.getPlacement(),
+                    campaign: programmaticMraidCampaign,
+                    coreConfig: coreConfig,
+                    adsConfig: adsConfig,
+                    request: request,
+                    options: {},
+                    mraid: mraidView,
+                    endScreen: undefined,
+                    privacy: new Privacy(platform, programmaticMraidCampaign, privacyManager, false, false),
+                    privacyManager: privacyManager,
+                    programmaticTrackingService: programmaticTrackingService
+                };
 
-                mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
-                sinon.stub(mraidAdUnit, 'sendClick');
-                programmaticMraidEventHandler = new ProgrammaticMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
+                programmaticMraidAdUnit = new MRAIDAdUnit(programmaticMraidAdUnitParams);
+                programmaticMraidEventHandler = new ProgrammaticMRAIDEventHandler(programmaticMraidAdUnit, programmaticMraidAdUnitParams);
+                sinon.stub(programmaticMraidAdUnit, 'sendClick').returns(sinon.spy());
+            });
 
-                programmaticMraidEventHandler.onMraidClick('market://foobar.com');
+            describe('when calling onClick', () => {
+                if (platform === Platform.IOS) {
+                    describe('on iOS', () => {
+                        it('should send a tracking event for programmatic mraid click', () => {
+                            sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
+                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                sinon.assert.calledOnce(<sinon.SinonSpy>programmaticMraidAdUnit.sendClick);
+                            });
+                        });
 
-                return resolvedPromise.then(() => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>core.Android!.Intent.launch, {
-                        'action': 'android.intent.action.VIEW',
-                        'uri': 'market://foobar.com'
+                        it('should send second tracking event for programmatic mraid click after processing the first', () => {
+                            sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
+                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                    sinon.assert.calledTwice(<sinon.SinonSpy>programmaticMraidAdUnit.sendClick);
+                                });
+                            });
+                        });
+
+                        it('should ignore user clicks while processing the first click event', () => {
+                            const mockMraidView = sinon.mock(mraidView);
+                            const expectationMraidView = sinon.mock(mraidView).expects('setCallButtonEnabled').twice();
+                            sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
+                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                mockMraidView.verify();
+                                assert.equal(expectationMraidView.getCall(0).args[0], false, 'Should block CTA event while processing click event');
+                                assert.equal(expectationMraidView.getCall(1).args[0], true, 'Should enable CTA event after processing click event');
+                            });
+                        });
+
+                        it('should send a click with session manager', () => {
+                            sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
+                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, asset: programmaticMraidAdUnitParams.campaign.getResourceUrl() });
+                            });
+                        });
+
+                        it('should send a view with session manager', () => {
+                            sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
+                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, { placement: placement, asset: programmaticMraidAdUnitParams.campaign.getResourceUrl() });
+                            });
+                        });
+
+                        it('should send a third quartile event with session manager', () => {
+                            sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
+                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, { placement: placement, asset: programmaticMraidAdUnitParams.campaign.getResourceUrl() });
+                            });
+                        });
+
+                        it('should open click through link', () => {
+                            sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
+                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                sinon.assert.calledWith(<sinon.SinonSpy>core.iOS!.UrlScheme.open, clickDestinationUrl);
+                            });
+                        });
                     });
-                });
-            });
+                }
 
-            it('with response that does not contain location, it should not launch intent', () => {
-                extendedMraidCampaign = TestFixtures.getExtendedMRAIDCampaignFollowsRedirects();
-                (<sinon.SinonSpy>thirdPartyEventManager.clickAttributionEvent).restore();
-                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve());
-                extendedMraidAdUnitParams.mraid = mraidView;
-                extendedMraidAdUnitParams.campaign = extendedMraidCampaign;
-                extendedMraidAdUnitParams.thirdPartyEventManager = thirdPartyEventManager;
-                (<sinon.SinonSpy>operativeEventManager.sendClick).restore();
-                const response = TestFixtures.getOkNativeResponse();
-                response.headers = [];
-                resolvedPromise = Promise.resolve(response);
-                sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
-                extendedMraidAdUnitParams.operativeEventManager = operativeEventManager;
+                if (platform === Platform.ANDROID) {
+                    describe('on Android', () => {
+                        it('should send a tracking event for programmatic mraid click', () => {
+                            sinon.stub(core.Android!.Intent, 'launch').resolves();
+                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                sinon.assert.calledOnce(<sinon.SinonSpy>programmaticMraidAdUnit.sendClick);
+                            });
+                        });
 
-                mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
-                sinon.stub(mraidAdUnit, 'sendClick');
+                        it('should send second tracking event for programmatic mraid click after processing the first', () => {
+                            sinon.stub(core.Android!.Intent, 'launch').resolves();
+                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                    sinon.assert.calledTwice(<sinon.SinonSpy>programmaticMraidAdUnit.sendClick);
+                                });
+                            });
+                        });
 
-                programmaticMraidEventHandler = new ProgrammaticMRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
-                programmaticMraidEventHandler.onMraidClick('http://example.net');
+                        it('should ignore user clicks while processing the first click event', () => {
+                            const mockMraidView = sinon.mock(mraidView);
+                            const expectationMraidView = sinon.mock(mraidView).expects('setCallButtonEnabled').twice();
+                            sinon.stub(core.Android!.Intent, 'launch').resolves();
+                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                mockMraidView.verify();
+                                assert.equal(expectationMraidView.getCall(0).args[0], false, 'Should block CTA event while processing click event');
+                                assert.equal(expectationMraidView.getCall(1).args[0], true, 'Should enable CTA event after processing click event');
+                            });
+                        });
 
-                return resolvedPromise.then(() => {
-                    sinon.assert.notCalled(<sinon.SinonSpy>core.Android!.Intent.launch);
-                });
-            });
-        });
-    });
+                        it('should send a click with session manager', () => {
+                            sinon.stub(core.Android!.Intent, 'launch').resolves();
+                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, asset: programmaticMraidAdUnitParams.campaign.getResourceUrl() });
+                            });
+                        });
 
-    describe('with Programmatic MRAID', () => {
-        let programmaticMraidAdUnitParams: IMRAIDAdUnitParameters;
-        let metaDataManager: MetaDataManager;
-        let sessionManager: SessionManager;
-        let coreConfig: CoreConfiguration;
-        let adsConfig: AdsConfiguration;
-        let programmaticMraidAdUnit: MRAIDAdUnit;
-        let privacy: AbstractPrivacy;
+                        it('should send a view with session manager', () => {
+                            sinon.stub(core.Android!.Intent, 'launch').resolves();
+                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, { placement: placement, asset: programmaticMraidAdUnitParams.campaign.getResourceUrl() });
+                            });
+                        });
 
-        beforeEach(() => {
-            platform = Platform.ANDROID;
-            backend = TestFixtures.getBackend(platform);
-            nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-            core = TestFixtures.getCoreApi(nativeBridge);
-            ads = TestFixtures.getAdsApi(nativeBridge);
-            storageBridge = new StorageBridge(core);
-            focusManager = new FocusManager(platform, core);
-            metaDataManager = new MetaDataManager(core);
-            container = new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core));
-            request = new RequestManager(platform, core, new WakeUpManager(core));
-            sinon.stub(request, 'followRedirectChain').resolves();
-            placement = TestFixtures.getPlacement();
-            privacyManager = sinon.createStubInstance(UserPrivacyManager);
+                        it('should send a third quartile event with session manager', () => {
+                            sinon.stub(core.Android!.Intent, 'launch').resolves();
+                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, { placement: placement, asset: programmaticMraidAdUnitParams.campaign.getResourceUrl() });
+                            });
+                        });
 
-            clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
-            thirdPartyEventManager = new ThirdPartyEventManager(core, request);
-            sessionManager = new SessionManager(core, request, storageBridge);
-            coreConfig = TestFixtures.getCoreConfiguration();
-            adsConfig = TestFixtures.getAdsConfiguration();
-            programmaticMraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
-
-            privacy = new Privacy(platform, programmaticMraidCampaign, privacyManager, adsConfig.isGDPREnabled(), coreConfig.isCoppaCompliant());
-            mraidView = new MRAID(platform, core, <AndroidDeviceInfo>deviceInfo, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup());
-
-            operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
-                platform,
-                core,
-                ads,
-                request: request,
-                metaDataManager: metaDataManager,
-                sessionManager: sessionManager,
-                clientInfo: clientInfo,
-                deviceInfo: deviceInfo,
-                coreConfig: coreConfig,
-                adsConfig: adsConfig,
-                storageBridge: storageBridge,
-                campaign: programmaticMraidCampaign,
-                playerMetadataServerId: 'test-gamerSid'
-            });
-
-            programmaticMraidAdUnitParams = {
-                platform,
-                core,
-                ads,
-                ar,
-                forceOrientation: Orientation.LANDSCAPE,
-                focusManager: focusManager,
-                container: container,
-                deviceInfo: deviceInfo,
-                clientInfo: clientInfo,
-                thirdPartyEventManager: thirdPartyEventManager,
-                operativeEventManager: operativeEventManager,
-                placement: TestFixtures.getPlacement(),
-                campaign: programmaticMraidCampaign,
-                coreConfig: coreConfig,
-                adsConfig: adsConfig,
-                request: request,
-                options: {},
-                mraid: mraidView,
-                endScreen: undefined,
-                privacy: new Privacy(platform, programmaticMraidCampaign, privacyManager, false, false),
-                privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService
-            };
-
-            programmaticMraidAdUnit = new MRAIDAdUnit(programmaticMraidAdUnitParams);
-            programmaticMraidEventHandler = new ProgrammaticMRAIDEventHandler(programmaticMraidAdUnit, programmaticMraidAdUnitParams);
-            sinon.stub(programmaticMraidAdUnit, 'sendClick').returns(sinon.spy());
-        });
-
-        describe('when calling onClick', () => {
-            it('should send a tracking event for programmatic mraid click', () => {
-                sinon.stub(core.Android!.Intent, 'launch').resolves();
-                programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
-                    sinon.assert.calledOnce(<sinon.SinonSpy>programmaticMraidAdUnit.sendClick);
-                });
-            });
-
-            it('should send second tracking event for programmatic mraid click after processing the first', () => {
-                sinon.stub(core.Android!.Intent, 'launch').resolves();
-                programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
-                    programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
-                        sinon.assert.calledTwice(<sinon.SinonSpy>programmaticMraidAdUnit.sendClick);
+                        it('should open click through link', () => {
+                            sinon.stub(core.Android!.Intent, 'launch').resolves();
+                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
+                                sinon.assert.calledWith(<sinon.SinonSpy>core.Android!.Intent.launch, clickDestinationUrl);
+                            });
+                        });
                     });
-                });
+                }
             });
 
-            it('should ignore user clicks while processing the first click event', () => {
-                const mockMraidView = sinon.mock(mraidView);
-                const expectationMraidView = sinon.mock(mraidView).expects('setCallButtonEnabled').twice();
-                sinon.stub(core.Android!.Intent, 'launch').resolves();
-                programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
-                    mockMraidView.verify();
-                    assert.equal(expectationMraidView.getCall(0).args[0], false, 'Should block CTA event while processing click event');
-                    assert.equal(expectationMraidView.getCall(1).args[0], true, 'Should enable CTA event after processing click event');
+            describe('when calling custom impression event multiple times', () => {
+                it('should only send tracking event once', () => {
+                    sinon.stub(programmaticMraidAdUnit, 'sendImpression');
+
+                    programmaticMraidEventHandler.onCustomImpressionEvent();
+                    programmaticMraidEventHandler.onCustomImpressionEvent();
+                    sinon.assert.calledOnce(<sinon.SinonSpy>programmaticMraidAdUnit.sendImpression);
                 });
-            });
-
-            it('should send a click with session manager', () => {
-                sinon.stub(core.Android!.Intent, 'launch').resolves();
-                programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, asset: programmaticMraidAdUnitParams.campaign.getResourceUrl() });
-                });
-            });
-
-            it('should send a view with session manager', () => {
-                sinon.stub(core.Android!.Intent, 'launch').resolves();
-                programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, { placement: placement, asset: programmaticMraidAdUnitParams.campaign.getResourceUrl() });
-                });
-            });
-
-            it('should send a third quartile event with session manager', () => {
-                sinon.stub(core.Android!.Intent, 'launch').resolves();
-                programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, { placement: placement, asset: programmaticMraidAdUnitParams.campaign.getResourceUrl() });
-                });
-            });
-        });
-
-        describe('when calling custom impression event multiple times', () => {
-            it('should only send tracking event once', () => {
-                sinon.stub(programmaticMraidAdUnit, 'sendImpression');
-
-                programmaticMraidEventHandler.onCustomImpressionEvent();
-                programmaticMraidEventHandler.onCustomImpressionEvent();
-                sinon.assert.calledOnce(<sinon.SinonSpy>programmaticMraidAdUnit.sendImpression);
             });
         });
     });
