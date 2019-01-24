@@ -1,7 +1,5 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import {
-    IAdUnitContainerListener,
-} from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { IAdUnitContainerListener } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { EndScreen } from 'Ads/Views/EndScreen';
 import { IARApi } from 'AR/AR';
 import { FinishState } from 'Core/Constants/FinishState';
@@ -10,7 +8,6 @@ import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { WKAudiovisualMediaTypes } from 'Ads/Native/WebPlayer';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Platform } from 'Core/Constants/Platform';
-import { Privacy } from 'Ads/Views/Privacy';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { WebViewTopCalculator } from 'Ads/Utilities/WebPlayer/WebViewTopCalculator';
 import { MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
