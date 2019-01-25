@@ -2,6 +2,7 @@
 
 * Staging Scripts Fixes [#7912](https://github.com/Applifier/unity-ads-webview/pull/7912)
 * Promo adds greater UI flexibility [#7757](https://github.com/Applifier/unity-ads-webview/pull/7757)
+* VPAID in VAST ad should parse as VPAID ad [#7932](https://github.com/Applifier/unity-ads-webview/pull/7932)
 
 # Wed Jan 23 19:05:33 UTC 2019
 

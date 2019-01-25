@@ -273,6 +273,30 @@ export class Vast extends Model<IVast> {
         return [];
     }
 
+    public isVPAIDCampaign(): boolean {
+        const ad = this.getAd();
+        let vpaidMediaCount = 0;
+        let mediaCount = 0;
+        if (ad) {
+            const creatives = ad.getCreatives();
+            for (const creative of creatives) {
+                const mediaFiles = creative.getMediaFiles();
+                for (const mediaFile of mediaFiles) {
+                    mediaCount += 1;
+                    if (mediaFile.getApiFramework() === 'VPAID') {
+                        vpaidMediaCount += 1;
+                    }
+                }
+            }
+        }
+
+        if (vpaidMediaCount > 0 && vpaidMediaCount === mediaCount) {
+            // then all mediaFiles are VPAID
+            return true;
+        }
+        return false;
+    }
+
     private isValidLandscapeCompanion(creativeType: string | null, height: number, width: number): boolean {
         const minHeight = 320;
         const minWidth = 480;
