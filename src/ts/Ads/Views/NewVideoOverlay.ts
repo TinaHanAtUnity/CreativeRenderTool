@@ -92,6 +92,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
                 zyngaInterstitial: true
             };
             this.setFadeEnabled(false);
+            this.setTimerToSkipEnabled(true);
         }
 
         this._bindings = [
@@ -206,9 +207,17 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         this._videoProgress = value;
         this._skipRemaining = this._skipDuration - this._videoProgress;
-        const timerCount = Math.ceil((this._videoDuration - this._videoProgress) / 1000);
-        if (typeof timerCount === 'number' && !isNaN(timerCount)) {
+      
+        if (this._timerToSkipEnabled) {
+            var timerCount = Math.ceil((this._skipRemaining) / 1000);    
+        } else {
+            timerCount = Math.ceil((this._videoDuration - this._videoProgress) / 1000);
+        } 
+
+        if (typeof timerCount === 'number' && !isNaN(timerCount) && timerCount > 0) {
             this._timerElement.innerText = timerCount.toString();
+        } else {
+            this.hideTimer();
         }
 
         if (this._skipRemaining <= 0) {
@@ -426,6 +435,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private fadeOut() {
         this._container.classList.remove('fade-in');
         this._areControlsVisible = false;
+    }
+
+    private hideTimer() {
+        this._timerElement.style.display = 'none';
     }
 
     protected cleanUpPrivacy() {
