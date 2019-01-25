@@ -1,4 +1,8 @@
-Fri Jan 25 01:19:46 UTC 2019
+# Pending
+
+* splitting MRAIDEventHandler to Playable and Programmatic [#7780](https://github.com/Applifier/unity-ads-webview/pull/7780)
+
+# Fri Jan 25 01:19:46 UTC 2019
 
 * Staging Scripts Fixes [#7912](https://github.com/Applifier/unity-ads-webview/pull/7912)
 * Promo adds greater UI flexibility [#7757](https://github.com/Applifier/unity-ads-webview/pull/7757)
