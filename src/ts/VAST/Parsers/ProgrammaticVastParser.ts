@@ -27,7 +27,7 @@ export class ProgrammaticVastParser extends CampaignParser {
     }
 
     protected static VAST_PARSER_MAX_DEPTH: number;
-    protected _core: ICoreApi;
+    protected _coreApi: ICoreApi;
     protected _requestManager: RequestManager;
     protected _deviceInfo: DeviceInfo;
 
@@ -36,7 +36,7 @@ export class ProgrammaticVastParser extends CampaignParser {
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
         this._deviceInfo = core.DeviceInfo;
-        this._core = core.Api;
+        this._coreApi = core.Api;
         this._requestManager = core.RequestManager;
     }
 
@@ -55,7 +55,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     protected retrieveVast(response: AuctionResponse): Promise<Vast> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
-        return this._vastParser.retrieveVast(decodedVast, this._core, this._requestManager);
+        return this._vastParser.retrieveVast(decodedVast, this._coreApi, this._requestManager);
     }
 
     protected parseVastToCampaign(vast: Vast, session: Session, response: AuctionResponse, connectionType?: string): Promise<Campaign> {
@@ -147,6 +147,9 @@ export class ProgrammaticVastParser extends CampaignParser {
 
 export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
 
+    public static readonly MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD_MESSAGE: string = 'VAST ad contains media files meant for VPAID';
+    public static readonly MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD: number = 499;
+
     protected _vastParserStrict: VastParserStrict = new VastParserStrict();
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -156,6 +159,11 @@ export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
         }
 
         return this.retrieveVast(response).then((vast): Promise<Campaign> => {
+            // if the vast campaign is accidentally a vpaid campaign parse it as such
+            if (vast.isVPAIDCampaign()) {
+                // throw appropriate campaign error to be caught and handled in campaign manager
+                throw new CampaignError(ProgrammaticVastParserStrict.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD_MESSAGE, CampaignContentTypes.ProgrammaticVast, undefined, ProgrammaticVastParserStrict.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD);
+            }
             return this._deviceInfo.getConnectionType().then((connectionType) => {
                 return this.parseVastToCampaign(vast, session, response, connectionType);
             });
@@ -164,6 +172,6 @@ export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
 
     protected retrieveVast(response: AuctionResponse): Promise<Vast> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
-        return this._vastParserStrict.retrieveVast(decodedVast, this._core, this._requestManager);
+        return this._vastParserStrict.retrieveVast(decodedVast, this._coreApi, this._requestManager);
     }
 }
