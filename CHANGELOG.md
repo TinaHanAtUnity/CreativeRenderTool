@@ -1,4 +1,4 @@
-# Fri Jan 25 00:38:21 UTC 2019
+Fri Jan 25 01:19:46 UTC 2019
 
 * Staging Scripts Fixes [#7912](https://github.com/Applifier/unity-ads-webview/pull/7912)
 * Promo adds greater UI flexibility [#7757](https://github.com/Applifier/unity-ads-webview/pull/7757)
