@@ -15,6 +15,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 import { IMRAIDHandler } from 'MRAID/EventBridge/MRAIDEventAdapter';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -41,6 +42,8 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onPlayableAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: unknown): void;
     onMraidShowEndScreen(): void;
     onCustomImpressionEvent(): void;
+    onWebViewFullScreen(): Promise<void>;
+    onWebViewReduceSize(): Promise<void>;
 }
 
 export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandlerView, IMRAIDHandler {
@@ -221,6 +224,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
+    public isLoaded(): boolean {
+        return this._isLoaded;
+    }
+
     protected choosePrivacyShown(): void {
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._gdprBanner.style.visibility = 'visible';
@@ -385,6 +392,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._privacyPanelOpen = true;
     }
 
+    public loadWebPlayer(webPlayerContainer: WebPlayerContainer): Promise<void> {
+        return Promise.resolve();
+    }
+
     protected onSetOrientationProperties(allowOrientationChange: boolean, orientation: Orientation) {
         this._handlers.forEach(handler => handler.onMraidOrientationProperties({
             allowOrientationChange: allowOrientationChange,
@@ -436,7 +447,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public onBridgeResizeWebview() {
         // This will be used to handle rotation changes for webplayer-based mraid
-        // this._handlers.forEach(handler => handler.onWebViewResize(false));
     }
 
     public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {
