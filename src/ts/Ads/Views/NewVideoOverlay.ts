@@ -55,6 +55,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _callButtonElement: HTMLElement;
     private _timerElement: HTMLElement;
     private _chinaAdvertisementElement: HTMLElement;
+    private _timerButton: HTMLElement;
 
     private _fadeTimer?: number;
     private _areControlsVisible: boolean = false;
@@ -208,17 +209,17 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._videoProgress = value;
         this._skipRemaining = this._skipDuration - this._videoProgress;
 
-        let timerCount;
+        let timerCount: number;
         if (CustomFeatures.isZyngaGame(this._gameId)) {
             timerCount = Math.ceil((this._skipRemaining) / 1000);
         } else {
             timerCount = Math.ceil((this._videoDuration - this._videoProgress) / 1000);
         }
 
-        if (typeof timerCount === 'number' && !isNaN(timerCount) && timerCount > 0) {
+        if (timerCount > 0) {
             this._timerElement.innerText = timerCount.toString();
         } else {
-            this.hideTimer();
+            this.hideTimerButton();
         }
 
         if (this._skipRemaining <= 0) {
@@ -391,6 +392,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._timerElement = <HTMLElement>this._container.querySelector('.timer');
         this._chinaAdvertisementElement = <HTMLLIElement>this._container.querySelector('.china-advertisement');
+        this._timerButton = <HTMLElement>this._container.querySelector('.timer-button');
     }
 
     private showSkipButton() {
@@ -438,8 +440,8 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._areControlsVisible = false;
     }
 
-    private hideTimer() {
-        this._timerElement.style.display = 'none';
+    private hideTimerButton() {
+        this._timerButton.style.display = 'none';
     }
 
     protected cleanUpPrivacy() {
