@@ -3,7 +3,7 @@ import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0, Observable1, Observable2, Observable3 } from 'Core/Utilities/Observable';
 
-enum StoreEvent {
+enum AndroidStoreEvent {
     INITIALIZED,
     BILLING_START,
     BILLING_END,
@@ -73,11 +73,11 @@ export class AndroidStoreApi extends NativeApi {
 
     public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
-            case StoreEvent[StoreEvent.BILLING_START]:
+            case AndroidStoreEvent[AndroidStoreEvent.BILLING_START]:
                 this.onBillingStart.trigger(parameters[0]);
                 break;
 
-            case StoreEvent[StoreEvent.BILLING_END]:
+            case AndroidStoreEvent[AndroidStoreEvent.BILLING_END]:
                 this.onBillingEnd.trigger(parameters[0]);
                 break;
 
