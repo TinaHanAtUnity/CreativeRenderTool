@@ -207,12 +207,13 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         this._videoProgress = value;
         this._skipRemaining = this._skipDuration - this._videoProgress;
-      
-        if (this._timerToSkipEnabled) {
-            var timerCount = Math.ceil((this._skipRemaining) / 1000);    
+
+        let timerCount;
+        if (CustomFeatures.isZyngaGame(this._gameId)) {
+            timerCount = Math.ceil((this._skipRemaining) / 1000);
         } else {
             timerCount = Math.ceil((this._videoDuration - this._videoProgress) / 1000);
-        } 
+        }
 
         if (typeof timerCount === 'number' && !isNaN(timerCount) && timerCount > 0) {
             this._timerElement.innerText = timerCount.toString();

@@ -62,7 +62,7 @@ export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
     public setTimerToSkipEnabled(value: boolean) {
         this._timerToSkipEnabled = value;
     }
-    
+
     public abstract setSpinnerEnabled(value: boolean): void;
 
     public abstract setSkipEnabled(value: boolean): void;
