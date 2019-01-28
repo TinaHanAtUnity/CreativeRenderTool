@@ -1,3 +1,7 @@
+# Pending 
+
+* WebPlayer MRAID with Disabled AB group [#7938]https://github.com/Applifier/unity-ads-webview/pull/7938
+
 # Mon Jan 28 02:25:46 UTC 2019
 
 * Splitting MRAIDEventHandler to Playable and Programmatic [#7780](https://github.com/Applifier/unity-ads-webview/pull/7780)
