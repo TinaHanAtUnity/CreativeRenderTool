@@ -4,24 +4,19 @@ import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { AndroidVideoEventHandler } from 'Ads/EventHandlers/AndroidVideoEventHandler';
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { IosVideoEventHandler } from 'Ads/EventHandlers/IosVideoEventHandler';
-import { PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
 import { VideoEventHandler } from 'Ads/EventHandlers/VideoEventHandler';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
-import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
-import { WebViewError } from 'Core/Errors/WebViewError';
 import { IAbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { Placement } from 'Ads/Models/Placement';
-import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 
 export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends IAdUnitParameters<T>> {

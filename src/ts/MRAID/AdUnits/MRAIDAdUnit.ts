@@ -19,30 +19,32 @@ import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/View
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AuctionV5Test, ABGroup } from 'Core/Models/ABGroup';
 import { ProgrammaticTrackingErrorName, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
     endScreen?: EndScreen;
     ar: IARApi;
+    webPlayerContainer: WebPlayerContainer;
 }
 
 export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
 
-    private _operativeEventManager: OperativeEventManager;
-    private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _mraid: MRAIDView<IMRAIDViewHandler>;
-    private _ar: IARApi;
-    private _options: unknown;
-    private _orientationProperties: IOrientationProperties;
-    private _endScreen?: EndScreen;
-    private _showingMRAID: boolean;
-    private _clientInfo: ClientInfo;
-    private _placement: Placement;
-    private _campaign: MRAIDCampaign;
-    private _privacy: AbstractPrivacy;
-    private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
-    private _pts: ProgrammaticTrackingService;
-    private _abGroup: ABGroup;
+    protected _operativeEventManager: OperativeEventManager;
+    protected _thirdPartyEventManager: ThirdPartyEventManager;
+    protected _mraid: MRAIDView<IMRAIDViewHandler>;
+    protected _ar: IARApi;
+    protected _options: unknown;
+    protected _orientationProperties: IOrientationProperties;
+    protected _endScreen?: EndScreen;
+    protected _showingMRAID: boolean;
+    protected _clientInfo: ClientInfo;
+    protected _placement: Placement;
+    protected _campaign: MRAIDCampaign;
+    protected _privacy: AbstractPrivacy;
+    protected _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
+    protected _pts: ProgrammaticTrackingService;
+    protected _abGroup: ABGroup;
 
     constructor(parameters: IMRAIDAdUnitParameters) {
         super(parameters);
@@ -204,13 +206,13 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         // EMPTY
     }
 
-    private unsetReferences() {
+    protected unsetReferences() {
         delete this._mraid;
         delete this._endScreen;
         delete this._privacy;
     }
 
-    private sendTrackingEvent(eventName: string): void {
+    protected sendTrackingEvent(eventName: string): void {
         const sessionId = this._campaign.getSession().getId();
 
         if(this._additionalTrackingEvents && this._additionalTrackingEvents[eventName]) {
@@ -227,14 +229,14 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
     }
 
-    private getOperativeEventParams(): IOperativeEventParams {
+    protected getOperativeEventParams(): IOperativeEventParams {
         return {
             placement: this._placement,
             asset: this._campaign.getResourceUrl()
         };
     }
 
-    private removeEndScreenContainer() {
+    protected removeEndScreenContainer() {
         if(this._endScreen) {
             this._endScreen.hide();
 
@@ -245,21 +247,21 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
     }
 
-    private removePrivacyContainer() {
+    protected removePrivacyContainer() {
         const privacyContainer = this._privacy.container();
         if (privacyContainer && privacyContainer.parentElement) {
             privacyContainer.parentElement.removeChild(this._privacy.container());
         }
     }
 
-    private removeMraidContainer() {
+    protected removeMraidContainer() {
         const mraidContainer = this._mraid.container();
         if (mraidContainer && mraidContainer.parentElement) {
             mraidContainer.parentElement.removeChild(this._mraid.container());
         }
     }
 
-    private sendFinishOperativeEvents() {
+    protected sendFinishOperativeEvents() {
         const operativeEventParams = this.getOperativeEventParams();
         const finishState = this.getFinishState();
 

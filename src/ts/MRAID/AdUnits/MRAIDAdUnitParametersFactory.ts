@@ -7,9 +7,12 @@ import { ExtendedMRAID } from 'MRAID/Views/ExtendedMRAID';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
 import { MRAID } from 'MRAID/Views/MRAID';
-import { AR, IARApi } from 'AR/AR';
+import { IARApi } from 'AR/AR';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { WebPlayerMRAIDTest } from 'Core/Models/ABGroup';
+import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
 
 export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
 
@@ -25,10 +28,12 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
     }
 
     private _ar: IARApi;
+    private _webPlayerContainer: WebPlayerContainer;
 
     constructor(ar: IARApi, core: ICore, ads: IAds) {
         super(core, ads);
         this._ar = ar;
+        this._webPlayerContainer = ads.InterstitialWebPlayerContainer;
     }
 
     protected createParameters(baseParams: IAdUnitParameters<MRAIDCampaign>): IMRAIDAdUnitParameters {
@@ -43,6 +48,8 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
             mraid = new ExtendedMRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.deviceInfo.getLanguage(), baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId);
         } else if (ARUtil.isARCreative(baseParams.campaign) || MRAIDAdUnitParametersFactory._forcedARMRAID) {
             mraid = new ARMRAID(baseParams.platform, baseParams.core, this._ar, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.deviceInfo.getLanguage(), baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId);
+        } else if (WebPlayerMRAIDTest.isValid(baseParams.coreConfig.getAbGroup())) {
+            mraid = new WebPlayerMRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId);
         } else {
             mraid = new MRAID(baseParams.platform, baseParams.core, baseParams.deviceInfo, baseParams.placement, baseParams.campaign, baseParams.privacy, showGDPRBanner, baseParams.coreConfig.getAbGroup(), baseParams.gameSessionId);
         }
@@ -50,7 +57,8 @@ export class MRAIDAdUnitParametersFactory extends AbstractAdUnitParametersFactor
         return {
             ... baseParams,
             mraid: mraid,
-            ar: this._ar
+            ar: this._ar,
+            webPlayerContainer: this._webPlayerContainer
         };
     }
 }
