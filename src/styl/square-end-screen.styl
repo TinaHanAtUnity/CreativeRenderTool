@@ -245,15 +245,13 @@ html #end-screen.square-end-screen .end-screen-info-background {
   }
 }
 
-/* iPhone X fixes */
-@media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3) {
+/* iPhone X, XR and XS Max fixes */
+@media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3),
+only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2),
+only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
   &.landscape #end-screen.square-end-screen {
     .game-image {
       background-position: left;
-    }
-
-    .privacy-button {
-      left: -14px;
     }
 
     .download-container {
@@ -263,47 +261,13 @@ html #end-screen.square-end-screen .end-screen-info-background {
     .game-rating, .name-container {
       font-size: 1.2rem;
     }
-  }
-}
 
-/* iPhone XS Max */
-@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
-  &.landscape #end-screen.square-end-screen {
-    .game-image {
-      background-position: left;
-    }
-
-    .privacy-button {
-      left: -14px;
-    }
-
-    .download-container {
-      font-size: 1.05rem;
-    }
-
-    .game-rating, .name-container {
-      font-size: 1.2rem;
-    }
-  }
-}
-
-/* iPhone XR */
-@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
-  &.landscape #end-screen.square-end-screen {
-    .game-image {
-      background-position: left;
-    }
-
-    .privacy-button {
-      left: -14px;
-    }
-
-    .download-container {
-      font-size: 1.05rem;
-    }
-
-    .game-rating, .name-container {
-      font-size: 1.2rem;
+    /* This is to fix issue that was visible at least in some iPhone X series. The square image doesn't
+      take the full space it has so the campaign-container's background color that was meant for devices that
+      don't support blurring of the background image was visible.
+    */
+    .campaign-container {
+      background-color: $end-screen-background-color;
     }
   }
 }
