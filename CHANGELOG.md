@@ -1,6 +1,6 @@
-# Pending
+# Mon Jan 28 02:25:46 UTC 2019
 
-* splitting MRAIDEventHandler to Playable and Programmatic [#7780](https://github.com/Applifier/unity-ads-webview/pull/7780)
+* Splitting MRAIDEventHandler to Playable and Programmatic [#7780](https://github.com/Applifier/unity-ads-webview/pull/7780)
 
 # Fri Jan 25 01:19:46 UTC 2019
 
