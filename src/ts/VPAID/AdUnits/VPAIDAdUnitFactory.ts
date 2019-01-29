@@ -33,7 +33,6 @@ export class VPAIDAdUnitFactory extends AbstractAdUnitFactory<VPAIDCampaign, IVP
             const endScreenEventHandler = new VPAIDEndScreenEventHandler(vpaidAdUnit, parameters);
             parameters.endScreen.addEventHandler(endScreenEventHandler);
         }
-        AbstractPrivacy.setupReportListener(parameters.privacy, vpaidAdUnit);
 
         return vpaidAdUnit;
     }

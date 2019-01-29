@@ -11,21 +11,23 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ABGroup } from 'Core/Models/ABGroup';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
     private _operativeEventManager: OperativeEventManager;
-    private _adUnit: MRAIDAdUnit;
     private _placement: Placement;
-    private _platform: Platform;
     private _core: ICoreApi;
     private _ads: IAdsApi;
     private _customImpressionFired: boolean;
 
+    protected _platform: Platform;
+    protected _adUnit: MRAIDAdUnit;
     protected _mraidView: MRAIDView<IMRAIDViewHandler>;
     protected _request: RequestManager;
     protected _campaign: MRAIDCampaign;
+    protected _deviceInfo: DeviceInfo;
     protected _gameSessionId?: number;
     protected _abGroup: ABGroup;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
@@ -42,6 +44,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._platform = parameters.platform;
         this._core = parameters.core;
         this._ads = parameters.ads;
+        this._deviceInfo = parameters.deviceInfo;
         this._customImpressionFired = false;
         this._gameSessionId = parameters.gameSessionId;
         this._abGroup = parameters.coreConfig.getAbGroup();
@@ -97,6 +100,14 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             this._adUnit.sendImpression();
             this._customImpressionFired = true;
         }
+    }
+
+    public onWebViewFullScreen(): Promise<void> {
+        return Promise.resolve();
+    }
+
+    public onWebViewReduceSize(): Promise<void> {
+        return Promise.resolve();
     }
 
     protected sendTrackingEvents() {

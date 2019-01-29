@@ -6,7 +6,6 @@ import { WKAudiovisualMediaTypes } from 'Ads/Native/WebPlayer';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Closer } from 'Ads/Views/Closer';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
@@ -26,7 +25,6 @@ export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign>
     vpaid: VPAID;
     closer: Closer;
     endScreen?: VPAIDEndScreen | undefined;
-    privacy: AbstractPrivacy;
     webPlayerContainer: WebPlayerContainer;
 }
 

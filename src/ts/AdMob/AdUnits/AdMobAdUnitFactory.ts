@@ -1,10 +1,7 @@
 import { AdMobAdUnit, IAdMobAdUnitParameters } from 'AdMob/AdUnits/AdMobAdUnit';
 import { AdMobEventHandler } from 'AdMob/EventHandlers/AdmobEventHandler';
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
-import { AdMobView } from 'AdMob/Views/AdMobView';
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export class AdMobAdUnitFactory extends AbstractAdUnitFactory<AdMobCampaign, IAdMobAdUnitParameters> {
 
@@ -28,7 +25,6 @@ export class AdMobAdUnitFactory extends AbstractAdUnitFactory<AdMobCampaign, IAd
         });
         parameters.view.render();
         parameters.view.addEventHandler(eventHandler);
-        AbstractPrivacy.setupReportListener(parameters.privacy, adUnit);
 
         return adUnit;
     }

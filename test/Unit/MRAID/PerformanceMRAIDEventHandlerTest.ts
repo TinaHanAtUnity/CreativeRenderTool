@@ -25,6 +25,7 @@ import { MRAID } from 'MRAID/Views/MRAID';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 describe('PerformanceMRAIDEventHandlersTest', () => {
 
@@ -52,6 +53,7 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
 
     describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
+        let webPlayerContainer: WebPlayerContainer;
 
         beforeEach(() => {
             platform = Platform.ANDROID;
@@ -81,6 +83,7 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
             sinon.stub(mraidView, 'container').returns(document.createElement('div'));
             privacyManager = sinon.createStubInstance(UserPrivacyManager);
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+            webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
 
             extendedMraidAdUnitParams = {
                 platform,
@@ -104,7 +107,8 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
                 endScreen: undefined,
                 privacy: new Privacy(platform, extendedMraidCampaign, privacyManager, false, false),
                 privacyManager: privacyManager,
-                programmaticTrackingService: programmaticTrackingService
+                programmaticTrackingService: programmaticTrackingService,
+                webPlayerContainer: webPlayerContainer
             };
 
             mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);

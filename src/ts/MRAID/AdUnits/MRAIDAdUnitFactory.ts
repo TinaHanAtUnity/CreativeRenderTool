@@ -1,6 +1,5 @@
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { ARMRAID } from 'AR/Views/ARMRAID';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
@@ -9,13 +8,21 @@ import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCam
 import { PerformanceMRAIDEventHandler } from 'MRAID/EventHandlers/PerformanceMRAIDEventHandler';
 import { ARMRAIDEventHandler } from 'AR/EventHandlers/ARMRAIDEventHandler';
 import { ProgrammaticMRAIDEventHandler } from 'MRAID/EventHandlers/ProgrammaticMRAIDEventHandler';
+import { WebPlayerMRAIDTest } from 'Core/Models/ABGroup';
+import { WebPlayerMRAIDAdUnit } from 'MRAID/AdUnits/WebPlayerMRAIDAdUnit';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
     public createAdUnit(parameters: IMRAIDAdUnitParameters): MRAIDAdUnit {
-        const mraidAdUnit: MRAIDAdUnit = new MRAIDAdUnit(parameters);
+        let mraidAdUnit: MRAIDAdUnit = new MRAIDAdUnit(parameters);
+
+        if (WebPlayerMRAIDTest.isValid(parameters.coreConfig.getAbGroup())) {
+            mraidAdUnit = new WebPlayerMRAIDAdUnit(parameters);
+        } else {
+            mraidAdUnit = new MRAIDAdUnit(parameters);
+        }
+
         const mraidEventHandler: IMRAIDViewHandler = this.getMRAIDEventHandler(mraidAdUnit, parameters);
         parameters.mraid.addEventHandler(mraidEventHandler);
-        AbstractPrivacy.setupReportListener(parameters.privacy, mraidAdUnit);
         return mraidAdUnit;
     }
 

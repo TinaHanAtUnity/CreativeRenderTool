@@ -1,6 +1,7 @@
 import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
 import { IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
+import { WebViewTopCalculator } from 'Ads/Utilities/WebPlayer/WebViewTopCalculator';
 
 export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements IMRAIDViewHandler {
 
@@ -17,6 +18,22 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
         });
     }
 
+    // Handles webview resizing when webview is overlaying webplayer - for privacy modal
+    public onWebViewFullScreen(): Promise<void> {
+        return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()])
+        .then(([width, height]) => {
+            return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, height);
+        });
+    }
+
+    // Handles webview resizing when webview is overlaying webplayer - for privacy modal
+    public onWebViewReduceSize(): Promise<void> {
+        return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()])
+        .then(([width, height]) => {
+            return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, this.getTopViewHeight(width, height));
+        });
+    }
+
     private openUrlOnCallButton(url: string, clickDuration: number, clickUrl: string): Promise<void> {
         return this.openUrl(url).then(() => {
             this._mraidView.setCallButtonEnabled(true);
@@ -29,4 +46,8 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
         });
     }
 
+    private getTopViewHeight(width: number, height: number): number {
+        const webViewResizer = new WebViewTopCalculator(this._deviceInfo, this._platform);
+        return webViewResizer.getTopPosition(width, height);
+    }
 }

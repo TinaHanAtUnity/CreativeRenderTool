@@ -20,12 +20,15 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Privacy } from 'Ads/Views/Privacy';
-import { ARUtil } from 'AR/Utilities/ARUtil';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { MRAIDView, IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
+import { WebPlayerMRAIDAdUnit } from 'MRAID/AdUnits/WebPlayerMRAIDAdUnit';
+import { WebPlayerMRAID } from 'MRAID/Views/WebPlayerMRAID';
 
-describe('MraidAdUnit', () => {
+describe('WebPlayerMraidAdUnit', () => {
     const sandbox = sinon.createSandbox();
     let mraidAdUnitParameters: IMRAIDAdUnitParameters;
     let mraidAdUnit: MRAIDAdUnit;
@@ -33,6 +36,7 @@ describe('MraidAdUnit', () => {
     let ads: IAdsApi;
     let operativeEventManager: OperativeEventManager;
     let webPlayerContainer: WebPlayerContainer;
+    let deviceInfo: DeviceInfo;
 
     let containerOpen: sinon.SinonSpy;
     let containerClose: sinon.SinonSpy;
@@ -53,25 +57,25 @@ describe('MraidAdUnit', () => {
     });
 
     beforeEach(() => {
-        const platform = Platform.ANDROID;
+        const platform = Platform.IOS;
         const backend = TestFixtures.getBackend(platform);
         const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        const core = TestFixtures.getCoreApi(nativeBridge);
 
         ads = TestFixtures.getAdsApi(nativeBridge);
-        mraidView = sinon.createStubInstance(MRAID);
+        mraidView = sinon.createStubInstance(WebPlayerMRAID);
         webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
 
         (<sinon.SinonSpy>mraidView.container).restore();
         sandbox.stub(mraidView, 'container').returns(document.createElement('div'));
 
         const userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
-        const core = TestFixtures.getCoreApi(nativeBridge);
         const wakeUpManager = new WakeUpManager(core);
         const request = new RequestManager(platform, core, wakeUpManager);
         const storageBridge = new StorageBridge(core);
         const thirdPartyEventMnager = new ThirdPartyEventManager(core, request);
         const clientInfo = TestFixtures.getClientInfo(platform);
-        const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         const coreConfig = TestFixtures.getCoreConfiguration();
         const adsConfig = TestFixtures.getAdsConfiguration();
         const mraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
@@ -135,13 +139,57 @@ describe('MraidAdUnit', () => {
 
         sendWithGetStub = sandbox.stub(thirdPartyEventMnager, 'sendWithGet').returns(Promise.resolve());
 
-        mraidAdUnit = new MRAIDAdUnit(mraidAdUnitParameters);
+        mraidAdUnit = new WebPlayerMRAIDAdUnit(mraidAdUnitParameters);
     });
 
     it('should change the orientation properties used by container open', () => {
         mraidAdUnit.setOrientationProperties(orientationProperties);
         return mraidAdUnit.show().then(() => {
-            sinon.assert.calledWith(containerOpen, mraidAdUnit, ['webview'], false, Orientation.NONE, true, false, true, false, {});
+            sinon.assert.calledWith(containerOpen, mraidAdUnit, ['webplayer', 'webview'], false, Orientation.NONE, true, false, true, false, {});
+        });
+    });
+
+    const getAdUnitFromView = (view: MRAIDView<IMRAIDViewHandler>, mraidParams: IMRAIDAdUnitParameters, plat: Platform) => {
+        (<sinon.SinonSpy>view.container).restore();
+        sandbox.stub(view, 'container').returns(document.createElement('div'));
+
+        mraidParams.mraid = view;
+        mraidParams.platform = plat;
+        return new WebPlayerMRAIDAdUnit(mraidParams);
+    };
+
+    [Platform.ANDROID, Platform.IOS].forEach(platform => {
+        describe(`${platform} when ad unit is shown for programmatic MRAID content`, () => {
+
+            let adUnit: WebPlayerMRAIDAdUnit;
+            let webPlayerSetSettings: sinon.SinonSpy;
+            let webPlayerSetEventSettings: sinon.SinonSpy;
+
+            const assertViewsOpened = (views: string[]) => {
+                sinon.assert.calledWith(containerOpen, adUnit, views, true, Orientation.NONE, true, false, true, false, {});
+            };
+
+            beforeEach(() => {
+                const view = sinon.createStubInstance(WebPlayerMRAID);
+                adUnit = getAdUnitFromView(view, mraidAdUnitParameters, platform);
+
+                webPlayerSetSettings = <sinon.SinonSpy>webPlayerContainer.setSettings;
+                webPlayerSetEventSettings = <sinon.SinonSpy>webPlayerContainer.setEventSettings;
+
+                return adUnit.show();
+            });
+
+            it('should open the container with webview and webplayer', () => {
+                assertViewsOpened(['webplayer', 'webview']);
+            });
+
+            it('should set the webplayercontainer settings', () => {
+                sinon.assert.called(webPlayerSetSettings);
+            });
+
+            it('should set the webplayercontainer event settings', () => {
+                sinon.assert.called(webPlayerSetEventSettings);
+            });
         });
     });
 
@@ -164,7 +212,7 @@ describe('MraidAdUnit', () => {
 
         });
 
-        describe('for MRAID content', () => {
+        describe('for ExtendedMRAID content', () => {
             beforeEach(() => {
                 mraidViewShowSpy = <sinon.SinonSpy>mraidView.show;
                 sendStartEventStub = sandbox.stub(ads.Listener, 'sendStartEvent').returns(Promise.resolve(void(0)));
@@ -183,7 +231,6 @@ describe('MraidAdUnit', () => {
             it('should invoke Listener.sendStartEvent with placementId', () => {
                 sinon.assert.calledWith(sendStartEventStub, 'fooId');
             });
-
             it('should send start operative event', () => {
                 sinon.assert.calledOnce(operativeEventStartStub);
             });
@@ -200,52 +247,8 @@ describe('MraidAdUnit', () => {
                 assert.isTrue(mraidAdUnit.isShowing());
             });
 
-            it('should open the container with just webview', () => {
-                assertViewsOpened(['webview']);
-            });
-
             it('should open the view', () => {
                 sinon.assert.called(mraidViewShowSpy);
-            });
-        });
-
-        describe('for AR content', () => {
-            describe('if AR supported', () => {
-
-                beforeEach(() => {
-                    sandbox.stub(ARUtil, 'isARCreative').returns(true);
-                    sandbox.stub(ARUtil, 'isARSupported').returns(Promise.resolve(true));
-
-                    return mraidAdUnit.show();
-                });
-
-                afterEach(() => {
-                    return mraidAdUnit.hide();
-                });
-
-                it('should open container with AR View', () => {
-                    sinon.assert.calledOnce(onStartObserver);
-                    assertViewsOpened(['arview', 'webview']);
-                });
-            });
-
-            describe('if AR not supported', () => {
-
-                beforeEach(() => {
-                    sandbox.stub(ARUtil, 'isARCreative').returns(true);
-                    sandbox.stub(ARUtil, 'isARSupported').returns(Promise.resolve(false));
-
-                    return mraidAdUnit.show();
-                });
-
-                afterEach(() => {
-                    return mraidAdUnit.hide();
-                });
-
-                it('should open container without AR View', () => {
-                    sinon.assert.calledOnce(onStartObserver);
-                    assertViewsOpened(['webview']);
-                });
             });
         });
     });
@@ -367,7 +370,6 @@ describe('MraidAdUnit', () => {
         let setFinishStateSpy: sinon.SinonSpy;
 
         beforeEach(() => {
-            setViewableSpy = <sinon.SinonSpy>mraidView.setViewableState;
             setFinishStateSpy = sandbox.spy(mraidAdUnit, 'setFinishState');
 
             return mraidAdUnit.show();
@@ -375,31 +377,75 @@ describe('MraidAdUnit', () => {
 
         afterEach(() => mraidAdUnit.hide());
 
-        describe('onContainerShow', () => {
-            it('should send the true viewable state event', () => {
+        describe('for viewable state', () => {
+
+            beforeEach(() => {
+                setViewableSpy = <sinon.SinonSpy>mraidView.setViewableState;
+            });
+
+            it('should send the true viewable state event onContainerShow', () => {
                 mraidAdUnit.onContainerShow();
                 sinon.assert.calledWith(setViewableSpy, true);
+                sinon.assert.calledTwice(setViewableSpy);
             });
-        });
 
-        describe('onContainerDestroy', () => {
-            it('should set finish state to skipped', () => {
+            it('should set finish state to skipped onContainerDestroy', () => {
                 mraidAdUnit.onContainerDestroy();
                 sinon.assert.calledWith(setFinishStateSpy, FinishState.SKIPPED);
+                sinon.assert.calledOnce(setFinishStateSpy);
+            });
+
+            it('should send the false viewable state event onContainerBackground', () => {
+                mraidAdUnit.onContainerBackground();
+                sinon.assert.calledWith(setViewableSpy, false);
+                sinon.assert.calledOnce(setViewableSpy);
+
+            });
+
+            it ('should send the true viewable state event onContainerForeground', () => {
+                mraidAdUnit.onContainerForeground();
+                sinon.assert.calledWith(setViewableSpy, true);
+                sinon.assert.calledOnce(setViewableSpy);
             });
         });
 
-        describe('onContainerBackground', () => {
-            it('should send the false viewable state event', () => {
-                mraidAdUnit.onContainerBackground();
-                sinon.assert.calledWith(setViewableSpy, false);
+        describe('onContainerShow', () => {
+            it('should call onContainerForeground on IOS', () => {
+                const view = sinon.createStubInstance(WebPlayerMRAID);
+                const adUnit = getAdUnitFromView(view, mraidAdUnitParameters, Platform.IOS);
+
+                const onContainerForegroundSpy = sandbox.spy(adUnit, 'onContainerForeground');
+                adUnit.onContainerShow();
+                sinon.assert.called(onContainerForegroundSpy);
             });
         });
 
         describe('onContainerForeground', () => {
-            it ('should send the true viewable state event', () => {
-                mraidAdUnit.onContainerForeground();
-                sinon.assert.calledWith(setViewableSpy, true);
+            let adUnit: WebPlayerMRAIDAdUnit;
+            let view: MRAID;
+            let containerSetViewFrame: sinon.SinonSpy;
+            let loadWebplayerSpy: sinon.SinonSpy;
+
+            beforeEach(() => {
+                view = sinon.createStubInstance(WebPlayerMRAID);
+
+                adUnit = getAdUnitFromView(view, mraidAdUnitParameters, Platform.IOS);
+
+                (<sinon.SinonStub>view.isLoaded).returns(false);
+                sandbox.stub(mraidAdUnitParameters.deviceInfo, 'getScreenWidth').resolves(500);
+
+                containerSetViewFrame = <sinon.SinonSpy>mraidAdUnitParameters.container.setViewFrame;
+                loadWebplayerSpy = <sinon.SinonStub>view.loadWebPlayer;
+
+                return adUnit.onContainerForegroundMRAID();
+            });
+
+            it('should set the webview view frame with a minimized height', () => {
+                sinon.assert.calledWith(containerSetViewFrame, 'webview', 0, 0, 500, 74.03999999999999);
+            });
+
+            it('should load the webplayer for the mraid view', () => {
+                sinon.assert.called(loadWebplayerSpy);
             });
         });
     });

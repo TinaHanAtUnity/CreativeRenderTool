@@ -317,6 +317,39 @@
                 this.getConfiguration = function() {
                     return playableConfiguration;
                 }
+
+                var frameCount = 0;
+                var playableStartTime = undefined;
+                var playableTime = 0;
+
+                var lastFrameTime = 0;
+                var originalRequestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+
+                if (typeof originalRequestAnimationFrame === 'function') {
+                    var sendStats = function() {
+                        if (playableStartTime !== undefined) {
+                            var playTime = playableTime / 1000;
+                            var totalTime =  (Date.now() - playableStartTime) / 1000;
+                            window.nativebridge.sendEvent('sendStats', [totalTime, playTime, frameCount]);
+                        }
+                    };
+                    window.requestAnimationFrame = window.webkitRequestAnimationFrame = function (callback) {
+                        if (playableStartTime === undefined) {
+                            playableStartTime = Date.now();
+                        }
+                        return originalRequestAnimationFrame((time) => {
+                            if (time - lastFrameTime > 16) {
+                                frameCount++;
+                                if (lastFrameTime !== 0) {
+                                    playableTime += (time - lastFrameTime);
+                                }
+                            }
+                            lastFrameTime = time;
+                            callback(time);
+                        });
+                    };
+                    setInterval(sendStats, 500);
+                }
             };
             window.mraid = new MRAID();
         })();

@@ -87,15 +87,15 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandlerView> {
         };
     }
 
-    public static setupReportListener(privacy: AbstractPrivacy, ad: AbstractAdUnit | AbstractVideoOverlay): void {
-        privacy._onReport.subscribe((campaign: Campaign, reasonKey: string) => {
+    public setupReportListener(ad: AbstractAdUnit): void {
+        this._onReport.subscribe((campaign: Campaign, reasonKey: string) => {
             this.onUserReport(campaign, reasonKey, ad);
             this.timeoutAd(ad);
-            privacy._onReport.unsubscribe();
+            this._onReport.unsubscribe();
         });
     }
 
-    private static onUserReport(campaign: Campaign, reasonKey: string, ad: AbstractAdUnit | AbstractVideoOverlay): void {
+    private onUserReport(campaign: Campaign, reasonKey: string, ad: AbstractAdUnit | AbstractVideoOverlay): void {
         let adType;
         let isCached;
         let finishState;
@@ -128,7 +128,7 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandlerView> {
     }
 
     // After the report, wait four seconds and close the ad
-    private static timeoutAd(ad: AbstractAdUnit | AbstractVideoOverlay): Promise<void> {
+    private timeoutAd(ad: AbstractAdUnit): Promise<void> {
         return new Promise(() => {
             setTimeout(() => {
                 return ad.hide();

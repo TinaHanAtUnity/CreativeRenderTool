@@ -35,6 +35,7 @@ import { IARApi } from 'AR/AR';
 import { ProgrammaticMRAIDEventHandler } from 'MRAID/EventHandlers/ProgrammaticMRAIDEventHandler';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
 
@@ -68,6 +69,7 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
             let programmaticMraidAdUnit: MRAIDAdUnit;
             let privacy: AbstractPrivacy;
             let clickDestinationUrl: string;
+            let webPlayerContainer: WebPlayerContainer;
 
             beforeEach(() => {
                 backend = TestFixtures.getBackend(platform);
@@ -98,6 +100,7 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
                 coreConfig = TestFixtures.getCoreConfiguration();
                 adsConfig = TestFixtures.getAdsConfiguration();
                 programmaticMraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
+                webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
 
                 programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
@@ -142,7 +145,8 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
                     endScreen: undefined,
                     privacy: new Privacy(platform, programmaticMraidCampaign, privacyManager, false, false),
                     privacyManager: privacyManager,
-                    programmaticTrackingService: programmaticTrackingService
+                    programmaticTrackingService: programmaticTrackingService,
+                    webPlayerContainer: webPlayerContainer
                 };
 
                 programmaticMraidAdUnit = new MRAIDAdUnit(programmaticMraidAdUnitParams);
@@ -278,6 +282,59 @@ import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
                     programmaticMraidEventHandler.onCustomImpressionEvent();
                     sinon.assert.calledOnce(<sinon.SinonSpy>programmaticMraidAdUnit.sendImpression);
                 });
+            });
+
+            describe('on Webview Resizing for webplayer', () => {
+
+                beforeEach(() => {
+                    sinon.stub(deviceInfo, 'getScreenWidth').resolves(500);
+                    sinon.stub(deviceInfo, 'getScreenHeight').resolves(600);
+                    sinon.stub(container, 'setViewFrame');
+                });
+
+                if (platform === Platform.ANDROID) {
+                    context('onWebViewFullScreen', () => {
+                        beforeEach(() => {
+                            return programmaticMraidEventHandler.onWebViewFullScreen();
+                        });
+
+                        it('should set webview view frame to full screen', () => {
+                            sinon.assert.calledWith(<sinon.SinonStub>container.setViewFrame, 'webview', 0, 0, 500, 600);
+                        });
+                    });
+
+                    context('onWebViewReduceSize', () => {
+                        beforeEach(() => {
+                            return programmaticMraidEventHandler.onWebViewReduceSize();
+                        });
+
+                        it('should set webview view frame to top of window', () => {
+                            sinon.assert.calledWith(<sinon.SinonStub>container.setViewFrame, 'webview', 0, 0, 500, 30);
+                        });
+                    });
+                }
+
+                if (platform === Platform.IOS) {
+                    context('onWebViewFullScreen', () => {
+                        beforeEach(() => {
+                            return programmaticMraidEventHandler.onWebViewFullScreen();
+                        });
+
+                        it('should set webview view frame to full screen', () => {
+                            sinon.assert.calledWith(<sinon.SinonStub>container.setViewFrame, 'webview', 0, 0, 500, 600);
+                        });
+                    });
+
+                    context('onWebViewReduceSize', () => {
+                        beforeEach(() => {
+                            return programmaticMraidEventHandler.onWebViewReduceSize();
+                        });
+
+                        it('should set webview view frame to top of window', () => {
+                            sinon.assert.calledWith(<sinon.SinonStub>container.setViewFrame, 'webview', 0, 0, 500, 36);
+                        });
+                    });
+                }
             });
         });
     });

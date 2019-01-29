@@ -6,11 +6,10 @@ import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 
 export class XPromoAdUnitParametersFactory extends AbstractAdUnitParametersFactory<XPromoCampaign, IXPromoAdUnitParameters> {
     protected createParameters(baseParams: IAdUnitParameters<XPromoCampaign>) {
-        const privacy = this.createPrivacy(baseParams);
         const showPrivacyDuringVideo = baseParams.placement.skipEndCardOnClose() || false;
-        const overlay = this.createOverlay(baseParams, privacy, showPrivacyDuringVideo);
+        const overlay = this.createOverlay(baseParams, baseParams.privacy, showPrivacyDuringVideo);
 
-        const endScreenParameters = this.createEndScreenParameters(privacy, baseParams.campaign.getGameName(), baseParams);
+        const endScreenParameters = this.createEndScreenParameters(baseParams.privacy, baseParams.campaign.getGameName(), baseParams);
         const endScreen = new XPromoEndScreen(endScreenParameters, baseParams.campaign);
         const video = this.getVideo(baseParams.campaign, baseParams.forceOrientation);
 
@@ -18,8 +17,7 @@ export class XPromoAdUnitParametersFactory extends AbstractAdUnitParametersFacto
             ... baseParams,
             video: video,
             overlay: overlay,
-            endScreen: endScreen,
-            privacy: privacy
+            endScreen: endScreen
         };
     }
 }

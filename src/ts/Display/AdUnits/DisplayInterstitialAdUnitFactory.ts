@@ -16,7 +16,6 @@ export class DisplayInterstitialAdUnitFactory extends AbstractAdUnitFactory<Disp
         const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(parameters);
         const displayInterstitialEventHandler = new DisplayInterstitialEventHandler(displayInterstitialAdUnit, parameters);
         parameters.view.addEventHandler(displayInterstitialEventHandler);
-        AbstractPrivacy.setupReportListener(parameters.privacy, displayInterstitialAdUnit);
         return displayInterstitialAdUnit;
     }
 
