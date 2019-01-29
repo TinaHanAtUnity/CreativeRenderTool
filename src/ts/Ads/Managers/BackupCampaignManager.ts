@@ -17,10 +17,13 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { CometCampaignLoader } from 'Performance/Parsers/CometCampaignLoader';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { Platform } from 'Core/Constants/Platform';
+import { FileId } from 'Core/Utilities/FileId';
 
 export class BackupCampaignManager {
     private static _maxExpiryDelay: number = 7 * 24 * 3600 * 1000; // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
 
+    private _platform: Platform;
     private _core: ICoreApi;
     private _storageBridge: StorageBridge;
     private _coreConfiguration: CoreConfiguration;
@@ -28,7 +31,8 @@ export class BackupCampaignManager {
 
     private _campaignCount: number = 0;
 
-    constructor(core: ICoreApi, storageBridge: StorageBridge, coreConfiguration: CoreConfiguration, deviceInfo: DeviceInfo) {
+    constructor(platform: Platform, core: ICoreApi, storageBridge: StorageBridge, coreConfiguration: CoreConfiguration, deviceInfo: DeviceInfo) {
+        this._platform = platform;
         this._core = core;
         this._storageBridge = storageBridge;
         this._coreConfiguration = coreConfiguration;
@@ -228,6 +232,14 @@ export class BackupCampaignManager {
         if(asset.isCached() && fileId) {
             return this._core.Cache.getFileInfo(fileId).then((fileInfo: IFileInfo) => {
                 if(fileInfo.found && fileInfo.size > 0) {
+                    if(this._platform === Platform.IOS) {
+                        return FileId.getFileUrl(fileId, this._core.Cache).then((fileUrl: string) => {
+                            asset.setCachedUrl(fileUrl);
+                        }).catch(() => {
+                            asset.setCachedUrl(undefined);
+                            asset.setFileId(undefined);
+                        });
+                    }
                     return;
                 } else {
                     asset.setCachedUrl(undefined);

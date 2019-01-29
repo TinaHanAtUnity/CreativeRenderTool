@@ -3,54 +3,116 @@
 @import "gdpr-pop-up.styl";
 @import "square-end-screen.styl";
 
+// We have new media queries with custom font sizes for the endscreen so we need to use 'em' unit
+$endscreen-default-size = unit($default-px-size/ 16, "em");
+
 $end-screen-mixin($scale-size = $default-scale-size) {
 
   #end-screen {
     .btn-close-region {
       $close-button-default($scale-size);
-      padding: $default-size * $scale-size * .25;
+      padding: $scale-size * $default-size * .25;
     }
 
     .china-advertisement {
       $china-overlay($default-scale-size);
+      position: absolute;
       right: 0;
       bottom: 0;
-      padding: $default-size * $scale-size * .5;
+      margin-right: .5 * $endscreen-default-size;
+      padding: 0;
       color: $gray;
-      font-size: $default-scale-size * $default-font-size * .60;
+      font-size: $endscreen-default-size * .60;
+      opacity: .6;
     }
 
     .download-container {
-      $download-container-default($scale-size);
+      margin: .75 * $default-scale-size * $scale-size auto 0 auto;
+      padding: $endscreen-default-size * .6 0;
+      width: $endscreen-default-size * 11.2;
+      border-radius: $endscreen-default-size * .6;
+      background: $blue;
+      color: $white;
+      text-align: center;
+      font-size: $endscreen-default-size;
     }
 
     .game-rating {
       $game-rating-default($scale-size);
+      margin-top: .41 * $endscreen-default-size;
+      letter-spacing: 0;
+      font-size: .8 * $endscreen-default-size;
     }
 
-    .game-rating-mask {
+    .game-rating-stars-top {
       $game-rating-mask-default($scale-size);
+      position: absolute;
+      left: 0;
+      z-index: 1;
+    }
+
+    .game-rating-stars-bottom {
+      z-index: 0;
     }
 
     .game-rating-count {
       $game-rating-count-default($scale-size);
+      font-size: .5 * $endscreen-default-size;
     }
 
     .game-icon {
-      $game-icon-default($scale-size);
+      margin-bottom: .8 * $endscreen-default-size;
+      min-width: 3.5 * $endscreen-default-size;
+      min-height: 3.5 * $endscreen-default-size;
+      width: 3.5 * $endscreen-default-size;
+      height: 3.5 * $endscreen-default-size;
+      border-radius: .4 * $endscreen-default-size;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    .icon-star {
+      margin-left: -.25 * $endscreen-default-size;
+    }
+
+    .first-icon-star {
+      margin-left: 0;
+    }
+
+    .icon-star:before {
+      font-size: .8 * $endscreen-default-size;
     }
 
     .unityads-logo {
       $unityads-logo-default($scale-size);
+      max-height: 1 * $endscreen-default-size;
+      font-size: .7 * $endscreen-default-size;
+      opacity: .6;
     }
 
     .name-container {
       $name-container-default($scale-size);
+      max-width: 85%;
+      color: $end-screen-game-name-color;
+      text-align: center;
+      font-size: 1 * $endscreen-default-size;
+    }
+
+    .bottom-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      margin: 0 0 .25 * $endscreen-default-size 0;
+      width: 100%;
+      height: 1.5 * $endscreen-default-size;
     }
 
     .privacy-button {
       $privacy-button-default($scale-size);
-      margin: 0 0 0 $default-size * $scale-size * .25;
+      left: 0;
+      margin-left: .5 * $endscreen-default-size;
+      line-height: 1 * $endscreen-default-size;
     }
 
     .icon-gdpr {
@@ -78,42 +140,73 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       width: 100%;
       height: 100%;
     }
+
+    .column-container {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: $endscreen-default-size * .85;
+    }
   }
 
   body {
     &.portrait #end-screen {
-      .column-container {
-        margin-left: $default-size * $scale-size * .5;
-      }
-
       .download-container {
-        margin: $default-size * $scale-size * .75 auto;
+        margin: 1 * $endscreen-default-size auto 0 auto;
       }
     }
 
     &.landscape #end-screen {
-      .column-container {
-        margin: $default-size * $scale-size * .5 0;
-      }
       .btn-close-region {
         color: $gray;
+      }
+
+      .end-screen-info {
+        .download-container  {
+          margin: 1 * $endscreen-default-size auto 0 auto;
+        }
+
+        .game-icon {
+          margin-bottom: .8 * $endscreen-default-size;
+        }
       }
     }
 
     #end-screen {
       .store-container {
-        margin-top: $default-size * $scale-size * .4;
+        margin-top: 0;
       }
 
       .row-container {
-        bottom: $default-size * $scale-size;
+        bottom: $endscreen-default-size;
+      }
+    }
+
+    &.ios {
+      #end-screen .end-screen-info {
+        .game-icon {
+          border-radius: .8 * $endscreen-default-size;
+        }
+
+        .download-container {
+          border-radius: .6 * $endscreen-default-size;
+        }
+      }
+    }
+
+    &.landscape #end-screen {
+      .end-screen-info {
+        .download-container  {
+          margin: 1 * $endscreen-default-size auto 0 auto;
+        }
       }
     }
   }
 }
 
 body {
-
   &.portrait #end-screen {
     .game-background-portrait {
       display: block;
@@ -128,24 +221,17 @@ body {
       justify-content: center;
     }
 
-    .column-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-start;
-    }
-
     .end-screen-info-background {
       width: 100%;
       height: 50%;
     }
 
-    .privacy-button {
-      left: 0;
-    }
-
     .game-icon {
       align-self: center;
+    }
+    
+    .game-background {
+      background-color: $end-screen-gray-border;
     }
   }
 
@@ -184,14 +270,6 @@ body {
       text-align: center;
     }
 
-    .privacy-button {
-      left: 50%;
-    }
-
-    .unityads-logo {
-      width: 50%;
-    }
-
     .gdpr-pop-up {
       left: 0;
     }
@@ -225,19 +303,141 @@ body {
     background-repeat: no-repeat;
   }
 
+  &.show-gdpr-banner {
+    .privacy-button {
+      display: none;
+    }
+  }
+
   .end-screen-info-background {
+    position: relative;
     display: flex;
+    flex: 1;
     flex-direction: column;
     align-items: center;
     align-content: center;
     height: 100%;
     justify-content: center;
     background-color: $end-screen-background-color;
-  }
 
-  &.show-gdpr-banner {
-    .privacy-button {
-      display: none;
+    @media (orientation: portrait) {
+      @media (min-height: 0) {
+        font-size: $default-px-size * .4;
+      }
+
+      @media (min-height: 250px) {
+        font-size: $default-px-size * .5;
+      }
+
+      @media (min-height: 320px) {
+        font-size: $default-px-size * .7;
+      }
+
+      @media (min-height: 380px) {
+        font-size: $default-px-size * .8;
+      }
+
+      @media (min-height: 460px) {
+        font-size: $default-px-size * 1;
+      }
+
+      @media (min-height: 560px) {
+        font-size: $default-px-size * 1.2;
+      }
+
+      @media (min-height: 600px) {
+        font-size: $default-px-size * 1.3;
+      }
+
+      @media (min-height: 680px) {
+        font-size: $default-px-size * 1.5;
+      }
+
+      @media (min-height: 780px) {
+        font-size: $default-px-size * 1.6;
+      }
+
+      @media (min-height: 980px) {
+        font-size: $default-px-size * 1.8;
+      }
+
+      @media (min-height: 1050px) {
+        font-size: $default-px-size * 2.2;
+      }
+
+      @media (min-height: 1175px) {
+        font-size: $default-px-size * 2.5;
+      }
+
+      @media (min-height: 1375px) {
+          font-size: $default-px-size * 3;
+      }
+
+      @media (min-height: 1675px) {
+        font-size: $default-px-size * 3.5;
+      }
+
+      @media (min-height: 1975px) {
+        font-size: $default-px-size * 4.4;
+      }
+
+      @media (min-height: 2275px) {
+        font-size: $default-px-size * 5;
+      }
+
+      @media (min-height: 2575px) {
+        font-size: $default-px-size * 6;
+      }
+
+      @media (min-height: 2875px) {
+        font-size: $default-px-size * 7;
+      }
+
+      @media (min-height: 3475px) {
+        font-size: $default-px-size * 8;
+      }
+    }
+
+    @media (orientation: landscape) {
+      @media (min-width: 200px) {
+        font-size: $default-px-size * .7;
+      }
+
+      @media (min-width: 320px) {
+        font-size: $default-px-size * .8;
+      }
+
+      @media (min-width: 460px) {
+        font-size: $default-px-size * 1;
+      }
+
+      @media (min-width: 580px) {
+        font-size: $default-px-size * 1.2;
+      }
+
+      @media (min-width: 760px) {
+        font-size: $default-px-size * 1.4;
+      }
+
+      @media (min-width: 960px) {
+        font-size: $default-px-size * 1.6;
+      }
+
+      @media (min-width: 1160px) {
+          font-size: $default-px-size * 2.2;
+      }
+
+      @media (min-width: 1460px) {
+        font-size: $default-px-size * 2.8;
+      }
+
+      @media (min-width: 1760px) {
+        font-size: $default-px-size * 3.8;
+      }
+
+      @media (min-width: 2260px) {
+        font-size: $default-px-size * 4.6;
+      }
     }
   }
 }

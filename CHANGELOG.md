@@ -1,7 +1,9 @@
-# Pending 
+# Tue Jan 29 18:19:32 UTC 2019
 
+* End screen improvements for the full network [#7890](https://github.com/Applifier/unity-ads-webview/pull/7890)
 * WebPlayer MRAID with Disabled AB group [#7938](https://github.com/Applifier/unity-ads-webview/pull/7938)
 * Refactor Privacy Code [#7934](https://github.com/Applifier/unity-ads-webview/pull/7934)
+* Fix iOS cached file URLs when loading backup campaigns [#7980](https://github.com/Applifier/unity-ads-webview/pull/7980)
 
 # Mon Jan 28 02:25:46 UTC 2019
 
