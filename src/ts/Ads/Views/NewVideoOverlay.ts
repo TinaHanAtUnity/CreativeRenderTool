@@ -87,13 +87,16 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             this._templateData.gameIcon = this._campaign.getGameIcon() ? this._campaign.getGameIcon().getUrl() : '';
         }
 
-        if (InterstitialLayoutTest.isValid(parameters.coreConfig.getAbGroup()) && parameters.placement.allowSkip()) {
+        const isZyngaGame = CustomFeatures.isZyngaGame(parameters.clientInfo.getGameId());
+
+        // Run the test on Skippable videos that aren't Zynga games
+        if (!isZyngaGame && InterstitialLayoutTest.isValid(parameters.coreConfig.getAbGroup()) && parameters.placement.allowSkip()) {
             this._templateData.skipUnderTimer = true;
             this.setTimerToSkipEnabled(true);
         }
 
-        // Zynga requests that overlays do not fade
-        if (CustomFeatures.isZyngaGame(parameters.clientInfo.getGameId())) {
+        // Disable Fade for Zynga Games
+        if (isZyngaGame) {
             this.setFadeEnabled(false);
         }
 
