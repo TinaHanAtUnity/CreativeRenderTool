@@ -8,7 +8,7 @@ describe('VastCreativeCompanionAdValidatorTest', () => {
     describe('getErrors', () => {
 
         it('Should not give any errors when valid VastCreativeCompanionAd is given', () => {
-            const companionAd = new VastCreativeCompanionAd('testId', 200, 200, 'image/jpg', 'http://google.com?someQuery=test&other=no', 'http://google.com?someQuery=test&other=no', {
+            const companionAd = new VastCreativeCompanionAd('testId', 200, 200, 'image/jpg', 'http://google.com?someQuery=test&other=no', 'http://google.com?someQuery=test&other=no', [], {
                 'click': ['http://google.com', 'https://reddit.com'],
                 'impression': ['http://google.com/impression?someQuery=test&other=no']
             });
@@ -18,7 +18,7 @@ describe('VastCreativeCompanionAdValidatorTest', () => {
 
         it('Should not give any errors when creativeType is supported', () => {
             const test = (type: string) => {
-                const companionAd = new VastCreativeCompanionAd('testId', 200, 200, type, 'http://google.com?someQuery=test&other=no', 'http://google.com?someQuery=test&other=no', {
+                const companionAd = new VastCreativeCompanionAd('testId', 200, 200, type, 'http://google.com?someQuery=test&other=no', 'http://google.com?someQuery=test&other=no', [], {
                     'click': ['http://google.com', 'https://reddit.com'],
                     'impression': ['http://google.com/impression?someQuery=test&other=no']
                 });
@@ -32,7 +32,7 @@ describe('VastCreativeCompanionAdValidatorTest', () => {
         });
 
         it('Should give errors when invalid VastCreativeCompanionAd is given', () => {
-            const companionAd = new VastCreativeCompanionAd('testId', 200, 200, 'invalid', 'http://google.com?someQuery=test&other=no', 'invalidClick', {
+            const companionAd = new VastCreativeCompanionAd('testId', 200, 200, 'invalid', 'http://google.com?someQuery=test&other=no', 'invalidClick', [], {
                 'click': ['', 'abc'],
                 'impression': ['abc?no=hello']
             });
