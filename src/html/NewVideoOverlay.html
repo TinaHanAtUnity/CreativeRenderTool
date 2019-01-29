@@ -1,18 +1,7 @@
 <div class="content">
     <div class="top-container">
         <div class="left-corner">
-            <% if (data.zyngaInterstitial) { %>
-                <div class="mute-button button button-left <%= data.muted ? 'muted' : '' %>">
-                    <div class="tab">
-                        <div class="icon-container">
-                            <span class="icon icon-volume"></span>
-                        </div>
-                        <div class="icon-container">
-                            <span class="icon icon-volume-mute"></span>
-                        </div>
-                    </div>
-                </div>
-            <% } else { %>
+            <% if (!data.zyngaInterstitial) { %>
                 <div class="skip-button button button-left">
                     <div class="tab">
                         <div class="icon-container">
