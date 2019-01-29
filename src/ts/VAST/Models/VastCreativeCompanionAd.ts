@@ -42,16 +42,16 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
         this.set('companionClickThroughURLTemplate', url);
     }
 
-    public setCompanionClickTrackingURLTemplates(urls: string[]) {
-        this.set('companionClickTrackingURLTemplates', urls);
-    }
-
     public setStaticResourceURL(url: string | null) {
         this.set('staticResourceURL', url);
     }
 
     public setCreativeType(type: string | null) {
         this.set('creativeType', type);
+    }
+
+    public addCompanionClickTrackingURLTemplate(url: string) {
+        this.getCompanionClickTrackingURLTemplates().push(url);
     }
 
     public addTrackingEvent(eventName: string, trackingURLTemplate: string) {

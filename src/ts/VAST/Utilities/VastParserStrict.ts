@@ -28,6 +28,7 @@ enum VastNodeName {
     AD_PARAMETERS = 'AdParameters',
     STATIC_RESOURCE = 'StaticResource',
     COMPANION_CLICK_THROUGH = 'CompanionClickThrough',
+    COMPANION_CLICK_TRACKING = 'CompanionClickTracking',
     PARSE_ERROR = 'parsererror',
     VAST = 'VAST'
 }
@@ -311,6 +312,12 @@ export class VastParserStrict {
             creative.setVideoClickThroughURLTemplate(url);
         }
 
+        const clickTrackingURLTemplates: string[] = [];
+        this.getNodesWithName(creativeElement, VastNodeName.CLICK_TRACKING).forEach((element: HTMLElement) => {
+            const clickTrackingURLTemplate = this.parseNodeText(element);
+            clickTrackingURLTemplates.push(clickTrackingURLTemplate);
+        });
+
         this.getNodesWithName(creativeElement, VastNodeName.CLICK_TRACKING).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
             creative.addVideoClickTrackingURLTemplate(url);
@@ -375,12 +382,20 @@ export class VastParserStrict {
                 staticResourceUrl = `${urlProtocol}${staticResourceUrl}`;
             }
             companionAd.setStaticResourceURL(staticResourceUrl);
+
+            const companionClickThroughElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.COMPANION_CLICK_THROUGH);
+            if (companionClickThroughElement) {
+                companionAd.setCompanionClickThroughURLTemplate(this.parseNodeText(companionClickThroughElement));
+            }
+
+            this.getNodesWithName(companionAdElement, VastNodeName.COMPANION_CLICK_TRACKING).forEach((element: HTMLElement) => {
+                const companionClickTrackingUrl = this.parseNodeText(element);
+                if (companionClickTrackingUrl) {
+                    companionAd.addCompanionClickTrackingURLTemplate(companionClickTrackingUrl);
+                }
+            });
         }
 
-        const companionClickThroughElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.COMPANION_CLICK_THROUGH);
-        if (companionClickThroughElement) {
-            companionAd.setCompanionClickThroughURLTemplate(this.parseNodeText(companionClickThroughElement));
-        }
         return companionAd;
     }
 
