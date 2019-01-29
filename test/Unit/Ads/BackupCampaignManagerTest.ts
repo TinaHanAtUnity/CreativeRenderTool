@@ -18,7 +18,7 @@ describe('BackupCampaignManagerTest', () => {
         const core = TestFixtures.getCoreApi(nativeBridge);
         const storageBridge: StorageBridge = new StorageBridge(core, 1);
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, TestFixtures.getCoreConfiguration(), TestFixtures.getAndroidDeviceInfo(core));
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, TestFixtures.getCoreConfiguration(), TestFixtures.getAndroidDeviceInfo(core));
         const placement: Placement = TestFixtures.getPlacement();
         const testMediaId: string = '12345';
 
@@ -52,7 +52,7 @@ describe('BackupCampaignManagerTest', () => {
 
         const storageBridge: StorageBridge = new StorageBridge(core, 1);
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, TestFixtures.getCoreConfiguration(), TestFixtures.getAndroidDeviceInfo(core));
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, TestFixtures.getCoreConfiguration(), TestFixtures.getAndroidDeviceInfo(core));
 
         const campaign: PerformanceCampaign = TestFixtures.getCampaign();
         const testMediaId: string = 'beefcace-abcdefg-deadbeef';
@@ -94,7 +94,7 @@ describe('BackupCampaignManagerTest', () => {
 
         const configuration = TestFixtures.getCoreConfiguration();
         sinon.stub(configuration, 'getTestMode').returns(true);
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, configuration, TestFixtures.getAndroidDeviceInfo(core));
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, configuration, TestFixtures.getAndroidDeviceInfo(core));
         const placement: Placement = TestFixtures.getPlacement();
         const testMediaId: string = '12345';
 
@@ -112,7 +112,7 @@ describe('BackupCampaignManagerTest', () => {
 
         const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         sinon.stub(deviceInfo, 'getApiLevel').returns(16); // Android 4.1
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, TestFixtures.getCoreConfiguration(), deviceInfo);
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, TestFixtures.getCoreConfiguration(), deviceInfo);
         const placement: Placement = TestFixtures.getPlacement();
         const testMediaId: string = '12345';
 
@@ -130,7 +130,7 @@ describe('BackupCampaignManagerTest', () => {
 
         const configuration = TestFixtures.getCoreConfiguration();
         sinon.stub(configuration, 'getTestMode').returns(true);
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, configuration, TestFixtures.getAndroidDeviceInfo(core));
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, configuration, TestFixtures.getAndroidDeviceInfo(core));
         const campaign: PerformanceCampaign = TestFixtures.getCampaign();
 
         backupCampaignManager.storeCampaign(campaign);
@@ -147,7 +147,7 @@ describe('BackupCampaignManagerTest', () => {
 
         const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         sinon.stub(deviceInfo, 'getApiLevel').returns(16); // Android 4.1
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, TestFixtures.getCoreConfiguration(), deviceInfo);
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, TestFixtures.getCoreConfiguration(), deviceInfo);
         const campaign: PerformanceCampaign = TestFixtures.getCampaign();
 
         backupCampaignManager.storeCampaign(campaign);
@@ -163,7 +163,7 @@ describe('BackupCampaignManagerTest', () => {
         const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         const core = TestFixtures.getCoreApi(nativeBridge);
         const storageBridge: StorageBridge = new StorageBridge(core, 1);
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, configuration, TestFixtures.getAndroidDeviceInfo(core));
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, configuration, TestFixtures.getAndroidDeviceInfo(core));
 
         return backupCampaignManager.loadCampaign(TestFixtures.getPlacement()).then(campaign => {
             assert.isUndefined(campaign, 'campaign was loaded when test mode is active');
@@ -177,7 +177,7 @@ describe('BackupCampaignManagerTest', () => {
         const core = TestFixtures.getCoreApi(nativeBridge);
         const storageBridge: StorageBridge = new StorageBridge(core, 1);
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, TestFixtures.getCoreConfiguration(), TestFixtures.getAndroidDeviceInfo(core));
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, TestFixtures.getCoreConfiguration(), TestFixtures.getAndroidDeviceInfo(core));
 
         return backupCampaignManager.loadCampaign(TestFixtures.getPlacement()).then(campaign => {
             assert.isUndefined(campaign, 'campaign was loaded when storage is empty');
@@ -243,7 +243,7 @@ describe('BackupCampaignManagerTest', () => {
         }));
 
         const storageBridge: StorageBridge = new StorageBridge(core, 1);
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, TestFixtures.getCoreConfiguration(), TestFixtures.getAndroidDeviceInfo(core));
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, TestFixtures.getCoreConfiguration(), TestFixtures.getAndroidDeviceInfo(core));
 
         return backupCampaignManager.loadCampaign(placement).then(loadedCampaign => {
             assert.isDefined(loadedCampaign, 'campaign was not loaded when campaign was stored and cached');
@@ -309,7 +309,7 @@ describe('BackupCampaignManagerTest', () => {
         }));
 
         const storageBridge: StorageBridge = new StorageBridge(core, 1);
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(core, storageBridge, TestFixtures.getCoreConfiguration(), TestFixtures.getAndroidDeviceInfo(core));
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, TestFixtures.getCoreConfiguration(), TestFixtures.getAndroidDeviceInfo(core));
 
         return backupCampaignManager.loadCampaign(placement).then(loadedCampaign => {
             assert.isDefined(loadedCampaign, 'campaign was not loaded when campaign was stored and cached files were deleted');
