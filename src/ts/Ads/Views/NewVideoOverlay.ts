@@ -225,7 +225,9 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         }
 
         if (this._skipRemaining <= 0) {
-            this.hideTimerButton();
+            if (this._timerToSkipEnabled) {
+                this.hideTimerButton();
+            }
             this.showSkipButton();
             this._chinaAdvertisementElement.classList.add('with-skip-button');
         }
