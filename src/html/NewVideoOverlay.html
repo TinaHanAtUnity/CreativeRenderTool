@@ -1,7 +1,7 @@
 <div class="content">
     <div class="top-container">
         <div class="left-corner">
-            <% if (!data.zyngaInterstitial) { %>
+            <% if (!data.skipUnderTimer) { %>
                 <div class="skip-button button button-left">
                     <div class="tab">
                         <div class="icon-container">
@@ -16,7 +16,7 @@
             <div class="china-advertisement">广告</div>
         </div>
         <div class="right-corner">
-            <% if (data.zyngaInterstitial) { %>
+            <% if (data.skipUnderTimer) { %>
                 <div class="skip-button button button-right">
                     <div class="tab">
                         <div class="icon-container">

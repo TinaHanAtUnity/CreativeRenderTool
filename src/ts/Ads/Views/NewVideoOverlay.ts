@@ -7,7 +7,7 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
-import { ABGroup } from 'Core/Models/ABGroup';
+import { ABGroup, InterstitialLayoutTest } from 'Core/Models/ABGroup';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -87,13 +87,14 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             this._templateData.gameIcon = this._campaign.getGameIcon() ? this._campaign.getGameIcon().getUrl() : '';
         }
 
-        // Zynga Interstitial
-        if (CustomFeatures.isZyngaGame(parameters.clientInfo.getGameId()) && parameters.placement.allowSkip()) {
-            this._templateData = {
-                zyngaInterstitial: true
-            };
-            this.setFadeEnabled(false);
+        if (InterstitialLayoutTest.isValid(parameters.coreConfig.getAbGroup()) && parameters.placement.allowSkip()) {
+            this._templateData.skipUnderTimer = true;
             this.setTimerToSkipEnabled(true);
+        }
+
+        // Zynga requests that overlays do not fade
+        if (CustomFeatures.isZyngaGame(parameters.clientInfo.getGameId())) {
+            this.setFadeEnabled(false);
         }
 
         this._bindings = [
