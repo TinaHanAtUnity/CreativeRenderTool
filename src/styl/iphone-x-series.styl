@@ -208,27 +208,77 @@ $iphone-x-mraid-styles() {
     }
 
     .camera-permission-panel {
-        .gdpr-link {
-          bottom: calc(.5rem + constant(safe-area-inset-bottom));
+      .gdpr-link {
+        bottom: calc(.5rem + constant(safe-area-inset-bottom));
 
-          bottom: calc(.5rem + env(safe-area-inset-bottom));
-        }
-        .show-learn-more-button {
-          bottom: calc(-.5rem + constant(safe-area-inset-bottom));
+        bottom: calc(.5rem + env(safe-area-inset-bottom));
+      }
+      .show-learn-more-button {
+        bottom: calc(-.5rem + constant(safe-area-inset-bottom));
 
-          bottom: calc(-.5rem + env(safe-area-inset-bottom));
-        }
+        bottom: calc(-.5rem + env(safe-area-inset-bottom));
+      }
     }
 }
 
 $iphone-x-styles() {
-  #mraid {
+
+  div.safe-area-content {
+    padding-top: constant(safe-area-inset-top);
+    padding-right: constant(safe-area-inset-right);
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-left: constant(safe-area-inset-left);
+
+    padding-top: env(safe-area-inset-top);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+  }
+
+  #promo {
+    iframe {
+      padding-top: constant(safe-area-inset-top);
+      padding-right: constant(safe-area-inset-right);
+      padding-bottom: constant(safe-area-inset-bottom);
+      padding-left: constant(safe-area-inset-left);
+      width: calc(100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+      height: calc(100vh - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
+
+      padding-top: env(safe-area-inset-top);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+      height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+
+    .privacy-button {
+      padding-top: constant(safe-area-inset-top);
+      padding-left: constant(safe-area-inset-left);
+
+      padding-top: env(safe-area-inset-top);
+      padding-left: env(safe-area-inset-left);
+    }
+
+    .gdpr-pop-up {
+      bottom: constant(safe-area-inset-bottom);
+      left: constant(safe-area-inset-left);
+      width: calc(100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+
+
+      bottom: env(safe-area-inset-bottom);
+      left: env(safe-area-inset-left);
+      width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+    }
+  }
+
+  #webplayer-mraid {
     $iphone-x-mraid-styles();
     $privacy-button-iphone-x-top();
     $gdpr-pop-up-top();
   }
 
-  #extended-mraid {
+  #extended-mraid, #mraid {
     $iphone-x-mraid-styles();
     $privacy-button-iphone-x-bottom();
     $gdpr-pop-up-bottom();
@@ -271,7 +321,7 @@ $iphone-x-styles() {
       width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
       height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     }
-    
+
     .privacy-button {
       padding-right: constant(safe-area-inset-right);
       padding-bottom: constant(safe-area-inset-bottom);

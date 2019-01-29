@@ -6,11 +6,9 @@ import { StreamType } from 'Core/Constants/Android/StreamType';
 import { Platform } from 'Core/Constants/Platform';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
-import { Privacy } from 'Ads/Views/Privacy';
 
 export interface IVastAdUnitParameters extends IVideoAdUnitParameters<VastCampaign> {
     endScreen?: VastEndScreen;
-    privacy: Privacy;
 }
 
 export class VastAdUnit extends VideoAdUnit<VastCampaign> {

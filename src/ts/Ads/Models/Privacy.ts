@@ -35,7 +35,7 @@ export type IPermissions = IUnityConsentPermissions | IProfilingPermissions;
 const CurrentUnityConsentVersion = 20181106;
 
 export interface IRawGamePrivacy {
-    method: string;
+    method: string | undefined;
 }
 
 interface IGamePrivacy {

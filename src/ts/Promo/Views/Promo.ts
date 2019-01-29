@@ -1,5 +1,5 @@
 import { Placement } from 'Ads/Models/Placement';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { Localization } from 'Core/Utilities/Localization';
@@ -12,7 +12,7 @@ import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import PromoIndexTpl from 'html/promo/container.html';
 
-export class Promo extends View<{}> implements IPrivacyHandler {
+export class Promo extends View<{}> implements IPrivacyHandlerView {
 
     public readonly onPromo = new Observable1<string>();
     public readonly onClose = new Observable0();
@@ -44,41 +44,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
         this._messageHandler = (e: Event) => this.onMessage(<MessageEvent>e);
         this._promoIndexTemplate = PromoIndexTpl;
 
-        if(campaign) {
-            this._templateData = {
-                'localizedPrice': PurchasingUtilities.getProductPrice(campaign.getIapProductId()),
-                'isRewardedPromo': !placement.allowSkip(), // Support older promo version
-                'rewardedPromoTimerDuration': !placement.allowSkip() ? 5 : 0
-            };
-            let portraitFontURL = '';
-            let landscapeFontURL = '';
-            const portraitAssets = campaign.getPortraitAssets();
-            if (portraitAssets) {
-                const font = portraitAssets.getButtonAsset().getFont();
-                if (font) {
-                    this._templateData.portraitPriceTextFontFamily = font.getFamily();
-                    this._templateData.portraitPriceTextFontColor = font.getColor();
-                    this._templateData.portraitPriceTextFontSize = font.getSize();
-                    portraitFontURL = font.getUrl();
-                }
-                this._templateData.portraitBackgroundImage = portraitAssets.getBackgroundAsset().getImage().getUrl();
-                this._templateData.portraitButtonImage = portraitAssets.getButtonAsset().getImage().getUrl();
-            }
-            const landscapeAssets = campaign.getLandscapeAssets();
-            if (landscapeAssets) {
-                const font = landscapeAssets.getButtonAsset().getFont();
-                if (font) {
-                    this._templateData.landscapePriceTextFontFamily = font.getFamily();
-                    this._templateData.landscapePriceTextFontColor = font.getColor();
-                    this._templateData.landscapePriceTextFontSize = font.getSize();
-                    landscapeFontURL = font.getUrl();
-                }
-                this._templateData.landscapeBackgroundImage = landscapeAssets.getBackgroundAsset().getImage().getUrl();
-                this._templateData.landscapeButtonImage = landscapeAssets.getButtonAsset().getImage().getUrl();
-            }
-            this._promoIndexTemplate = this._promoIndexTemplate.replace('{DATA_FONT_PORTRAIT}', portraitFontURL);
-            this._promoIndexTemplate = this._promoIndexTemplate.replace('{DATA_FONT_LANDSCAPE}', landscapeFontURL);
-        }
+        this.setupTemplateData(campaign, placement);
 
         this._bindings = [
             {
@@ -142,18 +108,10 @@ export class Promo extends View<{}> implements IPrivacyHandler {
         }
     }
 
-    public onPrivacy(url: string): void {
-        // do nothing
-    }
-
     public onPrivacyClose(): void {
         if (this._privacy) {
             this._privacy.hide();
         }
-    }
-
-    public onGDPROptOut(optOutEnabled: boolean): void {
-        // do nothing
     }
 
     private choosePrivacyShown() {
@@ -231,5 +189,67 @@ export class Promo extends View<{}> implements IPrivacyHandler {
     private replaceDynamicMarkupPlaceholder(markup: string): string {
         const dynamicMarkup = this._promoCampaign.getDynamicMarkup();
         return dynamicMarkup ? markup.replace('{UNITY_DYNAMIC_MARKUP}', dynamicMarkup) : markup;
+    }
+
+    private setupTemplateData(campaign: PromoCampaign, placement: Placement) {
+        if(campaign) {
+            this._templateData = {
+                'localizedPrice': PurchasingUtilities.getProductPrice(campaign.getIapProductId()),
+                'isRewardedPromo': !placement.allowSkip(), // Support older promo version
+                'rewardedPromoTimerDuration': !placement.allowSkip() ? 5 : 0
+            };
+            let portraitFontURL = '';
+            let landscapeFontURL = '';
+            const portraitAssets = campaign.getPortraitAssets();
+            if (portraitAssets) {
+                const buttonCoordinates = portraitAssets.getButtonAsset().getCoordinates();
+                if (buttonCoordinates) {
+                    this._templateData.portraitButtonCoordinatesTop = buttonCoordinates.getTop();
+                    this._templateData.portraitButtonCoordinatesLeft = buttonCoordinates.getLeft();
+                }
+                const buttonSize = portraitAssets.getButtonAsset().getSize();
+                this._templateData.portraitButtonSizeWidth = buttonSize.getWidth();
+                this._templateData.portraitButtonSizeHeight = buttonSize.getHeight();
+                const font = portraitAssets.getButtonAsset().getFont();
+                if (font) {
+                    this._templateData.portraitPriceTextFontFamily = font.getFamily();
+                    this._templateData.portraitPriceTextFontColor = font.getColor();
+                    this._templateData.portraitPriceTextFontSize = font.getSize();
+                    portraitFontURL = font.getUrl();
+                }
+                const backgroundSize = portraitAssets.getBackgroundAsset().getSize();
+                this._templateData.portraitBackgroundImageWidth = backgroundSize.getWidth();
+                this._templateData.portraitBackgroundImageHeight = backgroundSize.getHeight();
+                this._templateData.portraitBackgroundImage = portraitAssets.getBackgroundAsset().getImage().getUrl();
+                this._templateData.portraitButtonImage = portraitAssets.getButtonAsset().getImage().getUrl();
+            }
+            const landscapeAssets = campaign.getLandscapeAssets();
+            if (landscapeAssets) {
+                const buttonCoordinates = landscapeAssets.getButtonAsset().getCoordinates();
+                if (buttonCoordinates) {
+                    this._templateData.landscapeButtonCoordinatesTop = buttonCoordinates.getTop();
+                    this._templateData.landscapeButtonCoordinatesLeft = buttonCoordinates.getLeft();
+                }
+                const buttonSize = landscapeAssets.getButtonAsset().getSize();
+                if (buttonSize) {
+                    this._templateData.landscapeButtonSizeWidth = buttonSize.getWidth();
+                    this._templateData.landscapeButtonSizeHeight = buttonSize.getHeight();
+                }
+                const font = landscapeAssets.getButtonAsset().getFont();
+                if (font) {
+                    this._templateData.landscapePriceTextFontFamily = font.getFamily();
+                    this._templateData.landscapePriceTextFontColor = font.getColor();
+                    this._templateData.landscapePriceTextFontSize = font.getSize();
+                    landscapeFontURL = font.getUrl();
+                }
+                const backgroundSize = landscapeAssets.getBackgroundAsset().getSize();
+                this._templateData.landscapeBackgroundImageWidth = backgroundSize.getWidth();
+                this._templateData.landscapeBackgroundImageHeight = backgroundSize.getHeight();
+                this._templateData.landscapeBackgroundImage = landscapeAssets.getBackgroundAsset().getImage().getUrl();
+                this._templateData.landscapeButtonImage = landscapeAssets.getButtonAsset().getImage().getUrl();
+            }
+            this._promoIndexTemplate = this._promoIndexTemplate.replace('{DATA_FONT_PORTRAIT}', portraitFontURL);
+            this._promoIndexTemplate = this._promoIndexTemplate.replace('{DATA_FONT_LANDSCAPE}', landscapeFontURL);
+        }
     }
 }

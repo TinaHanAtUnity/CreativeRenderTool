@@ -1,6 +1,6 @@
 import { IAdsApi } from 'Ads/IAds';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { Platform } from 'Core/Constants/Platform';
 import { Localization } from 'Core/Utilities/Localization';
@@ -26,7 +26,7 @@ export interface IVideoOverlayParameters<T extends Campaign> {
     placement: Placement;
 }
 
-export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
+export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandlerView {
 
     protected _privacy: AbstractPrivacy;
     protected _showGDPRBanner: boolean;
@@ -265,20 +265,12 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         return this._muted;
     }
 
-    public onPrivacy(url: string): void {
-        // do nothing
-    }
-
     public onPrivacyClose(): void {
         if (this._privacy) {
             this._privacy.hide();
         }
         this._isPrivacyShowing = false;
         this._ads.VideoPlayer.play();
-    }
-
-    public onGDPROptOut(optOutEnabled: boolean): void {
-        // do nothing
     }
 
     protected choosePrivacyShown(): void {

@@ -65,7 +65,7 @@ export class VastParserStrict {
         this._maxWrapperDepth = maxWrapperDepth;
     }
 
-    public parseVast(vast: string | null): Vast {
+    public parseVast(vast: string | null, urlProtocol: string = 'https:'): Vast {
         if (!vast) {
             throw new Error('VAST data is missing');
         }
@@ -101,7 +101,7 @@ export class VastParserStrict {
         // parse each Ad element
         this.getNodesWithName(documentElement, VastNodeName.AD).forEach((element: HTMLElement) => {
             if (ads.length <= 0) {
-                const ad = this.parseAdElement(element);
+                const ad = this.parseAdElement(element, urlProtocol);
                 const adErrors = new VastAdValidator(ad).getErrors();
                 if (adErrors.length > 0) {
                     errors = errors.concat(adErrors);
@@ -123,7 +123,8 @@ export class VastParserStrict {
         return new Vast(ads, parseErrorURLTemplates);
     }
 
-    public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, parent?: Vast, depth: number = 0): Promise<Vast> {
+    // default to https: for relative urls
+    public retrieveVast(vast: string, core: ICoreApi, request: RequestManager, parent?: Vast, depth: number = 0, urlProtocol: string = 'https:'): Promise<Vast> {
         let parsedVast: Vast;
 
         if (depth === 0) {
@@ -131,7 +132,7 @@ export class VastParserStrict {
         }
 
         try {
-            parsedVast = this.parseVast(vast);
+            parsedVast = this.parseVast(vast, urlProtocol);
         } catch (e) {
             let errorData: object;
             if (depth > 0) {
@@ -160,9 +161,9 @@ export class VastParserStrict {
 
         const encodedWrapperURL = Url.encodeUrlWithQueryParams(wrapperURL);
         core.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + encodedWrapperURL);
-
+        const wrapperUrlProtocol = Url.getProtocol(wrapperURL);
         return request.get(encodedWrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
-            return this.retrieveVast(response.response, core, request, parsedVast, depth + 1);
+            return this.retrieveVast(response.response, core, request, parsedVast, depth + 1, wrapperUrlProtocol);
         });
     }
 
@@ -229,12 +230,12 @@ export class VastParserStrict {
         }
     }
 
-    private parseAdElement(adElement: HTMLElement): VastAd {
+    private parseAdElement(adElement: HTMLElement, urlProtocol: string): VastAd {
 
         // use the first 'InLine' ad
         const element = this.getFirstNodeWithName(adElement, VastNodeName.INLINE) || this.getFirstNodeWithName(adElement, VastNodeName.WRAPPER);
         if (element) {
-            const parsedAd = this.parseAdContent(element);
+            const parsedAd = this.parseAdContent(element, urlProtocol);
             parsedAd.setId(adElement.getAttribute(VastAttributeNames.ID));
             return parsedAd;
         }
@@ -243,7 +244,7 @@ export class VastParserStrict {
         return new VastAd();
     }
 
-    private parseAdContent(adElement: HTMLElement): VastAd {
+    private parseAdContent(adElement: HTMLElement, urlProtocol: string): VastAd {
         const vastAd = new VastAd();
         this.getNodesWithName(adElement, VastNodeName.VAST_AD_TAG_URI).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
@@ -257,7 +258,11 @@ export class VastParserStrict {
 
         this.getNodesWithName(adElement, VastNodeName.IMPRESSION).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
-            vastAd.addImpressionURLTemplate(url);
+            // ignore empty urls and about:blank
+            // about:blank needs to be ignored so that VPAID ads can be parsed
+            if (url.length > 0 && url !== 'about:blank') {
+                vastAd.addImpressionURLTemplate(url);
+            }
         });
 
         this.getNodesWithName(adElement, VastNodeName.LINEAR).forEach((element: HTMLElement) => {
@@ -266,7 +271,7 @@ export class VastParserStrict {
         });
 
         this.getNodesWithName(adElement, VastNodeName.COMPANION).forEach((element: HTMLElement) => {
-            const companionAd = this.parseCreativeCompanionAdElement(element);
+            const companionAd = this.parseCreativeCompanionAdElement(element, urlProtocol);
             vastAd.addCompanionAd(companionAd);
         });
 
@@ -346,7 +351,7 @@ export class VastParserStrict {
         return creative;
     }
 
-    private parseCreativeCompanionAdElement(companionAdElement: HTMLElement): VastCreativeCompanionAd {
+    private parseCreativeCompanionAdElement(companionAdElement: HTMLElement, urlProtocol: string): VastCreativeCompanionAd {
         const id = companionAdElement.getAttribute(VastAttributeNames.ID);
         const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
         const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
@@ -365,7 +370,11 @@ export class VastParserStrict {
         if (staticResourceElement) {
             const creativeType = staticResourceElement.getAttribute(VastAttributeNames.CREATIVE_TYPE);
             companionAd.setCreativeType(creativeType);
-            companionAd.setStaticResourceURL(this.parseNodeText(staticResourceElement));
+            let staticResourceUrl = this.parseNodeText(staticResourceElement);
+            if (Url.isRelativeUrl(staticResourceUrl)) {
+                staticResourceUrl = `${urlProtocol}${staticResourceUrl}`;
+            }
+            companionAd.setStaticResourceURL(staticResourceUrl);
         }
 
         const companionClickThroughElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.COMPANION_CLICK_THROUGH);

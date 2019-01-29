@@ -1,7 +1,7 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import {AbstractPrivacy, IPrivacyHandlerView} from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ICoreApi } from 'Core/ICore';
@@ -46,7 +46,7 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onWebViewReduceSize(): Promise<void>;
 }
 
-export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler, IMRAIDHandler {
+export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandlerView, IMRAIDHandler {
 
     protected _core: ICoreApi;
     protected _placement: Placement;
@@ -218,14 +218,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         return valid;
     }
 
-    public onPrivacy(url: string): void {
-        // do nothing
-    }
-
-    public onGDPROptOut(optOutEnabled: boolean) {
-        // do nothing
-    }
-
     public setCallButtonEnabled(value: boolean) {
         if (this._callButtonEnabled !== value) {
             this._callButtonEnabled = value;
@@ -387,17 +379,21 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    protected onPrivacyEvent(event: Event): void {
+    public onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._privacy.show();
         this._privacyPanelOpen = true;
     }
 
-    protected onGDPRPopupEvent(event: Event) {
+    public onGDPRPopupEvent(event: Event) {
         event.preventDefault();
         this._gdprPopupClicked = true;
         this._privacy.show();
         this._privacyPanelOpen = true;
+    }
+
+    public loadWebPlayer(webPlayerContainer: WebPlayerContainer): Promise<void> {
+        return Promise.resolve();
     }
 
     protected onSetOrientationProperties(allowOrientationChange: boolean, orientation: Orientation) {
@@ -450,7 +446,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     public onBridgeResizeWebview() {
-        this.reduceWebViewContainerHeight();
+        // This will be used to handle rotation changes for webplayer-based mraid
     }
 
     public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {
@@ -463,17 +459,5 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public onBridgeAREvent(msg: MessageEvent) {
         this.onAREvent(msg).catch((reason) => this._core.Sdk.logError('AR message error: ' + reason.toString()));
-    }
-
-    public loadWebPlayer(webPlayerContainer: WebPlayerContainer): Promise<void> {
-        return Promise.resolve();
-    }
-
-    public fullScreenWebViewContainer() {
-        return this._handlers[0].onWebViewFullScreen();
-    }
-
-    public reduceWebViewContainerHeight() {
-        return this._handlers[0].onWebViewReduceSize();
     }
 }

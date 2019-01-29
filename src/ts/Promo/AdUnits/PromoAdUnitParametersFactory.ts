@@ -16,15 +16,13 @@ export class PromoAdUnitParametersFactory extends AbstractAdUnitParametersFactor
     }
 
     protected createParameters(baseParams: IAdUnitParameters<PromoCampaign>) {
-        const privacy = this.createPrivacy(baseParams);
         const showGDPRBanner = this.showGDPRBanner(baseParams);
 
-        const view = new Promo(baseParams.platform, baseParams.core, baseParams.campaign, baseParams.deviceInfo.getLanguage(), privacy, showGDPRBanner, baseParams.placement);
+        const view = new Promo(baseParams.platform, baseParams.core, baseParams.campaign, baseParams.deviceInfo.getLanguage(), baseParams.privacy, showGDPRBanner, baseParams.placement);
         return {
             ... baseParams,
             purchasing: this._purchasing,
-            view,
-            privacy
+            view
         };
     }
 }

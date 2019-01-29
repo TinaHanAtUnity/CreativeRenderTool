@@ -4,23 +4,20 @@ import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { AndroidVideoEventHandler } from 'Ads/EventHandlers/AndroidVideoEventHandler';
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { IosVideoEventHandler } from 'Ads/EventHandlers/IosVideoEventHandler';
-import { PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
 import { VideoEventHandler } from 'Ads/EventHandlers/VideoEventHandler';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
-import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
-import { WebViewError } from 'Core/Errors/WebViewError';
 import { IAbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { Placement } from 'Ads/Models/Placement';
+import { PrivacyMethod } from 'Ads/Models/Privacy';
 
 export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends IAdUnitParameters<T>> {
     private static _forceGDPRBanner: boolean = false;
@@ -32,7 +29,9 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
 
     public create(campaign: T, placement: Placement, orientation: Orientation, gamerServerId: string, options: unknown) {
         const params = this._adUnitParametersFactory.create(campaign, placement, orientation, gamerServerId, options);
-        return this.createAdUnit(params);
+        const adUnit =  this.createAdUnit(params);
+        params.privacy.setupReportListener(adUnit);
+        return adUnit;
     }
 
     protected abstract createAdUnit(parameters: Params): AbstractAdUnit;
@@ -99,7 +98,7 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
         });
     }
 
-    protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
+    protected createOverlay(parameters: IAdUnitParameters<Campaign>, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
 
         let overlay: AbstractVideoOverlay;
 
@@ -108,7 +107,7 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(parameters.platform, parameters.campaign, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            overlay = new NewVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+            overlay = new NewVideoOverlay(parameters, parameters.privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
@@ -132,22 +131,20 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
             adUnitStyle: adUnitStyle,
             clientInfo: params.clientInfo,
             core: params.core,
-            ads: params.ads
+            ads: params.ads,
+            programmaticTrackingService: params.programmaticTrackingService
         };
-    }
-
-    protected createPrivacy(parameters: IAdUnitParameters<Campaign>): Privacy {
-        const privacy = new Privacy(parameters.platform, parameters.campaign, parameters.privacyManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
-        const privacyEventHandler = new PrivacyEventHandler(parameters);
-
-        privacy.addEventHandler(privacyEventHandler);
-        return privacy;
     }
 
     protected showGDPRBanner(parameters: IAdUnitParameters<Campaign>): boolean {
         if (AbstractAdUnitFactory._forceGDPRBanner) {
             return true;
         }
+
+        if (PrivacyMethod.LEGITIMATE_INTEREST !== parameters.adsConfig.getGamePrivacy().getMethod()) {
+            return false;
+        }
+
         return parameters.adsConfig.isGDPREnabled() ? !parameters.adsConfig.isOptOutRecorded() : false;
     }
 

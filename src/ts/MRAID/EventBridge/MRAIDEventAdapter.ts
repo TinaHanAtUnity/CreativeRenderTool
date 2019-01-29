@@ -101,5 +101,4 @@ export abstract class MRAIDEventAdapter implements IMRAIDAdapter {
     protected handleSendStats(totalTime: number, playTime: number, frameCount: number) {
         this._handler.onBridgeSendStats(totalTime, playTime, frameCount);
     }
-
 }

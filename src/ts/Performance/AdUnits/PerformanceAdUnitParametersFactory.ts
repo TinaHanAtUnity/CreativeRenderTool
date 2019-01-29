@@ -9,14 +9,13 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
     protected createParameters(baseParams: IAdUnitParameters<PerformanceCampaign>) {
-        const privacy = this.createPrivacy(baseParams);
         const showPrivacyDuringVideo = baseParams.placement.skipEndCardOnClose() || false;
-        const overlay = this.createOverlay(baseParams, privacy, showPrivacyDuringVideo);
+        const overlay = this.createOverlay(baseParams, baseParams.privacy, showPrivacyDuringVideo);
 
         const adUnitStyle: AdUnitStyle = baseParams.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
 
         const endScreenParameters: IEndScreenParameters = {
-            ... this.createEndScreenParameters(privacy, baseParams.campaign.getGameName(), baseParams),
+            ... this.createEndScreenParameters(baseParams.privacy, baseParams.campaign.getGameName(), baseParams),
             adUnitStyle: adUnitStyle,
             campaignId: baseParams.campaign.getId(),
             osVersion: baseParams.deviceInfo.getOsVersion()
@@ -29,8 +28,7 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
             video: video,
             overlay: overlay,
             endScreen: endScreen,
-            adUnitStyle: adUnitStyle,
-            privacy: privacy
+            adUnitStyle: adUnitStyle
         };
     }
 }
