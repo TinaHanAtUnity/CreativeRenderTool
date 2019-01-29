@@ -24,7 +24,6 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
     endScreen?: EndScreen;
-    privacy: AbstractPrivacy;
     ar: IARApi;
     webPlayerContainer: WebPlayerContainer;
 }

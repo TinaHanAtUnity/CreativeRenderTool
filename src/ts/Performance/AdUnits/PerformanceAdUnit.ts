@@ -10,7 +10,6 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;
     adUnitStyle?: AdUnitStyle;
-    privacy: AbstractPrivacy;
 }
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {

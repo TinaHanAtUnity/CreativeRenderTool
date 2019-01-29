@@ -7,15 +7,13 @@ import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScree
 
 export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory<VastCampaign, IVastAdUnitParameters> {
     protected createParameters(baseParams: IAdUnitParameters<VastCampaign>) {
-        const privacy = this.createPrivacy(baseParams);
-        const overlay = new VastVideoOverlay(baseParams, privacy, this.showGDPRBanner(baseParams));
+        const overlay = new VastVideoOverlay(baseParams, baseParams.privacy, this.showGDPRBanner(baseParams));
         let vastEndScreen: VastEndScreen | undefined;
 
         const vastAdUnitParameters: IVastAdUnitParameters = {
             ... baseParams,
             video: baseParams.campaign.getVideo(),
-            overlay: overlay,
-            privacy: privacy
+            overlay: overlay
         };
 
         if(baseParams.campaign.hasEndscreen()) {
@@ -25,7 +23,7 @@ export class VastAdUnitParametersFactory extends AbstractAdUnitParametersFactory
                 country: baseParams.coreConfig.getCountry()
             };
 
-            vastEndScreen = new VastEndScreen(baseParams.platform, vastEndscreenParameters, privacy);
+            vastEndScreen = new VastEndScreen(baseParams.platform, vastEndscreenParameters, baseParams.privacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
         }
         return vastAdUnitParameters;

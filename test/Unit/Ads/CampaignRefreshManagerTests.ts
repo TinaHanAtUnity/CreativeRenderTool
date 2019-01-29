@@ -56,6 +56,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -133,6 +134,7 @@ describe('CampaignRefreshManager', () => {
     let placementManager: PlacementManager;
     let backupCampaignManager: BackupCampaignManager;
     let campaignParserManager: ContentTypeHandlerManager;
+    let privacy: AbstractPrivacy;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -142,6 +144,7 @@ describe('CampaignRefreshManager', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        privacy = sinon.createStubInstance(AbstractPrivacy);
 
         storageBridge = new StorageBridge(core);
         placementManager = sinon.createStubInstance(PlacementManager);
@@ -199,7 +202,8 @@ describe('CampaignRefreshManager', () => {
             request: request,
             options: {},
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService
+            programmaticTrackingService: programmaticTrackingService,
+            privacy: privacy
         };
 
         RefreshManager.ParsingErrorRefillDelay = 0; // prevent tests from hanging due to long retry timeouts

@@ -33,6 +33,7 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import * as sinon from 'sinon';
 import { TestAdUnit } from 'TestHelpers/TestAdUnit';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 describe('AndroidAdUnitTest', () => {
     let platform: Platform;
@@ -70,6 +71,7 @@ describe('AndroidAdUnitTest', () => {
         container = new Activity(core, ads, deviceInfo);
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        const privacy = sinon.createStubInstance(AbstractPrivacy);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             platform,
             core,
@@ -104,7 +106,8 @@ describe('AndroidAdUnitTest', () => {
             request: request,
             options: {},
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService
+            programmaticTrackingService: programmaticTrackingService,
+            privacy: privacy
         };
     });
 
