@@ -142,6 +142,17 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
+    public getCompanionClickTrackingUrls(): string[] {
+        return this._vastCampaign.getVast().getCompanionClickTrackingUrls();
+    }
+
+    public sendCompanionClickTrackingEvent(sessionId: string): void {
+        const companionClickTrackingUrls = this._vastCampaign.getVast().getCompanionClickTrackingUrls();
+        for (const companionClickTrackingUrl of companionClickTrackingUrls) {
+            this._thirdPartyEventManager.sendWithGet('vast companion click', sessionId, companionClickTrackingUrl, this._vastCampaign.getUseWebViewUserAgentForTracking());
+        }
+    }
+
     public sendCompanionTrackingEvent(sessionId: string): void {
         const companionTrackingUrls = this._vastCampaign.getVast().getCompanionCreativeViewTrackingUrls();
         for (const url of companionTrackingUrls) {

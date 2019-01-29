@@ -233,6 +233,21 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
+    public getCompanionClickTrackingUrls(): string[] {
+        const ad = this.getAd();
+        const companionClickTrackingUrls: string[] = [];
+        if (ad) {
+            const companionAds = ad.getCompanionAds();
+
+            if (companionAds) {
+                for (const companionAd of companionAds) {
+                    return companionAd.getCompanionClickTrackingURLTemplates();
+                }
+            }
+        }
+        return companionClickTrackingUrls;
+    }
+
     public getVideoMediaFiles(): VastMediaFile[] {
         const ad = this.getAd();
         const mediaFiles: VastMediaFile[] = [];
