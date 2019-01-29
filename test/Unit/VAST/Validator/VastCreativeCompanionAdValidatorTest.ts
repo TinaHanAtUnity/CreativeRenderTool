@@ -8,7 +8,7 @@ describe('VastCreativeCompanionAdValidatorTest', () => {
     describe('getErrors', () => {
 
         it('Should not give any errors when valid VastCreativeCompanionAd is given', () => {
-            const companionAd = new VastCreativeCompanionAd('testId', 200, 200, 'image/jpg', 'http://google.com?someQuery=test&other=no', 'http://google.com?someQuery=test&other=no', [], {
+            const companionAd = new VastCreativeCompanionAd('testId', 200, 200, 'image/jpg', 'http://google.com?someQuery=test&other=no', 'http://google.com?someQuery=test&other=no', ['https://google.com?companionAd=yes&clickTracking=true'], {
                 'click': ['http://google.com', 'https://reddit.com'],
                 'impression': ['http://google.com/impression?someQuery=test&other=no']
             });
@@ -32,13 +32,13 @@ describe('VastCreativeCompanionAdValidatorTest', () => {
         });
 
         it('Should give errors when invalid VastCreativeCompanionAd is given', () => {
-            const companionAd = new VastCreativeCompanionAd('testId', 200, 200, 'invalid', 'http://google.com?someQuery=test&other=no', 'invalidClick', [], {
+            const companionAd = new VastCreativeCompanionAd('testId', 200, 200, 'invalid', 'http://google.com?someQuery=test&other=no', 'invalidClick', ['invalidClickTracking'], {
                 'click': ['', 'abc'],
                 'impression': ['abc?no=hello']
             });
             const errors = new VastCreativeCompanionAdValidator(companionAd).getErrors();
-            assert.lengthOf(errors, 5, JSON.stringify(errors));
-            assert.equal(VastValidationUtilities.formatErrors(errors), 'VAST Companion ad(testId) "StaticResource" attribute "creativeType=invalid" is not supported\n    VAST companion ad(testId) companionClickThroughURLTemplate contains invalid url("invalidClick")\n    VAST companion ad trackingEvents contains invalid url("")\n    VAST companion ad trackingEvents contains invalid url("abc")\n    VAST companion ad trackingEvents contains invalid url("abc?no=hello")');
+            assert.lengthOf(errors, 6, JSON.stringify(errors));
+            assert.equal(VastValidationUtilities.formatErrors(errors), 'VAST Companion ad(testId) "StaticResource" attribute "creativeType=invalid" is not supported\n    VAST companion ad(testId) companionClickThroughURLTemplate contains invalid url("invalidClick")\n    VAST companion ad(testId) companionClickTrackingURLTemplates contains invalid url("invalidClickTracking")\n    VAST companion ad trackingEvents contains invalid url("")\n    VAST companion ad trackingEvents contains invalid url("abc")\n    VAST companion ad trackingEvents contains invalid url("abc?no=hello")');
         });
 
         it('Should give errors when invalid VastCreativeCompanionAd is given', () => {

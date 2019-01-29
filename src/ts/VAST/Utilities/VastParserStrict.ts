@@ -312,12 +312,6 @@ export class VastParserStrict {
             creative.setVideoClickThroughURLTemplate(url);
         }
 
-        const clickTrackingURLTemplates: string[] = [];
-        this.getNodesWithName(creativeElement, VastNodeName.CLICK_TRACKING).forEach((element: HTMLElement) => {
-            const clickTrackingURLTemplate = this.parseNodeText(element);
-            clickTrackingURLTemplates.push(clickTrackingURLTemplate);
-        });
-
         this.getNodesWithName(creativeElement, VastNodeName.CLICK_TRACKING).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
             creative.addVideoClickTrackingURLTemplate(url);
