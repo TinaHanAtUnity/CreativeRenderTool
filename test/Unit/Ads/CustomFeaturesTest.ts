@@ -38,23 +38,6 @@ describe('CustomFeatures', () => {
         });
     });
 
-    describe('isZyngaGame', () => {
-        it('should return true if gameId is 98530', () => {
-            const value = CustomFeatures.isZyngaGame('98530');
-            assert.isTrue(value);
-        });
-
-        it('should return true if gameId is 21739', () => {
-            const value = CustomFeatures.isZyngaGame('21739');
-            assert.isTrue(value);
-        });
-
-        it('should return false if gameId is 99999', () => {
-            const value = CustomFeatures.isZyngaGame('99999');
-            assert.isFalse(value);
-        });
-    });
-
     describe('isCheetahGame', () => {
         it('should return true if gameId is 2808037', () => {
             const value = CustomFeatures.isCheetahGame('2808037');
