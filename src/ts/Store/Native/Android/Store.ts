@@ -73,15 +73,49 @@ export class AndroidStoreApi extends NativeApi {
 
     public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
+            case AndroidStoreEvent[AndroidStoreEvent.INITIALIZED]:
+                this.onInitialized.trigger();
+                break;
+
+            case AndroidStoreEvent[AndroidStoreEvent.BILLING_SUPPORTED_RESULT]:
+                this.onBillingSupportedResult.trigger(<number>parameters[0], <number>parameters[1]);
+                break;
+
+            case AndroidStoreEvent[AndroidStoreEvent.BILLING_SUPPORTED_ERROR]:
+                this.onBillingSupportedError.trigger(<number>parameters[0], <AndroidStoreError>parameters[1], <string>parameters[2]);
+                break;
+
+            case AndroidStoreEvent[AndroidStoreEvent.PURCHASE_HISTORY_RESULT]:
+                this.onPurchaseHistoryResult.trigger(<number>parameters[0], <any>parameters[1]);
+                break;
+
+            case AndroidStoreEvent[AndroidStoreEvent.PURCHASE_HISTORY_ERROR]:
+                this.onPurchaseHistoryError.trigger(<number>parameters[0], <AndroidStoreError>parameters[1], <string>parameters[2]);
+                break;
+
+            case AndroidStoreEvent[AndroidStoreEvent.SKU_DETAILS_RESULT]:
+                this.onSkuDetailsResult.trigger(<number>parameters[0], <any>parameters[1]);
+                break;
+
+            case AndroidStoreEvent[AndroidStoreEvent.SKU_DETAILS_ERROR]:
+                this.onSkuDetailsError.trigger(<number>parameters[0], <AndroidStoreError>parameters[1], <string>parameters[2]);
+                break;
+
             case AndroidStoreEvent[AndroidStoreEvent.BILLING_START]:
                 this.onBillingStart.trigger(parameters[0]);
+                break;
+
+            case AndroidStoreEvent[AndroidStoreEvent.BILLING_START_ERROR]:
+                this.onBillingStartError.trigger(<AndroidStoreError>parameters[0], <string>parameters[1]);
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.BILLING_END]:
                 this.onBillingEnd.trigger(parameters[0]);
                 break;
 
-            // todo: other event types
+            case AndroidStoreEvent[AndroidStoreEvent.BILLING_END_ERROR]:
+                this.onBillingEndError.trigger(<AndroidStoreError>parameters[0], <string>parameters[1]);
+                break;
 
             default:
                 super.handleEvent(event, parameters);
