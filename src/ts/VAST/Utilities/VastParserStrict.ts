@@ -3,13 +3,15 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';
-import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
+import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { Url } from 'Core/Utilities/Url';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { VastAdValidator } from 'VAST/Validators/VastAdValidator';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
+import { IVastCreativeCompanionAd } from 'VAST/Models/IVastCreativeCompanionAd';
+import { Model } from 'Core/Models/Model';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -271,8 +273,14 @@ export class VastParserStrict {
         });
 
         this.getNodesWithName(adElement, VastNodeName.COMPANION).forEach((element: HTMLElement) => {
-            const companionAd = this.parseCreativeCompanionAdElement(element, urlProtocol);
-            vastAd.addCompanionAd(companionAd);
+            const staticResourceElement = this.getFirstNodeWithName(element, VastNodeName.STATIC_RESOURCE);
+            if (staticResourceElement) {
+                const companionAd = this.parseCreativeStaticResourceCompanionAdElement(element, urlProtocol);
+                vastAd.addCompanionAd(companionAd);
+            } else {
+                // ignore element as it is not of a type we support
+                vastAd.addUnparsableCompanionAd(element.outerHTML);
+            }
         });
 
         return vastAd;
@@ -351,11 +359,11 @@ export class VastParserStrict {
         return creative;
     }
 
-    private parseCreativeCompanionAdElement(companionAdElement: HTMLElement, urlProtocol: string): VastCreativeCompanionAd {
+    private parseCreativeStaticResourceCompanionAdElement(companionAdElement: HTMLElement, urlProtocol: string): VastCreativeStaticResourceCompanionAd {
         const id = companionAdElement.getAttribute(VastAttributeNames.ID);
         const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
         const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
-        const companionAd = new VastCreativeCompanionAd(id, height, width);
+        const companionAd = new VastCreativeStaticResourceCompanionAd(id, height, width);
 
         // Get tracking urls for companion ad
         this.getNodesWithName(companionAdElement, VastNodeName.TRACKING).forEach((element: HTMLElement) => {
