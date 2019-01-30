@@ -30,8 +30,6 @@ export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
     protected _fadeEnabled: boolean = true;
     protected _isPrivacyShowing: boolean = false;
 
-    protected _timerToSkipEnabled: boolean = false;
-
     constructor(platform: Platform, containerId: string, muted: boolean) {
         super(platform, containerId);
         this._muted = muted;
@@ -57,10 +55,6 @@ export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
 
     public isPrivacyShowing(): boolean {
         return this._isPrivacyShowing;
-    }
-
-    public setTimerToSkipEnabled(value: boolean) {
-        this._timerToSkipEnabled = value;
     }
 
     public abstract setSpinnerEnabled(value: boolean): void;

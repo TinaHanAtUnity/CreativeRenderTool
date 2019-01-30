@@ -35,6 +35,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
+    protected _timerToSkipEnabled: boolean = false;
 
     private _skipEnabled: boolean;
 
@@ -439,6 +440,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
     private hideTimerButton() {
         this._timerButton.style.display = 'none';
+    }
+
+    private setTimerToSkipEnabled(value: boolean) {
+        this._timerToSkipEnabled = value;
     }
 
     protected cleanUpPrivacy() {
