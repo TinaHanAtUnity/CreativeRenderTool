@@ -81,12 +81,13 @@ describe('Vast', () => {
             assert.equal(vast.getCompanionPortraitUrl(), 'http://url.com/portrait.png');
         });
 
-        it('should return url for click through url', () => {
-            vastAd.addCompanionAd(new VastCreativeCompanionAd('id1', 320, 480, 'image/png', 'http://url.com/landscape.png', 'https://url.com/click'));
-            vastAd.addCompanionAd(new VastCreativeCompanionAd('id2', 480, 320, 'image/png', 'http://url.com/portrait.png', 'https://url.com/click'));
-            vastAd.addCompanionAd(new VastCreativeCompanionAd('id3', 700, 800, 'image/png', 'http://image.com', 'https://url.com/click'));
+        it('should return urls for companion click through and companion click trackings', () => {
+            vastAd.addCompanionAd(new VastCreativeCompanionAd('id1', 320, 480, 'image/png', 'http://url.com/landscape.png', 'https://url.com/click', ['https://url.com/clickTracking']));
+            vastAd.addCompanionAd(new VastCreativeCompanionAd('id2', 480, 320, 'image/png', 'http://url.com/portrait.png', 'https://url.com/click', ['https://url.com/clickTracking']));
+            vastAd.addCompanionAd(new VastCreativeCompanionAd('id3', 700, 800, 'image/png', 'http://image.com', 'https://url.com/click', ['https://url.com/clickTracking']));
             const vast = new Vast([vastAd], []);
             assert.equal(vast.getCompanionClickThroughUrl(), 'https://url.com/click');
+            assert.deepEqual(vast.getCompanionClickTrackingUrls(), ['https://url.com/clickTracking']);
         });
 
         it('should not return url for landscape endcard if dimensions are too small', () => {
