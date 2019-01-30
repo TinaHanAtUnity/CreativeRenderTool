@@ -1,3 +1,7 @@
+# Merged
+
+* Disabling offending hybrid tests [#8002](https://github.com/Applifier/unity-ads-webview/pull/8002)
+
 # Tue Jan 29 18:19:32 UTC 2019
 
 * End screen improvements for the full network [#7890](https://github.com/Applifier/unity-ads-webview/pull/7890)
