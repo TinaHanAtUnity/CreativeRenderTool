@@ -376,20 +376,19 @@ export class VastParserStrict {
                 staticResourceUrl = `${urlProtocol}${staticResourceUrl}`;
             }
             companionAd.setStaticResourceURL(staticResourceUrl);
-
-            const companionClickThroughElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.COMPANION_CLICK_THROUGH);
-            if (companionClickThroughElement) {
-                companionAd.setCompanionClickThroughURLTemplate(this.parseNodeText(companionClickThroughElement));
-            }
-
-            this.getNodesWithName(companionAdElement, VastNodeName.COMPANION_CLICK_TRACKING).forEach((element: HTMLElement) => {
-                const companionClickTrackingUrl = this.parseNodeText(element);
-                if (companionClickTrackingUrl) {
-                    companionAd.addCompanionClickTrackingURLTemplate(companionClickTrackingUrl);
-                }
-            });
         }
 
+        const companionClickThroughElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.COMPANION_CLICK_THROUGH);
+        if (companionClickThroughElement) {
+            companionAd.setCompanionClickThroughURLTemplate(this.parseNodeText(companionClickThroughElement));
+        }
+
+        this.getNodesWithName(companionAdElement, VastNodeName.COMPANION_CLICK_TRACKING).forEach((element: HTMLElement) => {
+            const companionClickTrackingUrl = this.parseNodeText(element);
+            if (companionClickTrackingUrl) {
+                companionAd.addCompanionClickTrackingURLTemplate(companionClickTrackingUrl);
+            }
+        });
         return companionAd;
     }
 
