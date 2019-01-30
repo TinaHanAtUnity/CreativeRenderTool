@@ -35,7 +35,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this.setCallButtonEnabled(false);
 
         let clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
-        if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+        if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId()) && this._vastAdUnit.getCompanionClickTrackingUrls().length === 0) {
             clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         }
         if (clickThroughURL) {

@@ -307,7 +307,7 @@ export class VastParser {
     private parseCreativeCompanionAdElement(companionAdElement: Element): VastCreativeCompanionAd | null {
         const staticResourceElement = <Element>this.childByName(companionAdElement, 'StaticResource');
         const companionClickThroughElement = this.childByName(companionAdElement, 'CompanionClickThrough');
-        const companionClickTrackingElemets = <Element[]>this.childsByName(companionAdElement, 'CompanionClickTracking');
+        const companionClickTrackingElements = <Element[]>this.childsByName(companionAdElement, 'CompanionClickTracking');
 
         if (companionAdElement && staticResourceElement) {
             const id = companionAdElement.getAttribute('id');
@@ -317,7 +317,7 @@ export class VastParser {
             const staticResourceURL = this.parseNodeText(staticResourceElement);
             const companionClickThroughURLTemplate = this.parseNodeText(companionClickThroughElement!);
             const companionClickTrackingURLTemplates: string[] = [];
-            for (const trackingElement of companionClickTrackingElemets) {
+            for (const trackingElement of companionClickTrackingElements) {
                 const companionClickTrackingTemplate = this.parseNodeText(trackingElement);
                 if (companionClickTrackingTemplate != null) {
                     companionClickTrackingURLTemplates.push(companionClickTrackingTemplate);
