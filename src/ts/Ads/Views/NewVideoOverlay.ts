@@ -94,10 +94,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         if (!isZyngaGame && InterstitialLayoutTest.isValid(parameters.coreConfig.getAbGroup()) && parameters.placement.allowSkip()) {
             this._templateData.skipUnderTimer = true;
             this.setTimerToSkipEnabled(true);
-        }
-
-        // Disable Fade for Zynga Games
-        if (isZyngaGame) {
             this.setFadeEnabled(false);
         }
 
