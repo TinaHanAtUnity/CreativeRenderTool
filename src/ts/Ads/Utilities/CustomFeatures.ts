@@ -2,18 +2,18 @@ import ZyngaGamesJson from 'json/custom_features/ZyngaGames.json';
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 
-let ZyngaGameIds: string[];
-let CheetahGameIds: string[];
-let BitmangoGameIds: string[];
+const ZyngaGameIds = setGameIds(ZyngaGamesJson);
+const CheetahGameIds = setGameIds(CheetahGamesJson);
+const BitmangoGameIds = setGameIds(BitmangoGamesJson);
 
-try {
-    ZyngaGameIds = JSON.parse(ZyngaGamesJson);
-    CheetahGameIds = JSON.parse(CheetahGamesJson);
-    BitmangoGameIds = JSON.parse(BitmangoGamesJson);
-} catch {
-    ZyngaGameIds = [];
-    CheetahGameIds = [];
-    BitmangoGameIds = [];
+function setGameIds(gameIdJson: string): string[] {
+    let gameIds: string[];
+    try {
+        gameIds = JSON.parse(gameIdJson);
+    } catch {
+        gameIds = [];
+    }
+    return gameIds;
 }
 
 export class CustomFeatures {
