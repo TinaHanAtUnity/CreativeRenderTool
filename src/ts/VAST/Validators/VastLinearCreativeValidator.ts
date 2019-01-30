@@ -42,7 +42,7 @@ export class VastLinearCreativeValidator implements IValidator {
     private validateVideoClickTrackingURLTemplates(linearCreative: VastCreativeLinear) {
         const videoClickTrackingURLTemplates = linearCreative.getVideoClickTrackingURLTemplates();
         videoClickTrackingURLTemplates.map((url) => {
-            if (!Url.isValidProtocol(url)) {
+            if (url && !Url.isValidProtocol(url)) {
                 this._errors.push(VastValidationUtilities.invalidUrlError('linear creative videoClickTrackingURLTemplates', url));
             }
         });
@@ -51,7 +51,7 @@ export class VastLinearCreativeValidator implements IValidator {
     private validateVideoCustomClickURLTemplates(linearCreative: VastCreativeLinear) {
         const videoCustomClickURLTemplates = linearCreative.getVideoCustomClickURLTemplates();
         videoCustomClickURLTemplates.map((url) => {
-            if (!Url.isValidProtocol(url)) {
+            if (url && !Url.isValidProtocol(url)) {
                 this._errors.push(VastValidationUtilities.invalidUrlError('linear creative videoCustomClickURLTemplates', url));
             }
         });
