@@ -119,12 +119,22 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowingMRAID(false);
 
         this._mraid.hide();
-        this.removeEndScreenContainer();
-        this.removePrivacyContainer();
+        // this.removeEndScreenContainer();
+        if(this._endScreen) {
+            this._endScreen.hide();
+            this._endScreen.container().parentElement!.removeChild(this._endScreen.container());
+        }
+        // this.removePrivacyContainer();
+
+        if(this._privacy) {
+            this._privacy.hide();
+            this._privacy.container().parentElement!.removeChild(this._privacy.container());
+        }
 
         this.sendFinishOperativeEvents();
         this.onFinish.trigger();
-        this.removeMraidContainer();
+        // this.removeMraidContainer();
+        this._mraid.container().parentElement!.removeChild(this._mraid.container());
         this.unsetReferences();
 
         this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
