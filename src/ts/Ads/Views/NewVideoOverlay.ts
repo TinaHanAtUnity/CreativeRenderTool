@@ -35,7 +35,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
-    protected _timerToSkipEnabled: boolean = false;
+    private _timerToSkipEnabled: boolean = false;
 
     private _skipEnabled: boolean;
 
