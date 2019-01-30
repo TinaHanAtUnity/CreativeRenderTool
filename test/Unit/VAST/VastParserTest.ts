@@ -215,9 +215,14 @@ describe('VastParser', () => {
             assert.equal(vast.getCompanionPortraitUrl(), 'http://unity.com/portrait.jpg');
         });
 
-        it('should have correct companion clickthrough url', () => {
+        it('should have correct companion clickThrough url', () => {
             const vast = TestFixtures.getVastParser().parseVast(VastCompanionAd);
             assert.equal(vast.getCompanionClickThroughUrl(), 'https://test.com/companionClickThrough');
+        });
+
+        it('should have correct companion clickTracking url', () => {
+            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAd);
+            assert.deepEqual(vast.getCompanionClickTrackingUrls(), ['https://test.com/companionClickTracking']);
         });
 
         it('should return null if the companion does not have a static resource tag for landscape image', () => {
