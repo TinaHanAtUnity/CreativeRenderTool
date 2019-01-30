@@ -112,7 +112,7 @@ export class OrganicPurchaseManager {
             this.subscribe();
         }).catch((e) => {
             this.subscribe();
-            // throw e;
+            throw e;
         });
     }
 
