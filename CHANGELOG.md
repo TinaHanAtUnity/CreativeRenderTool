@@ -1,6 +1,7 @@
 # Merged
 
 * Disabling offending hybrid tests [#8002](https://github.com/Applifier/unity-ads-webview/pull/8002)
+* Cleanup CustomFeatures [#8004](https://github.com/Applifier/unity-ads-webview/pull/8004)
 
 # Tue Jan 29 18:19:32 UTC 2019
 
