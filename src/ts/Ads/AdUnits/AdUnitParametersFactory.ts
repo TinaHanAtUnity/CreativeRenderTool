@@ -20,7 +20,7 @@ import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { Privacy } from 'Ads/Views/Privacy';
-import { PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
+import { PrivacyEventHandler, IPrivacyEventHandlerParameters } from 'Ads/EventHandlers/PrivacyEventHandler';
 import { Video } from 'Ads/Models/Assets/Video';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { WebViewError } from 'Core/Errors/WebViewError';
@@ -29,6 +29,8 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
+import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
+import { PrivacyMethod } from 'Ads/Models/Privacy';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -116,7 +118,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             privacyManager: this._privacyManager,
             programmaticTrackingService: this._programmaticTrackingService,
             gameSessionId: this._sessionManager.getGameSessionId(),
-            options: this._options
+            options: this._options,
+            privacy: this.createPrivacy()
         };
     }
 
@@ -138,9 +141,23 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         });
     }
 
-    protected createPrivacy(parameters: IAdUnitParameters<Campaign>): Privacy {
-        const privacy = new Privacy(parameters.platform, parameters.campaign, parameters.privacyManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
-        const privacyEventHandler = new PrivacyEventHandler(parameters);
+    protected createPrivacy(): AbstractPrivacy {
+        let privacy: AbstractPrivacy;
+
+        if (this._adsConfig.getGamePrivacy().isEnabled()) {
+            privacy = new PrivacySettings(this._platform, this._campaign, this._privacyManager, this._adsConfig.isGDPREnabled(), this._coreConfig.isCoppaCompliant());
+        } else {
+            privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._adsConfig.isGDPREnabled(), this._coreConfig.isCoppaCompliant());
+        }
+
+        const privacyEventHandlerParameters: IPrivacyEventHandlerParameters = {
+            platform: this._platform,
+            core: this._core,
+            privacyManager: this._privacyManager,
+            adsConfig: this._adsConfig
+        };
+
+        const privacyEventHandler = new PrivacyEventHandler(privacyEventHandlerParameters);
 
         privacy.addEventHandler(privacyEventHandler);
         return privacy;
@@ -150,6 +167,11 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         if (AbstractAdUnitParametersFactory._forceGDPRBanner) {
             return true;
         }
+
+        if (PrivacyMethod.LEGITIMATE_INTEREST !== parameters.adsConfig.getGamePrivacy().getMethod()) {
+            return false;
+        }
+
         return parameters.adsConfig.isGDPREnabled() ? !parameters.adsConfig.isOptOutRecorded() : false;
     }
 

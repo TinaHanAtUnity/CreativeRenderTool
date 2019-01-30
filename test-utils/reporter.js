@@ -173,6 +173,9 @@ var HybridTestReporter = (function () {
                 self.logger.log('Waiting for mappings...');
                 Promise.all(self.mappings).then(function() {
                     done(failures);
+                }).catch(function(reason){
+                    self.logger.log('Could not process all mappings : ' + reason);
+                    done(failures);
                 });
             } else {
                 done(failures);
@@ -262,6 +265,8 @@ var HybridTestReporter = (function () {
             if(window.StackTrace) {
                 self.mappings.push(window.StackTrace.fromError(test.err).then(function(mappedStack) {
                     printFailure(test, i, mappedStack);
+                }).catch(function(error){
+                    self.logger.log('Could not process : ' + JSON.stringify(test.err));
                 }));
             } else {
                 printFailure(test, i);

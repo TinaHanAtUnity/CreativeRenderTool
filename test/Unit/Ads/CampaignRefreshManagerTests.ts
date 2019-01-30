@@ -2,7 +2,7 @@ import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
 import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { AdUnitContainer, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, IAdUnit, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IAdsApi } from 'Ads/IAds';
 import { AssetManager } from 'Ads/Managers/AssetManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
@@ -56,9 +56,10 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export class TestContainer extends AdUnitContainer {
-    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
+    public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
         return Promise.resolve();
     }
     public close(): Promise<void> {
@@ -82,6 +83,7 @@ export class TestContainer extends AdUnitContainer {
 }
 
 export class TestAdUnit extends AbstractAdUnit {
+
     public show(): Promise<void> {
         return Promise.resolve();
     }
@@ -132,6 +134,7 @@ describe('CampaignRefreshManager', () => {
     let placementManager: PlacementManager;
     let backupCampaignManager: BackupCampaignManager;
     let campaignParserManager: ContentTypeHandlerManager;
+    let privacy: AbstractPrivacy;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -141,6 +144,7 @@ describe('CampaignRefreshManager', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        privacy = sinon.createStubInstance(AbstractPrivacy);
 
         storageBridge = new StorageBridge(core);
         placementManager = sinon.createStubInstance(PlacementManager);
@@ -154,7 +158,7 @@ describe('CampaignRefreshManager', () => {
         cacheBookkeeping = new CacheBookkeepingManager(core);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         cache = new CacheManager(core, wakeUpManager, request, cacheBookkeeping);
-        backupCampaignManager = new BackupCampaignManager(core, storageBridge, coreConfig, deviceInfo);
+        backupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, coreConfig, deviceInfo);
         campaignParserManager = new ContentTypeHandlerManager();
         assetManager = new AssetManager(platform, core, cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
         container = new TestContainer();
@@ -198,7 +202,8 @@ describe('CampaignRefreshManager', () => {
             request: request,
             options: {},
             privacyManager: privacyManager,
-            programmaticTrackingService: programmaticTrackingService
+            programmaticTrackingService: programmaticTrackingService,
+            privacy: privacy
         };
 
         RefreshManager.ParsingErrorRefillDelay = 0; // prevent tests from hanging due to long retry timeouts

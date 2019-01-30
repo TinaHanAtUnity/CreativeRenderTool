@@ -17,15 +17,13 @@ export class AdMobAdUnitParametersFactory extends AbstractAdUnitParametersFactor
     }
 
     protected createParameters(baseParams: IAdUnitParameters<AdMobCampaign>) {
-        const privacy = this.createPrivacy(baseParams);
         const showGDPRBanner = this.showGDPRBanner(baseParams);
-        const view = new AdMobView(baseParams.platform, baseParams.core, this._adMobSignalFactory, baseParams.container, baseParams.campaign, baseParams.deviceInfo.getLanguage(), baseParams.clientInfo.getGameId(), privacy, showGDPRBanner, baseParams.programmaticTrackingService);
+        const view = new AdMobView(baseParams.platform, baseParams.core, this._adMobSignalFactory, baseParams.container, baseParams.campaign, baseParams.deviceInfo.getLanguage(), baseParams.clientInfo.getGameId(), baseParams.privacy, showGDPRBanner, baseParams.programmaticTrackingService);
 
         return {
             ... baseParams,
             adMobSignalFactory: this._adMobSignalFactory,
-            view,
-            privacy
+            view
         };
     }
 }

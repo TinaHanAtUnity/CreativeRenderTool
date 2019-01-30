@@ -15,6 +15,7 @@ import VastCompanionAdXml from 'xml/VastCompanionAd.xml';
 import VastCompanionAdWithoutClickThrough from 'xml/VastCompanionAdWithoutClickThrough.xml';
 import VastCompanionAdWithoutLandscapeImageXml from 'xml/VastCompanionAdWithoutLandscapeImage.xml';
 import VastCompanionAdWithoutPortraitImageXml from 'xml/VastCompanionAdWithoutPortraitImage.xml';
+import VastCompanionAdWithRelativeUrlsXml from 'xml/VastCompanionAdWithRelativeUrls.xml';
 
 import VastRaw from 'xml/VastRaw.xml';
 import VastWithSpaces from 'xml/VastWithSpaces.xml';
@@ -373,6 +374,11 @@ describe('VastParserStrict', () => {
                             message: 'should have correct companion portrait url when no clickthrough url is present',
                             inputXml: VastCompanionAdWithoutLandscapeImageXml,
                             expectedValue: 'http://unity.com/portrait.jpg'
+                        },
+                        {
+                            message: 'should have companion portrait url with https when using relative path in static resource',
+                            inputXml: VastCompanionAdWithRelativeUrlsXml,
+                            expectedValue: 'https://unity.com/portrait.jpg'
                         }
                     ];
 
@@ -405,6 +411,11 @@ describe('VastParserStrict', () => {
                                 message: 'should have correct companion landscape url when no clickthrough url is present',
                                 inputXml: VastCompanionAdWithoutPortraitImageXml,
                                 expectedValue: 'http://unity.com/landscape.jpg'
+                            },
+                            {
+                                message: 'should have companion landscape url with https when using relative path in static resource',
+                                inputXml: VastCompanionAdWithRelativeUrlsXml,
+                                expectedValue: 'https://unity.com/landscape.jpg'
                             }
                         ];
 

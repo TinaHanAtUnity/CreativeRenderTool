@@ -1,7 +1,7 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import {AbstractPrivacy, IPrivacyHandlerView} from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ICoreApi } from 'Core/ICore';
@@ -15,6 +15,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 import { IMRAIDHandler } from 'MRAID/EventBridge/MRAIDEventAdapter';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -41,9 +42,11 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onPlayableAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: unknown): void;
     onMraidShowEndScreen(): void;
     onCustomImpressionEvent(): void;
+    onWebViewFullScreen(): Promise<void>;
+    onWebViewReduceSize(): Promise<void>;
 }
 
-export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler, IMRAIDHandler {
+export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandlerView, IMRAIDHandler {
 
     protected _core: ICoreApi;
     protected _placement: Placement;
@@ -215,18 +218,14 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         return valid;
     }
 
-    public onPrivacy(url: string): void {
-        // do nothing
-    }
-
-    public onGDPROptOut(optOutEnabled: boolean) {
-        // do nothing
-    }
-
     public setCallButtonEnabled(value: boolean) {
         if (this._callButtonEnabled !== value) {
             this._callButtonEnabled = value;
         }
+    }
+
+    public isLoaded(): boolean {
+        return this._isLoaded;
     }
 
     protected choosePrivacyShown(): void {
@@ -393,6 +392,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._privacyPanelOpen = true;
     }
 
+    public loadWebPlayer(webPlayerContainer: WebPlayerContainer): Promise<void> {
+        return Promise.resolve();
+    }
+
     protected onSetOrientationProperties(allowOrientationChange: boolean, orientation: Orientation) {
         this._handlers.forEach(handler => handler.onMraidOrientationProperties({
             allowOrientationChange: allowOrientationChange,
@@ -444,7 +447,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public onBridgeResizeWebview() {
         // This will be used to handle rotation changes for webplayer-based mraid
-        // this._handlers.forEach(handler => handler.onWebViewResize(false));
     }
 
     public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {

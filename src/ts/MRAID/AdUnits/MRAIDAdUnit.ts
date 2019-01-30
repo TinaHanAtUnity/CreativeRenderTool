@@ -9,7 +9,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { EventType } from 'Ads/Models/Session';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { EndScreen } from 'Ads/Views/EndScreen';
 import { IARApi } from 'AR/AR';
 import { ARUtil } from 'AR/Utilities/ARUtil';
@@ -17,30 +16,35 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { AuctionV5Test, ABGroup } from 'Core/Models/ABGroup';
+import { ProgrammaticTrackingErrorName, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
     endScreen?: EndScreen;
-    privacy: Privacy;
     ar: IARApi;
+    webPlayerContainer: WebPlayerContainer;
 }
 
 export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
 
-    private _operativeEventManager: OperativeEventManager;
-    private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _mraid: MRAIDView<IMRAIDViewHandler>;
-    private _ar: IARApi;
-    private _options: unknown;
-    private _orientationProperties: IOrientationProperties;
-    private _endScreen?: EndScreen;
-    private _showingMRAID: boolean;
-    private _clientInfo: ClientInfo;
-    private _placement: Placement;
-    private _campaign: MRAIDCampaign;
-    private _privacy: AbstractPrivacy;
-    private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
+    protected _operativeEventManager: OperativeEventManager;
+    protected _thirdPartyEventManager: ThirdPartyEventManager;
+    protected _mraid: MRAIDView<IMRAIDViewHandler>;
+    protected _ar: IARApi;
+    protected _options: unknown;
+    protected _orientationProperties: IOrientationProperties;
+    protected _endScreen?: EndScreen;
+    protected _showingMRAID: boolean;
+    protected _clientInfo: ClientInfo;
+    protected _placement: Placement;
+    protected _campaign: MRAIDCampaign;
+    protected _privacy: AbstractPrivacy;
+    protected _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
+    protected _pts: ProgrammaticTrackingService;
+    protected _abGroup: ABGroup;
 
     constructor(parameters: IMRAIDAdUnitParameters) {
         super(parameters);
@@ -55,6 +59,8 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._campaign = parameters.campaign;
         this._privacy = parameters.privacy;
         this._ar = parameters.ar;
+        this._pts = parameters.programmaticTrackingService;
+        this._abGroup = parameters.coreConfig.getAbGroup();
 
         this._mraid.render();
         document.body.appendChild(this._mraid.container());
@@ -200,19 +206,22 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         // EMPTY
     }
 
-    private unsetReferences() {
+    protected unsetReferences() {
         delete this._mraid;
         delete this._endScreen;
         delete this._privacy;
     }
 
-    private sendTrackingEvent(eventName: string): void {
+    protected sendTrackingEvent(eventName: string): void {
         const sessionId = this._campaign.getSession().getId();
 
         if(this._additionalTrackingEvents && this._additionalTrackingEvents[eventName]) {
             const trackingEventUrls = this._additionalTrackingEvents[eventName];
 
             if(trackingEventUrls) {
+                if (trackingEventUrls.length === 0 && eventName === 'impression') {
+                    this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
+                }
                 for (const url of trackingEventUrls) {
                     this._thirdPartyEventManager.sendWithGet(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
                 }
@@ -220,14 +229,14 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
     }
 
-    private getOperativeEventParams(): IOperativeEventParams {
+    protected getOperativeEventParams(): IOperativeEventParams {
         return {
             placement: this._placement,
             asset: this._campaign.getResourceUrl()
         };
     }
 
-    private removeEndScreenContainer() {
+    protected removeEndScreenContainer() {
         if(this._endScreen) {
             this._endScreen.hide();
 
@@ -238,21 +247,21 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
     }
 
-    private removePrivacyContainer() {
+    protected removePrivacyContainer() {
         const privacyContainer = this._privacy.container();
         if (privacyContainer && privacyContainer.parentElement) {
             privacyContainer.parentElement.removeChild(this._privacy.container());
         }
     }
 
-    private removeMraidContainer() {
+    protected removeMraidContainer() {
         const mraidContainer = this._mraid.container();
         if (mraidContainer && mraidContainer.parentElement) {
             mraidContainer.parentElement.removeChild(this._mraid.container());
         }
     }
 
-    private sendFinishOperativeEvents() {
+    protected sendFinishOperativeEvents() {
         const operativeEventParams = this.getOperativeEventParams();
         const finishState = this.getFinishState();
 
