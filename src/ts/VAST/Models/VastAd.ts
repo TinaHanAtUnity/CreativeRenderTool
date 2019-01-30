@@ -6,7 +6,7 @@ import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 interface IVastAd {
     id: string | null;
     creatives: VastCreative[];
-    unparsableCompanionAds: string[];
+    unparseableCompanionAds: string[];
     companionAds: VastCreativeStaticResourceCompanionAd[];
     errorURLTemplates: string[];
     impressionURLTemplates: string[];
@@ -16,8 +16,8 @@ interface IVastAd {
 export class VastAd extends Model<IVastAd> {
 
     constructor();
-    constructor(id: string, creatives: VastCreative[], errorURLTemplates: string[], impressionURLTemplates: string[], wrapperURLs: string[], companionAds: VastCreativeStaticResourceCompanionAd[], unparsableCompanionAds: string[]);
-    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeStaticResourceCompanionAd[], unparsableCompanionAds?: string[]) {
+    constructor(id: string, creatives: VastCreative[], errorURLTemplates: string[], impressionURLTemplates: string[], wrapperURLs: string[], companionAds: VastCreativeStaticResourceCompanionAd[], unparseableCompanionAds: string[]);
+    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeStaticResourceCompanionAd[], unparseableCompanionAds?: string[]) {
         super('VastAd', {
             id: ['string', 'null'],
             creatives: ['array'],
@@ -25,7 +25,7 @@ export class VastAd extends Model<IVastAd> {
             errorURLTemplates: ['array'],
             impressionURLTemplates: ['array'],
             wrapperURLs: ['array'],
-            unparsableCompanionAds: ['array']
+            unparseableCompanionAds: ['array']
         });
 
         this.set('id', id || null);
@@ -34,7 +34,7 @@ export class VastAd extends Model<IVastAd> {
         this.set('errorURLTemplates', errorURLTemplates || []);
         this.set('impressionURLTemplates', impressionURLTemplates || []);
         this.set('wrapperURLs', wrapperURLs || []);
-        this.set('unparsableCompanionAds', unparsableCompanionAds || []);
+        this.set('unparseableCompanionAds', unparseableCompanionAds || []);
     }
 
     public getId(): string | null {
@@ -70,11 +70,11 @@ export class VastAd extends Model<IVastAd> {
     }
 
     public getUnparseableCompanionAds(): string[] {
-        return this.get('unparsableCompanionAds');
+        return this.get('unparseableCompanionAds');
     }
 
     public addUnparsableCompanionAd(companionAd: string) {
-        this.get('unparsableCompanionAds').push(companionAd);
+        this.get('unparseableCompanionAds').push(companionAd);
     }
 
     public getErrorURLTemplates(): string[] {
