@@ -31,8 +31,6 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 

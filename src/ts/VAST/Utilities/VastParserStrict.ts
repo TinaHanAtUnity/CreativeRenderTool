@@ -30,6 +30,7 @@ enum VastNodeName {
     AD_PARAMETERS = 'AdParameters',
     STATIC_RESOURCE = 'StaticResource',
     COMPANION_CLICK_THROUGH = 'CompanionClickThrough',
+    COMPANION_CLICK_TRACKING = 'CompanionClickTracking',
     PARSE_ERROR = 'parsererror',
     VAST = 'VAST'
 }
@@ -316,18 +317,22 @@ export class VastParserStrict {
         const clickThroughElement = this.getFirstNodeWithName(creativeElement, VastNodeName.CLICK_THROUGH);
         if (clickThroughElement) {
             const url = this.parseNodeText(clickThroughElement);
-            creative.setVideoClickThroughURLTemplate(url);
+            if (url && url.length > 0) {
+                creative.setVideoClickThroughURLTemplate(url);
+            }
         }
 
         this.getNodesWithName(creativeElement, VastNodeName.CLICK_TRACKING).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
-            creative.addVideoClickTrackingURLTemplate(url);
+            if (url && url.length > 0) {
+                creative.addVideoClickTrackingURLTemplate(url);
+            }
         });
 
         this.getNodesWithName(creativeElement, VastNodeName.TRACKING).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
             const eventName = element.getAttribute(VastAttributeNames.EVENT);
-            if (eventName) {
+            if (eventName && url && url.length > 0) {
                 creative.addTrackingEvent(eventName, url);
             }
         });
@@ -387,8 +392,18 @@ export class VastParserStrict {
 
         const companionClickThroughElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.COMPANION_CLICK_THROUGH);
         if (companionClickThroughElement) {
-            companionAd.setCompanionClickThroughURLTemplate(this.parseNodeText(companionClickThroughElement));
+            const companionClickThroughUrl = this.parseNodeText(companionClickThroughElement);
+            if (companionClickThroughUrl && companionClickThroughUrl.length > 0) {
+                companionAd.setCompanionClickThroughURLTemplate(companionClickThroughUrl);
+            }
         }
+
+        this.getNodesWithName(companionAdElement, VastNodeName.COMPANION_CLICK_TRACKING).forEach((element: HTMLElement) => {
+            const companionClickTrackingUrl = this.parseNodeText(element);
+            if (companionClickTrackingUrl && companionClickTrackingUrl.length > 0) {
+                companionAd.addCompanionClickTrackingURLTemplate(companionClickTrackingUrl);
+            }
+        });
         return companionAd;
     }
 
