@@ -22,7 +22,7 @@ do
     git checkout "staging/$release"
     hub pull-request -b $release -h "staging/$release" -m "$(pr_message $release)"
     sleep 2
-done
+done <"$releases"
 
 echo "Deployment PRs made."
 open "https://github.com/Applifier/unity-ads-webview/pulls"
