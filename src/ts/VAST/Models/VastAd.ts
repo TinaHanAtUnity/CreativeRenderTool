@@ -73,7 +73,7 @@ export class VastAd extends Model<IVastAd> {
         return this.get('unparseableCompanionAds');
     }
 
-    public addUnparsableCompanionAd(companionAd: string) {
+    public addUnparseableCompanionAd(companionAd: string) {
         this.get('unparseableCompanionAds').push(companionAd);
     }
 

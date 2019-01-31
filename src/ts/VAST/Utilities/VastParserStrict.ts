@@ -279,7 +279,7 @@ export class VastParserStrict {
                 vastAd.addCompanionAd(companionAd);
             } else {
                 // ignore element as it is not of a type we support
-                vastAd.addUnparsableCompanionAd(element.outerHTML);
+                vastAd.addUnparseableCompanionAd(element.outerHTML);
             }
         });
 
