@@ -62,6 +62,15 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._pts = parameters.programmaticTrackingService;
         this._abGroup = parameters.coreConfig.getAbGroup();
 
+        this._mraid.render();
+        document.body.appendChild(this._mraid.container());
+
+        if(this._endScreen) {
+            this._endScreen.render();
+            this._endScreen.hide();
+            document.body.appendChild(this._endScreen.container());
+        }
+
         this._orientationProperties = {
             allowOrientationChange: true,
             forceOrientation: Orientation.NONE
@@ -72,14 +81,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public show(): Promise<void> {
-        this._mraid.render();
-        document.body.appendChild(this._mraid.container());
-
-        if(this._endScreen) {
-            this._endScreen.render();
-            this._endScreen.hide();
-            document.body.appendChild(this._endScreen.container());
-        }
         this.setShowing(true);
         this.setShowingMRAID(true);
         this._mraid.show();
