@@ -6,6 +6,7 @@ import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParam
 import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
 import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
 
 export interface IBannersApi extends IModuleApi {
     Banner: BannerApi;
@@ -19,4 +20,5 @@ export interface IBanners extends IApiModule {
     CampaignManager: BannerCampaignManager;
     PlacementManager: BannerPlacementManager;
     WebPlayerContainer: WebPlayerContainer;
+    AdUnitFactory: BannerAdUnitFactory;
 }

@@ -37,6 +37,9 @@ const runTest = async (browser, isolated, testFilter) => {
             console.dir(message);
         }
     });
+    page.exposeFunction('debugEnabled', () => {
+        return debug;
+    });
 
     if(coverage) {
         page.exposeFunction('writeCoverage', (coverage) => {
@@ -66,6 +69,9 @@ const runTest = async (browser, isolated, testFilter) => {
     }
 
     await page.evaluate(() => {
+        if (window.debugEnabled()) {
+            mocha.timeout(100 * 1000);
+        }
         mocha.run((failures) => {
             if(window.writeCoverage && __coverage__) {
                 window.writeCoverage(JSON.stringify(__coverage__));
