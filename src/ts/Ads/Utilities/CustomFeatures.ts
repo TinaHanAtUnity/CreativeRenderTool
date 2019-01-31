@@ -1,8 +1,10 @@
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
+import ZyngaGamesJson from 'json/custom_features/ZyngaGames.json';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
+const ZyngaGameIds = setGameIds(ZyngaGamesJson);
 
 function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
@@ -63,6 +65,10 @@ export class CustomFeatures {
 
     public static isTimerExpirationExperiment(gameId: string): boolean {
         return gameId === '1453434';
+    }
+
+    public static isZyngaGame(gameId: string): boolean {
+        return this.existsInList(ZyngaGameIds, gameId);
     }
 
     private static existsInList(gameIdList: string[], gameId: string): boolean {
