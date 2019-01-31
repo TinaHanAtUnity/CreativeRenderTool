@@ -17,6 +17,8 @@ import { ICore, ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class ProgrammaticVastParser extends CampaignParser {
 
@@ -152,13 +154,31 @@ export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
 
     protected _vastParserStrict: VastParserStrict = new VastParserStrict();
 
+    private getWarnings(vast: Vast): string[] {
+        let warnings: string[] = [];
+        for (const vastAd of vast.getAds()) {
+            warnings = warnings.concat(vastAd.getUnparseableCompanionAds());
+        }
+        return warnings.map((warning) => {
+            return `Unsupported companionAd : ${warning}`;
+        });
+    }
+
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
 
-        if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
+        if (ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
             this._vastParserStrict.setMaxWrapperDepth(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH);
         }
 
         return this.retrieveVast(response).then((vast): Promise<Campaign> => {
+            const warnings = this.getWarnings(vast);
+            if (warnings.length > 0) {
+                // report warnings with diagnostic
+                SessionDiagnostics.trigger('programmatic_vast_parser_strict_warning', {
+                    warnings: warnings
+                }, session);
+            }
+
             // if the vast campaign is accidentally a vpaid campaign parse it as such
             if (vast.isVPAIDCampaign()) {
                 // throw appropriate campaign error to be caught and handled in campaign manager
@@ -174,4 +194,5 @@ export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
         return this._vastParserStrict.retrieveVast(decodedVast, this._coreApi, this._requestManager);
     }
+
 }

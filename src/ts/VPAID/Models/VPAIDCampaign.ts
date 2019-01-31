@@ -1,6 +1,6 @@
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
-import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
+import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
 import { VPAID } from 'VPAID/Models/VPAID';
 import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 
@@ -35,7 +35,7 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
         return this.getVPAID().hasEndScreen();
     }
 
-    public getCompanionAd(): VastCreativeCompanionAd | null {
+    public getCompanionAd(): VastCreativeStaticResourceCompanionAd | null {
         return this.getVPAID().getCompanion();
     }
 
