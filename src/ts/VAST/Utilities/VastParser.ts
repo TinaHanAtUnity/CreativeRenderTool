@@ -4,7 +4,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';
 import { VastCreative } from 'VAST/Models/VastCreative';
-import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
+import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { Url } from 'Core/Utilities/Url';
@@ -304,7 +304,7 @@ export class VastParser {
         return creative;
     }
 
-    private parseCreativeCompanionAdElement(companionAdElement: Element): VastCreativeCompanionAd | null {
+    private parseCreativeCompanionAdElement(companionAdElement: Element): VastCreativeStaticResourceCompanionAd | null {
         const staticResourceElement = <Element>this.childByName(companionAdElement, 'StaticResource');
         const companionClickThroughElement = this.childByName(companionAdElement, 'CompanionClickThrough');
 
@@ -318,7 +318,7 @@ export class VastParser {
 
             const trackingEvents = this.getTrackingEventsFromElement(companionAdElement);
 
-            return new VastCreativeCompanionAd(id, height, width, creativeType, staticResourceURL, companionClickThroughURLTemplate, trackingEvents);
+            return new VastCreativeStaticResourceCompanionAd(id, height, width, creativeType, staticResourceURL, companionClickThroughURLTemplate, trackingEvents);
         } else {
             return null;
         }
