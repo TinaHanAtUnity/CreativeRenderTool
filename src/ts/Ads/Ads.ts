@@ -105,6 +105,7 @@ export class Ads implements IAds {
     private _creativeUrl?: string;
     private _requestDelay: number;
     private _wasRealtimePlacement: boolean = false;
+    private _appInForeground: boolean | undefined;
 
     private _core: ICore;
 
@@ -283,6 +284,10 @@ export class Ads implements IAds {
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
+
+        if (!this._core.FocusManager.isAppForeground()) {
+            Diagnostics.trigger('ad_shown_in_background', {});
+        }
 
         if(this._showing) {
             // do not send finish event because there will be a finish event from currently open ad unit
