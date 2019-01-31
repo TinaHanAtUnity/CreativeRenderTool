@@ -21,6 +21,7 @@ export class VastCreativeStaticResourceCompanionAdValidator implements IValidato
         this.validateStaticResourceUrl(companionAd);
         this.validateCreativeType(companionAd);
         this.validateCompanionClickThroughURLTemplate(companionAd);
+        this.validateCompanionClickTrackingURLTemplates(companionAd);
         this.validateTrackingEvents(companionAd);
     }
 
@@ -51,6 +52,16 @@ export class VastCreativeStaticResourceCompanionAdValidator implements IValidato
             this._errors.push(new Error(`VAST Companion ad(${adId}) is missing required CompanionClickThrough Element`));
         } else if (!Url.isValidProtocol(companionClickThroughURLTemplate)) {
             this._errors.push(VastValidationUtilities.invalidUrlError(`companion ad(${adId}) companionClickThroughURLTemplate`, companionClickThroughURLTemplate));
+        }
+    }
+
+    private validateCompanionClickTrackingURLTemplates(companionAd: VastCreativeStaticResourceCompanionAd) {
+        const adId = companionAd.getId();
+        const companionClickTrackingURLTemplates = companionAd.getCompanionClickTrackingURLTemplates();
+        for (const companionClickTrackingURLTemplate of companionClickTrackingURLTemplates) {
+            if (!Url.isValidProtocol(companionClickTrackingURLTemplate)) {
+                this._errors.push(VastValidationUtilities.invalidUrlError(`companion ad(${adId}) companionClickTrackingURLTemplates`, companionClickTrackingURLTemplate));
+            }
         }
     }
 

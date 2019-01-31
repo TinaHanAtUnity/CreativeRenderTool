@@ -323,6 +323,13 @@ describe('VastParserStrict', () => {
                 });
             });
 
+            describe('getCompanionClickTrackingUrls', () => {
+                it('should have correct companion clickTracking url', () => {
+                    const vast = TestFixtures.getVastParserStrict().parseVast(VastCompanionAdXml);
+                    assert.deepEqual(vast.getCompanionClickTrackingUrls(), ['https://test.com/companionClickTracking']);
+                });
+            });
+
             describe('getCompanionCreativeViewTrackingUrls', () => {
                 it('should have the correct companion tracking urls', () => {
                     const vast = TestFixtures.getVastParserStrict().parseVast(VastCompanionAdXml);

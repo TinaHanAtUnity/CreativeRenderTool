@@ -163,8 +163,6 @@ import EventTestVast from 'xml/EventTestVast.xml';
             let campaign: VastCampaign;
             let vastEndScreen: VastEndScreen;
             let vastEndScreenEventHandler: VastEndScreenEventHandler;
-            const vastXml = EventTestVast;
-            const vastParser = TestFixtures.getVastParser();
 
             beforeEach(() => {
 
@@ -180,6 +178,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
                 vastAdUnit = new VastAdUnit(vastAdUnitParameters);
                 vastEndScreenEventHandler = new VastEndScreenEventHandler(vastAdUnit, vastAdUnitParameters);
                 sinon.stub(vastAdUnit, 'sendTrackingEvent').returns(sinon.spy());
+                sinon.stub(vastAdUnit, 'sendCompanionClickTrackingEvent').returns(sinon.spy());
             });
 
             if(platform === Platform.IOS) {
@@ -188,6 +187,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
                     sinon.stub(core.iOS!.UrlScheme, 'open').resolves();
                     return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
                         sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.sendTrackingEvent);
+                        sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.sendCompanionClickTrackingEvent);
                     });
                 });
 
@@ -196,6 +196,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
                     return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
                         return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
                             sinon.assert.calledTwice(<sinon.SinonSpy>vastAdUnit.sendTrackingEvent);
+                            sinon.assert.calledTwice(<sinon.SinonSpy>vastAdUnit.sendCompanionClickTrackingEvent);
                         });
                     });
                 });
