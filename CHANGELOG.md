@@ -2,6 +2,7 @@
 
 * Disabling offending hybrid tests [#8002](https://github.com/Applifier/unity-ads-webview/pull/8002)
 * Cleanup CustomFeatures [#8004](https://github.com/Applifier/unity-ads-webview/pull/8004)
+* ABTest: Custom Zynga Interstitial Video Overlay[#7981](https://github.com/Applifier/unity-ads-webview/pull/7981)
 
 # Tue Jan 29 18:19:32 UTC 2019
 
