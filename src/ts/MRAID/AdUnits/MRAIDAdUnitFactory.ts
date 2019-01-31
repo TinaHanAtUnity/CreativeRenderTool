@@ -13,7 +13,7 @@ import { WebPlayerMRAIDAdUnit } from 'MRAID/AdUnits/WebPlayerMRAIDAdUnit';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
     public createAdUnit(parameters: IMRAIDAdUnitParameters): MRAIDAdUnit {
-        let mraidAdUnit: MRAIDAdUnit = new MRAIDAdUnit(parameters);
+        let mraidAdUnit: MRAIDAdUnit;
 
         if (WebPlayerMRAIDTest.isValid(parameters.coreConfig.getAbGroup())) {
             mraidAdUnit = new WebPlayerMRAIDAdUnit(parameters);
