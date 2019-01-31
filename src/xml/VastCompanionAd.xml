@@ -46,6 +46,7 @@
                                 <Tracking event="creativeView"><![CDATA[https://test.com/clicktracking]]></Tracking>
                             </TrackingEvents>
                             <CompanionClickThrough><![CDATA[https://test.com/companionClickThrough]]></CompanionClickThrough>
+                            <CompanionClickTracking><![CDATA[https://test.com/companionClickTracking]]></CompanionClickTracking>
                         </Companion>
                         <Companion id="unity_brand_endcard_landscape" width="3500" height="2500">
                             <StaticResource creativeType="image/png"><![CDATA[http://unity.com/landscape.jpg]]></StaticResource>
@@ -53,6 +54,7 @@
                                 <Tracking event="creativeView"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_uuid=83d5ca41-447b-4650-a4a1-745fa218e1e1&mt_cmid=1&mt_aid=123&event=companionImpression&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
                             </TrackingEvents>
                             <CompanionClickThrough><![CDATA[https://test.com/companionClickThrough]]></CompanionClickThrough>
+                            <CompanionClickTracking><![CDATA[https://test.com/companionClickTracking]]></CompanionClickTracking>
                         </Companion>
                     </CompanionAds>
                 </Creative>

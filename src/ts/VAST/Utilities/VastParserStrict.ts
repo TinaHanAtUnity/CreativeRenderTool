@@ -3,13 +3,15 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';
-import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
+import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { Url } from 'Core/Utilities/Url';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { VastAdValidator } from 'VAST/Validators/VastAdValidator';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
+import { IVastCreativeCompanionAd } from 'VAST/Models/IVastCreativeCompanionAd';
+import { Model } from 'Core/Models/Model';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -28,6 +30,7 @@ enum VastNodeName {
     AD_PARAMETERS = 'AdParameters',
     STATIC_RESOURCE = 'StaticResource',
     COMPANION_CLICK_THROUGH = 'CompanionClickThrough',
+    COMPANION_CLICK_TRACKING = 'CompanionClickTracking',
     PARSE_ERROR = 'parsererror',
     VAST = 'VAST'
 }
@@ -271,8 +274,14 @@ export class VastParserStrict {
         });
 
         this.getNodesWithName(adElement, VastNodeName.COMPANION).forEach((element: HTMLElement) => {
-            const companionAd = this.parseCreativeCompanionAdElement(element, urlProtocol);
-            vastAd.addCompanionAd(companionAd);
+            const staticResourceElement = this.getFirstNodeWithName(element, VastNodeName.STATIC_RESOURCE);
+            if (staticResourceElement) {
+                const companionAd = this.parseCreativeStaticResourceCompanionAdElement(element, urlProtocol);
+                vastAd.addCompanionAd(companionAd);
+            } else {
+                // ignore element as it is not of a type we support
+                vastAd.addUnparseableCompanionAd(element.outerHTML);
+            }
         });
 
         return vastAd;
@@ -308,18 +317,22 @@ export class VastParserStrict {
         const clickThroughElement = this.getFirstNodeWithName(creativeElement, VastNodeName.CLICK_THROUGH);
         if (clickThroughElement) {
             const url = this.parseNodeText(clickThroughElement);
-            creative.setVideoClickThroughURLTemplate(url);
+            if (url && url.length > 0) {
+                creative.setVideoClickThroughURLTemplate(url);
+            }
         }
 
         this.getNodesWithName(creativeElement, VastNodeName.CLICK_TRACKING).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
-            creative.addVideoClickTrackingURLTemplate(url);
+            if (url && url.length > 0) {
+                creative.addVideoClickTrackingURLTemplate(url);
+            }
         });
 
         this.getNodesWithName(creativeElement, VastNodeName.TRACKING).forEach((element: HTMLElement) => {
             const url = this.parseNodeText(element);
             const eventName = element.getAttribute(VastAttributeNames.EVENT);
-            if (eventName) {
+            if (eventName && url && url.length > 0) {
                 creative.addTrackingEvent(eventName, url);
             }
         });
@@ -351,11 +364,11 @@ export class VastParserStrict {
         return creative;
     }
 
-    private parseCreativeCompanionAdElement(companionAdElement: HTMLElement, urlProtocol: string): VastCreativeCompanionAd {
+    private parseCreativeStaticResourceCompanionAdElement(companionAdElement: HTMLElement, urlProtocol: string): VastCreativeStaticResourceCompanionAd {
         const id = companionAdElement.getAttribute(VastAttributeNames.ID);
         const height = this.getIntAttribute(companionAdElement, VastAttributeNames.HEIGHT);
         const width = this.getIntAttribute(companionAdElement, VastAttributeNames.WIDTH);
-        const companionAd = new VastCreativeCompanionAd(id, height, width);
+        const companionAd = new VastCreativeStaticResourceCompanionAd(id, height, width);
 
         // Get tracking urls for companion ad
         this.getNodesWithName(companionAdElement, VastNodeName.TRACKING).forEach((element: HTMLElement) => {
@@ -379,8 +392,18 @@ export class VastParserStrict {
 
         const companionClickThroughElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.COMPANION_CLICK_THROUGH);
         if (companionClickThroughElement) {
-            companionAd.setCompanionClickThroughURLTemplate(this.parseNodeText(companionClickThroughElement));
+            const companionClickThroughUrl = this.parseNodeText(companionClickThroughElement);
+            if (companionClickThroughUrl && companionClickThroughUrl.length > 0) {
+                companionAd.setCompanionClickThroughURLTemplate(companionClickThroughUrl);
+            }
         }
+
+        this.getNodesWithName(companionAdElement, VastNodeName.COMPANION_CLICK_TRACKING).forEach((element: HTMLElement) => {
+            const companionClickTrackingUrl = this.parseNodeText(element);
+            if (companionClickTrackingUrl && companionClickTrackingUrl.length > 0) {
+                companionAd.addCompanionClickTrackingURLTemplate(companionClickTrackingUrl);
+            }
+        });
         return companionAd;
     }
 
