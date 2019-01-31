@@ -194,5 +194,4 @@ export class ProgrammaticVastParserStrict extends ProgrammaticVastParser {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
         return this._vastParserStrict.retrieveVast(decodedVast, this._coreApi, this._requestManager);
     }
-
 }
