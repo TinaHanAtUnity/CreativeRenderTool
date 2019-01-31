@@ -27,15 +27,17 @@ then
         git reset --hard origin/$release
         echo "Updating $release into $lkg"
         git tag -f $lkg HEAD
-        sleep 1
     done <"$releases"
 
     git push --tags -f
 
+    author=$(git config --get user.name)
+
     # ads-sdk slack channel
-    curl -X POST -H 'Content-type: application/json' --data '{"text":"Ads SDK will be performing a Webview Deployment shortly. Here is the changelog showing the latest updates: https://github.com/Applifier/unity-ads-webview/blob/master/CHANGELOG.md"}' https://hooks.slack.com/services/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
+    curl -X POST -H 'Content-type: application/json' --data '{"text":"Ads SDK Deployment is underway.","attachments":[{"title":"See the Latest Additions","title_link":"https://github.com/Applifier/unity-ads-webview/blob/master/CHANGELOG.md","color":"#2e80b8","author_name":"By: $author"}]}' https://hooks.slack.com/services/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
+
     # ads-deploys slack channel
-    curl -X POST -H 'Content-type: application/json' --data '{"text":"Ads SDK will be performing a Webview Deployment shortly. Here is the changelog showing the latest updates: https://github.com/Applifier/unity-ads-webview/blob/master/CHANGELOG.md"}' https://hooks.slack.com/services/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
+    curl -X POST -H 'Content-type: application/json' --data '{"text":"Ads SDK Deployment is underway.","attachments":[{"title":"See the Latest Additions","title_link":"https://github.com/Applifier/unity-ads-webview/blob/master/CHANGELOG.md","color":"#2e80b8","author_name":"By: $author"}]}' https://hooks.slack.com/services/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
 
     git checkout master
     ./tools/fire_deploy_json.sh
