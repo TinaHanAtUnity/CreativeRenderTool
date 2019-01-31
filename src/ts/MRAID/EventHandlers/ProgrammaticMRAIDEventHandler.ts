@@ -18,21 +18,21 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
         });
     }
 
-    // Handles webview resizing when webview is overlaying webplayer - for privacy modal
-    public onWebViewFullScreen(): Promise<void> {
-        return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()])
-        .then(([width, height]) => {
-            return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, height);
-        });
-    }
+    // // Handles webview resizing when webview is overlaying webplayer - for privacy modal
+    // public onWebViewFullScreen(): Promise<void> {
+    //     return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()])
+    //     .then(([width, height]) => {
+    //         return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, height);
+    //     });
+    // }
 
-    // Handles webview resizing when webview is overlaying webplayer - for privacy modal
-    public onWebViewReduceSize(): Promise<void> {
-        return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()])
-        .then(([width, height]) => {
-            return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, this.getTopViewHeight(width, height));
-        });
-    }
+    // // Handles webview resizing when webview is overlaying webplayer - for privacy modal
+    // public onWebViewReduceSize(): Promise<void> {
+    //     return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()])
+    //     .then(([width, height]) => {
+    //         return this._adUnit.getContainer().setViewFrame('webview', 0, 0, width, this.getTopViewHeight(width, height));
+    //     });
+    // }
 
     private openUrlOnCallButton(url: string, clickDuration: number, clickUrl: string): Promise<void> {
         return this.openUrl(url).then(() => {
