@@ -286,11 +286,6 @@ describe('VastAdUnitTest', () => {
             assert.equal(clickThroughURL, null);
         });
 
-        it('should return correct companion click tracking url', () => {
-            const companionClickTrackingUrls = vastAdUnit.getCompanionClickTrackingUrls();
-            assert.deepEqual(companionClickTrackingUrls, ['https://test.com/companionClickTracking']);
-        });
-
         it('should return endscreen', () => {
             const endScreen = vastAdUnit.getEndScreen();
             assert.equal(endScreen, vastEndScreen);

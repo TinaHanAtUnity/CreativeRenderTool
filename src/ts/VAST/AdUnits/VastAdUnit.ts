@@ -142,10 +142,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
-    public getCompanionClickTrackingUrls(): string[] {
-        return this._vastCampaign.getVast().getCompanionClickTrackingUrls();
-    }
-
     public sendCompanionClickTrackingEvent(sessionId: string): void {
         const companionClickTrackingUrls = this._vastCampaign.getVast().getCompanionClickTrackingUrls();
         for (const companionClickTrackingUrl of companionClickTrackingUrls) {
