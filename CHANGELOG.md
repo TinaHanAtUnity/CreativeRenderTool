@@ -1,3 +1,7 @@
+# Merged
+
+* Support VAST CompanionClickTracking for end card click event [#8003](https://github.com/Applifier/unity-ads-webview/pull/8003)
+
 # Thu Jan 31 04:33:07 UTC 2019
 
 * Disabling offending hybrid tests [#8002](https://github.com/Applifier/unity-ads-webview/pull/8002)
