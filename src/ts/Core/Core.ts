@@ -145,11 +145,10 @@ export class Core implements ICore {
             HttpKafka.setClientInfo(this.ClientInfo);
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
-                this.Api.Request.Android!.setMaximumPoolSize(8);
                 this.Api.Request.Android!.setKeepAliveTime(10000);
-            } else {
-                this.Api.Request.setConcurrentRequestCount(8);
             }
+
+            this.Api.Request.setConcurrentRequestCount(8);
 
             return Promise.all([this.DeviceInfo.fetch(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
@@ -228,10 +227,9 @@ export class Core implements ICore {
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.NativeBridge.setAutoBatchEnabled(false);
-                this.Api.Request.Android!.setMaximumPoolSize(1);
-            } else {
-                this.Api.Request.setConcurrentRequestCount(1);
             }
+
+            this.Api.Request.setConcurrentRequestCount(1);
         }).catch((error: { message: string; name: unknown }) => {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');

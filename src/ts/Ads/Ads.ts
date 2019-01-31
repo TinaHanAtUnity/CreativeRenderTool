@@ -465,11 +465,7 @@ export class Ads implements IAds {
             this._wasRealtimePlacement = false;
 
             this._currentAdUnit.show().then(() => {
-                if(this._core.NativeBridge.getPlatform() === Platform.ANDROID) {
-                    this._core.Api.Request.Android!.setMaximumPoolSize(8);
-                } else {
-                    this._core.Api.Request.setConcurrentRequestCount(8);
-                }
+                this._core.Api.Request.setConcurrentRequestCount(8);
 
                 this.BackupCampaignManager.deleteBackupCampaigns();
             });
@@ -492,11 +488,7 @@ export class Ads implements IAds {
     private onAdUnitClose(): void {
         this._showing = false;
 
-        if(this._core.NativeBridge.getPlatform() === Platform.ANDROID) {
-            this._core.Api.Request.Android!.setMaximumPoolSize(1);
-        } else {
-            this._core.Api.Request.setConcurrentRequestCount(1);
-        }
+        this._core.Api.Request.setConcurrentRequestCount(1);
     }
 
     private setupTestEnvironment(): void {
