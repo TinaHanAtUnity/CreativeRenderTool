@@ -105,7 +105,6 @@ export class Ads implements IAds {
     private _creativeUrl?: string;
     private _requestDelay: number;
     private _wasRealtimePlacement: boolean = false;
-    private _appInForeground: boolean | undefined;
 
     private _core: ICore;
 
