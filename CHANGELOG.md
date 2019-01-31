@@ -1,6 +1,8 @@
 # Merged
 
 * Support VAST CompanionClickTracking for end card click event [#8003](https://github.com/Applifier/unity-ads-webview/pull/8003)
+* Improve Slack Webhooks and Increase Speed of Release Scripts [#8032](https://github.com/Applifier/unity-ads-webview/pull/8032)
+* Adds a diagnostic if an ad is shown while app is in background [#8031](https://github.com/Applifier/unity-ads-webview/pull/8031)
 
 # Thu Jan 31 04:33:07 UTC 2019
 
