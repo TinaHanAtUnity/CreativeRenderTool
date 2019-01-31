@@ -21,11 +21,9 @@ while IFS= read -r release
 do
     git checkout "staging/$release"
     hub pull-request -b $release -h "staging/$release" -m "$(pr_message $release)"
-    sleep 2
 done <"$releases"
 
 echo "Deployment PRs made."
-open "https://github.com/Applifier/unity-ads-webview/pulls"
 
-#ads-sdk slack channel
-curl -X POST -H 'Content-type: application/json' --data '{"text":"Ads SDK Webview Deployment has been staged for a deployment with the following changes: https://github.com/Applifier/unity-ads-webview/blob/master/CHANGELOG.md"}' https://hooks.slack.com/services/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
+author=$(git config --get user.name)
+curl -X POST -H 'Content-type: application/json' --data '{"text":"Ads SDK Webview has been staged.","attachments":[{"title":"See the Latest Changes","title_link":"https://github.com/Applifier/unity-ads-webview/blob/master/CHANGELOG.md","color":"good","author_name":"By: $author"}]}' https://hooks.slack.com/services/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
