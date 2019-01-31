@@ -5,7 +5,7 @@ import { VastLinearCreativeValidator } from 'VAST/Validators/VastLinearCreativeV
 import { VastCreativeValidator } from 'VAST/Validators/VastCreativeValidator';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
 import { Url } from 'Core/Utilities/Url';
-import { VastCreativeCompanionAdValidator } from 'VAST/Validators/VastCreativeCompanionAdValidator';
+import { VastCreativeStaticResourceCompanionAdValidator } from 'VAST/Validators/VastCreativeStaticResourceCompanionAdValidator';
 
 export class VastAdValidator implements IValidator {
 
@@ -39,7 +39,7 @@ export class VastAdValidator implements IValidator {
 
     private validateCompanionAds(vastAd: VastAd) {
         vastAd.getCompanionAds().forEach((companionAd) => {
-            this._errors = this._errors.concat(new VastCreativeCompanionAdValidator(companionAd).getErrors());
+            this._errors = this._errors.concat(new VastCreativeStaticResourceCompanionAdValidator(companionAd).getErrors());
         });
     }
 

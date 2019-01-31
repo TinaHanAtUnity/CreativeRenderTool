@@ -4,7 +4,7 @@ import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastLinearCreativeValidator } from 'VAST/Validators/VastLinearCreativeValidator';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
-import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
+import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
 import { VastAd } from 'VAST/Models/VastAd';
 import { VastAdValidator } from 'VAST/Validators/VastAdValidator';
 
@@ -19,7 +19,7 @@ describe('VastAdValidatorTest', () => {
                 ['http://reddit.com/click', 'https://reddit.com/thridparty/click'],
                 ['http://google.com/custom/click'],
                 'test');
-            const companionAd = new VastCreativeCompanionAd('testId', 200, 200, 'image/jpg', 'http://google.com?someQuery=test&other=no', 'http://google.com?someQuery=test&other=no', {
+            const companionAd = new VastCreativeStaticResourceCompanionAd('testId', 200, 200, 'image/jpg', 'http://google.com?someQuery=test&other=no', 'http://google.com?someQuery=test&other=no', {
                 'click': ['http://google.com', 'https://reddit.com'],
                 'impression': ['http://google.com/impression?someQuery=test&other=no']
             });
@@ -29,7 +29,8 @@ describe('VastAdValidatorTest', () => {
                 ['http://reddit.com/error', 'https://google.com/error/report?someQuery=test&other=no'],
                 ['https://reddit.com/impression', 'https://google.com/impression/report?someQuery=test&other=no'],
                 ['https://reddit.com/wrapper/1234?someQuery=test&other=no'],
-                [companionAd, companionAd]
+                [companionAd, companionAd],
+                []
             );
             const errors = new VastAdValidator(vastAd).getErrors();
             assert.lengthOf(errors, 0, JSON.stringify(errors));
@@ -44,7 +45,7 @@ describe('VastAdValidatorTest', () => {
                 ['htt', 'https://reddit.com/thridparty/click?someQuery=test&other=no'],
                 [''],
                 'test');
-            const companionAd = new VastCreativeCompanionAd('testId', 200, 200, 'invalid', 'http://google.com?someQuery=test&other=no', 'invalidClick', {
+            const companionAd = new VastCreativeStaticResourceCompanionAd('testId', 200, 200, 'invalid', 'http://google.com?someQuery=test&other=no', 'invalidClick', {
                 'click': ['', 'abc'],
                 'impression': ['abc?no=hello']
             });
@@ -54,7 +55,8 @@ describe('VastAdValidatorTest', () => {
                 ['reddit.com/error', 'omeQuery=test&other=no'],
                 ['', 'https://google.com/impression/report?someQuery=test&other=no'],
                 [''],
-                [companionAd, companionAd]
+                [companionAd, companionAd],
+                []
             );
             const errors = new VastAdValidator(vastAd).getErrors();
             assert.lengthOf(errors, 22, JSON.stringify(errors));
