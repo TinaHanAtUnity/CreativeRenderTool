@@ -46,3 +46,4 @@ export const AuctionV5Test = new ABTest(15);
 export const VastParsingStrictTest = new ABTest(16); // Testing new vast parser logic
 export const WebPlayerMRAIDTest = new DisabledABTest();
 export const CTAClickHandlingTest = new ABTest(17);
+export const InterstitialLayoutTest = new ABTest(5, 6);
