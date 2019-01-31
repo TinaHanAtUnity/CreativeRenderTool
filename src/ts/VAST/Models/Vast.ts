@@ -1,6 +1,6 @@
 import { Model } from 'Core/Models/Model';
 import { VastAd } from 'VAST/Models/VastAd';
-import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
+import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { CampaignError } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
@@ -161,7 +161,7 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
-    public getLandscapeOrientedCompanionAd(): VastCreativeCompanionAd | null {
+    public getLandscapeOrientedCompanionAd(): VastCreativeStaticResourceCompanionAd | null {
         const ad = this.getAd();
         if (ad) {
             const companionAds = ad.getCompanionAds();
@@ -186,7 +186,7 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
-    public getPortraitOrientedCompanionAd(): VastCreativeCompanionAd | null {
+    public getPortraitOrientedCompanionAd(): VastCreativeStaticResourceCompanionAd | null {
         const ad = this.getAd();
         if (ad) {
             const companionAds = ad.getCompanionAds();

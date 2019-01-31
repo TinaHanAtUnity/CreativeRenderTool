@@ -1,15 +1,15 @@
 import { IValidator } from 'VAST/Validators/IValidator';
-import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
+import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
 import { Url } from 'Core/Utilities/Url';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
 
-export class VastCreativeCompanionAdValidator implements IValidator {
+export class VastCreativeStaticResourceCompanionAdValidator implements IValidator {
 
     private static readonly _supportedCreativeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
 
     private _errors: Error[] = [];
 
-    constructor(companionAd: VastCreativeCompanionAd) {
+    constructor(companionAd: VastCreativeStaticResourceCompanionAd) {
         this.validate(companionAd);
     }
 
@@ -17,7 +17,7 @@ export class VastCreativeCompanionAdValidator implements IValidator {
         return this._errors;
     }
 
-    private validate(companionAd: VastCreativeCompanionAd) {
+    private validate(companionAd: VastCreativeStaticResourceCompanionAd) {
         this.validateStaticResourceUrl(companionAd);
         this.validateCreativeType(companionAd);
         this.validateCompanionClickThroughURLTemplate(companionAd);
@@ -25,7 +25,7 @@ export class VastCreativeCompanionAdValidator implements IValidator {
         this.validateTrackingEvents(companionAd);
     }
 
-    private validateStaticResourceUrl(companionAd: VastCreativeCompanionAd) {
+    private validateStaticResourceUrl(companionAd: VastCreativeStaticResourceCompanionAd) {
         const adId = companionAd.getId();
         const staticResourceURL = companionAd.getStaticResourceURL();
         if (staticResourceURL === null) {
@@ -35,17 +35,17 @@ export class VastCreativeCompanionAdValidator implements IValidator {
         }
     }
 
-    private validateCreativeType(companionAd: VastCreativeCompanionAd) {
+    private validateCreativeType(companionAd: VastCreativeStaticResourceCompanionAd) {
         const adId = companionAd.getId();
         const creativeType = companionAd.getCreativeType();
         if (creativeType === null) {
             this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" is missing required "creativeType" attribute`));
-        } else if (VastCreativeCompanionAdValidator._supportedCreativeTypes.indexOf(creativeType) === -1) {
+        } else if (VastCreativeStaticResourceCompanionAdValidator._supportedCreativeTypes.indexOf(creativeType) === -1) {
             this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" attribute "creativeType=${creativeType}" is not supported`));
         }
     }
 
-    private validateCompanionClickThroughURLTemplate(companionAd: VastCreativeCompanionAd) {
+    private validateCompanionClickThroughURLTemplate(companionAd: VastCreativeStaticResourceCompanionAd) {
         const adId = companionAd.getId();
         const companionClickThroughURLTemplate = companionAd.getCompanionClickThroughURLTemplate();
         if (companionClickThroughURLTemplate === null) {
@@ -55,7 +55,7 @@ export class VastCreativeCompanionAdValidator implements IValidator {
         }
     }
 
-    private validateCompanionClickTrackingURLTemplates(companionAd: VastCreativeCompanionAd) {
+    private validateCompanionClickTrackingURLTemplates(companionAd: VastCreativeStaticResourceCompanionAd) {
         const adId = companionAd.getId();
         const companionClickTrackingURLTemplates = companionAd.getCompanionClickTrackingURLTemplates();
         for (const companionClickTrackingURLTemplate of companionClickTrackingURLTemplates) {
@@ -65,7 +65,7 @@ export class VastCreativeCompanionAdValidator implements IValidator {
         }
     }
 
-    private validateTrackingEvents(companionAd: VastCreativeCompanionAd) {
+    private validateTrackingEvents(companionAd: VastCreativeStaticResourceCompanionAd) {
         const trackingEvents = companionAd.getTrackingEvents();
         Object.keys(trackingEvents).map((key) => {
             const urls = trackingEvents[key];

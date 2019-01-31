@@ -2,6 +2,9 @@
 
 * Disabling offending hybrid tests [#8002](https://github.com/Applifier/unity-ads-webview/pull/8002)
 * Cleanup CustomFeatures [#8004](https://github.com/Applifier/unity-ads-webview/pull/8004)
+* ABTest: Custom Zynga Interstitial Video Overlay [#7981](https://github.com/Applifier/unity-ads-webview/pull/7981)
+* Further Improve Staging Scripts [#8006](https://github.com/Applifier/unity-ads-webview/pull/8006)
+* Vast Parser Strict Improvements : ignore unsupported companion ad types [#8005](https://github.com/Applifier/unity-ads-webview/pull/8005)
 
 # Tue Jan 29 18:19:32 UTC 2019
 
