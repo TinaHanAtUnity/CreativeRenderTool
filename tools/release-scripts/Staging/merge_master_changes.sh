@@ -17,6 +17,5 @@ do
         echo "Resolve merge conflicts then proceed by pressing any key."
         read answer < /dev/tty
     fi
-    sleep 1
 done <"$releases"
 

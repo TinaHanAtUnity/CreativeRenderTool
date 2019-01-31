@@ -27,7 +27,7 @@ then
     done <"$releases"
 
     # Opens kibana, grafana, and travis in a browser for monitoring
-    echo "\nLinks to monitoring resources:"
+    echo "Links to monitoring resources:"
     echo "https://grafana.applifier.info/dashboard/db/sdk-2?refresh=30s&orgId=1&from=now-2h&to=now"
     echo "https://kibana.prd.log.corp.unity3d.com/app/kibana#/dashboard/6e0c34c0-0c54-11e8-a3ee-8d67f75e4519?_g=()&_a=(description:'',filters:!(),options:(darkTheme:!t),panels:!((col:1,id:'3aad1e10-0c49-11e8-a3ee-8d67f75e4519',panelIndex:1,row:1,size_x:3,size_y:2,type:visualization),(col:1,id:a8097c60-0c49-11e8-a3ee-8d67f75e4519,panelIndex:3,row:8,size_x:12,size_y:5,type:visualization),(col:6,id:'00768280-0c4a-11e8-a3ee-8d67f75e4519',panelIndex:4,row:1,size_x:4,size_y:7,type:visualization),(col:1,id:'4665f3c0-0c4a-11e8-a3ee-8d67f75e4519',panelIndex:5,row:3,size_x:5,size_y:5,type:visualization),(col:4,id:'7bbae800-0c4a-11e8-a3ee-8d67f75e4519',panelIndex:6,row:1,size_x:2,size_y:2,type:visualization),(col:10,id:b4cda790-0c4a-11e8-a3ee-8d67f75e4519,panelIndex:7,row:1,size_x:3,size_y:7,type:visualization)),query:(match_all:()),timeRestore:!f,title:ads-sdk2-diagnostics,uiState:(P-1:(vis:(defaultColors:('0%20-%20100':'rgb(0,104,55)')))),viewMode:view)"
     echo "https://travis-ci.com/Applifier/unity-ads-webview/builds"
