@@ -134,7 +134,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.sendFinishOperativeEvents();
         this.onFinish.trigger();
         // this.removeMraidContainer();
-        this._mraid.container().parentElement!.removeChild(this._mraid.container());
         this.unsetReferences();
 
         this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
