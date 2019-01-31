@@ -28,7 +28,6 @@ export enum AndroidStoreError {
     UNKNOWN_ERROR
 }
 
-
 export class AndroidStoreApi extends NativeApi {
 
     public readonly onInitialized = new Observable0();
