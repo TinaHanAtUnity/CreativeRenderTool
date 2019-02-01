@@ -40,6 +40,16 @@
       "disableBackButton": true,
       "muteVideo": false,
       "useDeviceOrientationForVideo": false
+    },
+    {
+      "id": "banner",
+      "name": "Banner",
+      "default": false,
+      "allowSkip": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "adTypes": ["BANNER"]
     }
   ],
   "useAuction": true,
