@@ -6,7 +6,7 @@ git checkout master
 git pull
 
 webviewdir=$(git rev-parse --show-toplevel)
-releases="$webviewdir/release-scripts/releases.txt"
+releases="$webviewdir/tools/release-scripts/releases.txt"
 
 echo "Staging test endpoints:"
 echo "http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-ios-sans-webhook/"

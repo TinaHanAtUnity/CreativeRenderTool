@@ -6,7 +6,7 @@ git checkout master
 git pull
 
 webviewdir=$(git rev-parse --show-toplevel)
-releases="$webviewdir/release-scripts/releases.txt"
+releases="$webviewdir/tools/release-scripts/releases.txt"
 
 while IFS= read -r release
 do

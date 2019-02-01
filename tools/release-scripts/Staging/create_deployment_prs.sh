@@ -3,7 +3,7 @@
 # Creates the deployment pull requests.
 
 webviewdir=$(git rev-parse --show-toplevel)
-releases="$webviewdir/release-scripts/releases.txt"
+releases="$webviewdir/tools/release-scripts/releases.txt"
 
 hub=$(which hub || (echo "Hub not on PATH" && exit 1))
 
