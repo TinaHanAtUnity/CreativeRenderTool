@@ -38,20 +38,20 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _skipEnabled: boolean;
 
     private _videoDurationEnabled: boolean = false;
-    private _videoProgress: number;
+    protected _videoProgress: number;
 
     private _muteEnabled: boolean = false;
     private _showPrivacyDuringVideo: boolean = false;
 
     private _debugMessageVisible: boolean = false;
-    private _callButtonVisible: boolean = false;
+    protected _callButtonVisible: boolean = false;
     private _callButtonEnabled: boolean = true;
 
     private _skipButtonElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
-    private _callButtonElement: HTMLElement;
+    protected _callButtonElement: HTMLElement;
     private _timerElement: HTMLElement;
     private _chinaAdvertisementElement: HTMLElement;
 
@@ -332,7 +332,8 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
                         appStoreId: campaign.getAppStoreId(),
                         store: campaign.getStore(),
                         videoProgress: this._videoProgress,
-                        appDownloadUrl: campaign instanceof PerformanceCampaign ? campaign.getAppDownloadUrl() : undefined
+                        appDownloadUrl: campaign instanceof PerformanceCampaign ? campaign.getAppDownloadUrl() : undefined,
+                        skipEnabled: this._skipEnabled
                     });
                 }
             });
@@ -382,7 +383,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         }
     }
 
-    private showCallButton() {
+    protected showCallButton() {
         this._callButtonElement.classList.add('show-call-button');
         this._callButtonElement.classList.add('show-go-text');
     }

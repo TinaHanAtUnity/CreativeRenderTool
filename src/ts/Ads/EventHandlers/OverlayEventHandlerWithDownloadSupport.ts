@@ -8,6 +8,7 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 
 export interface IVideoOverlayDownloadParameters extends IStoreHandlerDownloadParameters {
     videoProgress: number;
+    skipEnabled: boolean;
 }
 
 export class OverlayEventHandlerWithDownloadSupport<T extends Campaign> extends OverlayEventHandler<T> {
@@ -21,12 +22,15 @@ export class OverlayEventHandlerWithDownloadSupport<T extends Campaign> extends 
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._overlay = this._adUnit.getOverlay();
         this._storeHandler = storeHandler;
+
     }
 
     public onOverlayDownload(parameters: IVideoOverlayDownloadParameters): void {
         this.setCallButtonEnabled(false);
         this._storeHandler.onDownload(parameters);
-        this.onOverlaySkip(parameters.videoProgress);
+        if (parameters.skipEnabled) {
+            this.onOverlaySkip(parameters.videoProgress);
+        }
         this.setCallButtonEnabled(true);
     }
 
