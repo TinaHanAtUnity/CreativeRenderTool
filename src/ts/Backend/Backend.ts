@@ -25,6 +25,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { CallbackStatus, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IosPreferences } from 'Backend/Api/IosPreferences';
 import { AndroidPreferences } from 'Backend/Api/AndroidPreferences';
+import { BannerListener } from 'Backend/Api/BannerListener';
 
 interface IInvocation {
     className: string;
@@ -59,6 +60,7 @@ interface IBackendApi {
     Storage: Storage;
     UrlScheme: UrlScheme;
     VideoPlayer: VideoPlayer;
+    BannerListener: BannerListener;
 }
 
 export class Backend implements IWebViewBridge {
@@ -94,7 +96,8 @@ export class Backend implements IWebViewBridge {
             Sdk: new Sdk(this),
             Storage: new Storage(this),
             UrlScheme: new UrlScheme(this),
-            VideoPlayer: new VideoPlayer(this)
+            VideoPlayer: new VideoPlayer(this),
+            BannerListener: new BannerListener(this)
         };
     }
 
