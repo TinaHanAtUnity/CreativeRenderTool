@@ -48,6 +48,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Purchasing } from 'Purchasing/Purchasing';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { UnityInfo } from 'Core/Models/UnityInfo';
+import { Store } from 'Store/Store';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 
 export class Core implements ICore {
@@ -75,6 +76,7 @@ export class Core implements ICore {
     public Analytics: Analytics;
     public Ads: Ads;
     public Purchasing: Purchasing;
+    public Store: Store;
 
     private _initialized = false;
     private _initializedAt: number;
@@ -222,6 +224,12 @@ export class Core implements ICore {
             this.Ads = new Ads(configJson, this);
             this.Ads.SessionManager.setGameSessionId(gameSessionId);
             this.Purchasing = new Purchasing(this);
+
+            if(this.Config.isIapTrackingEnabled) {
+                const store: Store = new Store(this.Core);
+                store.StoreManager.startTracking();
+            }
+
             return this.Ads.initialize(jaegerInitSpan);
         }).then(() => {
             this.JaegerManager.stop(jaegerInitSpan);

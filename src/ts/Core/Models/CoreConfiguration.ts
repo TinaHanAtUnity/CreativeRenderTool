@@ -20,6 +20,7 @@ export interface ICoreConfiguration {
     token: string;
     jaegerTracing: boolean;
     organizationId: string | undefined;
+    iapTracking: boolean;
 }
 
 export class CoreConfiguration extends Model<ICoreConfiguration> {
@@ -34,7 +35,8 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
         projectId: ['string'],
         token: ['string'],
         jaegerTracing: ['boolean'],
-        organizationId: ['string', 'undefined']
+        organizationId: ['string', 'undefined'],
+        iapTracking: ['boolean']
     };
 
     constructor(data: ICoreConfiguration) {
@@ -94,5 +96,9 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
 
     public getOrganizationId(): string | undefined {
         return this.get('organizationId');
+    }
+
+    public isIapTrackingEnabled(): boolean {
+        return this.get('iapTracking');
     }
 }

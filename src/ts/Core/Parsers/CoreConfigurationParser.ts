@@ -13,6 +13,7 @@ export interface IRawCoreConfiguration {
     token: string;
     jaegerTracing?: boolean;
     organizationId: string;
+    iapTracking?: boolean;
 }
 
 export class CoreConfigurationParser {
@@ -28,7 +29,8 @@ export class CoreConfigurationParser {
             projectId: configJson.projectId,
             token: configJson.token,
             jaegerTracing: configJson.jaegerTracing ? true : false,
-            organizationId: configJson.organizationId
+            organizationId: configJson.organizationId,
+            iapTracking: configJson.iapTracking ? true : false
         };
 
         const coreConfig = new CoreConfiguration(configurationParams);
