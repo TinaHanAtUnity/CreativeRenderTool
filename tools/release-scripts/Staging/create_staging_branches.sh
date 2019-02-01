@@ -2,11 +2,11 @@
 ##
 # Creates the staging branches for a deployment.
 
-
-releases="release-scripts/releases.txt"
-
 git checkout master
 git pull
+
+webviewdir=$(git rev-parse --show-toplevel)
+releases="$webviewdir/release-scripts/releases.txt"
 
 while IFS= read -r release
 do
