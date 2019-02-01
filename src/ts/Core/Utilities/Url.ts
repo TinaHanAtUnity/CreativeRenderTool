@@ -14,7 +14,7 @@ export class Url {
 
     public static decodeUrl(url: string): string {
         try {
-            return decodeURIComponent(decodeURI(url));
+            return decodeURIComponent(url);
         } catch {
             return url;
         }
