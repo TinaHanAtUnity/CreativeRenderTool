@@ -251,7 +251,9 @@ export class VastParserStrict {
         const vastAd = new VastAd();
         this.getNodesWithName(adElement, VastNodeName.VAST_AD_TAG_URI).forEach((element: HTMLElement) => {
             const url = Url.decodeUrl(this.parseNodeText(element));
-            vastAd.addWrapperURL(url);
+            if (url && url.length > 0) {
+                vastAd.addWrapperURL(url);
+            }
         });
 
         this.getNodesWithName(adElement, VastNodeName.ERROR).forEach((element: HTMLElement) => {
