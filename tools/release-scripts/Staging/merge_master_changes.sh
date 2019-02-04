@@ -3,10 +3,11 @@
 # Merges master into each staging branch. Execution will pause if there is
 # a merge conflict.
 
-releases="release-scripts/releases.txt"
-
 git checkout master
 git pull
+
+webviewdir=$(git rev-parse --show-toplevel)
+releases="$webviewdir/tools/release-scripts/releases.txt"
 
 while IFS= read -r release
 do
@@ -17,6 +18,5 @@ do
         echo "Resolve merge conflicts then proceed by pressing any key."
         read answer < /dev/tty
     fi
-    sleep 1
 done <"$releases"
 

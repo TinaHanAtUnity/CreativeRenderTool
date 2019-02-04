@@ -150,6 +150,9 @@ import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
 import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
+import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
+import OnProgrammaticBannerCampaign from 'json/OnProgrammaticBannerCampaign.json';
+import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -463,6 +466,27 @@ export class TestFixtures {
             advertiserBundleId: json.advertiserBundleId || undefined,
             useWebViewUserAgentForTracking: false,
             buyerId: json.buyerId || undefined
+        };
+    }
+
+    public static getBannerCampaignParams(json: any): IBannerCampaign {
+        return {
+            markup: json.content,
+            contentType: json.contentType,
+            width: json.width,
+            height: json.height,
+            trackingUrls: json.trackingUrls,
+            useWebViewUserAgentForTracking: false,
+            id: json.campaignId,
+            session: this.getSession(),
+            mediaId: '000000000000000000000003',
+            backupCampaign: false,
+            willExpireAt: json.cacheTTL ? Date.now() + json.cacheTTL * 1000 : undefined,
+            adType: json.adType,
+            correlationId: json.correlationId || undefined,
+            creativeId: json.creativeId || undefined,
+            seatId: json.seatId || undefined,
+            meta: undefined
         };
     }
 
@@ -905,11 +929,18 @@ export class TestFixtures {
             Api: api,
             PlacementManager: new BannerPlacementManager(ads.Api, ads.Config),
             CampaignManager: new BannerCampaignManager(core.NativeBridge.getPlatform(), core.Api, core.Config, ads.Config, ads.AssetManager, ads.SessionManager, ads.AdMobSignalFactory, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.JaegerManager),
-            WebPlayerContainer: new BannerWebPlayerContainer(platform, ads.Api)
+            WebPlayerContainer: new BannerWebPlayerContainer(platform, ads.Api),
+            AdUnitFactory: new BannerAdUnitFactory()
         };
         banners.AdUnitParametersFactory = new BannerAdUnitParametersFactory(<IBanners>banners, ads, core);
         banners.AdContext = new BannerAdContext(<IBanners>banners, ads, core);
         return <IBanners>banners;
+    }
+
+    public static getBannerCampaign() {
+        const json = JSON.parse(OnProgrammaticBannerCampaign);
+        const params = this.getBannerCampaignParams(json);
+        return new BannerCampaign(params);
     }
 
     public static getCoreApi(nativeBridge: NativeBridge): ICoreApi {
