@@ -225,8 +225,8 @@ export class Core implements ICore {
             this.Ads.SessionManager.setGameSessionId(gameSessionId);
             this.Purchasing = new Purchasing(this);
 
-            if(this.Config.isIapTrackingEnabled) {
-                const store: Store = new Store(this.Core);
+            if(this.Config.isIapTrackingEnabled || true) { // todo: fix this before merging to master
+                const store: Store = new Store(this);
                 store.StoreManager.startTracking();
             }
 
