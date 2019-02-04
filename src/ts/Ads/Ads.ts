@@ -271,6 +271,9 @@ export class Ads implements IAds {
         if (!this.isConsentShowRequired()) {
             return Promise.resolve();
         }
+
+        Diagnostics.trigger('consent_show', {adsConfig: JSON.stringify(this.Config)});
+
         const consentView = new ConsentUnit({
             platform: this._core.NativeBridge.getPlatform(),
             privacyManager: this.PrivacyManager,
