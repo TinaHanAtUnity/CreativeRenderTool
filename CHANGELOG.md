@@ -1,6 +1,7 @@
 # Merged
 
 * Remove abTest for performance MRAID CTA handling [#8082](https://github.com/Applifier/unity-ads-webview/pull/8082)
+* Remove Interstitial Layout AB Test [#8083](https://github.com/Applifier/unity-ads-webview/pull/8083)
 
 # Mon Feb  4 15:46:43 UTC 2019
 
