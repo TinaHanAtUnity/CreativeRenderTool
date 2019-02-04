@@ -272,7 +272,7 @@ export class Ads implements IAds {
             return Promise.resolve();
         }
 
-        Diagnostics.trigger('consent_show', {adsConfig: JSON.stringify(this.Config)});
+        Diagnostics.trigger('consent_show', {adsConfig: JSON.stringify(this.Config.getDTO())});
 
         const consentView = new ConsentUnit({
             platform: this._core.NativeBridge.getPlatform(),
