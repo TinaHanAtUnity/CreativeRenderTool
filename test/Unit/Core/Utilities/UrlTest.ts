@@ -211,4 +211,16 @@ describe('UrlTest', () => {
           });
         });
     });
+
+    describe('decodeProtocol', () => {
+        it('should replace http%3A%2F%2F with http://', () => {
+            const url = Url.decodeProtocol('http%3A%2F%2Fad.doubleclick.net%2Fddm%2Fpfadx%2FN7088.284566THETRADEDESK%2FB21520108.235840185%3Bsz');
+            assert.equal(url, 'http://ad.doubleclick.net%2Fddm%2Fpfadx%2FN7088.284566THETRADEDESK%2FB21520108.235840185%3Bsz');
+        });
+
+        it('should replace https%3A%2F%2F with https://', () => {
+            const url = Url.decodeProtocol('https%3A%2F%2Fad.doubleclick.net%2Fddm%2Fpfadx%2FN7088.284566THETRADEDESK%2FB21520108.235840185%3Bsz');
+            assert.equal(url, 'https://ad.doubleclick.net%2Fddm%2Fpfadx%2FN7088.284566THETRADEDESK%2FB21520108.235840185%3Bsz');
+        });
+    });
 });

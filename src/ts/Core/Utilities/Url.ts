@@ -12,9 +12,9 @@ export interface IUrl {
 
 export class Url {
 
-    public static decodeUrl(url: string): string {
+    public static decodeProtocol(url: string): string {
         try {
-            return decodeURIComponent(url);
+            return url.replace(/^(https|http)%3A%2F%2F/i, '$1://');
         } catch {
             return url;
         }
