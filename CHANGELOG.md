@@ -1,3 +1,7 @@
+# Mon Feb  4 15:46:43 UTC 2019
+
+* Added diagnostics to consent show & send. For investigating a possible live issue. [#8061](https://github.com/Applifier/unity-ads-webview/pull/8061)
+
 # Fri Feb  1 21:57:36 UTC 2019
 
 * Support VAST CompanionClickTracking for end card click event [#8003](https://github.com/Applifier/unity-ads-webview/pull/8003)

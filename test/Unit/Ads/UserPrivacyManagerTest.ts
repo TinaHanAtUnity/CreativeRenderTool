@@ -544,14 +544,15 @@ describe('UserPrivacyManagerTest', () => {
         describe('when updating user privacy', () => {
             function sendEvent(permissions: IPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER): Promise<any> {
                 return privacyManager.updateUserPrivacy(permissions, source).then(() => {
-                    sinon.assert.calledOnce(httpKafkaStub);
-                    return httpKafkaStub.firstCall.args[2];
+                    sinon.assert.calledTwice(httpKafkaStub); // First one is temporary diagnostics
+                    return httpKafkaStub.secondCall.args[2];
                 });
             }
 
             it('should send event to a correct topic', () => {
                 return sendEvent().then(() => {
-                    sinon.assert.calledOnce(httpKafkaStub);
+                    sinon.assert.calledTwice(httpKafkaStub);
+                    sinon.assert.calledWith(httpKafkaStub, 'ads.sdk2.diagnostics', sinon.match.any);
                     sinon.assert.calledWith(httpKafkaStub, 'ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY);
                 });
             });

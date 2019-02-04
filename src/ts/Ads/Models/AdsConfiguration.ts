@@ -146,7 +146,11 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         return {
             'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
             'placements': placements,
-            'defaultPlacement': defaultPlacementId
+            'defaultPlacement': defaultPlacementId,
+            'gamePrivacy': this.getGamePrivacy().getDTO(),
+            'userPrivacy': this.getUserPrivacy().getDTO(),
+            'optOutEnabled': this.isOptOutEnabled(),
+            'optOutRecorded': this.isOptOutEnabled()
         };
     }
 }
