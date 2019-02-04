@@ -2,10 +2,11 @@
 ##
 # Updates all LKGs for releases.
 
-releases="release-scripts/releases.txt"
-
 git checkout master
 git pull
+
+webviewdir=$(git rev-parse --show-toplevel)
+releases="$webviewdir/tools/release-scripts/releases.txt"
 
 echo "Staging test endpoints:"
 echo "http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-ios-sans-webhook/"
@@ -32,12 +33,25 @@ then
     git push --tags -f
 
     author=$(git config --get user.name)
+    authorPhrase="\"By: $author\""
+    slackjson=$(cat <<EOF
+{
+	"text": "Ads SDK Deployment is underway.",
+	"attachments": [{
+		"title": "See the Latest Additions",
+		"title_link": "https://github.com/Applifier/unity-ads-webview/blob/master/CHANGELOG.md",
+		"color": "#2e80b8",
+		"author_name": $authorPhrase
+	}]
+}
+EOF
+)
 
     # ads-sdk slack channel
-    curl -X POST -H 'Content-type: application/json' --data '{"text":"Ads SDK Deployment is underway.","attachments":[{"title":"See the Latest Additions","title_link":"https://github.com/Applifier/unity-ads-webview/blob/master/CHANGELOG.md","color":"#2e80b8","author_name":"By: $author"}]}' https://hooks.slack.com/services/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
+    curl -X POST -H 'Content-type: application/json' --data "$slackjson" https://hooks.slack.com/services/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
 
     # ads-deploys slack channel
-    curl -X POST -H 'Content-type: application/json' --data '{"text":"Ads SDK Deployment is underway.","attachments":[{"title":"See the Latest Additions","title_link":"https://github.com/Applifier/unity-ads-webview/blob/master/CHANGELOG.md","color":"#2e80b8","author_name":"By: $author"}]}' https://hooks.slack.com/services/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
+    curl -X POST -H 'Content-type: application/json' --data "$slackjson" https://hooks.slack.com/services/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
 
     git checkout master
     ./tools/fire_deploy_json.sh

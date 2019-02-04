@@ -34,6 +34,7 @@ export class BannerAdContext {
     private _campaignManager: BannerCampaignManager;
     private _placementManager: BannerPlacementManager;
     private _adUnitParametersFactory: BannerAdUnitParametersFactory;
+    private _bannerAdUnitFactory: BannerAdUnitFactory;
     private _focusManager: FocusManager;
     private _programmaticTrackingService: ProgrammaticTrackingService;
 
@@ -47,6 +48,7 @@ export class BannerAdContext {
         this._focusManager = core.FocusManager;
         this._campaignManager = banner.CampaignManager;
         this._placementManager = banner.PlacementManager;
+        this._bannerAdUnitFactory = banner.AdUnitFactory;
         this._adUnitParametersFactory = banner.AdUnitParametersFactory;
         this._deviceInfo = core.DeviceInfo;
         this._programmaticTrackingService = ads.ProgrammaticTrackingService;
@@ -212,7 +214,7 @@ export class BannerAdContext {
     private createAdUnit() {
         return this._adUnitParametersFactory.create(this._campaign, this._placement)
             .then((parameters) => {
-                return new BannerAdUnitFactory().createAdUnit(parameters);
+                return this._bannerAdUnitFactory.createAdUnit(parameters);
             });
     }
 
