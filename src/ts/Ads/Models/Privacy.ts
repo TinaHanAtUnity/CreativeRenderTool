@@ -127,7 +127,8 @@ export class UserPrivacy extends Model<IUserPrivacy> {
     public getDTO(): { [key: string]: unknown } {
         return {
             'method': this.getMethod(),
-            'version': this.getVersion()
+            'version': this.getVersion(),
+            'permissions': this.getPermissions()
         };
     }
 }
