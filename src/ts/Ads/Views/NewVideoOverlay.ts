@@ -383,9 +383,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     private showCallButton() {
-        if (!this._areControlsVisible) {
-            return;
-        }
         this._callButtonElement.classList.add('show-call-button');
         this._callButtonElement.classList.add('show-go-text');
     }
