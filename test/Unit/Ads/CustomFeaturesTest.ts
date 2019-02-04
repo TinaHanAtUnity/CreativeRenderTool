@@ -113,30 +113,14 @@ describe('CustomFeatures', () => {
             const core = TestFixtures.getCoreApi(nativeBridge);
             const deviceInfo = TestFixtures.getIosDeviceInfo(core);
 
-            it('should return true when AppSheet is broken and byPassAppSheet is false', () => {
+            it('should return true when AppSheet is broken', () => {
                 sinon.stub(IosUtils, 'isAppSheetBroken').returns(true);
-                sinon.stub(campaign, 'getBypassAppSheet').returns(false);
                 const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(platform, deviceInfo, campaign, coreConfig);
                 assert.isTrue(isEnabled);
             });
 
-            it('should return true when AppSheet is broken and byPassAppSheet is true', () => {
-                sinon.stub(IosUtils, 'isAppSheetBroken').returns(true);
-                sinon.stub(campaign, 'getBypassAppSheet').returns(true);
-                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(platform, deviceInfo, campaign, coreConfig);
-                assert.isTrue(isEnabled);
-            });
-
-            it('should return true when AppSheet is supported and byPassAppSheet is true', () => {
+            it('should return false when AppSheet is is not broken', () => {
                 sinon.stub(IosUtils, 'isAppSheetBroken').returns(false);
-                sinon.stub(campaign, 'getBypassAppSheet').returns(true);
-                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(platform, deviceInfo, campaign, coreConfig);
-                assert.isTrue(isEnabled);
-            });
-
-            it('should return false when AppSheet is supported and byPassAppSheet is false', () => {
-                sinon.stub(IosUtils, 'isAppSheetBroken').returns(false);
-                sinon.stub(campaign, 'getBypassAppSheet').returns(false);
                 const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(platform, deviceInfo, campaign, coreConfig);
                 assert.isFalse(isEnabled);
             });
@@ -145,7 +129,6 @@ describe('CustomFeatures', () => {
                 coreConfigStub.restore();
                 sinon.stub(coreConfig, 'getAbGroup').returns(toAbGroup(0));
                 sinon.stub(IosUtils, 'isAppSheetBroken').returns(true);
-                sinon.stub(campaign, 'getBypassAppSheet').returns(true);
                 const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(platform, deviceInfo, campaign, coreConfig);
                 assert.isFalse(isEnabled);
             });

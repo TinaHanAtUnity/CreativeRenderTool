@@ -89,9 +89,7 @@ export class CustomFeatures {
                 return true;
             }
 
-            const isAppSheetBroken = IosUtils.isAppSheetBroken(deviceInfo.getOsVersion(), deviceInfo.getModel());
-            const byPassAppSheet = campaign.getBypassAppSheet();
-            return isAppSheetBroken || byPassAppSheet;
+            return IosUtils.isAppSheetBroken(deviceInfo.getOsVersion(), deviceInfo.getModel());
         }
 
         return false;
