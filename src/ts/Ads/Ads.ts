@@ -469,8 +469,6 @@ export class Ads implements IAds {
             this._wasRealtimePlacement = false;
 
             this._currentAdUnit.show().then(() => {
-                this._core.Api.Request.setConcurrentRequestCount(8);
-
                 this.BackupCampaignManager.deleteBackupCampaigns();
             });
         });
@@ -491,8 +489,6 @@ export class Ads implements IAds {
 
     private onAdUnitClose(): void {
         this._showing = false;
-
-        this._core.Api.Request.setConcurrentRequestCount(1);
     }
 
     private setupTestEnvironment(): void {

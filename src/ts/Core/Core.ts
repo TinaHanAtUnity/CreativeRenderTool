@@ -228,8 +228,6 @@ export class Core implements ICore {
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.NativeBridge.setAutoBatchEnabled(false);
             }
-
-            this.Api.Request.setConcurrentRequestCount(1);
         }).catch((error: { message: string; name: unknown }) => {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
