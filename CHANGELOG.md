@@ -1,3 +1,9 @@
+# Staged
+
+* Refactor Swipe Class into Separate Classes [#8028](https://github.com/Applifier/unity-ads-webview/pull/8028)
+* Remove banner-auction-request_failed Diagnostic [#8105](https://github.com/Applifier/unity-ads-webview/pull/8105)
+* Decode Url protocols in VastParserStrict [#8058](https://github.com/Applifier/unity-ads-webview/pull/8058)
+
 # Mon Feb  4 23:58:18 UTC 2019
 
 * Remove abTest for performance MRAID CTA handling [#8082](https://github.com/Applifier/unity-ads-webview/pull/8082)
