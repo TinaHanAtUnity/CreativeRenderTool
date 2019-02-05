@@ -6,7 +6,6 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { RequestError } from 'Core/Errors/RequestError';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
-import { CTAClickHandlingTest } from 'Core/Models/ABGroup';
 
 export class PerformanceMRAIDEventHandler extends MRAIDEventHandler implements IMRAIDViewHandler {
 
@@ -26,13 +25,7 @@ export class PerformanceMRAIDEventHandler extends MRAIDEventHandler implements I
                 });
             }
         } else {
-            if (CTAClickHandlingTest.isValid(this._abGroup)) {
-                return this.openUrlOnCallButton(url, Date.now() - ctaClickedTime, url);
-            } else {
-                return this._request.followRedirectChain(url).then((storeUrl) => {
-                    return this.openUrlOnCallButton(storeUrl, Date.now() - ctaClickedTime, url);
-                });
-            }
+            return this.openUrlOnCallButton(url, Date.now() - ctaClickedTime, url);
         }
         return Promise.resolve();
     }
