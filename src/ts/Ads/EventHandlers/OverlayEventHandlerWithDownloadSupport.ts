@@ -5,6 +5,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
 import { IStoreHandler, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
+import { IOperativeEventParams } from 'Ads/Managers/OperativeEventManager';
 
 export interface IVideoOverlayDownloadParameters extends IStoreHandlerDownloadParameters {
     videoProgress: number;
@@ -30,6 +31,9 @@ export class OverlayEventHandlerWithDownloadSupport<T extends Campaign> extends 
         this._storeHandler.onDownload(parameters);
         if (parameters.skipEnabled) {
             this.onOverlaySkip(parameters.videoProgress);
+        } else {
+            // This is for the install now button test in rewarded ad video overlay
+            this._operativeEventManager.sendThirdQuartile(this.getOperativeEventParams(parameters));
         }
         this.setCallButtonEnabled(true);
     }
@@ -38,5 +42,14 @@ export class OverlayEventHandlerWithDownloadSupport<T extends Campaign> extends 
         if (this._overlay) {
             this._overlay.setCallButtonEnabled(enabled);
         }
+    }
+
+    private getOperativeEventParams(parameters: IVideoOverlayDownloadParameters): IOperativeEventParams {
+        return {
+            placement: this._placement,
+            videoOrientation: this.getVideoOrientation(),
+            adUnitStyle: parameters.adUnitStyle,
+            asset: this._adUnit.getVideo()
+        };
     }
 }
