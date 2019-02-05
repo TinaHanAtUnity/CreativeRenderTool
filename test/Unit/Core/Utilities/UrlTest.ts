@@ -227,7 +227,7 @@ describe('UrlTest', () => {
             const url = Url.decodeProtocol('http://ad.doubleclick.net%2Fddm%2Fpfadx%2FN7088.284566THETRADEDESK%2FB21520108.235840185%3Bsz');
             assert.equal(url, 'http://ad.doubleclick.net%2Fddm%2Fpfadx%2FN7088.284566THETRADEDESK%2FB21520108.235840185%3Bsz');
         });
-        
+
         it('should not replace https://', () => {
             const url = Url.decodeProtocol('https://ad.doubleclick.net%2Fddm%2Fpfadx%2FN7088.284566THETRADEDESK%2FB21520108.235840185%3Bsz');
             assert.equal(url, 'https://ad.doubleclick.net%2Fddm%2Fpfadx%2FN7088.284566THETRADEDESK%2FB21520108.235840185%3Bsz');
