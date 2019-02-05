@@ -30,7 +30,10 @@ export class OverlayEventHandlerWithDownloadSupport<T extends Campaign> extends 
         this.setCallButtonEnabled(false);
         if (!parameters.skipEnabled) {
             // This is for the install now button test in rewarded ad video overlay.
-            this._operativeEventManager.sendThirdQuartile(this.getOperativeEventParams(parameters));
+            const operativeEventParams = this.getOperativeEventParams(parameters);
+            this._operativeEventManager.sendThirdQuartile(operativeEventParams);
+            this._operativeEventManager.sendView(operativeEventParams);
+
         }
         this._storeHandler.onDownload(parameters);
         if (parameters.skipEnabled) {
