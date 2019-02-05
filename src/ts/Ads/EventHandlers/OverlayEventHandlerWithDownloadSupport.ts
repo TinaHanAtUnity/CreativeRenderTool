@@ -28,12 +28,13 @@ export class OverlayEventHandlerWithDownloadSupport<T extends Campaign> extends 
 
     public onOverlayDownload(parameters: IVideoOverlayDownloadParameters): void {
         this.setCallButtonEnabled(false);
+        if (!parameters.skipEnabled) {
+            // This is for the install now button test in rewarded ad video overlay.
+            this._operativeEventManager.sendThirdQuartile(this.getOperativeEventParams(parameters));
+        }
         this._storeHandler.onDownload(parameters);
         if (parameters.skipEnabled) {
             this.onOverlaySkip(parameters.videoProgress);
-        } else {
-            // This is for the install now button test in rewarded ad video overlay
-            this._operativeEventManager.sendThirdQuartile(this.getOperativeEventParams(parameters));
         }
         this.setCallButtonEnabled(true);
     }
