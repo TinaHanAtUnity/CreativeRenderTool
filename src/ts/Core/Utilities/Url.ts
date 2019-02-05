@@ -13,11 +13,7 @@ export interface IUrl {
 export class Url {
 
     public static decodeProtocol(url: string): string {
-        try {
-            return url.replace(/^(https|http)%3A%2F%2F/i, '$1://');
-        } catch {
-            return url;
-        }
+        return url.replace(/^(https|http)%3A%2F%2F/i, '$1://');
     }
 
     private static applyEncode(url: string, encodeFunc: (url: string) => string): string {
