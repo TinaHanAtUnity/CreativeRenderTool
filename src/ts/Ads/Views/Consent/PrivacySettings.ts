@@ -94,7 +94,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             {
                 event: 'swipedown',
                 listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.close-area'
+                selector: '.close-area, close-button'
             }
         ];
 
