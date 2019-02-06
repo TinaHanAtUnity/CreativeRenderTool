@@ -321,7 +321,7 @@ export class CampaignManager {
 
             for(const placement of noFill) {
                 promises.push(this.handleNoFill(placement));
-                if(StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode && auctionStatusCode === 999) {
+                if (StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode && auctionStatusCode === 999) {
                     refreshDelay = this.getNextDayUTCTimeDelta();
                 } else {
                     refreshDelay = RefreshManager.NoFillDelay;

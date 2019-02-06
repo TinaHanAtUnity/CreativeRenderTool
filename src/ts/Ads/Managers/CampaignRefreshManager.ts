@@ -318,7 +318,7 @@ export class CampaignRefreshManager extends RefreshManager {
         if(campaignCount === 0) {
             this._noFills++;
 
-            let delay: number = isStatusCodeAbTest ? 0 : refreshDelay;
+            let delay: number = isStatusCodeAbTest ? refreshDelay : 0;
 
             // delay starts from 20 secs, then increased 50% for each additional no fill (20 secs, 30 secs, 45 secs etc.)
             if(!isStatusCodeAbTest && this._noFills > 0 && this._noFills < 15) {
