@@ -1,4 +1,4 @@
-# Pending
+# Wed Feb  6 17:45:38 UTC 2019
 
 * Always enable multithreading (Android & iOS) and fix Android multithreading Request API except on group 17 [#8029](https://github.com/Applifier/unity-ads-webview/pull/8029)
 
