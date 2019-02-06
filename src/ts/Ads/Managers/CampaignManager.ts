@@ -194,7 +194,6 @@ export class CampaignManager {
                         });
                     }
                 }
-
                 throw new WebViewError('Empty campaign response', 'CampaignRequestError');
             }).then(() => {
                 this._requesting = false;
@@ -956,6 +955,6 @@ export class CampaignManager {
         nextDay.setTime(d2Sec);
         nextDay.setUTCHours(0, 0, 0, 0);
 
-        return nextDay.getTime() - nowSec;
+        return Math.floor((nextDay.getTime() - nowSec) / 1000);
     }
 }

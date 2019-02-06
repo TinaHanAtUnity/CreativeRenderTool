@@ -6,7 +6,7 @@ import { INativeResponse } from 'Core/Managers/RequestManager';
 import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 
 export abstract class RefreshManager {
-    public static NoFillDelay = 3600;   // in milliseconds
+    public static NoFillDelay = 3600;   // in seconds
     public static ErrorRefillDelay = 3600;
     public static ParsingErrorRefillDelay = 60;
 
