@@ -14,7 +14,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { toAbGroup } from 'Core/Models/ABGroup';
+import { toAbGroup, AndroidThreadingTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -213,6 +213,10 @@ export class Core implements ICore {
                 const error = new Error('Game with ID ' + this.ClientInfo.getGameId() + ' is not enabled');
                 error.name = 'DisabledGame';
                 throw error;
+            }
+
+            if(AndroidThreadingTest.isValid(this.Config.getAbGroup()) && this.NativeBridge.getPlatform() === Platform.ANDROID) {
+                this.Api.Request.setConcurrentRequestCount(1);
             }
 
             this.Analytics = new Analytics(this);
