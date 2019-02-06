@@ -35,13 +35,13 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this.setCallButtonEnabled(false);
 
         let clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
-        if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+        if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId()) && this._vastCampaign.getVast().getCompanionClickTrackingUrls().length === 0) {
             clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         }
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
-            if (!CTAClickHandlingTest.isValid(this._abGroup) && CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+            if (CTAClickHandlingTest.isValid(this._abGroup) && CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
                 return this.openUrlOnCallButton(clickThroughURL, Date.now() - ctaClickedTime, clickThroughURL);
             } else {
                 return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
@@ -71,9 +71,10 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private openUrlOnCallButton(url: string, clickDuration: number, clickUrl: string): Promise<void> {
         return this.onOpenUrl(url).then(() => {
             this.setCallButtonEnabled(true);
-            if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
+            if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId()) && this._vastCampaign.getVast().getCompanionClickTrackingUrls().length === 0) {
                 this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
             }
+            this._vastAdUnit.sendCompanionClickTrackingEvent(this._vastCampaign.getSession().getId());
             this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._vastCampaign.getSession().getId());
 
             ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'vast_endscreen', this._vastCampaign, this._abGroup.valueOf(), this._gameSessionId);

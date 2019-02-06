@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 
-releases="release-scripts/releases.txt"
+git checkout master
+git pull
+
+webviewdir=$(git rev-parse --show-toplevel)
+releases="$webviewdir/tools/release-scripts/releases.txt"
 
 while IFS= read -r release
 do
     git checkout staging/$release
     git push origin staging/$release
-    sleep 2
 done <"$releases"

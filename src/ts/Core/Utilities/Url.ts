@@ -12,13 +12,17 @@ export interface IUrl {
 
 export class Url {
 
+    public static decodeProtocol(url: string): string {
+        return url.replace(/^(https|http)%3A%2F%2F/i, '$1://');
+    }
+
     private static applyEncode(url: string, encodeFunc: (url: string) => string): string {
-        if(url) {
+        if (url) {
             let encodedUrl = '';
             let i = 0;
             while(i < url.length) {
                 // Skip already encoded URL characters
-                if(url[i] === '%' && (url.length - i) >= 3 && Url.isNumber(url[i + 1]) && Url.isNumber(url[i + 2])) {
+                if (url[i] === '%' && (url.length - i) >= 3 && Url.isNumber(url[i + 1]) && Url.isNumber(url[i + 2])) {
                     encodedUrl += url[i++];
                     encodedUrl += url[i++];
                     encodedUrl += url[i++];
@@ -80,7 +84,7 @@ export class Url {
 
     public static addParameters(url: string, parameters: { [key: string]: unknown }): string {
         let newUrl: string = url.toString();
-        if(newUrl.indexOf('?') !== -1) {
+        if (newUrl.indexOf('?') !== -1) {
             newUrl += '&';
         } else {
             newUrl += '?';
@@ -88,9 +92,9 @@ export class Url {
 
         const pairs: string[] = [];
         for(const key in parameters) {
-            if(parameters.hasOwnProperty(key)) {
+            if (parameters.hasOwnProperty(key)) {
                 const value = <string>parameters[key];
-                if(value !== undefined) {
+                if (value !== undefined) {
                     pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
                 }
             }
@@ -108,7 +112,7 @@ export class Url {
 
         for(const entryPair of queryString) {
             const queryParam = entryPair.split('=');
-            if(queryParam[0] === parameter) {
+            if (queryParam[0] === parameter) {
                 return queryParam[1];
             }
         }
@@ -129,7 +133,7 @@ export class Url {
     public static isValid(url: string): boolean {
         // note: this is not an attempt for full URL validation, instead this just checks that protocol is http(s) and
         // all URL characters are legal following RFC3986, using ASCII character ranges &-; and ?-[ is intentional
-        if(url && (url.match(/^http:./i) || url.match(/^https:./i) && url.match(/^([\!\$\#\&-\;\=\?-\[\]_a-z~{}|\\^`]|[\u00A1-\uFFFF]|%[0-9a-fA-F]{2})+$/i))) {
+        if (url && (url.match(/^http:./i) || url.match(/^https:./i) && url.match(/^([\!\$\#\&-\;\=\?-\[\]_a-z~{}|\\^`]|[\u00A1-\uFFFF]|%[0-9a-fA-F]{2})+$/i))) {
             return true;
         }
 

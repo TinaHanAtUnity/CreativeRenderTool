@@ -303,15 +303,15 @@ describe('VastParserStrict', () => {
                 it('sanity check', () => {
                     const vast = TestFixtures.getVastParserStrict().parseVast(VastRaw);
                     assert.deepEqual(vast.getErrorURLTemplates(), [
-                        'http://events.tremorhub.com/diag?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&rtype=VAST_ERR&vastError=[ERRORCODE]&sec=false&adcode=80zxm-1018032&seatId=60632&pbid=1358&brid=3056&sid=7997&sdom=demo.app.com&asid=4187&nid=15&lid=33&adom=tremorvideo.com&crid=7286756&aid=10973&rseat=1031'
-                    ]);
+                        'http://events.tremorhub.com/diag?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&rtype=VAST_ERR&vastError=%5BERRORCODE%5D&sec=false&adcode=80zxm-1018032&seatId=60632&pbid=1358&brid=3056&sid=7997&sdom=demo.app.com&asid=4187&nid=15&lid=33&adom=tremorvideo.com&crid=7286756&aid=10973&rseat=1031'
+                    ], `Got ${JSON.stringify(vast.getErrorURLTemplates())}`);
                 });
 
                 it('should have spaces trimmed', () => {
                     const vast = TestFixtures.getVastParserStrict().parseVast(VastWithSpaces);
                     assert.deepEqual(vast.getErrorURLTemplates(), [
-                        'http://events.tremorhub.com/diag?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&rtype=VAST_ERR&vastError=[ERRORCODE]&sec=false&adcode=80zxm-1018032&seatId=60632&pbid=1358&brid=3056&sid=7997&sdom=demo.app.com&asid=4187&nid=15&lid=33&adom=tremorvideo.com&crid=7286756&aid=10973&rseat=1031'
-                    ]);
+                        'http://events.tremorhub.com/diag?rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&pbid=1358&seatid=60632&aid=10973&asid=4187&lid=33&rid=5beaaaa404184c0eb68c2bf3b3e6cfaf&rtype=VAST_ERR&vastError=%5BERRORCODE%5D&sec=false&adcode=80zxm-1018032&seatId=60632&pbid=1358&brid=3056&sid=7997&sdom=demo.app.com&asid=4187&nid=15&lid=33&adom=tremorvideo.com&crid=7286756&aid=10973&rseat=1031'
+                    ], `Got ${JSON.stringify(vast.getErrorURLTemplates())}`);
                 });
 
             });
@@ -320,6 +320,13 @@ describe('VastParserStrict', () => {
                 it('should have correct companion clickthrough url', () => {
                     const vast = TestFixtures.getVastParserStrict().parseVast(VastCompanionAdXml);
                     assert.equal(vast.getCompanionClickThroughUrl(), 'https://test.com/companionClickThrough');
+                });
+            });
+
+            describe('getCompanionClickTrackingUrls', () => {
+                it('should have correct companion clickTracking url', () => {
+                    const vast = TestFixtures.getVastParserStrict().parseVast(VastCompanionAdXml);
+                    assert.deepEqual(vast.getCompanionClickTrackingUrls(), ['https://test.com/companionClickTracking']);
                 });
             });
 
@@ -387,6 +394,18 @@ describe('VastParserStrict', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(test.inputXml);
                         assert.equal(vast.getCompanionPortraitUrl(), test.expectedValue);
                     });
+                });
+            });
+
+            describe('Decoding', () => {
+                it('should leave encoded urls alone except for encoded protocols should be decoded', () => {
+                    const vast = TestFixtures.getVastParserStrict().parseVast(VastCompanionAdXml);
+                    assert.deepEqual(vast.getTrackingEventUrls('start'), [
+                        'https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_aid=123&event=vst&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111',
+                        'https://nym1-ib.adnxs.com/it?referrer=play.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.episodeinteractive.android.catalog&e=wqT_3QK2CaC2BAAAAwDWAAUBCKLuy98FEPur583z1P7wFBj2lqKwnafJ5VcqNgkAAAECCDBAEQEHNAAAMEAZAAAAwMxMMEAhERIAKREJADERCagw6uHrBTi5OUC5OUgCUNjKszpYr6NPYABo2KtzeKm_BIABAYoBA1VTRJIBAQbwb5gBAaABAagBAbABALgBA8ABBMgBAtABCdgBAOABAPABAIoCWnVmKCdhJywgMjkzMzE2NywgMTU0MjY0OTYzNCk7dWYoJ3InLCAxMjI0Nzk5NjAsIDE1NDI2NDk2MzQpO3VmKCdjJywgMjU0MDA5Njk2PQDwjZICjQIhSVRmamFRaUpyWTRNRU5qS3N6b1lBQ0N2bzA4d0FEZ0FRQVJJdVRsUTZ1SHJCVmdBWUk0RGFBQndPSGlNR1lBQk9JZ0JqQm1RQVFHWUFRR2dBUUdvQVFPd0FRQzVBU21MaUlNQUFEQkF3UUVwaTRpREFBQXdRTWtCU2dJVzdqVGJ6al9aQVFBQUEBAyRQQV80QUVBOVFFAQ6QQWdBSUFpQUtXdkFhSUFwZThCcEFDQXBnQ0FLQUNBS2dDQUxVQwUpCEwwQwUI8EhNQUNBTWdDQU9BQ0FPZ0NBUGdDQUlBREFaQURBSmdEQWFnRGlhMk9ETG9EQ1U1WlRUSTZNell5TnVBRDFRRS6aAmEheWd5dVJnNhABJHI2TlBJQVFvQUQJmABBAcRQRG9KVGxsTk1qb3pOakkyUU5VQlNRARsEQUEByABVEQwMQUFBVx0M9JoB2AK0rQHgAv3gOeoCTHBsYXkuZ29vZ2xlLmNvbS9zdG9yZS9hcHBzL2RldGFpbHM_aWQ9Y29tLmVwaXNvZGVpbnRlcmFjdGl2ZS5hbmRyb2lkLmNhdGFsb2eAAwCIAwGQAwCYAxSgAwGqAwDAA-CoAcgDANIDKAgAEiQ1MmYyZDcwNS03MWU3LTQ0NTItOThhMS1kYjE5MWVjY2M2ZTXSAywIAhIoNWQ1NGJkNWVkOTllMzMyMmVlYjNiZTRlMGI0MWQzMGNlNWFmN2ZjNdIDJAgEEiAxMzQwNDM1MmFhYzVkMGFhMmVmMWE3ZDBlYmI3OGEwZtIDKAgKEiQ4M2M5NDZmMi0wNmQ1LTRlM2QtYTBlMC1mNmI2NmNhMjA1NTfYA8G8V-ADAOgDAvgDAIAEAJIECS9vcGVucnRiMpgEAKIEDjk5LjIwMy4xMjguMTExqASBiA6yBA4IARAAGNAFIIAKMAA4ArgEAMAEAMgEANIEDjczNTMjTllNMjozNjI22gQCCADgBADwBNjKszr6BBIJAAAAIIc2RUARYeAY989UwIIFJpZzASCIBQGYBQCgBf8RAXwBqgUWRHEyOHlqeHpXa05MbTY1UHgwNnppdsAFAMkFAAUBEPA_0gUJAXYFAZzYBQHgBQHwBdz4J_oFBAgAEACQBgGYBgC4BgDBBgAAAAAAAPA_yAYA&s=e36f70042d51515729e9a8355f5ef410e93be582',
+                        'http://ad.doubleclick.net%2Fddm%2Fpfadx%2FN7088.284566THETRADEDESK%2FB21520108.235840185%3Bsz',
+                        'https://ad.doubleclick.net%2Fddm%2Fpfadx%2FN7088.284566THETRADEDESK%2FB21520108.235840185%3Bsz'
+                    ]);
                 });
             });
 

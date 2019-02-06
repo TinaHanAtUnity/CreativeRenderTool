@@ -1,3 +1,29 @@
+# Wed Feb  6 01:02:05 UTC 2019
+
+* Refactor Swipe Class into Separate Classes [#8028](https://github.com/Applifier/unity-ads-webview/pull/8028)
+* Remove banner-auction-request_failed Diagnostic [#8105](https://github.com/Applifier/unity-ads-webview/pull/8105)
+* Decode Url protocols in VastParserStrict [#8058](https://github.com/Applifier/unity-ads-webview/pull/8058)
+
+# Mon Feb  4 23:58:18 UTC 2019
+
+* Remove abTest for performance MRAID CTA handling [#8082](https://github.com/Applifier/unity-ads-webview/pull/8082)
+* Remove Interstitial Layout AB Test [#8083](https://github.com/Applifier/unity-ads-webview/pull/8083)
+* Ignore areControlsVisible in showCallButton [#8060](https://github.com/Applifier/unity-ads-webview/pull/8060)
+* Prefix Release Scripts with Numbers [#8104](https://github.com/Applifier/unity-ads-webview/pull/8104)
+
+# Mon Feb  4 15:46:43 UTC 2019
+
+* Added diagnostics to consent show & send. For investigating a possible live issue. [#8061](https://github.com/Applifier/unity-ads-webview/pull/8061)
+
+# Fri Feb  1 21:57:36 UTC 2019
+
+* Support VAST CompanionClickTracking for end card click event [#8003](https://github.com/Applifier/unity-ads-webview/pull/8003)
+* Improve Slack Webhooks and Increase Speed of Release Scripts [#8032](https://github.com/Applifier/unity-ads-webview/pull/8032)
+* Adds a diagnostic if an ad is shown while app is in background [#8031](https://github.com/Applifier/unity-ads-webview/pull/8031)
+* Reverse traffic control for ByteDance CTA AB test [#8056](https://github.com/Applifier/unity-ads-webview/pull/8056)
+* Minor Fixes on Release Scripts [#8057](https://github.com/Applifier/unity-ads-webview/pull/8057)
+* Add Initial BannerAdContext Tests [#8030](https://github.com/Applifier/unity-ads-webview/pull/8030)
+
 # Thu Jan 31 04:33:07 UTC 2019
 
 * Disabling offending hybrid tests [#8002](https://github.com/Applifier/unity-ads-webview/pull/8002)
