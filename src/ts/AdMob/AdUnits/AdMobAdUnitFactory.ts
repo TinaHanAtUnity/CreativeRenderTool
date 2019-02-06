@@ -1,33 +1,17 @@
-import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { AdMobAdUnit, IAdMobAdUnitParameters } from 'AdMob/AdUnits/AdMobAdUnit';
-import { AdMobView } from 'AdMob/Views/AdMobView';
 import { AdMobEventHandler } from 'AdMob/EventHandlers/AdmobEventHandler';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
+import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
 
-export class AdMobAdUnitFactory extends AbstractAdUnitFactory {
+export class AdMobAdUnitFactory extends AbstractAdUnitFactory<AdMobCampaign, IAdMobAdUnitParameters> {
 
-    public createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<AdMobCampaign>): AdMobAdUnit {
-        // AdMobSignalFactory will always be defined, checking and throwing just to remove the undefined type.
-        if (!parameters.adMobSignalFactory) {
-            throw new Error('AdMobSignalFactory is undefined, should not get here.');
-        }
+    public createAdUnit(parameters: IAdMobAdUnitParameters): AdMobAdUnit {
 
-        const privacy = this.createPrivacy(nativeBridge, parameters);
-        const showGDPRBanner = this.showGDPRBanner(parameters);
-        const view = new AdMobView(nativeBridge, parameters.adMobSignalFactory, parameters.container, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.programmaticTrackingService);
-        view.render();
-
-        const adUnitParameters: IAdMobAdUnitParameters = {
-            ... parameters,
-            view: view
-        };
-        const adUnit = new AdMobAdUnit(nativeBridge, adUnitParameters);
+        const adUnit = new AdMobAdUnit(parameters);
 
         const eventHandler = new AdMobEventHandler({
-            nativeBridge: nativeBridge,
+            platform: parameters.platform,
+            core: parameters.core,
             adUnit: adUnit,
             request: parameters.request,
             thirdPartyEventManager: parameters.thirdPartyEventManager,
@@ -37,10 +21,10 @@ export class AdMobAdUnitFactory extends AbstractAdUnitFactory {
             clientInfo: parameters.clientInfo,
             coreConfig: parameters.coreConfig,
             adsConfig: parameters.adsConfig,
-            gdprManager: parameters.gdprManager
+            privacyManager: parameters.privacyManager
         });
-        view.addEventHandler(eventHandler);
-        Privacy.setupReportListener(privacy, adUnit);
+        parameters.view.render();
+        parameters.view.addEventHandler(eventHandler);
 
         return adUnit;
     }

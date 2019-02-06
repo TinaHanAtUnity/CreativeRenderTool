@@ -1,16 +1,21 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import {AbstractPrivacy, IPrivacyHandlerView} from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { WebViewError } from 'Core/Errors/WebViewError';
+import { ICoreApi } from 'Core/ICore';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { DOMUtils } from 'Core/Utilities/DOMUtils';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
+import { IMRAIDHandler } from 'MRAID/EventBridge/MRAIDEventAdapter';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -34,13 +39,18 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onMraidSkip(): void;
     onMraidClose(): void;
     onMraidOrientationProperties(orientationProperties: IOrientationProperties): void;
-    onPlayableAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: any): void;
+    onPlayableAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: unknown): void;
     onMraidShowEndScreen(): void;
+    onCustomImpressionEvent(): void;
+    onWebViewFullScreen(): Promise<void>;
+    onWebViewReduceSize(): Promise<void>;
 }
 
-export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler {
+export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandlerView, IMRAIDHandler {
 
+    protected _core: ICoreApi;
     protected _placement: Placement;
+    protected _deviceInfo: DeviceInfo;
     protected _campaign: MRAIDCampaign;
     protected _privacy: AbstractPrivacy;
     protected _showGDPRBanner = false;
@@ -63,7 +73,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected _closeElement: HTMLElement;
     protected _didReward = false;
-    protected _updateInterval: any;
+    protected _updateInterval?: number;
     protected _closeRemaining: number;
     protected _CLOSE_LENGTH = 30;
 
@@ -72,16 +82,23 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _backgroundTime: number = 0;
     protected _backgroundTimestamp: number;
 
-    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
-        super(nativeBridge, id);
+    protected _mraidAdapterContainer: MRAIDAdapterContainer;
 
+    protected _privacyPanelOpen: boolean;
+
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
+        super(platform, id);
+
+        this._core = core;
         this._placement = placement;
+        this._deviceInfo = deviceInfo;
         this._campaign = campaign;
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
 
         this._abGroup = abGroup;
 
+        this._privacyPanelOpen = false;
         this._privacy.render();
         this._privacy.hide();
         document.body.appendChild(this._privacy.container());
@@ -115,6 +132,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         ];
 
         this._gameSessionId = gameSessionId || 0;
+        this._mraidAdapterContainer = new MRAIDAdapterContainer(this);
     }
 
     public abstract setViewableState(viewable: boolean): void;
@@ -151,22 +169,21 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    public createMRAID(container: any): Promise<string> {
+    public createMRAID(container: string): Promise<string> {
         const fetchingTimestamp = Date.now();
         let fetchingStopTimestamp = Date.now();
         let mraidParseTimestamp = Date.now();
         return this.fetchMRAID().then(mraid => {
-            let modifiedMraid = mraid;
             fetchingStopTimestamp = mraidParseTimestamp = Date.now();
-            if(modifiedMraid) {
+            if(mraid) {
                 const markup = this._campaign.getDynamicMarkup();
                 if(markup) {
-                    modifiedMraid = modifiedMraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
+                    mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
                 }
 
-                modifiedMraid = modifiedMraid.replace(/\$/g, '$$$');
-                modifiedMraid = this.replaceMraidSources(modifiedMraid);
-                return container.replace('<body></body>', '<body>' + modifiedMraid + '</body>');
+                mraid = mraid.replace(/\$/g, '$$$');
+                mraid = this.replaceMraidSources(mraid);
+                return container.replace('<body></body>', '<body>' + mraid + '</body>');
             }
             throw new WebViewError('Unable to fetch MRAID');
         }).then((data) => {
@@ -201,18 +218,14 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         return valid;
     }
 
-    public onPrivacy(url: string): void {
-        // do nothing
-    }
-
-    public onGDPROptOut(optOutEnabled: boolean) {
-        // do nothing
-    }
-
     public setCallButtonEnabled(value: boolean) {
         if (this._callButtonEnabled !== value) {
             this._callButtonEnabled = value;
         }
+    }
+
+    public isLoaded(): boolean {
+        return this._isLoaded;
     }
 
     protected choosePrivacyShown(): void {
@@ -240,7 +253,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             const skipLength = this._placement.allowSkipInSeconds();
             this._closeRemaining = this._CLOSE_LENGTH;
             let skipRemaining = skipLength;
-            this._updateInterval = setInterval(() => {
+            this._updateInterval = window.setInterval(() => {
                 if(this._closeRemaining > 0) {
                     this._closeRemaining--;
                 }
@@ -260,7 +273,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             }, 1000);
         } else {
             this._closeRemaining = this._CLOSE_LENGTH;
-            this._updateInterval = setInterval(() => {
+            this._updateInterval = window.setInterval(() => {
                 const progress = (this._CLOSE_LENGTH - this._closeRemaining) / this._CLOSE_LENGTH;
                 if(progress >= 0.75 && !this._didReward) {
                     this._handlers.forEach(handler => handler.onMraidReward());
@@ -283,7 +296,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
+        if(this._platform === Platform.ANDROID && (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
             this._container.style.display = 'none';
             /* tslint:disable:no-unused-expression */
@@ -322,13 +335,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         // documentElement which throws an exception.
 
         let dom: Document;
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._platform === Platform.IOS) {
             dom = DOMUtils.parseFromString(mraid, 'text/html');
         } else {
             dom = new DOMParser().parseFromString(mraid, 'text/html');
         }
         if(!dom) {
-            this._nativeBridge.Sdk.logWarning(`Could not parse markup for campaign ${this._campaign.getId()}`);
+            this._core.Sdk.logWarning(`Could not parse markup for campaign ${this._campaign.getId()}`);
             return mraid;
         }
 
@@ -343,12 +356,12 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     private fetchMRAID(): Promise<string | undefined> {
         const resourceUrl = this._campaign.getResourceUrl();
         if(resourceUrl) {
-            if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            if (this._platform === Platform.ANDROID) {
                 return XHRequest.get(resourceUrl.getUrl());
             } else {
                 const fileId = resourceUrl.getFileId();
                 if(fileId) {
-                    return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
+                    return this._core.Cache.getFileContent(fileId, 'UTF-8');
                 } else {
                     return XHRequest.get(resourceUrl.getOriginalUrl());
                 }
@@ -362,50 +375,69 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     public onPrivacyClose(): void {
         if(this._privacy) {
             this._privacy.hide();
+            this._privacyPanelOpen = false;
         }
     }
 
     public onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._privacy.show();
+        this._privacyPanelOpen = true;
     }
 
     public onGDPRPopupEvent(event: Event) {
         event.preventDefault();
         this._gdprPopupClicked = true;
         this._privacy.show();
+        this._privacyPanelOpen = true;
     }
 
-    protected onSetOrientationProperties(allowOrientationChange: boolean, orientation: string) {
-        let forceOrientation = Orientation.NONE;
-            switch(orientation) {
-                case 'portrait':
-                    forceOrientation = Orientation.PORTRAIT;
-                    break;
+    public loadWebPlayer(webPlayerContainer: WebPlayerContainer): Promise<void> {
+        return Promise.resolve();
+    }
 
-                case 'landscape':
-                    forceOrientation = Orientation.LANDSCAPE;
-                    break;
-
-                default:
-        }
+    protected onSetOrientationProperties(allowOrientationChange: boolean, orientation: Orientation) {
         this._handlers.forEach(handler => handler.onMraidOrientationProperties({
             allowOrientationChange: allowOrientationChange,
-            forceOrientation: forceOrientation
+            forceOrientation: orientation
         }));
     }
-
-    protected abstract sendMraidAnalyticsEvent(eventName: string, eventData?: any): void;
 
     protected onOpen(url: string) {
         this._handlers.forEach(handler => handler.onMraidClick(url));
     }
 
-    protected onClose() {
+    protected onLoadedEvent(): void {
+        // do nothing by default except for MRAID
+    }
+
+    protected onAREvent(msg: MessageEvent): Promise<void> {
+        return Promise.resolve();
+    }
+
+    protected abstract sendMraidAnalyticsEvent(eventName: string, eventData?: unknown): void;
+
+    public onBridgeSetOrientationProperties(allowOrientationChange: boolean, forceOrientation: Orientation) {
+        this.onSetOrientationProperties(allowOrientationChange, forceOrientation);
+    }
+
+    public onBridgeOpen(url: string) {
+        this.onOpen(encodeURI(url));
+    }
+
+    public onBridgeLoad() {
+        this.onLoadedEvent();
+    }
+
+    public onBridgeAnalyticsEvent(event: string, eventData: string) {
+        this.sendMraidAnalyticsEvent(event, eventData);
+    }
+
+    public onBridgeClose() {
         this._handlers.forEach(handler => handler.onMraidClose());
     }
 
-    protected onCustomState(customState: string) {
+    public onBridgeStateChange(customState: string) {
         if(customState === 'completed') {
             if(!this._placement.allowSkip() && this._closeRemaining > 5) {
                 this._closeRemaining = 5;
@@ -413,7 +445,19 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    protected onResizeWebview() {
-        // this._handlers.forEach(handler => handler.onWebViewResize(false));
+    public onBridgeResizeWebview() {
+        // This will be used to handle rotation changes for webplayer-based mraid
+    }
+
+    public onBridgeSendStats(totalTime: number, playTime: number, frameCount: number) {
+        this.updateStats({
+            totalTime: totalTime,
+            playTime: playTime,
+            frameCount: frameCount
+        });
+    }
+
+    public onBridgeAREvent(msg: MessageEvent) {
+        this.onAREvent(msg).catch((reason) => this._core.Sdk.logError('AR message error: ' + reason.toString()));
     }
 }

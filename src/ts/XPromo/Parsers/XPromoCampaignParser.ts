@@ -4,15 +4,18 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
-import { StoreName } from 'Performance/Models/PerformanceCampaign';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
+import { IRawPerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export class XPromoCampaignParser extends CampaignParser {
+
     public static ContentType = 'xpromo/video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
-        const json = response.getJsonContent();
+
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
+        const json = <IRawPerformanceCampaign>response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;
@@ -35,13 +38,16 @@ export class XPromoCampaignParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: json.id,
             willExpireAt: undefined,
+            contentType: XPromoCampaignParser.ContentType,
             adType: undefined,
             correlationId: undefined,
-            creativeId: response.getCreativeId(),
-            seatId: undefined,
+            creativeId: response.getCreativeId() || undefined,
+            seatId: response.getSeatId() || undefined,
             meta: json.meta,
             session: session,
-            mediaId: response.getMediaId()
+            mediaId: response.getMediaId(),
+            trackingUrls: response.getTrackingUrls() ? this.validateAndEncodeTrackingUrls(response.getTrackingUrls(), session) : {},
+            backupCampaign: false
         };
 
         const parameters: IXPromoCampaign = {
@@ -59,7 +65,6 @@ export class XPromoCampaignParser extends CampaignParser {
             clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl, session) : undefined,
             clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
             bypassAppSheet: json.bypassAppSheet,
-            trackingUrls: response.getTrackingUrls() ? this.validateAndEncodeTrackingUrls(response.getTrackingUrls(), session) : undefined,
             videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
             store: storeName
         };

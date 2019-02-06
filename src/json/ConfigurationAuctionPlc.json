@@ -40,11 +40,20 @@
       "disableBackButton": true,
       "muteVideo": false,
       "useDeviceOrientationForVideo": false
+    },
+    {
+      "id": "banner",
+      "name": "Banner",
+      "default": false,
+      "allowSkip": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "adTypes": ["BANNER"]
     }
   ],
   "useAuction": true,
   "country": "FI",
-  "gamerId": "57a35671bb58271e002d93c9",
   "abGroup": 99,
   "properties": "abcdefgh12345678",
   "projectId": "abcd-1234",
@@ -52,5 +61,8 @@
   "organizationId": "5552368",
   "gdprEnabled": false,
   "optOutRecorded": false,
-  "optOutEnabled": false
+  "optOutEnabled": false,
+  "gamePrivacy": {
+    "method": "legitimate_interest"
+  }
 }

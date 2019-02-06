@@ -1,11 +1,11 @@
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Swipe } from 'Core/Utilities/Swipe';
 import { Tap } from 'Core/Utilities/Tap';
 import { Template } from 'Core/Utilities/Template';
 import { IViewBinding } from 'Core/Views/IViewBinding';
+import { HorizontalSwipe } from 'Core/Utilities/HorizontalSwipe';
+import { DownSwipe } from 'Core/Utilities/DownSwipe';
 
-export type TemplateDataType = string | number | boolean | null | undefined  | string[];
+export type TemplateDataType = string | number | boolean | null | undefined | string[];
 
 export interface ITemplateData {
     [key: string]: TemplateDataType;
@@ -15,7 +15,11 @@ export abstract class View<T extends object> {
 
     private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
         if(binding.event === 'swipe') {
-            binding.swipe = new Swipe(element);
+            binding.swipe = new HorizontalSwipe(element);
+        }
+
+        if(binding.event === 'swipedown') {
+            binding.swipe = new DownSwipe(element);
         }
 
         if(attachTap && binding.event === 'click') {
@@ -24,22 +28,29 @@ export abstract class View<T extends object> {
         element.addEventListener(binding.event, binding.listener, false);
     }
 
-    protected _nativeBridge: NativeBridge;
-
+    protected _platform: Platform;
     protected _template: Template;
-    protected _templateData: { [key: string]: TemplateDataType | ITemplateData };
-    protected _bindings: IViewBinding[];
+    protected _templateData: { [key: string]: TemplateDataType | ITemplateData } = {};
+    protected _bindings: IViewBinding[] = [];
     protected _container: HTMLElement;
     protected _handlers: T[] = [];
 
     protected _id: string;
 
-    constructor(nativeBridge: NativeBridge, id: string) {
-        this._nativeBridge = nativeBridge;
+    private _attachTap: boolean = false;
+
+    constructor(platform: Platform, id: string, attachTap?: boolean) {
+        this._platform = platform;
         this._id = id;
+
+        if (attachTap !== undefined) {
+            this._attachTap = attachTap;
+        } else {
+            this._attachTap = this._platform === Platform.IOS;
+        }
     }
 
-   public addEventHandler(handler: T): T {
+    public addEventHandler(handler: T): T {
         this._handlers.push(handler);
         return handler;
     }
@@ -55,23 +66,21 @@ export abstract class View<T extends object> {
     }
 
     public render(): void {
-        this._container = document.createElement('div');
-        this._container.id = this._id;
-        this._container.innerHTML = this._template.render(this._templateData ? this._templateData : {});
-
-        const attachTap = this._nativeBridge.getPlatform() === Platform.IOS;
+        const container = this._container = document.createElement('div');
+        container.id = this._id;
+        container.innerHTML = this._template.render(this._templateData ? this._templateData : {});
 
         this._bindings.forEach((binding: IViewBinding) => {
             if(binding.selector) {
-                const elements: NodeList = this._container.querySelectorAll(binding.selector);
+                const elements: NodeList = container.querySelectorAll(binding.selector);
                 // tslint:disable:prefer-for-of
                 for(let i = 0; i < elements.length; ++i) {
                     const element = elements[i];
-                    View.addEventListener(binding, <HTMLElement>element, attachTap);
+                    View.addEventListener(binding, <HTMLElement>element, this._attachTap);
                 }
                 // tslint:enable:prefer-for-of
             } else {
-                View.addEventListener(binding, this._container, attachTap);
+                View.addEventListener(binding, container, this._attachTap);
             }
         });
     }
@@ -81,10 +90,14 @@ export abstract class View<T extends object> {
     }
 
     public show(): void {
-        this._container.style.visibility = 'visible';
+        if(this._container) {
+            this._container.style.visibility = 'visible';
+        }
     }
 
     public hide(): void {
-        this._container.style.visibility = 'hidden';
+        if(this._container) {
+            this._container.style.visibility = 'hidden';
+        }
     }
 }

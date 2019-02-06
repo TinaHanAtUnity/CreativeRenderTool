@@ -1,9 +1,10 @@
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import InterstitialOverlayTemplate from 'html/InterstitialOverlay.html';
+import { Campaign } from 'Ads/Models/Campaign';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 export class ClosableVideoOverlay extends AbstractVideoOverlay {
 
@@ -23,11 +24,12 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
 
     private _callButtonVisible: boolean = false;
 
-    private _fadeTimer: any;
+    private _fadeTimer?: number;
     private _fadeStatus: boolean = true;
+    private _campaign: Campaign;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string) {
-        super(nativeBridge, 'closable-video-overlay', muted);
+    constructor(platform: Platform, campaign: Campaign, muted: boolean, language: string, gameId: string) {
+        super(platform, 'closable-video-overlay', muted);
 
         const localization = new Localization(language, 'overlay');
         this._template = new Template(InterstitialOverlayTemplate, localization);
@@ -35,6 +37,7 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
         this._templateData = {
             muted: muted
         };
+        this._campaign = campaign;
 
         this._bindings = [
             {
@@ -95,7 +98,7 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
         }
 
         if(this._fadeEnabled && !this._fadeTimer && this._skipRemaining <= 0) {
-            this._fadeTimer = setTimeout(() => {
+            this._fadeTimer = window.setTimeout(() => {
                 this.fade(true);
                 this._fadeTimer = undefined;
             }, 3000);
@@ -131,6 +134,9 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
     }
 
     public setCallButtonVisible(value: boolean) {
+        if (!(this._campaign instanceof VastCampaign)) {
+            return;
+        }
         if(this._callButtonVisible !== value) {
             this._callButtonElement.style.display = value ? 'block' : 'none';
         }

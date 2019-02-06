@@ -1,8 +1,8 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { ICoreApi, ICore } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
@@ -11,36 +11,41 @@ import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 
 export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
+
     public static ContentType = CampaignContentTypes.ProgrammaticVpaid;
 
     private _vpaidParser: VPAIDParser = new VPAIDParser();
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
-        const decodedVast = decodeURIComponent(response.getContent()).trim();
-        return this._vastParser.retrieveVast(decodedVast, nativeBridge, request).then((vast): Promise<Campaign> => {
+    constructor(core: ICore) {
+        super(core);
+    }
+
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
+        return this.retrieveVast(response).then((vast): Promise<Campaign> => {
             const vpaidMediaFile = this.getVPAIDMediaFile(vast);
-            const campaignId = this.getProgrammaticCampaignId(nativeBridge);
             if (vpaidMediaFile) {
                 const vpaid = this._vpaidParser.parseFromVast(vast, vpaidMediaFile);
 
                 const cacheTTL = response.getCacheTTL();
 
                 const baseCampaignParams: ICampaign = {
-                    id: this.getProgrammaticCampaignId(nativeBridge),
+                    id: this.getProgrammaticCampaignId(),
                     willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
+                    contentType: ProgrammaticVPAIDParser.ContentType,
                     adType: response.getAdType() || undefined,
                     correlationId: response.getCorrelationId() || undefined,
                     creativeId: response.getCreativeId() || undefined,
                     seatId: response.getSeatId() || undefined,
                     meta: undefined,
                     session: session,
-                    mediaId: response.getMediaId()
+                    mediaId: response.getMediaId(),
+                    trackingUrls: response.getTrackingUrls() || {},
+                    backupCampaign: false
                 };
 
                 const vpaidCampaignParams: IVPAIDCampaign = {
                     ... baseCampaignParams,
                     vpaid: vpaid,
-                    trackingUrls: response.getTrackingUrls(),
                     appCategory: response.getCategory() || undefined,
                     appSubcategory: response.getSubCategory() || undefined,
                     advertiserDomain: response.getAdvertiserDomain() || undefined,
@@ -52,7 +57,7 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
 
                 return Promise.resolve(new VPAIDCampaign(vpaidCampaignParams));
             } else {
-                return this.parseVastToCampaign(vast, nativeBridge, campaignId, session, response);
+                return this.parseVastToCampaign(vast, session, response);
             }
         });
     }

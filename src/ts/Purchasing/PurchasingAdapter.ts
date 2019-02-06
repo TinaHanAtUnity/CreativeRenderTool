@@ -1,5 +1,6 @@
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { Observable1 } from 'Core/Utilities/Observable';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 export interface ITransactionDetails {
     productId: string;
@@ -7,7 +8,7 @@ export interface ITransactionDetails {
     receipt: string;
     price: number;
     currency: string;
-    extras: any;
+    extras: unknown;
 }
 
 export interface ITransactionErrorDetails {
@@ -15,7 +16,7 @@ export interface ITransactionErrorDetails {
     exceptionMessage: string;
     store: string;
     storeSpecificErrorCode: string;
-    extras: any;
+    extras: unknown;
 }
 
 export interface IProduct {
@@ -26,11 +27,12 @@ export interface IProduct {
     isoCurrencyCode: string | undefined;
     localizedPrice: number | undefined;
 }
+
 export interface IPurchasingAdapter {
     initialize(): Promise<void>;
-    purchaseItem(productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails>;
+    purchaseItem(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails>;
     refreshCatalog(): Promise<IProduct[]>;
-    onPromoClosed(campaign: PromoCampaign, placementId: string): void;
+    onPromoClosed(thirdPartyEventManager: ThirdPartyEventManager, campaign: PromoCampaign, placementId: string): void;
 
     onCatalogRefreshed: Observable1<IProduct[]>;
 }

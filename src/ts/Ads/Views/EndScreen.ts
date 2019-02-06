@@ -3,16 +3,18 @@ import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHa
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
 import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi } from 'Core/ICore';
 
 export interface IEndScreenParameters {
-    nativeBridge: NativeBridge;
+    platform: Platform;
+    core: ICoreApi;
+    apiLevel?: number;
     language: string;
     gameId: string;
     targetGameName: string | undefined;
@@ -30,7 +32,7 @@ export interface IEndScreenHandler extends IGDPREventHandler {
     onKeyEvent(keyCode: number): void;
 }
 
-export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
+export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandlerView {
 
     protected _localization: Localization;
     protected _adUnitStyle?: AdUnitStyle;
@@ -42,9 +44,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _gdprPopupClicked = false;
     private _campaignId: string | undefined;
     private _osVersion: string | undefined;
+    private _apiLevel?: number;
 
     constructor(parameters : IEndScreenParameters) {
-        super(parameters.nativeBridge, 'end-screen');
+        super(parameters.platform, 'end-screen');
         this._localization = new Localization(parameters.language, 'endscreen');
         this._abGroup = parameters.abGroup;
         this._gameName = parameters.targetGameName;
@@ -53,6 +56,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._showGDPRBanner = parameters.showGDPRBanner;
         this._campaignId = parameters.campaignId;
         this._osVersion = parameters.osVersion;
+        this._apiLevel = parameters.apiLevel;
 
         this._bindings = [
             {
@@ -111,7 +115,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         // Android <= 4.4.4
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() <= 19) {
+        if (this._platform === Platform.ANDROID && this._apiLevel! <= 19) {
             this._container.classList.add('old-androids');
         }
     }
@@ -153,14 +157,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         if (this._privacy) {
             this._privacy.hide();
         }
-    }
-
-    public onPrivacy(url: string): void {
-        // do nothing
-    }
-
-    public onGDPROptOut(optOutEnabled: boolean): void {
-        // do nothing
     }
 
     protected getEndscreenAlt(): string | undefined {

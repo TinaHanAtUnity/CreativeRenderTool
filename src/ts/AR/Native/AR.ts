@@ -1,6 +1,7 @@
 import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
 import { IosARApi } from 'AR/Native/iOS/IosARApi';
 import { IARSize } from 'AR/Utilities/ARUtil';
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { Platform } from 'Core/Constants/Platform';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -57,7 +58,7 @@ export class ARApi extends NativeApi {
     public readonly onSessionInterruptionEnded = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AR', ApiPackage.AR);
+        super(nativeBridge, 'AR', ApiPackage.AR, EventCategory.AR);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             this.Android = new AndroidARApi(nativeBridge);
@@ -98,28 +99,28 @@ export class ARApi extends NativeApi {
         return this._nativeBridge.invoke<IARVideoFormat[]>(this._fullApiClassName, 'getSupportedVideoFormats');
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch (event) {
             case AREvent[AREvent.AR_PLANES_ADDED]:
-                this.onPlanesAdded.trigger(parameters[0]);
+                this.onPlanesAdded.trigger(<string>parameters[0]);
                 break;
             case AREvent[AREvent.AR_PLANES_REMOVED]:
-                this.onPlanesRemoved.trigger(parameters[0]);
+                this.onPlanesRemoved.trigger(<string>parameters[0]);
                 break;
             case AREvent[AREvent.AR_PLANES_UPDATED]:
-                this.onPlanesUpdated.trigger(parameters[0]);
+                this.onPlanesUpdated.trigger(<string>parameters[0]);
                 break;
             case AREvent[AREvent.AR_ANCHORS_UPDATED]:
-                this.onAnchorsUpdated.trigger(parameters[0]);
+                this.onAnchorsUpdated.trigger(<string>parameters[0]);
                 break;
             case AREvent[AREvent.AR_FRAME_UPDATED]:
-                this.onFrameUpdated.trigger(parameters[0]);
+                this.onFrameUpdated.trigger(<string>parameters[0]);
                 break;
             case AREvent[AREvent.AR_WINDOW_RESIZED]:
-                this.onWindowResized.trigger(parameters[0], parameters[1]);
+                this.onWindowResized.trigger(<number>parameters[0], <number>parameters[1]);
                 break;
             case AREvent[AREvent.AR_ERROR]:
-                this.onError.trigger(parameters[0]);
+                this.onError.trigger(<number>parameters[0]);
                 break;
             case AREvent[AREvent.AR_SESSION_INTERRUPTED]:
                 this.onSessionInterrupted.trigger();
@@ -128,7 +129,7 @@ export class ARApi extends NativeApi {
                 this.onSessionInterruptionEnded.trigger();
                 break;
             default:
-                this._nativeBridge.Sdk.logError('Unknown AR event: ' + event);
+                super.handleEvent(event, parameters);
         }
     }
 }

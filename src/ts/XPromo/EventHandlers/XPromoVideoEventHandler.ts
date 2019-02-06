@@ -5,18 +5,24 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { AuctionV5Test, ABGroup } from 'Core/Models/ABGroup';
+import { ProgrammaticTrackingErrorName, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class XPromoVideoEventHandler extends VideoEventHandler {
 
     private _xpromoAdUnit: XPromoAdUnit;
     private _xpromoOperativeEventManager: XPromoOperativeEventManager;
     private _xpromoCampaign: XPromoCampaign;
+    private _pts: ProgrammaticTrackingService;
+    private _abGroup: ABGroup;
 
     constructor(params: IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>) {
         super(params);
         this._xpromoAdUnit = params.adUnit;
         this._xpromoOperativeEventManager = params.operativeEventManager;
         this._xpromoCampaign = params.campaign;
+        this._pts = params.programmaticTrackingService;
+        this._abGroup = params.coreConfig.getAbGroup();
     }
 
     public onCompleted(url: string): void {
@@ -32,8 +38,12 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
         super.onPrepared(url, duration, width, height);
 
         const overlay = this._adUnit.getOverlay();
-        if(TestEnvironment.get('debugOverlayEnabled') && overlay) {
-            overlay.setDebugMessage('XPromo');
+        if (overlay) {
+            overlay.setCallButtonVisible(true);
+
+            if(TestEnvironment.get('debugOverlayEnabled')) {
+                overlay.setDebugMessage('XPromo');
+            }
         }
     }
 
@@ -43,11 +53,15 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
         });
 
         const trackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('start');
+        if (trackingUrls.length === 0) {
+            this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this._adUnit.description());
+        }
+
         for (const url of trackingUrls) {
             this._thirdPartyEventManager.sendWithGet('xpromo start', this._xpromoCampaign.getSession().getId(), url);
         }
 
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
+        this._ads.Listener.sendStartEvent(this._placement.getId());
     }
 
     protected handleFirstQuartileEvent(progress: number): void {

@@ -4,38 +4,47 @@ import { VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { AndroidVideoEventHandler } from 'Ads/EventHandlers/AndroidVideoEventHandler';
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { IosVideoEventHandler } from 'Ads/EventHandlers/IosVideoEventHandler';
-import { PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
 import { VideoEventHandler } from 'Ads/EventHandlers/VideoEventHandler';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
-import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { Privacy } from 'Ads/Views/Privacy';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { Platform } from 'Core/Constants/Platform';
-import { WebViewError } from 'Core/Errors/WebViewError';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { IAbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
+import { Placement } from 'Ads/Models/Placement';
+import { PrivacyMethod } from 'Ads/Models/Privacy';
 
-export abstract class AbstractAdUnitFactory {
-
+export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends IAdUnitParameters<T>> {
     private static _forceGDPRBanner: boolean = false;
+    private _adUnitParametersFactory: IAbstractAdUnitParametersFactory<T, Params>;
 
-    public abstract createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit;
+    constructor(parametersFactory: IAbstractAdUnitParametersFactory<T, Params>) {
+        this._adUnitParametersFactory = parametersFactory;
+    }
+
+    public create(campaign: T, placement: Placement, orientation: Orientation, gamerServerId: string, options: unknown) {
+        const params = this._adUnitParametersFactory.create(campaign, placement, orientation, gamerServerId, options);
+        const adUnit =  this.createAdUnit(params);
+        params.privacy.setupReportListener(adUnit);
+        return adUnit;
+    }
+
+    protected abstract createAdUnit(parameters: Params): AbstractAdUnit;
 
     public static setForcedGDPRBanner(value: boolean) {
         AbstractAdUnitFactory._forceGDPRBanner = value;
     }
 
-    protected createEndScreenParameters(nativeBridge: NativeBridge, privacy: AbstractPrivacy, targetGameName: string | undefined, parameters: IAdUnitParameters<Campaign>): IEndScreenParameters {
+    protected createEndScreenParameters(privacy: AbstractPrivacy, targetGameName: string | undefined, parameters: IAdUnitParameters<Campaign>): IEndScreenParameters {
         const showGDPRBanner = this.showGDPRBanner(parameters);
         return {
-            nativeBridge: nativeBridge,
+            platform: parameters.platform,
+            core: parameters.core,
             language: parameters.deviceInfo.getLanguage(),
             gameId: parameters.clientInfo.getGameId(),
             targetGameName: targetGameName,
@@ -48,20 +57,19 @@ export abstract class AbstractAdUnitFactory {
         };
     }
 
-    protected prepareVideoPlayer<T extends VideoEventHandler, T2 extends VideoAdUnit, T3 extends Campaign, T4 extends OperativeEventManager, ParamsType extends IVideoEventHandlerParams<T2, T3, T4>>(VideoEventHandlerConstructor: { new(p: ParamsType): T }, params: ParamsType): T {
-        const nativeBridge = params.nativeBrige;
+    protected prepareVideoPlayer<T1 extends VideoEventHandler, T2 extends VideoAdUnit, T3 extends Campaign, T4 extends OperativeEventManager, ParamsType extends IVideoEventHandlerParams<T2, T3, T4>>(VideoEventHandlerConstructor: { new(p: ParamsType): T1 }, params: ParamsType): T1 {
         const adUnit = params.adUnit;
         const videoEventHandler = new VideoEventHandlerConstructor(params);
 
-        nativeBridge.VideoPlayer.addEventHandler(videoEventHandler);
+        params.ads.VideoPlayer.addEventHandler(videoEventHandler);
 
         adUnit.onClose.subscribe(() => {
-            nativeBridge.VideoPlayer.removeEventHandler(videoEventHandler);
+            params.ads.VideoPlayer.removeEventHandler(videoEventHandler);
         });
 
-        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (params.platform === Platform.ANDROID) {
             this.prepareAndroidVideoPlayer(params);
-        } else if(nativeBridge.getPlatform() === Platform.IOS) {
+        } else if(params.platform === Platform.IOS) {
             this.prepareIosVideoPlayer(params);
         }
 
@@ -69,38 +77,37 @@ export abstract class AbstractAdUnitFactory {
     }
 
     protected prepareAndroidVideoPlayer(params: IVideoEventHandlerParams) {
-        const nativeBridge = params.nativeBrige;
         const adUnit = params.adUnit;
         const androidVideoEventHandler = new AndroidVideoEventHandler(params);
 
-        nativeBridge.VideoPlayer.Android.addEventHandler(androidVideoEventHandler);
+        params.ads.VideoPlayer.Android!.addEventHandler(androidVideoEventHandler);
 
         adUnit.onClose.subscribe(() => {
-            nativeBridge.VideoPlayer.Android.removeEventHandler(androidVideoEventHandler);
+            params.ads.VideoPlayer.Android!.removeEventHandler(androidVideoEventHandler);
         });
     }
 
     protected prepareIosVideoPlayer(params: IVideoEventHandlerParams) {
-        const nativeBridge = params.nativeBrige;
         const adUnit = params.adUnit;
         const iosVideoEventHandler = new IosVideoEventHandler(params);
 
-        nativeBridge.VideoPlayer.Ios.addEventHandler(iosVideoEventHandler);
+        params.ads.VideoPlayer.iOS!.addEventHandler(iosVideoEventHandler);
 
         adUnit.onClose.subscribe(() => {
-            nativeBridge.VideoPlayer.Ios.removeEventHandler(iosVideoEventHandler);
+            params.ads.VideoPlayer.iOS!.removeEventHandler(iosVideoEventHandler);
         });
     }
 
-    protected createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean | undefined): AbstractVideoOverlay {
-        const showGDPRBanner = (parameters.campaign instanceof VastCampaign) ? this.showGDPRBanner(parameters) : false;
+    protected createOverlay(parameters: IAdUnitParameters<Campaign>, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
+
         let overlay: AbstractVideoOverlay;
 
         const skipAllowed = parameters.placement.allowSkip();
+
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
-            overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            overlay = new ClosableVideoOverlay(parameters.platform, parameters.campaign, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), showPrivacyDuringVideo, parameters.campaign.getSeatId());
+            overlay = new NewVideoOverlay(parameters, parameters.privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
@@ -110,9 +117,9 @@ export abstract class AbstractAdUnitFactory {
         return overlay;
     }
 
-    protected getVideoEventHandlerParams(nativeBridge: NativeBridge, adUnit: VideoAdUnit, video: Video, adUnitStyle: AdUnitStyle | undefined, params: IAdUnitParameters<Campaign>): IVideoEventHandlerParams {
+    protected getVideoEventHandlerParams(adUnit: VideoAdUnit, video: Video, adUnitStyle: AdUnitStyle | undefined, params: IAdUnitParameters<Campaign>): IVideoEventHandlerParams {
         return {
-            nativeBrige: nativeBridge,
+            platform: params.platform,
             adUnit: adUnit,
             campaign: params.campaign,
             operativeEventManager: params.operativeEventManager,
@@ -122,24 +129,11 @@ export abstract class AbstractAdUnitFactory {
             placement: params.placement,
             video: video,
             adUnitStyle: adUnitStyle,
-            clientInfo: params.clientInfo
+            clientInfo: params.clientInfo,
+            core: params.core,
+            ads: params.ads,
+            programmaticTrackingService: params.programmaticTrackingService
         };
-    }
-
-    protected getVideo(campaign: Campaign, forceOrientation: Orientation): Video {
-        const video = CampaignAssetInfo.getOrientedVideo(campaign, forceOrientation);
-        if(!video) {
-            throw new WebViewError('Unable to select an oriented video');
-        }
-
-        return video;
-    }
-
-    protected createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): Privacy {
-        const privacy = new Privacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.adsConfig.isGDPREnabled(), parameters.coreConfig.isCoppaCompliant());
-        const privacyEventHandler = new PrivacyEventHandler(nativeBridge, parameters);
-        privacy.addEventHandler(privacyEventHandler);
-        return privacy;
     }
 
     protected showGDPRBanner(parameters: IAdUnitParameters<Campaign>): boolean {
@@ -147,6 +141,11 @@ export abstract class AbstractAdUnitFactory {
             return true;
         }
 
+        if (PrivacyMethod.LEGITIMATE_INTEREST !== parameters.adsConfig.getGamePrivacy().getMethod()) {
+            return false;
+        }
+
         return parameters.adsConfig.isGDPREnabled() ? !parameters.adsConfig.isOptOutRecorded() : false;
     }
+
 }

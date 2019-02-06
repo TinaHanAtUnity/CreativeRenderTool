@@ -161,13 +161,6 @@
     "platforms": "all"
   },
   {
-    "key": "gamerId",
-    "type": "string",
-    "description": "Internal gamer identifier",
-    "provider": "Server",
-    "platforms": "all"
-  },
-  {
     "key": "gameSessionId",
     "type": "number",
     "description": "Unique game session identifier. This identifier is shared with analytics events.",
@@ -485,7 +478,7 @@
   {
     "key": "organizationId",
     "type": "string",
-    "description": "Previously knows as 'developerID'",
+    "description": "Organization ID from Genesis'",
     "provider": "Server",
     "platforms": "all"
   },
@@ -521,6 +514,34 @@
     "key": "unityCreativeId",
     "type": "string",
     "description": "Creative id of the shown creative",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "analyticsUserId",
+    "type": "string",
+    "description": "Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending)",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "analyticsSessionId",
+    "type": "string",
+    "description": "Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "isBackupCampaign",
+    "type": "boolean",
+    "description": "Flag describing if the campaign was loaded from server or from backup stored on device",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "privacy",
+    "type": "object",
+    "description": "Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK",
     "provider": "SDK",
     "platforms": "all"
   }

@@ -6,18 +6,24 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { ProgrammaticTrackingService, ProgrammaticTrackingErrorName } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { AuctionV5Test, ABGroup } from 'Core/Models/ABGroup';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 
     private _vastAdUnit: VastAdUnit;
     private _vastCampaign: VastCampaign;
     private _clientInfo: ClientInfo;
+    private _pts: ProgrammaticTrackingService;
+    private _abGroup: ABGroup;
 
     constructor(params: IVideoEventHandlerParams<VastAdUnit, VastCampaign>) {
         super(params);
         this._vastAdUnit = params.adUnit;
         this._vastCampaign = params.campaign;
         this._clientInfo = params.clientInfo;
+        this._pts = params.programmaticTrackingService;
+        this._abGroup = params.coreConfig.getAbGroup();
     }
 
     public onProgress(progress: number): void {
@@ -100,7 +106,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
             session.setEventSent(EventType.IMPRESSION);
         }
 
-        this.sendThirdPartyImpressionEvent();
+        this.sendThirdPartyVastImpressionEvent();
         this.sendThirdPartyTrackingEvent('creativeView');
         this.sendThirdPartyTrackingEvent('start');
         this.sendThirdPartyTrackingEvent('impression');
@@ -152,7 +158,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         this.sendThirdPartyTrackingEvent('complete');
     }
 
-    private sendThirdPartyImpressionEvent(): void {
+    private sendThirdPartyVastImpressionEvent(): void {
         const impressionUrls = this._vastCampaign.getImpressionUrls();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
@@ -164,6 +170,9 @@ export class VastVideoEventHandler extends VideoEventHandler {
     private sendThirdPartyTrackingEvent(eventName: string): void {
         const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
+            if (trackingEventUrls.length === 0 && eventName === 'start') {
+                this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this._vastAdUnit.description());
+            }
             for (const url of trackingEventUrls) {
                 this.sendThirdPartyEvent(`vast ${eventName}`, url);
             }
@@ -171,9 +180,6 @@ export class VastVideoEventHandler extends VideoEventHandler {
     }
 
     private sendThirdPartyEvent(event: string, url: string): void {
-        let modifiedUrl = url;
-        modifiedUrl = modifiedUrl.replace(/%ZONE%/, this._placement.getId());
-        modifiedUrl = modifiedUrl.replace(/%SDK_VERSION%/, this._clientInfo.getSdkVersion().toString());
-        this._thirdPartyEventManager.sendWithGet(event, this._campaign.getSession().getId(), modifiedUrl, this._vastCampaign.getUseWebViewUserAgentForTracking());
+        this._thirdPartyEventManager.sendWithGet(event, this._campaign.getSession().getId(), url, this._vastCampaign.getUseWebViewUserAgentForTracking());
     }
 }

@@ -1,13 +1,13 @@
-import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { OverlayEventHandlerWithDownloadSupport } from 'Ads/EventHandlers/OverlayEventHandlerWithDownloadSupport';
+import { IStoreHandler } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 
-export class XPromoOverlayEventHandler extends OverlayEventHandler<XPromoCampaign> {
+export class XPromoOverlayEventHandler extends OverlayEventHandlerWithDownloadSupport<XPromoCampaign> {
     private _xPromoAdUnit: XPromoAdUnit;
 
-    constructor(nativeBridge: NativeBridge, adUnit: XPromoAdUnit, parameters: IXPromoAdUnitParameters) {
-        super(nativeBridge, adUnit, parameters);
+    constructor(adUnit: XPromoAdUnit, parameters: IXPromoAdUnitParameters, storeHandler: IStoreHandler) {
+        super(adUnit, parameters, storeHandler);
         this._xPromoAdUnit = adUnit;
     }
 

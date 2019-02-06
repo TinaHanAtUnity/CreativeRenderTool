@@ -14,19 +14,23 @@ import { SensorDelay } from 'Core/Constants/Android/SensorDelay';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { AuctionV5Test, ABGroup } from 'Core/Models/ABGroup';
+import { ProgrammaticTrackingErrorName, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
+    adMobSignalFactory: AdMobSignalFactory;
 }
 
 export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
+
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _options: any;
+    private _options: unknown;
     private _keyDownListener: (kc: number) => void;
     private _campaign: AdMobCampaign;
     private _placement: Placement;
@@ -34,9 +38,11 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _startTime: number = 0;
     private _requestToViewTime: number = 0;
     private _clientInfo: ClientInfo;
+    private _pts: ProgrammaticTrackingService;
+    private _abGroup: ABGroup;
 
-    constructor(nativeBridge: NativeBridge, parameters: IAdMobAdUnitParameters) {
-        super(nativeBridge, parameters);
+    constructor(parameters: IAdMobAdUnitParameters) {
+        super(parameters);
         this._operativeEventManager = parameters.operativeEventManager;
         this._view = parameters.view;
         this._options = parameters.options;
@@ -46,6 +52,8 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._clientInfo = parameters.clientInfo;
+        this._pts = parameters.programmaticTrackingService;
+        this._abGroup = parameters.coreConfig.getAbGroup();
 
         // TODO, we skip initial because the AFMA grantReward event tells us the video
         // has been completed. Is there a better way to do this with AFMA right now?
@@ -57,8 +65,8 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowing(true);
 
         this.sendTrackingEvent('show');
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
+        if (this._platform === Platform.ANDROID) {
+            this._ads.Android!.AdUnit.onKeyDown.subscribe(this._keyDownListener);
         }
 
         this._container.addEventHandler(this);
@@ -93,9 +101,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.sendTrackingEvent('click');
         this._operativeEventManager.sendClick(this.getOperativeEventParams());
 
-        UserCountData.getClickCount(this._nativeBridge).then((clickCount) => {
+        UserCountData.getClickCount(this._core).then((clickCount) => {
             if (typeof clickCount === 'number') {
-                UserCountData.setClickCount(clickCount + 1, this._nativeBridge);
+                UserCountData.setClickCount(clickCount + 1, this._core);
             }
         }).catch(() => {
             Diagnostics.trigger('request_count_failure', {
@@ -105,9 +113,11 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendStartEvent() {
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
+        this._ads.Listener.sendStartEvent(this._placement.getId());
         this.sendTrackingEvent('start');
-        this._operativeEventManager.sendStart(this.getOperativeEventParams());
+        this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
+            this.onStartProcessed.trigger();
+        });
     }
 
     public sendSkipEvent() {
@@ -139,6 +149,10 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendTrackingEvent(event: string) {
         const urls = this._campaign.getTrackingUrlsForEvent(event);
+        if (urls.length === 0 && event === 'start') {
+            this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
+        }
+
         for (const url of urls) {
             this._thirdPartyEventManager.sendWithGet(`admob ${event}`, this._campaign.getSession().getId(), url);
         }
@@ -153,8 +167,8 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerShow(): void {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
+        if (this._platform === Platform.IOS) {
+            this._core.SensorInfo.Ios!.startAccelerometerUpdates(new Double(0.01));
         }
     }
 
@@ -164,7 +178,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerBackground(): void {
-        this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
+        this._core.SensorInfo.stopAccelerometerUpdates();
 
         if (this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
             this.setFinishState(FinishState.SKIPPED);
@@ -184,11 +198,11 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private startAccelerometerUpdates(): void {
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.SensorInfo.Android.startAccelerometerUpdates(SensorDelay.SENSOR_DELAY_FASTEST);
-            this._nativeBridge.AndroidAdUnit.startMotionEventCapture(10000);
+        if (this._platform === Platform.ANDROID) {
+            this._core.SensorInfo.Android!.startAccelerometerUpdates(SensorDelay.SENSOR_DELAY_FASTEST);
+            this._ads.Android!.AdUnit.startMotionEventCapture(10000);
         } else {
-            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
+            this._core.SensorInfo.Ios!.startAccelerometerUpdates(new Double(0.01));
         }
     }
 
@@ -199,18 +213,18 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private onHide() {
         this.setShowing(false);
-        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
 
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._keyDownListener);
+        if (this._platform === Platform.ANDROID) {
+            this._ads.Android!.AdUnit.onKeyDown.unsubscribe(this._keyDownListener);
         }
 
-        this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
+        this._core.SensorInfo.stopAccelerometerUpdates();
 
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.AndroidAdUnit.endMotionEventCapture();
-            this._nativeBridge.AndroidAdUnit.clearMotionEventCapture();
+        if (this._platform === Platform.ANDROID) {
+            this._ads.Android!.AdUnit.endMotionEventCapture();
+            this._ads.Android!.AdUnit.clearMotionEventCapture();
         }
 
         if (this.getFinishState() === FinishState.SKIPPED) {

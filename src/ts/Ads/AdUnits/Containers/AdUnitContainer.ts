@@ -1,5 +1,3 @@
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-
 export enum Orientation {
     NONE,
     PORTRAIT,
@@ -18,6 +16,10 @@ export enum AdUnitContainerSystemMessage {
     AUDIO_SESSION_INTERRUPT_ENDED,
     AUDIO_SESSION_ROUTE_CHANGED,
     AUDIO_SESSION_CATEGORY_CHANGED
+}
+
+export interface IAdUnit {
+    description(): string;
 }
 
 export interface IAdUnitContainerListener {
@@ -44,10 +46,10 @@ export abstract class AdUnitContainer {
     protected _handlers: IAdUnitContainerListener[] = [];
     protected _paused = false;
 
-    public abstract open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: any): Promise<void>;
+    public abstract open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: unknown): Promise<void>;
     public abstract close(): Promise<void>;
-    public abstract reconfigure(configuration: ViewConfiguration): Promise<any[]>;
-    public abstract reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any[]>;
+    public abstract reconfigure(configuration: ViewConfiguration): Promise<unknown[]>;
+    public abstract reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<void>;
     public abstract isPaused(): boolean;
     public abstract setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void>;
     public abstract getViews(): Promise<string[]>;

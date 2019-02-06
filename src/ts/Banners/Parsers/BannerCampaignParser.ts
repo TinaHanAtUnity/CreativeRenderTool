@@ -3,8 +3,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
+import { Platform } from 'Core/Constants/Platform';
 
 export class BannerCampaignParser extends CampaignParser {
     public static ContentTypeJS = 'programmatic/banner-js';
@@ -12,15 +11,15 @@ export class BannerCampaignParser extends CampaignParser {
 
     private _wrapJS = false;
 
-    constructor(wrapJS: boolean = false) {
-        super();
+    constructor(platform: Platform, wrapJS: boolean = false) {
+        super(platform);
         this._wrapJS = wrapJS;
     }
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const markup = this._wrapJS ? this.getJSContent(response) : this.getHTMLContent(response);
         const campaign = <IBannerCampaign>{
-            id: this.getProgrammaticCampaignId(nativeBridge),
+            id: this.getProgrammaticCampaignId(),
             adType: response.getAdType(),
             correlationId: response.getCorrelationId(),
             mediaId: response.getMediaId(),
@@ -30,7 +29,7 @@ export class BannerCampaignParser extends CampaignParser {
             seatId: response.getSeatId(),
             willExpireAt: response.getCacheTTL(),
             markup: markup,
-            trackingUrls: response.getTrackingUrls(),
+            trackingUrls: response.getTrackingUrls() || {},
             width: response.getWidth(),
             height: response.getHeight()
         };

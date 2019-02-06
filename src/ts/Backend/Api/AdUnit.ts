@@ -2,10 +2,13 @@ import { BackendApi } from 'Backend/BackendApi';
 import { Platform } from 'Core/Constants/Platform';
 
 export class AdUnit extends BackendApi {
+    private _activityId: number;
 
     public open(activityId: number, views: string[], orientation: number, keyEvents: string[], systemUiVisibility: number, hardwareAcceleration: boolean) {
         const videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
         const webView = <HTMLIFrameElement>window.parent.document.getElementById('webView');
+
+        this._activityId = activityId;
 
         if(videoView) {
             videoView.style.display = 'block';
@@ -43,6 +46,20 @@ export class AdUnit extends BackendApi {
 
         if(webView) {
             webView.style.display = 'none';
+        }
+
+        const platform = this._backend.getPlatform();
+        if(platform === Platform.ANDROID) {
+            setTimeout(() => {
+                this._backend.sendEvent('ADUNIT', 'ON_PAUSE', false, this._activityId);
+                this._backend.sendEvent('ADUNIT', 'ON_STOP', this._activityId);
+                this._backend.sendEvent('ADUNIT', 'ON_DESTROY', true, this._activityId);
+            }, 0);
+        } else if(platform === Platform.IOS) {
+            setTimeout(() => {
+                this._backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_WILL_DISAPPEAR');
+                this._backend.sendEvent('ADUNIT', 'VIEW_CONTROLLER_DID_DISAPPEAR');
+            }, 0);
         }
     }
 

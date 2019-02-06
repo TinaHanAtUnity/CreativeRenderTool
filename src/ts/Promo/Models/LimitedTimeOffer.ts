@@ -10,6 +10,11 @@ export interface ILimitedTimeOfferData {
     firstImpression: Date | undefined;
 }
 
+export interface IRawLimitedTimeOfferData {
+    duration: number;
+    firstImpression: number | undefined;
+}
+
 export class LimitedTimeOffer extends Model<ILimitedTimeOffer> {
     constructor(data: ILimitedTimeOfferData) {
         super('LimitedTimeOffer', {

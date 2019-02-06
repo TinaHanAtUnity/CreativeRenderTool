@@ -1,11 +1,12 @@
-import { Request, INativeResponse } from 'Core/Utilities/Request';
 import { ICampaignErrorHandler } from 'Ads/Errors/CampaignErrorHandlerFactory';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CampaignError } from 'Ads/Errors/CampaignError';
+import { ICoreApi } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 
 // VAST Error code defined in 3.0
 // https://wiki.iabtechlab.com/index.php?title=VAST_Error_Code_Troubleshooting_Matrix
+// https://iabtechlab.com/wp-content/uploads/2018/11/VAST4.1-final-Nov-8-2018.pdf   Page 28 for error codes
 export enum VastErrorCode {
     XML_PARSER_ERROR = 100,
     SCHEMA_VAL_ERROR = 101,
@@ -53,7 +54,7 @@ export class VastErrorInfo {
         // code 5xx for Non-Linear ads
         [VastErrorCode.COMPANION_GENERAL_ERROR]: 'General error from Companion Ad',
         [VastErrorCode.COMPANION_SIZE_UNSUPPORTED]: 'Companion creative size unsupported',
-        [VastErrorCode.COMPANION_UNABLE_TO_DISPLAY]: 'Companion unable to displayg',
+        [VastErrorCode.COMPANION_UNABLE_TO_DISPLAY]: 'Companion unable to display',
         [VastErrorCode.COMPANION_UNABLE_TO_FETCH]: 'Unable to fetch Companion resource',
         [VastErrorCode.COMPANION_RESOURCE_NOT_FOUND]: 'Supported Companion resource not found',
         [VastErrorCode.UNDEFINED_ERROR]: 'Undefined Error',
@@ -63,19 +64,19 @@ export class VastErrorInfo {
 }
 
 export class VastCampaignErrorHandler implements ICampaignErrorHandler {
-    private _request: Request;
-    private _nativeBridge: NativeBridge;
+    private _core: ICoreApi;
+    private _request: RequestManager;
 
-    constructor(nativeBridge: NativeBridge, request: Request) {
+    constructor(core: ICoreApi, request: RequestManager) {
         this._request = request;
-        this._nativeBridge = nativeBridge;
+        this._core = core;
     }
 
     public handleCampaignError(campaignError: CampaignError): Promise<void> {
         if (campaignError.errorTrackingUrl) {
             const errorCode = campaignError.errorCode ? campaignError.errorCode : VastErrorCode.UNDEFINED_ERROR;
             const errorUrl = this.formatVASTErrorURL(campaignError.errorTrackingUrl, errorCode, campaignError.assetUrl);
-            this._nativeBridge.Sdk.logInfo(`VAST Campaign Error tracking url: ${errorUrl} with errorCode: ${errorCode} errorMessage: ${campaignError.errorMessage}`);
+            this._core.Sdk.logInfo(`VAST Campaign Error tracking url: ${errorUrl} with errorCode: ${errorCode} errorMessage: ${campaignError.errorMessage}`);
 
             this._request.get(errorUrl, []).then(() => {
                 return Promise.resolve();

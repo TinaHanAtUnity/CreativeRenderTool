@@ -1,3 +1,4 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable2 } from 'Core/Utilities/Observable';
@@ -24,7 +25,7 @@ export class StorageApi extends NativeApi {
     public onSet: Observable2<string, object> = new Observable2();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Storage', ApiPackage.CORE);
+        super(nativeBridge, 'Storage', ApiPackage.CORE, EventCategory.STORAGE);
     }
 
     public read(type: StorageType): Promise<void> {
@@ -55,10 +56,10 @@ export class StorageApi extends NativeApi {
         return this._nativeBridge.invoke<string[]>(this._fullApiClassName, 'getKeys', [StorageType[type], key, recursive]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case StorageEvent[StorageEvent.SET]:
-                this.onSet.trigger(parameters[0], parameters[1]);
+                this.onSet.trigger(<string>parameters[0], <object>parameters[1]);
                 break;
 
             default:

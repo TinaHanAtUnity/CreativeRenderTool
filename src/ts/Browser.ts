@@ -1,9 +1,15 @@
+import 'Workarounds';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
 import { Platform } from 'Core/Constants/Platform';
 import { Backend } from 'Backend/Backend';
-import 'Workarounds';
+import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
+import { ConfigManager } from 'Core/Managers/ConfigManager';
+import { toAbGroup } from 'Core/Models/ABGroup';
+import { ARUtil } from 'AR/Utilities/ARUtil';
+import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
+import { ICoreApi } from 'Core/ICore';
 
 document.addEventListener('DOMContentLoaded', () => {
     const resizeHandler = (event?: Event) => {
@@ -26,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const JS_FUNC_NAME_GET_HEADLESS = 'getHeadless';
 
     const setClientInfo = () => {
-        const fields: Array<[string, string, ((element: HTMLInputElement) => any) | undefined]> = [
+        const fields: [string, string, ((element: HTMLInputElement) => unknown) | undefined][] = [
             ['appName', 'setAppName', undefined],
             ['appVersion', 'setAppVersion', undefined],
             ['sdkVersion', 'setSdkVersion', toInt],
@@ -39,14 +45,15 @@ document.addEventListener('DOMContentLoaded', () => {
             ['initTimeStamp', 'setInitTimeStamp', toInt],
             ['reinitialized', 'setReinitialized', toBoolean]
         ];
-        fields.forEach(([field, setter, parser]: [string, string, ((element: HTMLInputElement) => any) | undefined]) => {
+        fields.forEach(([field, setter, parser]: [string, string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById(field);
+            // tslint:disable-next-line
             (<any>UnityAds.getBackend().Api.Sdk)[setter](parser ? parser(element) : element.value);
         });
     };
 
     const setAndroidDeviceInfo = () => {
-        const fields: Array<[string, ((element: HTMLInputElement) => any) | undefined]> = [
+        const fields: [string, ((element: HTMLInputElement) => unknown) | undefined][] = [
             ['AdvertisingTrackingId', undefined],
             ['LimitAdTrackingFlag', toBoolean],
             ['AndroidId', undefined],
@@ -76,14 +83,15 @@ document.addEventListener('DOMContentLoaded', () => {
             ['BatteryStatus', toInt],
             ['RingerMode', toInt]
         ];
-        fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => any) | undefined]) => {
+        fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById('android' + field);
+            // tslint:disable-next-line
             (<any>UnityAds.getBackend().Api.DeviceInfo)['set' + field](parser ? parser(element) : element.value);
         });
     };
 
     const setIosDeviceInfo = () => {
-        const fields: Array<[string, ((element: HTMLInputElement) => any) | undefined]> = [
+        const fields: [string, ((element: HTMLInputElement) => unknown) | undefined][] = [
             ['AdvertisingTrackingId', undefined],
             ['LimitAdTrackingFlag', toBoolean],
             ['Manufacturer', undefined],
@@ -111,8 +119,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ['UserInterfaceIdiom', toInt],
             ['Simulator', toBoolean]
         ];
-        fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => any) | undefined]) => {
+        fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById('ios' + field);
+            // tslint:disable-next-line
             (<any>UnityAds.getBackend().Api.DeviceInfo)['set' + field](parser ? parser(element) : element.value);
         });
     };
@@ -138,40 +147,25 @@ document.addEventListener('DOMContentLoaded', () => {
             autoSkipElement.disabled = true;
             initializeButton.disabled = true;
 
-            const publicStorage: any = {
-                test: {}
-            };
+            if (abGroupElement.value.length) {
+                ConfigManager.setAbGroup(toAbGroup(parseInt(abGroupElement.value, 10)));
+            }
 
-            if(abGroupElement.value.length) {
-                publicStorage.test.abGroup = {
-                    value: parseInt(abGroupElement.value, 10),
-                    ts: Date.now()
-                };
+            if (campaignIdElement.value.length) {
+                CampaignManager.setCampaignId(campaignIdElement.value);
             }
-            if(campaignIdElement.value.length) {
-                publicStorage.test.campaignId = {
-                    value: campaignIdElement.value,
-                    ts: Date.now()
-                };
+
+            if (countryElement.value.length) {
+                CampaignManager.setCountry(countryElement.value);
             }
-            if(countryElement.value.length) {
-                publicStorage.test.country = {
-                    value: countryElement.value,
-                    ts: Date.now()
-                };
+
+            if (autoSkipElement.checked) {
+                NewVideoOverlay.setAutoSkip(autoSkipElement.checked);
             }
-            if(autoSkipElement.checked) {
-                publicStorage.test.autoSkip = {
-                    value: true,
-                    ts: Date.now()
-                };
-            }
-            if(campaignResponseElement.value.length) {
+
+            if (campaignResponseElement.value.length) {
                 CampaignManager.setCampaignResponse(campaignResponseElement.value);
             }
-
-            window.sessionStorage.clear();
-            window.sessionStorage.setItem('PUBLIC', JSON.stringify(publicStorage));
 
             // tslint:disable:no-console
             const listener: IUnityAdsListener = {
@@ -207,6 +201,10 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             // tslint:enable:no-console
 
+            ARUtil.isARSupported = () => Promise.resolve(false);
+            PermissionsUtil.checkPermissionInManifest = () => Promise.resolve(false);
+            PermissionsUtil.checkPermissions = (platform: Platform, core: ICoreApi, permission: PermissionTypes) => Promise.resolve(CurrentPermission.DENIED);
+
             switch(platformElement.value) {
                 case 'android':
                     UnityAds.setBackend(new Backend(Platform.ANDROID));
@@ -229,6 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
+        // tslint:disable-next-line
         if((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS]()) {
             initialize();
         } else {
@@ -236,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 event.preventDefault();
                 initialize();
             }, false);
+            // tslint:disable-next-line
             (<any>window).parent.document.getElementById('initialize').disabled = false;
         }
     }

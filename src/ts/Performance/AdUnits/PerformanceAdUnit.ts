@@ -3,7 +3,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
@@ -11,7 +10,6 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;
     adUnitStyle?: AdUnitStyle;
-    privacy: AbstractPrivacy;
 }
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
@@ -21,8 +19,8 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
     private _performanceCampaign: PerformanceCampaign;
     private _thirdPartyEventManager: ThirdPartyEventManager;
 
-    constructor(nativeBridge: NativeBridge, parameters: IPerformanceAdUnitParameters) {
-        super(nativeBridge, parameters);
+    constructor(parameters: IPerformanceAdUnitParameters) {
+        super(parameters);
 
         parameters.overlay.setSpinnerEnabled(!CampaignAssetInfo.isCached(parameters.campaign));
 

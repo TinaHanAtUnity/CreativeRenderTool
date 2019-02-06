@@ -3,7 +3,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1 } from 'Core/Utilities/Observable';
 
 export class AndroidARApi extends NativeApi {
-    public readonly onAndroidEnumsReceived = new Observable1<any>();
+    public readonly onAndroidEnumsReceived = new Observable1<unknown>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'AR', ApiPackage.AR);
@@ -14,7 +14,7 @@ export class AndroidARApi extends NativeApi {
     }
 
     public initAR(): Promise<void> {
-        return this._nativeBridge.invoke<any>(this._fullApiClassName, 'getAndroidConfigEnums').then((enums) => {
+        return this._nativeBridge.invoke<unknown>(this._fullApiClassName, 'getAndroidConfigEnums').then((enums) => {
             this.onAndroidEnumsReceived.trigger(enums);
 
             return Promise.resolve();
@@ -23,5 +23,13 @@ export class AndroidARApi extends NativeApi {
 
     public advanceFrame(): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'advanceFrame');
+    }
+
+    public swapBuffers(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'swapBuffers');
+    }
+
+    public setViewRenderMode(mode: number): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setViewRenderMode', [mode]);
     }
 }

@@ -1,65 +1,38 @@
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
-import { IMRAIDViewHandler, MRAIDView } from 'MRAID//Views/MRAIDView';
-import { PlayableMRAID } from 'MRAID//Views/PlayableMRAID';
-import { ARUtil } from 'AR/Utilities/ARUtil';
-import { ARMRAID } from 'AR/Views/ARMRAID';
-import { MRAID } from 'MRAID//Views/MRAID';
-import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { PlayableEventHandler } from 'MRAID/EventHandlers/PlayableEventHandler';
-import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
-import { Privacy } from 'Ads/Views/Privacy';
+import { ARMRAID } from 'AR/Views/ARMRAID';
+import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
+import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
+import { PerformanceMRAIDEventHandler } from 'MRAID/EventHandlers/PerformanceMRAIDEventHandler';
+import { ARMRAIDEventHandler } from 'AR/EventHandlers/ARMRAIDEventHandler';
+import { ProgrammaticMRAIDEventHandler } from 'MRAID/EventHandlers/ProgrammaticMRAIDEventHandler';
+import { WebPlayerMRAIDTest } from 'Core/Models/ABGroup';
+import { WebPlayerMRAIDAdUnit } from 'MRAID/AdUnits/WebPlayerMRAIDAdUnit';
 
-export class MRAIDAdUnitFactory extends AbstractAdUnitFactory {
+export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
+    public createAdUnit(parameters: IMRAIDAdUnitParameters): MRAIDAdUnit {
+        let mraidAdUnit: MRAIDAdUnit;
 
-    private static _forcedPlayableMRAID: boolean = false;
-    private static _forcedARMRAID: boolean = false;
-
-    public static setForcedPlayableMRAID(value: boolean) {
-        MRAIDAdUnitFactory._forcedPlayableMRAID = value;
-    }
-
-    public static setForcedARMRAID(value: boolean) {
-        MRAIDAdUnitFactory._forcedARMRAID = value;
-    }
-
-    public createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<MRAIDCampaign>): MRAIDAdUnit {
-        const resourceUrl = parameters.campaign.getResourceUrl();
-
-        let mraid: MRAIDView<IMRAIDViewHandler>;
-        const showGDPRBanner = this.showGDPRBanner(parameters);
-        const privacy = this.createPrivacy(nativeBridge, parameters);
-
-        parameters.gameSessionId = parameters.gameSessionId || 0;
-
-        if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || MRAIDAdUnitFactory._forcedPlayableMRAID) {
-            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
-        } else if (ARUtil.isARCreative(parameters.campaign) || MRAIDAdUnitFactory._forcedARMRAID) {
-            mraid = new ARMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
+        if (WebPlayerMRAIDTest.isValid(parameters.coreConfig.getAbGroup())) {
+            mraidAdUnit = new WebPlayerMRAIDAdUnit(parameters);
         } else {
-            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.coreConfig.getAbGroup(), parameters.gameSessionId);
+            mraidAdUnit = new MRAIDAdUnit(parameters);
         }
 
-        const mraidAdUnitParameters: IMRAIDAdUnitParameters = {
-            ... parameters,
-            mraid: mraid,
-            privacy: privacy
-        };
-
-        const mraidAdUnit: MRAIDAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
-
-        // NOTE: When content type is correct for playables we want to change this to content type check.
-        const isPlayable: boolean = parameters.campaign instanceof PerformanceMRAIDCampaign;
-        const isSonicPlayable: boolean = CustomFeatures.isSonicPlayable(parameters.campaign.getCreativeId());
-        const EventHandler =  (isSonicPlayable || isPlayable) ? PlayableEventHandler : MRAIDEventHandler;
-        const mraidEventHandler: IMRAIDViewHandler = new EventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
-        mraid.addEventHandler(mraidEventHandler);
-        Privacy.setupReportListener(privacy, mraidAdUnit);
+        const mraidEventHandler: IMRAIDViewHandler = this.getMRAIDEventHandler(mraidAdUnit, parameters);
+        parameters.mraid.addEventHandler(mraidEventHandler);
         return mraidAdUnit;
     }
 
+    private getMRAIDEventHandler(mraidAdUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters): IMRAIDViewHandler {
+        if (CustomFeatures.isSonicPlayable(parameters.campaign.getCreativeId()) || parameters.campaign instanceof PerformanceMRAIDCampaign) {
+            return new PerformanceMRAIDEventHandler(mraidAdUnit, parameters);
+        } else if (parameters.mraid instanceof ARMRAID) {
+            return new ARMRAIDEventHandler(mraidAdUnit, parameters);
+        } else {
+            return new ProgrammaticMRAIDEventHandler(mraidAdUnit, parameters);
+        }
+    }
 }

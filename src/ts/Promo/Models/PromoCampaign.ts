@@ -1,28 +1,43 @@
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
+import { IRawLimitedTimeOfferData, LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
+import { IRawPromoOrientationAsset, PromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
+import { ProductInfo, IRawProductInfo } from 'Promo/Models/ProductInfo';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { LimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
-import { ProductInfo } from 'Promo/Models/ProductInfo';
+import { Asset } from 'Ads/Models/Assets/Asset';
+
+export interface IRawPromoCampaign {
+    expiry?: string;
+    creativeUrl?: string;
+    dynamicMarkup: string | undefined;
+    limitedTimeOffer: IRawLimitedTimeOfferData | undefined;
+    costs: IRawProductInfo[];
+    payouts: IRawProductInfo[];
+    premiumProduct: IRawProductInfo;
+    iapProductId?: string;
+    portrait: IRawPromoOrientationAsset;
+    landscape: IRawPromoOrientationAsset;
+}
 
 export interface IPromoCampaign extends ICampaign {
-    additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
     dynamicMarkup: string | undefined;
     creativeAsset: HTML | undefined;
-    rewardedPromo: boolean;
     limitedTimeOffer: LimitedTimeOffer | undefined;
     costs: ProductInfo[];
     payouts: ProductInfo[];
     premiumProduct: ProductInfo;
+    portraitAssets: PromoOrientationAsset | undefined;
+    landscapeAssets: PromoOrientationAsset | undefined;
 }
 
 export class PromoCampaign extends Campaign<IPromoCampaign> {
     constructor(campaign: IPromoCampaign) {
         super('PromoCampaign', {
             ... Campaign.Schema,
-            additionalTrackingEvents: ['object', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
             creativeAsset: ['object', 'undefined'],
-            rewardedPromo: ['boolean'],
+            portraitAssets: ['object', 'undefined'],
+            landscapeAssets: ['object', 'undefined'],
             limitedTimeOffer: ['object', 'undefined'],
             payouts: ['array'],
             costs: ['array'],
@@ -41,13 +56,13 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
     }
 
     private createTrackingEventUrlsWithProductType(productType: string): { [url: string]: string[] } {
-        const additionalTrackingEvents = this.get('additionalTrackingEvents');
+        const trackingUrls = this.get('trackingUrls');
         const result: { [url: string]: string[] } = { };
-        if (additionalTrackingEvents !== undefined) {
-            for (const key in additionalTrackingEvents) {
-                if(additionalTrackingEvents.hasOwnProperty(key)) {
+        if (trackingUrls !== undefined) {
+            for (const key in trackingUrls) {
+                if(trackingUrls.hasOwnProperty(key)) {
                     result[key] = [];
-                    const trackingURLs = additionalTrackingEvents[key];
+                    const trackingURLs = trackingUrls[key];
                     for(const trackingURL of trackingURLs) {
                         if(trackingURL) {
                             const isStagingURL = trackingURL.indexOf('events-iap.staging.unityads.unity3d.com') !== -1;
@@ -69,21 +84,29 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         const productId = this.getIapProductId();
         const productType = PurchasingUtilities.getProductType(productId);
         if (productType === undefined) {
-            return this.get('additionalTrackingEvents');
+            return this.get('trackingUrls');
         }
         return this.createTrackingEventUrlsWithProductType(productType);
     }
 
-    public getTrackingUrlsForEvent(eventName: string): string[] {
-        const trackingUrls = this.getTrackingEventUrls();
-        if (trackingUrls) {
-            return trackingUrls[eventName] || [];
+    public getTrackingUrlsForEvent(event: string): string[] {
+        const urls = this.getTrackingEventUrls();
+        if (urls) {
+            return urls[event] || [];
         }
         return [];
     }
 
     public getCreativeResource(): HTML | undefined {
         return this.get('creativeAsset');
+    }
+
+    public getPortraitAssets(): PromoOrientationAsset | undefined {
+        return this.get('portraitAssets');
+    }
+
+    public getLandscapeAssets(): PromoOrientationAsset | undefined {
+        return this.get('landscapeAssets');
     }
 
     public getDynamicMarkup(): string | undefined {
@@ -94,13 +117,33 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         return this.get('premiumProduct').getId();
     }
 
-    public getRequiredAssets() : HTML[] {
+    public getRequiredAssets() : Asset[] {
+        const assetList: Asset[] = [];
         const creativeResource = this.getCreativeResource();
-        if (creativeResource) {
-            return [creativeResource];
+        if (this.isUsingServerTemplate() && creativeResource) {
+            assetList.push(creativeResource);
+        } else {
+            const orientationResources = this.getOrientationResources();
+            for(const orientationResource of orientationResources) {
+                assetList.push(orientationResource.getButtonAsset().getImage());
+                assetList.push(orientationResource.getBackgroundAsset().getImage());
+            }
         }
-        return [];
+        return assetList;
     }
+
+    public getOrientationResources(): PromoOrientationAsset[] {
+        const resources = [];
+        const landscape = this.getLandscapeAssets();
+        if (landscape) {
+           resources.push(landscape);
+        }
+        const portrait = this.getPortraitAssets();
+        if (portrait) {
+          resources.push(portrait);
+        }
+        return resources;
+      }
 
     public getPayouts() : ProductInfo[] {
         return this.get('payouts');
@@ -110,15 +153,21 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         return this.get('costs');
     }
 
-    public getOptionalAssets() {
+    public getOptionalAssets(): Asset[] {
         return [];
-    }
-
-    public getRewardedPromo(): boolean {
-        return this.get('rewardedPromo');
     }
 
     public getLimitedTimeOffer(): LimitedTimeOffer | undefined {
         return this.get('limitedTimeOffer');
+    }
+
+    public isUsingServerTemplate(): boolean {
+        const orientationResources = [this.getPortraitAssets(), this.getLandscapeAssets()];
+        for(const orientationResource of orientationResources) {
+            if (orientationResource) {
+                return false;
+            }
+        }
+        return true;
     }
 }

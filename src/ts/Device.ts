@@ -111,6 +111,5 @@ if(typeof location !== 'undefined') {
     const extWindow = <IExtendedWindow> window;
     extWindow.nativebridge = nativeBridge;
     extWindow.webview = new WebView(nativeBridge);
-
     document.addEventListener('DOMContentLoaded', () => extWindow.webview.initialize(), false);
 }

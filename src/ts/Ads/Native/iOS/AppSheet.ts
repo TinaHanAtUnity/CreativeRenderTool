@@ -1,3 +1,4 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
@@ -59,7 +60,7 @@ export class AppSheetApi extends NativeApi {
     public readonly onError = new Observable2<string, IAppSheetOptions>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AppSheet', ApiPackage.CORE);
+        super(nativeBridge, 'AppSheet', ApiPackage.CORE, EventCategory.APPSHEET);
     }
 
     public canOpen(): Promise<boolean> {
@@ -89,22 +90,22 @@ export class AppSheetApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getPrepareTimeout');
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case AppSheetEvent[AppSheetEvent.PREPARED]:
-                this.onPrepared.trigger(parameters[0]);
+                this.onPrepared.trigger(<IAppSheetOptions>parameters[0]);
                 break;
 
             case AppSheetEvent[AppSheetEvent.OPENED]:
-                this.onOpen.trigger(parameters[0]);
+                this.onOpen.trigger(<IAppSheetOptions>parameters[0]);
                 break;
 
             case AppSheetEvent[AppSheetEvent.CLOSED]:
-                this.onClose.trigger(parameters[0]);
+                this.onClose.trigger(<IAppSheetOptions>parameters[0]);
                 break;
 
             case AppSheetEvent[AppSheetEvent.FAILED]:
-                this.onError.trigger(parameters[0], parameters[1]);
+                this.onError.trigger(<string>parameters[0], <IAppSheetOptions>parameters[1]);
                 break;
 
             default:

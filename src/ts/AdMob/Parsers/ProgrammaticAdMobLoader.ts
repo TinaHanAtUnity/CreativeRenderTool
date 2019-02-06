@@ -1,5 +1,5 @@
-import { CampaignLoader } from 'Ads/Parsers/CampaignLoader';
 import { AdMobCampaign, AdMobVideo } from 'AdMob/Models/AdMobCampaign';
+import { CampaignLoader } from 'Ads/Parsers/CampaignLoader';
 
 export class ProgrammaticAdMobLoader extends CampaignLoader {
     public load(data: string): AdMobCampaign | undefined {
@@ -9,6 +9,8 @@ export class ProgrammaticAdMobLoader extends CampaignLoader {
         } catch(e) {
             return undefined;
         }
+
+        campaign.backupCampaign = true;
 
         if(campaign.session) {
             campaign.session = this.loadSession(campaign.session);

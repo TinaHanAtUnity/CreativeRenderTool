@@ -1,22 +1,37 @@
 import { BackendApi } from 'Backend/BackendApi';
 
+export interface IRequestLogEntry {
+    method: string;
+    url: string;
+}
+
 export class Request extends BackendApi {
 
     private _retryCount: number = 0;
     private _toggleUrl: boolean = false;
     private _passthrough = false;
+    private _requestLog: IRequestLogEntry[] = [];
 
-    public getLog() {
-        return this._requestLog;
+    public getLog(method?: string | RegExp): string[] {
+        let entries: IRequestLogEntry[];
+        if (method) {
+            entries = this._requestLog.filter((entry) => entry.method.match(method));
+        } else {
+            entries = this._requestLog;
+        }
+        return entries.map((entry) => entry.url);
     }
 
-    public setLog(requestLog: string[]) {
+    public setLog(requestLog: IRequestLogEntry[]) {
         this._requestLog = requestLog;
     }
 
-    public get(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
+    public get(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
         if(this._passthrough) {
-            this._requestLog.push(url);
+            this._requestLog.push({
+                method: 'GET',
+                url: url
+            });
             const xhr = new XMLHttpRequest();
             xhr.onload = (event: Event) => {
                 this._backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
@@ -71,9 +86,12 @@ export class Request extends BackendApi {
         }
     }
 
-    public head(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
+    public head(id: string, url: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
         if(this._passthrough) {
-            this._requestLog.push(url);
+            this._requestLog.push({
+                method: 'HEAD',
+                url: url
+            });
             const xhr = new XMLHttpRequest();
             xhr.onload = (event: Event) => {
                 this._backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
@@ -91,19 +109,25 @@ export class Request extends BackendApi {
             }
         } else if (url.indexOf('/recursiveResponseCode') !== -1) {
             this.sendSuccessResponse(id, url, 'Recursive redirect response', 301, [['location', 'http://www.example.org/recursiveResponseCode/']]);
+        } else if (url.indexOf('/rejectedResponseCode') !== -1) {
+            this.sendFailResponse(id, url, 'Fail response');
         } else {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
         }
     }
 
-    public post(id: string, url: string, body: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number) {
+    public post(id: string, url: string, body: string, headers: [string, string][], connectTimeout: number, readTimeout: number) {
         if(this._passthrough) {
-            this._requestLog.push(url);
+            this._requestLog.push({
+                method: 'POST',
+                url: url
+            });
             const xhr = new XMLHttpRequest();
             xhr.onload = (event: Event) => {
                 this._backend.sendEvent('REQUEST', 'COMPLETE', id, url, xhr.responseText, xhr.status, xhr.getAllResponseHeaders());
             };
             xhr.open('POST', url);
+            xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.send(body);
             return;
         }
@@ -149,13 +173,11 @@ export class Request extends BackendApi {
         this._passthrough = value;
     }
 
-    private _requestLog: string[] = [];
-
     public setToggleUrl(status: boolean) {
         this._toggleUrl = status;
     }
 
-    private sendSuccessResponse(id: string, url: string, body: string, responseCode: number, headers: Array<[string, string]>) {
+    private sendSuccessResponse(id: string, url: string, body: string, responseCode: number, headers: [string, string][]) {
         this._backend.sendEvent('REQUEST', 'COMPLETE', id, url, body, responseCode, headers);
     }
 

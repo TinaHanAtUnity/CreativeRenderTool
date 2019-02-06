@@ -1,14 +1,18 @@
 import { EndScreenEventHandler, IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHandler';
 import { KeyCode } from 'Core/Constants/Android/KeyCode';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
+import { IStoreHandler, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<PerformanceCampaign, PerformanceAdUnit> {
 
-    constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters) {
-        super(nativeBridge, adUnit, parameters);
+    private _thirdPartyEventManager: ThirdPartyEventManager;
+
+    constructor(adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters, storeHandler: IStoreHandler) {
+        super(adUnit, parameters, storeHandler);
+        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
     }
 
     public onKeyEvent(keyCode: number): void {
@@ -17,7 +21,7 @@ export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<Perf
         }
     }
 
-    public onEndScreenDownload(parameters: IEndScreenDownloadParameters): void {
+    public onEndScreenDownload(parameters: IStoreHandlerDownloadParameters): void {
         super.onEndScreenDownload(parameters);
         this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.CLICK);
     }

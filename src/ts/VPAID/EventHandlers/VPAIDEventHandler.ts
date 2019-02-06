@@ -1,31 +1,43 @@
+import { IAdsApi } from 'Ads/IAds';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { Closer } from 'Ads/Views/Closer';
 import { FinishState } from 'Core/Constants/FinishState';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/ICore';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDHandler } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 
+export interface IVPAIDEventHandlerParameters {
+    operativeEventManager: OperativeEventManager;
+    thirdPartyEventManager: ThirdPartyEventManager;
+    campaign: VPAIDCampaign;
+    placement: Placement;
+    closer: Closer;
+    core: ICoreApi;
+    ads: IAdsApi;
+    endScreen: VPAIDEndScreen | undefined;
+}
+
 export class VPAIDEventHandler implements IVPAIDHandler {
-    private _nativeBridge: NativeBridge;
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adUnit: VPAIDAdUnit;
-    private _vpaidEventHandlers: { [key: string]: () => void } = {};
+    private _vpaidEventHandlers: { [key: string]: (...args: unknown[]) => void } = {};
     private _vpaidCampaign: VPAIDCampaign;
     private _placement: Placement;
     private _vpaidEndScreen: VPAIDEndScreen | undefined;
     private _closer: Closer;
     private _adDuration: number = -2;
     private _adRemainingTime: number = -2;
+    private _core: ICoreApi;
+    private _ads: IAdsApi;
 
-    constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
-        this._nativeBridge = nativeBridge;
+    constructor(adUnit: VPAIDAdUnit, parameters: IVPAIDEventHandlerParameters) {
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._adUnit = adUnit;
@@ -33,6 +45,8 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._placement = parameters.placement;
         this._closer = parameters.closer;
         this._vpaidEndScreen = parameters.endScreen;
+        this._core = parameters.core;
+        this._ads = parameters.ads;
 
         this._vpaidEventHandlers.AdError = this.onAdError;
         this._vpaidEventHandlers.AdLoaded = this.onAdLoaded;
@@ -47,17 +61,17 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._vpaidEventHandlers.AdVideoComplete = this.onAdVideoComplete;
         this._vpaidEventHandlers.AdPaused = this.onAdPaused;
         this._vpaidEventHandlers.AdPlaying = this.onAdPlaying;
-        this._vpaidEventHandlers.AdClickThru = this.onAdClickThru;
+        this._vpaidEventHandlers.AdClickThru = <(...args: unknown[]) => void>this.onAdClickThru;
         this._vpaidEventHandlers.AdDurationChange = this.onAdDurationChange;
     }
 
-    public onVPAIDEvent(eventType: string, args: any[]) {
-        let argsCopy: any[] | undefined;
+    public onVPAIDEvent(eventType: string, args: unknown[]) {
+        let argsCopy: unknown[] | undefined;
         if(args) {
             argsCopy = Array.prototype.slice.call(args);
         }
 
-        this._nativeBridge.Sdk.logDebug(`vpaid event ${eventType} with args ${argsCopy && argsCopy.length ? argsCopy.join(' ') : 'None'}`);
+        this._core.Sdk.logDebug(`vpaid event ${eventType} with args ${argsCopy && argsCopy.length ? argsCopy.join(' ') : 'None'}`);
         const handler = this._vpaidEventHandlers[eventType];
         if (handler) {
             if(argsCopy && argsCopy.length && argsCopy instanceof Array) {
@@ -148,7 +162,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     }
 
     private onAdStarted() {
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
+        this._ads.Listener.sendStartEvent(this._placement.getId());
         this._adUnit.sendTrackingEvent('creativeView');
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this._adUnit.onStartProcessed.trigger();

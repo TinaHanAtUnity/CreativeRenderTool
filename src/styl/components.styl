@@ -30,31 +30,36 @@ $game-rating-mask-default($scale-size, $with-styles = true) {
 $game-rating-count-default($scale-size, $with-styles = true) {
   color: $gray;
   if($with-styles) {
-    font-size: $default-font-size * $scale-size;
+    font-size: $default-font-size * $scale-size * .5;
   }
 }
 
 $game-icon-default($scale-size, $radius-size = .75, $with-styles = true) {
-  $set-image($scale-size * $default-size * 4.5, $scale-size * $default-size * 4.5, $scale-size * $default-size * $radius-size);
+  $set-image($scale-size * $default-size, $scale-size * $default-size, $scale-size * $default-size * $radius-size);
 }
 
 $unityads-logo-default($scale-size, $with-styles = true) {
   $set-image(100%, $scale-size * $default-size, 0, "../img/unityads.png", contain);
-  bottom: $scale-size * $default-size * .25;
+  bottom: 0;
+  left: 0;
 
   if($with-styles) {
     position: absolute;
     z-index: 5;
+    max-height: $scale-size * $default-size * 1;
+    font-size: $scale-size * $default-size * .7;
+    opacity: .6;
   }
 }
 
 $name-container-default($scale-size, $with-styles = true) {
-  max-width: $default-size * $scale-size * 12.5;
-  font-size: $scale-size * $default-font-size * 1.5;
+  max-width: 85%;
+  font-size: $scale-size * $default-font-size * 1;
   if($with-styles) {
     display: -webkit-box;
     overflow: hidden;
-    color: $black;
+    color: $end-screen-game-name-color;
+    text-align: center;
     text-overflow: ellipsis;
 
     -webkit-line-clamp: 2; // @stylint ignore;
@@ -177,8 +182,9 @@ $radio-group-container($scale-size = $default-scale-size, $context-font-size = 1
 
 }
 
-$tencent-overlay($scale-size = $default-scale-size) {
+$china-overlay($scale-size = $default-scale-size) {
   position: fixed;
+  display: none;
   padding: $default-scale-size * .7rem;
   color: $white;
   font-size: $default-scale-size * $default-font-size * .75;
@@ -349,19 +355,12 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
         font-size: $pop-up-font-size * 1.25;
       }
 
+      .middle-link,
       .left-side-link {
         bottom: 0;
         display: inline-block;
         margin-bottom: $pop-up-size * .5;
         margin-left: $pop-up-size * .5;
-        width: 22%;
-        color: darken($end-screen-info-gray, 40%);
-      }
-
-      .middle-link {
-        bottom: 0;
-        display: inline-block;
-        margin: $pop-up-size * .5;
         width: 22%;
         color: darken($end-screen-info-gray, 40%);
       }
@@ -372,4 +371,168 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
       cursor: pointer;
     }
   }
+}
+
+$radio-group-container-blue($scale-size = $default-scale-size, $context-font-size = 1rem) {
+  $radio-group-default-size = $scale-size * $default-size;
+
+  padding: $radio-group-default-size * .5;
+  font-size: $context-font-size;
+
+  [type="radio"]:checked,
+  [type="radio"]:not(:checked) {
+    position: absolute;
+    visibility: hidden;
+  }
+
+  /* label text*/
+  [type="radio"]:checked + label,
+  [type="radio"]:not(:checked) + label {
+    position: relative;
+    padding-left: $radio-group-default-size * 1.5;
+    cursor: pointer;
+    line-height: $context-font-size * 1.5;
+    display: inline-block;
+  }
+
+  [type="radio"]:checked + label:before,
+  [type="radio"]:not(:checked) + label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: $radio-group-default-size * .75;
+    height: @width;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  [type="radio"]:checked + label:before {
+    background-image: url('./../img/radio_on_blue.png');
+  }
+
+  [type="radio"]:not(:checked) + label:before {
+    background-image: url('./../img/radio_off.png');
+  }
+
+  [type="radio"]:checked + label {
+    font-weight: 500;
+  }
+
+}
+
+$checkbox-group-container($scale-size = $default-scale-size, $context-font-size = 1rem) {
+  $radio-group-default-size = $scale-size * $default-size;
+
+  font-size: $context-font-size;
+
+  [type="checkbox"]:checked,
+  [type="checkbox"]:not(:checked) {
+    position: absolute;
+    visibility: hidden;
+  }
+
+  // label texts
+  [type="checkbox"]:checked + label,
+  [type="checkbox"]:not(:checked) + label {
+    position: relative;
+    padding-left: $radio-group-default-size * 1.25;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: $privacy-text-font-weight;
+  }
+
+  // box
+  [type="checkbox"]:checked + label:before,
+  [type="checkbox"]:not(:checked) + label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: $radio-group-default-size * .75;
+    height: @width;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  [type="checkbox"]:checked + label:before {
+    background-image: url('./../img/checkbox-selected.png');
+  }
+
+  [type="checkbox"]:not(:checked) + label:before {
+    background-image: url('./../img/checkbox2.png');
+  }
+
+  .checkbox-item-container {
+    margin: .75 * $default-size 0 .75 * $default-size 0;
+  }
+
+  .indented-checkbox {
+    padding-left: 1.25 * $default-size;
+  }
+
+  // line between main and sub checkbox
+  // todo: on some devices the label is wrapped. Use screen ratio to set height
+  #personalization-checkbox-group {
+    .sub-box-line {
+      position: absolute;
+      width: .75 * $default-size;
+      height: 1 * $default-size;
+      border-bottom: 1px solid $white-smoke;
+      border-left: 1px solid $white-smoke;
+      transform: translate(.3 * $default-size, -.65 * $default-size);
+    }
+
+    .two-lines.sub-box-line {
+      height: 1.65 * $default-size;
+      transform: translate(.3 * $default-size, -1.35 * $default-size);
+    }
+  }
+}
+
+$click-animation() {
+  span {
+    display: block;
+    animation: onagree .3s ease-in forwards;
+  }
+
+  @keyframes onagree {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-8px);
+      opacity: .25;
+    }
+  }
+}
+
+$privacy-back-button-default() {
+  width: 2 * $default-size;
+  color: $black;
+  font-size: $privacy-heading-font-size;
+}
+
+$privacy-blue-button-default() {
+  $consent-button-default();
+  border: 1px solid $blue;
+  background-color: $blue;
+  color: $white;
+}
+
+$privacy-white-button-default() {
+  $consent-button-default();
+  border: 1px solid $privacy-light-gray;
+  background-color: $white;
+  color: $black;
+}
+
+$consent-button-default() {
+  border-radius: $default-size * .4;
+  text-align: center;
+  font-weight: $privacy-title-font-weight;
+  font-size: $privacy-heading-font-size;
 }

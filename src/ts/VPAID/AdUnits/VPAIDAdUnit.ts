@@ -6,7 +6,6 @@ import { WKAudiovisualMediaTypes } from 'Ads/Native/WebPlayer';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Closer } from 'Ads/Views/Closer';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
@@ -14,18 +13,19 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IObserver2 } from 'Core/Utilities/IObserver';
 import { Timer } from 'Core/Utilities/Timer';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
+import { AuctionV5Test, ABGroup } from 'Core/Models/ABGroup';
+import { ProgrammaticTrackingErrorName, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
     closer: Closer;
     endScreen?: VPAIDEndScreen | undefined;
-    privacy: AbstractPrivacy;
+    webPlayerContainer: WebPlayerContainer;
 }
 
 export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
@@ -42,7 +42,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _view: VPAID;
     private _vpaidCampaign: VPAIDCampaign;
     private _timer: Timer;
-    private _options: any;
+    private _options: unknown;
     private _deviceInfo: DeviceInfo;
     private _urlLoadingObserver: IObserver2<string, string>;
     private _privacyShowing = false;
@@ -51,9 +51,11 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _shouldFullScreenWebView = true;
     private _topWebViewAreaHeight: number;
     private readonly _topWebViewAreaMinHeight = 70;
+    private _pts: ProgrammaticTrackingService;
+    private _abGroup: ABGroup;
 
-    constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters) {
-        super(nativeBridge, parameters);
+    constructor(parameters: IVPAIDAdUnitParameters) {
+        super(parameters);
 
         this._vpaidCampaign = parameters.campaign;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
@@ -63,15 +65,17 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._deviceInfo = parameters.deviceInfo;
         this._placement = parameters.placement;
         this._clientInfo = parameters.clientInfo;
-        this._webPlayerContainer = parameters.webPlayerContainer!;
+        this._webPlayerContainer = parameters.webPlayerContainer;
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
         this._endScreen = parameters.endScreen;
+        this._pts = parameters.programmaticTrackingService;
+        this._abGroup = parameters.coreConfig.getAbGroup();
 
         if (this._endScreen) {
             this._endScreen.render();
         }
 
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (parameters.platform === Platform.ANDROID) {
             this._topWebViewAreaHeight = Math.floor(this.getAndroidViewSize(this._topWebViewAreaMinHeight, this.getScreenDensity()));
         } else {
             this._topWebViewAreaHeight = this._topWebViewAreaMinHeight;
@@ -104,10 +108,10 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public openUrl(url: string | null) {
         if (url) {
-            if (this._nativeBridge.getPlatform() === Platform.IOS) {
-                this._nativeBridge.UrlScheme.open(url);
-            } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                this._nativeBridge.Intent.launch({
+            if (this._platform === Platform.IOS) {
+                this._core.iOS!.UrlScheme.open(url);
+            } else if (this._platform === Platform.ANDROID) {
+                this._core.Android!.Intent.launch({
                     'action': 'android.intent.action.VIEW',
                     'uri': url
                 });
@@ -118,6 +122,10 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public sendTrackingEvent(eventType: string) {
         const urls = this._vpaidCampaign.getTrackingUrlsForEvent(eventType);
         const sessionId = this._vpaidCampaign.getSession().getId();
+
+        if (urls.length === 0 && eventType === 'start') {
+            this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
+        }
 
         for (const url of urls) {
             this._thirdPartyEventManager.sendWithGet(`vpaid ${eventType}`, sessionId, url);
@@ -206,8 +214,8 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
     }
 
-    private setupWebPlayer(): Promise<any> {
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+    private setupWebPlayer(): Promise<unknown> {
+        if (this._platform === Platform.ANDROID) {
             return this.setupAndroidWebPlayer();
         } else {
             return this.setupIosWebPlayer();
@@ -222,22 +230,31 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             setMediaPlaybackRequiresUserGesture: [false]
         }, {}));
         const eventSettings = {
-            'onPageStarted': { 'sendEvent': true },
-            'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': true }
+            onPageStarted: {
+                sendEvent: true
+            },
+            shouldOverrideUrlLoading: {
+                sendEvent: true,
+                returnValue: true
+            }
         };
         promises.push(this._webPlayerContainer.setEventSettings(eventSettings));
         return Promise.all(promises);
     }
 
-    private setupIosWebPlayer(): Promise<any> {
+    private setupIosWebPlayer(): Promise<unknown> {
         const settings = {
-            'allowsPlayback': true,
-            'playbackRequiresAction': false,
-            'typesRequiringAction': WKAudiovisualMediaTypes.NONE
+            allowsPlayback: true,
+            playbackRequiresAction: false,
+            typesRequiringAction: WKAudiovisualMediaTypes.NONE
         };
         const events = {
-            'onPageStarted': { 'sendEvent': true },
-            'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': true }
+            onPageStarted: {
+                sendEvent: true
+            },
+            shouldOverrideUrlLoading: {
+                sendEvent: true, returnValue: true
+            }
         };
         return Promise.all([
             this._webPlayerContainer.setSettings(settings, {}),
@@ -267,7 +284,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         this._timer.stop();
         this.setShowing(false);
-        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
         this._webPlayerContainer.shouldOverrideUrlLoading.unsubscribe(this._urlLoadingObserver);
         this._container.removeEventHandler(this);
@@ -300,7 +317,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private getScreenDensity(): number {
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (this._platform === Platform.ANDROID) {
             return (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity();
         }
         return 0;

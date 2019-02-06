@@ -34,7 +34,6 @@
 | forceCampaignId | string | Force campaign ID for internal testing purposes | SDK | all |
 | force_country | string | Force country targeting for internal testing purposes | SDK | all |
 | gameId | string | Source game identifier | App | all |
-| gamerId | string | Internal gamer identifier | Server | all |
 | gameSessionId | number | Unique game session identifier. This identifier is shared with analytics events. | SDK | all |
 | language | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | limitAdTracking | boolean | boolean if user has limited tracking or not | SDK | all |
@@ -80,11 +79,15 @@
 | projectId | string | Unity project ID | Server | all |
 | gameSessionCounters | object | Game session based counts of starts, views and ad requests | SDK | all |
 | ext | object | JSON string for optional signals for admob | SDK | all |
-| organizationId | string | Previously knows as 'developerID' | Server | all |
+| organizationId | string | Organization ID from Genesis' | Server | all |
 | gdprEnabled | boolean | If GDPR is enabled | Server | all |
 | optOutRecorded | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | optOutEnabled | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
+| abGroup | number | AB Group number assigned to this user from configuration | Server | all |
 | unityCreativeId | string | Creative id of the shown creative | SDK | all |
+| analyticsUserId | string | Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending) | SDK | all |
+| analyticsSessionId | string | Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit | SDK | all |
+| privacy | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 
 
 
@@ -101,7 +104,6 @@
 | language | all | True | False | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | test | all | True | False | boolean | Test mode | App | all |
 | forceAbGroup | no | True | False | number | Force A/B group for internal testing purposes | SDK | all |
-| gamerId | no | True | False | string | Internal gamer identifier | Server | all |
 | deviceMake | android | True | False | string | Android device manufacturer | SDK | android |
 | advertisingTrackingId | no | True | False | string | Advertising identifier in raw format | SDK | all |
 | limitAdTracking | no | True | False | boolean | boolean if user has limited tracking or not | SDK | all |
@@ -110,6 +112,8 @@
 | frameworkVersion | no | True | False | string | Unity engine version | SDK | all |
 | adapterName | no | True | False | string | Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer | SDK | all |
 | adapterVersion | no | True | False | string | SDK version name for adapter, should be in sync with SDK version | SDK | all |
+| analyticsUserId | no | True | False | string | Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending) | SDK | all |
+| analyticsSessionId | no | True | False | string | Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit | SDK | all |
 
 
 
@@ -166,10 +170,12 @@
 | projectId | all | False | True | string | Unity project ID | Server | all |
 | gameSessionCounters | all | False | True | object | Game session based counts of starts, views and ad requests | SDK | all |
 | ext | all | False | True | object | JSON string for optional signals for admob | SDK | all |
-| organizationId | no | False | True | string | Previously knows as 'developerID' | Server | all |
+| organizationId | no | False | True | string | Organization ID from Genesis' | Server | all |
 | gdprEnabled | all | False | True | boolean | If GDPR is enabled | Server | all |
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
+| abGroup | no | False | True | number | AB Group number assigned to this user from configuration | Server | all |
+| privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 
 
 
@@ -217,6 +223,7 @@
 | optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | unityCreativeId | all | False | True | string | Creative id of the shown creative | SDK | all |
+| privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 
 
 
@@ -264,4 +271,5 @@
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | videoOrientation | no | False | True | string | Chosen video orientation | SDK | all |
 | unityCreativeId | all | False | True | string | Creative id of the shown creative | SDK | all |
+| privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 

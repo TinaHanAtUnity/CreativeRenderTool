@@ -1,5 +1,5 @@
+import { ICoreApi } from 'Core/ICore';
 import { BaseMetaData, IMetaData } from 'Core/Models/MetaData/BaseMetaData';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
 
 interface IPlayerMetaData extends IMetaData {
@@ -18,11 +18,11 @@ export class PlayerMetaData extends BaseMetaData<IPlayerMetaData> {
         this.set('category', 'player');
     }
 
-    public fetch(nativeBridge: NativeBridge, keys?: string[]): Promise<boolean> {
-        return super.fetch(nativeBridge, keys).then((exists) => {
+    public fetch(core: ICoreApi, keys?: string[]): Promise<boolean> {
+        return super.fetch(core, keys).then((exists) => {
             if (exists) {
-                return nativeBridge.Storage.delete(StorageType.PUBLIC, this.getCategory()).then(() => {
-                    nativeBridge.Storage.write(StorageType.PUBLIC);
+                return core.Storage.delete(StorageType.PUBLIC, this.getCategory()).then(() => {
+                    core.Storage.write(StorageType.PUBLIC);
                     return true;
                 });
             } else {
@@ -35,7 +35,7 @@ export class PlayerMetaData extends BaseMetaData<IPlayerMetaData> {
         return this.get('server_id');
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'sid': this.getServerId()
         };

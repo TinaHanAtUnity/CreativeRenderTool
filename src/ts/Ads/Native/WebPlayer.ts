@@ -1,3 +1,4 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable2, Observable3 } from 'Core/Utilities/Observable';
@@ -60,20 +61,20 @@ export interface IWebPlayerEventSettings {
     onReceivedTouchIconUrl?: { sendEvent?: boolean; shouldCallSuper?: boolean };
     onShowCustomView?: { sendEvent?: boolean; shouldCallSuper?: boolean };
     onHideCustomView?: { sendEvent?: boolean; shouldCallSuper?: boolean };
-    onCreateWindow?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    onCreateWindow?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
     onRequestFocus?: { sendEvent?: boolean; shouldCallSuper?: boolean };
     onCloseWindow?: { sendEvent?: boolean; shouldCallSuper?: boolean };
-    onJsAlert?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
-    onJsConfirm?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
-    onJsPrompt?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
-    onConsoleMessage?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
-    onShowFileChooser?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
-    onDownloadStart?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
-    shouldOverrideUrlLoading?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    onJsAlert?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
+    onJsConfirm?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
+    onJsPrompt?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
+    onConsoleMessage?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
+    onShowFileChooser?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
+    onDownloadStart?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
+    shouldOverrideUrlLoading?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
     onPageCommitVisible?: { sendEvent?: boolean; shouldCallSuper?: boolean };
     shouldInterceptRequest?: { sendEvent?: boolean; shouldCallSuper?: boolean };
     onFormResubmission?: { sendEvent?: boolean; shouldCallSuper?: boolean };
-    shouldOverrideKeyEvent?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    shouldOverrideKeyEvent?: { sendEvent?: boolean; shouldCallSuper?: boolean; returnValue?: boolean };
     onUnhandledKeyEvent?: { sendEvent?: boolean; shouldCallSuper?: boolean };
 }
 
@@ -177,7 +178,7 @@ export class WebPlayerApi extends NativeApi {
     public readonly onCreateWebView = new Observable2<string, string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'WebPlayer', ApiPackage.ADS);
+        super(nativeBridge, 'WebPlayer', ApiPackage.ADS, EventCategory.WEBPLAYER);
     }
 
     public setUrl(url: string, viewId: string): Promise<void> {
@@ -204,32 +205,32 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setEventSettings', [eventSettings, viewId]);
     }
 
-    public sendEvent(args: any[], viewId: string): Promise<void> {
+    public sendEvent(args: unknown[], viewId: string): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendEvent', [args, viewId]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case WebplayerEvent[WebplayerEvent.PAGE_STARTED]:
-                this.onPageStarted.trigger(parameters.pop(), parameters[0]);
+                this.onPageStarted.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
 
             case WebplayerEvent[WebplayerEvent.PAGE_FINISHED]:
-                this.onPageFinished.trigger(parameters.pop(), parameters[0]);
+                this.onPageFinished.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
 
             case WebplayerEvent[WebplayerEvent.ERROR]:
-                this.onPageFinished.trigger(parameters.pop(), parameters[0]);
+                this.onPageFinished.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
             case WebplayerEvent[WebplayerEvent.WEBPLAYER_EVENT]:
-                this.onWebPlayerEvent.trigger(parameters.pop(), parameters[0]);
+                this.onWebPlayerEvent.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
 
             case WebplayerEvent[WebplayerEvent.SHOULD_OVERRIDE_URL_LOADING]:
-                this.shouldOverrideUrlLoading.trigger(parameters.pop(), parameters[0], parameters[1]);
+                this.shouldOverrideUrlLoading.trigger(<string>parameters.pop(), <string>parameters[0], <string>parameters[1]);
                 break;
             case WebplayerEvent[WebplayerEvent.CREATE_WEBVIEW]:
-                this.onCreateWebView.trigger(parameters.pop(), parameters[0]);
+                this.onCreateWebView.trigger(<string>parameters.pop(), <string>parameters[0]);
                 break;
             default:
                 super.handleEvent(event, parameters);

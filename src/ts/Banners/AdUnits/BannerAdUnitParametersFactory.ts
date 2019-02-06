@@ -1,35 +1,44 @@
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventMacro, IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
-import { IBannerAdUnitParameters } from 'Banners/AdUnits/BannerAdUnit';
+import { Platform } from 'Core/Constants/Platform';
+import { ICoreApi, ICore } from 'Core/ICore';
+import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { IAds } from 'Ads/IAds';
+import { IBanners } from 'Banners/IBanners';
 
 export class BannerAdUnitParametersFactory {
 
-    private _nativeBridge: NativeBridge;
-    private _request: Request;
+    private _platform: Platform;
+    private _core: ICoreApi;
     private _clientInfo: ClientInfo;
     private _webPlayerContainer: WebPlayerContainer;
+    private _thirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
+    private _programmaticTrackingService: ProgrammaticTrackingService;
 
-    constructor(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, webPlayerContainer: WebPlayerContainer) {
-        this._nativeBridge = nativeBridge;
-        this._request = request;
-        this._clientInfo = clientInfo;
-        this._webPlayerContainer = webPlayerContainer;
+    constructor(banner: IBanners, ads: IAds, core: ICore) {
+        this._platform = core.NativeBridge.getPlatform();
+        this._core = core.Api;
+        this._clientInfo = core.ClientInfo;
+        this._thirdPartyEventManagerFactory = ads.ThirdPartyEventManagerFactory;
+        this._webPlayerContainer = banner.WebPlayerContainer;
+        this._programmaticTrackingService = ads.ProgrammaticTrackingService;
     }
 
-    public create(campaign: BannerCampaign, placement: Placement, options: any): Promise<IBannerAdUnitParameters> {
+    public create(campaign: BannerCampaign, placement: Placement): Promise<IBannerAdUnitParameters> {
         return Promise.resolve({
-            placement,
-            campaign,
+            platform: this._platform,
+            core: this._core,
+            campaign: campaign,
             clientInfo: this._clientInfo,
-            thirdPartyEventManager: new ThirdPartyEventManager(this._nativeBridge, this._request, {
-                '%ZONE%': placement.getId(),
-                '%SDK_VERSION%': this._clientInfo.getSdkVersion().toString()
+            thirdPartyEventManager: this._thirdPartyEventManagerFactory.create({
+                [ThirdPartyEventMacro.ZONE]: placement.getId(),
+                [ThirdPartyEventMacro.SDK_VERSION]: this._clientInfo.getSdkVersion().toString()
             }),
+            programmaticTrackingService: this._programmaticTrackingService,
             webPlayerContainer: this._webPlayerContainer
         });
     }

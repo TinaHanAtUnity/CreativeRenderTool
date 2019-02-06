@@ -11,6 +11,7 @@
                     </div>
                 </div>
             </div>
+            <div class="china-advertisement">广告</div>
         </div>
         <div class="right-corner">
             <div class="timer-button button button-right">
@@ -58,13 +59,25 @@
             </div>
         </div>
         <div class="right-corner">
-            <div class="call-button button button-bottom button-right">
-                <div class="tab">
-                    <span class="text"><%= data.t("Learn More") %> <span class="go-text">GO</span></span>
+            <% if (data.showInstallButton) { %>
+                <div class="install-button call-button button button-bottom button-right">
+                    <div class="tab">
+                        <div class="download-wrapper">
+                            <div class="game-icon" style="background-image: url('<%= data.gameIcon && data.gameIcon.replace("file://", "" ) %>')"></div>
+                            <div class="download-container">
+                                <span class="download-text"><%= data.t("Install Now") %></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            <% } else { %>
+                <div class="vast-button call-button button button-bottom button-right">
+                    <div class="tab">
+                        <span class="text"><%= data.t("Learn More") %> <span class="go-text">GO</span></span>
+                    </div>
+                </div>
+            <% } %>
         </div>
     </div>
     <div class="debug-message-text"></div>
-    <div class ="tencent-advertisement"></div>
 </div>

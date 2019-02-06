@@ -1,7 +1,7 @@
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
+import { Platform } from 'Core/Constants/Platform';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
@@ -12,7 +12,7 @@ export interface ICloseHandler extends IGDPREventHandler {
     onClose(skipped: boolean): void;
 }
 
-export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
+export class Closer extends View<ICloseHandler> implements IPrivacyHandlerView {
 
     public readonly onPrivacyOpened: Observable0 = new Observable0();
     public readonly onPrivacyClosed: Observable0 = new Observable0();
@@ -28,8 +28,8 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
     private _showGDPRBanner: boolean;
     private _gdprPopupClicked: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
-        super(nativeBridge, 'closer');
+    constructor(platform: Platform, placement: Placement, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+        super(platform, 'closer');
         this._template = new Template(CloserTemplate);
         this._placement = placement;
         this._privacy = privacy;
@@ -57,10 +57,6 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
         this._privacy.hide();
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
-    }
-
-    public onPrivacy(url: string): void {
-        // do nothing
     }
 
     public onPrivacyClose(): void {
@@ -91,19 +87,14 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
         this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
     }
 
-    public onGDPROptOut(optOutEnabled: boolean): void {
-        // do nothing
-    }
-
     public update(progress: number, total: number) {
-        let modifiedTotal = total;
-        if (progress >= (modifiedTotal * 0.75)) {
+        if (progress >= (total * 0.75)) {
             this._canReward = true;
         }
 
-        modifiedTotal = this._placement.allowSkip() ? this._placement.allowSkipInSeconds() : modifiedTotal;
-        const secondsLeft = this.clampLower(Math.floor(modifiedTotal - progress), 0);
-        let progressFraction = progress / modifiedTotal;
+        total = this._placement.allowSkip() ? this._placement.allowSkipInSeconds() : total;
+        const secondsLeft = this.clampLower(Math.floor(total - progress), 0);
+        let progressFraction = progress / total;
         if (secondsLeft <= 0) {
             this._allowClose = true;
         }
