@@ -331,6 +331,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
                         bypassAppSheet: campaign.getBypassAppSheet(),
                         appStoreId: campaign.getAppStoreId(),
                         store: campaign.getStore(),
+                        videoDuration: this._videoDuration,
                         videoProgress: this._videoProgress,
                         appDownloadUrl: campaign instanceof PerformanceCampaign ? campaign.getAppDownloadUrl() : undefined,
                         skipEnabled: this._skipEnabled
