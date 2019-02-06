@@ -47,3 +47,4 @@ export const VastParsingStrictTest = new ABTest(16); // Testing new vast parser 
 export const WebPlayerMRAIDTest = new DisabledABTest();
 export const CTAClickHandlingTest = new ABTest(17);
 export const AndroidThreadingTest = new ABTest(17);
+export const StatusCodeTest = new DisabledABTest();

@@ -26,7 +26,7 @@ import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheStatus } from 'Core/Managers/CacheManager';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { ABGroup, AuctionV5Test } from 'Core/Models/ABGroup';
+import { ABGroup, AuctionV5Test, StatusCodeTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -178,11 +178,10 @@ export class CampaignManager {
                     retryWithConnectionEvents: false
                 });
             }).then(response => {
-                if(response) {
-                    if (response.responseCode) {
-                        jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
-                    }
-
+                if (response && response.responseCode) {
+                    jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
+                }
+                if (response) {
                     this.setSDKSignalValues(requestTimestamp);
 
                     if(AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
@@ -323,7 +322,7 @@ export class CampaignManager {
 
             for(const placement of noFill) {
                 promises.push(this.handleNoFill(placement));
-                if(auctionStatusCode && auctionStatusCode === 999) {
+                if(StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode && auctionStatusCode === 999) {
                     refreshDelay = this.getNextDayUTCTimeDelta();
                 } else {
                     refreshDelay = RefreshManager.NoFillDelay;
