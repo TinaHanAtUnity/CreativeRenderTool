@@ -329,5 +329,16 @@ body {
       max-height: 85%;
       width: 56%;
     }
+
+    &:not(.initial) {
+      .view-container {
+        min-height: 0;
+        max-height: 85%;
+        animation: page-animation-max-to-min .3s ease-out;
+      }
+      .main-view-container {
+        display: none;
+      }
+    }
   }
 }
