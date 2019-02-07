@@ -3,6 +3,11 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 
+export enum AuctionStatusCode {
+    NORMAL = 0,
+    FREQUENCY_CAP_REACHED = 999
+}
+
 export interface IRawAuctionResponse {
     auctionId?: string;
     correlationId: string;

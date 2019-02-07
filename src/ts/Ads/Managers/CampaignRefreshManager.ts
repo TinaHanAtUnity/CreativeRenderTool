@@ -263,10 +263,10 @@ export class CampaignRefreshManager extends RefreshManager {
         }
         this._core.Sdk.logError(JSON.stringify(error));
 
-        const minimumRefreshTimestamp = Date.now() + RefreshManager.ErrorRefillDelay * 1000;
+        const minimumRefreshTimestamp = Date.now() + RefreshManager.ErrorRefillDelayInSeconds * 1000;
         if(this._refillTimestamp === 0 || this._refillTimestamp > minimumRefreshTimestamp) {
             this._refillTimestamp = minimumRefreshTimestamp;
-            this._core.Sdk.logDebug('Unity Ads will refresh ads in ' + RefreshManager.ErrorRefillDelay + ' seconds');
+            this._core.Sdk.logDebug('Unity Ads will refresh ads in ' + RefreshManager.ErrorRefillDelayInSeconds + ' seconds');
         }
 
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
@@ -283,10 +283,10 @@ export class CampaignRefreshManager extends RefreshManager {
         if(this._campaignCount === 1) {
             this._parsingErrorCount++;
 
-            if(this._parsingErrorCount === 1 && RefreshManager.ParsingErrorRefillDelay > 0) {
-                const retryDelaySeconds: number = RefreshManager.ParsingErrorRefillDelay + Math.random() * RefreshManager.ParsingErrorRefillDelay;
+            if(this._parsingErrorCount === 1 && RefreshManager.ParsingErrorRefillDelayInSeconds > 0) {
+                const retryDelaySeconds: number = RefreshManager.ParsingErrorRefillDelayInSeconds + Math.random() * RefreshManager.ParsingErrorRefillDelayInSeconds;
                 this._core.Sdk.logDebug('Unity Ads retrying failed campaign in ' + retryDelaySeconds + ' seconds');
-                this._refillTimestamp = Date.now() + RefreshManager.ParsingErrorRefillDelay * 1000;
+                this._refillTimestamp = Date.now() + RefreshManager.ParsingErrorRefillDelayInSeconds * 1000;
                 setTimeout(() => {
                     this._core.Sdk.logDebug('Unity Ads retrying failed campaign now');
                     this.refresh();

@@ -3,12 +3,7 @@ import { AssetManager } from 'Ads/Managers/AssetManager';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import {
-    AuctionResponse,
-    IRawAuctionResponse,
-    IRawAuctionV5Response,
-    IRawRealtimeResponse
-} from 'Ads/Models/AuctionResponse';
+import { AuctionResponse, IRawAuctionResponse, IRawAuctionV5Response, IRawRealtimeResponse, AuctionStatusCode } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
@@ -50,9 +45,9 @@ import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
-import { VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { ProgrammaticVastParserStrict } from 'VAST/Parsers/ProgrammaticVastParser';
+import { TimeUtils } from 'Ads/Utilities/TimeUtils';
 
 export class CampaignManager {
 
@@ -321,10 +316,10 @@ export class CampaignManager {
 
             for(const placement of noFill) {
                 promises.push(this.handleNoFill(placement));
-                if (StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode === 999) {
-                    refreshDelay = this.getNextDayUTCTimeDelta();
+                if (StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode === AuctionStatusCode.FREQUENCY_CAP_REACHED) {
+                    refreshDelay = TimeUtils.getNextUTCDayDeltaSeconds(Date.now());
                 } else {
-                    refreshDelay = RefreshManager.NoFillDelay;
+                    refreshDelay = RefreshManager.NoFillDelayInSeconds;
                 }
             }
 
@@ -473,10 +468,10 @@ export class CampaignManager {
         for(const placement of noFill) {
             promises.push(this.handleNoFill(placement));
 
-            if (StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode === 999) {
-                refreshDelay = this.getNextDayUTCTimeDelta();
+            if (StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode === AuctionStatusCode.FREQUENCY_CAP_REACHED) {
+                refreshDelay = TimeUtils.getNextUTCDayDeltaSeconds(Date.now());
             } else {
-                refreshDelay = RefreshManager.NoFillDelay;
+                refreshDelay = RefreshManager.NoFillDelayInSeconds;
             }
         }
 
@@ -953,15 +948,5 @@ export class CampaignManager {
                 signal: 'requestCount'
             });
         });
-    }
-
-    private getNextDayUTCTimeDelta(): number {
-        const nowSec = Date.now();
-        const d2Sec = nowSec + 24 * 60 * 60 * 1000; // next day in milliseconds
-        const nextDay = new Date();
-        nextDay.setTime(d2Sec);
-        nextDay.setUTCHours(0, 0, 0, 0);
-
-        return Math.floor((nextDay.getTime() - nowSec) / 1000);
     }
 }

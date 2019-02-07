@@ -206,7 +206,7 @@ describe('CampaignRefreshManager', () => {
             privacy: privacy
         };
 
-        RefreshManager.ParsingErrorRefillDelay = 0; // prevent tests from hanging due to long retry timeouts
+        RefreshManager.ParsingErrorRefillDelayInSeconds = 0; // prevent tests from hanging due to long retry timeouts
         jaegerManager = sinon.createStubInstance(JaegerManager);
         jaegerManager.isJaegerTracingEnabled = sinon.stub().returns(false);
         jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
