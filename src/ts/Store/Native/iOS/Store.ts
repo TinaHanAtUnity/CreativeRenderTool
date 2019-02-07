@@ -1,20 +1,18 @@
-import { NativeApi } from 'Core/Native/Bridge/NativeApi';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ApiPackage } from 'Core/Native/Bridge/NativeApi';
 import { EventCategory } from 'Core/Constants/EventCategory';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 
 enum IosStoreEvent {
     PRODUCT_REQUEST_COMPLETE,
     PRODUCT_REQUEST_ERROR_NO_PRODUCTS,
-    RECEIVED_TRANSACTION,
-
+    RECEIVED_TRANSACTION
 }
 
 export class IosStoreApi extends NativeApi {
     public readonly onProductRequestErrorNoProducts = new Observable1<number>();
-    public readonly onProductRequestComplete = new Observable2<number, any>(); // todo: typing
-    public readonly onTransaction = new Observable1<any>(); // todo: typing
+    public readonly onProductRequestComplete = new Observable2<number, unknown>(); // todo: typing
+    public readonly onTransaction = new Observable1<unknown>(); // todo: typing
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Store', ApiPackage.STORE, EventCategory.STORE);
@@ -29,7 +27,7 @@ export class IosStoreApi extends NativeApi {
     }
 
     public stopTransactionObserver(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'stopTransactionObserverä');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'stopTransactionObserver');
     }
 
     public getReceipt(): Promise<string> {

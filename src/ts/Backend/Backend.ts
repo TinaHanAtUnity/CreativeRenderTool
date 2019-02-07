@@ -26,6 +26,8 @@ import { CallbackStatus, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IosPreferences } from 'Backend/Api/IosPreferences';
 import { AndroidPreferences } from 'Backend/Api/AndroidPreferences';
 import { BannerListener } from 'Backend/Api/BannerListener';
+import { IosStore } from 'Backend/Api/IosStore';
+import { AndroidStore } from 'Backend/Api/AndroidStore';
 
 interface IInvocation {
     className: string;
@@ -58,6 +60,7 @@ interface IBackendApi {
     Request: Request;
     Sdk: Sdk;
     Storage: Storage;
+    Store: AndroidStore | IosStore;
     UrlScheme: UrlScheme;
     VideoPlayer: VideoPlayer;
     BannerListener: BannerListener;
@@ -95,6 +98,7 @@ export class Backend implements IWebViewBridge {
             Resolve: new Resolve(this),
             Sdk: new Sdk(this),
             Storage: new Storage(this),
+            Store: platform === Platform.IOS ? new IosStore(this) : new AndroidStore(this),
             UrlScheme: new UrlScheme(this),
             VideoPlayer: new VideoPlayer(this),
             BannerListener: new BannerListener(this)

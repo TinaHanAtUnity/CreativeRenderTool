@@ -13,12 +13,12 @@ export class AppleStoreManager extends StoreManager {
     }
 
     public startTracking(): void {
-        this._store.iOS!.Store.onTransaction.subscribe((data: any) => this.onTransaction(data));
+        this._store.iOS!.Store.onTransaction.subscribe((data: unknown) => this.onTransaction(data));
 
         this._store.iOS!.Store.startTransactionObserver();
     }
 
-    private onTransaction(data: any): void {
+    private onTransaction(data: unknown): void {
         this._core.Api.Sdk.logInfo('IOS TRANSACTION: ' + JSON.stringify(data));
     }
 }

@@ -18,12 +18,12 @@ export class Store implements IStore, IApiModule {
         this._core = core;
 
         this.Api = {
-            Android: {
+            Android: core.NativeBridge.getPlatform() === Platform.ANDROID ? {
                 Store: new AndroidStoreApi(core.NativeBridge)
-            },
-            Ios: {
+            } : undefined,
+            Ios: core.NativeBridge.getPlatform() === Platform.IOS ? {
                 Store: new IosStoreApi(core.NativeBridge)
-            }
+            } : undefined
         };
 
         if(core.NativeBridge.getPlatform() === Platform.ANDROID) {

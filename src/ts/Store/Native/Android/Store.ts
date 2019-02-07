@@ -33,13 +33,13 @@ export class AndroidStoreApi extends NativeApi {
     public readonly onInitialized = new Observable0();
     public readonly onBillingSupportedResult = new Observable2<number, number>();
     public readonly onBillingSupportedError = new Observable3<number, AndroidStoreError, string>();
-    public readonly onPurchaseHistoryResult = new Observable2<number, any>(); // todo: better typing?
+    public readonly onPurchaseHistoryResult = new Observable2<number, unknown>(); // todo: better typing?
     public readonly onPurchaseHistoryError = new Observable3<number, AndroidStoreError, string>();
-    public readonly onSkuDetailsResult = new Observable2<number, any>(); // todo: better typing?
+    public readonly onSkuDetailsResult = new Observable2<number, unknown>(); // todo: better typing?
     public readonly onSkuDetailsError = new Observable3<number, AndroidStoreError, string>();
-    public readonly onBillingStart = new Observable1<any>();
+    public readonly onBillingStart = new Observable1<unknown>();
     public readonly onBillingStartError = new Observable2<AndroidStoreError, string>();
-    public readonly onBillingEnd = new Observable1<any>();
+    public readonly onBillingEnd = new Observable1<unknown>();
     public readonly onBillingEndError = new Observable2<AndroidStoreError, string>();
 
     constructor(nativeBridge: NativeBridge) {
@@ -58,8 +58,8 @@ export class AndroidStoreApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'isBillingSupported', [operationId, purchaseType]);
     }
 
-    public getPurchases(purchaseType: string): Promise<any> { // todo: better typing?
-        return this._nativeBridge.invoke<any>(this._fullApiClassName, 'getPurchases', [purchaseType]);
+    public getPurchases(purchaseType: string): Promise<unknown> { // todo: better typing?
+        return this._nativeBridge.invoke<unknown>(this._fullApiClassName, 'getPurchases', [purchaseType]);
     }
 
     public getPurchaseHistory(operationId: number, purchaseType: string, maxPurchases: number): Promise<void> {
@@ -85,7 +85,7 @@ export class AndroidStoreApi extends NativeApi {
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.PURCHASE_HISTORY_RESULT]:
-                this.onPurchaseHistoryResult.trigger(<number>parameters[0], <any>parameters[1]);
+                this.onPurchaseHistoryResult.trigger(<number>parameters[0], parameters[1]);
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.PURCHASE_HISTORY_ERROR]:
@@ -93,7 +93,7 @@ export class AndroidStoreApi extends NativeApi {
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.SKU_DETAILS_RESULT]:
-                this.onSkuDetailsResult.trigger(<number>parameters[0], <any>parameters[1]);
+                this.onSkuDetailsResult.trigger(<number>parameters[0], parameters[1]);
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.SKU_DETAILS_ERROR]:
