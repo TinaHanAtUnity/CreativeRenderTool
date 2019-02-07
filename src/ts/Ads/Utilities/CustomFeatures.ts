@@ -1,6 +1,14 @@
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import ZyngaGamesJson from 'json/custom_features/ZyngaGames.json';
+import { Campaign } from 'Ads/Models/Campaign';
+import { IosUtils } from 'Ads/Utilities/IosUtils';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { Platform } from 'Core/Constants/Platform';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { toAbGroup, InstallInRewardedVideos } from 'Core/Models/ABGroup';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
@@ -69,6 +77,22 @@ export class CustomFeatures {
 
     public static isZyngaGame(gameId: string): boolean {
         return this.existsInList(ZyngaGameIds, gameId);
+    }
+
+    public static isRewardedVideoInstallButtonEnabled(platform: Platform, deviceInfo: DeviceInfo, campaign: Campaign, coreConfig: CoreConfiguration) {
+        if (!InstallInRewardedVideos.isValid(coreConfig.getAbGroup())) {
+            return false;
+        }
+
+        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
+            if (platform === Platform.ANDROID) {
+                return true;
+            }
+
+            return IosUtils.isAppSheetBroken(deviceInfo.getOsVersion(), deviceInfo.getModel());
+        }
+
+        return false;
     }
 
     private static existsInList(gameIdList: string[], gameId: string): boolean {
