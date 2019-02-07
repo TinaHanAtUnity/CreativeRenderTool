@@ -283,7 +283,7 @@ export class CampaignManager {
         session.setGameSessionCounters(gameSessionCounters);
         session.setPrivacy(requestPrivacy);
 
-        const auctionStatusCode = json.statusCode;
+        const auctionStatusCode: number = json.statusCode || 0;
 
         this._backupCampaignManager.deleteBackupCampaigns();
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
@@ -321,7 +321,7 @@ export class CampaignManager {
 
             for(const placement of noFill) {
                 promises.push(this.handleNoFill(placement));
-                if (StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode && auctionStatusCode === 999) {
+                if (StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode === 999) {
                     refreshDelay = this.getNextDayUTCTimeDelta();
                 } else {
                     refreshDelay = RefreshManager.NoFillDelay;
@@ -348,7 +348,7 @@ export class CampaignManager {
                 if(fill.hasOwnProperty(mediaId)) {
                     let auctionResponse: AuctionResponse;
                     try {
-                        auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], mediaId, json.correlationId);
+                        auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode);
                         promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
@@ -394,6 +394,8 @@ export class CampaignManager {
         session.setAdPlan(response.response);
         session.setGameSessionCounters(gameSessionCounters);
         session.setPrivacy(requestPrivacy);
+
+        const auctionStatusCode: number = json.statusCode || 0;
 
         this._backupCampaignManager.deleteBackupCampaigns();
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
@@ -470,7 +472,12 @@ export class CampaignManager {
 
         for(const placement of noFill) {
             promises.push(this.handleNoFill(placement));
-            refreshDelay = RefreshManager.NoFillDelay;
+
+            if (StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode === 999) {
+                refreshDelay = this.getNextDayUTCTimeDelta();
+            } else {
+                refreshDelay = RefreshManager.NoFillDelay;
+            }
         }
 
         let campaignCount: number = 0;
@@ -493,7 +500,7 @@ export class CampaignManager {
             if(campaigns.hasOwnProperty(mediaId)) {
                 let auctionResponse: AuctionResponse;
                 try {
-                    auctionResponse = new AuctionResponse(campaigns[mediaId], json.media[mediaId], mediaId, json.correlationId);
+                    auctionResponse = new AuctionResponse(campaigns[mediaId], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode);
                     promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
                         if(error === CacheStatus.STOPPED) {
                             return Promise.resolve();

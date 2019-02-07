@@ -12,6 +12,7 @@ describe('AuctionResponse', () => {
             const mediaId: string = 'UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85';
             const campaignObject: any = json.media[mediaId];
             const correlationId = json.correlationId;
+            const statusCode = json.statusCode;
             const placements: AuctionPlacement[] = [];
 
             for(const placement in json.placements) {
@@ -21,7 +22,7 @@ describe('AuctionResponse', () => {
                 }
             }
 
-            const auctionResponse = new AuctionResponse(placements, campaignObject, mediaId, correlationId);
+            const auctionResponse = new AuctionResponse(placements, campaignObject, mediaId, correlationId, statusCode);
             assert.equal(auctionResponse.getPlacements(), placements, 'Placements not what was expected');
             assert.equal(auctionResponse.getContentType(), campaignObject.contentType, 'ContentType not what was expected');
             assert.equal(auctionResponse.getContent(), campaignObject.content, 'Content not what was expected');
@@ -35,6 +36,7 @@ describe('AuctionResponse', () => {
             assert.equal(auctionResponse.getCorrelationId(), correlationId, 'CorrelationId not what was expected');
             assert.equal(auctionResponse.getUseWebViewUserAgentForTracking(), campaignObject.useWebViewUserAgentForTracking, 'UseWebViewUserAgentForTracking not what was expected');
             assert.equal(auctionResponse.isMoatEnabled(), campaignObject.isMoatEnabled, 'IsMoatEnabled not what was expected');
+            assert.equal(auctionResponse.getStatusCode(), statusCode, 'statusCode not what was expected');
         });
     });
 });

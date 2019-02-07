@@ -19,6 +19,7 @@ export interface IRawAuctionV5Response {
     realtimeData?: { [key: string]: string };
     media: { [key: string]: IAuctionResponse };
     tracking: { [key: string]: ICampaignTrackingUrls | undefined };
+    statusCode?: number;
 }
 
 export interface IRawRealtimeResponse {
@@ -53,7 +54,7 @@ export interface IAuctionResponse {
 
 export class AuctionResponse extends Model<IAuctionResponse> {
 
-    constructor(placements: AuctionPlacement[], data: IAuctionResponse, mediaId: string, correlationId: string) {
+    constructor(placements: AuctionPlacement[], data: IAuctionResponse, mediaId: string, correlationId: string, statusCode?: number) {
         super('AuctionResponse', {
             placements: ['array'],
             contentType: ['string'],
@@ -98,7 +99,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('width', data.width);
         this.set('height', data.height);
         this.set('isMoatEnabled', data.isMoatEnabled);
-        this.set('statusCode', data.statusCode);
+        this.set('statusCode', statusCode);
     }
 
     public getPlacements(): AuctionPlacement[] {
