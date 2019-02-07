@@ -1,19 +1,20 @@
 import { Model } from 'Core/Models/Model';
+import { IVastCreativeCompanionAd } from 'VAST/Models/IVastCreativeCompanionAd';
 
-interface IVastCreativeCompanionAd {
-    id: string | null;
+interface IVastCreativeStaticResourceCompanionAd extends IVastCreativeCompanionAd {
     width: number;
     height: number;
     type: string;
     staticResourceURL: string | null;
     creativeType: string | null;
     companionClickThroughURLTemplate: string | null;
+    companionClickTrackingURLTemplates: string[];
     trackingEvents: { [eventName: string]: string[] };
 }
 
-export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
+export class VastCreativeStaticResourceCompanionAd extends Model<IVastCreativeStaticResourceCompanionAd> {
 
-    constructor(id: string | null, height: number | null, width: number | null, creativeType?: string | null, staticResourceURL?: string | null, companionClickThroughURLTemplate?: string | null, trackingEvents?: { [eventName: string]: string[] }) {
+    constructor(id: string | null, height: number | null, width: number | null, creativeType?: string | null, staticResourceURL?: string | null, companionClickThroughURLTemplate?: string | null, companionClickTrackingURLTemplates?: string[], trackingEvents?: { [eventName: string]: string[] }) {
         super('VastCreativeCompanionAd', {
             id: ['string', 'null'],
             width: ['number'],
@@ -22,6 +23,7 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
             staticResourceURL: ['string', 'null'],
             creativeType: ['string', 'null'],
             companionClickThroughURLTemplate: ['string', 'null'],
+            companionClickTrackingURLTemplates: ['array'],
             trackingEvents: ['object']
         });
 
@@ -32,6 +34,7 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
         this.set('creativeType', creativeType || null);
         this.set('staticResourceURL', staticResourceURL || null);
         this.set('companionClickThroughURLTemplate', companionClickThroughURLTemplate || null);
+        this.set('companionClickTrackingURLTemplates', companionClickTrackingURLTemplates || []);
         this.set('trackingEvents', trackingEvents || {});
     }
 
@@ -45,6 +48,10 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
 
     public setCreativeType(type: string | null) {
         this.set('creativeType', type);
+    }
+
+    public addCompanionClickTrackingURLTemplate(url: string) {
+        this.getCompanionClickTrackingURLTemplates().push(url);
     }
 
     public addTrackingEvent(eventName: string, trackingURLTemplate: string) {
@@ -76,6 +83,10 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
         return this.get('companionClickThroughURLTemplate');
     }
 
+    public getCompanionClickTrackingURLTemplates(): string[] {
+        return this.get('companionClickTrackingURLTemplates');
+    }
+
     public getHeight(): number {
         return this.get('height');
     }
@@ -92,7 +103,8 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
             'type': this.getType(),
             'staticResourceURL': this.getStaticResourceURL(),
             'creativeType': this.getCreativeType(),
-            'companionClickThroughURLTemplate': this.getCompanionClickThroughURLTemplate()
+            'companionClickThroughURLTemplate': this.getCompanionClickThroughURLTemplate(),
+            'companionClickTrackingURLTemplates': this.getCompanionClickTrackingURLTemplates()
         };
     }
 

@@ -19,7 +19,7 @@ export class MRAIDAdapterContainer implements IMRAIDHandler {
     }
 
     public disconnect(): void {
-        this._eventAdapter.connect();
+        this._eventAdapter.disconnect();
     }
 
     public sendViewableEvent(viewable: boolean) {

@@ -1,8 +1,9 @@
 import { Platform } from 'Core/Constants/Platform';
-import { Swipe, SwipeType } from 'Core/Utilities/Swipe';
 import { Tap } from 'Core/Utilities/Tap';
 import { Template } from 'Core/Utilities/Template';
 import { IViewBinding } from 'Core/Views/IViewBinding';
+import { HorizontalSwipe } from 'Core/Utilities/HorizontalSwipe';
+import { DownSwipe } from 'Core/Utilities/DownSwipe';
 
 export type TemplateDataType = string | number | boolean | null | undefined | string[];
 
@@ -14,11 +15,11 @@ export abstract class View<T extends object> {
 
     private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
         if(binding.event === 'swipe') {
-            binding.swipe = new Swipe(element, SwipeType.HORIZONTAL);
+            binding.swipe = new HorizontalSwipe(element);
         }
 
         if(binding.event === 'swipedown') {
-            binding.swipe = new Swipe(element, SwipeType.SWIPE_DOWN);
+            binding.swipe = new DownSwipe(element);
         }
 
         if(attachTap && binding.event === 'click') {

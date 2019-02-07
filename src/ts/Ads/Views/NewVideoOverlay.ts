@@ -7,7 +7,6 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
-import { ABGroup } from 'Core/Models/ABGroup';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -39,20 +38,20 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _skipEnabled: boolean;
 
     private _videoDurationEnabled: boolean = false;
-    private _videoProgress: number;
+    protected _videoProgress: number;
 
     private _muteEnabled: boolean = false;
     private _showPrivacyDuringVideo: boolean = false;
 
     private _debugMessageVisible: boolean = false;
-    private _callButtonVisible: boolean = false;
+    protected _callButtonVisible: boolean = false;
     private _callButtonEnabled: boolean = true;
 
     private _skipButtonElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
-    private _callButtonElement: HTMLElement;
+    protected _callButtonElement: HTMLElement;
     private _timerElement: HTMLElement;
     private _chinaAdvertisementElement: HTMLElement;
 
@@ -61,7 +60,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _gameId: string;
 
     private _country: string | undefined;
-    private _abGroup: ABGroup;
     private _campaign: Campaign;
 
     constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
@@ -72,7 +70,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._gameId = parameters.clientInfo.getGameId();
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
         this._country = parameters.coreConfig.getCountry();
-        this._abGroup = parameters.coreConfig.getAbGroup();
         this._campaign = parameters.campaign;
         this._showGDPRBanner = showGDPRBanner;
         this._showPrivacyDuringVideo = showPrivacyDuringVideo;
@@ -198,8 +195,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         this._videoProgress = value;
         this._skipRemaining = this._skipDuration - this._videoProgress;
+
         const timerCount = Math.ceil((this._videoDuration - this._videoProgress) / 1000);
-        if (typeof timerCount === 'number' && !isNaN(timerCount)) {
+
+        if (typeof timerCount === 'number' && !isNaN(timerCount) && timerCount > 0) {
             this._timerElement.innerText = timerCount.toString();
         }
 
@@ -332,8 +331,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
                         bypassAppSheet: campaign.getBypassAppSheet(),
                         appStoreId: campaign.getAppStoreId(),
                         store: campaign.getStore(),
+                        videoDuration: this._videoDuration,
                         videoProgress: this._videoProgress,
-                        appDownloadUrl: campaign instanceof PerformanceCampaign ? campaign.getAppDownloadUrl() : undefined
+                        appDownloadUrl: campaign instanceof PerformanceCampaign ? campaign.getAppDownloadUrl() : undefined,
+                        skipEnabled: this._skipEnabled
                     });
                 }
             });
@@ -383,10 +384,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         }
     }
 
-    private showCallButton() {
-        if (!this._areControlsVisible) {
-            return;
-        }
+    protected showCallButton() {
         this._callButtonElement.classList.add('show-call-button');
         this._callButtonElement.classList.add('show-go-text');
     }

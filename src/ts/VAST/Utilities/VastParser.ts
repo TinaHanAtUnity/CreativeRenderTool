@@ -4,7 +4,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';
 import { VastCreative } from 'VAST/Models/VastCreative';
-import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
+import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { Url } from 'Core/Utilities/Url';
@@ -304,9 +304,10 @@ export class VastParser {
         return creative;
     }
 
-    private parseCreativeCompanionAdElement(companionAdElement: Element): VastCreativeCompanionAd | null {
+    private parseCreativeCompanionAdElement(companionAdElement: Element): VastCreativeStaticResourceCompanionAd | null {
         const staticResourceElement = <Element>this.childByName(companionAdElement, 'StaticResource');
         const companionClickThroughElement = this.childByName(companionAdElement, 'CompanionClickThrough');
+        const companionClickTrackingElements = <Element[]>this.childsByName(companionAdElement, 'CompanionClickTracking');
 
         if (companionAdElement && staticResourceElement) {
             const id = companionAdElement.getAttribute('id');
@@ -315,10 +316,16 @@ export class VastParser {
             const creativeType = staticResourceElement.getAttribute('creativeType');
             const staticResourceURL = this.parseNodeText(staticResourceElement);
             const companionClickThroughURLTemplate = this.parseNodeText(companionClickThroughElement!);
-
+            const companionClickTrackingURLTemplates: string[] = [];
+            for (const trackingElement of companionClickTrackingElements) {
+                const companionClickTrackingTemplate = this.parseNodeText(trackingElement);
+                if (companionClickTrackingTemplate != null) {
+                    companionClickTrackingURLTemplates.push(companionClickTrackingTemplate);
+                }
+            }
             const trackingEvents = this.getTrackingEventsFromElement(companionAdElement);
 
-            return new VastCreativeCompanionAd(id, height, width, creativeType, staticResourceURL, companionClickThroughURLTemplate, trackingEvents);
+            return new VastCreativeStaticResourceCompanionAd(id, height, width, creativeType, staticResourceURL, companionClickThroughURLTemplate, companionClickTrackingURLTemplates, trackingEvents);
         } else {
             return null;
         }

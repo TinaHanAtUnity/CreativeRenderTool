@@ -1,6 +1,6 @@
 import { Model } from 'Core/Models/Model';
 import { VastAd } from 'VAST/Models/VastAd';
-import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
+import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { CampaignError } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
@@ -161,7 +161,7 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
-    public getLandscapeOrientedCompanionAd(): VastCreativeCompanionAd | null {
+    public getLandscapeOrientedCompanionAd(): VastCreativeStaticResourceCompanionAd | null {
         const ad = this.getAd();
         if (ad) {
             const companionAds = ad.getCompanionAds();
@@ -186,7 +186,7 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
-    public getPortraitOrientedCompanionAd(): VastCreativeCompanionAd | null {
+    public getPortraitOrientedCompanionAd(): VastCreativeStaticResourceCompanionAd | null {
         const ad = this.getAd();
         if (ad) {
             const companionAds = ad.getCompanionAds();
@@ -231,6 +231,27 @@ export class Vast extends Model<IVast> {
         }
 
         return null;
+    }
+
+    public getCompanionClickTrackingUrls(): string[] {
+        const ad = this.getAd();
+        if (ad) {
+            const companionAds = ad.getCompanionAds();
+
+            if (companionAds) {
+                for (const companionAd of companionAds) {
+                    const urls = companionAd.getCompanionClickTrackingURLTemplates();
+                    const height = companionAd.getHeight();
+                    const width = companionAd.getWidth();
+                    const creativeType = companionAd.getCreativeType();
+                    const validCompanion = this.isValidPortraitCompanion(creativeType, height, width) || this.isValidLandscapeCompanion(creativeType, height, width);
+                    if (urls.length > 0 && validCompanion) {
+                        return urls;
+                    }
+                }
+            }
+        }
+        return [];
     }
 
     public getVideoMediaFiles(): VastMediaFile[] {
