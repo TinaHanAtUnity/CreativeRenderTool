@@ -109,23 +109,25 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
             const observer = this._promo.Purchasing.onGetPromoCatalog.subscribe((promoCatalogJSON) => {
                 this._promo.Purchasing.onGetPromoCatalog.unsubscribe(observer);
                 if(promoCatalogJSON === '') {
-                    reject(this.logIssue('Promo catalog JSON is empty'));
-                }
+                    reject(this.logIssue('Promo catalog JSON is empty', 'catalog_json_empty'));                }
                 try {
                     const products: IProduct[] = JSON.parse(promoCatalogJSON);
                     resolve(products);
                 } catch(err) {
-                    reject(this.logIssue(`Promo catalog JSON failed to parse with the following string: ${promoCatalogJSON}`));
+                    reject(this.logIssue(`Promo catalog JSON failed to parse with the following string: ${promoCatalogJSON}`, 'catalog_json_parse_failure'));
                 }
             });
             this._promo.Purchasing.getPromoCatalog().catch((e) => {
                 this._promo.Purchasing.onGetPromoCatalog.unsubscribe(observer);
-                reject(this.logIssue('Purchasing Catalog failed to refresh'));
+                reject(this.logIssue('Purchasing Catalog failed to refresh', 'catalog_refresh_failed'));
             });
         });
     }
 
-    private logIssue(errorMessage: string): Error {
+    private logIssue(errorMessage: string, errorType?: string): Error {
+        if (errorType) {
+            Diagnostics.trigger(errorType, { message: errorMessage });
+        }
         this._core.Sdk.logError(errorMessage);
         return new Error(errorMessage);
     }
@@ -161,7 +163,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         if (jsonPayload.type === 'CatalogUpdated') {
             return this.refreshCatalog().then((catalog) => this.onCatalogRefreshed.trigger(catalog));
         } else {
-            return Promise.reject(this.logIssue('IAP Payload is incorrect'));
+            return Promise.reject(this.logIssue('IAP Payload is incorrect', 'handle_send_event_failure'));
         }
     }
 
@@ -187,7 +189,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
             });
             this._promo.Purchasing.initializePurchasing().catch(() => {
                 this._promo.Purchasing.onInitialize.unsubscribe(observer);
-                reject(this.logIssue('Purchase initialization failed'));
+                reject(this.logIssue('Purchase initialization failed', 'purchase_initialization_failed'));
             });
         });
     }
@@ -226,12 +228,12 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
                     }
                     resolve();
                 } else {
-                    reject(this.logIssue(`Purchase command attempt failed with command ${isCommandSuccessful}`));
+                    reject(this.logIssue(`Purchase command attempt failed with command ${isCommandSuccessful}`, 'purchase_command_failed'));
                 }
             });
             this._promo.Purchasing.initiatePurchasingCommand(JSON.stringify(iapPayload)).catch(() => {
                 this._promo.Purchasing.onCommandResult.unsubscribe(observer);
-                reject(this.logIssue('Purchase event failed to send'));
+                reject(this.logIssue('Purchase event failed to send', 'purchase_event_failed'));
             });
         });
     }
