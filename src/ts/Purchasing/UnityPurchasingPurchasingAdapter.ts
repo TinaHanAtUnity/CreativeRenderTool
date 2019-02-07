@@ -127,7 +127,6 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
 
     private logIssue(errorType: string, errorMessage: string): Error {
         this._core.Sdk.logError(errorMessage);
-        Diagnostics.trigger(errorType, { message: errorMessage });
         return new Error(errorMessage);
     }
 
