@@ -109,23 +109,23 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
             const observer = this._promo.Purchasing.onGetPromoCatalog.subscribe((promoCatalogJSON) => {
                 this._promo.Purchasing.onGetPromoCatalog.unsubscribe(observer);
                 if(promoCatalogJSON === '') {
-                    reject(this.logIssue('catalog_json_empty', 'Promo catalog JSON is empty'));
+                    reject(this.logIssue('Promo catalog JSON is empty'));
                 }
                 try {
                     const products: IProduct[] = JSON.parse(promoCatalogJSON);
                     resolve(products);
                 } catch(err) {
-                    reject(this.logIssue('catalog_json_parse_failure', `Promo catalog JSON failed to parse with the following string: ${promoCatalogJSON}`));
+                    reject(this.logIssue(`Promo catalog JSON failed to parse with the following string: ${promoCatalogJSON}`));
                 }
             });
             this._promo.Purchasing.getPromoCatalog().catch((e) => {
                 this._promo.Purchasing.onGetPromoCatalog.unsubscribe(observer);
-                reject(this.logIssue('catalog_refresh_failed', 'Purchasing Catalog failed to refresh'));
+                reject(this.logIssue('Purchasing Catalog failed to refresh'));
             });
         });
     }
 
-    private logIssue(errorType: string, errorMessage: string): Error {
+    private logIssue(errorMessage: string): Error {
         this._core.Sdk.logError(errorMessage);
         return new Error(errorMessage);
     }
@@ -161,7 +161,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         if (jsonPayload.type === 'CatalogUpdated') {
             return this.refreshCatalog().then((catalog) => this.onCatalogRefreshed.trigger(catalog));
         } else {
-            return Promise.reject(this.logIssue('handle_send_event_failure', 'IAP Payload is incorrect'));
+            return Promise.reject(this.logIssue('IAP Payload is incorrect'));
         }
     }
 
@@ -170,7 +170,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
             if (framework && framework.getName() === 'Unity') {
                 return Promise.resolve();
             } else {
-                return Promise.reject(this.logIssue('purchasing_not_made_with_unity', 'Game not made with Unity. You must use BYOP to use IAP Promo.'));
+                return Promise.reject(this.logIssue('Game not made with Unity. You must use BYOP to use IAP Promo.'));
             }
         });
     }
@@ -180,14 +180,14 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
             const observer = this._promo.Purchasing.onInitialize.subscribe((isReady) => {
                 this._promo.Purchasing.onInitialize.unsubscribe(observer);
                 if (isReady !== 'True') {
-                    reject(this.logIssue('purchasingsdk_not_detected', 'Purchasing SDK not detected. You have likely configured a promo placement but have not included the Unity Purchasing SDK in your game.'));
+                    reject(this.logIssue('Purchasing SDK not detected. You have likely configured a promo placement but have not included the Unity Purchasing SDK in your game.'));
                 } else {
                     resolve();
                 }
             });
             this._promo.Purchasing.initializePurchasing().catch(() => {
                 this._promo.Purchasing.onInitialize.unsubscribe(observer);
-                reject(this.logIssue('purchase_initialization_failed', 'Purchase initialization failed'));
+                reject(this.logIssue('Purchase initialization failed'));
             });
         });
     }
@@ -197,14 +197,14 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
             const promoVersionObserver = this._promo.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
                 this._promo.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
                 if(!this.isPromoVersionSupported(promoVersion)) {
-                    reject(this.logIssue('promo_version_not_supported', `Promo version: ${promoVersion} is not supported. Initialize UnityPurchasing 1.16+ to ensure Promos are marked as ready`));
+                    reject(this.logIssue(`Promo version: ${promoVersion} is not supported. Initialize UnityPurchasing 1.16+ to ensure Promos are marked as ready`));
                 } else {
                     resolve();
                 }
             });
             this._promo.Purchasing.getPromoVersion().catch(() => {
                 this._promo.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
-                reject(this.logIssue('promo_version_check_failed', 'Promo version check failed'));
+                reject(this.logIssue('Promo version check failed'));
             });
         });
     }
@@ -226,12 +226,12 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
                     }
                     resolve();
                 } else {
-                    reject(this.logIssue('purchase_command_attempt_failed', `Purchase command attempt failed with command ${isCommandSuccessful}`));
+                    reject(this.logIssue(`Purchase command attempt failed with command ${isCommandSuccessful}`));
                 }
             });
             this._promo.Purchasing.initiatePurchasingCommand(JSON.stringify(iapPayload)).catch(() => {
                 this._promo.Purchasing.onCommandResult.unsubscribe(observer);
-                reject(this.logIssue('send_purchase_event_failed', 'Purchase event failed to send'));
+                reject(this.logIssue('Purchase event failed to send'));
             });
         });
     }
