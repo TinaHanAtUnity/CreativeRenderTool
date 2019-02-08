@@ -36,9 +36,8 @@ export class NativeBridge implements INativeBridge {
 
     private _allowAutoBatching = true;
     private _autoBatchEnabled: boolean;
-    private _autoBatch?: BatchInvocation;
-    private _autoBatchTimer?: number;
-    private _autoBatchInterval = 1;
+    private _currentBatch?: BatchInvocation;
+    private _nextBatch?: BatchInvocation;
 
     private _eventHandlers: { [key: string]: NativeApi } = {};
 
@@ -56,20 +55,17 @@ export class NativeBridge implements INativeBridge {
 
     public invoke<T>(className: string, methodName: string, parameters?: unknown[]): Promise<T> {
         if(this._autoBatchEnabled) {
-            if(!this._autoBatch) {
-                this._autoBatch = new BatchInvocation(this);
+            if(!this._currentBatch) {
+                this._currentBatch = new BatchInvocation(this);
+                const promise = this._currentBatch.queue<T>(className, methodName, parameters);
+                this.invokeBatch(this._currentBatch);
+                return promise;
+            } else {
+                if(!this._nextBatch) {
+                    this._nextBatch = new BatchInvocation(this);
+                }
+                return this._nextBatch.queue<T>(className, methodName, parameters);
             }
-            const promise = this._autoBatch.queue<T>(className, methodName, parameters);
-            if(!this._autoBatchTimer) {
-                this._autoBatchTimer = window.setTimeout(() => {
-                    if(this._autoBatch) {
-                        this.invokeBatch(this._autoBatch);
-                        delete this._autoBatch;
-                        delete this._autoBatchTimer;
-                    }
-                }, this._autoBatchInterval);
-            }
-            return promise;
         } else {
             const batch = new BatchInvocation(this);
             const promise = batch.queue<T>(className, methodName, parameters);
@@ -79,6 +75,14 @@ export class NativeBridge implements INativeBridge {
     }
 
     public handleCallback(results: unknown[][]): void {
+        if(this._nextBatch) {
+            this._currentBatch = this._nextBatch;
+            delete this._nextBatch;
+            this.invokeBatch(this._currentBatch);
+        } else {
+            delete this._currentBatch;
+        }
+
         results.forEach((result: unknown[]): void => {
             const id: number = parseInt(<string>result.shift(), 10);
             const status = NativeBridge.convertStatus(<string>result.shift());

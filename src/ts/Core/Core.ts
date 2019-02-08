@@ -228,10 +228,6 @@ export class Core implements ICore {
             return this.Ads.initialize(jaegerInitSpan);
         }).then(() => {
             this.JaegerManager.stop(jaegerInitSpan);
-
-            if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
-                this.NativeBridge.setAutoBatchEnabled(false);
-            }
         }).catch((error: { message: string; name: unknown }) => {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
