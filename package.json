@@ -14,14 +14,14 @@
     "@types/sinon": "4.3.3",
     "autoprefixer-stylus": "0.14.0",
     "chai": "4.2.0",
-    "chokidar": "2.0.4",
+    "chokidar": "2.1.0",
     "google-closure-compiler": "20190121.0.0",
     "html-minifier": "3.5.21",
     "inline-source-cli": "1.2.0",
     "mocha": "5.2.0",
     "node-fetch": "2.3.0",
     "protobufjs": "6.8.8",
-    "puppeteer": "1.12.0",
+    "puppeteer": "1.12.2",
     "puppeteer-extra": "2.1.1",
     "puppeteer-extra-plugin-user-data-dir": "2.1.1",
     "puppeteer-extra-plugin-user-preferences": "2.1.1",
@@ -41,6 +41,6 @@
     "tslib": "1.9.3",
     "tslint": "5.12.1",
     "tslint-microsoft-contrib": "6.0.0",
-    "typescript": "3.3.1"
+    "typescript": "3.3.3"
   }
 }
