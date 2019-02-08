@@ -13,9 +13,9 @@ export class AppleStoreManager extends StoreManager {
     }
 
     public startTracking(): void {
-        this._store.iOS!.Store.onTransaction.subscribe((data: unknown) => this.onTransaction(data));
+        this._store.iOS!.Products.onTransaction.subscribe((data: unknown) => this.onTransaction(data));
 
-        this._store.iOS!.Store.startTransactionObserver();
+        this._store.iOS!.Products.startTransactionObserver();
     }
 
     private onTransaction(data: unknown): void {

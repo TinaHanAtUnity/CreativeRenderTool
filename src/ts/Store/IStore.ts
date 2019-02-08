@@ -1,14 +1,14 @@
 import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { AndroidStoreApi } from 'Store/Native/Android/Store';
-import { IosStoreApi } from 'Store/Native/iOS/Store';
 import { StoreManager } from 'Store/Managers/StoreManager';
+import { ProductsApi } from 'Store/Native/iOS/Products';
 
 export interface IStoreApi extends IModuleApi {
     Android?: {
         Store: AndroidStoreApi;
     };
     iOS?: {
-        Store: IosStoreApi;
+        Products: ProductsApi;
     };
 }
 

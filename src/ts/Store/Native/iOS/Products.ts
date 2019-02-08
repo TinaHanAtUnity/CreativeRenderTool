@@ -9,13 +9,13 @@ enum IosStoreEvent {
     RECEIVED_TRANSACTION
 }
 
-export class IosStoreApi extends NativeApi {
+export class ProductsApi extends NativeApi {
     public readonly onProductRequestErrorNoProducts = new Observable1<number>();
     public readonly onProductRequestComplete = new Observable2<number, unknown>(); // todo: typing
     public readonly onTransaction = new Observable1<unknown>(); // todo: typing
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Store', ApiPackage.STORE, EventCategory.STORE);
+        super(nativeBridge, 'Products', ApiPackage.STORE, EventCategory.STORE);
     }
 
     public requestProductInfos(productIds: string[], requestId: number): Promise<void> {

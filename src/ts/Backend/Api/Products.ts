@@ -1,6 +1,6 @@
 import { BackendApi } from 'Backend/BackendApi';
 
-export class IosStore extends BackendApi {
+export class Products extends BackendApi {
     public startTransactionObserver() {
         return;
     }
