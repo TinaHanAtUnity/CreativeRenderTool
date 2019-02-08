@@ -7,7 +7,6 @@ import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
-import { ABGroup, InterstitialLayoutTest } from 'Core/Models/ABGroup';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -35,35 +34,32 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
-    private _timerToSkipEnabled: boolean = false;
 
     private _skipEnabled: boolean;
 
     private _videoDurationEnabled: boolean = false;
-    private _videoProgress: number;
+    protected _videoProgress: number;
 
     private _muteEnabled: boolean = false;
     private _showPrivacyDuringVideo: boolean = false;
 
     private _debugMessageVisible: boolean = false;
-    private _callButtonVisible: boolean = false;
+    protected _callButtonVisible: boolean = false;
     private _callButtonEnabled: boolean = true;
 
     private _skipButtonElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
-    private _callButtonElement: HTMLElement;
+    protected _callButtonElement: HTMLElement;
     private _timerElement: HTMLElement;
     private _chinaAdvertisementElement: HTMLElement;
-    private _timerButton: HTMLElement;
 
     private _fadeTimer?: number;
     private _areControlsVisible: boolean = false;
     private _gameId: string;
 
     private _country: string | undefined;
-    private _abGroup: ABGroup;
     private _campaign: Campaign;
 
     constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
@@ -74,7 +70,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._gameId = parameters.clientInfo.getGameId();
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
         this._country = parameters.coreConfig.getCountry();
-        this._abGroup = parameters.coreConfig.getAbGroup();
         this._campaign = parameters.campaign;
         this._showGDPRBanner = showGDPRBanner;
         this._showPrivacyDuringVideo = showPrivacyDuringVideo;
@@ -86,15 +81,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             this._templateData.showInstallButton = true;
             this._templateData.gameIcon = this._campaign.getGameIcon() ? this._campaign.getGameIcon().getUrl() : '';
-        }
-
-        const isZyngaGame = CustomFeatures.isZyngaGame(parameters.clientInfo.getGameId());
-
-        // Run the test on Skippable videos that aren't Zynga games
-        if (!isZyngaGame && InterstitialLayoutTest.isValid(parameters.coreConfig.getAbGroup()) && parameters.placement.allowSkip()) {
-            this._templateData.skipUnderTimer = true;
-            this.setTimerToSkipEnabled(true);
-            this.setFadeEnabled(false);
         }
 
         this._bindings = [
@@ -210,21 +196,13 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._videoProgress = value;
         this._skipRemaining = this._skipDuration - this._videoProgress;
 
-        let timerCount;
-        if (this._timerToSkipEnabled) {
-            timerCount = Math.ceil((this._skipRemaining) / 1000);
-        } else {
-            timerCount = Math.ceil((this._videoDuration - this._videoProgress) / 1000);
-        }
+        const timerCount = Math.ceil((this._videoDuration - this._videoProgress) / 1000);
 
         if (typeof timerCount === 'number' && !isNaN(timerCount) && timerCount > 0) {
             this._timerElement.innerText = timerCount.toString();
         }
 
         if (this._skipRemaining <= 0) {
-            if (this._timerToSkipEnabled) {
-                this.hideTimerButton();
-            }
             this.showSkipButton();
             this._chinaAdvertisementElement.classList.add('with-skip-button');
         }
@@ -353,8 +331,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
                         bypassAppSheet: campaign.getBypassAppSheet(),
                         appStoreId: campaign.getAppStoreId(),
                         store: campaign.getStore(),
+                        videoDuration: this._videoDuration,
                         videoProgress: this._videoProgress,
-                        appDownloadUrl: campaign instanceof PerformanceCampaign ? campaign.getAppDownloadUrl() : undefined
+                        appDownloadUrl: campaign instanceof PerformanceCampaign ? campaign.getAppDownloadUrl() : undefined,
+                        skipEnabled: this._skipEnabled
                     });
                 }
             });
@@ -386,7 +366,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._timerElement = <HTMLElement>this._container.querySelector('.timer');
         this._chinaAdvertisementElement = <HTMLLIElement>this._container.querySelector('.china-advertisement');
-        this._timerButton = <HTMLElement>this._container.querySelector('.timer-button');
     }
 
     private showSkipButton() {
@@ -405,10 +384,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         }
     }
 
-    private showCallButton() {
-        if (!this._areControlsVisible) {
-            return;
-        }
+    protected showCallButton() {
         this._callButtonElement.classList.add('show-call-button');
         this._callButtonElement.classList.add('show-go-text');
     }
@@ -432,14 +408,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private fadeOut() {
         this._container.classList.remove('fade-in');
         this._areControlsVisible = false;
-    }
-
-    private hideTimerButton() {
-        this._timerButton.style.display = 'none';
-    }
-
-    private setTimerToSkipEnabled(value: boolean) {
-        this._timerToSkipEnabled = value;
     }
 
     protected cleanUpPrivacy() {

@@ -14,7 +14,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { toAbGroup } from 'Core/Models/ABGroup';
+import { toAbGroup, AndroidThreadingTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -145,11 +145,10 @@ export class Core implements ICore {
             HttpKafka.setClientInfo(this.ClientInfo);
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
-                this.Api.Request.Android!.setMaximumPoolSize(8);
                 this.Api.Request.Android!.setKeepAliveTime(10000);
-            } else {
-                this.Api.Request.setConcurrentRequestCount(8);
             }
+
+            this.Api.Request.setConcurrentRequestCount(8);
 
             return Promise.all([this.DeviceInfo.fetch(), this.UnityInfo.fetch(this.ClientInfo.getApplicationName()), this.setupTestEnvironment()]);
         }).then(() => {
@@ -216,6 +215,10 @@ export class Core implements ICore {
                 throw error;
             }
 
+            if(AndroidThreadingTest.isValid(this.Config.getAbGroup()) && this.NativeBridge.getPlatform() === Platform.ANDROID) {
+                this.Api.Request.setConcurrentRequestCount(1);
+            }
+
             this.Analytics = new Analytics(this);
             return Promise.all([configJson, this.Analytics.initialize()]);
         }).then(([configJson, gameSessionId]: [unknown, number]) => {
@@ -228,9 +231,6 @@ export class Core implements ICore {
 
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.NativeBridge.setAutoBatchEnabled(false);
-                this.Api.Request.Android!.setMaximumPoolSize(1);
-            } else {
-                this.Api.Request.setConcurrentRequestCount(1);
             }
         }).catch((error: { message: string; name: unknown }) => {
             jaegerInitSpan.addAnnotation(error.message);

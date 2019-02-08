@@ -146,7 +146,6 @@ export class BannerCampaignManager {
     }
 
     private handleError(e: Error, diagnostic: string): Promise<Campaign> {
-        Diagnostics.trigger(diagnostic, e);
         return Promise.reject(e);
     }
 

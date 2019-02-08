@@ -11,7 +11,9 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
 
 import ProgrammaticVastCampaignFlat from 'json/campaigns/vast/ProgrammaticVastCampaignFlat.json';
+import ProgrammaticVastCampaignWithEncodedUrl from 'json/campaigns/vast/ProgrammaticVastCampaignWithEncodedUrl.json';
 import ProgrammaticVastCampaignWithVpaidAd from 'json/campaigns/vast/ProgrammaticVastCampaignWithVpaidAd.json';
+import VastCompanionAdXml from 'xml/VastCompanionAd.xml';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -19,7 +21,6 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticVastParser, ProgrammaticVastParserStrict } from 'VAST/Parsers/ProgrammaticVastParser';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
-import { VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 
 describe('ProgrammaticVastParser', () => {
     const placementId = 'TestPlacement';
@@ -101,6 +102,7 @@ describe('ProgrammaticVastParserStrict', () => {
         (<any>core.Api.Sdk) = sinon.createStubInstance(SdkApi);
 
         request = sinon.createStubInstance(RequestManager);
+        core.RequestManager = request;
         session = TestFixtures.getSession();
 
         parser = new ProgrammaticVastParserStrict(core);
@@ -150,6 +152,22 @@ describe('ProgrammaticVastParserStrict', () => {
                     } else {
                         assert.fail(`Expected MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD error but got ${error.message}`);
                     }
+                });
+            });
+        });
+
+        describe('with encoded urls in vast ad', () => {
+            it('should have valid data', () => {
+                const getStub: sinon.SinonStub = <sinon.SinonStub>request.get;
+                getStub.returns(Promise.resolve({
+                    response: VastCompanionAdXml
+                }));
+                const auctionPlacement = new AuctionPlacement(placementId, mediaId);
+                const response = new AuctionResponse([auctionPlacement], JSON.parse(ProgrammaticVastCampaignWithEncodedUrl), mediaId, correlationId);
+                return parser.parse(response, session).then((parsedCampaign) => {
+                    const vastCampaign: VastCampaign = <VastCampaign>parsedCampaign;
+                    assert.isNotNull(vastCampaign);
+                    // no errors is passing
                 });
             });
         });
