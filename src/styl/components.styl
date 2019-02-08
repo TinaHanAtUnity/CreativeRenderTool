@@ -492,6 +492,73 @@ $checkbox-group-container($scale-size = $default-scale-size, $context-font-size 
   }
 }
 
+$switch-group-container() {
+
+  .switch-container {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 28px;
+  }
+
+  .switch-label {
+    position: relative;
+    width: 80%;
+  }
+
+  [type="checkbox"]:checked,
+  [type="checkbox"]:not(:checked) {
+    position: absolute;
+    visibility: hidden;
+  }
+
+  [type="checkbox"]:checked + label,
+  [type="checkbox"]:not(:checked) + label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cecece;
+    border-radius: 34px;
+    transition: .15s ease-in-out;
+  }
+
+  [type="checkbox"]:checked + label:before,
+  [type="checkbox"]:not(:checked) + label:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: .15s ease-in-out;
+  }
+
+  [type="checkbox"]:checked + label {
+    background-color: #2196F3;
+  }
+
+  [type="checkbox"]:focus + label {
+    box-shadow: 0 0 1px #2196F3;
+  }
+
+  [type="checkbox"]:checked + label:before {
+    transform: translateX(18px);
+  }
+}
+
 $click-animation() {
   span {
     display: block;
