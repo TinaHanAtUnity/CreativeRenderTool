@@ -1,6 +1,7 @@
 # Pending
 
 * Install button experiment for rewarded ad videos [#8055](https://github.com/Applifier/unity-ads-webview/pull/8055)
+* Update dependencies [#8054](https://github.com/Applifier/unity-ads-webview/pull/8054)
 
 # Thu Feb  7 00:49:07 UTC 2019
 * Fix connect to disconnect in MRAIDAdapterContainer [#8150](https://github.com/Applifier/unity-ads-webview/pull/8150)
