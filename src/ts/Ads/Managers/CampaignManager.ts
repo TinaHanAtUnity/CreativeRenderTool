@@ -390,7 +390,7 @@ export class CampaignManager {
         session.setGameSessionCounters(gameSessionCounters);
         session.setPrivacy(requestPrivacy);
 
-        const auctionStatusCode: number = json.statusCode || 0;
+        const auctionStatusCode: number = json.statusCode || AuctionStatusCode.NORMAL;
 
         this._backupCampaignManager.deleteBackupCampaigns();
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
