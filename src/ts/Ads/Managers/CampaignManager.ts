@@ -114,6 +114,7 @@ export class CampaignManager {
     private _realtimeBody?: { [key: string]: unknown } = {};
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
+    private _deviceFreeSpace: number;
 
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
         this._platform = platform;
@@ -282,6 +283,7 @@ export class CampaignManager {
         session.setAdPlan(response.response);
         session.setGameSessionCounters(gameSessionCounters);
         session.setPrivacy(requestPrivacy);
+        session.setDeviceFreeSpace(this._deviceFreeSpace);
 
         this._backupCampaignManager.deleteBackupCampaigns();
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
@@ -388,6 +390,7 @@ export class CampaignManager {
         session.setAdPlan(response.response);
         session.setGameSessionCounters(gameSessionCounters);
         session.setPrivacy(requestPrivacy);
+        session.setDeviceFreeSpace(this._deviceFreeSpace);
 
         this._backupCampaignManager.deleteBackupCampaigns();
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
@@ -845,6 +848,7 @@ export class CampaignManager {
                 return signal.getDTO();
             })
         ]).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal, optionalSignal]) => {
+            this._deviceFreeSpace = freeSpace; // save device free space for this session
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;

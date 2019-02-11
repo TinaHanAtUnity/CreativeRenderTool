@@ -9,7 +9,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { MOAT } from 'Ads/Views/MOAT';
-import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
@@ -37,7 +37,7 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastOverlayEventHandlersTest', () => {
         let campaign: VastCampaign;
-        let overlay: NewVideoOverlay;
+        let overlay: VideoOverlay;
         let metaDataManager: MetaDataManager;
         let focusManager: FocusManager;
 
@@ -98,7 +98,7 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
                 platform: platform,
                 ads: ads
             };
-            overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+            overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 

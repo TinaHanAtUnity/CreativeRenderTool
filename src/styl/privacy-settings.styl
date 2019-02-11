@@ -24,7 +24,18 @@
   }
 
   .close-area {
+    position: relative;
     flex-grow: 1;
+  }
+
+  .close-button {
+    position: absolute;
+    padding: .35 * $default-size $default-size;
+    border-radius: 3 * $default-size;
+    background: $privacy-close-button;
+    color: $privacy-close-button-text;
+    font-weight: $privacy-title-font-weight;
+    font-size: $privacy-heading-font-size;
   }
 
   .page-container {
@@ -37,6 +48,7 @@
     padding-bottom: 1rem;
     min-height: 80%;
     max-height: 80%;
+    width: 100%;
     border-top-left-radius: $default-size;
     border-top-right-radius: $default-size;
     background: $white;
@@ -290,6 +302,43 @@
     100% {
       min-height: 0;
       max-height: 80%;
+    }
+  }
+}
+
+body {
+  &.portrait #privacy-settings {
+
+    .close-button {
+      bottom: 1.25 * $default-size;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  &.landscape #privacy-settings {
+
+    .close-button {
+      top: 1.25 * $default-size;
+      right: 1.25 * $default-size;
+    }
+
+    .view-container {
+      left: 22%;
+      min-height: 85%;
+      max-height: 85%;
+      width: 56%;
+    }
+
+    &:not(.initial) {
+      .view-container {
+        min-height: 0;
+        max-height: 85%;
+        animation: page-animation-max-to-min .3s ease-out;
+      }
+      .main-view-container {
+        display: none;
+      }
     }
   }
 }
