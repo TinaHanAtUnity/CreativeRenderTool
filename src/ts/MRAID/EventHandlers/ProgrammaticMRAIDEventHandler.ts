@@ -2,18 +2,30 @@ import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
 import { IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { WebViewTopCalculator } from 'Ads/Utilities/WebPlayer/WebViewTopCalculator';
+import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 
 export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements IMRAIDViewHandler {
 
+    private _jaegerSpan?: JaegerSpan;
+
     public onMraidClick(url: string): Promise<void> {
+        if (this._jaegerSpan) {
+            this._jaegerSpan.addAnnotation(`onMRAIDClick from ProgrammaticMRAIDEventHandler after onBridgeOpen ${url}`);
+        }
         super.onMraidClick(url);
 
         this._mraidView.setCallButtonEnabled(false);
 
         const ctaClickedTime = Date.now();
         return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking()).then((storeUrl) => {
+            if (this._jaegerSpan) {
+                this._jaegerSpan.addAnnotation(`onMRAIDClick from ProgrammaticMRAIDEventHandler after followRedirectChain success ${storeUrl}`);
+            }
             return this.openUrlOnCallButton(storeUrl, Date.now() - ctaClickedTime, url);
-        }).catch(() => {
+        }).catch((e) => {
+            if (this._jaegerSpan) {
+                this._jaegerSpan.addAnnotation(`onMRAIDClick from ProgrammaticMRAIDEventHandler after followRedirectChain fail ${e.message}`);
+            }
             return this.openUrlOnCallButton(url, Date.now() - ctaClickedTime, url);
         });
     }
@@ -38,9 +50,15 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
         return this.openUrl(url).then(() => {
             this._mraidView.setCallButtonEnabled(true);
             this.sendTrackingEvents();
+            if (this._jaegerSpan) {
+                this._jaegerSpan.addAnnotation(`openUrlOnCallButton from ProgrammaticMRAIDEventHandler after openURL success ${url}`);
+            }
 
             ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'programmatic_mraid', this._campaign, this._abGroup.valueOf(), this._gameSessionId);
-        }).catch(() => {
+        }).catch((e) => {
+            if (this._jaegerSpan) {
+                this._jaegerSpan.addAnnotation(`openUrlOnCallButton from ProgrammaticMRAIDEventHandler after openURL fail ${e.message}`);
+            }
             this._mraidView.setCallButtonEnabled(true);
             this.sendTrackingEvents();
         });
@@ -49,5 +67,9 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
     private getTopViewHeight(width: number, height: number): number {
         const webViewResizer = new WebViewTopCalculator(this._deviceInfo, this._platform);
         return webViewResizer.getTopPosition(width, height);
+    }
+
+    public setJaegerSpan(jaegerSpan: JaegerSpan) {
+        this._jaegerSpan = jaegerSpan;
     }
 }
