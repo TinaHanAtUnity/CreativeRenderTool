@@ -89,7 +89,7 @@ export class CustomFeatures {
                 return true;
             }
 
-            return IosUtils.isAppSheetBroken(deviceInfo.getOsVersion(), deviceInfo.getModel());
+            return true;
         }
 
         return false;

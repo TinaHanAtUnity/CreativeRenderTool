@@ -210,6 +210,10 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         }
     }
 
+    public isVideoVisible(): boolean {
+        return true;
+    }
+
     public onContainerForeground(): void {
         if(this.isShowing() && !this.isActive() && !this.getContainer().isPaused()) {
             this.setActive(true);
@@ -220,7 +224,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                 video again. When the video-prepared event is received by the video-event-handler
                 it will seek the video to correct position and call play.
             */
-            if(this.canShowVideo() && this.getVideoState() === VideoState.PAUSED) {
+            if(this.isVideoVisible() && this.canShowVideo() && this.getVideoState() === VideoState.PAUSED) {
                 this.setVideoState(VideoState.PLAYING);
                 this._ads.VideoPlayer.play();
             } else if(this.canPrepareVideo()) {
@@ -246,7 +250,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
             case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_ENDED:
             case AdUnitContainerSystemMessage.AUDIO_SESSION_ROUTE_CHANGED:
-                if(this.isShowing() && this.isActive() && this.canPlayVideo()) {
+                if (this.isVideoVisible() && this.isShowing() && this.isActive() && this.canPlayVideo()) {
                     this.setVideoState(VideoState.PLAYING);
                     this._ads.VideoPlayer.play();
                 }
