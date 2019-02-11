@@ -15,6 +15,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('ProgrammaticAdMobParser', () => {
@@ -48,6 +49,7 @@ import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
                 nativeBridge = TestFixtures.getNativeBridge(platform, backend);
                 core = TestFixtures.getCoreModule(nativeBridge);
                 (<any>core.Api).Sdk = sinon.createStubInstance(SdkApi);
+                core.Config = sinon.createStubInstance(CoreConfiguration);
 
                 request = sinon.createStubInstance(RequestManager);
                 core.RequestManager = request;

@@ -12,6 +12,7 @@ import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { RequestError } from 'Core/Errors/RequestError';
+import { AdmobParsingTest, ABGroup } from 'Core/Models/ABGroup';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
 
@@ -19,11 +20,13 @@ export class ProgrammaticAdMobParser extends CampaignParser {
 
     private _core: ICoreApi;
     private _requestManager: RequestManager;
+    private _abGroup: ABGroup;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
         this._core = core.Api;
         this._requestManager = core.RequestManager;
+        this._abGroup = core.Config.getAbGroup();
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -31,7 +34,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         const cacheTTL = response.getCacheTTL();
         const videoPromise = this.getVideoFromMarkup(markup, session).catch((e) => {
             this._core.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
-            if (e instanceof RequestError) {
+            if (AdmobParsingTest.isValid(this._abGroup) && e instanceof RequestError) {
                 // Video attempting to be shown is no longer being hosted by Admob
                 throw e;
             }
