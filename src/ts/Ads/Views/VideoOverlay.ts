@@ -6,7 +6,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 
-import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
+import VideoOverlayTemplate from 'html/VideoOverlay.html';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -25,7 +25,7 @@ export interface IVideoOverlayParameters<T extends Campaign> {
     placement: Placement;
 }
 
-export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandlerView {
+export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandlerView {
 
     protected _privacy: AbstractPrivacy;
     protected _showGDPRBanner: boolean;
@@ -63,12 +63,12 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _campaign: Campaign;
 
     constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
-        super(parameters.platform, 'new-video-overlay', parameters.placement.muteVideo());
+        super(parameters.platform, 'video-overlay', parameters.placement.muteVideo());
 
         this._ads = parameters.ads;
         this._localization = new Localization(parameters.deviceInfo.getLanguage(), 'overlay');
         this._gameId = parameters.clientInfo.getGameId();
-        this._template = new Template(NewVideoOverlayTemplate, this._localization);
+        this._template = new Template(VideoOverlayTemplate, this._localization);
         this._country = parameters.coreConfig.getCountry();
         this._campaign = parameters.campaign;
         this._showGDPRBanner = showGDPRBanner;
@@ -182,7 +182,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     public setVideoProgress(value: number): void {
-        if (NewVideoOverlay.AutoSkip) {
+        if (VideoOverlay.AutoSkip) {
             this._handlers.forEach(handler => handler.onOverlaySkip(value));
         }
 
