@@ -12,7 +12,7 @@ import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { MOAT } from 'Ads/Views/MOAT';
-import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -53,7 +53,7 @@ describe('VastVideoEventHandler tests', () => {
     let placement: Placement;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
-    let overlay: NewVideoOverlay;
+    let overlay: VideoOverlay;
     let vastEndScreen: VastEndScreen;
     let wakeUpManager: WakeUpManager;
     let request: RequestManager;
@@ -116,7 +116,7 @@ describe('VastVideoEventHandler tests', () => {
             platform: platform,
             ads: ads
         };
-        overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+        overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         wakeUpManager = new WakeUpManager(core);
