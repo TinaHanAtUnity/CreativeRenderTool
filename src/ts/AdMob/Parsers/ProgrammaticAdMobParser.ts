@@ -11,6 +11,7 @@ import { FileId } from 'Core/Utilities/FileId';
 import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { VastParser } from 'VAST/Utilities/VastParser';
+import { ClientError } from 'Core/Errors/ClientError';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
 
@@ -30,6 +31,10 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         const cacheTTL = response.getCacheTTL();
         const videoPromise = this.getVideoFromMarkup(markup, session).catch((e) => {
             this._core.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
+            if (e instanceof ClientError) {
+                // Video attempting to be shown is no longer being hosted by Admob
+                throw e;
+            }
             return null;
         });
 
