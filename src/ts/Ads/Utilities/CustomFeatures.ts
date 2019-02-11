@@ -79,20 +79,12 @@ export class CustomFeatures {
         return this.existsInList(ZyngaGameIds, gameId);
     }
 
-    public static isRewardedVideoInstallButtonEnabled(platform: Platform, deviceInfo: DeviceInfo, campaign: Campaign, coreConfig: CoreConfiguration) {
+    public static isRewardedVideoInstallButtonEnabled(campaign: Campaign, coreConfig: CoreConfiguration) {
         if (!InstallInRewardedVideos.isValid(coreConfig.getAbGroup())) {
             return false;
         }
 
-        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
-            if (platform === Platform.ANDROID) {
-                return true;
-            }
-
-            return true;
-        }
-
-        return false;
+        return (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign);
     }
 
     private static existsInList(gameIdList: string[], gameId: string): boolean {

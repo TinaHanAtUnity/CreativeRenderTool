@@ -87,49 +87,30 @@ describe('CustomFeatures', () => {
         });
 
         describe('Android', () => {
-            const platform = Platform.ANDROID;
-            const backend = TestFixtures.getBackend(platform);
-            const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-            const core = TestFixtures.getCoreApi(nativeBridge);
-            const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
-
             it('should return true when ABGroup is correct', () => {
-                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(platform, deviceInfo, campaign, coreConfig);
+                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(campaign, coreConfig);
                 assert.isTrue(isEnabled);
             });
 
             it('should return false when user is in AB group that does not have the test enabled', () => {
                 coreConfigStub.restore();
                 sinon.stub(coreConfig, 'getAbGroup').returns(toAbGroup(0));
-                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(platform, deviceInfo, campaign, coreConfig);
+                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(campaign, coreConfig);
                 assert.isFalse(isEnabled);
             });
         });
 
         describe('iOS', () => {
-            const platform = Platform.IOS;
-            const backend = TestFixtures.getBackend(platform);
-            const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
-            const core = TestFixtures.getCoreApi(nativeBridge);
-            const deviceInfo = TestFixtures.getIosDeviceInfo(core);
-
-            it('should return true when AppSheet is broken', () => {
-                sinon.stub(IosUtils, 'isAppSheetBroken').returns(true);
-                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(platform, deviceInfo, campaign, coreConfig);
+            it('should return true when ABGroup is correct', () => {
+                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(campaign, coreConfig);
                 assert.isTrue(isEnabled);
-            });
-
-            it('should return false when AppSheet is is not broken', () => {
-                sinon.stub(IosUtils, 'isAppSheetBroken').returns(false);
-                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(platform, deviceInfo, campaign, coreConfig);
-                assert.isFalse(isEnabled);
             });
 
             it('should return false when in AB group that does not have the test enabled', () => {
                 coreConfigStub.restore();
                 sinon.stub(coreConfig, 'getAbGroup').returns(toAbGroup(0));
                 sinon.stub(IosUtils, 'isAppSheetBroken').returns(true);
-                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(platform, deviceInfo, campaign, coreConfig);
+                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(campaign, coreConfig);
                 assert.isFalse(isEnabled);
             });
         });

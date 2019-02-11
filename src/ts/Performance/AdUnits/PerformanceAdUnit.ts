@@ -8,6 +8,8 @@ import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { IAppSheetOptions } from 'Ads/Native/iOS/AppSheet';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { Platform } from 'Core/Constants/Platform';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;
@@ -30,6 +32,8 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
     private _appSheetOpenObserver: IObserver1<IAppSheetOptions>;
     private _appSheetCloseObserver: IObserver1<IAppSheetOptions>;
     private _appSheetErrorObserver: IObserver2<string, IAppSheetOptions>;
+    private _installButtonExperimentEnabled: boolean;
+    private _isIOS: boolean;
 
     constructor(parameters: IPerformanceAdUnitParameters) {
         super(parameters);
@@ -45,17 +49,22 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         this._performanceCampaign = parameters.campaign;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
 
-        this._appSheetOpenObserver = this._ads.iOS!.AppSheet.onOpen.subscribe(() => {
-            this.onAppSheetOpened();
-        });
+        this._installButtonExperimentEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(parameters.campaign, parameters.coreConfig);
+        this._isIOS = parameters.platform === Platform.IOS;
 
-        this._appSheetCloseObserver = this._ads.iOS!.AppSheet.onClose.subscribe(() => {
-            this.onAppSheetClosed();
-        });
+        if (this._isIOS && this._installButtonExperimentEnabled) {
+            this._appSheetOpenObserver = this._ads.iOS!.AppSheet.onOpen.subscribe(() => {
+                this.onAppSheetOpened();
+            });
 
-        this._appSheetErrorObserver = this._ads.iOS!.AppSheet.onError.subscribe(() => {
-            this.onAppSheetErrored();
-        });
+            this._appSheetCloseObserver = this._ads.iOS!.AppSheet.onClose.subscribe(() => {
+                this.onAppSheetClosed();
+            });
+
+            this._appSheetErrorObserver = this._ads.iOS!.AppSheet.onError.subscribe(() => {
+                this.onAppSheetErrored();
+            });
+        }
     }
 
     private onAppSheetOpened(): void {
@@ -68,7 +77,7 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
     private onAppSheetClosed(): void {
         this._appSheetState = AppSheetState.CLOSED;
-        if (this.isShowing() && this.canShowVideo() && this.canPlayVideo()) {
+        if (this.canResumeVideo()) {
             this.setVideoState(VideoState.PLAYING);
             this._ads.VideoPlayer.play();
         }
@@ -76,13 +85,21 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
     private onAppSheetErrored(): void {
         this._appSheetState = AppSheetState.ERRORED;
-        if (this.isShowing() && this.canShowVideo() && this.canPlayVideo()) {
+        if (this.canResumeVideo()) {
             this.setVideoState(VideoState.PLAYING);
             this._ads.VideoPlayer.play();
         }
     }
 
+    private canResumeVideo(): boolean {
+        return this.isShowing() && this.canShowVideo() && this.canPlayVideo();
+    }
+
     public isVideoVisible(): boolean {
+        if (!this._isIOS || !this._installButtonExperimentEnabled) {
+            return true;
+        }
+
         return this._appSheetState !== AppSheetState.OPENED;
     }
 
@@ -97,9 +114,11 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
         }
 
-        this._ads.iOS!.AppSheet.onOpen.unsubscribe(this._appSheetOpenObserver);
-        this._ads.iOS!.AppSheet.onClose.unsubscribe(this._appSheetCloseObserver);
-        this._ads.iOS!.AppSheet.onError.unsubscribe(this._appSheetErrorObserver);
+        if (this._isIOS) {
+            this._ads.iOS!.AppSheet.onOpen.unsubscribe(this._appSheetOpenObserver);
+            this._ads.iOS!.AppSheet.onClose.unsubscribe(this._appSheetCloseObserver);
+            this._ads.iOS!.AppSheet.onError.unsubscribe(this._appSheetErrorObserver);
+        }
 
         return super.hide();
     }
