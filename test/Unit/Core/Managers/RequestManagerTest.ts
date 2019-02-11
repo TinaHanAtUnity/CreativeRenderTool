@@ -51,18 +51,6 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 assert.isFalse(response3);
                 assert.isFalse(response4);
             });
-
-            it(('should correct handle 4XX responses'), () => {
-                const response1 = RequestManager.is4xxClientError(400);
-                const response2 = RequestManager.is4xxClientError(499);
-                const response3 = RequestManager.is4xxClientError(500);
-                const response4 = RequestManager.is4xxClientError(399);
-
-                assert.isTrue(response1);
-                assert.isTrue(response2);
-                assert.isFalse(response3);
-                assert.isFalse(response4);
-            });
         });
 
         it('Request get without headers (expect success)', () => {

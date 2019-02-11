@@ -5,7 +5,6 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { ClientError } from 'Core/Errors/ClientError';
 
 const enum RequestStatus {
     COMPLETE,
@@ -65,10 +64,6 @@ export class RequestManager {
 
     public static is3xxRedirect(sc: number): boolean {
         return sc >= 300 && sc < 400;
-    }
-
-    public static is4xxClientError(sc: number): boolean {
-        return sc >= 400 && sc < 500;
     }
 
     private static _connectTimeout = 30000;
@@ -244,8 +239,6 @@ export class RequestManager {
                             }
                         } else if (RequestManager.is2xxSuccessful(response.responseCode)) {
                             resolve(requestUrl);
-                        } else if (RequestManager.is4xxClientError(response.responseCode)) {
-                            reject(new ClientError(`Request to ${requestUrl} failed with status ${response.responseCode}`, response.responseCode));
                         } else {
                             reject(new Error(`Request to ${requestUrl} failed with status ${response.responseCode}`));
                         }
