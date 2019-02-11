@@ -43,6 +43,10 @@ export abstract class CampaignLoader {
             session.setPrivacy(rawSession.privacy);
         }
 
+        if(rawSession.deviceFreeSpace) {
+            session.setDeviceFreeSpace(rawSession.deviceFreeSpace);
+        }
+
         return session;
     }
 

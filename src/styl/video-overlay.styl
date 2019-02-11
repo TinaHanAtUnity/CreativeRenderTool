@@ -2,20 +2,20 @@
 @import "gdpr-pop-up.styl";
 @import "iphone-x-series.styl";
 
-$new-video-overlay-styles = {
+$video-overlay-styles = {
   base-size: unit(16px/16, "em") * $default-size,
   tab-font-color: "#f1f1f1",
 }
 
-$new-video-overlay-styles.touchable-area-height = $new-video-overlay-styles.base-size * 2;
-$new-video-overlay-styles.touchable-area-width = $new-video-overlay-styles.base-size * 2.2;
-$new-video-overlay-styles.call-button-width = $new-video-overlay-styles.base-size * 6;
+$video-overlay-styles.touchable-area-height = $video-overlay-styles.base-size * 2;
+$video-overlay-styles.touchable-area-width = $video-overlay-styles.base-size * 2.2;
+$video-overlay-styles.call-button-width = $video-overlay-styles.base-size * 6;
 // @stylint off
-$new-video-overlay-styles.tab-border-radius = $new-video-overlay-styles.base-size * 0.2;
-$new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-size * 0.3;
+$video-overlay-styles.tab-border-radius = $video-overlay-styles.base-size * 0.2;
+$video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.3;
 // @stylint on
 
-#new-video-overlay {
+#video-overlay {
   position: fixed;
   width: 100%;
   height: 100%;
@@ -31,7 +31,7 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
 
   .bottom-container {
     display: block;
-    height: .3 * $new-video-overlay-styles.base-size;
+    height: .3 * $video-overlay-styles.base-size;
 
     .left-corner,
     .center {
@@ -41,7 +41,7 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     .left-corner,
     .right-corner {
       top: auto;
-      bottom: .3 * $new-video-overlay-styles.base-size;
+      bottom: .3 * $video-overlay-styles.base-size;
     }
   }
 
@@ -83,8 +83,8 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
   }
 
   .button {
-    width: $new-video-overlay-styles.touchable-area-width;
-    height: $new-video-overlay-styles.touchable-area-height;
+    width: $video-overlay-styles.touchable-area-width;
+    height: $video-overlay-styles.touchable-area-height;
   }
 
   .margin-fixer {
@@ -113,11 +113,11 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     top: 0;
     left: 0;
     width: 100%;
-    height: $new-video-overlay-styles.touchable-area-height;
+    height: $video-overlay-styles.touchable-area-height;
 
     .left-corner,
     .right-corner {
-      top: .3 * $new-video-overlay-styles.base-size;
+      top: .3 * $video-overlay-styles.base-size;
     }
   }
 
@@ -128,12 +128,12 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     left: 0;
     align-items: center;
     width: 100%;
-    height: $new-video-overlay-styles.touchable-area-height;
+    height: $video-overlay-styles.touchable-area-height;
 
     .center,
     .tab {
       top: auto;
-      bottom: $new-video-overlay-styles.tab-vertical-margin;
+      bottom: $video-overlay-styles.tab-vertical-margin;
     }
 
     .center {
@@ -151,51 +151,51 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     .tab {
       right: 0;
       left: auto;
-      border-radius: $new-video-overlay-styles.tab-border-radius 0 0 $new-video-overlay-styles.tab-border-radius;
+      border-radius: $video-overlay-styles.tab-border-radius 0 0 $video-overlay-styles.tab-border-radius;
     }
   }
 
   .tab {
     position: absolute;
-    top: $new-video-overlay-styles.tab-vertical-margin;
+    top: $video-overlay-styles.tab-vertical-margin;
     left: 0;
-    width: $new-video-overlay-styles.base-size * 2;
-    height: $new-video-overlay-styles.base-size * 1.5;
-    border-radius: 0 $new-video-overlay-styles.tab-border-radius $new-video-overlay-styles.tab-border-radius 0;
+    width: $video-overlay-styles.base-size * 2;
+    height: $video-overlay-styles.base-size * 1.5;
+    border-radius: 0 $video-overlay-styles.tab-border-radius $video-overlay-styles.tab-border-radius 0;
     background-color: rgba(0, 0, 0, .54);
-    color: $new-video-overlay-styles.tab-font-color;
+    color: $video-overlay-styles.tab-font-color;
     text-align: center;
-    text-shadow: $new-video-overlay-styles.base-size * .01 $new-video-overlay-styles.base-size * .01 $new-video-overlay-styles.base-size * .025 rgba(0, 0, 0, .8), 0 0 $new-video-overlay-styles.base-size * .1 rgba(0, 0, 0, 1);
+    text-shadow: $video-overlay-styles.base-size * .01 $video-overlay-styles.base-size * .01 $video-overlay-styles.base-size * .025 rgba(0, 0, 0, .8), 0 0 $video-overlay-styles.base-size * .1 rgba(0, 0, 0, 1);
     font-weight: 300;
   }
 
   .icon,
   .text {
-    font-size: $new-video-overlay-styles.base-size * .65;
+    font-size: $video-overlay-styles.base-size * .65;
   }
 
   .gdpr-button {
     position: absolute;
     top: 0;
-    left: $new-video-overlay-styles.touchable-area-width;
+    left: $video-overlay-styles.touchable-area-width;
 
     .tab {
-      bottom: $new-video-overlay-styles.base-size * .54;
-      width: $new-video-overlay-styles.base-size;
-      height: $new-video-overlay-styles.base-size;
-      border-radius: $new-video-overlay-styles.tab-border-radius;
+      bottom: $video-overlay-styles.base-size * .54;
+      width: $video-overlay-styles.base-size;
+      height: $video-overlay-styles.base-size;
+      border-radius: $video-overlay-styles.tab-border-radius;
     }
 
     .icon-container {
       line-height: .8em;
     }
     .icon {
-      font-size: $new-video-overlay-styles.base-size * .5;
+      font-size: $video-overlay-styles.base-size * .5;
     }
   }
 
   .call-button .tab {
-    line-height: $new-video-overlay-styles.base-size * 1.31;
+    line-height: $video-overlay-styles.base-size * 1.31;
   }
 
   .call-button {
@@ -209,28 +209,28 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
 
   .vast-button {
     display: none;
-    width: $new-video-overlay-styles.call-button-width;
+    width: $video-overlay-styles.call-button-width;
 
     .tab {
-      width: $new-video-overlay-styles.call-button-width;
+      width: $video-overlay-styles.call-button-width;
       text-align: left;
     }
 
     .text {
-      margin-left: $new-video-overlay-styles.base-size * .8;
+      margin-left: $video-overlay-styles.base-size * .8;
       text-align: center;
     }
 
     .go-text {
       position: absolute;
-      margin-top: $new-video-overlay-styles.base-size * .55;
-      margin-left: $new-video-overlay-styles.base-size *  .55;
-      width: $new-video-overlay-styles.base-size *  2.4;
-      height: $new-video-overlay-styles.base-size * 1.7;
+      margin-top: $video-overlay-styles.base-size * .55;
+      margin-left: $video-overlay-styles.base-size *  .55;
+      width: $video-overlay-styles.base-size *  2.4;
+      height: $video-overlay-styles.base-size * 1.7;
       border: 1px solid;
-      border-radius: $new-video-overlay-styles.base-size * .25;
-      font-size: $new-video-overlay-styles.base-size * .8;
-      line-height: $new-video-overlay-styles.base-size * 1.85;
+      border-radius: $video-overlay-styles.base-size * .25;
+      font-size: $video-overlay-styles.base-size * .8;
+      line-height: $video-overlay-styles.base-size * 1.85;
       transform: translateX(200%);
       transition: transform .6s ease-in;
     }
@@ -244,50 +244,50 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
 
   .install-button {
     display: none;
-    width: 7.5 * $new-video-overlay-styles.base-size;
-    height: 3 * $new-video-overlay-styles.base-size;
+    width: 7.5 * $video-overlay-styles.base-size;
+    height: 3 * $video-overlay-styles.base-size;
 
     .tab {
-      width: 7.5 * $new-video-overlay-styles.base-size;
-      height: 2.3 * $new-video-overlay-styles.base-size;
+      width: 7.5 * $video-overlay-styles.base-size;
+      height: 2.3 * $video-overlay-styles.base-size;
       text-align: left;
     }
 
     .download-wrapper {
-      $new-video-overlay-styles-download-element-height = $new-video-overlay-styles.base-size * 1.7;
-      $new-video-overlay-styles-download-element-margin = $new-video-overlay-styles.base-size * .3;
-      $new-video-overlay-styles-download-element-border-radius = $new-video-overlay-styles.base-size * .25;
+      $video-overlay-styles-download-element-height = $video-overlay-styles.base-size * 1.7;
+      $video-overlay-styles-download-element-margin = $video-overlay-styles.base-size * .3;
+      $video-overlay-styles-download-element-border-radius = $video-overlay-styles.base-size * .25;
 
       position: relative;
 
       .game-icon {
-        $set-image($new-video-overlay-styles-download-element-height, $new-video-overlay-styles-download-element-height, $new-video-overlay-styles-download-element-border-radius);
-        margin: $new-video-overlay-styles-download-element-margin;
+        $set-image($video-overlay-styles-download-element-height, $video-overlay-styles-download-element-height, $video-overlay-styles-download-element-border-radius);
+        margin: $video-overlay-styles-download-element-margin;
       }
 
       .download-container {
         position: absolute;
         top: 0;
-        left: $new-video-overlay-styles-download-element-height + 2 * $new-video-overlay-styles-download-element-margin;
-        width: $new-video-overlay-styles.base-size * 4.5;
-        height: $new-video-overlay-styles-download-element-height;
-        border-radius: $new-video-overlay-styles-download-element-border-radius;
+        left: $video-overlay-styles-download-element-height + 2 * $video-overlay-styles-download-element-margin;
+        width: $video-overlay-styles.base-size * 4.5;
+        height: $video-overlay-styles-download-element-height;
+        border-radius: $video-overlay-styles-download-element-border-radius;
         background: $blue;
         color: $white;
         text-align: center;
-        line-height: $new-video-overlay-styles.base-size * 1.5;
+        line-height: $video-overlay-styles.base-size * 1.5;
       }
 
       .download-text {
         text-shadow: none;
-        font-size: $new-video-overlay-styles.base-size * .65;
+        font-size: $video-overlay-styles.base-size * .65;
       }
     }
   }
 
   .timer-container,
   .icon-container {
-    line-height: $new-video-overlay-styles.base-size * 1.55;
+    line-height: $video-overlay-styles.base-size * 1.55;
   }
 
   .icon-volume-mute {
@@ -309,7 +309,7 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
   }
 
   .timer {
-    font-size: $new-video-overlay-styles.base-size * .6;
+    font-size: $video-overlay-styles.base-size * .6;
   }
 
   .buffering-spinner {
@@ -376,21 +376,21 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
 
   &.show-gdpr-banner {
     .gdpr-pop-up {
-      $gdpr-pop-up($new-video-overlay-styles.base-size);
+      $gdpr-pop-up($video-overlay-styles.base-size);
       position: static;
       margin: auto;
       width: 50%;
-      height: $new-video-overlay-styles.base-size * 1.5;
-      border-radius: $new-video-overlay-styles.tab-border-radius;
+      height: $video-overlay-styles.base-size * 1.5;
+      border-radius: $video-overlay-styles.tab-border-radius;
       pointer-events: 1;
 
       .icon-gdpr {
-        font-size: $new-video-overlay-styles.base-size * .5;
+        font-size: $video-overlay-styles.base-size * .5;
       }
 
       .gdpr-text {
         color: $black;
-        font-size: $new-video-overlay-styles.base-size * .35;
+        font-size: $video-overlay-styles.base-size * .35;
       }
     }
   }
@@ -416,7 +416,7 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
   @media (orientation: portrait) {
     &.show-gdpr-banner {
       .bottom-container {
-        height: $new-video-overlay-styles.touchable-area-height * 2;
+        height: $video-overlay-styles.touchable-area-height * 2;
 
         .left-corner,
         .right-corner {
@@ -428,7 +428,7 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
 
           .gdpr-pop-up {
             width: 90%;
-            border-radius: $new-video-overlay-styles.tab-border-radius $new-video-overlay-styles.tab-border-radius 0 0;
+            border-radius: $video-overlay-styles.tab-border-radius $video-overlay-styles.tab-border-radius 0 0;
           }
         }
       }
@@ -441,27 +441,27 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
   @media (orientation: landscape) {
     .content {
       @media (max-width: 392px) {
-        font-size: $new-video-overlay-styles.base-size * .6;
+        font-size: $video-overlay-styles.base-size * .6;
       }
 
       @media (min-width: 472px) and (max-width: 593px) {
-        font-size: $new-video-overlay-styles.base-size * 1.2;
+        font-size: $video-overlay-styles.base-size * 1.2;
       }
 
       @media (min-width: 594px) and (max-width: 792px) {
-        font-size: $new-video-overlay-styles.base-size * 1.5;
+        font-size: $video-overlay-styles.base-size * 1.5;
       }
 
       @media (min-width: 792px) and (max-width: 840px) {
-        font-size: $new-video-overlay-styles.base-size * 2;
+        font-size: $video-overlay-styles.base-size * 2;
       }
 
       @media (min-width: 840px) and (max-width: 959px) {
-        font-size: $new-video-overlay-styles.base-size * 2.1;
+        font-size: $video-overlay-styles.base-size * 2.1;
       }
 
       @media (min-width: 960px) {
-        font-size: $new-video-overlay-styles.base-size * 2.2;
+        font-size: $video-overlay-styles.base-size * 2.2;
       }
     }
   }
@@ -472,27 +472,27 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
   @media (orientation: portrait) {
     .content {
       @media (max-width: 320px) {
-        font-size: $new-video-overlay-styles.base-size * 1.2;
+        font-size: $video-overlay-styles.base-size * 1.2;
       }
 
       @media (min-width: 321px) and (max-width: 359px) {
-        font-size: $new-video-overlay-styles.base-size * 1.5;
+        font-size: $video-overlay-styles.base-size * 1.5;
       }
 
       @media (min-width: 360px) and (max-width: 413px) {
-        font-size: $new-video-overlay-styles.base-size * 1.7;
+        font-size: $video-overlay-styles.base-size * 1.7;
       }
 
       @media (min-width: 414px) and (max-width: 480px) {
-        font-size: $new-video-overlay-styles.base-size * 1.9;
+        font-size: $video-overlay-styles.base-size * 1.9;
       }
 
       @media (min-width: 481px) and (max-width: 568px) {
-        font-size: $new-video-overlay-styles.base-size * 2;
+        font-size: $video-overlay-styles.base-size * 2;
       }
 
       @media (min-width: 569px) {
-        font-size: $new-video-overlay-styles.base-size * 2.4;
+        font-size: $video-overlay-styles.base-size * 2.4;
       }
     }
   }
