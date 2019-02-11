@@ -47,6 +47,10 @@
     "mocha-no-side-effect-code": false,
     "no-http-string": [false, "http://www.example.com/?.*", "http://www.examples.com/?.*"],
     "export-name": false,
-    "insecure-random": false
+    "insecure-random": false,
+    "newline-per-chained-call": false,
+    "no-null-keyword": false,
+    "no-dynamic-delete": false,
+    "prefer-readonly": false
   }
 }
