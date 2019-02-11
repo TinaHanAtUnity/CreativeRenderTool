@@ -69,13 +69,13 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
                 endScreen.remove();
             }
 
-            if(this._moat) {
+            if (this._moat) {
                 this._moat.removeMessageListener();
-                if (this._moat.container().parentElement) {
-                    this._moat.container().parentElement!.removeChild(this._moat.container());
+                const moatContainer = this._moat.container();
+                if (moatContainer && moatContainer.parentElement) {
+                    moatContainer.parentElement.removeChild(moatContainer);
                 }
             }
-
             return super.hide();
         });
     }
