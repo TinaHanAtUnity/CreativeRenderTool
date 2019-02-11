@@ -1,5 +1,8 @@
 # Pending
 
+* Add deviceFreeSpace to video operative events [#8179](https://github.com/Applifier/unity-ads-webview/pull/8179)
+* Change text of the Delete your data button [#8180](https://github.com/Applifier/unity-ads-webview/pull/8180)
+* Add list of 3rd parties to the new privacy and consent views [#8177](https://github.com/Applifier/unity-ads-webview/pull/8177)
 * Renamed NewVideoOverlay -> VideoOverlay, new-video-overlay -> video-overlay [#8152](https://github.com/Applifier/unity-ads-webview/pull/8152)
 * Add close button to the new Privacy settigns view [#8106](https://github.com/Applifier/unity-ads-webview/pull/8106)
 
