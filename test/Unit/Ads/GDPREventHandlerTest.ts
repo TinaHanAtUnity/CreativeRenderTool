@@ -8,7 +8,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
@@ -62,7 +62,7 @@ describe('GDPREventHandlerTest', () => {
             request: sinon.createStubInstance(RequestManager),
             options: {},
             endScreen: sinon.createStubInstance(PerformanceEndScreen),
-            overlay: sinon.createStubInstance(NewVideoOverlay),
+            overlay: sinon.createStubInstance(VideoOverlay),
             video: sinon.createStubInstance(Video),
             privacy: sinon.createStubInstance(Privacy),
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
