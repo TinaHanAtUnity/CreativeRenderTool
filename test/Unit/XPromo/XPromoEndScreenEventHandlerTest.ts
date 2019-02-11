@@ -13,7 +13,7 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { Platform } from 'Core/Constants/Platform';
@@ -47,7 +47,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let core: ICoreApi;
     let ads: IAdsApi;
     let container: AdUnitContainer;
-    let overlay: NewVideoOverlay;
+    let overlay: VideoOverlay;
     let endScreen: XPromoEndScreen;
     let storageBridge: StorageBridge;
     let sessionManager: SessionManager;
@@ -136,7 +136,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 platform: platform,
                 ads: ads
             };
-            overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+            overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
             xPromoAdUnitParameters = {
                 platform,
@@ -301,7 +301,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 platform: platform,
                 ads: ads
             };
-            overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+            overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
             xPromoAdUnitParameters = {
                 platform,

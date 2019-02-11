@@ -1,8 +1,8 @@
-import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
-export class NewVideoOverlayWithInstallInRewardedVideos extends NewVideoOverlay {
+export class VideoOverlayWithInstallInRewardedVideos extends VideoOverlay {
 
     public setVideoProgress(value: number): void {
         super.setVideoProgress(value);

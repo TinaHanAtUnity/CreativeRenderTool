@@ -10,7 +10,7 @@ import { StoreHandler, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHa
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -42,7 +42,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
     let core: ICoreApi;
     let ads: IAdsApi;
     let storageBridge: StorageBridge;
-    let overlay: NewVideoOverlay;
+    let overlay: VideoOverlay;
     let endScreen: PerformanceEndScreen;
     let container: AdUnitContainer;
     let performanceAdUnit: PerformanceAdUnit;
@@ -115,7 +115,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             platform: platform,
             ads: ads
         };
-        overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+        overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         performanceAdUnitParameters = {
