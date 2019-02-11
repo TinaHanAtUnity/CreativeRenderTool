@@ -67,6 +67,23 @@ describe('CometCampaignLoaderTest', () => {
         }
     });
 
+    it('should reload comet campaign with correct free space value', () => {
+        const originalCampaign: PerformanceCampaign = TestFixtures.getCampaign();
+        originalCampaign.getSession().setDeviceFreeSpace(12345);
+
+        const serializedCampaign = originalCampaign.toJSON();
+
+        const loader: CometCampaignLoader = new CometCampaignLoader();
+
+        const newCampaign: PerformanceCampaign | undefined = loader.load(serializedCampaign);
+
+        assert.isDefined(newCampaign, 'performance campaign reload failed');
+
+        if(newCampaign) {
+            assert.equal(newCampaign.getSession().getDeviceFreeSpace(), 12345, 'reloaded performance campaign session device free space does not match original');
+        }
+    });
+
     it('should not reload broken comet campaign', () => {
         const originalCampaign: PerformanceCampaign = TestFixtures.getCampaign();
 
