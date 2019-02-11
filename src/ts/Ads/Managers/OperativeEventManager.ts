@@ -99,6 +99,7 @@ export interface IInfoJson {
     frameworkVersion?: string;
     skippedAt?: number;
     isBackupCampaign: boolean;
+    deviceFreeSpace: number;
 }
 
 export class OperativeEventManager {
@@ -345,13 +346,14 @@ export class OperativeEventManager {
     protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, previousPlacementId?: string): Promise<[string, IInfoJson]> {
         const session = this._campaign.getSession();
         return Promise.all([
+            this._deviceInfo.getFreeSpace(),
             this._deviceInfo.getNetworkType(),
             this._deviceInfo.getConnectionType(),
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight(),
             this._metaDataManager.fetch(MediationMetaData),
             this._metaDataManager.fetch(FrameworkMetaData)
-        ]).then(([networkType, connectionType, screenWidth, screenHeight, mediation, framework]: [number, string, number, number, MediationMetaData | undefined, FrameworkMetaData | undefined]) => {
+        ]).then(([freeSpace, networkType, connectionType, screenWidth, screenHeight, mediation, framework]: [number, number, string, number, number, MediationMetaData | undefined, FrameworkMetaData | undefined]) => {
             let infoJson: IInfoJson = {
                 'eventId': eventId,
                 'auctionId': session.getId(),
@@ -384,7 +386,8 @@ export class OperativeEventManager {
                 'connectionType': connectionType,
                 'screenWidth': screenWidth,
                 'screenHeight': screenHeight,
-                'isBackupCampaign': this._campaign.isBackupCampaign()
+                'isBackupCampaign': this._campaign.isBackupCampaign(),
+                'deviceFreeSpace': freeSpace
             };
 
             if(this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
