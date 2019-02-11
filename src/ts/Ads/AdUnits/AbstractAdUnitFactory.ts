@@ -13,7 +13,7 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { Platform } from 'Core/Constants/Platform';
 import { IAbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { Placement } from 'Ads/Models/Placement';
@@ -57,7 +57,7 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
         };
     }
 
-    protected prepareVideoPlayer<T1 extends VideoEventHandler, T2 extends VideoAdUnit, T3 extends Campaign, T4 extends OperativeEventManager, ParamsType extends IVideoEventHandlerParams<T2, T3, T4>>(VideoEventHandlerConstructor: { new(p: ParamsType): T1 }, params: ParamsType): T1 {
+    protected prepareVideoPlayer<T1 extends VideoEventHandler, T2 extends VideoAdUnit, T3 extends Campaign, T4 extends OperativeEventManager, ParamsType extends IVideoEventHandlerParams<T2, T3, T4>>(VideoEventHandlerConstructor: new(p: ParamsType) => T1, params: ParamsType): T1 {
         const adUnit = params.adUnit;
         const videoEventHandler = new VideoEventHandlerConstructor(params);
 
@@ -107,7 +107,7 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(parameters.platform, parameters.campaign, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            overlay = new NewVideoOverlay(parameters, parameters.privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+            overlay = new VideoOverlay(parameters, parameters.privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {

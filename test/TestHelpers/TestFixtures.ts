@@ -122,7 +122,7 @@ import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { StoreHandler, IStoreHandlerDownloadParameters, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
@@ -683,7 +683,7 @@ export class TestFixtures {
         return new XPromoEndScreen(this.getEndScreenParameters(platform, core, campaign), campaign);
     }
 
-    public static getVideoOverlay<T extends Campaign>(platform: Platform, core: ICoreApi, ads: IAdsApi, campaign: T): NewVideoOverlay {
+    public static getVideoOverlay<T extends Campaign>(platform: Platform, core: ICoreApi, ads: IAdsApi, campaign: T): VideoOverlay {
         const overlayParams: IVideoOverlayParameters<T> = {
             platform,
             ads,
@@ -693,7 +693,7 @@ export class TestFixtures {
             coreConfig: TestFixtures.getCoreConfiguration(),
             placement: TestFixtures.getPlacement()
         };
-        return new NewVideoOverlay(overlayParams, TestFixtures.getPrivacy(platform, campaign), false, false);
+        return new VideoOverlay(overlayParams, TestFixtures.getPrivacy(platform, campaign), false, false);
     }
 
     public static getPerformanceOverlayEventHandler(platform: Platform, core: ICoreApi, ads: IAdsApi, ar: IARApi, purchasing: IPurchasingApi, campaign: Campaign, adUnit: PerformanceAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): PerformanceOverlayEventHandler {
