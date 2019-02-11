@@ -1,4 +1,4 @@
-# Pending
+# Mon Feb 11 17:59:20 UTC 2019
 
 * Add deviceFreeSpace to video operative events [#8179](https://github.com/Applifier/unity-ads-webview/pull/8179)
 * Change text of the Delete your data button [#8180](https://github.com/Applifier/unity-ads-webview/pull/8180)
