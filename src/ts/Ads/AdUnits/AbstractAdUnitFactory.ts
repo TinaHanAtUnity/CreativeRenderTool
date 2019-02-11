@@ -57,7 +57,7 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
         };
     }
 
-    protected prepareVideoPlayer<T1 extends VideoEventHandler, T2 extends VideoAdUnit, T3 extends Campaign, T4 extends OperativeEventManager, ParamsType extends IVideoEventHandlerParams<T2, T3, T4>>(VideoEventHandlerConstructor: { new(p: ParamsType): T1 }, params: ParamsType): T1 {
+    protected prepareVideoPlayer<T1 extends VideoEventHandler, T2 extends VideoAdUnit, T3 extends Campaign, T4 extends OperativeEventManager, ParamsType extends IVideoEventHandlerParams<T2, T3, T4>>(VideoEventHandlerConstructor: new(p: ParamsType) => T1, params: ParamsType): T1 {
         const adUnit = params.adUnit;
         const videoEventHandler = new VideoEventHandlerConstructor(params);
 
