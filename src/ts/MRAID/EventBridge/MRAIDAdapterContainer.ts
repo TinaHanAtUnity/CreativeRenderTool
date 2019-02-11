@@ -4,6 +4,7 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 export class MRAIDAdapterContainer implements IMRAIDHandler {
     private _eventAdapter: MRAIDEventAdapter;
     private _handler: IMRAIDHandler;
+    private _isConnected: boolean = false;
 
     constructor(handler: IMRAIDHandler) {
         this._handler = handler;
@@ -15,11 +16,15 @@ export class MRAIDAdapterContainer implements IMRAIDHandler {
 
     public connect(eventAdapter: MRAIDEventAdapter): void {
         this._eventAdapter = eventAdapter;
-        this._eventAdapter.connect();
+        if (!this._isConnected) {
+            this._eventAdapter.connect();
+            this._isConnected = true;
+        }
     }
 
     public disconnect(): void {
         this._eventAdapter.disconnect();
+        this._isConnected = false;
     }
 
     public sendViewableEvent(viewable: boolean) {
