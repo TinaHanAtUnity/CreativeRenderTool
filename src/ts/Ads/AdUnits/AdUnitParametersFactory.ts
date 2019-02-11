@@ -31,6 +31,8 @@ import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { NewVideoOverlayWithInstallInRewardedVideos } from 'Ads/Views/NewVideoOverlayWithInstallInRewardedVideo';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -208,7 +210,12 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(parameters.platform, parameters.campaign, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            overlay = new NewVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+
+            if (CustomFeatures.isRewardedVideoInstallButtonEnabled(this._platform, this._deviceInfo, this._campaign, this._coreConfig)) {
+                overlay = new NewVideoOverlayWithInstallInRewardedVideos(parameters, parameters.privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+            } else {
+                overlay = new NewVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+            }
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
