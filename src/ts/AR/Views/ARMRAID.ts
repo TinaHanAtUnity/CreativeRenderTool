@@ -40,7 +40,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _deviceorientationListener: EventListener;
     private _loadingScreenTimeout?: number;
     private _prepareTimeout?: number;
-    private _autoBeginTimer?: number;
 
     private _arFrameUpdatedObserver: IObserver1<string>;
     private _arPlanesAddedObserver: IObserver1<string>;
@@ -219,11 +218,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         if(this._prepareTimeout) {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
-        }
-
-        if(this._autoBeginTimer) {
-            clearTimeout(this._autoBeginTimer);
-            this._autoBeginTimer = undefined;
         }
 
         super.hide();
@@ -463,11 +457,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private onCameraPermissionEvent(hasCameraPermission: boolean) {
-        if (this._autoBeginTimer) {
-            clearInterval(this._autoBeginTimer);
-            this._autoBeginTimer = undefined;
-        }
-
         this._hasCameraPermission = hasCameraPermission;
         this._iframe.contentWindow!.postMessage({
             type: 'permission',
@@ -566,7 +555,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
                     if (results === CurrentPermission.ACCEPTED) {
                         this.sendMraidAnalyticsEvent('camera_permission_user_accepted', undefined);
-                        this.startBeginTimer();
                         this._arCameraAlreadyAccepted = true;
                     }
 
@@ -575,28 +563,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 }
             });
         });
-    }
-
-    private startBeginTimer() {
-        const beginButton = <HTMLElement>this._cameraPermissionPanel.querySelector('.permission-accept-button');
-        const buttonText = beginButton.innerHTML.trim();
-        let autoBeginTimeout = ARMRAID.AutoBeginTimeout;
-        beginButton.innerHTML = `Begins...${autoBeginTimeout}`;
-
-        this._autoBeginTimer = window.setInterval(() => {
-            const timerPaused = !this._viewable || this._permissionLearnMoreOpen || this._privacyPanelOpen;
-            if (timerPaused) {
-                return;
-            }
-
-            autoBeginTimeout--;
-            beginButton.innerHTML = `Begins...${autoBeginTimeout}`;
-
-            if (autoBeginTimeout <= 0) {
-                this.onCameraPermissionEvent(true);
-                return;
-            }
-        }, 1000);
     }
 
     protected onArReadyToShowEvent(msg: MessageEvent): Promise<void> {
