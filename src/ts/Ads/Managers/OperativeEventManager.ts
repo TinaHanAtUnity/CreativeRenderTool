@@ -99,6 +99,7 @@ export interface IInfoJson {
     frameworkVersion?: string;
     skippedAt?: number;
     isBackupCampaign: boolean;
+    deviceFreeSpace: number;
 }
 
 export class OperativeEventManager {
@@ -384,7 +385,8 @@ export class OperativeEventManager {
                 'connectionType': connectionType,
                 'screenWidth': screenWidth,
                 'screenHeight': screenHeight,
-                'isBackupCampaign': this._campaign.isBackupCampaign()
+                'isBackupCampaign': this._campaign.isBackupCampaign(),
+                'deviceFreeSpace': session.getDeviceFreeSpace()
             };
 
             if(this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {

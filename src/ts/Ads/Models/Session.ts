@@ -20,6 +20,7 @@ export interface ISession {
     eventSent: { [key: number]: boolean };
     gameSessionCounters: IGameSessionCounters;
     privacy: IRequestPrivacy;
+    deviceFreeSpace: number;
 }
 
 export class Session extends Model<ISession> {
@@ -30,7 +31,8 @@ export class Session extends Model<ISession> {
             adPlan: ['string', 'undefined'],
             eventSent: ['object'],
             gameSessionCounters: ['object'],
-            privacy: ['object']
+            privacy: ['object'],
+            deviceFreeSpace: ['number']
         });
 
         this.set('id', id);
@@ -79,6 +81,14 @@ export class Session extends Model<ISession> {
 
     public getPrivacy(): IRequestPrivacy {
         return this.get('privacy');
+    }
+
+    public setDeviceFreeSpace(freeSpace: number) {
+        this.set('deviceFreeSpace', freeSpace);
+    }
+
+    public getDeviceFreeSpace(): number {
+        return this.get('deviceFreeSpace');
     }
 
     public getDTO(): { [key: string]: unknown } {

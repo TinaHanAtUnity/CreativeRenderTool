@@ -12,7 +12,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
-import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -37,7 +37,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
-    let overlay: NewVideoOverlay;
+    let overlay: VideoOverlay;
     let endScreen: PerformanceEndScreen;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
@@ -107,7 +107,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             coreConfig: coreConfig,
             placement: TestFixtures.getPlacement()
         };
-        overlay = new NewVideoOverlay(overlayParams, privacy, false, false);
+        overlay = new VideoOverlay(overlayParams, privacy, false, false);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         performanceAdUnitParameters = {

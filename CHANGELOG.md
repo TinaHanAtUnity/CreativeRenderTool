@@ -1,3 +1,8 @@
+# Pending
+
+* Renamed NewVideoOverlay -> VideoOverlay, new-video-overlay -> video-overlay [#8152](https://github.com/Applifier/unity-ads-webview/pull/8152)
+* Add close button to the new Privacy settigns view [#8106](https://github.com/Applifier/unity-ads-webview/pull/8106)
+
 # Fri Feb  8 20:37:59 UTC 2019
 
 * Install button experiment for rewarded ad videos [#8055](https://github.com/Applifier/unity-ads-webview/pull/8055)

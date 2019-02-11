@@ -8,7 +8,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -134,7 +134,7 @@ describe('VastAdUnitTest', () => {
             platform: platform,
             ads: ads
         };
-        const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+        const overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
@@ -184,7 +184,7 @@ describe('VastAdUnitTest', () => {
                 platform: platform,
                 ads: ads
             };
-            vastAdUnitParameters.overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+            vastAdUnitParameters.overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
             vastAdUnitParameters.campaign = vastCampaign;
             vastAdUnit = new VastAdUnit(vastAdUnitParameters);
         });
@@ -265,7 +265,7 @@ describe('VastAdUnitTest', () => {
                 platform: platform,
                 ads: ads
             };
-            vastAdUnitParameters.overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+            vastAdUnitParameters.overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
             vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
             vastAdUnitParameters.campaign = vastCampaign;
             vastAdUnitParameters.endScreen = vastEndScreen;
