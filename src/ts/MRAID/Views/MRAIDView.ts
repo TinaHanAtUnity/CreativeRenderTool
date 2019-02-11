@@ -472,16 +472,4 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected onArReadyToShowEvent(msg: MessageEvent): Promise<void> {
         return Promise.resolve();
     }
-
-    public loadWebPlayer(webPlayerContainer: WebPlayerContainer): Promise<void> {
-        return Promise.resolve();
-    }
-
-    public fullScreenWebViewContainer() {
-        return this._handlers[0].onWebViewFullScreen();
-    }
-
-    public reduceWebViewContainerHeight() {
-        return this._handlers[0].onWebViewReduceSize();
-    }
 }
