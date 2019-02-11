@@ -47,7 +47,7 @@ import { IMRAIDHandler, MRAIDEvents } from 'MRAID/EventBridge/MRAIDEventAdapter'
                 onBridgeResizeWebview: sinon.spy(),
                 onBridgeSendStats: sinon.spy(),
                 onBridgeAREvent: sinon.spy(),
-                onBridgeArReadyToShow: sinon.spy(),
+                onBridgeArReadyToShow: sinon.spy()
             };
 
             mraidAdapterContainer = new MRAIDAdapterContainer(handler);

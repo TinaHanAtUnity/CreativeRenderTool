@@ -265,14 +265,14 @@ $ar-available-button-color = #0d2124;
     75%,
     90%,
     to {
-      animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+      animation-timing-function: cubic-bezier(.215, .61, .355, 1);
     }
 
     from {
-      opacity: 0;
       right: -5em;
       padding-right: 6.5em;
-      transform: scaleX(3000px, 0, 0);
+      opacity: 0;
+      transform: translate3d(3000px, 0, 0);
     }
 
     60% {
@@ -291,7 +291,7 @@ $ar-available-button-color = #0d2124;
     }
 
     to {
-      right: 0em;
+      right: 0;
       padding-right: 1.5em;
       transform: translate3d(0, 0, 0);
     }
@@ -299,16 +299,18 @@ $ar-available-button-color = #0d2124;
 
   .ar-available-button {
     position: absolute;
-    z-index: 105;
-    min-width: 30vw;
     top: 70vh;
     right: 0;
-    border-radius: 1em 0em 0em 1em;
-    background: $ar-available-button-color;
-    padding: 1.5em 1.5em 1.5em 1.5em;
-    -webkit-animation bounceInRight 1s;
+    z-index: 105;
     display: none;
+    padding: 1.5em 1.5em 1.5em 1.5em;
+    min-width: 30vw;
+    border-radius: 1em 0 0 1em;
+    background: $ar-available-button-color;
     color: white;
+
+    -webkit-animation: bounceInRight 1s;
+    animation: bounceInRight 1s;
   }
 
   .ar-available-button-wrapper {
