@@ -129,6 +129,12 @@
                     }
                 };
 
+                this.readyToShowAR = function() {
+                    window.parent.postMessage({
+                        type: 'arReadyShow',
+                    }, '*');
+                };
+
                 this.addEventListener = function(event, listener) {
                     if(event in listeners) {
                         listeners[event].push(listener);

@@ -32,6 +32,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _cameraPermissionPanel: HTMLElement;
     private _permissionLearnMorePanel: HTMLElement;
     private _permissionLearnMoreOpen: boolean;
+    private _arAvailableButton: HTMLElement;
+    private _arCameraAlreadyAccepted: boolean;
 
     private _iframeLoaded = false;
 
@@ -86,9 +88,17 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             {
                 event: 'click',
                 listener: (event: Event) => {
-                    this.onShowFallback();
+                    this.hideARPermissionPanel();
                 },
                 selector: '.permission-decline-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => {
+                    this.hideArAvailableButton();
+                    this.showARPermissionPanel();
+                },
+                selector: '.ar-available-button'
             },
             {
                 event: 'click',
@@ -114,6 +124,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._cameraPermissionPanel = <HTMLElement>this._container.querySelector('.camera-permission-panel');
         this._permissionLearnMorePanel = <HTMLElement>this._container.querySelector('.permissions-learn-more');
+        this._arAvailableButton = <HTMLElement>this._container.querySelector('.ar-available-button');
 
         const iframe = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
 
@@ -223,7 +234,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._loadingScreen.style.display = 'block';
         this._loadingScreenTimeout = window.setTimeout(() => {
             if(this._iframeLoaded) {
-                this.showARPermissionPanel();
+                this.onShowFallback();
             } else {
                 // start the prepare timeout and wait for the onload event
                 this._prepareTimeout = window.setTimeout(() => {
@@ -327,7 +338,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         if(!this._loadingScreenTimeout) {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
-            this.showARPermissionPanel();
+            this.onShowFallback();
         }
 
         const frameLoadDuration = (Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId()) / 1000);
@@ -434,10 +445,59 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._permissionLearnMoreOpen = false;
     }
 
-    /**
-     * showARPermissionPanel needs to be shown before the timer starts
-     */
     private showARPermissionPanel() {
+        if (this._arCameraAlreadyAccepted) {
+            this.onShowAr();
+        } else {
+            this._cameraPermissionPanel.classList.remove('hidden');
+            this._cameraPermissionPanel.style.display = 'block';
+            this._iframe.classList.add('mraid-iframe-camera-permission-dialog');
+            this._gdprBanner.classList.add('mraid-container');
+        }
+    }
+
+    private hideARPermissionPanel() {
+        this._cameraPermissionPanel.classList.add('hidden');
+        this._iframe.classList.remove('mraid-iframe-camera-permission-dialog');
+        this._gdprBanner.classList.remove('mraid-container');
+    }
+
+    private onCameraPermissionEvent(hasCameraPermission: boolean) {
+        if (this._autoBeginTimer) {
+            clearInterval(this._autoBeginTimer);
+            this._autoBeginTimer = undefined;
+        }
+
+        this._hasCameraPermission = hasCameraPermission;
+        this._iframe.contentWindow!.postMessage({
+            type: 'permission',
+            value: {
+                type: 'Camera',
+                status: hasCameraPermission
+            }
+        }, '*');
+
+        this.showMRAIDAd();
+        this.hideARPermissionPanel();
+    }
+
+    private onShowAr() {
+        this._permissionResultObserver = this._core.Permissions.onPermissionsResult.subscribe((permission, granted) => {
+            if(permission === PermissionTypes.CAMERA) {
+                this.onCameraPermissionEvent(granted);
+            }
+        });
+
+        PermissionsUtil.requestPermission(this._platform, this._core, PermissionTypes.CAMERA);
+        this.sendMraidAnalyticsEvent('permission_dialog_ar_mode', undefined);
+    }
+
+    private onShowFallback() {
+        this.hideLoadingScreen();
+        this.onCameraPermissionEvent(false);
+    }
+
+    private hideLoadingScreen() {
         ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
             if(this._loadingScreen.style.display === 'none') {
                 return;
@@ -459,13 +519,34 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._loadingScreen.style.display = 'none';
             }, false);
         });
+        this._loadingScreen.classList.add('hidden');
+    }
 
+    private onPrivacyClicked(event: Event) {
+        event.stopPropagation();
+        event.preventDefault();
+        const url = (<HTMLLinkElement>event.target).href;
+        if (this._platform === Platform.IOS) {
+            this._core.iOS!.UrlScheme.open(url);
+        } else if (this._platform === Platform.ANDROID) {
+            this._core.Android!.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
+        }
+    }
+
+    private hideArAvailableButton() {
+        this._arAvailableButton.classList.add('hidden');
+        this._arAvailableButton.style.display = 'none';
+    }
+
+    private showArAvailableButton() {
         ARUtil.isARSupported(this._ar).then(supported => {
             this._loadingScreen.classList.add('hidden');
 
             if (!supported) {
                 this.sendMraidAnalyticsEvent('not_supported', undefined);
-                this.onCameraPermissionEvent(false);
                 return;
             }
 
@@ -476,19 +557,21 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 }
                 return PermissionsUtil.checkPermissions(this._platform, this._core, PermissionTypes.CAMERA);
             }).then((results: CurrentPermission) => {
-                const requestPermissionText = <HTMLElement>this._cameraPermissionPanel.querySelector('.request-text');
                 if (results === CurrentPermission.DENIED) {
                     this.sendMraidAnalyticsEvent('camera_permission_user_denied', undefined);
-                    this.onCameraPermissionEvent(false);
+                    this._arAvailableButton.classList.add('hidden');
                 } else {
+                    // the user can see ar content
+                    this._arCameraAlreadyAccepted = false;
+
                     if (results === CurrentPermission.ACCEPTED) {
                         this.sendMraidAnalyticsEvent('camera_permission_user_accepted', undefined);
-                        requestPermissionText.style.display = 'none';
                         this.startBeginTimer();
+                        this._arCameraAlreadyAccepted = true;
                     }
-                    this._cameraPermissionPanel.style.display = 'block';
-                    this._iframe.classList.add('mraid-iframe-camera-permission-dialog');
-                    this._gdprBanner.classList.add('mraid-container');
+
+                    this._arAvailableButton.classList.remove('hidden');
+                    this._arAvailableButton.style.display = 'block';
                 }
             });
         });
@@ -516,54 +599,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }, 1000);
     }
 
-    private onCameraPermissionEvent(hasCameraPermission: boolean) {
-        if (this._autoBeginTimer) {
-            clearInterval(this._autoBeginTimer);
-            this._autoBeginTimer = undefined;
-        }
-
-        this._hasCameraPermission = hasCameraPermission;
-        this._iframe.contentWindow!.postMessage({
-            type: 'permission',
-            value: {
-                type: 'Camera',
-                status: hasCameraPermission
-            }
-        }, '*');
-
-        this.showMRAIDAd();
-        this._cameraPermissionPanel.classList.add('hidden');
-        this._iframe.classList.remove('mraid-iframe-camera-permission-dialog');
-        this._gdprBanner.classList.remove('mraid-container');
-    }
-
-    private onShowAr() {
-        this._permissionResultObserver = this._core.Permissions.onPermissionsResult.subscribe((permission, granted) => {
-            if(permission === PermissionTypes.CAMERA) {
-                this.onCameraPermissionEvent(granted);
-            }
-        });
-
-        PermissionsUtil.requestPermission(this._platform, this._core, PermissionTypes.CAMERA);
-        this.sendMraidAnalyticsEvent('permission_dialog_ar_mode', undefined);
-    }
-
-    private onShowFallback() {
-        this.sendMraidAnalyticsEvent('permission_dialog_fallback_mode', undefined);
-        this.onCameraPermissionEvent(false);
-    }
-
-    private onPrivacyClicked(event: Event) {
-        event.stopPropagation();
-        event.preventDefault();
-        const url = (<HTMLLinkElement>event.target).href;
-        if (this._platform === Platform.IOS) {
-            this._core.iOS!.UrlScheme.open(url);
-        } else if (this._platform === Platform.ANDROID) {
-            this._core.Android!.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': url
-            });
-        }
+    protected onArReadyToShowEvent(msg: MessageEvent): Promise<void> {
+        this.showArAvailableButton();
+        return Promise.resolve();
     }
 }

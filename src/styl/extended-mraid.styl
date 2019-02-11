@@ -7,6 +7,7 @@ $permissions-max-width = 300px;
 $permissions-gray = #a6a6a6;
 $camera-permission-panel-color = #fafafa;
 $camera-permission-panel-height = 100vw;
+$ar-available-button-color = #0d2124;
 
 #extended-mraid {
 
@@ -256,6 +257,62 @@ $camera-permission-panel-height = 100vw;
         margin-left: 15pt;
       }
     }
+  }
+
+  @-webkit-keyframes bounceInRight {
+    from,
+    60%,
+    75%,
+    90%,
+    to {
+      animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+
+    from {
+      opacity: 0;
+      right: -5em;
+      padding-right: 6.5em;
+      transform: scaleX(3000px, 0, 0);
+    }
+
+    60% {
+      opacity: 1;
+      transform: translate3d(-25px, 0, 0);
+    }
+
+    75% {
+      transform: translate3d(10px, 0, 0);
+    }
+
+    90% {
+      right: -5em;
+      padding-right: 6.5em;
+      transform: translate3d(-5px, 0, 0);
+    }
+
+    to {
+      right: 0em;
+      padding-right: 1.5em;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .ar-available-button {
+    position: absolute;
+    z-index: 105;
+    min-width: 30vw;
+    top: 70vh;
+    right: 0;
+    border-radius: 1em 0em 0em 1em;
+    background: $ar-available-button-color;
+    padding: 1.5em 1.5em 1.5em 1.5em;
+    -webkit-animation bounceInRight 1s;
+    display: none;
+    color: white;
+  }
+
+  .ar-available-button-wrapper {
+    overflow:hidden;
   }
 
   .camera-permission-panel {

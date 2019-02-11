@@ -66,4 +66,8 @@ export class MRAIDAdapterContainer implements IMRAIDHandler {
     public onBridgeAREvent(event: MessageEvent): void {
         this._handler.onBridgeAREvent(event);
     }
+
+    public onBridgeArReadyToShow(event: MessageEvent): void {
+        this._handler.onBridgeArReadyToShow(event);
+    }
 }
