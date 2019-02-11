@@ -53,8 +53,8 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onViewDataButtonEvent(event),
-                selector: '.view-data-button'
+                listener: (event: Event) => this.onDeleteDataButtonEvent(event),
+                selector: '.delete-data-button'
             },
             {
                 event: 'click',
@@ -170,7 +170,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         this.showView(ViewState.PERSONALIZATION);
     }
 
-    private onViewDataButtonEvent(event: Event) {
+    private onDeleteDataButtonEvent(event: Event) {
         event.preventDefault();
 
         this.showView(ViewState.DATA);
