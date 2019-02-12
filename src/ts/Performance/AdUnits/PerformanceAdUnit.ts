@@ -1,4 +1,4 @@
-import { IVideoAdUnitParameters, VideoAdUnit, VideoState } from 'Ads/AdUnits/VideoAdUnit';
+import { IVideoAdUnitParameters, VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
