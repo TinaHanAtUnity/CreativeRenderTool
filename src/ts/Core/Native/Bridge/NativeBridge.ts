@@ -34,7 +34,6 @@ export class NativeBridge implements INativeBridge {
     private _platform: Platform;
     private _backend: IWebViewBridge;
 
-    private _allowAutoBatching = true;
     private _autoBatchEnabled: boolean;
     private _currentBatch?: BatchInvocation;
     private _nextBatch?: BatchInvocation;
@@ -138,16 +137,6 @@ export class NativeBridge implements INativeBridge {
 
     public getPlatform(): Platform {
         return this._platform;
-    }
-
-    public setAllowAutoBatching(value: boolean) {
-        this._allowAutoBatching = value;
-    }
-
-    public setAutoBatchEnabled(enabled: boolean) {
-        if(this._allowAutoBatching) {
-            this._autoBatchEnabled = enabled;
-        }
     }
 
     private invokeBatch(batch: BatchInvocation): void {

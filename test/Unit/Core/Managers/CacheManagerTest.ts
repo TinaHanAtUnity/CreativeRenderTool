@@ -25,7 +25,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
         beforeEach(() => {
             backend = new Backend(platform);
-            nativeBridge = new NativeBridge(backend, platform, false);
+            nativeBridge = new NativeBridge(backend, platform);
             backend.setNativeBridge(nativeBridge);
             core = TestFixtures.getCoreApi(nativeBridge);
             wakeUpManager = new WakeUpManager(core);
