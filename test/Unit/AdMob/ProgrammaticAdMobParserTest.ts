@@ -16,6 +16,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('ProgrammaticAdMobParser', () => {
@@ -50,6 +51,8 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
                 core = TestFixtures.getCoreModule(nativeBridge);
                 (<any>core.Api).Sdk = sinon.createStubInstance(SdkApi);
                 core.Config = sinon.createStubInstance(CoreConfiguration);
+                core.Ads = TestFixtures.getAdsModule(core);
+                core.Ads.ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
                 request = sinon.createStubInstance(RequestManager);
                 core.RequestManager = request;
