@@ -10,6 +10,8 @@
     "timeZone": "+0200",
     "totalMemory": 12345678,
     "androidId": "1234567890abcdef",
+    "deviceId1": "1234567890abbbbb",
+    "deviceId2": "1234567890accccc",
     "apiLevel": 20,
     "apkDigest": "abcd-1234",
     "totalSpaceExternal": 123456789,
@@ -29,5 +31,6 @@
     "batteryStatus": 1,
     "freeMemory": 1234567,
     "freeSpaceExternal": 12345678,
-    "ringerMode": 2
+    "ringerMode": 2,
+    "imei": 1
 }

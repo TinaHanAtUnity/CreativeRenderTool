@@ -518,6 +518,13 @@
     "platforms": "all"
   },
   {
+    "key": "imei",
+    "type": "string",
+    "description": "default or slot 0 from getDeviceId ",
+    "provider": "SDK",
+    "platforms": "android"
+  },
+  {
     "key": "analyticsUserId",
     "type": "string",
     "description": "Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending)",

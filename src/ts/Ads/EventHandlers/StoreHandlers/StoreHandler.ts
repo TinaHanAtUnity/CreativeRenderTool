@@ -19,6 +19,8 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { ICoreApi } from 'Core/ICore';
 import { IAdsApi } from 'Ads/IAds';
+import { DownloadManager } from 'China/Managers/DownloadManager';
+import { DeviceIdManager } from 'China/Managers/DeviceIdManager';
 
 export interface IStoreHandler {
     onDownload(parameters: IStoreHandlerDownloadParameters): void;
@@ -36,6 +38,8 @@ export interface IStoreHandlerParameters {
     adUnit: VideoAdUnit;
     campaign: Campaign;
     coreConfig?: CoreConfiguration;
+    downloadManager?: DownloadManager;
+    deviceIdManager?: DeviceIdManager;
 }
 
 export interface IStoreHandlerDownloadParameters {

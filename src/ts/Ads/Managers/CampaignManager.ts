@@ -53,6 +53,7 @@ import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivac
 import { VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { ProgrammaticVastParserStrict } from 'VAST/Parsers/ProgrammaticVastParser';
+import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 
 export class CampaignManager {
 
@@ -693,16 +694,7 @@ export class CampaignManager {
 
         let url: string = this.getBaseUrl();
 
-        if(this._deviceInfo.getAdvertisingIdentifier()) {
-            url = Url.addParameters(url, {
-                advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
-                limitAdTracking: this._deviceInfo.getLimitAdTracking()
-            });
-        } else if(this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
-            url = Url.addParameters(url, {
-                androidId: this._deviceInfo.getAndroidId()
-            });
-        }
+        url = Url.addParameters(url, TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo));
 
         if (nofillRetry && this._lastAuctionId) {
             url = Url.addParameters(url, {
