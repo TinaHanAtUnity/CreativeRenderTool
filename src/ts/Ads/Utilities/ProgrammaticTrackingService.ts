@@ -8,7 +8,9 @@ export enum ProgrammaticTrackingErrorName {
     BannerRequestError = 'banner_request_error',
 
     AuctionV4StartMissing = 'auction_v4_missing_start',
-    AuctionV5StartMissing = 'auction_v5_missing_start'
+    AuctionV5StartMissing = 'auction_v5_missing_start',
+
+    AdmobTestHttpError = 'admob_video_http_error'
 }
 
 export enum ProgrammaticTrackingMetricName {
