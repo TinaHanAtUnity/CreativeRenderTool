@@ -95,12 +95,12 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         return this.isShowing() && this.canShowVideo() && this.canPlayVideo();
     }
 
-    public isVideoVisible(): boolean {
+    public isAppSheetOpen(): boolean {
         if (!this._isIOS || !this._installButtonExperimentEnabled) {
-            return true;
+            return false;
         }
 
-        return this._appSheetState !== AppSheetState.OPENED;
+        return this._appSheetState === AppSheetState.OPENED;
     }
 
     public hide(): Promise<void> {
