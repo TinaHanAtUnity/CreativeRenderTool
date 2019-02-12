@@ -86,7 +86,7 @@ export class CampaignManager {
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable4<unknown, string[], string, Session | undefined>();
     public readonly onConnectivityError = new Observable1<string[]>();
-    public readonly onAdPlanReceived = new Observable2<number, number>();
+    public readonly onAdPlanReceived = new Observable2<number, number, number>();
 
     protected _platform: Platform;
     protected _core: ICoreApi;
@@ -318,11 +318,7 @@ export class CampaignManager {
 
             for(const placement of noFill) {
                 promises.push(this.handleNoFill(placement));
-                if (StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode === AuctionStatusCode.FREQUENCY_CAP_REACHED) {
-                    refreshDelay = TimeUtils.getNextUTCDayDeltaSeconds(Date.now());
-                } else {
-                    refreshDelay = RefreshManager.NoFillDelayInSeconds;
-                }
+                refreshDelay = RefreshManager.NoFillDelayInSeconds;
             }
 
             let campaigns: number = 0;
@@ -339,7 +335,7 @@ export class CampaignManager {
             }
 
             this._core.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
-            this.onAdPlanReceived.trigger(refreshDelay, campaigns);
+            this.onAdPlanReceived.trigger(refreshDelay, campaigns, auctionStatusCode);
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
@@ -470,12 +466,7 @@ export class CampaignManager {
 
         for(const placement of noFill) {
             promises.push(this.handleNoFill(placement));
-
-            if (StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode === AuctionStatusCode.FREQUENCY_CAP_REACHED) {
-                refreshDelay = TimeUtils.getNextUTCDayDeltaSeconds(Date.now());
-            } else {
-                refreshDelay = RefreshManager.NoFillDelayInSeconds;
-            }
+            refreshDelay = RefreshManager.NoFillDelayInSeconds;
         }
 
         let campaignCount: number = 0;
@@ -492,7 +483,7 @@ export class CampaignManager {
         }
 
         this._core.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
-        this.onAdPlanReceived.trigger(refreshDelay, campaignCount);
+        this.onAdPlanReceived.trigger(refreshDelay, campaignCount, auctionStatusCode);
 
         for(const mediaId in campaigns) {
             if(campaigns.hasOwnProperty(mediaId)) {

@@ -76,7 +76,7 @@ export class CampaignRefreshManager extends RefreshManager {
         this._campaignManager.onNoFill.subscribe((placementId) => this.onNoFill(placementId));
         this._campaignManager.onError.subscribe((error, placementIds, diagnosticsType, session) => this.onError(error, placementIds, diagnosticsType, session));
         this._campaignManager.onConnectivityError.subscribe((placementIds) => this.onConnectivityError(placementIds));
-        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount) => this.onAdPlanReceived(refreshDelay, campaignCount));
+        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount, auctionStatusCode) => this.onAdPlanReceived(refreshDelay, campaignCount, auctionStatusCode));
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
         if(this._platform === Platform.IOS) {
             this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
@@ -311,7 +311,7 @@ export class CampaignRefreshManager extends RefreshManager {
         }
     }
 
-    private onAdPlanReceived(refreshDelay: number, campaignCount: number) {
+    private onAdPlanReceived(refreshDelay: number, campaignCount: number, auctionStatusCode: number) {
         const isStatusCodeAbTest: boolean = StatusCodeTest.isValid(this._coreConfig.getAbGroup());
         this._campaignCount = campaignCount;
 
@@ -321,7 +321,7 @@ export class CampaignRefreshManager extends RefreshManager {
             let delay: number = isStatusCodeAbTest ? refreshDelay : 0;
 
             // delay starts from 20 secs, then increased 50% for each additional no fill (20 secs, 30 secs, 45 secs etc.)
-            if(!isStatusCodeAbTest && this._noFills > 0 && this._noFills < 15) {
+            if(this._noFills > 0 && this._noFills < 15) {
                 delay = 20;
                 for(let i: number = 1; i < this._noFills; i++) {
                     delay = delay * 1.5;
