@@ -1,5 +1,11 @@
 # Pending
 
+* Consolidate vast url parsing into a single function [#8176](https://github.com/Applifier/unity-ads-webview/pull/8176)
+* Add trace information for webplayer-mraid click diagnostics [#8175](https://github.com/Applifier/unity-ads-webview/pull/8175)
+* Remove Purchasing Diagnostics [#8151](https://github.com/Applifier/unity-ads-webview/pull/8151)
+
+# Mon Feb 11 17:59:20 UTC 2019
+
 * Add deviceFreeSpace to video operative events [#8179](https://github.com/Applifier/unity-ads-webview/pull/8179)
 * Change text of the Delete your data button [#8180](https://github.com/Applifier/unity-ads-webview/pull/8180)
 * Add list of 3rd parties to the new privacy and consent views [#8177](https://github.com/Applifier/unity-ads-webview/pull/8177)
