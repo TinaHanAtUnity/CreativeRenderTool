@@ -3,13 +3,8 @@ import { ICore } from 'Core/ICore';
 import { IStoreApi } from 'Store/IStore';
 
 export class AppleStoreManager extends StoreManager {
-    private _core: ICore;
-    private _store: IStoreApi;
-
     constructor(core: ICore, store: IStoreApi) {
-        super();
-        this._core = core;
-        this._store = store;
+        super(core, store);
     }
 
     public startTracking(): void {
