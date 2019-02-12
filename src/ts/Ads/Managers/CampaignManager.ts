@@ -86,7 +86,7 @@ export class CampaignManager {
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable4<unknown, string[], string, Session | undefined>();
     public readonly onConnectivityError = new Observable1<string[]>();
-    public readonly onAdPlanReceived = new Observable2<number, number, number>();
+    public readonly onAdPlanReceived = new Observable3<number, number, number>();
 
     protected _platform: Platform;
     protected _core: ICoreApi;

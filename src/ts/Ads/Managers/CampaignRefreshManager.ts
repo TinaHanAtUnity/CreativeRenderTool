@@ -25,6 +25,8 @@ import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { StatusCodeTest } from 'Core/Models/ABGroup';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { AuctionStatusCode } from 'Ads/Models/AuctionResponse';
+import { TimeUtils } from 'Ads/Utilities/TimeUtils';
 
 export class CampaignRefreshManager extends RefreshManager {
     private _platform: Platform;
@@ -312,13 +314,12 @@ export class CampaignRefreshManager extends RefreshManager {
     }
 
     private onAdPlanReceived(refreshDelay: number, campaignCount: number, auctionStatusCode: number) {
-        const isStatusCodeAbTest: boolean = StatusCodeTest.isValid(this._coreConfig.getAbGroup());
         this._campaignCount = campaignCount;
 
         if(campaignCount === 0) {
             this._noFills++;
 
-            let delay: number = isStatusCodeAbTest ? refreshDelay : 0;
+            let delay: number = 0;
 
             // delay starts from 20 secs, then increased 50% for each additional no fill (20 secs, 30 secs, 45 secs etc.)
             if(this._noFills > 0 && this._noFills < 15) {
@@ -331,6 +332,12 @@ export class CampaignRefreshManager extends RefreshManager {
             if(delay > 0) {
                 this._refillTimestamp = Date.now() + delay * 1000;
                 delay = delay + Math.random() * 10; // add 0-10 second random delay
+                if (StatusCodeTest.isValid(this._coreConfig.getAbGroup())) {
+                    if (auctionStatusCode === AuctionStatusCode.FREQUENCY_CAP_REACHED && delay < TimeUtils.getNextUTCDayDeltaSeconds(Date.now())) {
+                        this._noFills--;
+                        return;
+                    }
+                }
                 this._core.Sdk.logDebug('Unity Ads ad plan will be refreshed in ' + delay + ' seconds');
                 setTimeout(() => {
                     this.refresh(true);
