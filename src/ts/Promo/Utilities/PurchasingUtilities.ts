@@ -185,8 +185,7 @@ export class PurchasingUtilities {
                 this._core.Sdk.logInfo('UnityPurchasing delegate is set');
                 return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._adsConfig, this._clientInfo, this._metaDataManager);
             }
-        }).catch((e) => {
-            this._core.Sdk.logInfo('UnityPurchasing delegate is set');
+        }).catch(() => {
             return new UnityPurchasingPurchasingAdapter(this._core, this._promo, this._coreConfig, this._adsConfig, this._clientInfo, this._metaDataManager);
         });
     }
