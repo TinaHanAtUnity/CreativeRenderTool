@@ -258,6 +258,12 @@
       "required": "yes",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "deviceFreeSpace",
+      "required": "yes",
+      "queryString": false,
+      "body": true
     }
   ]
 }

@@ -4,7 +4,7 @@ import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
 import { Platform } from 'Core/Constants/Platform';
 import { Backend } from 'Backend/Backend';
-import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { toAbGroup } from 'Core/Models/ABGroup';
 import { ARUtil } from 'AR/Utilities/ARUtil';
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (autoSkipElement.checked) {
-                NewVideoOverlay.setAutoSkip(autoSkipElement.checked);
+                VideoOverlay.setAutoSkip(autoSkipElement.checked);
             }
 
             if (campaignResponseElement.value.length) {

@@ -8,7 +8,7 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -109,7 +109,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
                 platform: platform,
                 ads: ads
             };
-            const overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, false);
+            const overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             vastAdUnitParameters = {
