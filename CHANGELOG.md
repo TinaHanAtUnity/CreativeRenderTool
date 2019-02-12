@@ -3,6 +3,8 @@
 * Consolidate vast url parsing into a single function [#8176](https://github.com/Applifier/unity-ads-webview/pull/8176)
 * Add trace information for webplayer-mraid click diagnostics [#8175](https://github.com/Applifier/unity-ads-webview/pull/8175)
 * Remove Purchasing Diagnostics [#8151](https://github.com/Applifier/unity-ads-webview/pull/8151)
+* Enable Admob HTTP Parsing ABTest on Group 18 [#8203](https://github.com/Applifier/unity-ads-webview/pull/8203)
+* Enable MRAID Webplayer ABTest on Group 19 [#8207](https://github.com/Applifier/unity-ads-webview/pull/8207)
 
 # Mon Feb 11 17:59:20 UTC 2019
 
