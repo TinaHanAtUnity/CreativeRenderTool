@@ -10,8 +10,6 @@ import { Url } from 'Core/Utilities/Url';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { VastAdValidator } from 'VAST/Validators/VastAdValidator';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
-import { IVastCreativeCompanionAd } from 'VAST/Models/IVastCreativeCompanionAd';
-import { Model } from 'Core/Models/Model';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -162,10 +160,9 @@ export class VastParserStrict {
             throw new Error(VastErrorInfo.errorMap[VastErrorCode.WRAPPER_DEPTH_LIMIT_REACHED]);
         }
 
-        const encodedWrapperURL = Url.encodeUrlWithQueryParams(wrapperURL);
-        core.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + encodedWrapperURL);
+        core.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
         const wrapperUrlProtocol = Url.getProtocol(wrapperURL);
-        return request.get(encodedWrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
+        return request.get(wrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
             return this.retrieveVast(response.response, core, request, parsedVast, depth + 1, wrapperUrlProtocol);
         });
     }
@@ -250,30 +247,28 @@ export class VastParserStrict {
     private parseAdContent(adElement: HTMLElement, urlProtocol: string): VastAd {
         const vastAd = new VastAd();
         this.getNodesWithName(adElement, VastNodeName.VAST_AD_TAG_URI).forEach((element: HTMLElement) => {
-            const url = Url.encodeUrlWithQueryParams(Url.decodeProtocol(this.parseNodeText(element)));
-            if (url && url.length > 0) {
+            const url = this.parseVastUrl(this.parseNodeText(element), urlProtocol);
+            if (url) {
                 vastAd.addWrapperURL(url);
             }
         });
 
         this.getNodesWithName(adElement, VastNodeName.ERROR).forEach((element: HTMLElement) => {
-            const url = Url.encodeUrlWithQueryParams(Url.decodeProtocol(this.parseNodeText(element)));
-            if (url && url.length > 0) {
+            const url = this.parseVastUrl(this.parseNodeText(element), urlProtocol);
+            if (url) {
                 vastAd.addErrorURLTemplate(url);
             }
         });
 
         this.getNodesWithName(adElement, VastNodeName.IMPRESSION).forEach((element: HTMLElement) => {
-            const url = Url.encodeUrlWithQueryParams(Url.decodeProtocol(this.parseNodeText(element)));
-            // ignore empty urls and about:blank
-            // about:blank needs to be ignored so that VPAID ads can be parsed
-            if (url.length > 0 && url !== 'about:blank') {
+            const url = this.parseVastUrl(this.parseNodeText(element), urlProtocol);
+            if (url) {
                 vastAd.addImpressionURLTemplate(url);
             }
         });
 
         this.getNodesWithName(adElement, VastNodeName.LINEAR).forEach((element: HTMLElement) => {
-            const creative = this.parseCreativeLinearElement(element);
+            const creative = this.parseCreativeLinearElement(element, urlProtocol);
             vastAd.addCreative(creative);
         });
 
@@ -296,7 +291,7 @@ export class VastParserStrict {
         return parseInt(stringAttribute || '0', 10);
     }
 
-    private parseCreativeLinearElement(creativeElement: HTMLElement): VastCreativeLinear {
+    private parseCreativeLinearElement(creativeElement: HTMLElement, urlProtocol: string): VastCreativeLinear {
         const creative = new VastCreativeLinear();
 
         const durationElement = this.getFirstNodeWithName(creativeElement, VastNodeName.DURATION);
@@ -320,43 +315,46 @@ export class VastParserStrict {
 
         const clickThroughElement = this.getFirstNodeWithName(creativeElement, VastNodeName.CLICK_THROUGH);
         if (clickThroughElement) {
-            const url = Url.encodeUrlWithQueryParams(Url.decodeProtocol(this.parseNodeText(clickThroughElement)));
-            if (url && url.length > 0) {
+            const url = this.parseVastUrl(this.parseNodeText(clickThroughElement), urlProtocol);
+            if (url) {
                 creative.setVideoClickThroughURLTemplate(url);
             }
         }
 
         this.getNodesWithName(creativeElement, VastNodeName.CLICK_TRACKING).forEach((element: HTMLElement) => {
-            const url = Url.encodeUrlWithQueryParams(Url.decodeProtocol(this.parseNodeText(element)));
-            if (url && url.length > 0) {
+            const url = this.parseVastUrl(this.parseNodeText(element), urlProtocol);
+            if (url) {
                 creative.addVideoClickTrackingURLTemplate(url);
             }
         });
 
         this.getNodesWithName(creativeElement, VastNodeName.TRACKING).forEach((element: HTMLElement) => {
-            const url = Url.encodeUrlWithQueryParams(Url.decodeProtocol(this.parseNodeText(element)));
+            const url = this.parseVastUrl(this.parseNodeText(element), urlProtocol);
             const eventName = element.getAttribute(VastAttributeNames.EVENT);
-            if (eventName && url && url.length > 0) {
+            if (eventName && url) {
                 creative.addTrackingEvent(eventName, url);
             }
         });
 
         this.getNodesWithName(creativeElement, VastNodeName.MEDIA_FILE).forEach((element: HTMLElement) => {
             const bitrate = this.getIntAttribute(element, VastAttributeNames.BITRATE);
-            const mediaFile = new VastMediaFile(
-                Url.encodeUrlWithQueryParams(Url.decodeProtocol(this.parseNodeText(element))),
-                element.getAttribute(VastAttributeNames.DELIVERY),
-                element.getAttribute(VastAttributeNames.CODEC),
-                element.getAttribute(VastAttributeNames.TYPE),
-                bitrate,
-                this.getIntAttribute(element, VastAttributeNames.MIN_BITRATE),
-                this.getIntAttribute(element, VastAttributeNames.MAX_BITRATE),
-                this.getIntAttribute(element, VastAttributeNames.WIDTH),
-                this.getIntAttribute(element, VastAttributeNames.HEIGHT),
-                element.getAttribute(VastAttributeNames.API_FRAMEWORK),
-                this.getVideoSizeInBytes(mediaDuration, bitrate)
-            );
-            creative.addMediaFile(mediaFile);
+            const mediaUrl = this.parseVastUrl(this.parseNodeText(element), urlProtocol);
+            if (mediaUrl) {
+                const mediaFile = new VastMediaFile(
+                    mediaUrl,
+                    element.getAttribute(VastAttributeNames.DELIVERY),
+                    element.getAttribute(VastAttributeNames.CODEC),
+                    element.getAttribute(VastAttributeNames.TYPE),
+                    bitrate,
+                    this.getIntAttribute(element, VastAttributeNames.MIN_BITRATE),
+                    this.getIntAttribute(element, VastAttributeNames.MAX_BITRATE),
+                    this.getIntAttribute(element, VastAttributeNames.WIDTH),
+                    this.getIntAttribute(element, VastAttributeNames.HEIGHT),
+                    element.getAttribute(VastAttributeNames.API_FRAMEWORK),
+                    this.getVideoSizeInBytes(mediaDuration, bitrate)
+                );
+                creative.addMediaFile(mediaFile);
+            }
         });
 
         const adParamsElement = this.getFirstNodeWithName(creativeElement, VastNodeName.AD_PARAMETERS);
@@ -376,9 +374,9 @@ export class VastParserStrict {
 
         // Get tracking urls for companion ad
         this.getNodesWithName(companionAdElement, VastNodeName.TRACKING).forEach((element: HTMLElement) => {
-            const url = Url.encodeUrlWithQueryParams(Url.decodeProtocol(this.parseNodeText(element)));
+            const url = this.parseVastUrl(this.parseNodeText(element), urlProtocol);
             const eventName = element.getAttribute(VastAttributeNames.EVENT);
-            if (eventName) {
+            if (url && eventName) {
                 companionAd.addTrackingEvent(eventName, url);
             }
         });
@@ -387,28 +385,42 @@ export class VastParserStrict {
         if (staticResourceElement) {
             const creativeType = staticResourceElement.getAttribute(VastAttributeNames.CREATIVE_TYPE);
             companionAd.setCreativeType(creativeType);
-            let staticResourceUrl = Url.encodeUrlWithQueryParams(Url.decodeProtocol(this.parseNodeText(staticResourceElement)));
-            if (Url.isRelativeUrl(staticResourceUrl)) {
-                staticResourceUrl = `${urlProtocol}${staticResourceUrl}`;
+            const staticResourceUrl = this.parseVastUrl(this.parseNodeText(staticResourceElement), urlProtocol);
+            if (staticResourceUrl) {
+                companionAd.setStaticResourceURL(staticResourceUrl);
             }
-            companionAd.setStaticResourceURL(staticResourceUrl);
         }
 
         const companionClickThroughElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.COMPANION_CLICK_THROUGH);
         if (companionClickThroughElement) {
-            const companionClickThroughUrl = Url.encodeUrlWithQueryParams(Url.decodeProtocol(this.parseNodeText(companionClickThroughElement)));
-            if (companionClickThroughUrl && companionClickThroughUrl.length > 0) {
+            const companionClickThroughUrl = this.parseVastUrl(this.parseNodeText(companionClickThroughElement), urlProtocol);
+            if (companionClickThroughUrl) {
                 companionAd.setCompanionClickThroughURLTemplate(companionClickThroughUrl);
             }
         }
 
         this.getNodesWithName(companionAdElement, VastNodeName.COMPANION_CLICK_TRACKING).forEach((element: HTMLElement) => {
-            const companionClickTrackingUrl = Url.encodeUrlWithQueryParams(Url.decodeProtocol(this.parseNodeText(element)));
-            if (companionClickTrackingUrl && companionClickTrackingUrl.length > 0) {
+            const companionClickTrackingUrl = this.parseVastUrl(this.parseNodeText(element), urlProtocol);
+            if (companionClickTrackingUrl) {
                 companionAd.addCompanionClickTrackingURLTemplate(companionClickTrackingUrl);
             }
         });
         return companionAd;
+    }
+
+    private parseVastUrl(maybeUrl: string, urlProtocol: string): string | undefined {
+        let url: string = maybeUrl;
+        // check if relative url ex: '//www.google.com/hello'
+        if (Url.isRelativeProtocol(url)) {
+            url = `${urlProtocol}${url}`;
+        }
+        // decode http%3A%2F%2F && https%3A%2F%2F then re-encode url
+        url = Url.encodeUrlWithQueryParams(Url.decodeProtocol(url));
+        if (Url.isValid(url)) {
+            return url;
+        } else {
+            return undefined;
+        }
     }
 
     private parseDuration(durationString: string): number {
