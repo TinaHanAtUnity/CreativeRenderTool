@@ -7,7 +7,7 @@ export class VideoOverlayWithInstallInRewardedVideos extends VideoOverlay {
     public setVideoProgress(value: number): void {
         super.setVideoProgress(value);
 
-        if (this._videoProgress > 500) {
+        if (this._videoProgress > 5000) {
             this.showCallButton();
             return;
         }
