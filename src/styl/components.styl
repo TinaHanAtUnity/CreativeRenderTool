@@ -493,13 +493,13 @@ $checkbox-group-container($scale-size = $default-scale-size, $context-font-size 
 }
 
 $switch-group-container() {
-
   .switch-container {
     position: relative;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    padding: .5 * $default-size 0;
   }
 
   .switch {
@@ -544,14 +544,15 @@ $switch-group-container() {
     background-color: white;
     border-radius: 50%;
     transition: .15s ease-in-out;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
   }
 
   [type="checkbox"]:checked + label {
-    background-color: #2196F3;
+    background-color: $consent-blue;
   }
 
   [type="checkbox"]:focus + label {
-    box-shadow: 0 0 1px #2196F3;
+    box-shadow: 0 0 1px $consent-blue;
   }
 
   [type="checkbox"]:checked + label:before {

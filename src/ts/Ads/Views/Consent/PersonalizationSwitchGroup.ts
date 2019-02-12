@@ -1,5 +1,5 @@
 import { View } from 'Core/Views/View';
-import CheckBoxGroupTemplate from 'html/consent/personalization-switch-group.html';
+import SwitchGroupTemplate from 'html/consent/personalization-switch-group.html';
 import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
 import { IGranularPermissions } from 'Ads/Models/Privacy';
@@ -22,7 +22,7 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationCheckboxGro
 
         this._userPrivacyManager = userPrivacyManager;
 
-        this._template = new Template(CheckBoxGroupTemplate);
+        this._template = new Template(SwitchGroupTemplate);
 
         this._bindings = [];
         this._bindings = [
