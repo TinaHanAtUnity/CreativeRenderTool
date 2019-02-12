@@ -14,11 +14,15 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDWebPlayerEventAdapter } from 'MRAID/EventBridge/MRAIDWebPlayerEventAdapter';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
+import { ProgrammaticMRAIDEventHandler } from 'MRAID/EventHandlers/ProgrammaticMRAIDEventHandler';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private readonly onLoaded = new Observable0();
     private _domContentLoaded = false;
+    private _jaegarSpan: JaegerSpan;
 
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(platform, core, deviceInfo, 'webplayer-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
@@ -26,6 +30,7 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
+        this._jaegarSpan = new JaegerSpan('webplayer-mraid');
 
         this._template = new Template(MRAIDTemplate);
     }
@@ -96,6 +101,12 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
         event.preventDefault();
         event.stopPropagation();
 
+        this._jaegarSpan.addAnnotation('on X button close in WebPlayerView');
+        this._jaegarSpan.stop();
+        SessionDiagnostics.trigger('webplayer-mraid-trace', {
+            spanData: this._jaegarSpan
+        }, this._campaign.getSession());
+
         if(this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onMraidSkip());
             this.sendMraidAnalyticsEvent('playable_skip');
@@ -121,6 +132,7 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     protected onOpen(url: string) {
+        this._jaegarSpan.addAnnotation(`onOpen from onBridgeOpen in WebPlayerView ${this._callButtonEnabled}`);
         if (!this._callButtonEnabled) {
             return;
         }
@@ -161,6 +173,27 @@ export class WebPlayerMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public onBridgeResizeWebview() {
         this.reduceWebViewContainerHeight();
+    }
+
+    public onBridgeOpen(url: string) {
+        this._jaegarSpan.addAnnotation('onBridgeOpen in WebPlayerView');
+        super.onBridgeOpen(url);
+    }
+
+    public onBridgeClose() {
+        this._jaegarSpan.addAnnotation('onBridgeClose in WebPlayerView');
+        this._jaegarSpan.stop();
+        SessionDiagnostics.trigger('webplayer-mraid-trace', {
+            spanData: this._jaegarSpan
+        }, this._campaign.getSession());
+        super.onBridgeClose();
+    }
+
+    public addEventHandler(handler: IMRAIDViewHandler): IMRAIDViewHandler {
+        if (handler instanceof ProgrammaticMRAIDEventHandler) {
+            handler.setJaegerSpan(this._jaegarSpan);
+        }
+        return super.addEventHandler(handler);
     }
 
     private fullScreenWebViewContainer() {
