@@ -1,7 +1,6 @@
 import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { IAppSheetOptions } from 'Ads/Native/iOS/AppSheet';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
 
 export enum AppSheetState {
@@ -21,21 +20,17 @@ export class IOSPerformanceAdUnit extends PerformanceAdUnit {
     constructor(parameters: IPerformanceAdUnitParameters) {
         super(parameters);
 
-        this._installButtonExperimentEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(parameters.campaign, parameters.coreConfig);
+        this._appSheetOpenObserver = this._ads.iOS!.AppSheet.onOpen.subscribe(() => {
+            this.onAppSheetOpened();
+        });
 
-        if (this._installButtonExperimentEnabled) {
-            this._appSheetOpenObserver = this._ads.iOS!.AppSheet.onOpen.subscribe(() => {
-                this.onAppSheetOpened();
-            });
+        this._appSheetCloseObserver = this._ads.iOS!.AppSheet.onClose.subscribe(() => {
+            this.onAppSheetClosed();
+        });
 
-            this._appSheetCloseObserver = this._ads.iOS!.AppSheet.onClose.subscribe(() => {
-                this.onAppSheetClosed();
-            });
-
-            this._appSheetErrorObserver = this._ads.iOS!.AppSheet.onError.subscribe(() => {
-                this.onAppSheetErrored();
-            });
-        }
+        this._appSheetErrorObserver = this._ads.iOS!.AppSheet.onError.subscribe(() => {
+            this.onAppSheetErrored();
+        });
     }
 
     private onAppSheetOpened(): void {
@@ -67,10 +62,6 @@ export class IOSPerformanceAdUnit extends PerformanceAdUnit {
     }
 
     public isAppSheetOpen(): boolean {
-        if (!this._installButtonExperimentEnabled) {
-            return false;
-        }
-
         return this._appSheetState === AppSheetState.OPENED;
     }
 
