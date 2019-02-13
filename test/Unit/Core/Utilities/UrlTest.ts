@@ -64,16 +64,16 @@ describe('UrlTest', () => {
         });
     });
 
-    describe('isRelativeUrl', () => {
+    describe('isRelativeProtocol', () => {
         it('should return true if it is a relative url', () => {
-            assert.isTrue(Url.isRelativeUrl('//www.unity3d.com'), 'should return true for valid relative path');
-            assert.isTrue(Url.isRelativeUrl('//www.google.com'), 'should return true for valid relative path');
+            assert.isTrue(Url.isRelativeProtocol('//www.unity3d.com'), 'should return true for valid relative path');
+            assert.isTrue(Url.isRelativeProtocol('//www.google.com'), 'should return true for valid relative path');
         });
 
         it('should return false for non relative urls', () => {
-            assert.isFalse(Url.isRelativeUrl('http://www.unity3d.com'));
-            assert.isFalse(Url.isRelativeUrl('https://www.unity3d.com'));
-            assert.isFalse(Url.isRelativeUrl('file://www.unity3d.com'));
+            assert.isFalse(Url.isRelativeProtocol('http://www.unity3d.com'));
+            assert.isFalse(Url.isRelativeProtocol('https://www.unity3d.com'));
+            assert.isFalse(Url.isRelativeProtocol('file://www.unity3d.com'));
         });
     });
 

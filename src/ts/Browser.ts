@@ -81,7 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ['DeviceVolume', toInt],
             ['BatteryLevel', toInt],
             ['BatteryStatus', toInt],
-            ['RingerMode', toInt]
+            ['RingerMode', toInt],
+            ['Imei', undefined]
         ];
         fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => unknown) | undefined]) => {
             const element = <HTMLInputElement>window.parent.document.getElementById('android' + field);

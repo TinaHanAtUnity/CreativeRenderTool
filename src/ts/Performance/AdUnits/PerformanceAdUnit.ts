@@ -6,10 +6,14 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
+import { DownloadManager } from 'China/Managers/DownloadManager';
+import { DeviceIdManager } from 'China/Managers/DeviceIdManager';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;
     adUnitStyle?: AdUnitStyle;
+    downloadManager?: DownloadManager;
+    deviceIdManager?: DeviceIdManager;
 }
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
@@ -59,6 +63,27 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
     public getEndScreen(): PerformanceEndScreen | undefined {
         return this._endScreen;
+    }
+
+    public setDownloadStatusMessage(message: string): void {
+        const downloadMessageText = document.body.getElementsByClassName('download-message-text')[0];
+        if (downloadMessageText) {
+            downloadMessageText.innerHTML = message;
+        }
+    }
+
+    public disableDownloadButton(): void {
+        const downloadContainer = document.body.getElementsByClassName('download-container')[0];
+        if (downloadContainer) {
+            downloadContainer.classList.add('disabled');
+        }
+    }
+
+    public enableDownloadButton(): void {
+        const downloadContainer = document.body.getElementsByClassName('download-container')[0];
+        if (downloadContainer) {
+            downloadContainer.classList.remove('disabled');
+        }
     }
 
     public onVideoError(): void {

@@ -152,6 +152,10 @@ import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParam
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
+import { AndroidDownloadApi } from 'China/Native/Android/Download';
+import { AndroidInstallListenerApi } from 'China/Native/Android/InstallListener';
+import { IChinaApi } from 'China/IChina';
+import { ChinaAndroidDeviceInfoApi } from 'China/Native/Android/DeviceInfo';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import OnProgrammaticBannerCampaign from 'json/OnProgrammaticBannerCampaign.json';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
@@ -1057,6 +1061,16 @@ export class TestFixtures {
         };
     }
 
+    public static getChinaApi(nativeBridge: NativeBridge): IChinaApi {
+        return {
+            Android: {
+                Download: new AndroidDownloadApi(nativeBridge),
+                InstallListener: new AndroidInstallListenerApi(nativeBridge),
+                DeviceInfo: new ChinaAndroidDeviceInfoApi(nativeBridge)
+            }
+        };
+    }
+
     public static getCoreConfiguration(): CoreConfiguration {
         const json = JSON.parse(ConfigurationAuctionPlc);
         return CoreConfigurationParser.parse(json);
@@ -1124,6 +1138,8 @@ export class TestFixtures {
     public static getFakeNativeAndroidDeviceInfo(): any {
         return {
             getAndroidId: sinon.stub().returns(Promise.resolve('17')),
+            getDeviceId: sinon.stub().returns(Promise.resolve('17')),
+            getDeviceIdWithSlot: sinon.stub().returns(Promise.resolve('17')),
             getApiLevel: sinon.stub().returns(Promise.resolve(16)),
             getManufacturer: sinon.stub().returns(Promise.resolve('N')),
             getScreenDensity: sinon.stub().returns(Promise.resolve(2)),
