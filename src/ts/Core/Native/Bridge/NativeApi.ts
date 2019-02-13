@@ -9,7 +9,8 @@ export enum ApiPackage {
     PURCHASING_CORE,
     ANALYTICS,
     AR,
-    BANNER
+    BANNER,
+    CHINA
 }
 
 export abstract class NativeApi {
@@ -21,7 +22,8 @@ export abstract class NativeApi {
         [ApiPackage.PURCHASING_CORE]: {android: 'com.unity3d.services.purchasing.core.api', ios: 'UPURApi'},
         [ApiPackage.ANALYTICS]: {android: 'com.unity3d.services.analytics.core.api', ios: 'UANAApi'},
         [ApiPackage.AR]: {android: 'com.unity3d.services.ar.api', ios: 'UARApi'},
-        [ApiPackage.BANNER]: {android: 'com.unity3d.services.banners.api', ios: 'UADSApi'}
+        [ApiPackage.BANNER]: {android: 'com.unity3d.services.banners.api', ios: 'UADSApi'},
+        [ApiPackage.CHINA]: {android: 'com.unity3d.services.china.api', ios: ''}
     };
 
     protected _nativeBridge: NativeBridge;
