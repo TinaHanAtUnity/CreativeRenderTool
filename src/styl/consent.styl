@@ -28,6 +28,40 @@
     padding: .5 * $default-size;
   }
 
+  .consent-introduction {
+    position: relative;
+    border-radius: .5 * $default-size;
+    padding: 0 1.75 * $default-size;
+    text-align: center;
+    background: $white;
+
+    .privacy-logo {
+      margin-top: 2 * $default-size;
+      margin-bottom: $default-size;
+      font-size: 2 * $consent-main-title-font-size;
+    }
+
+    .intro-title {
+      font-size: $consent-main-title-font-size;
+      font-weight: $privacy-main-title-font-weight;
+    }
+
+    .bold {
+      font-weight: $privacy-main-title-font-weight;
+    }
+
+    .continue-button {
+      font-size: $consent-title-font-size;
+      color: $consent-blue;
+      padding: 1.25 * $default-size 2 * $default-size 2.5 * $default-size 2 * $default-size;
+    }
+
+    .unity-logo {
+      opacity: .18;
+      margin-bottom: $default-size;
+    }
+  }
+
   .consent-container {
     position: relative;
     height: 80%;
@@ -39,8 +73,22 @@
     background: $white;
   }
 
-  .consent-introduction {
-    display: none;
+  &:not(.intro) {
+    .consent-container {
+      display: flex;
+    }
+    .consent-introduction {
+      display: none;
+    }
+  }
+
+  &.intro {
+    .consent-container {
+      display: none;
+    }
+    .consent-introduction {
+      display: block;
+    }
   }
 
   .consent-settings {
@@ -51,7 +99,7 @@
   }
 
   .consent-title {
-    font-size: .9 * $default-size;
+    font-size: $consent-title-font-size;
     font-weight: $privacy-main-title-font-weight;
     color: $black;
   }
@@ -66,7 +114,7 @@
   }
 
   .consent-button {
-    font-size: .8 * $default-size;
+    font-size: $consent-button-font-size;
     border-radius: 2 * $default-size;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
     text-align: center;

@@ -35,6 +35,11 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
         this._bindings = [
             {
                 event: 'click',
+                listener: (event: Event) => this.onContinueEvent(event),
+                selector: '.continue-button'
+            },
+            {
+                event: 'click',
                 listener: (event: Event) => this.onAgreeEvent(event),
                 selector: '.agree'
             },
@@ -62,6 +67,8 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
 
         this._privacyRowItemContainer.render();
         (<HTMLElement>this._container.querySelector('.privacy-container')).appendChild(this._privacyRowItemContainer.container());
+
+        this.container().classList.add('intro');
     }
 
     public show(): void {
@@ -71,6 +78,12 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
 
     public onSwitchGroupSelectionChange(): void {
         // todo: set buttons based on the switch group selection
+    }
+
+    private onContinueEvent(event: Event) {
+        event.preventDefault();
+
+        this.container().classList.remove('intro');
     }
 
     private onAgreeEvent(event: Event) {
