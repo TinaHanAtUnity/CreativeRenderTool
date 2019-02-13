@@ -1,4 +1,24 @@
-# Pending
+# Wed Feb 13 19:11:46 UTC 2019
+
+* Merge China [#7825](https://github.com/Applifier/unity-ads-webview/pull/7825)
+
+# Tue Feb 12 21:50:18 UTC 2019
+
+* Consolidate vast url parsing into a single function [#8176](https://github.com/Applifier/unity-ads-webview/pull/8176)
+* Add trace information for webplayer-mraid click diagnostics [#8175](https://github.com/Applifier/unity-ads-webview/pull/8175)
+* Remove Purchasing Diagnostics [#8151](https://github.com/Applifier/unity-ads-webview/pull/8151)
+* Enable Admob HTTP Parsing ABTest on Group 18 [#8203](https://github.com/Applifier/unity-ads-webview/pull/8203)
+* Enable MRAID Webplayer ABTest on Group 19 [#8207](https://github.com/Applifier/unity-ads-webview/pull/8207)
+
+# Mon Feb 11 17:59:20 UTC 2019
+
+* Add deviceFreeSpace to video operative events [#8179](https://github.com/Applifier/unity-ads-webview/pull/8179)
+* Change text of the Delete your data button [#8180](https://github.com/Applifier/unity-ads-webview/pull/8180)
+* Add list of 3rd parties to the new privacy and consent views [#8177](https://github.com/Applifier/unity-ads-webview/pull/8177)
+* Renamed NewVideoOverlay -> VideoOverlay, new-video-overlay -> video-overlay [#8152](https://github.com/Applifier/unity-ads-webview/pull/8152)
+* Add close button to the new Privacy settigns view [#8106](https://github.com/Applifier/unity-ads-webview/pull/8106)
+
+# Fri Feb  8 20:37:59 UTC 2019
 
 * Install button experiment for rewarded ad videos [#8055](https://github.com/Applifier/unity-ads-webview/pull/8055)
 * Update dependencies [#8054](https://github.com/Applifier/unity-ads-webview/pull/8054)

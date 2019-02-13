@@ -248,6 +248,12 @@
       "body": true
     },
     {
+      "parameter": "imei",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
       "parameter": "isBackupCampaign",
       "required": "all",
       "queryString": false,
@@ -255,6 +261,12 @@
     },
     {
       "parameter": "privacy",
+      "required": "yes",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "deviceFreeSpace",
       "required": "yes",
       "queryString": false,
       "body": true

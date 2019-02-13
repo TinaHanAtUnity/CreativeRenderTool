@@ -47,6 +47,14 @@ export class DeviceInfo extends BackendApi {
         this._androidId = value;
     }
 
+    public setDeviceId(value: string) {
+        this._deviceId = value;
+    }
+
+    public setImei(value: string) {
+        this._imei = value;
+    }
+
     public setApiLevel(value: number) {
         this._apiLevel = value;
     }
@@ -253,6 +261,10 @@ export class DeviceInfo extends BackendApi {
 
     public getAndroidId() {
         return this._androidId;
+    }
+
+    public getDeviceId() {
+        return this._deviceId;
     }
 
     public getApiLevel() {
@@ -501,6 +513,8 @@ export class DeviceInfo extends BackendApi {
     private _statusBarWidth: number = 0;
     private _statusBarHidden: boolean = true;
     private _adbEnabled = false;
+    private _deviceId: string;
+    private _imei: string;
 
     private getGuid() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {

@@ -1,8 +1,8 @@
 import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
-import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 
-export class VastVideoOverlay extends NewVideoOverlay implements IPrivacyHandlerView {
+export class VastVideoOverlay extends VideoOverlay implements IPrivacyHandlerView {
 
     private _seatId: number | undefined;
     private _hasEndcard: boolean;

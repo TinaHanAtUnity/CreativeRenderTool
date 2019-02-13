@@ -122,7 +122,7 @@ import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { StoreHandler, IStoreHandlerDownloadParameters, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
@@ -150,6 +150,10 @@ import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
 import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
+import { AndroidDownloadApi } from 'China/Native/Android/Download';
+import { AndroidInstallListenerApi } from 'China/Native/Android/InstallListener';
+import { IChinaApi } from 'China/IChina';
+import { ChinaAndroidDeviceInfoApi } from 'China/Native/Android/DeviceInfo';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import OnProgrammaticBannerCampaign from 'json/OnProgrammaticBannerCampaign.json';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
@@ -680,7 +684,7 @@ export class TestFixtures {
         return new XPromoEndScreen(this.getEndScreenParameters(platform, core, campaign), campaign);
     }
 
-    public static getVideoOverlay<T extends Campaign>(platform: Platform, core: ICoreApi, ads: IAdsApi, campaign: T): NewVideoOverlay {
+    public static getVideoOverlay<T extends Campaign>(platform: Platform, core: ICoreApi, ads: IAdsApi, campaign: T): VideoOverlay {
         const overlayParams: IVideoOverlayParameters<T> = {
             platform,
             ads,
@@ -690,7 +694,7 @@ export class TestFixtures {
             coreConfig: TestFixtures.getCoreConfiguration(),
             placement: TestFixtures.getPlacement()
         };
-        return new NewVideoOverlay(overlayParams, TestFixtures.getPrivacy(platform, campaign), false, false);
+        return new VideoOverlay(overlayParams, TestFixtures.getPrivacy(platform, campaign), false, false);
     }
 
     public static getPerformanceOverlayEventHandler(platform: Platform, core: ICoreApi, ads: IAdsApi, ar: IARApi, purchasing: IPurchasingApi, campaign: Campaign, adUnit: PerformanceAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): PerformanceOverlayEventHandler {
@@ -1033,6 +1037,16 @@ export class TestFixtures {
         };
     }
 
+    public static getChinaApi(nativeBridge: NativeBridge): IChinaApi {
+        return {
+            Android: {
+                Download: new AndroidDownloadApi(nativeBridge),
+                InstallListener: new AndroidInstallListenerApi(nativeBridge),
+                DeviceInfo: new ChinaAndroidDeviceInfoApi(nativeBridge)
+            }
+        };
+    }
+
     public static getCoreConfiguration(): CoreConfiguration {
         const json = JSON.parse(ConfigurationAuctionPlc);
         return CoreConfigurationParser.parse(json);
@@ -1100,6 +1114,8 @@ export class TestFixtures {
     public static getFakeNativeAndroidDeviceInfo(): any {
         return {
             getAndroidId: sinon.stub().returns(Promise.resolve('17')),
+            getDeviceId: sinon.stub().returns(Promise.resolve('17')),
+            getDeviceIdWithSlot: sinon.stub().returns(Promise.resolve('17')),
             getApiLevel: sinon.stub().returns(Promise.resolve(16)),
             getManufacturer: sinon.stub().returns(Promise.resolve('N')),
             getScreenDensity: sinon.stub().returns(Promise.resolve(2)),

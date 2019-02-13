@@ -12,6 +12,8 @@ export enum CurrentPermission {
 export enum PermissionTypes {
     CAMERA = 'camera',
     AUDIO = 'audio',
+    WRITE_EXTERNAL_STORAGE = 'write_external_storage',
+    READ_PHONE_STATE = 'read_phone_state',
     INVALID = 'invalid'
 }
 
@@ -68,6 +70,13 @@ export class PermissionsUtil {
         }
         if (permission === AndroidPermission.RECORD_AUDIO) {
             return PermissionTypes.AUDIO;
+        }
+        // only Android permissions
+        if (permission === AndroidPermission.WRITE_EXTERNAL_STORAGE) {
+            return PermissionTypes.WRITE_EXTERNAL_STORAGE;
+        }
+        if (permission === AndroidPermission.READ_PHONE_STATE) {
+            return PermissionTypes.READ_PHONE_STATE;
         }
         return PermissionTypes.INVALID;
     }
@@ -146,6 +155,13 @@ export class PermissionsUtil {
         }
         if (permission === PermissionTypes.AUDIO) {
             return isAndroid ? AndroidPermission.RECORD_AUDIO : IosPermission.AVMediaTypeAudio;
+        }
+        // only Android permissions
+        if (permission === PermissionTypes.READ_PHONE_STATE) {
+            return isAndroid ? AndroidPermission.READ_PHONE_STATE : PermissionTypes.INVALID;
+        }
+        if (permission === PermissionTypes.WRITE_EXTERNAL_STORAGE) {
+            return isAndroid ? AndroidPermission.WRITE_EXTERNAL_STORAGE : PermissionTypes.INVALID;
         }
         // not supported
         return PermissionTypes.INVALID;

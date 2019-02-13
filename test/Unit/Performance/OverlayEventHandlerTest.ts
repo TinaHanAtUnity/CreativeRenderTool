@@ -12,7 +12,7 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { NewVideoOverlay, IVideoOverlayParameters } from 'Ads/Views/NewVideoOverlay';
+import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
@@ -59,7 +59,7 @@ describe('OverlayEventHandlerTest', () => {
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: RequestManager;
-    let overlay: NewVideoOverlay;
+    let overlay: VideoOverlay;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let overlayEventHandler: OverlayEventHandler<PerformanceCampaign>;
     let campaign: PerformanceCampaign;
@@ -128,7 +128,7 @@ describe('OverlayEventHandlerTest', () => {
             platform: platform,
             ads: ads
         };
-        overlay = new NewVideoOverlay(videoOverlayParameters, privacy, false, true);
+        overlay = new VideoOverlay(videoOverlayParameters, privacy, false, true);
 
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
