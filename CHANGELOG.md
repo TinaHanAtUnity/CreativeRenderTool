@@ -1,5 +1,9 @@
 # Pending
 
+* Merge China [#7825](https://github.com/Applifier/unity-ads-webview/pull/7825)
+
+# Tue Feb 12 21:50:18 UTC 2019
+
 * Consolidate vast url parsing into a single function [#8176](https://github.com/Applifier/unity-ads-webview/pull/8176)
 * Add trace information for webplayer-mraid click diagnostics [#8175](https://github.com/Applifier/unity-ads-webview/pull/8175)
 * Remove Purchasing Diagnostics [#8151](https://github.com/Applifier/unity-ads-webview/pull/8151)

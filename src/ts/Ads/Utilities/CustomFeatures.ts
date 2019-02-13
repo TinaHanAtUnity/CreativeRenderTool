@@ -1,3 +1,4 @@
+import { Platform } from 'Core/Constants/Platform';
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import ZyngaGamesJson from 'json/custom_features/ZyngaGames.json';
@@ -6,7 +7,6 @@ import { IosUtils } from 'Ads/Utilities/IosUtils';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { Platform } from 'Core/Constants/Platform';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { toAbGroup, InstallInRewardedVideos } from 'Core/Models/ABGroup';
 
@@ -69,6 +69,11 @@ export class CustomFeatures {
 
     public static isByteDanceSeat(seatId: number | undefined): boolean {
         return seatId === 9116 || seatId === 9154;
+    }
+
+    public static isChinaSDK(platform: Platform, versionName: string): boolean {
+        return platform === Platform.ANDROID
+            && versionName.endsWith('china');
     }
 
     public static isTimerExpirationExperiment(gameId: string): boolean {

@@ -218,6 +218,25 @@ describe('OperativeEventManagerTest', () => {
                 });
             });
 
+            it('should send deviceId1 as imei if available', () => {
+                return operativeEventManager.sendClick({ placement: placement }).then(() => {
+                    assert(requestSpy.calledOnce, 'Operative event did not send POST request');
+                    const data = JSON.parse(requestSpy.getCall(0).args[1]);
+
+                    assert.equal(data.imei, deviceInfo.getDeviceId1());
+                });
+            });
+
+            it('should not send imei if not available', () => {
+                sinon.stub(deviceInfo, 'getDeviceId1').returns(undefined);
+                return operativeEventManager.sendClick({ placement: placement }).then(() => {
+                    assert(requestSpy.calledOnce, 'Operative event did not send POST request');
+                    const data = JSON.parse(requestSpy.getCall(0).args[1]);
+
+                    assert.isUndefined(data.imei, 'imei should be undefined');
+                });
+            });
+
             it('PerformanceCampaign specific', () => {
                 return operativeEventManager.sendClick({ placement: placement }).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');

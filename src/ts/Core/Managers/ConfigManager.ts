@@ -16,6 +16,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Url } from 'Core/Utilities/Url';
 import { UnityInfo } from 'Core/Models/UnityInfo';
+import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 
 export class ConfigManager {
 
@@ -142,16 +143,7 @@ export class ConfigManager {
             });
         }
 
-        if(this._deviceInfo.getAdvertisingIdentifier()) {
-            url = Url.addParameters(url, {
-                advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
-                limitAdTracking: this._deviceInfo.getLimitAdTracking()
-            });
-        } else if(this._platform === Platform.ANDROID) {
-            url = Url.addParameters(url, {
-                androidId: (<AndroidDeviceInfo>this._deviceInfo).getAndroidId()
-            });
-        }
+        url = Url.addParameters(url, TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo));
 
         if(framework) {
             url = Url.addParameters(url, framework.getDTO());

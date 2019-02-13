@@ -19,5 +19,7 @@ export enum EventCategory {
     BANNER,
     AR,
     ANALYTICS,
-    PERMISSIONS
+    PERMISSIONS,
+    DOWNLOAD,
+    INSTALL
 }

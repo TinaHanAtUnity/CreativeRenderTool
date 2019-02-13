@@ -2,9 +2,22 @@ import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1, Observable3 } from 'Core/Utilities/Observable';
 
+enum PermissionsEvent {
+    PERMISSIONS_RESULT,
+    PERMISSIONS_ERROR
+}
+
+export enum AndroidPermissionsResult {
+    PERMISSION_DENIED = -1,
+    PERMISSION_DENIED_APP_OP = -2,
+    PERMISSION_GRANTED = 0
+}
+
 export enum AndroidPermission {
     CAMERA = 'android.permission.CAMERA',
-    RECORD_AUDIO = 'android.permission.RECORD_AUDIO'
+    RECORD_AUDIO = 'android.permission.RECORD_AUDIO',
+    READ_PHONE_STATE = 'android.permission.READ_PHONE_STATE',
+    WRITE_EXTERNAL_STORAGE = 'android.permission.WRITE_EXTERNAL_STORAGE'
 }
 
 export class AndroidPermissionsApi extends NativeApi {
