@@ -5,11 +5,11 @@ import { Platform } from 'Core/Constants/Platform';
 import { IGranularPermissions } from 'Ads/Models/Privacy';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
-export interface IPersonalizationCheckboxGroupHandler {
+export interface IPersonalizationSwitchGroupHandler {
     onSwitchGroupSelectionChange(): void;
 }
 
-export class PersonalizationSwitchGroup extends View<IPersonalizationCheckboxGroupHandler> {
+export class PersonalizationSwitchGroup extends View<IPersonalizationSwitchGroupHandler> {
 
     private _userPrivacyManager: UserPrivacyManager;
 
@@ -27,17 +27,17 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationCheckboxGro
         this._bindings = [];
         this._bindings = [
             {
-                event: 'onchange',
+                event: 'change',
                 listener: (event: Event) => this.onExpSwitchChange(event),
                 selector: '#personalized-experience-switch'
             },
             {
-                event: 'onchange',
+                event: 'change',
                 listener: (event: Event) => this.onAdsSwitchChange(event),
-                selector: '.personalized-ads-switch'
+                selector: '#personalized-ads-switch'
             },
             {
-                event: 'onchange',
+                event: 'change',
                 listener: (event: Event) => this.on3rdPartySwitchChange(event),
                 selector: '#personalized-ads-3rd-party-switch'
             }
@@ -58,6 +58,8 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationCheckboxGro
         this._personalizedExpSwitch.checked = permissions.gameExp;
         this._personalizedAdsSwitch.checked = permissions.ads;
         this._personalized3rdPartySwitch.checked = permissions.external;
+
+        this.setSwitches();
     }
 
     public isPersonalizedExperienceChecked(): boolean {
@@ -77,6 +79,17 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationCheckboxGro
             this._personalizedExpSwitch.checked = checked;
             this._personalizedAdsSwitch.checked = checked;
             this._personalized3rdPartySwitch.checked = checked;
+            this.setSwitches();
+        }
+    }
+
+    private setSwitches(): void {
+        if (!this._personalizedAdsSwitch.checked) {
+            this._personalized3rdPartySwitch.checked = false;
+            this._container.querySelector('#third-party-switch')!.classList.add('disabled');
+        } else {
+            this._container.querySelector('#third-party-switch')!.classList.remove('disabled');
+
         }
     }
 
@@ -85,9 +98,8 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationCheckboxGro
     }
 
     private onAdsSwitchChange(event: Event): void {
-        if (!this._personalizedAdsSwitch.checked) {
-            this._personalized3rdPartySwitch.checked = false;
-        }
+        event.preventDefault();
+        this.setSwitches();
     }
 
     private on3rdPartySwitchChange(event: Event): void {

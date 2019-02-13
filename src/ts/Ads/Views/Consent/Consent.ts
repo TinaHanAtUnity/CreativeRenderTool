@@ -7,7 +7,10 @@ import { IPermissions } from 'Ads/Models/Privacy';
 import { ButtonSpinner } from 'Ads/Views/Consent/ButtonSpinner';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import ConsentTemplate from 'html/consent/Consent.html';
-import { PersonalizationSwitchGroup } from 'Ads/Views/Consent/PersonalizationSwitchGroup';
+import {
+    IPersonalizationSwitchGroupHandler,
+    PersonalizationSwitchGroup
+} from 'Ads/Views/Consent/PersonalizationSwitchGroup';
 import { PrivacyRowItemContainer } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 
 export interface IUnityConsentViewParameters {
@@ -16,7 +19,8 @@ export interface IUnityConsentViewParameters {
     consentSettingsView: UnityConsentSettings;
 }
 
-export class Consent extends View<IConsentViewHandler> {
+export class Consent extends View<IConsentViewHandler> implements IPersonalizationSwitchGroupHandler {
+
     private _privacyManager: UserPrivacyManager;
     private _switchGroup: PersonalizationSwitchGroup;
     private _privacyRowItemContainer: PrivacyRowItemContainer;
@@ -60,8 +64,19 @@ export class Consent extends View<IConsentViewHandler> {
         (<HTMLElement>this._container.querySelector('.privacy-container')).appendChild(this._privacyRowItemContainer.container());
     }
 
+    public show(): void {
+        super.show();
+        this._switchGroup.show();
+    }
+
+    public onSwitchGroupSelectionChange(): void {
+        // todo: set buttons based on the switch group selection
+    }
+
     private onAgreeEvent(event: Event) {
         event.preventDefault();
+
+        this._switchGroup.checkCheckboxes(true);
 
         const permissions: IPermissions = {
             gameExp: true,
@@ -69,20 +84,25 @@ export class Consent extends View<IConsentViewHandler> {
             external: true
         };
         this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
-        this.closeWithAnimation();
+        const element = (<HTMLElement>this._container.querySelector('.agree'));
+        this.closeWithAnimation(element);
     }
 
     private onDisagreeEvent(event: Event) {
         event.preventDefault();
 
         const permissions: IPermissions = {
-            all: true
+            gameExp: false,
+            ads: false,
+            external: false
         };
         this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
-        this.closeWithAnimation();
+        const element = (<HTMLElement>this._container.querySelector('.disagree'));
+
+        this.closeWithAnimation(element);
     }
 
-    private closeWithAnimation(): void {
+    private closeWithAnimation(buttonElement: HTMLElement): void {
         this.container().classList.add('prevent-clicks');
 
         const buttonSpinner = new ButtonSpinner(this._platform);

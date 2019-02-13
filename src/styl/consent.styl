@@ -16,7 +16,7 @@
   &.prevent-clicks {
     pointer-events: none;
   }
-  .safe-area-content {
+  .safe-area {
     position: fixed;
     top: 0;
     right: 0;
@@ -88,10 +88,59 @@
     margin-left: $default-size;
   }
 
+  #third-party-switch.disabled {
+    pointer-events: none;
+    opacity: 0.4;
+  }
+
 
   .switch-group-container {
     $switch-group-container();
     margin-top: .5 * $default-size;
   }
 
+}
+$iphone-x-paddings() {
+  #consent {
+    .safe-area {
+      top: constant(safe-area-inset-top);
+      right: constant(safe-area-inset-right);
+      bottom: constant(safe-area-inset-bottom);
+      left: constant(safe-area-inset-left);
+
+      top: env(safe-area-inset-top);
+      right: env(safe-area-inset-right);
+      bottom: env(safe-area-inset-bottom);
+      left: env(safe-area-inset-left);
+
+      padding: 0 .5 * $default-size;
+    }
+  }
+
+  .landscape {
+    #consent {
+      padding: .5 * $default-size 0 0 0;
+    }
+  }
+}
+
+/* iPhone X & iPhone XS */
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+  html {
+    $iphone-x-paddings();
+  }
+}
+
+/* iPhone XS Max */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+  html {
+    $iphone-x-paddings();
+  }
+}
+
+/* iPhone XR */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+  html {
+    $iphone-x-paddings();
+  }
 }
