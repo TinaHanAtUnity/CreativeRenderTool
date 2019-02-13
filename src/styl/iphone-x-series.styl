@@ -471,15 +471,15 @@ $iphone-x-performance-end-screen-styles() {
   .portrait {
     #end-screen.performance-end-screen {
       padding: 0;
-      padding-top: constant(safe-area-inset-top);
-      padding-top: env(safe-area-inset-top); // @stylint ignore;
+      padding-top: env(safe-area-inset-top);
+      padding-top: constant(safe-area-inset-top); // @stylint ignore;
       width: 100vw;
-      height: calc(100vh - constant(safe-area-inset-top));
-      height: calc(100vh - env(safe-area-inset-top)); // @stylint ignore;
+      height: calc(100vh - env(safe-area-inset-top));
+      height: calc(100vh - constant(safe-area-inset-top)); // @stylint ignore;
 
       .bottom-container {
-        margin-bottom: constant(safe-area-inset-bottom);
-        margin-bottom: env(safe-area-inset-bottom); // @stylint ignore;
+        margin-bottom: env(safe-area-inset-bottom);
+        margin-bottom: constant(safe-area-inset-bottom); // @stylint ignore;
       }
     }
   }
@@ -491,8 +491,11 @@ $iphone-x-performance-end-screen-styles() {
 
       .bottom-container {
         margin-bottom: constant(safe-area-inset-bottom);
+        margin-bottom: env(safe-area-inset-bottom); // @stylint ignore
 
         .privacy-button {
+          right: 0;
+          left: auto;
           margin-right: 1em;
         }
       }
@@ -504,11 +507,6 @@ $iphone-x-performance-end-screen-styles() {
     padding-right: constant(safe-area-inset-right); // @stylint ignore
     width: calc(100vw - env(safe-area-inset-right));
     width: calc(100vw - constant(safe-area-inset-right)); // @stylint ignore
-
-    .privacy-button {
-      right: 0;
-      left: auto;
-    }
   }
 
   .ios-landscape-left #end-screen.performance-end-screen {
@@ -520,8 +518,6 @@ $iphone-x-performance-end-screen-styles() {
     .privacy-button {
       right: env(safe-area-inset-right);
       right: constant(safe-area-inset-right);   // @stylint ignore
-      left: auto;
-      margin-right: 1em;
     }
   }
 
@@ -531,16 +527,6 @@ $iphone-x-performance-end-screen-styles() {
       @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
         font-size: $default-px-size * 1.5;
       }
-
-      /* iPhone XS Max
-      @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
-        font-size: $default-px-size * 1;
-      }
-
-      /* iPhone XR
-      @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
-        font-size: $default-px-size * 1;
-      }*/
     }
   }
 }
