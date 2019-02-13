@@ -31,7 +31,6 @@
   .consent-introduction {
     position: relative;
     border-radius: .5 * $default-size;
-    padding: 0 1.75 * $default-size;
     text-align: center;
     background: $white;
 
@@ -42,8 +41,13 @@
     }
 
     .intro-title {
+      padding: 0 1.5 * $default-size;
       font-size: $consent-main-title-font-size;
       font-weight: $privacy-main-title-font-weight;
+    }
+
+    .intro-text {
+      padding: 0 1.75 * $default-size;
     }
 
     .bold {
@@ -66,7 +70,6 @@
     position: relative;
     height: 80%;
     border-radius: .5 * $default-size;
-    padding-top: .5 * $default-size;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -93,6 +96,7 @@
 
   .consent-settings {
     position: relative;
+    border-radius: .5 * $default-size;
     overflow: auto;
     background: $white;
     padding: 1.5 * $default-size;
@@ -148,6 +152,21 @@
   }
 
 }
+
+&.landscape {
+  #consent {
+    .consent-introduction,
+    .consent-container {
+      left: 15%;
+      width: 70%;
+    }
+
+    .consent-container {
+      height: 100%;
+    }
+  }
+}
+
 $iphone-x-paddings() {
   #consent {
     .safe-area {
@@ -167,7 +186,9 @@ $iphone-x-paddings() {
 
   .landscape {
     #consent {
-      padding: .5 * $default-size 0 0 0;
+      .safe-area {
+        padding: .5 * $default-size 0 0 0;
+      }
     }
   }
 }
