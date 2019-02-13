@@ -90,7 +90,10 @@ export class NativeBridge implements INativeBridge {
             }
             delete this._callbackTable[id];
         });
-        this.processBatch();
+        if(this._autoBatch && this._autoBatch.getBatch().length > 0) {
+            this.invokeBatch(this._autoBatch);
+        }
+        delete this._autoBatch;
     }
 
     public addEventHandler(eventCategory: EventCategory, nativeApi: NativeApi) {
@@ -107,7 +110,6 @@ export class NativeBridge implements INativeBridge {
         } else {
             throw new Error('Unknown event category: ' + category);
         }
-        this.processBatch();
     }
 
     public handleInvocation(parameters: unknown[]): void {
@@ -119,7 +121,6 @@ export class NativeBridge implements INativeBridge {
         });
         // @ts-ignore
         (<unknown>window)[className][methodName].apply((<unknown>window)[className], parameters);
-        this.processBatch();
     }
 
     public getPlatform(): Platform {
@@ -132,15 +133,6 @@ export class NativeBridge implements INativeBridge {
 
     private invokeCallback(id: string, status: string, ...parameters: unknown[]): void {
         this._backend.handleCallback(id, status, JSON.stringify(parameters));
-    }
-
-    private processBatch() {
-        setTimeout(() => {
-            if(this._autoBatch && this._autoBatch.getBatch().length > 0) {
-                this.invokeBatch(this._autoBatch);
-                delete this._autoBatch;
-            }
-        }, 0);
     }
 
 }
