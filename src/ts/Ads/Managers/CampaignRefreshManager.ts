@@ -316,6 +316,13 @@ export class CampaignRefreshManager extends RefreshManager {
     private onAdPlanReceived(refreshDelay: number, campaignCount: number, auctionStatusCode: number) {
         this._campaignCount = campaignCount;
 
+        if (StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode === AuctionStatusCode.FREQUENCY_CAP_REACHED) {
+            const nowInMilliSec = Date.now();
+            this._refillTimestamp = nowInMilliSec + TimeUtils.getNextUTCDayDeltaSeconds(nowInMilliSec);
+
+            return;
+        }
+
         if(campaignCount === 0) {
             this._noFills++;
 
@@ -332,12 +339,6 @@ export class CampaignRefreshManager extends RefreshManager {
             if(delay > 0) {
                 this._refillTimestamp = Date.now() + delay * 1000;
                 delay = delay + Math.random() * 10; // add 0-10 second random delay
-                if (StatusCodeTest.isValid(this._coreConfig.getAbGroup())) {
-                    if (auctionStatusCode === AuctionStatusCode.FREQUENCY_CAP_REACHED && delay < TimeUtils.getNextUTCDayDeltaSeconds(Date.now())) {
-                        this._noFills--;
-                        return;
-                    }
-                }
                 this._core.Sdk.logDebug('Unity Ads ad plan will be refreshed in ' + delay + ' seconds');
                 setTimeout(() => {
                     this.refresh(true);
