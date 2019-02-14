@@ -23,19 +23,19 @@ export class GoogleStoreManager extends StoreManager {
     }
 
     private onBillingStart(data: IGooglePurchases) {
-        this._core.Api.Sdk.logInfo('GOOGLE BILLING START: ' + JSON.stringify(data));
+        this._core.Api.Sdk.logInfo('GOOGLE BILLING START: ' + JSON.stringify(data)); // todo: remove debug logging before merging to master
 
         this._existingOrderIds = [];
 
         if(data.purchaseDataList && data.purchaseDataList.length > 0) {
-            for(let purchaseData of data.purchaseDataList) {
+            for(const purchaseData of data.purchaseDataList) {
                 this._existingOrderIds.push(purchaseData.orderId);
             }
         }
     }
 
     private onBillingEnd(data: IGooglePurchases) {
-        this._core.Api.Sdk.logInfo('GOOGLE BILLING END: ' + JSON.stringify(data));
+        this._core.Api.Sdk.logInfo('GOOGLE BILLING END: ' + JSON.stringify(data)); // todo: remove debug logging before merging to master
 
         if(data.purchaseDataList && data.purchaseDataList.length > 0) {
             data.purchaseDataList.forEach((purchaseData: IGooglePurchaseData, index: number) => {

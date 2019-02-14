@@ -118,7 +118,7 @@ export class AndroidStoreApi extends NativeApi {
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.BILLING_START]:
-                this.onBillingStart.trigger(parameters[0]);
+                this.onBillingStart.trigger(<IGooglePurchases>parameters[0]);
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.BILLING_START_ERROR]:
@@ -126,7 +126,7 @@ export class AndroidStoreApi extends NativeApi {
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.BILLING_END]:
-                this.onBillingEnd.trigger(parameters[0]);
+                this.onBillingEnd.trigger(<IGooglePurchases>parameters[0]);
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.BILLING_END_ERROR]:

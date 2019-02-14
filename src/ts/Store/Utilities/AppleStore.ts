@@ -2,7 +2,7 @@ import { IStoreApi } from 'Store/IStore';
 import { IAppleProduct } from 'Store/Native/iOS/Products';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 
-export class AppleProduct {
+export class AppleStore {
     private _store: IStoreApi;
     private _callbackId: number = 1;
     private _callbacks: { [requestId: number]: CallbackContainer<IAppleProduct> };
