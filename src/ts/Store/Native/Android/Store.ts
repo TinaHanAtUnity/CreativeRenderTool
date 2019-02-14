@@ -28,6 +28,8 @@ export enum AndroidStoreError {
     UNKNOWN_ERROR
 }
 
+// interfaces as documented at https://developer.android.com/google/play/billing/billing_reference
+
 export interface IGooglePurchaseData {
     autorenewing?: boolean;
     orderId: string;
@@ -45,14 +47,31 @@ export interface IGooglePurchases {
     purchaseItemList: string[];
 }
 
+export interface IGoogleSkuDetails {
+    productId: string;
+    type: string;
+    price: string;
+    price_amount_micros: number;
+    price_currency_code: string;
+    title: string;
+    description: string;
+    // fields below are only for subscriptions
+    subscriptionPeriod?: string;
+    trialPeriod?: string;
+    introductoryPrice?: string;
+    introductoryPriceAmountMicros?: number;
+    introductoryPricePeriod?: string;
+    introductoryPriceCycles?: number;
+}
+
 export class AndroidStoreApi extends NativeApi {
 
     public readonly onInitialized = new Observable0();
     public readonly onBillingSupportedResult = new Observable2<number, number>();
     public readonly onBillingSupportedError = new Observable3<number, AndroidStoreError, string>();
-    public readonly onPurchaseHistoryResult = new Observable2<number, unknown>(); // todo: better typing?
+    public readonly onPurchaseHistoryResult = new Observable2<number, IGooglePurchases>();
     public readonly onPurchaseHistoryError = new Observable3<number, AndroidStoreError, string>();
-    public readonly onSkuDetailsResult = new Observable2<number, unknown>(); // todo: better typing?
+    public readonly onSkuDetailsResult = new Observable2<number, IGoogleSkuDetails[]>();
     public readonly onSkuDetailsError = new Observable3<number, AndroidStoreError, string>();
     public readonly onBillingStart = new Observable1<IGooglePurchases>();
     public readonly onBillingStartError = new Observable2<AndroidStoreError, string>();
@@ -75,8 +94,8 @@ export class AndroidStoreApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'isBillingSupported', [operationId, purchaseType]);
     }
 
-    public getPurchases(purchaseType: string): Promise<unknown> { // todo: better typing?
-        return this._nativeBridge.invoke<unknown>(this._fullApiClassName, 'getPurchases', [purchaseType]);
+    public getPurchases(purchaseType: string): Promise<IGooglePurchases> {
+        return this._nativeBridge.invoke<IGooglePurchases>(this._fullApiClassName, 'getPurchases', [purchaseType]);
     }
 
     public getPurchaseHistory(operationId: number, purchaseType: string, maxPurchases: number): Promise<void> {
@@ -102,7 +121,7 @@ export class AndroidStoreApi extends NativeApi {
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.PURCHASE_HISTORY_RESULT]:
-                this.onPurchaseHistoryResult.trigger(<number>parameters[0], parameters[1]);
+                this.onPurchaseHistoryResult.trigger(<number>parameters[0], <IGooglePurchases>parameters[1]);
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.PURCHASE_HISTORY_ERROR]:
@@ -110,7 +129,7 @@ export class AndroidStoreApi extends NativeApi {
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.SKU_DETAILS_RESULT]:
-                this.onSkuDetailsResult.trigger(<number>parameters[0], parameters[1]);
+                this.onSkuDetailsResult.trigger(<number>parameters[0], <IGoogleSkuDetails[]>parameters[1]);
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.SKU_DETAILS_ERROR]:
