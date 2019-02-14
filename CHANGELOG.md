@@ -1,5 +1,6 @@
 # Pending
 
+* Fix issue in components.styl that turned stylint off without turning it back on [#8252](https://github.com/Applifier/unity-ads-webview/pull/8252)
 * Take iPhone X series screen size better into use in performance ad endscreen [#8248](https://github.com/Applifier/unity-ads-webview/pull/8248)
 * Extend the install now button experiment in rewarded ads to all devices in the designated AB group [#8202](https://github.com/Applifier/unity-ads-webview/pull/8202)
 
