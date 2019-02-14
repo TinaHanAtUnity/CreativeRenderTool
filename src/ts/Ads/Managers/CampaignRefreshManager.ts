@@ -318,7 +318,7 @@ export class CampaignRefreshManager extends RefreshManager {
 
         if (StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode === AuctionStatusCode.FREQUENCY_CAP_REACHED) {
             const nowInMilliSec = Date.now();
-            this._refillTimestamp = nowInMilliSec + TimeUtils.getNextUTCDayDeltaSeconds(nowInMilliSec);
+            this._refillTimestamp = nowInMilliSec + TimeUtils.getNextUTCDayDeltaSeconds(nowInMilliSec) * 1000;
 
             return;
         }
