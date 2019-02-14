@@ -55,6 +55,8 @@ export class PerformanceEndScreen extends EndScreen {
     public render(): void {
         super.render();
 
+        document.documentElement.classList.add('performance-end-screen');
+
         const chinaAdvertisementElement: HTMLElement | null = this._container.querySelector('.china-advertisement');
         if (this._country === 'CN' && chinaAdvertisementElement) {
             chinaAdvertisementElement.style.display = 'block';
