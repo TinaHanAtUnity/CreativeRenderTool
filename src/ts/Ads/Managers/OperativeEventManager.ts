@@ -24,6 +24,7 @@ import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: RequestManager;
@@ -98,6 +99,7 @@ export interface IInfoJson {
     frameworkName?: string;
     frameworkVersion?: string;
     skippedAt?: number;
+    imei?: string;
     isBackupCampaign: boolean;
     deviceFreeSpace: number;
 }
@@ -398,7 +400,24 @@ export class OperativeEventManager {
                     'screenSize': this._deviceInfo.getScreenLayout()
                 };
 
-                if(!this._deviceInfo.getAdvertisingIdentifier()) {
+                // for china SDK prioritize both android id and imei over GAID
+                if (CustomFeatures.isChinaSDK(this._platform, this._clientInfo.getSdkVersionName())) {
+                    if (this._deviceInfo.getAndroidId() || this._deviceInfo.getDeviceId1()) {
+                        infoJson = {
+                            ... infoJson,
+                            'advertisingTrackingId': undefined,
+                            'androidId': this._deviceInfo.getAndroidId()
+                        };
+
+                        if(this._deviceInfo.getDeviceId1()) {
+                            infoJson = {
+                                ... infoJson,
+                                'imei': this._deviceInfo.getDeviceId1()
+                            };
+                        }
+                    }
+
+                } else if (!this._deviceInfo.getAdvertisingIdentifier()) {
                     infoJson = {
                         ... infoJson,
                         'androidId': this._deviceInfo.getAndroidId()

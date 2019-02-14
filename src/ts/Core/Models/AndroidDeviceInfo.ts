@@ -4,9 +4,12 @@ import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
 import { ISensorInfo, StorageType } from 'Core/Native/Android/DeviceInfo';
+import { BuildVerionCode } from 'Core/Constants/Android/BuildVerionCode';
 
 export interface IAndroidDeviceInfo extends IDeviceInfo {
     androidId: string;
+    deviceId1: string;
+    deviceId2: string;
     isGoogleStoreInstalled: boolean;
     isXiaomiStoreInstalled: boolean;
     isGoogleMapsInstalled: boolean;
@@ -47,6 +50,8 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         super('AndroidDeviceInfo', {
             ... DeviceInfo.Schema,
             androidId: ['string'],
+            deviceId1: ['string'],
+            deviceId2: ['string'],
             isGoogleStoreInstalled: ['boolean'],
             isXiaomiStoreInstalled: ['boolean'],
             isGoogleMapsInstalled: ['boolean'],
@@ -110,6 +115,11 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         });
     }
 
+    public setDeviceIds(deviceId1: string, deviceId2: string) {
+        this.set('deviceId1', deviceId1);
+        this.set('deviceId2', deviceId2);
+    }
+
     public getStores(): string {
         let storeString = '';
 
@@ -147,6 +157,14 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
 
     public getAndroidId(): string {
         return this.get('androidId');
+    }
+
+    public getDeviceId1(): string {
+        return this.get('deviceId1');
+    }
+
+    public getDeviceId2(): string {
+        return this.get('deviceId2');
     }
 
     public getApiLevel(): number {
@@ -284,6 +302,11 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
                 dto.androidId = this.getAndroidId();
             }
 
+            if (this.getDeviceId1() && this.getDeviceId2()) {
+                dto.deviceId1 = this.getDeviceId1();
+                dto.deviceId2 = this.getDeviceId2();
+            }
+
             return Promise.all([
                 this.getFreeSpaceExternal().catch(err => this.handleDeviceInfoError(err)),
                 this.getRingerMode().catch(err => this.handleDeviceInfoError(err))
@@ -337,6 +360,11 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
 
         if(!this.getAdvertisingIdentifier()) {
             dto.androidId = this.getAndroidId();
+        }
+
+        if (this.getDeviceId1() && this.getDeviceId2()) {
+            dto.deviceId1 = this.getDeviceId1();
+            dto.deviceId2 = this.getDeviceId2();
         }
 
         return dto;

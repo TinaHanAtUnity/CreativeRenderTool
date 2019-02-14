@@ -36,7 +36,9 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceC
             placement: parameters.placement,
             adUnit: performanceAdUnit,
             campaign: parameters.campaign,
-            coreConfig: parameters.coreConfig
+            coreConfig: parameters.coreConfig,
+            downloadManager: parameters.downloadManager,
+            deviceIdManager: parameters.deviceIdManager
         };
         const storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
 

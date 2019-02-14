@@ -97,6 +97,11 @@ $download-container-default($scale-size, $with-styles = true) {
     color: $white;
     text-align: center;
   }
+
+  &.disabled {
+    background: rgba(128, 128, 128, .5) !important; // @stylint off
+    pointer-events: none;
+  }
 }
 
 $privacy-button-default($scale-size, $with-styles = true) {

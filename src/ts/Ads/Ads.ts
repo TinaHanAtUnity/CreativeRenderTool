@@ -77,6 +77,7 @@ import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParameter
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
+import { China } from 'China/China';
 
 export class Ads implements IAds {
 
@@ -111,6 +112,7 @@ export class Ads implements IAds {
     public Banners: Banners;
     public Monetization: Monetization;
     public AR: AR;
+    public China: China;
 
     constructor(config: unknown, core: ICore) {
         this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config, core.ClientInfo);
@@ -191,6 +193,11 @@ export class Ads implements IAds {
             this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
             this.AR = new AR(this._core);
 
+            if (CustomFeatures.isChinaSDK(this._core.NativeBridge.getPlatform(), this._core.ClientInfo.getSdkVersionName())) {
+                this.China = new China(this._core);
+                this.China.initialize();
+            }
+
             if (this.SessionManager.getGameSessionId() % 1000 === 0) {
                 Promise.all([
                     ARUtil.isARSupported(this.AR.Api),
@@ -207,7 +214,7 @@ export class Ads implements IAds {
                 new AdMob(this._core, this),
                 new Display(this._core, this),
                 new MRAID(this.AR.Api, this._core, this),
-                new Performance(this.AR.Api, this._core, this),
+                new Performance(this.AR.Api, this._core, this, this.China),
                 new VAST(this._core, this),
                 new VPAID(this._core, this),
                 new XPromo(this._core, this)
