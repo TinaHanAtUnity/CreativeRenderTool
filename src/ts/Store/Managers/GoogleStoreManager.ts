@@ -27,12 +27,12 @@ export class GoogleStoreManager extends StoreManager {
         this._store.Android!.Store.setListenerState(true);
 
         // todo: check isBillingSupported properly instead of just logging the result
-        this._googleStore.isBillingSupported("inapp").then(result => {
-            this._core.Api.Sdk.logInfo("GOOGLE INAPP BILLING SUPPORTED: " + result);
+        this._googleStore.isBillingSupported('inapp').then(result => {
+            this._core.Api.Sdk.logInfo('GOOGLE INAPP BILLING SUPPORTED: ' + result);
         });
 
-        this._googleStore.isBillingSupported("subs").then(result => {
-            this._core.Api.Sdk.logInfo("GOOGLE SUBSCRIPTION BILLING SUPPORTED: " + result);
+        this._googleStore.isBillingSupported('subs').then(result => {
+            this._core.Api.Sdk.logInfo('GOOGLE SUBSCRIPTION BILLING SUPPORTED: ' + result);
         });
     }
 
@@ -57,15 +57,15 @@ export class GoogleStoreManager extends StoreManager {
                     if(data.signatureList && data.signatureList[index]) {
                         this.logNewPurchase(purchaseData, data.signatureList[index]);
                     } else {
-                        this.logNewPurchase(purchaseData, "SIGNATUREMISSING");
+                        this.logNewPurchase(purchaseData, 'SIGNATUREMISSING');
                         // todo: proper error handling
                     }
                 }
             });
         }
 
-        this._googleStore.getPurchaseHistory("inapp").then(history => {
-            this._core.Api.Sdk.logInfo("GOOGLE INAPP PURCHASE HISTORY: " + JSON.stringify(history));
+        this._googleStore.getPurchaseHistory('inapp').then(history => {
+            this._core.Api.Sdk.logInfo('GOOGLE INAPP PURCHASE HISTORY: ' + JSON.stringify(history));
         });
     }
 
@@ -82,7 +82,7 @@ export class GoogleStoreManager extends StoreManager {
     private logNewPurchase(purchaseData: IGooglePurchaseData, signature: string) {
         const timestamp = Date.now();
 
-        this._googleStore.getSkuDetails(purchaseData.productId, "inapp").then(skuDetails => {
+        this._googleStore.getSkuDetails(purchaseData.productId, 'inapp').then(skuDetails => {
             const transaction = new StoreTransaction(timestamp, purchaseData.productId, skuDetails.price_amount_micros * 1000000, skuDetails.price_currency_code, signature);
             this.sendTransaction(transaction);
         });
