@@ -489,7 +489,7 @@ $iphone-x-performance-end-screen-styles() {
         right: auto;
         left: 0;
         margin-right: 0;
-        margin-left: 1em
+        margin-left: 1em;
       }
       .bottom-container {
         margin-bottom: constant(safe-area-inset-bottom);
@@ -518,8 +518,6 @@ $iphone-x-performance-end-screen-styles() {
       padding-right: constant(safe-area-inset-right); // @stylint ignore
       width: calc(100vw - env(safe-area-inset-right));
       width: calc(100vw - constant(safe-area-inset-right)); // @stylint ignore
-
-
     }
 
     .ios-landscape-left #end-screen {
@@ -548,8 +546,8 @@ $iphone-x-performance-end-screen-styles() {
     }
 
     .ios-landscape-right #privacy {
-      width: calc(100% - env(safe-area-inset-left));
       left: 0;
+      width: calc(100% - env(safe-area-inset-left));
     }
 
     .ios-landscape-left #privacy {
