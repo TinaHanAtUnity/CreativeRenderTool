@@ -90,10 +90,12 @@ export class NativeBridge implements INativeBridge {
             }
             delete this._callbackTable[id];
         });
-        if(this._autoBatch && this._autoBatch.getBatch().length > 0) {
-            this.invokeBatch(this._autoBatch);
+        if(this._autoBatchEnabled) {
+            if(this._autoBatch && this._autoBatch.getBatch().length > 0) {
+                this.invokeBatch(this._autoBatch);
+            }
+            delete this._autoBatch;
         }
-        delete this._autoBatch;
     }
 
     public addEventHandler(eventCategory: EventCategory, nativeApi: NativeApi) {

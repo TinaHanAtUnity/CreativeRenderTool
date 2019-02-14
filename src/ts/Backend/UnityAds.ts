@@ -12,12 +12,12 @@ export class UnityAds {
         switch(platform) {
             case Platform.ANDROID:
                 // todo: setting auto batching on causes some very weird behaviour with Node, should be investigated
-                nativeBridge = new NativeBridge(UnityAds._backend, Platform.ANDROID);
+                nativeBridge = new NativeBridge(UnityAds._backend, Platform.ANDROID, false);
                 UnityAds._backend.setNativeBridge(nativeBridge);
                 break;
 
             case Platform.IOS:
-                nativeBridge = new NativeBridge(UnityAds._backend, Platform.IOS);
+                nativeBridge = new NativeBridge(UnityAds._backend, Platform.IOS, false);
                 UnityAds._backend.setNativeBridge(nativeBridge);
                 break;
 

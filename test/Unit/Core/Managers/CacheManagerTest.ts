@@ -24,9 +24,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
         let cacheManager: CacheManager;
 
         beforeEach(() => {
-            backend = new Backend(platform);
-            nativeBridge = new NativeBridge(backend, platform);
-            backend.setNativeBridge(nativeBridge);
+            backend = TestFixtures.getBackend(platform);
+            nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             wakeUpManager = new WakeUpManager(core);
             requestManager = new RequestManager(nativeBridge.getPlatform(), core, wakeUpManager);

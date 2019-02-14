@@ -855,7 +855,7 @@ export class TestFixtures {
     }
 
     public static getNativeBridge(platform: Platform, backend: Backend): NativeBridge {
-        const nativeBridge = new NativeBridge(backend, platform);
+        const nativeBridge = new NativeBridge(backend, platform, false);
         backend.setNativeBridge(nativeBridge);
         return nativeBridge;
     }
