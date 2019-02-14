@@ -1,4 +1,4 @@
-# Pending
+# Thu Feb 14 18:04:51 UTC 2019
 
 * Fix issue in components.styl that turned stylint off without turning it back on [#8252](https://github.com/Applifier/unity-ads-webview/pull/8252)
 * Take iPhone X series screen size better into use in performance ad endscreen [#8248](https://github.com/Applifier/unity-ads-webview/pull/8248)
