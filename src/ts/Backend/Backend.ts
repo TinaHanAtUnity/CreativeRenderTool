@@ -25,6 +25,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { CallbackStatus, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IosPreferences } from 'Backend/Api/IosPreferences';
 import { AndroidPreferences } from 'Backend/Api/AndroidPreferences';
+import { Download } from 'Backend/Api/Download';
 import { BannerListener } from 'Backend/Api/BannerListener';
 import { AndroidStore } from 'Backend/Api/AndroidStore';
 import { Products } from 'Backend/Api/Products';
@@ -64,6 +65,7 @@ interface IBackendApi {
     Store: AndroidStore;
     UrlScheme: UrlScheme;
     VideoPlayer: VideoPlayer;
+    Download: Download;
     BannerListener: BannerListener;
 }
 
@@ -103,6 +105,7 @@ export class Backend implements IWebViewBridge {
             Store: new AndroidStore(this),
             UrlScheme: new UrlScheme(this),
             VideoPlayer: new VideoPlayer(this),
+            Download: new Download(this),
             BannerListener: new BannerListener(this)
         };
     }

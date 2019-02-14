@@ -20,5 +20,7 @@ export enum EventCategory {
     AR,
     ANALYTICS,
     PERMISSIONS,
+    DOWNLOAD,
+    INSTALL,
     STORE
 }

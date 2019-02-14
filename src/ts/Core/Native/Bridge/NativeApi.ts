@@ -10,6 +10,7 @@ export enum ApiPackage {
     ANALYTICS,
     AR,
     BANNER,
+    CHINA,
     STORE
 }
 
@@ -23,6 +24,7 @@ export abstract class NativeApi {
         [ApiPackage.ANALYTICS]: {android: 'com.unity3d.services.analytics.core.api', ios: 'UANAApi'},
         [ApiPackage.AR]: {android: 'com.unity3d.services.ar.api', ios: 'UARApi'},
         [ApiPackage.BANNER]: {android: 'com.unity3d.services.banners.api', ios: 'UADSApi'},
+        [ApiPackage.CHINA]: {android: 'com.unity3d.services.china.api', ios: ''},
         [ApiPackage.STORE]: {android: 'com.unity3d.services.store.core.api', ios: 'USTRApi'}
     };
 

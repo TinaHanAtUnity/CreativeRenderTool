@@ -1,6 +1,4 @@
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export class VideoOverlayWithInstallInRewardedVideos extends VideoOverlay {
 
