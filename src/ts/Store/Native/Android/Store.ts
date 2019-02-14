@@ -28,6 +28,23 @@ export enum AndroidStoreError {
     UNKNOWN_ERROR
 }
 
+export interface IGooglePurchaseData {
+    autorenewing?: boolean;
+    orderId: string;
+    packageName: string;
+    productId: string;
+    purchaseTime: number;
+    purchaseState: number;
+    developerPayload: string;
+    purchaseToken: string;
+}
+
+export interface IGooglePurchases {
+    purchaseDataList: IGooglePurchaseData[];
+    signatureList: string[];
+    purchaseItemList: string[];
+}
+
 export class AndroidStoreApi extends NativeApi {
 
     public readonly onInitialized = new Observable0();
@@ -37,9 +54,9 @@ export class AndroidStoreApi extends NativeApi {
     public readonly onPurchaseHistoryError = new Observable3<number, AndroidStoreError, string>();
     public readonly onSkuDetailsResult = new Observable2<number, unknown>(); // todo: better typing?
     public readonly onSkuDetailsError = new Observable3<number, AndroidStoreError, string>();
-    public readonly onBillingStart = new Observable1<unknown>();
+    public readonly onBillingStart = new Observable1<IGooglePurchases>();
     public readonly onBillingStartError = new Observable2<AndroidStoreError, string>();
-    public readonly onBillingEnd = new Observable1<unknown>();
+    public readonly onBillingEnd = new Observable1<IGooglePurchases>();
     public readonly onBillingEndError = new Observable2<AndroidStoreError, string>();
 
     constructor(nativeBridge: NativeBridge) {
