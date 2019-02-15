@@ -9,6 +9,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
+import { IOSPerformanceAdUnit } from 'Performance/AdUnits/IOSPerformanceAdUnit';
 
 export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -21,7 +22,10 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceC
     }
 
     public createAdUnit(parameters: IPerformanceAdUnitParameters): PerformanceAdUnit {
-        const performanceAdUnit = new PerformanceAdUnit(parameters);
+        const isIOS = parameters.platform === Platform.IOS;
+        const installButtonExperimentEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(parameters.campaign, parameters.coreConfig);
+        const useIOSPerformanceAdUnit = installButtonExperimentEnabled && isIOS;
+        const performanceAdUnit = useIOSPerformanceAdUnit ? new IOSPerformanceAdUnit(parameters) : new PerformanceAdUnit(parameters);
 
         let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
 
@@ -36,7 +40,9 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceC
             placement: parameters.placement,
             adUnit: performanceAdUnit,
             campaign: parameters.campaign,
-            coreConfig: parameters.coreConfig
+            coreConfig: parameters.coreConfig,
+            downloadManager: parameters.downloadManager,
+            deviceIdManager: parameters.deviceIdManager
         };
         const storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
 

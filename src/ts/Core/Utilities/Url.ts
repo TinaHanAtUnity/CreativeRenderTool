@@ -148,7 +148,7 @@ export class Url {
         }
     }
 
-    public static isRelativeUrl(url: string): boolean {
+    public static isRelativeProtocol(url: string): boolean {
         if (url && url.match(/^\/\/./i)) {
             return true;
         } else {

@@ -85,8 +85,10 @@
 | optOutEnabled | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | abGroup | number | AB Group number assigned to this user from configuration | Server | all |
 | unityCreativeId | string | Creative id of the shown creative | SDK | all |
+| imei | string | IMEI or MEID from getDeviceId | SDK | android |
 | analyticsUserId | string | Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending) | SDK | all |
 | analyticsSessionId | string | Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit | SDK | all |
+| isBackupCampaign | boolean | Flag describing if the campaign was loaded from server or from backup stored on device | SDK | all |
 | privacy | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 
 
@@ -112,6 +114,7 @@
 | frameworkVersion | no | True | False | string | Unity engine version | SDK | all |
 | adapterName | no | True | False | string | Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer | SDK | all |
 | adapterVersion | no | True | False | string | SDK version name for adapter, should be in sync with SDK version | SDK | all |
+| imei | no | True | False | string | IMEI or MEID from getDeviceId | SDK | android |
 | analyticsUserId | no | True | False | string | Unity Analytics user ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending) | SDK | all |
 | analyticsSessionId | no | True | False | string | Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit | SDK | all |
 
@@ -174,6 +177,7 @@
 | gdprEnabled | all | False | True | boolean | If GDPR is enabled | Server | all |
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
+| imei | no | True | False | string | IMEI or MEID from getDeviceId  | SDK | android |
 | abGroup | no | False | True | number | AB Group number assigned to this user from configuration | Server | all |
 | privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
 
@@ -223,7 +227,10 @@
 | optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | unityCreativeId | all | False | True | string | Creative id of the shown creative | SDK | all |
+| imei | no | False | True | string | IMEI or MEID from getDeviceId | SDK | android |
+| isBackupCampaign | all | False | True | boolean | Flag describing if the campaign was loaded from server or from backup stored on device | SDK | all |
 | privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
+| deviceFreeSpace | yes | False | True | number | Free space in kilobytes | SDK | all |
 
 
 
@@ -271,5 +278,8 @@
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | videoOrientation | no | False | True | string | Chosen video orientation | SDK | all |
 | unityCreativeId | all | False | True | string | Creative id of the shown creative | SDK | all |
+| imei | no | False | True | string | IMEI or MEID from getDeviceId | SDK | android |
+| isBackupCampaign | all | False | True | boolean | Flag describing if the campaign was loaded from server or from backup stored on device | SDK | all |
 | privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
+| deviceFreeSpace | yes | False | True | number | Free space in kilobytes | SDK | all |
 

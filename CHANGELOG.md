@@ -1,5 +1,30 @@
-# Pending
+# Merged
 
+* Disable multithreading A/B test [#8206](https://github.com/Applifier/unity-ads-webview/pull/8206)
+
+# Thu Feb 14 18:04:51 UTC 2019
+
+* Fix issue in components.styl that turned stylint off without turning it back on [#8252](https://github.com/Applifier/unity-ads-webview/pull/8252)
+* Take iPhone X series screen size better into use in performance ad endscreen [#8248](https://github.com/Applifier/unity-ads-webview/pull/8248)
+* Extend the install now button experiment in rewarded ads to all devices in the designated AB group [#8202](https://github.com/Applifier/unity-ads-webview/pull/8202)
+
+# Wed Feb 13 19:11:46 UTC 2019
+
+* Merge China [#7825](https://github.com/Applifier/unity-ads-webview/pull/7825)
+
+# Tue Feb 12 21:50:18 UTC 2019
+
+* Consolidate vast url parsing into a single function [#8176](https://github.com/Applifier/unity-ads-webview/pull/8176)
+* Add trace information for webplayer-mraid click diagnostics [#8175](https://github.com/Applifier/unity-ads-webview/pull/8175)
+* Remove Purchasing Diagnostics [#8151](https://github.com/Applifier/unity-ads-webview/pull/8151)
+* Enable Admob HTTP Parsing ABTest on Group 18 [#8203](https://github.com/Applifier/unity-ads-webview/pull/8203)
+* Enable MRAID Webplayer ABTest on Group 19 [#8207](https://github.com/Applifier/unity-ads-webview/pull/8207)
+
+# Mon Feb 11 17:59:20 UTC 2019
+
+* Add deviceFreeSpace to video operative events [#8179](https://github.com/Applifier/unity-ads-webview/pull/8179)
+* Change text of the Delete your data button [#8180](https://github.com/Applifier/unity-ads-webview/pull/8180)
+* Add list of 3rd parties to the new privacy and consent views [#8177](https://github.com/Applifier/unity-ads-webview/pull/8177)
 * Renamed NewVideoOverlay -> VideoOverlay, new-video-overlay -> video-overlay [#8152](https://github.com/Applifier/unity-ads-webview/pull/8152)
 * Add close button to the new Privacy settigns view [#8106](https://github.com/Applifier/unity-ads-webview/pull/8106)
 

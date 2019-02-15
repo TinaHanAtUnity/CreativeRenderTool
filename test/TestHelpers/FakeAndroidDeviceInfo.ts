@@ -26,6 +26,14 @@ export class FakeAndroidDeviceInfo extends AndroidDeviceInfo {
         return this._fakeDevice.androidId;
     }
 
+    public getDeviceId1(): string {
+        return this._fakeDevice.getDeviceId1;
+    }
+
+    public getDeviceId2(): string {
+        return this._fakeDevice.getDeviceId2;
+    }
+
     public getAdvertisingIdentifier(): string {
         return this._fakeDevice.advertisingId;
     }
