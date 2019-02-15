@@ -267,11 +267,11 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     protected prepareOverlay() {
         const overlay = this.getOverlay();
 
-        if(overlay) {
+        if (overlay) {
             overlay.render();
             document.body.appendChild(overlay.container());
 
-            if(!this._placement.allowSkip()) {
+            if (!this._placement.allowSkip()) {
                 overlay.setSkipEnabled(false);
             } else {
                 overlay.setSkipEnabled(true);
@@ -283,10 +283,10 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     protected hideChildren() {
         const overlay = this.getOverlay();
 
-        if(overlay) {
+        if (overlay) {
             overlay.hide();
             const container = overlay.container();
-            if(container && container.parentElement) {
+            if (container && container.parentElement) {
                 container.parentElement.removeChild(container);
             }
         }

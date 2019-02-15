@@ -189,6 +189,11 @@ describe('EndScreenEventHandlerTest', () => {
             endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
         });
 
+        afterEach(() => {
+            performanceAdUnit.setShowing(true);
+            return performanceAdUnit.hide();
+        });
+
         it('should send a click with session manager', () => {
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
@@ -221,28 +226,31 @@ describe('EndScreenEventHandlerTest', () => {
             };
 
             beforeEach(() => {
-                performanceAdUnitParameters.campaign = apkCampaign;
-                performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
+                performanceAdUnit.setShowing(true);
+                return performanceAdUnit.hide().then(() => {
+                    performanceAdUnitParameters.campaign = apkCampaign;
+                    performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
 
-                const storeHandlerParameters: IStoreHandlerParameters = {
-                    platform,
-                    core,
-                    ads,
-                    thirdPartyEventManager: thirdPartyEventManager,
-                    operativeEventManager: operativeEventManager,
-                    deviceInfo: deviceInfo,
-                    clientInfo: clientInfo,
-                    placement: placement,
-                    adUnit: performanceAdUnit,
-                    campaign: apkCampaign,
-                    coreConfig: coreConfig
-                };
+                    const storeHandlerParameters: IStoreHandlerParameters = {
+                        platform,
+                        core,
+                        ads,
+                        thirdPartyEventManager: thirdPartyEventManager,
+                        operativeEventManager: operativeEventManager,
+                        deviceInfo: deviceInfo,
+                        clientInfo: clientInfo,
+                        placement: placement,
+                        adUnit: performanceAdUnit,
+                        campaign: apkCampaign,
+                        coreConfig: coreConfig
+                    };
 
-                storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
-                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
+                    storeHandler = StoreHandlerFactory.getNewStoreHandler(storeHandlerParameters);
+                    endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
 
-                sandbox.stub(performanceAdUnit, 'hide').callsFake(() => {
-                    performanceAdUnit.onClose.trigger();
+                    sandbox.stub(performanceAdUnit, 'hide').callsFake(() => {
+                        performanceAdUnit.onClose.trigger();
+                    });
                 });
             });
 
@@ -847,52 +855,66 @@ describe('EndScreenEventHandlerTest', () => {
 
         describe('with follow redirects', () => {
             it('with response that contains location, it should launch intent', () => {
-                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
-                performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
+                const overlayContainer = overlay.container();
+                if (overlayContainer && overlayContainer.parentElement) {
+                    overlayContainer.parentElement.removeChild(overlayContainer);
+                }
+                performanceAdUnit.setShowing(true);
+                return performanceAdUnit.hide().then(() => {
+                    performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
+                    performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
 
-                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
-                    url: 'http://foo.url.com',
-                    response: 'foo response',
-                    responseCode: 200,
-                    headers: [['location', 'market://foobar.com']]
-                }));
+                    sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
+                        url: 'http://foo.url.com',
+                        response: 'foo response',
+                        responseCode: 200,
+                        headers: [['location', 'market://foobar.com']]
+                    }));
 
-                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    store: performanceAdUnitParameters.campaign.getStore(),
-                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
-                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
-                });
+                    endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                        appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                        bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                        store: performanceAdUnitParameters.campaign.getStore(),
+                        clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                        clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                    });
 
-                return resolvedPromise.then(() => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>core.Android!.Intent.launch, {
-                        'action': 'android.intent.action.VIEW',
-                        'uri': 'market://foobar.com'
+                    return resolvedPromise.then(() => {
+                        sinon.assert.calledWith(<sinon.SinonSpy>core.Android!.Intent.launch, {
+                            'action': 'android.intent.action.VIEW',
+                            'uri': 'market://foobar.com'
+                        });
                     });
                 });
             });
 
             it('with response that does not contain location, it should not launch intent', () => {
-                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
-                performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
+                const overlayContainer = overlay.container();
+                if (overlayContainer && overlayContainer.parentElement) {
+                    overlayContainer.parentElement.removeChild(overlayContainer);
+                }
+                performanceAdUnit.setShowing(true);
+                return performanceAdUnit.hide().then(() => {
+                    performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
+                    performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
 
-                const response = TestFixtures.getOkNativeResponse();
-                response.headers = [];
-                resolvedPromise = Promise.resolve(response);
-                (<sinon.SinonSpy>operativeEventManager.sendClick).restore();
-                sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
+                    const response = TestFixtures.getOkNativeResponse();
+                    response.headers = [];
+                    resolvedPromise = Promise.resolve(response);
+                    (<sinon.SinonSpy>operativeEventManager.sendClick).restore();
+                    sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
 
-                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    store: performanceAdUnitParameters.campaign.getStore(),
-                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
-                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
-                });
+                    endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                        appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                        bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                        store: performanceAdUnitParameters.campaign.getStore(),
+                        clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                        clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                    });
 
-                return resolvedPromise.then(() => {
-                    sinon.assert.notCalled(<sinon.SinonSpy>core.Android!.Intent.launch);
+                    return resolvedPromise.then(() => {
+                        sinon.assert.notCalled(<sinon.SinonSpy>core.Android!.Intent.launch);
+                    });
                 });
             });
         });
@@ -1047,45 +1069,18 @@ describe('EndScreenEventHandlerTest', () => {
             endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
         });
 
-        it('should send a click with session manager', () => {
-            sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
-            performanceAdUnitParameters.deviceInfo = deviceInfo;
-            performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
-            endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
-
-            endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                store: performanceAdUnitParameters.campaign.getStore(),
-                clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
-                clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
-            });
-
-            const params: IOperativeEventParams = { placement: placement,
-                videoOrientation: 'landscape',
-                adUnitStyle: undefined,
-                asset: performanceAdUnit.getVideo()
-            };
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
+        afterEach(() => {
+            performanceAdUnit.setShowing(true);
+            return performanceAdUnit.hide();
         });
 
-        describe('with follow redirects', () => {
-            it('with response that contains location, it should open url scheme', () => {
-                sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
+        it('should send a click with session manager', () => {
+            sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
+            performanceAdUnit.setShowing(true);
+            return performanceAdUnit.hide().then(() => {
                 performanceAdUnitParameters.deviceInfo = deviceInfo;
                 performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
                 endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
-
-                campaign = TestFixtures.getCampaignFollowsRedirects();
-                campaign.set('store', StoreName.APPLE);
-                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
-
-                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
-                    url: 'http://foo.url.com',
-                    response: 'foo response',
-                    responseCode: 200,
-                    headers: [['location', 'appstore://foobar.com']]
-                }));
 
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
@@ -1095,8 +1090,46 @@ describe('EndScreenEventHandlerTest', () => {
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
                 });
 
-                return resolvedPromise.then(() => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>core.iOS!.UrlScheme.open, 'appstore://foobar.com');
+                const params: IOperativeEventParams = { placement: placement,
+                    videoOrientation: 'landscape',
+                    adUnitStyle: undefined,
+                    asset: performanceAdUnit.getVideo()
+                };
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
+            });
+        });
+
+        describe('with follow redirects', () => {
+            it('with response that contains location, it should open url scheme', () => {
+                sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
+                performanceAdUnit.setShowing(true);
+                return performanceAdUnit.hide().then(() => {
+                    performanceAdUnitParameters.deviceInfo = deviceInfo;
+                    performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
+                    endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
+
+                    campaign = TestFixtures.getCampaignFollowsRedirects();
+                    campaign.set('store', StoreName.APPLE);
+                    performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
+
+                    sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
+                        url: 'http://foo.url.com',
+                        response: 'foo response',
+                        responseCode: 200,
+                        headers: [['location', 'appstore://foobar.com']]
+                    }));
+
+                    endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                        appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                        bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                        store: performanceAdUnitParameters.campaign.getStore(),
+                        clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                        clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                    });
+
+                    return resolvedPromise.then(() => {
+                        sinon.assert.calledWith(<sinon.SinonSpy>core.iOS!.UrlScheme.open, 'appstore://foobar.com');
+                    });
                 });
             });
 
@@ -1132,17 +1165,20 @@ describe('EndScreenEventHandlerTest', () => {
                 sinon.stub(campaign, 'getBypassAppSheet').returns(false);
                 sinon.stub(campaign, 'getStore').returns(StoreName.APPLE);
 
-                performanceAdUnitParameters.deviceInfo = deviceInfo;
-                performanceAdUnitParameters.campaign = campaign;
-                performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
-                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
+                performanceAdUnit.setShowing(true);
+                return performanceAdUnit.hide().then(() => {
+                    performanceAdUnitParameters.deviceInfo = deviceInfo;
+                    performanceAdUnitParameters.campaign = campaign;
+                    performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
+                    endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
 
-                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    store: performanceAdUnitParameters.campaign.getStore(),
-                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
-                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                    endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                        appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                        bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                        store: performanceAdUnitParameters.campaign.getStore(),
+                        clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                        clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                    });
                 });
             });
 
@@ -1163,19 +1199,21 @@ describe('EndScreenEventHandlerTest', () => {
                 sinon.stub(campaign, 'getClickAttributionUrlFollowsRedirects').returns(false);
                 sinon.stub(campaign, 'getBypassAppSheet').returns(true);
                 sinon.stub(campaign, 'getStore').returns(StoreName.APPLE);
+                performanceAdUnit.setShowing(true);
+                return performanceAdUnit.hide().then(() => {
+                    performanceAdUnitParameters.deviceInfo = deviceInfo;
+                    performanceAdUnitParameters.campaign = campaign;
 
-                performanceAdUnitParameters.deviceInfo = deviceInfo;
-                performanceAdUnitParameters.campaign = campaign;
+                    performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
+                    endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
 
-                performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
-                endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
-
-                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    store: performanceAdUnitParameters.campaign.getStore(),
-                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
-                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                    endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                        appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                        bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                        store: performanceAdUnitParameters.campaign.getStore(),
+                        clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                        clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                    });
                 });
             });
 
@@ -1188,18 +1226,17 @@ describe('EndScreenEventHandlerTest', () => {
         describe('open app sheet', () => {
             beforeEach(() => {
                 sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
-                performanceAdUnitParameters.deviceInfo = deviceInfo;
-                performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
+
                 endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
                 sinon.stub(campaign, 'getClickAttributionUrlFollowsRedirects').returns(false);
                 sinon.stub(campaign, 'getBypassAppSheet').returns(false);
                 sinon.stub(ads.iOS!.AppSheet, 'canOpen').returns(Promise.resolve(true));
 
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    appStoreId: '11111',
+                    bypassAppSheet: false,
                     store: performanceAdUnitParameters.campaign.getStore(),
-                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                    clickAttributionUrlFollowsRedirects: false,
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
                 });
             });
@@ -1210,6 +1247,7 @@ describe('EndScreenEventHandlerTest', () => {
                 sinon.spy(ads.iOS!.AppSheet, 'destroy');
 
                 return new Promise((resolve, reject) => setTimeout(resolve, 500)).then(() => {
+                    sinon.assert.called(<sinon.SinonSpy>ads.iOS!.AppSheet.present);
                     sinon.assert.calledWith(<sinon.SinonSpy>ads.iOS!.AppSheet.present, {id: 11111});
                     sinon.assert.called(<sinon.SinonSpy>ads.iOS!.AppSheet.destroy);
                 });

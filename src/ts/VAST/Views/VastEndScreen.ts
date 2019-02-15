@@ -104,12 +104,16 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     public remove(): void {
         if (this._privacy) {
             this._privacy.hide();
-            document.body.removeChild(this._privacy.container());
+            const privacyContainer = this._privacy.container();
+            if (privacyContainer && privacyContainer.parentElement) {
+                privacyContainer.parentElement.removeChild(privacyContainer);
+            }
             delete this._privacy;
         }
 
-        if (this.container().parentElement) {
-            this.container().parentElement!.removeChild(this.container());
+        const container = this.container();
+        if (container && container.parentElement) {
+            container.parentElement.removeChild(this.container());
         }
     }
 

@@ -128,7 +128,8 @@ describe('OverlayEventHandlerTest', () => {
             platform: platform,
             ads: ads
         };
-        overlay = new VideoOverlay(videoOverlayParameters, privacy, false, true);
+
+        overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
 
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
@@ -159,6 +160,11 @@ describe('OverlayEventHandlerTest', () => {
 
         performanceAdUnit = new PerformanceAdUnit(performanceAdUnitParameters);
         overlayEventHandler = new OverlayEventHandler(performanceAdUnit, performanceAdUnitParameters);
+    });
+
+    afterEach(() => {
+        performanceAdUnit.setShowing(true);
+        return performanceAdUnit.hide();
     });
 
     describe('When calling onSkip', () => {
