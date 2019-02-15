@@ -118,6 +118,7 @@
   }
 
   .consent-button {
+    position: relative;
     font-size: $consent-button-font-size;
     border-radius: 2 * $default-size;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
@@ -126,6 +127,12 @@
     align-self: center;
     font-weight: $privacy-title-font-weight;
 
+  }
+
+  .consent-button {
+    &.click-animation {
+      $click-animation();
+    }
   }
 
   .agree {

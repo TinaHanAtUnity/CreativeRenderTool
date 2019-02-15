@@ -120,12 +120,9 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
 
         const buttonSpinner = new ButtonSpinner(this._platform);
         buttonSpinner.render();
-        const agreeButton = <HTMLElement>this._container.querySelector('.agree');
-        if (agreeButton) {
-            agreeButton.appendChild(buttonSpinner.container());
-            agreeButton.classList.add('click-animation');
+        buttonElement.appendChild(buttonSpinner.container());
+        buttonElement.classList.add('click-animation');
 
-        }
         setTimeout(() => {
             this._handlers.forEach(h => h.onClose());
         }, 1500);
