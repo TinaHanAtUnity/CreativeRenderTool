@@ -2,7 +2,6 @@
 
 * Disable multithreading A/B test [#8206](https://github.com/Applifier/unity-ads-webview/pull/8206)
 * Check DOM clean between tests [#8205](https://github.com/Applifier/unity-ads-webview/pull/8205)
-* Refactor store handler parameters for each store to interface [#8249](https://github.com/Applifier/unity-ads-webview/pull/8249)
 * ABtest for campaign refresh with auction status code [#8148](https://github.com/Applifier/unity-ads-webview/pull/8148)
 
 # Thu Feb 14 18:04:51 UTC 2019
