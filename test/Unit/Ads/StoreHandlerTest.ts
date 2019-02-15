@@ -57,6 +57,11 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                     adUnit = TestFixtures.getPerformanceAdUnit(platform, core, ads, ar, purchasing);
                     storeHandler = TestFixtures.getStoreHandler(platform, core, ads, campaign, adUnit, thirdPartyEventManager, nativeBridge);
                     downloadParameters = TestFixtures.getStoreHandlerDownloadParameters(campaign);
+                    return adUnit.show();
+                });
+
+                afterEach(() => {
+                    return adUnit.hide();
                 });
 
                 it('should call nativeBridge.Listener.sendClickEvent', () => {
@@ -76,6 +81,11 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
                     xPromoAdUnit = TestFixtures.getXPromoAdUnit(platform, core, ads, ar, purchasing);
                     storeHandler = TestFixtures.getStoreHandler(platform, core, ads, campaign, xPromoAdUnit, thirdPartyEventManager, nativeBridge);
                     downloadParameters = TestFixtures.getStoreHandlerDownloadParameters(campaign);
+                    return xPromoAdUnit.show();
+                });
+
+                afterEach(() => {
+                    return xPromoAdUnit.hide();
                 });
 
                 it('should call nativeBridge.Listener.sendClickEvent', () => {

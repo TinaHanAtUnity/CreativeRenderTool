@@ -24,9 +24,13 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
+import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
+import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
+import { Image } from 'Ads/Models/Assets/Image';
+import { Session } from 'Ads/Models/Session';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
-describe('VideoOverlayTest', () => {
+describe('OverlayTest', () => {
     let platform: Platform;
     let backend: Backend;
     let nativeBridge: NativeBridge;
@@ -101,73 +105,65 @@ describe('VideoOverlayTest', () => {
         assert.isNull(overlay.container().querySelector('.install-button'));
     });
 
-    describe('onCallButtonEvent', () => {
-        let ar: IARApi;
-        let purchasing: IPurchasingApi;
-        let adUnit: PerformanceAdUnit;
-        let thirdPartyEventManager: ThirdPartyEventManager;
-        let wakeUpManager: WakeUpManager;
-        let request: RequestManager;
+    describe('triggerOnOverlayDownload', () => {
+
         let perfOverlayHandler: PerformanceOverlayEventHandler;
 
         beforeEach(() => {
-            ar = TestFixtures.getARApi(nativeBridge);
-            purchasing = TestFixtures.getPurchasingApi(nativeBridge);
-            adUnit = TestFixtures.getPerformanceAdUnit(platform, core, ads, ar, purchasing);
-            wakeUpManager = new WakeUpManager(core);
-            request = new RequestManager(platform, core, wakeUpManager);
-            thirdPartyEventManager = new ThirdPartyEventManager(core, request);
-
-            perfOverlayHandler = TestFixtures.getPerformanceOverlayEventHandler(platform, core, ads, ar, purchasing, videoOverlayParameters.campaign, adUnit, thirdPartyEventManager, nativeBridge);
-            sinon.stub(perfOverlayHandler, 'onOverlayDownload');
+            perfOverlayHandler = sinon.createStubInstance(PerformanceOverlayEventHandler);
         });
 
-        xit('should call onOverlayDownload for performance campaign with correct parameters', () => {
-            const standaloneCampaign = TestFixtures.getCampaignStandaloneAndroid();
-            videoOverlayParameters.campaign = standaloneCampaign;
-            const videoOverlayDownloadParameters = {
-                clickAttributionUrl: standaloneCampaign.getClickAttributionUrl(),
-                clickAttributionUrlFollowsRedirects: standaloneCampaign.getClickAttributionUrlFollowsRedirects(),
-                bypassAppSheet: standaloneCampaign.getBypassAppSheet(),
-                appStoreId: standaloneCampaign.getAppStoreId(),
-                store: standaloneCampaign.getStore(),
-                videoProgress: undefined,
-                appDownloadUrl: standaloneCampaign.getAppDownloadUrl()
-            };
+        it('should call onOverlayDownload for performance campaign with correct parameters', () => {
+            const campaign: PerformanceCampaign = sinon.createStubInstance(PerformanceCampaign);
+            (<sinon.SinonStub>campaign.getClickAttributionUrl).returns('testClickAttributionUrl');
+            (<sinon.SinonStub>campaign.getClickAttributionUrlFollowsRedirects).returns(false);
+            (<sinon.SinonStub>campaign.getBypassAppSheet).returns(false);
+            (<sinon.SinonStub>campaign.getAppStoreId).returns('testAppStore');
+            (<sinon.SinonStub>campaign.getStore).returns(StoreName.STANDALONE_ANDROID);
+            (<sinon.SinonStub>campaign.getAppDownloadUrl).returns('testAppDownloadUrl');
+
+            videoOverlayParameters.campaign = campaign;
 
             const overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
             overlay.addEventHandler(perfOverlayHandler);
-            overlay.render();
-            const ctaButton = overlay.container().querySelector('.call-button');
-            if (ctaButton) {
-                ctaButton.dispatchEvent(new Event('click'));
-            }
+            (<any>overlay).triggerOnOverlayDownload();
 
-            sinon.assert.calledWith(<sinon.SinonSpy>perfOverlayHandler.onOverlayDownload, videoOverlayDownloadParameters);
+            sinon.assert.called(<sinon.SinonStub>perfOverlayHandler.onOverlayDownload);
+            const firstCall = (<sinon.SinonSpy>perfOverlayHandler.onOverlayDownload).args[0];
+            const firstArg = firstCall[0];
+            assert.equal(firstArg.clickAttributionUrl, 'testClickAttributionUrl');
+            assert.equal(firstArg.clickAttributionUrlFollowsRedirects, false);
+            assert.equal(firstArg.bypassAppSheet, false);
+            assert.equal(firstArg.appStoreId, 'testAppStore');
+            assert.equal(firstArg.store, StoreName.STANDALONE_ANDROID);
+            assert.equal(firstArg.appDownloadUrl, 'testAppDownloadUrl');
+            assert.equal(firstArg.videoProgress, undefined);
         });
 
-        xit('should call onOverlayDownload for xPromo campaign with correct parameters', () => {
-            const xPromoCampaign = TestFixtures.getXPromoCampaign();
-            videoOverlayParameters.campaign = xPromoCampaign;
-            const videoOverlayDownloadParameters = {
-                clickAttributionUrl: xPromoCampaign.getClickAttributionUrl(),
-                clickAttributionUrlFollowsRedirects: xPromoCampaign.getClickAttributionUrlFollowsRedirects(),
-                bypassAppSheet: xPromoCampaign.getBypassAppSheet(),
-                appStoreId: xPromoCampaign.getAppStoreId(),
-                store: xPromoCampaign.getStore(),
-                videoProgress: undefined,
-                appDownloadUrl: undefined
-            };
+        it('should call onOverlayDownload for xPromo campaign with correct parameters', () => {
+            const campaign: XPromoCampaign = sinon.createStubInstance(XPromoCampaign);
+            (<sinon.SinonStub>campaign.getClickAttributionUrl).returns('testClickAttributionUrl');
+            (<sinon.SinonStub>campaign.getClickAttributionUrlFollowsRedirects).returns(false);
+            (<sinon.SinonStub>campaign.getBypassAppSheet).returns(false);
+            (<sinon.SinonStub>campaign.getAppStoreId).returns('testAppStore');
+            (<sinon.SinonStub>campaign.getStore).returns(StoreName.STANDALONE_ANDROID);
+
+            videoOverlayParameters.campaign = campaign;
 
             const overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
             overlay.addEventHandler(perfOverlayHandler);
-            overlay.render();
-            const ctaButton = overlay.container().querySelector('.call-button');
-            if (ctaButton) {
-                ctaButton.dispatchEvent(new Event('click'));
-            }
+            (<any>overlay).triggerOnOverlayDownload();
 
-            sinon.assert.calledWith(<sinon.SinonSpy>perfOverlayHandler.onOverlayDownload, videoOverlayDownloadParameters);
+            sinon.assert.called(<sinon.SinonStub>perfOverlayHandler.onOverlayDownload);
+            const firstCall = (<sinon.SinonSpy>perfOverlayHandler.onOverlayDownload).args[0];
+            const firstArg = firstCall[0];
+            assert.equal(firstArg.clickAttributionUrl, 'testClickAttributionUrl');
+            assert.equal(firstArg.clickAttributionUrlFollowsRedirects, false);
+            assert.equal(firstArg.bypassAppSheet, false);
+            assert.equal(firstArg.appStoreId, 'testAppStore');
+            assert.equal(firstArg.store, StoreName.STANDALONE_ANDROID);
+            assert.equal(firstArg.appDownloadUrl, undefined);
+            assert.equal(firstArg.videoProgress, undefined);
         });
     });
 });

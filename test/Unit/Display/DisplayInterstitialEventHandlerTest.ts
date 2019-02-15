@@ -24,6 +24,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 
 describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;
@@ -45,7 +46,7 @@ describe('DisplayInterstitialEventHandler', () => {
 
     function eventHandlerTests() {
         beforeEach(() => {
-            sandbox = sinon.sandbox.create();
+            sandbox = sinon.createSandbox();
             const platform = Platform.ANDROID;
             backend = TestFixtures.getBackend(platform);
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
@@ -77,6 +78,7 @@ describe('DisplayInterstitialEventHandler', () => {
             const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
+            (<sinon.SinonStub>(<any>operativeEventManager).sendStart).returns(Promise.resolve());
             const privacyManager = sinon.createStubInstance(UserPrivacyManager);
 
             const coreConfig = TestFixtures.getCoreConfiguration();
@@ -85,6 +87,8 @@ describe('DisplayInterstitialEventHandler', () => {
             const privacy = new Privacy(platform, campaign, privacyManager, false, false);
 
             view = new DisplayInterstitial(platform, core, deviceInfo, placement, campaign, privacy, false);
+
+            const webPlayerContainer: WebPlayerContainer = TestFixtures.getWebPlayerContainer();
 
             displayInterstitialAdUnitParameters = {
                 platform: platform,
@@ -107,24 +111,24 @@ describe('DisplayInterstitialEventHandler', () => {
                 view: view,
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService,
-                webPlayerContainer: sinon.createStubInstance(WebPlayerContainer)
+                webPlayerContainer: webPlayerContainer
             };
 
             displayInterstitialAdUnit = new DisplayInterstitialAdUnit(displayInterstitialAdUnitParameters);
             displayInterstitialEventHandler = new DisplayInterstitialEventHandler(displayInterstitialAdUnit, displayInterstitialAdUnitParameters);
             view.addEventHandler(displayInterstitialEventHandler);
-            view.render();
-            return view.show();
+            return displayInterstitialAdUnit.show();
         });
 
         afterEach(() => {
-            view.hide();
             sandbox.restore();
+            displayInterstitialAdUnit.setShowing(true);
+            return displayInterstitialAdUnit.hide();
         });
 
         describe('on close', () => {
             it('should hide the adUnit', () => {
-                sandbox.stub(displayInterstitialAdUnit, 'hide');
+                sandbox.spy(displayInterstitialAdUnit, 'hide');
                 displayInterstitialEventHandler.onDisplayInterstitialClose();
 
                 sinon.assert.called(<sinon.SinonSpy>displayInterstitialAdUnit.hide);

@@ -1,6 +1,7 @@
 # Merged
 
 * Disable multithreading A/B test [#8206](https://github.com/Applifier/unity-ads-webview/pull/8206)
+* Check DOM clean between tests [#8205](https://github.com/Applifier/unity-ads-webview/pull/8205)
 
 # Thu Feb 14 18:04:51 UTC 2019
 

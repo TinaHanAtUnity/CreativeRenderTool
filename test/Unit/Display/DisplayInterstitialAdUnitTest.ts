@@ -64,7 +64,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             beforeEach(() => {
                 campaign = TestFixtures.getDisplayInterstitialCampaign();
 
-                sandbox = sinon.sandbox.create();
+                sandbox = sinon.createSandbox();
                 backend = TestFixtures.getBackend(platform);
                 nativeBridge = TestFixtures.getNativeBridge(platform, backend);
                 core = TestFixtures.getCoreApi(nativeBridge);
@@ -119,9 +119,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
                 view = new DisplayInterstitial(platform, core, <AndroidDeviceInfo>deviceInfo, placement, campaign, privacy, false);
                 view.render();
-                document.body.appendChild(view.container());
                 sandbox.stub(view, 'show');
-                sandbox.stub(view, 'hide');
+                sandbox.spy(view, 'hide');
 
                 displayInterstitialAdUnitParameters = {
                     platform: platform,
@@ -151,10 +150,9 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             });
 
             afterEach(() => {
-                if(adUnit.isShowing()) {
-                    adUnit.hide();
-                }
                 sandbox.restore();
+                adUnit.setShowing(true);
+                return adUnit.hide();
             });
 
             describe('showing', () => {
