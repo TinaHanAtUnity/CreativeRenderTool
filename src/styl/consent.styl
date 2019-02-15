@@ -4,14 +4,14 @@
   position: absolute;
   top: 0;
   right: 0;
-  bottom 0;
+  bottom: 0;
   left: 0;
   overflow: hidden;
   width: 100%;
   height: 100%;
   background: transparent;
-  font-size: $consent-text-font-size;
   color: $consent-text-font-color;
+  font-size: $consent-text-font-size;
 
   &.prevent-clicks {
     pointer-events: none;
@@ -31,8 +31,8 @@
   .consent-introduction {
     position: relative;
     border-radius: .5 * $default-size;
-    text-align: center;
     background: $white;
+    text-align: center;
 
     .privacy-logo {
       margin-top: 2 * $default-size;
@@ -42,8 +42,8 @@
 
     .intro-title {
       padding: 0 1.5 * $default-size;
-      font-size: $consent-main-title-font-size;
       font-weight: $privacy-main-title-font-weight;
+      font-size: $consent-main-title-font-size;
     }
 
     .intro-text {
@@ -55,24 +55,24 @@
     }
 
     .continue-button {
-      font-size: $consent-title-font-size;
-      color: $consent-blue;
       padding: 1.25 * $default-size 2 * $default-size 2.5 * $default-size 2 * $default-size;
+      color: $consent-blue;
+      font-size: $consent-title-font-size;
     }
 
     .unity-logo {
-      opacity: .18;
       margin-bottom: $default-size;
+      opacity: .18;
     }
   }
 
   .consent-container {
     position: relative;
-    height: 80%;
-    border-radius: .5 * $default-size;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    height: 80%;
+    border-radius: .5 * $default-size;
     background: $white;
   }
 
@@ -96,16 +96,16 @@
 
   .consent-settings {
     position: relative;
-    border-radius: .5 * $default-size;
     overflow: auto;
-    background: $white;
     padding: 1.5 * $default-size;
+    border-radius: .5 * $default-size;
+    background: $white;
   }
 
   .consent-title {
-    font-size: $consent-title-font-size;
-    font-weight: $privacy-main-title-font-weight;
     color: $black;
+    font-weight: $privacy-main-title-font-weight;
+    font-size: $consent-title-font-size;
   }
 
   .consent-button-container {
@@ -114,18 +114,18 @@
     flex-shrink: 0;
     justify-content: space-between;
     padding: $default-size $default-size;
-    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, .19);
   }
 
   .consent-button {
     position: relative;
-    font-size: $consent-button-font-size;
-    border-radius: 2 * $default-size;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
-    text-align: center;
-    padding: .75 * $default-size $default-size;
     align-self: center;
+    padding: .75 * $default-size $default-size;
+    border-radius: 2 * $default-size;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05);
+    text-align: center;
     font-weight: $privacy-title-font-weight;
+    font-size: $consent-button-font-size;
 
   }
 
@@ -136,20 +136,20 @@
   }
 
   .agree {
+    flex-grow: 1;
     background: $consent-blue;
     color: $white;
-    flex-grow: 1;
   }
 
   .disagree {
-    color: $black;
-    border: 1px solid #D8D8D8;
     margin-left: $default-size;
+    border: 1px solid $consent-border-gray;
+    color: $black;
   }
 
   #third-party-switch.disabled {
+    opacity: .4;
     pointer-events: none;
-    opacity: 0.4;
   }
 
 
@@ -162,9 +162,9 @@
     #privacy-row-item-container {
       .row-item {
         margin: 0 0 0 0;
-        border-top: 1px solid #E5E5E5;
-        border-bottom: 1px solid $white;
         padding: $default-size 0;
+        border-top: 1px solid $consent-divider-color;
+        border-bottom: 1px solid $white;
       }
 
       .row-item-title {
@@ -172,19 +172,21 @@
       }
 
       .description {
+        color: $consent-text-font-color;
         text-align: left;
+        font-weight: $consent-text-font-weight;
         font-size: $consent-text-font-size;
       }
 
       .heading2 {
         display: block;
-        font-size: $consent-text-font-size;
         font-weight: $privacy-main-title-font-weight;
+        font-size: $consent-text-font-size;
       }
 
       .arrow-icon {
-        padding-right: 0;
         margin-top: .25 * $default-size;
+        padding-right: 0;
         font-size: $consent-text-font-size;
         opacity: 1;
       }

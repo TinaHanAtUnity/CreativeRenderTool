@@ -47,7 +47,7 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
                 event: 'click',
                 listener: (event: Event) => this.onDisagreeEvent(event),
                 selector: '.disagree'
-            },
+            }
         ];
 
         this._switchGroup = new PersonalizationSwitchGroup(parameters.platform, parameters.privacyManager);

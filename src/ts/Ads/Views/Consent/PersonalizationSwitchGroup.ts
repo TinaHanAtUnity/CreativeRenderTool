@@ -94,7 +94,7 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationSwitchGroup
     }
 
     private onExpSwitchChange(event: Event): void {
-
+        //
     }
 
     private onAdsSwitchChange(event: Event): void {
@@ -103,6 +103,6 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationSwitchGroup
     }
 
     private on3rdPartySwitchChange(event: Event): void {
-
+        //
     }
 }
