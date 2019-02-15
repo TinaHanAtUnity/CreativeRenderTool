@@ -32,11 +32,11 @@ export interface IStoreHandlerParameters {
     ads: IAdsApi;
     thirdPartyEventManager: ThirdPartyEventManager;
     operativeEventManager: OperativeEventManager;
-    deviceInfo?: DeviceInfo;
-    clientInfo?: ClientInfo;
     placement: Placement;
     adUnit: VideoAdUnit;
     campaign: Campaign;
+    deviceInfo?: DeviceInfo;
+    clientInfo?: ClientInfo;
     coreConfig?: CoreConfiguration;
     downloadManager?: DownloadManager;
     deviceIdManager?: DeviceIdManager;
