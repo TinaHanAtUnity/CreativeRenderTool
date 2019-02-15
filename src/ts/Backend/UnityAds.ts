@@ -10,8 +10,9 @@ export class UnityAds {
     public static initialize(platform: Platform, gameId: string, listener: IUnityAdsListener, testMode: boolean = false) {
         let nativeBridge: NativeBridge;
         switch(platform) {
+            // Setting auto batching on does not work in a "single-threaded" environment due to callbacks and events
+            // being triggered out of order. This could in theory be fixed by running the backend in a web worker?
             case Platform.ANDROID:
-                // todo: setting auto batching on causes some very weird behaviour with Node, should be investigated
                 nativeBridge = new NativeBridge(UnityAds._backend, Platform.ANDROID, false);
                 UnityAds._backend.setNativeBridge(nativeBridge);
                 break;
