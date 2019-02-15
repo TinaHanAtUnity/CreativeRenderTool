@@ -105,10 +105,15 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         this._webPlayerContainer.onPageStarted.unsubscribe(this._onPageStartedObserver);
         this._webPlayerContainer.shouldOverrideUrlLoading.unsubscribe(this._shouldOverrideUrlLoadingObserver);
 
-        this._view.hide();
-        this.onFinish.trigger();
+        if (this._view) {
+            this._view.hide();
+            const viewContainer = this._view.container();
+            if (viewContainer && viewContainer.parentElement) {
+                viewContainer.parentElement.removeChild(viewContainer);
+            }
+        }
 
-        this._view.container().parentElement!.removeChild(this._view.container());
+        this.onFinish.trigger();
         this.unsetReferences();
 
         this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());

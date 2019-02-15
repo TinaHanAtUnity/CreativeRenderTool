@@ -166,27 +166,34 @@ describe('VastAdUnitTest', () => {
         vastAdUnit = new VastAdUnit(vastAdUnitParameters);
     });
 
-    afterEach(() => sandbox.restore());
+    afterEach(() => {
+        sandbox.restore();
+        vastAdUnit.setShowing(true);
+        return vastAdUnit.hide();
+    });
 
     describe('with click through url', () => {
         beforeEach(() => {
-            const video = new Video('', TestFixtures.getSession());
-            vastCampaign = TestFixtures.getEventVastCampaign();
-            sinon.stub(vastCampaign, 'getVideo').returns(video);
-            const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-            const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false);
-            videoOverlayParameters = {
-                deviceInfo: deviceInfo,
-                campaign: vastCampaign,
-                coreConfig: coreConfig,
-                placement: placement,
-                clientInfo: clientInfo,
-                platform: platform,
-                ads: ads
-            };
-            vastAdUnitParameters.overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
-            vastAdUnitParameters.campaign = vastCampaign;
-            vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+            vastAdUnit.setShowing(true);
+            return vastAdUnit.hide().then(() => {
+                const video = new Video('', TestFixtures.getSession());
+                vastCampaign = TestFixtures.getEventVastCampaign();
+                sinon.stub(vastCampaign, 'getVideo').returns(video);
+                const privacyManager = sinon.createStubInstance(UserPrivacyManager);
+                const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false);
+                videoOverlayParameters = {
+                    deviceInfo: deviceInfo,
+                    campaign: vastCampaign,
+                    coreConfig: coreConfig,
+                    placement: placement,
+                    clientInfo: clientInfo,
+                    platform: platform,
+                    ads: ads
+                };
+                vastAdUnitParameters.overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
+                vastAdUnitParameters.campaign = vastCampaign;
+                vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+            });
         });
 
         it('should return correct http:// url', () => {
@@ -244,32 +251,34 @@ describe('VastAdUnitTest', () => {
         let vastEndScreenParameters: IVastEndscreenParameters;
 
         beforeEach(() => {
+            vastAdUnit.setShowing(true);
+            return vastAdUnit.hide().then(() => {
+                vastEndScreenParameters = {
+                    campaign: vastAdUnitParameters.campaign,
+                    clientInfo: vastAdUnitParameters.clientInfo,
+                    country: vastAdUnitParameters.coreConfig.getCountry()
+                };
 
-            vastEndScreenParameters = {
-                campaign: vastAdUnitParameters.campaign,
-                clientInfo: vastAdUnitParameters.clientInfo,
-                country: vastAdUnitParameters.coreConfig.getCountry()
-            };
-
-            const video = new Video('', TestFixtures.getSession());
-            vastCampaign = TestFixtures.getCompanionVastCampaign();
-            sinon.stub(vastCampaign, 'getVideo').returns(video);
-            const privacyManager = sinon.createStubInstance(UserPrivacyManager);
-            const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false);
-            videoOverlayParameters = {
-                deviceInfo: deviceInfo,
-                campaign: vastCampaign,
-                coreConfig: coreConfig,
-                placement: placement,
-                clientInfo: clientInfo,
-                platform: platform,
-                ads: ads
-            };
-            vastAdUnitParameters.overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
-            vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
-            vastAdUnitParameters.campaign = vastCampaign;
-            vastAdUnitParameters.endScreen = vastEndScreen;
-            vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                const video = new Video('', TestFixtures.getSession());
+                vastCampaign = TestFixtures.getCompanionVastCampaign();
+                sinon.stub(vastCampaign, 'getVideo').returns(video);
+                const privacyManager = sinon.createStubInstance(UserPrivacyManager);
+                const privacy = new Privacy(platform, vastCampaign, privacyManager, false, false);
+                videoOverlayParameters = {
+                    deviceInfo: deviceInfo,
+                    campaign: vastCampaign,
+                    coreConfig: coreConfig,
+                    placement: placement,
+                    clientInfo: clientInfo,
+                    platform: platform,
+                    ads: ads
+                };
+                vastAdUnitParameters.overlay = new VideoOverlay(videoOverlayParameters, privacy, false, false);
+                vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+                vastAdUnitParameters.campaign = vastCampaign;
+                vastAdUnitParameters.endScreen = vastEndScreen;
+                vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+            });
         });
 
         it('should return correct companion click through url', () => {
@@ -305,8 +314,8 @@ describe('VastAdUnitTest', () => {
         });
 
         it('should hide and then remove endscreen on hide', () => {
-            sinon.stub(vastEndScreen, 'hide');
-            sinon.stub(vastEndScreen, 'remove');
+            sinon.spy(vastEndScreen, 'hide');
+            sinon.spy(vastEndScreen, 'remove');
             vastAdUnit.hide();
             return new Promise((resolve, reject) => {
                 setTimeout(resolve, 500);

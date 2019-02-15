@@ -57,26 +57,30 @@ describe('MRAID', () => {
         privacy = new Privacy(platform, fakeCampaign, privacyManager, false, false);
     });
 
-    it('should render', (done) => {
+    it('should render', () => {
         const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
         const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
 
         mraid.render();
 
-        setTimeout(() => {
-            const container = mraid.container();
-            assert.isNotNull(container.innerHTML);
-            assert.isNotNull(container.querySelector('.close-region'));
-            assert.isNotNull(container.querySelector('.close'));
-            assert.isNotNull(container.querySelector('.icon-close'));
-            assert.isNotNull(container.querySelector('.progress-wrapper'));
-            assert.isNotNull(container.querySelector('.circle-left'));
-            assert.isNotNull(container.querySelector('.circle-right'));
-            assert.isNotNull(container.querySelector('#mraid-iframe'));
-            assert.equal(mraid.container().innerHTML.indexOf('mraid.js'), -1);
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                const container = mraid.container();
+                assert.isNotNull(container.innerHTML);
+                assert.isNotNull(container.querySelector('.close-region'));
+                assert.isNotNull(container.querySelector('.close'));
+                assert.isNotNull(container.querySelector('.icon-close'));
+                assert.isNotNull(container.querySelector('.progress-wrapper'));
+                assert.isNotNull(container.querySelector('.circle-left'));
+                assert.isNotNull(container.querySelector('.circle-right'));
+                assert.isNotNull(container.querySelector('#mraid-iframe'));
+                assert.equal(mraid.container().innerHTML.indexOf('mraid.js'), -1);
 
-            done();
-        }, 0);
+                resolve();
+            }, 0);
+        }).then(() => {
+            mraid.hide();
+        });
     });
 
     it('should replace placeholder with dynamic markup injected', () => {
@@ -88,8 +92,10 @@ describe('MRAID', () => {
         const campaign = new MRAIDCampaign(params);
 
         const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
+        mraid.render();
         return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
+            mraid.hide();
         });
     });
 
@@ -102,10 +108,12 @@ describe('MRAID', () => {
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
         const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
+        mraid.render();
         return mraid.createMRAID(MRAIDContainer).then((src) => {
             const dom = new DOMParser().parseFromString(src, 'text/html');
             assert.isNotNull(dom);
             assert.isNull(dom.querySelector('script[src^="mraid.js"]'));
+            mraid.hide();
         });
     });
 
@@ -117,9 +125,11 @@ describe('MRAID', () => {
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
         const mraid = new MRAID(platform, core, TestFixtures.getAndroidDeviceInfo(core), placement, campaign, privacy, false, configuration.getAbGroup());
+        mraid.render();
         return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
             assert.notEqual(mraidSrc.indexOf('<script>var test = "Hello $&"</script>'), -1);
+            mraid.hide();
         });
     });
 });

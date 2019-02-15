@@ -155,9 +155,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
         super.hide();
 
-        if(this._privacy) {
+        if (this._privacy) {
             this._privacy.removeEventHandler(this);
             this._privacy.hide();
+            const container = this._privacy.container();
+            if (container && container.parentElement) {
+                container.parentElement.removeChild(container);
+            }
         }
 
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
