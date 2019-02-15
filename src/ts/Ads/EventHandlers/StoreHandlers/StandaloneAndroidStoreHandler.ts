@@ -14,6 +14,14 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Platform } from 'Core/Constants/Platform';
 
+export interface IStandaloneAndroidStoreHandlerParameters extends IStoreHandlerParameters {
+    deviceInfo: DeviceInfo;
+    clientInfo: ClientInfo;
+    coreConfig: CoreConfiguration;
+    downloadManager: DownloadManager;
+    deviceIdManager: DeviceIdManager;
+}
+
 export class StandaloneAndroidStoreHandler extends StoreHandler {
 
     private _coreConfigs: CoreConfiguration;
@@ -27,11 +35,9 @@ export class StandaloneAndroidStoreHandler extends StoreHandler {
     private onDownloadUpdateObserver: IObserver3<number, DownloadStatus, string|number>;
     private adUnitOnCloseObserver: IObserver0;
 
-    constructor(parameters: IStoreHandlerParameters) {
+    constructor(parameters: IStandaloneAndroidStoreHandlerParameters) {
         super(parameters);
-        if (!parameters.deviceInfo || !parameters.coreConfig || !parameters.clientInfo) {
-            throw new Error('Missing deviceInfo, coreConfig, or clientInfo for creating StandaloneAndroidStoreHandler');
-        }
+
         this._coreConfigs = parameters.coreConfig;
         this._deviceInfo = parameters.deviceInfo;
         this._clientInfo = parameters.clientInfo;
