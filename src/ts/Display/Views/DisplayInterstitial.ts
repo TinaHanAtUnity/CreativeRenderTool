@@ -97,8 +97,9 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
         window.removeEventListener('message', this._messageListener);
         super.hide();
 
-        if (this._privacy.container().parentElement) {
-            document.body.removeChild(this._privacy.container());
+        const privacyContainer = this._privacy.container();
+        if (privacyContainer && privacyContainer.parentElement) {
+            privacyContainer.parentElement.removeChild(privacyContainer);
         }
 
         for (const timer of this._timers) {

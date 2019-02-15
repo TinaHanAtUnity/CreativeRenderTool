@@ -64,6 +64,11 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let placement: Placement;
     let programmaticTrackingService: ProgrammaticTrackingService;
 
+    afterEach(() => {
+        xPromoAdUnit.setShowing(true);
+        return xPromoAdUnit.hide();
+    });
+
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
         let storeHandler: StoreHandler;

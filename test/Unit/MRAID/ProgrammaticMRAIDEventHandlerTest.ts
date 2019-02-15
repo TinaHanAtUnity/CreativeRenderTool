@@ -143,7 +143,7 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
                     options: {},
                     mraid: mraidView,
                     endScreen: undefined,
-                    privacy: new Privacy(platform, programmaticMraidCampaign, privacyManager, false, false),
+                    privacy: privacy,
                     privacyManager: privacyManager,
                     programmaticTrackingService: programmaticTrackingService,
                     webPlayerContainer: webPlayerContainer
@@ -152,6 +152,11 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
                 programmaticMraidAdUnit = new MRAIDAdUnit(programmaticMraidAdUnitParams);
                 programmaticMraidEventHandler = new ProgrammaticMRAIDEventHandler(programmaticMraidAdUnit, programmaticMraidAdUnitParams);
                 sinon.stub(programmaticMraidAdUnit, 'sendClick').returns(sinon.spy());
+            });
+
+            afterEach(() => {
+                programmaticMraidAdUnit.setShowing(true);
+                return programmaticMraidAdUnit.hide();
             });
 
             describe('when calling onClick', () => {
