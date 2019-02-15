@@ -3,19 +3,16 @@ import { StoreHandler, IStoreHandlerDownloadParameters, IStoreHandlerParameters 
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
-export interface IXiaomiStoreHandlerParameters extends IStoreHandlerParameters {
-    clientInfo: ClientInfo;
-    coreConfig: CoreConfiguration;
-}
-
 export class XiaomiStoreHandler extends StoreHandler {
 
     private _clientInfo: ClientInfo;
     private _coreConfig: CoreConfiguration;
 
-    constructor(parameters: IXiaomiStoreHandlerParameters) {
+    constructor(parameters: IStoreHandlerParameters) {
         super(parameters);
-
+        if (!parameters.clientInfo || !parameters.coreConfig) {
+            throw new Error('Missing clientInfo or coreConfig for creating XiaomiStoreHandler');
+        }
         this._clientInfo = parameters.clientInfo;
         this._coreConfig = parameters.coreConfig;
     }

@@ -2,17 +2,15 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { StoreHandler, IStoreHandlerDownloadParameters, IStoreHandlerParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 
-export interface IGoogleStoreHandlerParameters extends IStoreHandlerParameters {
-    clientInfo: ClientInfo;
-}
-
 export class GoogleStoreHandler extends StoreHandler {
 
     private _clientInfo: ClientInfo;
 
-    constructor(parameters: IGoogleStoreHandlerParameters) {
+    constructor(parameters: IStoreHandlerParameters) {
         super(parameters);
-
+        if (!parameters.clientInfo) {
+            throw new Error('Missing clientInfo for creating GoogleStoreHandler');
+        }
         this._clientInfo = parameters.clientInfo;
     }
 
