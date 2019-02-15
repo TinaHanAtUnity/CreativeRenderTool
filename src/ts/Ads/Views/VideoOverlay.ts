@@ -157,7 +157,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
             this._chinaAdvertisementElement.style.display = 'block';
         }
 
-        if (CustomFeatures.isCheetahGame(this._gameId)) {
+        if (CustomFeatures.isCloseIconSkipEnabled(this._gameId)) {
             this._skipButtonElement.classList.add('close-icon-skip');
         }
     }
