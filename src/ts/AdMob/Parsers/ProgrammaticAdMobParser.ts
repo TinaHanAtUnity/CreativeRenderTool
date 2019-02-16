@@ -46,7 +46,8 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                     responseCode: e.nativeResponse ? e.nativeResponse.responseCode : 0,
                     urlTimestamp: Url.getQueryParameter(this._mediaFileUrl, 'ts'),
                     utcTimestamp: new Date().getUTCMilliseconds(),
-                    videoId: Url.getQueryParameter(this._mediaFileUrl, 'video_id')
+                    videoId: Url.getQueryParameter(this._mediaFileUrl, 'video_id'),
+                    url: this._mediaFileUrl
                 }, session);
                 throw e;
             }
