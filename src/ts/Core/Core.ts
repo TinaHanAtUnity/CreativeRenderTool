@@ -208,7 +208,6 @@ export class Core implements ICore {
             this.Config = coreConfig;
 
             if(VastParsingStrictTest.isValid(this.Config.getAbGroup())) {
-                console.log('enabling timerless autobatching');
                 this.NativeBridge.setAutoBatchEnabled(true);
                 this.NativeBridge.useTimerlessBatching(true);
                 if(this.NativeBridge.getPlatform() === Platform.IOS) {
