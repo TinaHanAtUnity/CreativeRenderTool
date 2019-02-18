@@ -31,7 +31,7 @@ export class VastAdUnitFactory extends AbstractAdUnitFactory<VastCampaign, IVast
             if (parameters.platform === Platform.ANDROID) {
                 const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) =>  {
                     vastEndScreenHandler.onKeyEvent(keyCode);
-                    if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                    if(CustomFeatures.isCloseIconSkipEnabled(parameters.clientInfo.getGameId())) {
                         vastOverlayHandler.onKeyEvent(keyCode);
                     }
                 });

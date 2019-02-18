@@ -210,7 +210,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(parameters.platform, parameters.campaign, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            if (CustomFeatures.isRewardedVideoInstallButtonEnabled(this._platform, this._deviceInfo, this._campaign, this._coreConfig)) {
+            if (CustomFeatures.isRewardedVideoInstallButtonEnabled(this._campaign, this._coreConfig)) {
                 overlay = new VideoOverlayWithInstallInRewardedVideos(parameters, parameters.privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
             } else {
                 overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);

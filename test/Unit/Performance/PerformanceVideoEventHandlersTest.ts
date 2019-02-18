@@ -157,6 +157,11 @@ describe('PerformanceVideoEventHandlersTest', () => {
         performanceVideoEventHandler = new PerformanceVideoEventHandler(<IVideoEventHandlerParams<PerformanceAdUnit, PerformanceCampaign>>videoEventHandlerParams);
     });
 
+    afterEach(() => {
+        performanceAdUnit.setShowing(true);
+        return performanceAdUnit.hide();
+    });
+
     describe('with onVideoCompleted', () => {
         it('should show end screen', () => {
             sinon.spy(endScreen, 'show');

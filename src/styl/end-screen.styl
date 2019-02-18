@@ -37,6 +37,13 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       font-size: $endscreen-default-size;
     }
 
+    .download-message-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
     .game-rating {
       $game-rating-default($scale-size);
       margin-top: .41 * $endscreen-default-size;

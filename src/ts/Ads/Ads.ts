@@ -77,6 +77,7 @@ import { MRAIDAdUnitParametersFactory } from 'MRAID/AdUnits/MRAIDAdUnitParameter
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
+import { China } from 'China/China';
 
 export class Ads implements IAds {
 
@@ -111,6 +112,7 @@ export class Ads implements IAds {
     public Banners: Banners;
     public Monetization: Monetization;
     public AR: AR;
+    public China: China;
 
     constructor(config: unknown, core: ICore) {
         this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config, core.ClientInfo);
@@ -191,6 +193,11 @@ export class Ads implements IAds {
             this.Monetization = new Monetization(this._core, this, promo, this._core.Purchasing);
             this.AR = new AR(this._core);
 
+            if (CustomFeatures.isChinaSDK(this._core.NativeBridge.getPlatform(), this._core.ClientInfo.getSdkVersionName())) {
+                this.China = new China(this._core);
+                this.China.initialize();
+            }
+
             if (this.SessionManager.getGameSessionId() % 1000 === 0) {
                 Promise.all([
                     ARUtil.isARSupported(this.AR.Api),
@@ -207,7 +214,7 @@ export class Ads implements IAds {
                 new AdMob(this._core, this),
                 new Display(this._core, this),
                 new MRAID(this.AR.Api, this._core, this),
-                new Performance(this.AR.Api, this._core, this),
+                new Performance(this.AR.Api, this._core, this, this.China),
                 new VAST(this._core, this),
                 new VPAID(this._core, this),
                 new XPromo(this._core, this)
@@ -223,7 +230,7 @@ export class Ads implements IAds {
             });
 
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this._core.JaegerManager, this.BackupCampaignManager);
-            this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
+            this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
 
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
             promo.initialize();

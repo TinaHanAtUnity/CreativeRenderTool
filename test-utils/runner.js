@@ -3,6 +3,7 @@ const puppeteer = require('puppeteer-extra');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const path = require('path');
+const chai = require('chai');
 
 const testUrl = process.env.TEST_URL;
 const testList = process.env.TEST_LIST;
@@ -66,6 +67,9 @@ const runTest = async (browser, isolated, testFilter) => {
     }
 
     await page.evaluate(() => {
+        afterEach(() => {
+            chai.assert.isTrue(document.body.querySelectorAll('*').length <= 0, 'The dom has not been cleaned up! There are still ' + document.body.querySelectorAll('*').length + ' nodes! ' + document.body.outerHTML);
+        });
         mocha.run((failures) => {
             if(window.writeCoverage && __coverage__) {
                 window.writeCoverage(JSON.stringify(__coverage__));

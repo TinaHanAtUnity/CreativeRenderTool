@@ -163,12 +163,13 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
 
         afterEach(() => {
             sandbox.restore();
+            vastAdUnit.setShowing(true);
+            return vastAdUnit.hide();
         });
 
         describe('When calling onSkip', () => {
             beforeEach(() => {
                 sinon.spy(vastAdUnit, 'hide');
-
             });
 
             it('should hide ad unit', () => {
@@ -178,19 +179,22 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
 
             describe('When ad unit has an endscreen', () => {
                 it('should hide endcard', () => {
-                    const vastEndScreenParameters: IVastEndscreenParameters = {
-                        campaign: vastAdUnitParameters.campaign,
-                        clientInfo: vastAdUnitParameters.clientInfo,
-                        country: vastAdUnitParameters.coreConfig.getCountry()
-                    };
-                    const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
-                    sinon.spy(vastEndScreen, 'show');
-                    vastAdUnitParameters.endScreen = vastEndScreen;
-                    vastAdUnit = new VastAdUnit(vastAdUnitParameters);
-                    sinon.spy(vastAdUnit, 'hide');
-                    vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
-                    vastOverlayEventHandler.onOverlaySkip(1);
-                    sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
+                    vastAdUnit.setShowing(true);
+                    return vastAdUnit.hide().then(() => {
+                        const vastEndScreenParameters: IVastEndscreenParameters = {
+                            campaign: vastAdUnitParameters.campaign,
+                            clientInfo: vastAdUnitParameters.clientInfo,
+                            country: vastAdUnitParameters.coreConfig.getCountry()
+                        };
+                        const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, privacy);
+                        sinon.spy(vastEndScreen, 'show');
+                        vastAdUnitParameters.endScreen = vastEndScreen;
+                        vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                        sinon.spy(vastAdUnit, 'hide');
+                        vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
+                        vastOverlayEventHandler.onOverlaySkip(1);
+                        sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
+                    });
                 });
             });
         });
@@ -198,8 +202,11 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
         describe('When calling onMute', () => {
 
             beforeEach(() => {
-                vastAdUnit = new VastAdUnit(vastAdUnitParameters);
-                vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
+                vastAdUnit.setShowing(true);
+                return vastAdUnit.hide().then(() => {
+                    vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                    vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
+                });
             });
 
             const testMuteEvent = (muted: boolean) => {
@@ -238,8 +245,6 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
 
         describe('When calling onCallButton', () => {
             beforeEach(() => {
-                vastAdUnit = new VastAdUnit(vastAdUnitParameters);
-                vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
                 sinon.spy(ads.VideoPlayer, 'pause');
                 sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
                 sinon.stub(vastAdUnit, 'sendVideoClickTrackingEvent').returns(sinon.spy());

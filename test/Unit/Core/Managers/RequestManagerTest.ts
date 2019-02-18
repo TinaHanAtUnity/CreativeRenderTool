@@ -27,6 +27,32 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
             request = new RequestManager(platform, core, wakeUpManager, platform === Platform.ANDROID ? TestFixtures.getAndroidDeviceInfo(core) : undefined);
         });
 
+        describe(('Status code tests'), () => {
+            it(('should correct handle 2XX responses'), () => {
+                const response1 = RequestManager.is2xxSuccessful(200);
+                const response2 = RequestManager.is2xxSuccessful(299);
+                const response3 = RequestManager.is2xxSuccessful(300);
+                const response4 = RequestManager.is2xxSuccessful(199);
+
+                assert.isTrue(response1);
+                assert.isTrue(response2);
+                assert.isFalse(response3);
+                assert.isFalse(response4);
+            });
+
+            it(('should correct handle 3XX responses'), () => {
+                const response1 = RequestManager.is3xxRedirect(300);
+                const response2 = RequestManager.is3xxRedirect(399);
+                const response3 = RequestManager.is3xxRedirect(400);
+                const response4 = RequestManager.is3xxRedirect(299);
+
+                assert.isTrue(response1);
+                assert.isTrue(response2);
+                assert.isFalse(response3);
+                assert.isFalse(response4);
+            });
+        });
+
         it('Request get without headers (expect success)', () => {
             const successUrl: string = 'http://www.example.org/success';
             const successMessage: string = 'Success response';

@@ -110,6 +110,12 @@
       "body": false
     },
     {
+      "parameter": "imei",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
       "parameter": "analyticsUserId",
       "required": "no",
       "queryString": true,

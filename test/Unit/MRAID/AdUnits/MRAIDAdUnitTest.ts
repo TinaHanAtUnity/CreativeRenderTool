@@ -47,11 +47,6 @@ describe('MraidAdUnit', () => {
         forceOrientation: Orientation.NONE
     };
 
-    afterEach(() => {
-        sandbox.restore();
-        return mraidAdUnit.hide();
-    });
-
     beforeEach(() => {
         const platform = Platform.ANDROID;
         const backend = TestFixtures.getBackend(platform);
@@ -61,8 +56,8 @@ describe('MraidAdUnit', () => {
         mraidView = sinon.createStubInstance(MRAID);
         webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
 
-        (<sinon.SinonSpy>mraidView.container).restore();
-        sandbox.stub(mraidView, 'container').returns(document.createElement('div'));
+        const viewContainer = document.createElement('div');
+        (<sinon.SinonStub>mraidView.container).returns(viewContainer);
 
         const userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
         const core = TestFixtures.getCoreApi(nativeBridge);
@@ -138,6 +133,12 @@ describe('MraidAdUnit', () => {
         mraidAdUnit = new MRAIDAdUnit(mraidAdUnitParameters);
     });
 
+    afterEach(() => {
+        sandbox.restore();
+        mraidAdUnit.setShowing(true);
+        return mraidAdUnit.hide();
+    });
+
     it('should change the orientation properties used by container open', () => {
         mraidAdUnit.setOrientationProperties(orientationProperties);
         return mraidAdUnit.show().then(() => {
@@ -170,10 +171,6 @@ describe('MraidAdUnit', () => {
                 sendStartEventStub = sandbox.stub(ads.Listener, 'sendStartEvent').returns(Promise.resolve(void(0)));
 
                 return mraidAdUnit.show();
-            });
-
-            afterEach(() => {
-                return mraidAdUnit.hide();
             });
 
             it('should trigger onStart event', () => {
@@ -219,10 +216,6 @@ describe('MraidAdUnit', () => {
                     return mraidAdUnit.show();
                 });
 
-                afterEach(() => {
-                    return mraidAdUnit.hide();
-                });
-
                 it('should open container with AR View', () => {
                     sinon.assert.calledOnce(onStartObserver);
                     assertViewsOpened(['arview', 'webview']);
@@ -236,10 +229,6 @@ describe('MraidAdUnit', () => {
                     sandbox.stub(ARUtil, 'isARSupported').returns(Promise.resolve(false));
 
                     return mraidAdUnit.show();
-                });
-
-                afterEach(() => {
-                    return mraidAdUnit.hide();
                 });
 
                 it('should open container without AR View', () => {
@@ -372,8 +361,6 @@ describe('MraidAdUnit', () => {
 
             return mraidAdUnit.show();
         });
-
-        afterEach(() => mraidAdUnit.hide());
 
         describe('onContainerShow', () => {
             it('should send the true viewable state event', () => {

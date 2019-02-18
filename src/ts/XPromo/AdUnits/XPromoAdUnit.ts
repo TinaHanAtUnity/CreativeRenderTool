@@ -28,13 +28,19 @@ export class XPromoAdUnit extends VideoAdUnit<XPromoCampaign> {
 
     public hide(): Promise<void> {
         const endScreen = this.getEndScreen();
-        if(endScreen) {
+        if (endScreen) {
             endScreen.hide();
-            endScreen.container().parentElement!.removeChild(endScreen.container());
+            const container = endScreen.container();
+            if (container && container.parentElement) {
+                container.parentElement.removeChild(container);
+            }
         }
 
         this._privacy.hide();
-        this._privacy.container().parentElement!.removeChild(this._privacy.container());
+        const privacyContainer = this._privacy.container();
+        if (privacyContainer && privacyContainer.parentElement) {
+            privacyContainer.parentElement.removeChild(privacyContainer);
+        }
 
         return super.hide();
     }

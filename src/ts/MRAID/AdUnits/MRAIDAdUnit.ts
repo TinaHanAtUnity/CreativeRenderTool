@@ -118,7 +118,9 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowing(false);
         this.setShowingMRAID(false);
 
-        this._mraid.hide();
+        if (this._mraid) {
+            this._mraid.hide();
+        }
         this.removeEndScreenContainer();
         this.removePrivacyContainer();
 
@@ -248,16 +250,20 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     protected removePrivacyContainer() {
-        const privacyContainer = this._privacy.container();
-        if (privacyContainer && privacyContainer.parentElement) {
-            privacyContainer.parentElement.removeChild(this._privacy.container());
+        if (this._privacy) {
+            const privacyContainer = this._privacy.container();
+            if (privacyContainer && privacyContainer.parentElement) {
+                privacyContainer.parentElement.removeChild(privacyContainer);
+            }
         }
     }
 
     protected removeMraidContainer() {
-        const mraidContainer = this._mraid.container();
-        if (mraidContainer && mraidContainer.parentElement) {
-            mraidContainer.parentElement.removeChild(this._mraid.container());
+        if (this._mraid) {
+            const mraidContainer = this._mraid.container();
+            if (mraidContainer && mraidContainer.parentElement) {
+                mraidContainer.parentElement.removeChild(mraidContainer);
+            }
         }
     }
 
