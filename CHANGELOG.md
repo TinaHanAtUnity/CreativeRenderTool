@@ -1,4 +1,4 @@
-# Pending
+# Mon Feb 18 15:04:30 UTC 2019
 
 * Enable close icon skip also for Game7 games [#8273](https://github.com/Applifier/unity-ads-webview/pull/8273)
 * Disable multithreading A/B test [#8206](https://github.com/Applifier/unity-ads-webview/pull/8206)
