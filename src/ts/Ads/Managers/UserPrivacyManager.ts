@@ -154,6 +154,7 @@ export class UserPrivacyManager {
     private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource): Promise<INativeResponse> {
         const infoJson: unknown = {
             adid: this._deviceInfo.getAdvertisingIdentifier(),
+            group: this._coreConfig.getAbGroup(),
             action: GDPREventAction.CONSENT,
             projectId: this._coreConfig.getUnityProjectId(),
             platform: Platform[this._platform].toLowerCase(),

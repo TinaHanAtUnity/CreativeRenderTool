@@ -572,12 +572,16 @@ describe('UserPrivacyManagerTest', () => {
                 const expectedPermissions: IPermissions = { gameExp: false, ads: true, external: true };
                 (<sinon.SinonStub>coreConfig.isCoppaCompliant).returns(false);
 
+                const expectedAbGroup = 19;
+                (<sinon.SinonStub>coreConfig.getAbGroup).returns(expectedAbGroup);
+
                 return sendEvent(expectedPermissions, GDPREventSource.USER).then((eventData) => {
                     assert.isDefined(eventData);
                     assert.equal(eventData.method, PrivacyMethod.UNITY_CONSENT);
                     assert.equal(eventData.version, gamePrivacy.getVersion());
                     assert.equal(eventData.coppa, false);
                     assert.equal(eventData.permissions, expectedPermissions);
+                    assert.equal(eventData.group, expectedAbGroup);
                 });
             });
 
