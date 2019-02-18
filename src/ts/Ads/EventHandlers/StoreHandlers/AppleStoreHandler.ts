@@ -7,17 +7,15 @@ import { IosUtils } from 'Ads/Utilities/IosUtils';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
-export interface IAppleStoreHandlerParameters extends IStoreHandlerParameters {
-    deviceInfo: DeviceInfo;
-}
-
 export class AppleStoreHandler extends StoreHandler {
 
     private _deviceInfo: DeviceInfo;
 
-    constructor(parameters: IAppleStoreHandlerParameters) {
+    constructor(parameters: IStoreHandlerParameters) {
         super(parameters);
-
+        if (!parameters.deviceInfo) {
+            throw new Error('Missing deviceInfo for creating AppleStoreHandler');
+        }
         this._deviceInfo = parameters.deviceInfo;
     }
 

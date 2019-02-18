@@ -20,5 +20,6 @@
       },
       "useWebViewUserAgentForTracking": true
     }
-  }
+  },
+  "statusCode": 0
 }
