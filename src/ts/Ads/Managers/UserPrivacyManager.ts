@@ -165,11 +165,6 @@ export class UserPrivacyManager {
             permissions: permissions
         };
 
-        Diagnostics.trigger('consent_send_event', {
-            adsConfig: JSON.stringify(this._adsConfig.getDTO()),
-            permissions: JSON.stringify(permissions)
-        });
-
         return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
     }
 
