@@ -7,6 +7,7 @@ import {
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { UnityConsent } from 'Ads/Views/Consent/UnityConsent';
+import { Consent } from 'Ads/Views/Consent/Consent';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import { IPermissions } from 'Ads/Models/Privacy';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -26,7 +27,8 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     private _donePromiseResolve: () => void;
     private _showing: boolean;
     private _adUnitContainer: AdUnitContainer;
-    private _unityConsentView: UnityConsent;
+    // private _unityConsentView: UnityConsent;
+    private _unityConsentView: Consent;
     private _consentSettingsView: UnityConsentSettings;
     private _platform: Platform;
     private _privacyManager: UserPrivacyManager;
@@ -42,7 +44,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
         this._consentSettingsView = new UnityConsentSettings(this._platform, parameters.privacyManager);
         this._consentSettingsView.addEventHandler(this);
-        this._unityConsentView = new UnityConsent({
+        this._unityConsentView = new Consent({
             platform: parameters.platform,
             privacyManager: parameters.privacyManager,
             consentSettingsView: this._consentSettingsView
@@ -146,7 +148,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         setTimeout(() => {
             if(consent.hasOwnProperty('all')) {
                 this._core.Sdk.logInfo('setting autoAcceptConsent with All True based on ' + JSON.stringify(consent));
-                this._unityConsentView.testAutoConsent();
+                // this._unityConsentView.testAutoConsent();
             }
             if(consent.hasOwnProperty('ads')) {
                 this._core.Sdk.logInfo('setting autoAcceptConsent with Personalized Consent based on ' + JSON.stringify(consent));
