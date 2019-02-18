@@ -98,9 +98,9 @@ if(typeof location !== 'undefined') {
 
         case 'ios':
             if(window.webkit) {
-                nativeBridge = new NativeBridge(new WKWebViewBridge(), Platform.IOS);
+                nativeBridge = new NativeBridge(new WKWebViewBridge(), Platform.IOS, false);
             } else {
-                nativeBridge = new NativeBridge(new UIWebViewBridge(), Platform.IOS);
+                nativeBridge = new NativeBridge(new UIWebViewBridge(), Platform.IOS, false);
             }
             break;
 
