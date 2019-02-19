@@ -464,3 +464,103 @@ $iphone-x-styles() {
     height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   }
 }
+
+$iphone-x-performance-end-screen-styles() {
+  .performance-end-screen {
+    .portrait #end-screen {
+      padding: 0;
+      padding-top: env(safe-area-inset-top);
+      padding-top: constant(safe-area-inset-top); // @stylint ignore;
+      width: 100vw;
+      height: calc(100vh - env(safe-area-inset-top));
+      height: calc(100vh - constant(safe-area-inset-top)); // @stylint ignore;
+
+      .bottom-container {
+        margin-bottom: env(safe-area-inset-bottom);
+        margin-bottom: constant(safe-area-inset-bottom); // @stylint ignore;
+      }
+    }
+
+    .landscape #end-screen {
+      padding: 0;
+      height: 100vh;
+
+      .china-advertisement {
+        right: auto;
+        left: 0;
+        margin-right: 0;
+        margin-left: 1em;
+      }
+      .bottom-container {
+        margin-bottom: constant(safe-area-inset-bottom);
+        margin-bottom: env(safe-area-inset-bottom); // @stylint ignore
+
+        .privacy-button {
+          right: 0;
+          left: auto;
+          margin-right: 1em;
+          margin-left: 0;
+        }
+      }
+
+      &.show-gdpr-banner .gdpr-pop-up {
+        padding-bottom: constant(safe-area-inset-bottom);
+        padding-bottom: env(safe-area-inset-bottom); // @stylint ignore
+
+        .gdpr-text {
+          padding-bottom: 0;
+        }
+      }
+    }
+
+    .ios-landscape-right #end-screen {
+      padding-right: env(safe-area-inset-right);
+      padding-right: constant(safe-area-inset-right); // @stylint ignore
+      width: calc(100vw - env(safe-area-inset-right));
+      width: calc(100vw - constant(safe-area-inset-right)); // @stylint ignore
+    }
+
+    .ios-landscape-left #end-screen {
+      padding-left: env(safe-area-inset-left);
+      padding-left: constant(safe-area-inset-left); // @stylint ignore
+      width: calc(100vw - env(safe-area-inset-left));
+      width: calc(100vw - constant(safe-area-inset-left)); // @stylint ignore
+
+      .bottom-container .privacy-button {
+        right: env(safe-area-inset-right);
+        right: constant(safe-area-inset-right);   // @stylint ignore
+      }
+    }
+
+    #privacy {
+      height: calc(100% - constant(safe-area-inset-top));
+      height: calc(100% - env(safe-area-inset-top)); // @stylint ignore
+
+      .pop-up {
+        margin: 5% auto 5% auto;
+      }
+    }
+
+    .landscape  #privacy {
+      height: 100%;
+    }
+
+    .ios-landscape-right #privacy {
+      left: 0;
+      width: calc(100% - env(safe-area-inset-left));
+    }
+
+    .ios-landscape-left #privacy {
+      width: calc(100% - env(safe-area-inset-right));
+    }
+
+    #end-screen .end-screen-info-background{
+      @media (orientation: portrait) {
+        /* iPhone X & iPhone XS */
+        @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+          font-size: $default-px-size * 1.5;
+        }
+      }
+    }
+  }
+}

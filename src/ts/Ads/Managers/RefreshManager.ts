@@ -6,9 +6,9 @@ import { INativeResponse } from 'Core/Managers/RequestManager';
 import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 
 export abstract class RefreshManager {
-    public static NoFillDelay = 3600;
-    public static ErrorRefillDelay = 3600;
-    public static ParsingErrorRefillDelay = 60;
+    public static NoFillDelayInSeconds = 3600;
+    public static ErrorRefillDelayInSeconds = 3600;
+    public static ParsingErrorRefillDelayInSeconds = 60;
 
     public abstract getCampaign(placementId: string): Campaign | undefined;
     public abstract setCurrentAdUnit(adUnit: AbstractAdUnit): void;

@@ -3,12 +3,7 @@ import { AssetManager } from 'Ads/Managers/AssetManager';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import {
-    AuctionResponse,
-    IRawAuctionResponse,
-    IRawAuctionV5Response,
-    IRawRealtimeResponse
-} from 'Ads/Models/AuctionResponse';
+import { AuctionResponse, IRawAuctionResponse, IRawAuctionV5Response, IRawRealtimeResponse, AuctionStatusCode } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
@@ -26,7 +21,7 @@ import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheStatus } from 'Core/Managers/CacheManager';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { ABGroup, AuctionV5Test } from 'Core/Models/ABGroup';
+import { ABGroup, AuctionV5Test, StatusCodeTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -50,7 +45,6 @@ import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
-import { VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { ProgrammaticVastParserStrict } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
@@ -92,7 +86,7 @@ export class CampaignManager {
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable4<unknown, string[], string, Session | undefined>();
     public readonly onConnectivityError = new Observable1<string[]>();
-    public readonly onAdPlanReceived = new Observable2<number, number>();
+    public readonly onAdPlanReceived = new Observable3<number, number, number>();
 
     protected _platform: Platform;
     protected _core: ICoreApi;
@@ -183,7 +177,7 @@ export class CampaignManager {
                 if (response && response.responseCode) {
                     jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
                 }
-                if(response) {
+                if (response) {
                     this.setSDKSignalValues(requestTimestamp);
 
                     if(AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
@@ -286,6 +280,8 @@ export class CampaignManager {
         session.setPrivacy(requestPrivacy);
         session.setDeviceFreeSpace(this._deviceFreeSpace);
 
+        const auctionStatusCode: number = json.statusCode || AuctionStatusCode.NORMAL;
+
         this._backupCampaignManager.deleteBackupCampaigns();
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
 
@@ -322,7 +318,7 @@ export class CampaignManager {
 
             for(const placement of noFill) {
                 promises.push(this.handleNoFill(placement));
-                refreshDelay = RefreshManager.NoFillDelay;
+                refreshDelay = RefreshManager.NoFillDelayInSeconds;
             }
 
             let campaigns: number = 0;
@@ -339,13 +335,13 @@ export class CampaignManager {
             }
 
             this._core.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
-            this.onAdPlanReceived.trigger(refreshDelay, campaigns);
+            this.onAdPlanReceived.trigger(refreshDelay, campaigns, auctionStatusCode);
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     let auctionResponse: AuctionResponse;
                     try {
-                        auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], mediaId, json.correlationId);
+                        auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode);
                         promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
@@ -392,6 +388,8 @@ export class CampaignManager {
         session.setGameSessionCounters(gameSessionCounters);
         session.setPrivacy(requestPrivacy);
         session.setDeviceFreeSpace(this._deviceFreeSpace);
+
+        const auctionStatusCode: number = json.statusCode || AuctionStatusCode.NORMAL;
 
         this._backupCampaignManager.deleteBackupCampaigns();
         this._cacheBookkeeping.deleteCachedCampaignResponse(); // todo: legacy backup campaign cleanup, remove in early 2019
@@ -468,7 +466,7 @@ export class CampaignManager {
 
         for(const placement of noFill) {
             promises.push(this.handleNoFill(placement));
-            refreshDelay = RefreshManager.NoFillDelay;
+            refreshDelay = RefreshManager.NoFillDelayInSeconds;
         }
 
         let campaignCount: number = 0;
@@ -485,13 +483,13 @@ export class CampaignManager {
         }
 
         this._core.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
-        this.onAdPlanReceived.trigger(refreshDelay, campaignCount);
+        this.onAdPlanReceived.trigger(refreshDelay, campaignCount, auctionStatusCode);
 
         for(const mediaId in campaigns) {
             if(campaigns.hasOwnProperty(mediaId)) {
                 let auctionResponse: AuctionResponse;
                 try {
-                    auctionResponse = new AuctionResponse(campaigns[mediaId], json.media[mediaId], mediaId, json.correlationId);
+                    auctionResponse = new AuctionResponse(campaigns[mediaId], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode);
                     promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
                         if(error === CacheStatus.STOPPED) {
                             return Promise.resolve();

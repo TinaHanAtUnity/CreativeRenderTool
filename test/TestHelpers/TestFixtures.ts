@@ -16,7 +16,7 @@ import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
 import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
 import { VideoPlayerApi } from 'Ads/Native/VideoPlayer';
-import { WebPlayerApi } from 'Ads/Native/WebPlayer';
+import { WebPlayerApi, WebPlayerViewId } from 'Ads/Native/WebPlayer';
 import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
 import { IAnalyticsApi } from 'Analytics/IAnalytics';
@@ -150,6 +150,8 @@ import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
 import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
 import { BannerAdContext } from 'Banners/Context/BannerAdContext';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { AndroidDownloadApi } from 'China/Native/Android/Download';
 import { AndroidInstallListenerApi } from 'China/Native/Android/InstallListener';
 import { IChinaApi } from 'China/IChina';
@@ -626,6 +628,24 @@ export class TestFixtures {
         return new DisplayInterstitialCampaign(displayInterstitialParams);
     }
 
+    public static getWebPlayerContainer(): WebPlayerContainer {
+        const player: WebPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
+        (<any>player).onPageStarted = sinon.createStubInstance(Observable1);
+        (<any>player).onPageFinished = sinon.createStubInstance(Observable1);
+        (<any>player).onWebPlayerEvent = sinon.createStubInstance(Observable1);
+        (<any>player).onCreateWindow = sinon.createStubInstance(Observable1);
+        (<any>player).shouldOverrideUrlLoading = sinon.createStubInstance(Observable2);
+        (<any>player).onCreateWebView = sinon.createStubInstance(Observable1);
+        (<sinon.SinonStub>player.setUrl).returns(Promise.resolve());
+        (<sinon.SinonStub>player.setData).returns(Promise.resolve());
+        (<sinon.SinonStub>player.setDataWithUrl).returns(Promise.resolve());
+        (<sinon.SinonStub>player.setSettings).returns(Promise.resolve());
+        (<sinon.SinonStub>player.clearSettings).returns(Promise.resolve());
+        (<sinon.SinonStub>player.setEventSettings).returns(Promise.resolve());
+        (<sinon.SinonStub>player.sendEvent).returns(Promise.resolve());
+        return player;
+    }
+
     public static getOperativeEventManager<T extends Campaign>(platform: Platform, core: ICoreApi, ads: IAdsApi, campaign: T) {
         const wakeUpManager = new WakeUpManager(core);
         const storageBridge = new StorageBridge(core);
@@ -660,28 +680,27 @@ export class TestFixtures {
         return new Privacy(platform, campaign, privacyManager, TestFixtures.getAdsConfiguration().isGDPREnabled(), TestFixtures.getCoreConfiguration().isCoppaCompliant());
     }
 
-    public static getEndScreenParameters(platform: Platform, core: ICoreApi, campaign: PerformanceCampaign|XPromoCampaign): IEndScreenParameters {
+    public static getEndScreenParameters(platform: Platform, core: ICoreApi, campaign: PerformanceCampaign|XPromoCampaign, privacy: Privacy): IEndScreenParameters {
         const deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-
         return {
             platform,
             core,
             language: deviceInfo.getLanguage(),
             gameId: clientInfo.getGameId(),
-            privacy: TestFixtures.getPrivacy(platform, campaign),
+            privacy: privacy,
             showGDPRBanner: false,
             abGroup: TestFixtures.getCoreConfiguration().getAbGroup(),
             targetGameName: campaign.getGameName()
         };
     }
 
-    public static getPerformanceEndScreen(platform: Platform, core: ICoreApi, campaign: PerformanceCampaign): PerformanceEndScreen {
-        return new PerformanceEndScreen(this.getEndScreenParameters(platform, core, campaign), campaign);
+    public static getPerformanceEndScreen(platform: Platform, core: ICoreApi, campaign: PerformanceCampaign, privacy: Privacy): PerformanceEndScreen {
+        return new PerformanceEndScreen(this.getEndScreenParameters(platform, core, campaign, privacy), campaign);
     }
 
-    public static getXPromoEndScreen(platform: Platform, core: ICoreApi, campaign: XPromoCampaign): XPromoEndScreen {
-        return new XPromoEndScreen(this.getEndScreenParameters(platform, core, campaign), campaign);
+    public static getXPromoEndScreen(platform: Platform, core: ICoreApi, campaign: XPromoCampaign, privacy: Privacy): XPromoEndScreen {
+        return new XPromoEndScreen(this.getEndScreenParameters(platform, core, campaign, privacy), campaign);
     }
 
     public static getVideoOverlay<T extends Campaign>(platform: Platform, core: ICoreApi, ads: IAdsApi, campaign: T): VideoOverlay {
@@ -709,6 +728,7 @@ export class TestFixtures {
         const wakeUpManager = new WakeUpManager(core);
         const request = new RequestManager(platform, core, wakeUpManager);
         const campaign = TestFixtures.getXPromoCampaign();
+        const privacy = TestFixtures.getPrivacy(platform, campaign);
 
         return {
             platform,
@@ -727,10 +747,10 @@ export class TestFixtures {
             adsConfig: TestFixtures.getAdsConfiguration(),
             request: request,
             options: {},
-            endScreen: TestFixtures.getXPromoEndScreen(platform, core, campaign),
+            endScreen: TestFixtures.getXPromoEndScreen(platform, core, campaign, privacy),
             overlay: TestFixtures.getVideoOverlay(platform, core, ads, campaign),
             video: new Video('', TestFixtures.getSession()),
-            privacy: TestFixtures.getPrivacy(platform, campaign),
+            privacy: privacy,
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };
@@ -740,6 +760,7 @@ export class TestFixtures {
         const campaign = TestFixtures.getCampaign();
         const wakeUpManager = new WakeUpManager(core);
         const request = new RequestManager(platform, core, wakeUpManager);
+        const privacy = TestFixtures.getPrivacy(platform, campaign);
 
         return {
             platform,
@@ -758,10 +779,10 @@ export class TestFixtures {
             adsConfig: TestFixtures.getAdsConfiguration(),
             request: request,
             options: {},
-            endScreen: TestFixtures.getPerformanceEndScreen(platform, core, campaign),
+            endScreen: TestFixtures.getPerformanceEndScreen(platform, core, campaign, privacy),
             overlay: TestFixtures.getVideoOverlay(platform, core, ads, campaign),
             video: new Video('', TestFixtures.getSession()),
-            privacy: TestFixtures.getPrivacy(platform, campaign),
+            privacy: privacy,
             privacyManager: sinon.createStubInstance(UserPrivacyManager),
             programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };
@@ -909,7 +930,7 @@ export class TestFixtures {
         ads.PlacementManager = new PlacementManager(api, ads.Config!);
         ads.AssetManager = new AssetManager(platform, core.Api, core.CacheManager, CacheMode.DISABLED, core.DeviceInfo, core.CacheBookkeeping, ads.ProgrammaticTrackingService!, ads.BackupCampaignManager!);
         ads.CampaignManager = new CampaignManager(platform, core.Api, core.Config, ads.Config!, ads.AssetManager, ads.SessionManager!, ads.AdMobSignalFactory!, core.RequestManager, core.ClientInfo, core.DeviceInfo, core.MetaDataManager, core.CacheBookkeeping, ads.ContentTypeHandlerManager!, core.JaegerManager, ads.BackupCampaignManager!);
-        ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
+        ads.RefreshManager = new CampaignRefreshManager(platform, core.Api, core.Config, api, core.WakeUpManager, ads.CampaignManager, ads.Config!, core.FocusManager, ads.SessionManager!, core.ClientInfo, core.RequestManager, core.CacheManager);
         return <IAds>ads;
     }
 

@@ -206,7 +206,7 @@ describe('CampaignRefreshManager', () => {
             privacy: privacy
         };
 
-        RefreshManager.ParsingErrorRefillDelay = 0; // prevent tests from hanging due to long retry timeouts
+        RefreshManager.ParsingErrorRefillDelayInSeconds = 0; // prevent tests from hanging due to long retry timeouts
         jaegerManager = sinon.createStubInstance(JaegerManager);
         jaegerManager.isJaegerTracingEnabled = sinon.stub().returns(false);
         jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
@@ -217,7 +217,7 @@ describe('CampaignRefreshManager', () => {
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-            campaignRefreshManager = new CampaignRefreshManager(platform, core, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
+            campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
         it('get campaign should return undefined', () => {
@@ -618,7 +618,7 @@ describe('CampaignRefreshManager', () => {
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             campaignManager = new CampaignManager(platform, core, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, campaignParserManager, jaegerManager, backupCampaignManager);
-            campaignRefreshManager = new CampaignRefreshManager(platform, core, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
+            campaignRefreshManager = new CampaignRefreshManager(platform, core, coreConfig, ads, wakeUpManager, campaignManager, adsConfig, focusManager, sessionManager, clientInfo, request, cache);
         });
 
         afterEach(() => {

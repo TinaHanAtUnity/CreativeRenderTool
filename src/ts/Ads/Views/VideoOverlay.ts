@@ -157,7 +157,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
             this._chinaAdvertisementElement.style.display = 'block';
         }
 
-        if (CustomFeatures.isCheetahGame(this._gameId)) {
+        if (CustomFeatures.isCloseIconSkipEnabled(this._gameId)) {
             this._skipButtonElement.classList.add('close-icon-skip');
         }
     }
@@ -319,7 +319,10 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         event.stopPropagation();
         this.resetFadeTimer();
         this._handlers.forEach(handler => handler.onOverlayCallButton());
+        this.triggerOnOverlayDownload();
+    }
 
+    private triggerOnOverlayDownload(): void {
         if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             const campaign = this._campaign;
             this._handlers.filter(handler => typeof handler.onOverlayDownload === 'function')
@@ -413,7 +416,10 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     protected cleanUpPrivacy() {
         if (this._privacy) {
             this._privacy.hide();
-            document.body.removeChild(this._privacy.container());
+            const container = this._privacy.container();
+            if (container && container.parentElement) {
+                container.parentElement.removeChild(container);
+            }
             delete this._privacy;
         }
     }

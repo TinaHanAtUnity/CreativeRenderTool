@@ -77,7 +77,8 @@ describe('MRAIDEventHandlersTest', () => {
             extendedMraidCampaign = TestFixtures.getExtendedMRAIDCampaign();
             mraidView = sinon.createStubInstance(MRAID);
             (<sinon.SinonSpy>mraidView.container).restore();
-            sinon.stub(mraidView, 'container').returns(document.createElement('div'));
+            const viewContainer = document.createElement('div');
+            sinon.stub(mraidView, 'container').returns(viewContainer);
             privacyManager = sinon.createStubInstance(UserPrivacyManager);
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
             webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
@@ -111,6 +112,11 @@ describe('MRAIDEventHandlersTest', () => {
             mraidAdUnit = new MRAIDAdUnit(extendedMraidAdUnitParams);
             sinon.stub(mraidAdUnit, 'sendClick');
             mraidEventHandler = new MRAIDEventHandler(mraidAdUnit, extendedMraidAdUnitParams);
+        });
+
+        afterEach(() => {
+            mraidAdUnit.setShowing(true);
+            return mraidAdUnit.hide();
         });
 
         it('should send a native click event', () => {

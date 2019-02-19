@@ -23,6 +23,10 @@ import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHan
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { StatusCodeTest } from 'Core/Models/ABGroup';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { AuctionStatusCode } from 'Ads/Models/AuctionResponse';
+import { TimeUtils } from 'Ads/Utilities/TimeUtils';
 
 export class CampaignRefreshManager extends RefreshManager {
     private _platform: Platform;
@@ -30,7 +34,8 @@ export class CampaignRefreshManager extends RefreshManager {
     private _ads: IAdsApi;
     private _wakeUpManager: WakeUpManager;
     private _campaignManager: CampaignManager;
-    private _configuration: AdsConfiguration;
+    private _coreConfig: CoreConfiguration;
+    private _adsConfig: AdsConfiguration;
     private _currentAdUnit: AbstractAdUnit;
     private _focusManager: FocusManager;
     private _sessionManager: SessionManager;
@@ -49,7 +54,7 @@ export class CampaignRefreshManager extends RefreshManager {
     // this constant is intentionally named "magic" constant because the value is only a best guess and not a real technical constant
     private _startRefreshMagicConstant: number = 5000;
 
-    constructor(platform: Platform, core: ICoreApi, ads: IAdsApi, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: AdsConfiguration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: RequestManager, cache: CacheManager) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, ads: IAdsApi, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, adsConfig: AdsConfiguration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: RequestManager, cache: CacheManager) {
         super();
 
         this._platform = platform;
@@ -57,7 +62,8 @@ export class CampaignRefreshManager extends RefreshManager {
         this._ads = ads;
         this._wakeUpManager = wakeUpManager;
         this._campaignManager = campaignManager;
-        this._configuration = configuration;
+        this._coreConfig = coreConfig;
+        this._adsConfig = adsConfig;
         this._focusManager = focusManager;
         this._sessionManager = sessionManager;
         this._clientInfo = clientInfo;
@@ -72,7 +78,7 @@ export class CampaignRefreshManager extends RefreshManager {
         this._campaignManager.onNoFill.subscribe((placementId) => this.onNoFill(placementId));
         this._campaignManager.onError.subscribe((error, placementIds, diagnosticsType, session) => this.onError(error, placementIds, diagnosticsType, session));
         this._campaignManager.onConnectivityError.subscribe((placementIds) => this.onConnectivityError(placementIds));
-        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount) => this.onAdPlanReceived(refreshDelay, campaignCount));
+        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount, auctionStatusCode) => this.onAdPlanReceived(refreshDelay, campaignCount, auctionStatusCode));
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
         if(this._platform === Platform.IOS) {
             this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
@@ -83,7 +89,7 @@ export class CampaignRefreshManager extends RefreshManager {
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
-        const placement = this._configuration.getPlacement(placementId);
+        const placement = this._adsConfig.getPlacement(placementId);
         if(placement) {
             return placement.getCurrentCampaign();
         }
@@ -95,8 +101,8 @@ export class CampaignRefreshManager extends RefreshManager {
         const currentAdunit = this._currentAdUnit = adUnit;
         const onStartObserver = this._currentAdUnit.onStart.subscribe(() => {
             currentAdunit.onStart.unsubscribe(onStartObserver);
-            this.invalidateCampaigns(true, this._configuration.getPlacementIds());
-            this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
+            this.invalidateCampaigns(true, this._adsConfig.getPlacementIds());
+            this.setPlacementStates(PlacementState.WAITING, this._adsConfig.getPlacementIds());
         });
         this._currentAdUnit.onStartProcessed.subscribe(() => this.onAdUnitStartProcessed());
         this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
@@ -112,9 +118,9 @@ export class CampaignRefreshManager extends RefreshManager {
 
     public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
         if(this.shouldRefill(this._refillTimestamp)) {
-            this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
+            this.setPlacementStates(PlacementState.WAITING, this._adsConfig.getPlacementIds());
             this._refillTimestamp = 0;
-            this.invalidateCampaigns(false, this._configuration.getPlacementIds());
+            this.invalidateCampaigns(false, this._adsConfig.getPlacementIds());
             this._campaignCount = 0;
             return this._campaignManager.request(nofillRetry);
         } else if(this.checkForExpiredCampaigns()) {
@@ -125,17 +131,17 @@ export class CampaignRefreshManager extends RefreshManager {
     }
 
     public refreshWithBackupCampaigns(backupCampaignManager: BackupCampaignManager): Promise<(INativeResponse | void)[]> {
-        this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
+        this.setPlacementStates(PlacementState.WAITING, this._adsConfig.getPlacementIds());
         this._refillTimestamp = 0;
-        this.invalidateCampaigns(false, this._configuration.getPlacementIds());
+        this.invalidateCampaigns(false, this._adsConfig.getPlacementIds());
         this._campaignCount = 0;
 
         const promises = [this._campaignManager.request()];
 
-        const placements = this._configuration.getPlacements();
-        for(const placement in this._configuration.getPlacements()) {
+        const placements = this._adsConfig.getPlacements();
+        for(const placement in this._adsConfig.getPlacements()) {
             if(placements.hasOwnProperty(placement)) {
-                const promise = Promise.all([backupCampaignManager.loadCampaign(this._configuration.getPlacement(placement)), backupCampaignManager.loadTrackingUrls(this._configuration.getPlacement(placement))]).then(([campaign, trackingUrls]) => {
+                const promise = Promise.all([backupCampaignManager.loadCampaign(this._adsConfig.getPlacement(placement)), backupCampaignManager.loadTrackingUrls(this._adsConfig.getPlacement(placement))]).then(([campaign, trackingUrls]) => {
                     if(campaign) {
                         // todo: during auction v5 test it's ok if trackingUrls is undefined but after unconditional transition to v5 loading trackingUrls should be enforced
                         this.setPlacementReady(placement, campaign, trackingUrls);
@@ -160,12 +166,12 @@ export class CampaignRefreshManager extends RefreshManager {
     }
 
     public setPlacementState(placementId: string, placementState: PlacementState): void {
-        const placement = this._configuration.getPlacement(placementId);
+        const placement = this._adsConfig.getPlacement(placementId);
         placement.setState(placementState);
     }
 
     public sendPlacementStateChanges(placementId: string): void {
-        const placement = this._configuration.getPlacement(placementId);
+        const placement = this._adsConfig.getPlacement(placementId);
         if (placement.getPlacementStateChanged()) {
             placement.setPlacementStateChanged(false);
             this._ads.Placement.setPlacementState(placementId, placement.getState());
@@ -188,14 +194,14 @@ export class CampaignRefreshManager extends RefreshManager {
     private invalidateCampaigns(needsRefill: boolean, placementIds: string[]): void {
         this._needsRefill = needsRefill;
         for(const placementId of placementIds) {
-            this._configuration.getPlacement(placementId).setCurrentCampaign(undefined);
+            this._adsConfig.getPlacement(placementId).setCurrentCampaign(undefined);
         }
     }
 
     private checkForExpiredCampaigns(): boolean {
-        for(const placementId in this._configuration.getPlacements()) {
-            if (this._configuration.getPlacements().hasOwnProperty(placementId)) {
-                const campaign = this._configuration.getPlacement(placementId).getCurrentCampaign();
+        for(const placementId in this._adsConfig.getPlacements()) {
+            if (this._adsConfig.getPlacements().hasOwnProperty(placementId)) {
+                const campaign = this._adsConfig.getPlacement(placementId).getCurrentCampaign();
                 if(campaign && campaign.isExpired()) {
                     return true;
                 }
@@ -207,8 +213,8 @@ export class CampaignRefreshManager extends RefreshManager {
 
     private onCampaignExpired(): Promise<INativeResponse | void> {
         this._core.Sdk.logDebug('Unity Ads campaign has expired, requesting new ads');
-        this.setPlacementStates(PlacementState.NO_FILL, this._configuration.getPlacementIds());
-        this.invalidateCampaigns(false, this._configuration.getPlacementIds());
+        this.setPlacementStates(PlacementState.NO_FILL, this._adsConfig.getPlacementIds());
+        this.invalidateCampaigns(false, this._adsConfig.getPlacementIds());
         return this._campaignManager.request();
     }
 
@@ -259,10 +265,10 @@ export class CampaignRefreshManager extends RefreshManager {
         }
         this._core.Sdk.logError(JSON.stringify(error));
 
-        const minimumRefreshTimestamp = Date.now() + RefreshManager.ErrorRefillDelay * 1000;
+        const minimumRefreshTimestamp = Date.now() + RefreshManager.ErrorRefillDelayInSeconds * 1000;
         if(this._refillTimestamp === 0 || this._refillTimestamp > minimumRefreshTimestamp) {
             this._refillTimestamp = minimumRefreshTimestamp;
-            this._core.Sdk.logDebug('Unity Ads will refresh ads in ' + RefreshManager.ErrorRefillDelay + ' seconds');
+            this._core.Sdk.logDebug('Unity Ads will refresh ads in ' + RefreshManager.ErrorRefillDelayInSeconds + ' seconds');
         }
 
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
@@ -279,10 +285,10 @@ export class CampaignRefreshManager extends RefreshManager {
         if(this._campaignCount === 1) {
             this._parsingErrorCount++;
 
-            if(this._parsingErrorCount === 1 && RefreshManager.ParsingErrorRefillDelay > 0) {
-                const retryDelaySeconds: number = RefreshManager.ParsingErrorRefillDelay + Math.random() * RefreshManager.ParsingErrorRefillDelay;
+            if(this._parsingErrorCount === 1 && RefreshManager.ParsingErrorRefillDelayInSeconds > 0) {
+                const retryDelaySeconds: number = RefreshManager.ParsingErrorRefillDelayInSeconds + Math.random() * RefreshManager.ParsingErrorRefillDelayInSeconds;
                 this._core.Sdk.logDebug('Unity Ads retrying failed campaign in ' + retryDelaySeconds + ' seconds');
-                this._refillTimestamp = Date.now() + RefreshManager.ParsingErrorRefillDelay * 1000;
+                this._refillTimestamp = Date.now() + RefreshManager.ParsingErrorRefillDelayInSeconds * 1000;
                 setTimeout(() => {
                     this._core.Sdk.logDebug('Unity Ads retrying failed campaign now');
                     this.refresh();
@@ -307,8 +313,15 @@ export class CampaignRefreshManager extends RefreshManager {
         }
     }
 
-    private onAdPlanReceived(refreshDelay: number, campaignCount: number) {
+    private onAdPlanReceived(refreshDelay: number, campaignCount: number, auctionStatusCode: number) {
         this._campaignCount = campaignCount;
+
+        if (StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode === AuctionStatusCode.FREQUENCY_CAP_REACHED) {
+            const nowInMilliSec = Date.now();
+            this._refillTimestamp = nowInMilliSec + TimeUtils.getNextUTCDayDeltaSeconds(nowInMilliSec) * 1000;
+
+            return;
+        }
 
         if(campaignCount === 0) {
             this._noFills++;
@@ -351,7 +364,7 @@ export class CampaignRefreshManager extends RefreshManager {
     }
 
     private setCampaignForPlacement(placementId: string, campaign: Campaign | undefined, trackingUrls: ICampaignTrackingUrls | undefined) {
-        const placement = this._configuration.getPlacement(placementId);
+        const placement = this._adsConfig.getPlacement(placementId);
         if(placement) {
             placement.setCurrentCampaign(campaign);
             placement.setCurrentTrackingUrls(trackingUrls);
