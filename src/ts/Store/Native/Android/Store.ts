@@ -5,10 +5,10 @@ import { Observable0, Observable1, Observable2, Observable3 } from 'Core/Utiliti
 
 enum AndroidStoreEvent {
     INITIALIZED,
-    BILLING_START,
-    BILLING_END,
-    BILLING_START_ERROR,
-    BILLING_END_ERROR,
+    PURCHASE_STATUS_ON_RESUME,
+    PURCHASE_STATUS_ON_STOP,
+    PURCHASE_STATUS_ON_RESUME_ERROR,
+    PURCHASE_STATUS_ON_STOP_ERROR,
     PURCHASE_HISTORY_RESULT,
     PURCHASE_HISTORY_ERROR,
     SKU_DETAILS_RESULT,
@@ -47,6 +47,11 @@ export interface IGooglePurchases {
     purchaseItemList: string[];
 }
 
+export interface IGooglePurchaseStatus {
+    inapp?: IGooglePurchases;
+    subs?: IGooglePurchases;
+}
+
 export interface IGoogleSkuDetails {
     productId: string;
     type: string;
@@ -73,10 +78,10 @@ export class AndroidStoreApi extends NativeApi {
     public readonly onPurchaseHistoryError = new Observable3<number, AndroidStoreError, string>();
     public readonly onSkuDetailsResult = new Observable2<number, IGoogleSkuDetails[]>();
     public readonly onSkuDetailsError = new Observable3<number, AndroidStoreError, string>();
-    public readonly onBillingStart = new Observable1<IGooglePurchases>();
-    public readonly onBillingStartError = new Observable2<AndroidStoreError, string>();
-    public readonly onBillingEnd = new Observable1<IGooglePurchases>();
-    public readonly onBillingEndError = new Observable2<AndroidStoreError, string>();
+    public readonly onPurchaseStatusOnResume = new Observable2<string, IGooglePurchaseStatus>();
+    public readonly onPurchaseStatusOnResumeError = new Observable3<AndroidStoreError, string, string>();
+    public readonly onPurchaseStatusOnStop = new Observable2<string, IGooglePurchaseStatus>();
+    public readonly onPurchaseStatusOnStopError = new Observable3<AndroidStoreError, string, string>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Store', ApiPackage.STORE, EventCategory.STORE);
@@ -86,8 +91,12 @@ export class AndroidStoreApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'initialize');
     }
 
-    public setListenerState(state: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setListenerState', [state]);
+    public startPurchaseTracking(trackAllActivities: boolean, exceptions: string[], purchaseTypes: string[]): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'startPurchaseTracking', [trackAllActivities, exceptions, purchaseTypes]);
+    }
+
+    public stopPurchaseTracking(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'stopPurchaseTracking');
     }
 
     public isBillingSupported(operationId: number, purchaseType: string): Promise<void> {
@@ -136,20 +145,20 @@ export class AndroidStoreApi extends NativeApi {
                 this.onSkuDetailsError.trigger(<number>parameters[0], <AndroidStoreError>parameters[1], <string>parameters[2]);
                 break;
 
-            case AndroidStoreEvent[AndroidStoreEvent.BILLING_START]:
-                this.onBillingStart.trigger(<IGooglePurchases>parameters[0]);
+            case AndroidStoreEvent[AndroidStoreEvent.PURCHASE_STATUS_ON_RESUME]:
+                this.onPurchaseStatusOnResume.trigger(<string>parameters[0], <IGooglePurchaseStatus>parameters[1]);
                 break;
 
-            case AndroidStoreEvent[AndroidStoreEvent.BILLING_START_ERROR]:
-                this.onBillingStartError.trigger(<AndroidStoreError>parameters[0], <string>parameters[1]);
+            case AndroidStoreEvent[AndroidStoreEvent.PURCHASE_STATUS_ON_RESUME_ERROR]:
+                this.onPurchaseStatusOnResumeError.trigger(<AndroidStoreError>parameters[0], <string>parameters[1], <string>parameters[2]);
                 break;
 
-            case AndroidStoreEvent[AndroidStoreEvent.BILLING_END]:
-                this.onBillingEnd.trigger(<IGooglePurchases>parameters[0]);
+            case AndroidStoreEvent[AndroidStoreEvent.PURCHASE_STATUS_ON_STOP]:
+                this.onPurchaseStatusOnStop.trigger(<string>parameters[0], <IGooglePurchaseStatus>parameters[1]);
                 break;
 
-            case AndroidStoreEvent[AndroidStoreEvent.BILLING_END_ERROR]:
-                this.onBillingEndError.trigger(<AndroidStoreError>parameters[0], <string>parameters[1]);
+            case AndroidStoreEvent[AndroidStoreEvent.PURCHASE_STATUS_ON_STOP_ERROR]:
+                this.onPurchaseStatusOnStopError.trigger(<AndroidStoreError>parameters[0], <string>parameters[1], <string>parameters[2]);
                 break;
 
             default:

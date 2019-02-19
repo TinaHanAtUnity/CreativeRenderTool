@@ -1,7 +1,7 @@
 import { StoreManager } from 'Store/Managers/StoreManager';
 import { ICore } from 'Core/ICore';
 import { IStoreApi } from 'Store/IStore';
-import { IGooglePurchaseData, IGooglePurchases } from 'Store/Native/Android/Store';
+import { IGooglePurchaseData, IGooglePurchases, IGooglePurchaseStatus } from 'Store/Native/Android/Store';
 import { GoogleStore } from 'Store/Utilities/GoogleStore';
 import { StoreTransaction } from 'Store/Models/StoreTransaction';
 
@@ -17,14 +17,14 @@ export class GoogleStoreManager extends StoreManager {
 
     public startTracking(): void {
         this._store.Android!.Store.onInitialized.subscribe(() => this.onInitialized());
-        this._store.Android!.Store.onBillingStart.subscribe((data: IGooglePurchases) => this.onBillingStart(data));
-        this._store.Android!.Store.onBillingEnd.subscribe((data: IGooglePurchases) => this.onBillingEnd(data));
+        this._store.Android!.Store.onPurchaseStatusOnResume.subscribe((activity: string, data: IGooglePurchaseStatus) => this.onPurchaseStatusOnResume(activity, data));
+        this._store.Android!.Store.onPurchaseStatusOnStop.subscribe((activity: string, data: IGooglePurchaseStatus) => this.onPurchaseStatusOnStop(activity, data));
 
         this._store.Android!.Store.initialize();
     }
 
     private onInitialized() {
-        this._store.Android!.Store.setListenerState(true);
+        this._store.Android!.Store.startPurchaseTracking(true, ['com.unity3d.player.UnityPlayerActivity', 'com.unity3d.services.ads.adunit.AdUnitActivity', 'com.unity3d.services.ads.adunit.AdUnitTransparentActivity'], ['inapp', 'subs']);
 
         // todo: check isBillingSupported properly instead of just logging the result
         this._googleStore.isBillingSupported('inapp').then(result => {
@@ -36,6 +36,15 @@ export class GoogleStoreManager extends StoreManager {
         });
     }
 
+    private onPurchaseStatusOnResume(activity: string, data: IGooglePurchaseStatus) {
+        // todo: implement method
+    }
+
+    private onPurchaseStatusOnStop(activity: string, data: IGooglePurchaseStatus) {
+        // todo: implement method
+    }
+
+    /*
     private onBillingStart(data: IGooglePurchases) {
         this._core.Api.Sdk.logInfo('GOOGLE BILLING START: ' + JSON.stringify(data)); // todo: remove debug logging before merging to master
 
@@ -68,6 +77,7 @@ export class GoogleStoreManager extends StoreManager {
             this._core.Api.Sdk.logInfo('GOOGLE INAPP PURCHASE HISTORY: ' + JSON.stringify(history));
         });
     }
+    */
 
     private isNewPurchase(orderId: string) {
         if(this._existingOrderIds) {
