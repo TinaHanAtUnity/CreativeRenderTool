@@ -44,7 +44,7 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory<XPromoCampaign, I
         if (parameters.platform === Platform.ANDROID) {
             const onBackKeyObserver = parameters.ads.Android!.AdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => {
                 endScreenEventHandler.onKeyEvent(keyCode);
-                if(CustomFeatures.isCheetahGame(parameters.clientInfo.getGameId())) {
+                if(CustomFeatures.isCloseIconSkipEnabled(parameters.clientInfo.getGameId())) {
                     xPromoOverlayEventHandler.onKeyEvent(keyCode);
                 }
             });
