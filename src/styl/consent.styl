@@ -16,6 +16,39 @@
   &.prevent-clicks {
     pointer-events: none;
   }
+
+  &.old-androids {
+    .consent-button-container {
+      position: absolute;
+      bottom: 0;
+      left:0;
+      padding: $default-size 0;
+      width: 100%;
+      justify-content: center;
+      background: $white;
+    }
+
+    .consent-settings {
+      height: 100%;
+    }
+
+    .consent-container {
+      padding-bottom: 6 * $default-size;
+    }
+
+    .agree {
+      flex-grow: 0;
+    }
+
+    .save-my-choices {
+      flex-grow: 0;
+    }
+
+    .safe-area {
+      padding: 0;
+    }
+  }
+
   .safe-area {
     position: fixed;
     top: 0;

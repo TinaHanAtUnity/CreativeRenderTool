@@ -17,9 +17,12 @@ export interface IUnityConsentViewParameters {
     platform: Platform;
     privacyManager: UserPrivacyManager;
     consentSettingsView: UnityConsentSettings;
+    apiLevel?: number;
 }
 
 export class Consent extends View<IConsentViewHandler> implements IPersonalizationSwitchGroupHandler {
+
+    private _apiLevel?: number;
 
     private _privacyManager: UserPrivacyManager;
     private _switchGroup: PersonalizationSwitchGroup;
@@ -28,6 +31,8 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
 
     constructor(parameters: IUnityConsentViewParameters) {
         super(parameters.platform, 'consent');
+
+        this._apiLevel = parameters.apiLevel;
 
         this._privacyManager = parameters.privacyManager;
 
@@ -76,6 +81,11 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
         (<HTMLElement>this._container.querySelector('.privacy-container')).appendChild(this._privacyRowItemContainer.container());
 
         this._consentButtonContainer = (<HTMLElement>this._container.querySelector('.consent-button-container'));
+
+        // Android <= 4.4.4
+        if (this._platform === Platform.ANDROID && this._apiLevel && this._apiLevel <= 19) {
+            this._container.classList.add('old-androids');
+        }
 
         this.container().classList.add('intro');
     }

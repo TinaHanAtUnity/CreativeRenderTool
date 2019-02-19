@@ -7,13 +7,15 @@ import {
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { UnityConsent } from 'Ads/Views/Consent/UnityConsent';
-import { Consent } from 'Ads/Views/Consent/Consent';
+import { Consent, IUnityConsentViewParameters } from 'Ads/Views/Consent/Consent';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import { IPermissions } from 'Ads/Models/Privacy';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ICoreApi } from 'Core/ICore';
 import { UnityConsentSettings } from 'Ads/Views/Consent/UnityConsentSettings';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export interface IConsentUnitParameters {
     platform: Platform;
@@ -21,6 +23,7 @@ export interface IConsentUnitParameters {
     adUnitContainer: AdUnitContainer;
     adsConfig: AdsConfiguration;
     core: ICoreApi;
+    deviceInfo: DeviceInfo;
 }
 
 export class ConsentUnit implements IConsentViewHandler, IAdUnit {
@@ -44,11 +47,21 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
         this._consentSettingsView = new UnityConsentSettings(this._platform, parameters.privacyManager);
         this._consentSettingsView.addEventHandler(this);
-        this._unityConsentView = new Consent({
+
+        let viewParams: IUnityConsentViewParameters = {
             platform: parameters.platform,
-            privacyManager: parameters.privacyManager,
+                privacyManager: parameters.privacyManager,
             consentSettingsView: this._consentSettingsView
-        });
+        };
+
+        if (this._platform === Platform.ANDROID) {
+            viewParams = {
+                ... viewParams,
+                apiLevel: (<AndroidDeviceInfo>parameters.deviceInfo).getApiLevel()
+            };
+        }
+
+        this._unityConsentView = new Consent(viewParams);
         this._unityConsentView.addEventHandler(this);
 
     }
