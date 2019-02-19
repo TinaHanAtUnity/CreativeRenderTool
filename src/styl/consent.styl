@@ -136,15 +136,57 @@
   }
 
   .agree {
+    display: block;
     flex-grow: 1;
     background: $consent-blue;
     color: $white;
   }
 
   .disagree {
+    display: block;
     margin-left: $default-size;
     border: 1px solid $consent-border-gray;
     color: $black;
+  }
+
+  .save-my-choices {
+    display: none;
+    flex-grow: 1;
+    background: $consent-blue;
+    color: $white;
+  }
+
+  .consent-button-container:not(.show-save-my-choices-button) {
+    .agree {
+      display: block;
+    }
+
+    .disagree {
+      display: block;
+    }
+    .save-my-choices {
+      display: none;
+    }
+  }
+
+  .consent-button-container.hide-agree-and-no-thanks-buttons {
+    opacity: 0;
+    transition: opacity .15s ease-out;
+
+  }
+
+  .consent-button-container.show-save-my-choices-button {
+    opacity: 1;
+    transition: opacity .15s ease-out;
+    .agree {
+      display: none;
+    }
+    .disagree {
+      display: none;
+    }
+    .save-my-choices {
+      display: block;
+    }
   }
 
   #third-party-switch.disabled {

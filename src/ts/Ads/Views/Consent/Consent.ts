@@ -24,6 +24,7 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
     private _privacyManager: UserPrivacyManager;
     private _switchGroup: PersonalizationSwitchGroup;
     private _privacyRowItemContainer: PrivacyRowItemContainer;
+    private _consentButtonContainer: HTMLElement;
 
     constructor(parameters: IUnityConsentViewParameters) {
         super(parameters.platform, 'consent');
@@ -47,10 +48,16 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
                 event: 'click',
                 listener: (event: Event) => this.onDisagreeEvent(event),
                 selector: '.disagree'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onSaveMyChoicesEvent(event),
+                selector: '.save-my-choices'
             }
         ];
 
         this._switchGroup = new PersonalizationSwitchGroup(parameters.platform, parameters.privacyManager);
+        this._switchGroup.addEventHandler(this);
         this._privacyRowItemContainer = new PrivacyRowItemContainer(parameters.platform, parameters.privacyManager);
     }
 
@@ -68,6 +75,8 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
         this._privacyRowItemContainer.render();
         (<HTMLElement>this._container.querySelector('.privacy-container')).appendChild(this._privacyRowItemContainer.container());
 
+        this._consentButtonContainer = (<HTMLElement>this._container.querySelector('.consent-button-container'));
+
         this.container().classList.add('intro');
     }
 
@@ -77,7 +86,18 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
     }
 
     public onSwitchGroupSelectionChange(): void {
-        // todo: set buttons based on the switch group selection
+        if (this._consentButtonContainer && !this._consentButtonContainer.classList.contains('hide-agree-and-no-thanks-buttons')) {
+            this._consentButtonContainer.classList.add('hide-agree-and-no-thanks-buttons');
+            ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
+                const transitionEndCallback = (evt: Event) => {
+                    this._consentButtonContainer.classList.add('show-save-my-choices-button');
+                    this._consentButtonContainer.removeEventListener(e, transitionEndCallback);
+                };
+                this._consentButtonContainer.addEventListener(e, transitionEndCallback);
+            });
+        } else {
+            this._consentButtonContainer.classList.remove('hide-agree-and-no-thanks-buttons');
+        }
     }
 
     private onContinueEvent(event: Event) {
@@ -112,6 +132,19 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
         this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
         const element = (<HTMLElement>this._container.querySelector('.disagree'));
 
+        this.closeWithAnimation(element);
+    }
+
+    private onSaveMyChoicesEvent(event: Event) {
+        event.preventDefault();
+
+        const permissions: IPermissions = {
+            gameExp: this._switchGroup.isPersonalizedExperienceChecked(),
+            ads: this._switchGroup.isPersonalizedAdsChecked(),
+            external: this._switchGroup.isAds3rdPartyChecked()
+        };
+        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
+        const element = (<HTMLElement>this._container.querySelector('.save-my-choices'));
         this.closeWithAnimation(element);
     }
 

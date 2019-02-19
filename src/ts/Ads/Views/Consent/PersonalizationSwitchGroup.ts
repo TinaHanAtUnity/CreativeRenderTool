@@ -94,15 +94,18 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationSwitchGroup
     }
 
     private onExpSwitchChange(event: Event): void {
-        //
+        event.preventDefault();
+        this._handlers.forEach(handler => handler.onSwitchGroupSelectionChange());
     }
 
     private onAdsSwitchChange(event: Event): void {
         event.preventDefault();
         this.setSwitches();
+        this._handlers.forEach(handler => handler.onSwitchGroupSelectionChange());
     }
 
     private on3rdPartySwitchChange(event: Event): void {
-        //
+        event.preventDefault();
+        this._handlers.forEach(handler => handler.onSwitchGroupSelectionChange());
     }
 }
