@@ -3,6 +3,7 @@ import { Platform } from 'Core/Constants/Platform';
 
 import { Url } from 'Core/Utilities/Url';
 import 'mocha';
+import { AdmobUrlQueryParameters } from 'AdMob/Parsers/ProgrammaticAdMobParser';
 
 describe('UrlTest', () => {
 
@@ -231,6 +232,17 @@ describe('UrlTest', () => {
         it('should not replace https://', () => {
             const url = Url.decodeProtocol('https://ad.doubleclick.net%2Fddm%2Fpfadx%2FN7088.284566THETRADEDESK%2FB21520108.235840185%3Bsz');
             assert.equal(url, 'https://ad.doubleclick.net%2Fddm%2Fpfadx%2FN7088.284566THETRADEDESK%2FB21520108.235840185%3Bsz');
+        });
+    });
+
+    describe('getQueryParameters', () => {
+        it('should get params from Admob Video Urls', () => {
+            const mediaUrl = 'https://www.youtube.com/get_video?video_id=AiOZtKQLGW4&ts=1549413290&t=MChfLOuFJXpYeSibNYZyx1--1Rs&gad=1&br=1&itag=22,18';
+            const videoId = Url.getQueryParameter(mediaUrl, AdmobUrlQueryParameters.VIDEO_ID);
+            assert.equal(videoId, 'AiOZtKQLGW4', 'Video ID incorrect');
+
+            const timestamp = Url.getQueryParameter(mediaUrl, AdmobUrlQueryParameters.TIMESTAMP);
+            assert.equal(timestamp, '1549413290', 'Timestamp incorrect');
         });
     });
 });
