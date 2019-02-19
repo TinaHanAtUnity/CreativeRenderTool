@@ -50,9 +50,9 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 SessionDiagnostics.trigger('admob_http_parse_error', {
                     responseCode: e.nativeResponse ? e.nativeResponse.responseCode : 0,
                     urlTimestamp: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP),
-                    utcTimestamp: Math.floor(Date.now() / 1000),
+                    unityTimestamp: Math.floor(Date.now() / 1000),
                     videoId: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.VIDEO_ID),
-                    url: this._mediaFileUrl
+                    videoFileUrl: this._mediaFileUrl
                 }, session);
                 throw e;
             }
