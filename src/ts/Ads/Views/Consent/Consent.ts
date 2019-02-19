@@ -86,18 +86,19 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
     }
 
     public onSwitchGroupSelectionChange(): void {
-        if (this._consentButtonContainer && !this._consentButtonContainer.classList.contains('hide-agree-and-no-thanks-buttons')) {
-            this._consentButtonContainer.classList.add('hide-agree-and-no-thanks-buttons');
-            ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
-                const transitionEndCallback = (evt: Event) => {
-                    this._consentButtonContainer.classList.add('show-save-my-choices-button');
-                    this._consentButtonContainer.removeEventListener(e, transitionEndCallback);
-                };
-                this._consentButtonContainer.addEventListener(e, transitionEndCallback);
-            });
-        } else {
-            this._consentButtonContainer.classList.remove('hide-agree-and-no-thanks-buttons');
+        if (this._consentButtonContainer) {
+            if (this.shouldShowSaveMyChoices()) {
+                this._consentButtonContainer.classList.add('show-save-my-choices-button');
+            } else {
+                this._consentButtonContainer.classList.remove('show-save-my-choices-button');
+            }
         }
+    }
+
+    private shouldShowSaveMyChoices() {
+        return this._switchGroup.isPersonalizedExperienceChecked() ||
+            this._switchGroup.isPersonalizedAdsChecked() ||
+            this._switchGroup.isAds3rdPartyChecked();
     }
 
     private onContinueEvent(event: Event) {
