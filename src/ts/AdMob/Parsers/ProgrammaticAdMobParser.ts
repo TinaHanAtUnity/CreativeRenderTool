@@ -16,6 +16,11 @@ import { AdmobParsingTest, ABGroup } from 'Core/Models/ABGroup';
 import { ProgrammaticTrackingService, ProgrammaticTrackingErrorName } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
+export enum AdmobUrlQueryParameters {
+    TIMESTAMP = 'ts',
+    VIDEO_ID = 'video_id'
+}
+
 export class ProgrammaticAdMobParser extends CampaignParser {
 
     public static ContentType = 'programmatic/admob-video';
@@ -44,9 +49,9 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 this._pts.reportError(ProgrammaticTrackingErrorName.AdmobTestHttpError, 'AdMob', this.seatID);
                 SessionDiagnostics.trigger('admob_http_parse_error', {
                     responseCode: e.nativeResponse ? e.nativeResponse.responseCode : 0,
-                    urlTimestamp: Url.getQueryParameter(this._mediaFileUrl, 'ts'),
-                    utcTimestamp: new Date().getUTCMilliseconds(),
-                    videoId: Url.getQueryParameter(this._mediaFileUrl, 'video_id'),
+                    urlTimestamp: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP),
+                    utcTimestamp: Math.floor(Date.now() / 1000),
+                    videoId: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.VIDEO_ID),
                     url: this._mediaFileUrl
                 }, session);
                 throw e;
