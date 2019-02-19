@@ -15,8 +15,6 @@ import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { Promo } from 'Promo/Views/Promo';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
-import { AuctionV5Test, ABGroup } from 'Core/Models/ABGroup';
-import { ProgrammaticTrackingErrorName, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign> {
     purchasing: IPurchasingApi;
@@ -31,8 +29,6 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _campaign: PromoCampaign;
     private _privacy: AbstractPrivacy;
     private _purchasing: IPurchasingApi;
-    private _pts: ProgrammaticTrackingService;
-    private _abGroup: ABGroup;
 
     private _keyDownListener: (kc: number) => void;
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
@@ -49,7 +45,6 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._keyDownListener = (kc: number) => this.onKeyDown(kc);
         this._privacy = parameters.privacy;
         this._purchasing = parameters.purchasing;
-        parameters.coreConfig.getAbGroup();
     }
 
     public getThirdPartyEventManager(): ThirdPartyEventManager {
@@ -153,9 +148,6 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 });
 
                 if(trackingEventUrls) {
-                    if (trackingEventUrls.length === 0 && eventName === 'impression') {
-                        this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this.description());
-                    }
                     for (const url of trackingEventUrls) {
                         this._thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
                     }
