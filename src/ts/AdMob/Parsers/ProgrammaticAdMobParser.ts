@@ -15,6 +15,7 @@ import { RequestError } from 'Core/Errors/RequestError';
 import { AdmobParsingTest, ABGroup } from 'Core/Models/ABGroup';
 import { ProgrammaticTrackingService, ProgrammaticTrackingErrorName } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { SdkStats } from 'Ads/Utilities/SdkStats';
 
 export enum AdmobUrlQueryParameters {
     TIMESTAMP = 'ts',
@@ -49,8 +50,9 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 this._pts.reportError(ProgrammaticTrackingErrorName.AdmobTestHttpError, 'AdMob', this.seatID);
                 SessionDiagnostics.trigger('admob_http_parse_error', {
                     responseCode: e.nativeResponse ? e.nativeResponse.responseCode : 0,
+                    adRequestTimestamp: Math.floor(SdkStats.getAdRequestTimestamp() / 1000),
                     urlTimestamp: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP),
-                    unityTimestamp: Math.floor(Date.now() / 1000),
+                    failureTimestamp: Math.floor(Date.now() / 1000),
                     videoId: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.VIDEO_ID),
                     videoFileUrl: this._mediaFileUrl
                 }, session);
