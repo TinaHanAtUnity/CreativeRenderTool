@@ -60,19 +60,24 @@ describe('CustomFeatures', () => {
         });
     });
 
-    describe('isCheetahGame', () => {
-        it('should return true if gameId is 2808037', () => {
-            const value = CustomFeatures.isCheetahGame('2808037');
+    describe('isCloseIconSkipEnabled', () => {
+        it('should return true if gameId is 2808037 (Cheetah GameID)', () => {
+            const value = CustomFeatures.isCloseIconSkipEnabled('2808037');
             assert.isTrue(value);
         });
 
         it('should return true if gameId is 2907326 (Bitmango GameID)', () => {
-            const value = CustomFeatures.isCheetahGame('2907326');
+            const value = CustomFeatures.isCloseIconSkipEnabled('2907326');
+            assert.isTrue(value);
+        });
+
+        it('should return true if gameId is 1558951 (Game7 GameID)', () => {
+            const value = CustomFeatures.isCloseIconSkipEnabled('1558951');
             assert.isTrue(value);
         });
 
         it('should return false if gameId is 99999', () => {
-            const value = CustomFeatures.isCheetahGame('99999');
+            const value = CustomFeatures.isCloseIconSkipEnabled('99999');
             assert.isFalse(value);
         });
     });

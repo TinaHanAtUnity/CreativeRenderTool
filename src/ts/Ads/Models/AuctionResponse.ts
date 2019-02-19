@@ -3,6 +3,11 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 
+export enum AuctionStatusCode {
+    NORMAL = 0,
+    FREQUENCY_CAP_REACHED = 999
+}
+
 export interface IRawAuctionResponse {
     auctionId?: string;
     correlationId: string;
@@ -19,6 +24,7 @@ export interface IRawAuctionV5Response {
     realtimeData?: { [key: string]: string };
     media: { [key: string]: IAuctionResponse };
     tracking: { [key: string]: ICampaignTrackingUrls | undefined };
+    statusCode?: number;
 }
 
 export interface IRawRealtimeResponse {
@@ -48,11 +54,12 @@ export interface IAuctionResponse {
     width: number | undefined;
     height: number | undefined;
     isMoatEnabled: boolean | undefined;
+    statusCode: number | undefined;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
 
-    constructor(placements: AuctionPlacement[], data: IAuctionResponse, mediaId: string, correlationId: string) {
+    constructor(placements: AuctionPlacement[], data: IAuctionResponse, mediaId: string, correlationId: string, statusCode?: number) {
         super('AuctionResponse', {
             placements: ['array'],
             contentType: ['string'],
@@ -73,7 +80,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             mediaId: ['string'],
             width: ['number', 'undefined'],
             height: ['number', 'undefined'],
-            isMoatEnabled: ['boolean', 'undefined']
+            isMoatEnabled: ['boolean', 'undefined'],
+            statusCode: ['number', 'undefined']
         });
 
         this.set('placements', placements);
@@ -96,6 +104,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('width', data.width);
         this.set('height', data.height);
         this.set('isMoatEnabled', data.isMoatEnabled);
+        this.set('statusCode', statusCode);
     }
 
     public getPlacements(): AuctionPlacement[] {
@@ -180,6 +189,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public isMoatEnabled(): boolean | undefined {
         return this.get('isMoatEnabled');
+    }
+
+    public getStatusCode(): number | undefined {
+        return this.get('statusCode');
     }
 
     public getDTO(): {[key: string]: unknown } {

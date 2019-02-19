@@ -1,5 +1,14 @@
-# Pending
+# Mon Feb 18 15:04:30 UTC 2019
 
+* Enable close icon skip also for Game7 games [#8273](https://github.com/Applifier/unity-ads-webview/pull/8273)
+* Disable multithreading A/B test [#8206](https://github.com/Applifier/unity-ads-webview/pull/8206)
+* Check DOM clean between tests [#8205](https://github.com/Applifier/unity-ads-webview/pull/8205)
+* ABtest for campaign refresh with auction status code [#8148](https://github.com/Applifier/unity-ads-webview/pull/8148)
+
+# Thu Feb 14 18:04:51 UTC 2019
+
+* Fix issue in components.styl that turned stylint off without turning it back on [#8252](https://github.com/Applifier/unity-ads-webview/pull/8252)
+* Take iPhone X series screen size better into use in performance ad endscreen [#8248](https://github.com/Applifier/unity-ads-webview/pull/8248)
 * Extend the install now button experiment in rewarded ads to all devices in the designated AB group [#8202](https://github.com/Applifier/unity-ads-webview/pull/8202)
 
 # Wed Feb 13 19:11:46 UTC 2019

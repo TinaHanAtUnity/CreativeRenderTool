@@ -39,14 +39,19 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
     }
 
     public hide(): Promise<void> {
-        const endScreen = this.getEndScreen();
-        if(endScreen) {
-            endScreen.hide();
-            endScreen.container().parentElement!.removeChild(endScreen.container());
+        if (this._endScreen) {
+            this._endScreen.hide();
+            const endScreenContainer = this._endScreen.container();
+            if (endScreenContainer && endScreenContainer.parentElement) {
+                endScreenContainer.parentElement.removeChild(endScreenContainer);
+            }
         }
         if (this._privacy) {
             this._privacy.hide();
-            this._privacy.container().parentElement!.removeChild(this._privacy.container());
+            const privacyContainer = this._privacy.container();
+            if (privacyContainer && privacyContainer.parentElement) {
+                privacyContainer.parentElement.removeChild(privacyContainer);
+            }
         }
 
         return super.hide();
