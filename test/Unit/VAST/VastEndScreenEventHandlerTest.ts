@@ -149,11 +149,13 @@ import EventTestVast from 'xml/EventTestVast.xml';
                 const vastEndScreen = new VastEndScreen(platform, vastEndScreenParameters, sinon.createStubInstance(Privacy));
                 vastAdUnitParameters.endScreen = vastEndScreen;
                 const vastAdUnit = new VastAdUnit(vastAdUnitParameters);
-                sinon.stub(vastAdUnit, 'hide').returns(sinon.spy());
+                sinon.spy(vastAdUnit, 'hide');
                 const vastEndScreenEventHandler = new VastEndScreenEventHandler(vastAdUnit, vastAdUnitParameters);
 
                 vastEndScreenEventHandler.onVastEndScreenClose();
                 sinon.assert.called(<sinon.SinonSpy>vastAdUnit.hide);
+                vastAdUnit.setShowing(true);
+                return vastAdUnit.hide();
             });
         });
 
@@ -179,6 +181,11 @@ import EventTestVast from 'xml/EventTestVast.xml';
                 vastEndScreenEventHandler = new VastEndScreenEventHandler(vastAdUnit, vastAdUnitParameters);
                 sinon.stub(vastAdUnit, 'sendTrackingEvent').returns(sinon.spy());
                 sinon.stub(vastAdUnit, 'sendCompanionClickTrackingEvent').returns(sinon.spy());
+            });
+
+            afterEach(() => {
+                vastAdUnit.setShowing(true);
+                return vastAdUnit.hide();
             });
 
             if(platform === Platform.IOS) {

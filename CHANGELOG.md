@@ -1,6 +1,9 @@
-# Merged
+# Mon Feb 18 15:04:30 UTC 2019
 
+* Enable close icon skip also for Game7 games [#8273](https://github.com/Applifier/unity-ads-webview/pull/8273)
 * Disable multithreading A/B test [#8206](https://github.com/Applifier/unity-ads-webview/pull/8206)
+* Check DOM clean between tests [#8205](https://github.com/Applifier/unity-ads-webview/pull/8205)
+* ABtest for campaign refresh with auction status code [#8148](https://github.com/Applifier/unity-ads-webview/pull/8148)
 
 # Thu Feb 14 18:04:51 UTC 2019
 

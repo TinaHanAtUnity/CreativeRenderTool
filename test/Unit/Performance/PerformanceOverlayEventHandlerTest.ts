@@ -163,6 +163,11 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         performanceOverlayEventHandler = new PerformanceOverlayEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
     });
 
+    afterEach(() => {
+        performanceAdUnit.setShowing(true);
+        return performanceAdUnit.hide();
+    });
+
     describe('with onSkip', () => {
         it('should show end screen', () => {
             assert.isDefined(endScreen, 'endScreen not defined');
