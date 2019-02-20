@@ -1,18 +1,19 @@
 import { StoreManager } from 'Store/Managers/StoreManager';
 import { ICore } from 'Core/ICore';
 import { IStoreApi } from 'Store/IStore';
-import { IGooglePurchaseData, IGooglePurchases, IGooglePurchaseStatus } from 'Store/Native/Android/Store';
+import { IGooglePurchaseData, IGooglePurchaseStatus } from 'Store/Native/Android/Store';
 import { GoogleStore } from 'Store/Utilities/GoogleStore';
 import { StoreTransaction } from 'Store/Models/StoreTransaction';
 
 export class GoogleStoreManager extends StoreManager {
     private _googleStore: GoogleStore;
-    private _existingOrderIds: string[];
+    private _existingOrderIds: { [activity: string]: string[] };
 
     constructor(core: ICore, store: IStoreApi) {
         super(core, store);
 
         this._googleStore = new GoogleStore(store);
+        this._existingOrderIds = {};
     }
 
     public startTracking(): void {
@@ -37,51 +38,47 @@ export class GoogleStoreManager extends StoreManager {
     }
 
     private onPurchaseStatusOnResume(activity: string, data: IGooglePurchaseStatus) {
-        // todo: implement method
+        this._core.Api.Sdk.logInfo('GOOGLE PURCHASE STATUS ONRESUME: ' + activity + ' ' + JSON.stringify(data)); // todo: remove debug logging before merging to master
+
+        const orderIds: string[] = [];
+
+        if(data.inapp) {
+            if(data.inapp.purchaseDataList && data.inapp.purchaseDataList.length > 0) {
+                for(const purchaseData of data.inapp.purchaseDataList) {
+                    orderIds.push(purchaseData.orderId);
+                }
+            }
+        }
+
+        this._existingOrderIds[activity] = orderIds;
     }
 
     private onPurchaseStatusOnStop(activity: string, data: IGooglePurchaseStatus) {
-        // todo: implement method
-    }
+        this._core.Api.Sdk.logInfo('GOOGLE PURCHASE STATUS ONSTOP: ' + activity + ' ' + JSON.stringify(data)); // todo: remove debug logging before merging to master
 
-    /*
-    private onBillingStart(data: IGooglePurchases) {
-        this._core.Api.Sdk.logInfo('GOOGLE BILLING START: ' + JSON.stringify(data)); // todo: remove debug logging before merging to master
-
-        this._existingOrderIds = [];
-
-        if(data.purchaseDataList && data.purchaseDataList.length > 0) {
-            for(const purchaseData of data.purchaseDataList) {
-                this._existingOrderIds.push(purchaseData.orderId);
-            }
-        }
-    }
-
-    private onBillingEnd(data: IGooglePurchases) {
-        this._core.Api.Sdk.logInfo('GOOGLE BILLING END: ' + JSON.stringify(data)); // todo: remove debug logging before merging to master
-
-        if(data.purchaseDataList && data.purchaseDataList.length > 0) {
-            data.purchaseDataList.forEach((purchaseData: IGooglePurchaseData, index: number) => {
-                if(purchaseData.orderId && this.isNewPurchase(purchaseData.orderId)) {
-                    if(data.signatureList && data.signatureList[index]) {
-                        this.logNewPurchase(purchaseData, data.signatureList[index]);
-                    } else {
-                        this.logNewPurchase(purchaseData, 'SIGNATUREMISSING');
-                        // todo: proper error handling
+        if(data.inapp) {
+            if(data.inapp.purchaseDataList && data.inapp.purchaseDataList.length > 0) {
+                data.inapp.purchaseDataList.forEach((purchaseData: IGooglePurchaseData, index: number) => {
+                    if(purchaseData.orderId && this.isNewPurchase(activity, purchaseData.orderId)) {
+                        if(data.inapp!.signatureList && data.inapp!.signatureList[index]) {
+                            this.logNewPurchase(purchaseData, data.inapp!.signatureList[index]);
+                        } else {
+                            this.logNewPurchase(purchaseData, 'SIGNATUREMISSING');
+                            // todo: proper error handling
+                        }
                     }
-                }
+                });
+            }
+
+            this._googleStore.getPurchaseHistory('inapp').then(history => {
+                this._core.Api.Sdk.logInfo('GOOGLE INAPP PURCHASE HISTORY: ' + JSON.stringify(history));
             });
         }
-
-        this._googleStore.getPurchaseHistory('inapp').then(history => {
-            this._core.Api.Sdk.logInfo('GOOGLE INAPP PURCHASE HISTORY: ' + JSON.stringify(history));
-        });
     }
-    */
 
-    private isNewPurchase(orderId: string) {
-        if(this._existingOrderIds) {
-            if(this._existingOrderIds.indexOf(orderId) !== -1) {
+    private isNewPurchase(activity: string, orderId: string) {
+        if(this._existingOrderIds[activity]) {
+            if(this._existingOrderIds[activity].indexOf(orderId) !== -1) {
                 return false;
             }
         }
