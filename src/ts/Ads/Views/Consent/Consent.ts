@@ -11,7 +11,10 @@ import {
     IPersonalizationSwitchGroupHandler,
     PersonalizationSwitchGroup
 } from 'Ads/Views/Consent/PersonalizationSwitchGroup';
-import { PrivacyRowItemContainer } from 'Ads/Views/Consent/PrivacyRowItemContainer';
+import {
+    IPrivacyRowItemContainerHandler,
+    PrivacyRowItemContainer
+} from 'Ads/Views/Consent/PrivacyRowItemContainer';
 
 export interface IUnityConsentViewParameters {
     platform: Platform;
@@ -20,7 +23,7 @@ export interface IUnityConsentViewParameters {
     apiLevel?: number;
 }
 
-export class Consent extends View<IConsentViewHandler> implements IPersonalizationSwitchGroupHandler {
+export class Consent extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationSwitchGroupHandler {
 
     private _apiLevel?: number;
 
@@ -64,6 +67,7 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
         this._switchGroup = new PersonalizationSwitchGroup(parameters.platform, parameters.privacyManager);
         this._switchGroup.addEventHandler(this);
         this._privacyRowItemContainer = new PrivacyRowItemContainer(parameters.platform, parameters.privacyManager);
+        this._privacyRowItemContainer.addEventHandler(this);
     }
 
     // public testAutoConsent(consent: IPermissions): void {
@@ -103,6 +107,18 @@ export class Consent extends View<IConsentViewHandler> implements IPersonalizati
                 this._consentButtonContainer.classList.remove('show-save-my-choices-button');
             }
         }
+    }
+
+    public onDataDeletion(): void {
+        this._switchGroup.checkCheckboxes(false);
+    }
+
+    public onShowDataDeletionDialog(): void {
+        // do nothing
+    }
+
+    public onPrivacy(url: string): void {
+        this._handlers.forEach(handler => handler.onPrivacy(url));
     }
 
     private shouldShowSaveMyChoices() {
