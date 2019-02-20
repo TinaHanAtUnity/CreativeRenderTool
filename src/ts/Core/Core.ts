@@ -14,12 +14,13 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { toAbGroup } from 'Core/Models/ABGroup';
+import { toAbGroup, TimerlessBatchingTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { UnityInfo } from 'Core/Models/UnityInfo';
 import { BroadcastApi } from 'Core/Native/Android/Broadcast';
 import { IntentApi } from 'Core/Native/Android/Intent';
 import { LifecycleApi } from 'Core/Native/Android/Lifecycle';
@@ -42,14 +43,14 @@ import { StorageApi } from 'Core/Native/Storage';
 import { CoreConfigurationParser, IRawCoreConfiguration } from 'Core/Parsers/CoreConfigurationParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
+import { JsonParser } from 'Core/Utilities/JsonParser';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
-import { Purchasing } from 'Purchasing/Purchasing';
-import { JsonParser } from 'Core/Utilities/JsonParser';
-import { UnityInfo } from 'Core/Models/UnityInfo';
 import { Store } from 'Store/Store';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
+import { Purchasing } from 'Purchasing/Purchasing';
+import { UIWebViewBridge } from 'Core/Native/Bridge/UIWebViewBridge';
 
 export class Core implements ICore {
 
@@ -208,6 +209,14 @@ export class Core implements ICore {
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
 
+            if(TimerlessBatchingTest.isValid(this.Config.getAbGroup())) {
+                this.NativeBridge.setAutoBatchEnabled(true);
+                this.NativeBridge.setTimerlessBatching(true);
+                if(this.NativeBridge.getPlatform() === Platform.IOS) {
+                    UIWebViewBridge.setAsync(true);
+                }
+            }
+
             HttpKafka.setConfiguration(this.Config);
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
 
@@ -233,7 +242,7 @@ export class Core implements ICore {
         }).then(() => {
             this.JaegerManager.stop(jaegerInitSpan);
 
-            if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
+            if(this.NativeBridge.getPlatform() === Platform.ANDROID && !TimerlessBatchingTest.isValid(this.Config.getAbGroup())) {
                 this.NativeBridge.setAutoBatchEnabled(false);
             }
         }).catch((error: { message: string; name: unknown }) => {
