@@ -34,6 +34,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _permissionLearnMoreOpen: boolean;
     private _arAvailableButton: HTMLElement;
     private _arCameraAlreadyAccepted: boolean;
+    private _arAvailableButtonShown: boolean;
 
     private _iframeLoaded = false;
 
@@ -68,6 +69,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._template = new Template(ExtendedMRAIDTemplate, this._localization);
         this._permissionLearnMoreOpen = false;
         this._viewable = false;
+        this._arAvailableButtonShown = false;
 
         this._bindings = this._bindings.concat([
             {
@@ -511,26 +513,16 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._loadingScreen.classList.add('hidden');
     }
 
-    private onPrivacyClicked(event: Event) {
-        event.stopPropagation();
-        event.preventDefault();
-        const url = (<HTMLLinkElement>event.target).href;
-        if (this._platform === Platform.IOS) {
-            this._core.iOS!.UrlScheme.open(url);
-        } else if (this._platform === Platform.ANDROID) {
-            this._core.Android!.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': url
-            });
-        }
-    }
-
     private hideArAvailableButton() {
         this._arAvailableButton.classList.add('hidden');
         this._arAvailableButton.style.display = 'none';
     }
 
     private showArAvailableButton() {
+        if (this._arAvailableButtonShown) {
+            return;
+        }
+
         ARUtil.isARSupported(this._ar).then(supported => {
             this._loadingScreen.classList.add('hidden');
 
@@ -560,6 +552,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
                     this._arAvailableButton.classList.remove('hidden');
                     this._arAvailableButton.style.display = 'block';
+                    this._arAvailableButtonShown = true;
                 }
             });
         });
@@ -568,5 +561,19 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     protected onArReadyToShowEvent(msg: MessageEvent): Promise<void> {
         this.showArAvailableButton();
         return Promise.resolve();
+    }
+
+    private onPrivacyClicked(event: Event) {
+        event.stopPropagation();
+        event.preventDefault();
+        const url = (<HTMLLinkElement>event.target).href;
+        if (this._platform === Platform.IOS) {
+            this._core.iOS!.UrlScheme.open(url);
+        } else if (this._platform === Platform.ANDROID) {
+            this._core.Android!.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
+        }
     }
 }
