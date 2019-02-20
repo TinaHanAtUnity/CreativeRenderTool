@@ -1,3 +1,14 @@
+# Staged
+
+* Ping-Pong native bridge batching [#8153](https://github.com/Applifier/unity-ads-webview/pull/8153)
+* Invalidate backup campaign if force campaign id is in use [#8324](https://github.com/Applifier/unity-ads-webview/pull/8324)
+
+# Wed Feb 20 01:03:52 UTC 2019
+
+* Add SessionDiagnostic for Admob HTTP Errors [#8297](https://github.com/Applifier/unity-ads-webview/pull/8297)
+* Disable Vast Strict and Webplayer MRAID AB Tests on Groups 16 and 19 [#8303](https://github.com/Applifier/unity-ads-webview/pull/8303)
+* Remove PTS Tracking of Missing Starts/Impressions [#8275](https://github.com/Applifier/unity-ads-webview/pull/8275)
+
 # Mon Feb 18 15:04:30 UTC 2019
 
 * Enable close icon skip also for Game7 games [#8273](https://github.com/Applifier/unity-ads-webview/pull/8273)
