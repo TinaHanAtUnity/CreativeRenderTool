@@ -1,4 +1,4 @@
-# Pending
+# Wed Feb 20 01:03:52 UTC 2019
 
 * Add SessionDiagnostic for Admob HTTP Errors [#8297](https://github.com/Applifier/unity-ads-webview/pull/8297)
 * Disable Vast Strict and Webplayer MRAID AB Tests on Groups 16 and 19 [#8303](https://github.com/Applifier/unity-ads-webview/pull/8303)
