@@ -1,7 +1,12 @@
-# Staged
+# Wed Feb 20 21:17:27 UTC 2019
 
 * Ping-Pong native bridge batching [#8153](https://github.com/Applifier/unity-ads-webview/pull/8153)
 * Invalidate backup campaign if force campaign id is in use [#8324](https://github.com/Applifier/unity-ads-webview/pull/8324)
+* Remove Dead Code [#8251](https://github.com/Applifier/unity-ads-webview/pull/8251)
+* Remove support for promotions served by server [#8174](https://github.com/Applifier/unity-ads-webview/pull/8174)
+* Add Group 16 to Auction V5 Test [#8348](https://github.com/Applifier/unity-ads-webview/pull/8348)
+* Swap Bytedance AB Test and Reduce click_delay Diagnostic [#8347](https://github.com/Applifier/unity-ads-webview/pull/8347)
+
 
 # Wed Feb 20 01:03:52 UTC 2019
 

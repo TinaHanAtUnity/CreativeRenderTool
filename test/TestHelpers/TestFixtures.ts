@@ -498,7 +498,6 @@ export class TestFixtures {
 
     public static getPromoCampaignParams(json: any, adType?: string, rewardedPromo?: boolean): IPromoCampaign {
         const session = this.getSession();
-        const isRewardedPromo = (rewardedPromo !== undefined) ? rewardedPromo : false;
         const costProductInfoList: ProductInfo[] = [];
         const payoutProductInfoList: ProductInfo[] = [];
         const costProductInfo: IProductInfo = {
@@ -521,8 +520,6 @@ export class TestFixtures {
         return {
             ... this.getCometCampaignBaseParams(session, json.promo.id, json.meta, adType),
             trackingUrls: json.promo.tracking ? json.promo.tracking : {}, // Overwrite tracking urls from comet campaign
-            dynamicMarkup: json.promo.dynamicMarkup,
-            creativeAsset: new HTML(json.promo.creativeUrl, session),
             limitedTimeOffer: undefined,
             costs: costProductInfoList,
             payouts: payoutProductInfoList,
