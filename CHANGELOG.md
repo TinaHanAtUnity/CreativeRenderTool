@@ -1,3 +1,8 @@
+# Staged
+
+* Ping-Pong native bridge batching [#8153](https://github.com/Applifier/unity-ads-webview/pull/8153)
+* Invalidate backup campaign if force campaign id is in use [#8324](https://github.com/Applifier/unity-ads-webview/pull/8324)
+
 # Wed Feb 20 01:03:52 UTC 2019
 
 * Add SessionDiagnostic for Admob HTTP Errors [#8297](https://github.com/Applifier/unity-ads-webview/pull/8297)
