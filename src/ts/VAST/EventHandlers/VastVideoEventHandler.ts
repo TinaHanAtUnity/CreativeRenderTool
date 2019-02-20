@@ -6,24 +6,18 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { ProgrammaticTrackingService, ProgrammaticTrackingErrorName } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { AuctionV5Test, ABGroup } from 'Core/Models/ABGroup';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 
     private _vastAdUnit: VastAdUnit;
     private _vastCampaign: VastCampaign;
     private _clientInfo: ClientInfo;
-    private _pts: ProgrammaticTrackingService;
-    private _abGroup: ABGroup;
 
     constructor(params: IVideoEventHandlerParams<VastAdUnit, VastCampaign>) {
         super(params);
         this._vastAdUnit = params.adUnit;
         this._vastCampaign = params.campaign;
         this._clientInfo = params.clientInfo;
-        this._pts = params.programmaticTrackingService;
-        this._abGroup = params.coreConfig.getAbGroup();
     }
 
     public onProgress(progress: number): void {
@@ -170,9 +164,6 @@ export class VastVideoEventHandler extends VideoEventHandler {
     private sendThirdPartyTrackingEvent(eventName: string): void {
         const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
-            if (trackingEventUrls.length === 0 && eventName === 'start') {
-                this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this._vastAdUnit.description());
-            }
             for (const url of trackingEventUrls) {
                 this.sendThirdPartyEvent(`vast ${eventName}`, url);
             }
