@@ -78,10 +78,10 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             if (CTAClickHandlingTest.isValid(this._abGroup) && CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
                 return this.openUrlOnCallButton(clickThroughURL, Date.now() - ctaClickedTime, clickThroughURL);
             } else {
-                return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
-                    return this.openUrlOnCallButton(url, Date.now() - ctaClickedTime, clickThroughURL);
-                }).catch(() => {
-                    return this.openUrlOnCallButton(clickThroughURL, Date.now() - ctaClickedTime, clickThroughURL);
+                return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking, CTAClickHandlingTest.isValid(this._abGroup)).catch(() => {
+                    return clickThroughURL;
+                }).then((storeUrl: string) => {
+                    return this.openUrlOnCallButton(storeUrl, Date.now() - ctaClickedTime, clickThroughURL);
                 });
             }
         } else {

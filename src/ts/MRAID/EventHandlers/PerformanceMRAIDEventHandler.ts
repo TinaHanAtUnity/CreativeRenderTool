@@ -6,6 +6,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { RequestError } from 'Core/Errors/RequestError';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
+import { CTAClickHandlingTest } from 'Core/Models/ABGroup';
 
 export class PerformanceMRAIDEventHandler extends MRAIDEventHandler implements IMRAIDViewHandler {
 
@@ -18,10 +19,10 @@ export class PerformanceMRAIDEventHandler extends MRAIDEventHandler implements I
         if (this._campaign.getClickAttributionUrl()) {
             this.handleClickAttribution();
             if (!this._campaign.getClickAttributionUrlFollowsRedirects()) {
-                return this._request.followRedirectChain(url).then((storeUrl) => {
+                return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking(), CTAClickHandlingTest.isValid(this._abGroup)).catch(() => {
+                    return url;
+                }).then((storeUrl) => {
                     return this.openUrlOnCallButton(storeUrl, Date.now() - ctaClickedTime, url);
-                }).catch(() => {
-                    return this.openUrlOnCallButton(url, Date.now() - ctaClickedTime, url);
                 });
             }
         } else {
