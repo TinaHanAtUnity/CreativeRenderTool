@@ -14,7 +14,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { toAbGroup, VastParsingStrictTest } from 'Core/Models/ABGroup';
+import { toAbGroup, TimerlessBatchingTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -207,7 +207,7 @@ export class Core implements ICore {
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
 
-            if(VastParsingStrictTest.isValid(this.Config.getAbGroup())) {
+            if(TimerlessBatchingTest.isValid(this.Config.getAbGroup())) {
                 this.NativeBridge.setAutoBatchEnabled(true);
                 this.NativeBridge.useTimerlessBatching(true);
                 if(this.NativeBridge.getPlatform() === Platform.IOS) {
@@ -234,7 +234,7 @@ export class Core implements ICore {
         }).then(() => {
             this.JaegerManager.stop(jaegerInitSpan);
 
-            if(this.NativeBridge.getPlatform() === Platform.ANDROID && !VastParsingStrictTest.isValid(this.Config.getAbGroup())) {
+            if(this.NativeBridge.getPlatform() === Platform.ANDROID && !TimerlessBatchingTest.isValid(this.Config.getAbGroup())) {
                 this.NativeBridge.setAutoBatchEnabled(false);
             }
         }).catch((error: { message: string; name: unknown }) => {
