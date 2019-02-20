@@ -1,4 +1,4 @@
-# Staged
+# Wed Feb 20 21:17:27 UTC 2019
 
 * Ping-Pong native bridge batching [#8153](https://github.com/Applifier/unity-ads-webview/pull/8153)
 * Invalidate backup campaign if force campaign id is in use [#8324](https://github.com/Applifier/unity-ads-webview/pull/8324)
