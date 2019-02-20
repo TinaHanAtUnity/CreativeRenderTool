@@ -209,7 +209,7 @@ export class Core implements ICore {
 
             if(TimerlessBatchingTest.isValid(this.Config.getAbGroup())) {
                 this.NativeBridge.setAutoBatchEnabled(true);
-                this.NativeBridge.useTimerlessBatching(true);
+                this.NativeBridge.setTimerlessBatching(true);
                 if(this.NativeBridge.getPlatform() === Platform.IOS) {
                     UIWebViewBridge.setAsync(true);
                 }

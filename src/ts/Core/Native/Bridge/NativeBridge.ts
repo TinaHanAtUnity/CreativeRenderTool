@@ -153,7 +153,7 @@ export class NativeBridge implements INativeBridge {
         this._autoBatchEnabled = enabled;
     }
 
-    public useTimerlessBatching(value: boolean) {
+    public setTimerlessBatching(value: boolean) {
         this._timerlessBatching = value;
     }
 
