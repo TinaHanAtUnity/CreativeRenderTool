@@ -1,3 +1,8 @@
+# Staged
+
+* Update 3rd party list [#8350](https://github.com/Applifier/unity-ads-webview/pull/8350)
+* Fix Privacy settings layout on iPhone X [#8300](https://github.com/Applifier/unity-ads-webview/pull/8300)
+
 # Wed Feb 20 21:17:27 UTC 2019
 
 * Ping-Pong native bridge batching [#8153](https://github.com/Applifier/unity-ads-webview/pull/8153)
