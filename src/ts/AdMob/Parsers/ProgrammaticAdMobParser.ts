@@ -50,13 +50,15 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 this._pts.reportError(ProgrammaticTrackingErrorName.AdmobTestHttpError, 'AdMob', this.seatID);
                 if (e.nativeResponse && e.nativeResponse.responseCode) {
                     SessionDiagnostics.trigger('admob_http_parse_error', {
-                        responseCode: e.nativeResponse.responseCode,
-                        adRequestTimestamp: Math.floor(SdkStats.getAdRequestTimestamp() / 1000),
-                        urlTimestamp: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP),
-                        failureTimestamp: Math.floor(Date.now() / 1000),
                         videoId: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.VIDEO_ID),
+                        urlTimestamp: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP),
+                        adRequestTimestamp: Math.floor(SdkStats.getAdRequestTimestamp() / 1000),
+                        failureTimestamp: Math.floor(Date.now() / 1000),
                         initialVideoUrl: this._mediaFileUrl,
-                        redirectedUrl: e.nativeResponse.url
+                        responseCode: e.nativeResponse.responseCode,
+                        redirectedUrl: e.nativeResponse.url,
+                        headers: e.nativeResponse.headers,
+                        response: e.nativeResponse.response
                     }, session);
                 }
                 throw e;
