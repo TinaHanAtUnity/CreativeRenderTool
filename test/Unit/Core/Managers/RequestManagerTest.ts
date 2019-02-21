@@ -325,6 +325,17 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     assert.equal(e.message, 'Fail response');
                 });
             });
+
+            it('should not make HEAD request if clickUrl is appStoreUrlTemplate with skipAppStoreUrl true', () => {
+                const redirectUrl: string = 'https://play.google.com/store/apps/details?id=com.playgendary.tanks';
+                sinon.spy(request, 'head');
+                return request.followRedirectChain(redirectUrl, true, true).catch(() => {
+                    return redirectUrl;
+                }).then((url) => {
+                    sinon.assert.notCalled(<sinon.SinonSpy>request.head);
+                    assert.equal(url, redirectUrl);
+                });
+            });
         });
     });
 });
