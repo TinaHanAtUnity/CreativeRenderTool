@@ -13,7 +13,8 @@ import {
 } from 'Ads/Views/Consent/PersonalizationSwitchGroup';
 import {
     IPrivacyRowItemContainerHandler,
-    PrivacyRowItemContainer
+    PrivacyRowItemContainer,
+    PrivacyTextParagraph
 } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 
 export interface IUnityConsentViewParameters {
@@ -21,6 +22,12 @@ export interface IUnityConsentViewParameters {
     privacyManager: UserPrivacyManager;
     consentSettingsView: UnityConsentSettings;
     apiLevel?: number;
+}
+
+enum Page {
+    HOMESCREEN,
+    INTRO,
+    MY_CHOICES,
 }
 
 export class Consent extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationSwitchGroupHandler {
@@ -31,6 +38,8 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private _switchGroup: PersonalizationSwitchGroup;
     private _privacyRowItemContainer: PrivacyRowItemContainer;
     private _consentButtonContainer: HTMLElement;
+
+    private _currentPage: Page;
 
     constructor(parameters: IUnityConsentViewParameters) {
         super(parameters.platform, 'consent');
@@ -61,6 +70,45 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
                 event: 'click',
                 listener: (event: Event) => this.onSaveMyChoicesEvent(event),
                 selector: '.save-my-choices'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onAcceptAllEvent(event),
+                selector: '.accept-all'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onOptionsEvent(event),
+                selector: '.show-choices'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onThirdPartiesLinkEvent(event),
+                selector: '.third-parties-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onDataLinkEvent(event),
+                selector: '.data-link'
+            },            {
+                event: 'click',
+                listener: (event: Event) => this.onDemographicInfoLinkEvent(event),
+                selector: '.demographic-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onMobileIdentifiersLinkEvent(event),
+                selector: '.mobile-identifiers-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPersonalizationLink(event),
+                selector: '.personalization-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onMeasurementLinkEvent(event),
+                selector: '.measurement-link'
             }
         ];
 
@@ -91,7 +139,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             this._container.classList.add('old-androids');
         }
 
-        this.container().classList.add('intro');
+        this.container().classList.add('homescreen');
     }
 
     public show(): void {
@@ -127,10 +175,63 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             this._switchGroup.isAds3rdPartyChecked();
     }
 
+    private closeWithAnimation(buttonElement: HTMLElement): void {
+        this.container().classList.add('prevent-clicks');
+
+        const buttonSpinner = new ButtonSpinner(this._platform);
+        buttonSpinner.render();
+        buttonElement.appendChild(buttonSpinner.container());
+        buttonElement.classList.add('click-animation');
+
+        setTimeout(() => {
+            this._handlers.forEach(h => h.onClose());
+        }, 1500);
+    }
+
+    private showPage(page: Page) {
+        this._currentPage = page;
+
+        let classToAdd: string;
+
+        switch (page) {
+            case Page.HOMESCREEN:
+                classToAdd = 'homescreen';
+                break;
+            case Page.INTRO:
+                classToAdd = 'intro';
+                break;
+            case Page.MY_CHOICES:
+                classToAdd = 'mychoices';
+                break;
+            default:
+                classToAdd = 'mychoices';
+        }
+
+        const states = ['homescreen', 'intro', 'mychoices'];
+        states.forEach(state => {
+            if (state === classToAdd) {
+                this.container().classList.add(classToAdd);
+            } else {
+                this.container().classList.remove(state);
+            }
+        });
+    }
+
     private onContinueEvent(event: Event) {
         event.preventDefault();
 
         this.container().classList.remove('intro');
+    }
+
+    private onAcceptAllEvent(event: Event) {
+        event.preventDefault();
+
+        const permissions: IPermissions = {
+            all: true
+        };
+        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
+        const element = (<HTMLElement>this._container.querySelector('.accept-all'));
+        this.closeWithAnimation(element);
     }
 
     private onAgreeEvent(event: Event) {
@@ -175,16 +276,39 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this.closeWithAnimation(element);
     }
 
-    private closeWithAnimation(buttonElement: HTMLElement): void {
-        this.container().classList.add('prevent-clicks');
+    private onOptionsEvent(event: Event) {
+        event.preventDefault();
 
-        const buttonSpinner = new ButtonSpinner(this._platform);
-        buttonSpinner.render();
-        buttonElement.appendChild(buttonSpinner.container());
-        buttonElement.classList.add('click-animation');
+        this.showPage(Page.MY_CHOICES);
+    }
 
-        setTimeout(() => {
-            this._handlers.forEach(h => h.onClose());
-        }, 1500);
+    private onThirdPartiesLinkEvent(event: Event): void {
+        event.preventDefault();
+        this._privacyRowItemContainer.showParagraphAndScrollToSection(PrivacyTextParagraph.THIRD_PARTIES);
+    }
+
+    private onDataLinkEvent(event: Event): void {
+        event.preventDefault();
+        this._privacyRowItemContainer.showParagraphAndScrollToSection(PrivacyTextParagraph.DATA);
+    }
+
+    private onDemographicInfoLinkEvent(event: Event): void {
+        event.preventDefault();
+        this._privacyRowItemContainer.showParagraphAndScrollToSection(PrivacyTextParagraph.DEMOGRAPHIC_INFO);
+    }
+
+    private onMobileIdentifiersLinkEvent(event: Event): void {
+        event.preventDefault();
+        this._privacyRowItemContainer.showParagraphAndScrollToSection(PrivacyTextParagraph.MOBILE_IDENTIFIERS);
+    }
+
+    private onPersonalizationLink(event: Event): void {
+        event.preventDefault();
+        this._privacyRowItemContainer.showParagraphAndScrollToSection(PrivacyTextParagraph.PERSONALIZATION);
+    }
+
+    private onMeasurementLinkEvent(event: Event): void {
+        event.preventDefault();
+        this._privacyRowItemContainer.showParagraphAndScrollToSection(PrivacyTextParagraph.MEASUREMENT);
     }
 }

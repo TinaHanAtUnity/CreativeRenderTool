@@ -17,6 +17,46 @@
     pointer-events: none;
   }
 
+  &:not(.intro) {
+    #consent-my-choices {
+      display: flex;
+    }
+    #consent-introduction {
+      display: none;
+    }
+
+    #consent-homescreen {
+      display: none;
+    }
+  }
+
+  &.intro {
+    #consent-my-choices {
+      display: none;
+    }
+    #consent-introduction {
+      display: block;
+    }
+
+    #consent-homescreen {
+      display: none;
+    }
+  }
+
+  &.homescreen {
+    #consent-my-choices {
+      display: none;
+    }
+    #consent-introduction {
+      display: none;
+    }
+
+    #consent-homescreen {
+      display: flex;
+    }
+  }
+
+
   &.old-androids {
     .consent-button-container {
       position: absolute;
@@ -32,7 +72,7 @@
       height: 100%;
     }
 
-    .consent-container {
+    #consent-my-choices {
       padding-bottom: 6 * $default-size;
     }
 
@@ -99,7 +139,7 @@
     }
   }
 
-  .consent-container {
+  #consent-my-choices {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -108,25 +148,6 @@
     border-radius: .5 * $default-size;
     background: $white;
   }
-
-  &:not(.intro) {
-    .consent-container {
-      display: flex;
-    }
-    .consent-introduction {
-      display: none;
-    }
-  }
-
-  &.intro {
-    .consent-container {
-      display: none;
-    }
-    .consent-introduction {
-      display: block;
-    }
-  }
-
   .consent-settings {
     position: relative;
     overflow: auto;
@@ -268,23 +289,139 @@
 
 &.landscape {
   #consent {
-    .consent-introduction,
-    .consent-container {
+    #consent-introduction,
+    #consent-my-choices {
       left: 15%;
       width: 70%;
     }
 
-    .consent-container {
+    #consent-my-choices {
       height: 100%;
     }
 
-    .consent-introduction {
+    #consent-introduction {
       .continue-button {
         padding: .5 * $default-size 2 * $default-size $default-size 2 * $default-size;
       }
     }
   }
 }
+
+#consent-homescreen {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  justify-content: center;
+  text-align: center;
+
+  &.prevent-clicks {
+    pointer-events: none;
+  }
+
+  .homescreen-container {
+    position: relative;
+    align-self: center;
+    margin: 0 $default-size;
+    padding: 2 * $default-size 2 * $default-size 1.5 * $default-size 2 * $default-size;
+    border-radius: .5 * $default-size;
+    background: white;
+  }
+
+  .stripe {
+    display: none;
+  }
+
+  .item {
+    margin: 0 0 $default-size 0;
+  }
+
+  .privacy-logo {
+    color: $black;
+    text-align: center;
+    font-size: $privacy-text-font-size * 2;
+  }
+
+  .title {
+    font-weight: $privacy-main-title-font-weight;
+  }
+  .description {
+    color: $privacy-text-color;
+    font-weight: $privacy-text-font-weight;
+    font-size: $privacy-text-font-size;
+    line-height: $default-size;
+  }
+
+  .accept-all {
+    $privacy-blue-button-default();
+    margin-bottom: .5 * $default-size;
+  }
+
+  .show-choices {
+    $privacy-white-button-default();
+  }
+
+  .consent-button {
+    position: relative;
+    padding: $default-size;
+  }
+
+  .page-link {
+    text-decoration: underline;
+    // color: $blue;
+    cursor: pointer;
+
+  }
+
+  .unityads-logo {
+    $set-image(100%, $default-scale-size * $default-size, 0, "../img/unityads.png", contain);
+  }
+
+  .click-animation.agree {
+    $click-animation();
+  }
+}
+
+body {
+  &.landscape #consent-homescreen {
+    .homescreen-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin: $default-size 2 * $default-size;
+    }
+
+    .homescreen-container {
+      position: relative;
+      align-self: center;
+      margin: 0 $default-size;
+      padding: 1.5 * $default-size 1.5 * $default-size $default-size 1.5 * $default-size;
+      border-radius: .5 * $default-size;
+      background: white;
+    }
+
+    .stripe {
+      position: absolute;
+      display: block;
+      top: 0;
+      width: 1px;
+      height: 100%;
+      background-color: $consent-divider-color;
+    }
+
+    .top-container {
+      flex: 0 1 50%;
+      margin-right: 1.5 * $default-size;
+    }
+
+    .bottom-container {
+      flex: 0 1 50%;
+      margin-left: 1.5 * $default-size;
+    }
+  }
+}
+
 
 $iphone-x-paddings() {
   #consent {
