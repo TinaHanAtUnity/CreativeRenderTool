@@ -48,7 +48,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
             if (AdmobParsingTest.isValid(this._abGroup) && e instanceof RequestError) {
                 // Video attempting to be shown is no longer being hosted by Admob
                 this._pts.reportError(ProgrammaticTrackingErrorName.AdmobTestHttpError, 'AdMob', this.seatID);
-                if (e.nativeResponse && e.nativeResponse.responseCode) {
+                if (e.nativeResponse) {
                     SessionDiagnostics.trigger('admob_http_parse_error', {
                         videoId: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.VIDEO_ID),
                         urlTimestamp: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP),
