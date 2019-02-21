@@ -17,7 +17,7 @@ export interface IApplePayment {
 export interface IAppleTransaction {
     productId: string;
     transactionState: number;
-    transactionDate: string;
+    transactionDate: number;
     transactionIdentifier: string;
     hasOriginalTransaction: boolean;
     receipt: string;

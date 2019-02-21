@@ -102,7 +102,7 @@ export class GoogleStoreManager extends StoreManager {
 
         this._googleStore.getSkuDetails(purchaseData.productId, 'inapp').then(skuDetails => {
             const transaction = new StoreTransaction(timestamp, purchaseData.productId, skuDetails.price_amount_micros / 1000000, skuDetails.price_currency_code, signature);
-            this.sendTransaction(transaction);
+            this.onStoreTransaction.trigger(transaction);
         });
     }
 }
