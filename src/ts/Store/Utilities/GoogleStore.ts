@@ -6,9 +6,11 @@ export class GoogleStore {
     private _store: IStoreApi;
     private _billingCallbackId: number = 1;
     private _skuCallbackId: number = 1;
+    private _getPurchasesCallbackId: number = 1;
     private _purchaseHistoryCallbackId: number = 1;
     private _billingSupportedCallbacks: { [requestId: number]: CallbackContainer<number> };
     private _skuDetailsCallbacks: { [requestId: number]: CallbackContainer<IGoogleSkuDetails> };
+    private _getPurchasesCallbacks: { [requestId: number]: CallbackContainer<IGooglePurchases> };
     private _purchaseHistoryCallbacks:  { [requestId: number]: CallbackContainer<IGooglePurchases> };
 
     constructor(store: IStoreApi) {
@@ -21,6 +23,8 @@ export class GoogleStore {
         this._store.Android!.Store.onBillingSupportedError.subscribe((operationId, error, message) => this.onBillingSupportedError(operationId, error, message));
         this._store.Android!.Store.onSkuDetailsResult.subscribe((operationId, result) => this.onSkuDetailsResult(operationId, result));
         this._store.Android!.Store.onSkuDetailsError.subscribe((operationId, error, message) => this.onSkuDetailsError(operationId, error, message));
+        this._store.Android!.Store.onGetPurchasesResult.subscribe((operationId, result) => this.onGetPurchasesResult(operationId, result));
+        this._store.Android!.Store.onGetPurchasesError.subscribe((operationId, error, message) => this.onGetPurchasesError(operationId, error, message));
         this._store.Android!.Store.onPurchaseHistoryResult.subscribe((operationId, result) => this.onPurchaseHistoryResult(operationId, result));
         this._store.Android!.Store.onPurchaseHistoryError.subscribe((operationId, error, message) => this.onPurchaseHistoryError(operationId, error, message));
     }
@@ -45,6 +49,18 @@ export class GoogleStore {
         });
 
         this._store.Android!.Store.getSkuDetails(id, purchaseType, [productId]);
+
+        return promise;
+    }
+
+    public getPurchases(purchaseType: string): Promise<IGooglePurchases> {
+        const id = this._getPurchasesCallbackId++;
+
+        const promise = new Promise<IGooglePurchases>((resolve, reject) => {
+            this._getPurchasesCallbacks[id] = new CallbackContainer<IGooglePurchases>(resolve, reject);
+        });
+
+        this._store.Android!.Store.getPurchases(id, purchaseType);
 
         return promise;
     }
@@ -84,6 +100,15 @@ export class GoogleStore {
         // todo: add some error diagnostics
     }
 
+    private onGetPurchasesResult(operationId: number, result: IGooglePurchases) {
+        this.finishGetPurchasesRequest(true, operationId, result);
+    }
+
+    private onGetPurchasesError(operationId: number, error: AndroidStoreError, message: string) {
+        this.finishGetPurchasesRequest(false, operationId);
+        // todo: add some error diagnostics
+    }
+
     private onPurchaseHistoryResult(operationId: number, result: IGooglePurchases) {
         this.finishPurchaseHistoryRequest(true, operationId, result);
     }
@@ -118,6 +143,20 @@ export class GoogleStore {
             }
 
             delete this._skuDetailsCallbacks[operationId];
+        }
+    }
+
+    private finishGetPurchasesRequest(success: boolean, operationId: number, result?: IGooglePurchases) {
+        const callback = this._getPurchasesCallbacks[operationId];
+
+        if(callback) {
+            if(success) {
+                callback.resolve(result);
+            } else {
+                callback.reject();
+            }
+
+            delete this._getPurchasesCallbacks[operationId];
         }
     }
 

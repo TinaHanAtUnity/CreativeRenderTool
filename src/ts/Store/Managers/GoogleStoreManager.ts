@@ -30,10 +30,21 @@ export class GoogleStoreManager extends StoreManager {
         // todo: check isBillingSupported properly instead of just logging the result
         this._googleStore.isBillingSupported('inapp').then(result => {
             this._core.Api.Sdk.logInfo('GOOGLE INAPP BILLING SUPPORTED: ' + result);
+            if(result === 0) {
+                this._googleStore.getPurchases('inapp').then(purchases => {
+                    this._core.Api.Sdk.logInfo('GOOGLE INAPP PURCHASES AT START: ' + JSON.stringify(purchases));
+                });
+            }
         });
 
         this._googleStore.isBillingSupported('subs').then(result => {
             this._core.Api.Sdk.logInfo('GOOGLE SUBSCRIPTION BILLING SUPPORTED: ' + result);
+
+            if(result === 0) {
+                this._googleStore.getPurchases('subs').then(purchases => {
+                    this._core.Api.Sdk.logInfo('GOOGLE SUBSCRIPTION PURCHASES AT START: ' + JSON.stringify(purchases));
+                });
+            }
         });
     }
 

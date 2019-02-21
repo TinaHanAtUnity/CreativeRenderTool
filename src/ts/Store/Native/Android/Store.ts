@@ -9,6 +9,8 @@ enum AndroidStoreEvent {
     PURCHASE_STATUS_ON_STOP,
     PURCHASE_STATUS_ON_RESUME_ERROR,
     PURCHASE_STATUS_ON_STOP_ERROR,
+    GETPURCHASES_RESULT,
+    GETPURCHASES_ERROR,
     PURCHASE_HISTORY_RESULT,
     PURCHASE_HISTORY_ERROR,
     SKU_DETAILS_RESULT,
@@ -74,6 +76,8 @@ export class AndroidStoreApi extends NativeApi {
     public readonly onInitialized = new Observable0();
     public readonly onBillingSupportedResult = new Observable2<number, number>();
     public readonly onBillingSupportedError = new Observable3<number, AndroidStoreError, string>();
+    public readonly onGetPurchasesResult = new Observable2<number, IGooglePurchases>();
+    public readonly onGetPurchasesError = new Observable3<number, AndroidStoreError, string>();
     public readonly onPurchaseHistoryResult = new Observable2<number, IGooglePurchases>();
     public readonly onPurchaseHistoryError = new Observable3<number, AndroidStoreError, string>();
     public readonly onSkuDetailsResult = new Observable2<number, IGoogleSkuDetails[]>();
@@ -103,8 +107,8 @@ export class AndroidStoreApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'isBillingSupported', [operationId, purchaseType]);
     }
 
-    public getPurchases(purchaseType: string): Promise<IGooglePurchases> {
-        return this._nativeBridge.invoke<IGooglePurchases>(this._fullApiClassName, 'getPurchases', [purchaseType]);
+    public getPurchases(operationId: number, purchaseType: string): Promise<IGooglePurchases> {
+        return this._nativeBridge.invoke<IGooglePurchases>(this._fullApiClassName, 'getPurchases', [operationId, purchaseType]);
     }
 
     public getPurchaseHistory(operationId: number, purchaseType: string, maxPurchases: number): Promise<void> {
@@ -127,6 +131,14 @@ export class AndroidStoreApi extends NativeApi {
 
             case AndroidStoreEvent[AndroidStoreEvent.BILLING_SUPPORTED_ERROR]:
                 this.onBillingSupportedError.trigger(<number>parameters[0], <AndroidStoreError>parameters[1], <string>parameters[2]);
+                break;
+
+            case AndroidStoreEvent[AndroidStoreEvent.GETPURCHASES_RESULT]:
+                this.onGetPurchasesResult.trigger(<number>parameters[0], <IGooglePurchases>parameters[1]);
+                break;
+
+            case AndroidStoreEvent[AndroidStoreEvent.GETPURCHASES_ERROR]:
+                this.onGetPurchasesError.trigger(<number>parameters[0], <AndroidStoreError>parameters[1], <string>parameters[2]);
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.PURCHASE_HISTORY_RESULT]:
