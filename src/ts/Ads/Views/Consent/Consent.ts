@@ -27,7 +27,7 @@ export interface IUnityConsentViewParameters {
 enum Page {
     HOMESCREEN,
     INTRO,
-    MY_CHOICES,
+    MY_CHOICES
 }
 
 export class Consent extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationSwitchGroupHandler {
