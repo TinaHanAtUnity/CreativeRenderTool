@@ -223,16 +223,18 @@ $iphone-x-mraid-styles() {
 
 $iphone-x-styles() {
 
-  div.safe-area-content {
-    padding-top: constant(safe-area-inset-top);
-    padding-right: constant(safe-area-inset-right);
-    padding-bottom: constant(safe-area-inset-bottom);
-    padding-left: constant(safe-area-inset-left);
+  #gdpr-consent-settings {
+    .safe-area-content {
+      padding-top: constant(safe-area-inset-top);
+      padding-right: constant(safe-area-inset-right);
+      padding-bottom: constant(safe-area-inset-bottom);
+      padding-left: constant(safe-area-inset-left);
 
-    padding-top: env(safe-area-inset-top);
-    padding-right: env(safe-area-inset-right);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
+      padding-top: env(safe-area-inset-top);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+    }
   }
 
   #promo {
