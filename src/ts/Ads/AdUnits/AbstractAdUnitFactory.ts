@@ -98,25 +98,6 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
         });
     }
 
-    protected createOverlay(parameters: IAdUnitParameters<Campaign>, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
-
-        let overlay: AbstractVideoOverlay;
-
-        const skipAllowed = parameters.placement.allowSkip();
-
-        if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
-            overlay = new ClosableVideoOverlay(parameters.platform, parameters.campaign, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
-        } else {
-            overlay = new VideoOverlay(parameters, parameters.privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-        }
-
-        if (parameters.placement.disableVideoControlsFade()) {
-            overlay.setFadeEnabled(false);
-        }
-
-        return overlay;
-    }
-
     protected getVideoEventHandlerParams(adUnit: VideoAdUnit, video: Video, adUnitStyle: AdUnitStyle | undefined, params: IAdUnitParameters<Campaign>): IVideoEventHandlerParams {
         return {
             platform: params.platform,

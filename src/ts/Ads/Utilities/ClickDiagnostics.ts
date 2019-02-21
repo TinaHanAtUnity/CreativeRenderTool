@@ -21,7 +21,7 @@ export class ClickDiagnostics {
     }
 
     public static sendClickDiagnosticsEvent(clickDuration: number, clickUrl: string, clickLocation: string, clickedCampaign: Campaign, abGroup: number, gameSessionId: number | undefined) {
-        if (gameSessionId && gameSessionId % 2 === 1) {
+        if (gameSessionId && gameSessionId % 10 === 1) {
             SessionDiagnostics.trigger('click_delay', {
                 duration: clickDuration,
                 delayRange: ClickDiagnostics.getClickDelayRange(clickDuration),

@@ -14,6 +14,13 @@ import { VastParser } from 'VAST/Utilities/VastParser';
 import { RequestError } from 'Core/Errors/RequestError';
 import { AdmobParsingTest, ABGroup } from 'Core/Models/ABGroup';
 import { ProgrammaticTrackingService, ProgrammaticTrackingErrorName } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { SdkStats } from 'Ads/Utilities/SdkStats';
+
+export enum AdmobUrlQueryParameters {
+    TIMESTAMP = 'ts',
+    VIDEO_ID = 'video_id'
+}
 
 export class ProgrammaticAdMobParser extends CampaignParser {
 
@@ -23,6 +30,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     private _requestManager: RequestManager;
     private _abGroup: ABGroup;
     private _pts: ProgrammaticTrackingService;
+    private _mediaFileUrl: string;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
@@ -40,6 +48,14 @@ export class ProgrammaticAdMobParser extends CampaignParser {
             if (AdmobParsingTest.isValid(this._abGroup) && e instanceof RequestError) {
                 // Video attempting to be shown is no longer being hosted by Admob
                 this._pts.reportError(ProgrammaticTrackingErrorName.AdmobTestHttpError, 'AdMob', this.seatID);
+                SessionDiagnostics.trigger('admob_http_parse_error', {
+                    responseCode: e.nativeResponse ? e.nativeResponse.responseCode : 0,
+                    adRequestTimestamp: Math.floor(SdkStats.getAdRequestTimestamp() / 1000),
+                    urlTimestamp: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP),
+                    failureTimestamp: Math.floor(Date.now() / 1000),
+                    videoId: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.VIDEO_ID),
+                    videoFileUrl: this._mediaFileUrl
+                }, session);
                 throw e;
             }
             return null;
@@ -87,9 +103,9 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 return Promise.reject(new Error('Could not find script tag within body'));
             }
             const scriptSrc = scriptTag.textContent;
-            const mediaFileURL = this.getVideoFromScriptSource(scriptSrc!);
+            this._mediaFileUrl = this.getVideoFromScriptSource(scriptSrc!);
 
-            return this.getRealVideoURL(mediaFileURL).then((realVideoURL: string) => {
+            return this.getRealVideoURL(this._mediaFileUrl).then((realVideoURL: string) => {
                 return new Promise<AdMobVideo>((resolve, reject) => {
                     const mimeType = Url.getQueryParameter(realVideoURL, 'mime');
                     let extension: string | null = null;
@@ -98,13 +114,13 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                     }
                     if (this._platform === Platform.ANDROID) {
                         resolve(new AdMobVideo({
-                            mediaFileURL: mediaFileURL,
+                            mediaFileURL: this._mediaFileUrl,
                             video: new Video(realVideoURL, session),
                             extension: null
                         }));
                     } else if (extension && this._platform === Platform.IOS) {
                         resolve(new AdMobVideo({
-                            mediaFileURL: mediaFileURL,
+                            mediaFileURL: this._mediaFileUrl,
                             video: new Video(realVideoURL, session),
                             extension: extension
                         }));

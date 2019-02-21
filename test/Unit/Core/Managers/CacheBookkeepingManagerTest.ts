@@ -41,9 +41,8 @@ class TestHelper {
         let helper: TestHelper;
 
         beforeEach(() => {
-            backend = new Backend(platform);
-            nativeBridge = new NativeBridge(backend, platform, false);
-            backend.setNativeBridge(nativeBridge);
+            backend = TestFixtures.getBackend(platform);
+            nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             const wakeUpManager: WakeUpManager = new WakeUpManager(core);
             const request = new RequestManager(platform, core, wakeUpManager);
