@@ -101,53 +101,23 @@
     padding: .5 * $default-size;
   }
 
-  .consent-introduction {
-    position: relative;
-    border-radius: .5 * $default-size;
-    background: $white;
-    text-align: center;
-
-    .privacy-logo {
-      margin-top: 2 * $default-size;
-      margin-bottom: $default-size;
-      font-size: 2 * $consent-main-title-font-size;
-    }
-
-    .intro-title {
-      padding: 0 1.5 * $default-size;
-      font-weight: $privacy-main-title-font-weight;
-      font-size: $consent-main-title-font-size;
-    }
-
-    .intro-text {
-      padding: 0 1.75 * $default-size;
-    }
-
-    .bold {
-      font-weight: $privacy-main-title-font-weight;
-    }
-
-    .continue-button {
-      padding: 1.25 * $default-size 2 * $default-size 2.5 * $default-size 2 * $default-size;
-      color: $consent-blue;
-      font-size: $consent-title-font-size;
-    }
-
-    .unity-logo {
-      margin-bottom: $default-size;
-      opacity: .18;
-    }
+  .back-button {
+    $consent-privacy-close-button-default();
+    position: absolute;
+    top: 0;
+    left: 0;
   }
+}
 
-  #consent-my-choices {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    height: 80%;
-    border-radius: .5 * $default-size;
-    background: $white;
-  }
+#consent-my-choices {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 80%;
+  border-radius: .5 * $default-size;
+  background: $white;
+
   .consent-settings {
     position: relative;
     overflow: auto;
@@ -240,7 +210,6 @@
     pointer-events: none;
   }
 
-
   .switch-group-container {
     $switch-group-container();
     margin-top: .5 * $default-size;
@@ -284,26 +253,43 @@
       }
     }
   }
-
 }
 
-&.landscape {
-  #consent {
-    #consent-introduction,
-    #consent-my-choices {
-      left: 15%;
-      width: 70%;
-    }
+#consent-introduction {
+  position: relative;
+  border-radius: .5 * $default-size;
+  background: $white;
+  text-align: center;
 
-    #consent-my-choices {
-      height: 100%;
-    }
+  .privacy-logo {
+    margin-top: 2 * $default-size;
+    margin-bottom: $default-size;
+    font-size: 2 * $consent-main-title-font-size;
+  }
 
-    #consent-introduction {
-      .continue-button {
-        padding: .5 * $default-size 2 * $default-size $default-size 2 * $default-size;
-      }
-    }
+  .intro-title {
+    padding: 0 1.5 * $default-size;
+    font-weight: $privacy-main-title-font-weight;
+    font-size: $consent-main-title-font-size;
+  }
+
+  .intro-text {
+    padding: 0 1.75 * $default-size;
+  }
+
+  .bold {
+    font-weight: $privacy-main-title-font-weight;
+  }
+
+  .continue-button {
+    padding: 1.25 * $default-size 2 * $default-size 2.5 * $default-size 2 * $default-size;
+    color: $consent-blue;
+    font-size: $consent-title-font-size;
+  }
+
+  .unity-logo {
+    margin-bottom: $default-size;
+    opacity: .18;
   }
 }
 
@@ -389,6 +375,41 @@
 
   .click-animation.agree {
     $click-animation();
+  }
+}
+
+&.portrait {
+  #consent {
+    .back-button {
+      margin-top: -.5 * $default-size;
+      transform: translateY(-100%);
+    }
+  }
+}
+
+&.landscape {
+  #consent {
+    #consent-introduction,
+    #consent-my-choices {
+      left: 15%;
+      width: 70%;
+    }
+
+    #consent-my-choices {
+      height: 100%;
+    }
+
+    #consent-introduction {
+      .continue-button {
+        padding: .5 * $default-size 2 * $default-size $default-size 2 * $default-size;
+      }
+    }
+
+    .back-button {
+      margin-left: -.5 * $default-size;
+      transform: translateX(-100%);
+
+    }
   }
 }
 
