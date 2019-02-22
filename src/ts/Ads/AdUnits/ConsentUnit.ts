@@ -7,7 +7,7 @@ import {
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
 import { UnityConsent } from 'Ads/Views/Consent/UnityConsent';
-import { Consent, IUnityConsentViewParameters } from 'Ads/Views/Consent/Consent';
+import { Consent, ConsentPage, IUnityConsentViewParameters } from 'Ads/Views/Consent/Consent';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import { IPermissions } from 'Ads/Models/Privacy';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
@@ -51,7 +51,8 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         let viewParams: IUnityConsentViewParameters = {
             platform: parameters.platform,
                 privacyManager: parameters.privacyManager,
-            consentSettingsView: this._consentSettingsView
+            consentSettingsView: this._consentSettingsView,
+            landingPage: ConsentPage.INTRO
         };
 
         if (this._platform === Platform.ANDROID) {

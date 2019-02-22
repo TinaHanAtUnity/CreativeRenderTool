@@ -22,9 +22,10 @@ export interface IUnityConsentViewParameters {
     privacyManager: UserPrivacyManager;
     consentSettingsView: UnityConsentSettings;
     apiLevel?: number;
+    landingPage: ConsentPage;
 }
 
-enum Page {
+export enum ConsentPage {
     HOMESCREEN,
     INTRO,
     MY_CHOICES
@@ -39,12 +40,14 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private _privacyRowItemContainer: PrivacyRowItemContainer;
     private _consentButtonContainer: HTMLElement;
 
-    private _currentPage: Page;
+    private _landingPage: ConsentPage;
+    private _currentPage: ConsentPage;
 
     constructor(parameters: IUnityConsentViewParameters) {
         super(parameters.platform, 'consent');
 
         this._apiLevel = parameters.apiLevel;
+        this._landingPage = parameters.landingPage;
 
         this._privacyManager = parameters.privacyManager;
 
@@ -109,6 +112,11 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
                 event: 'click',
                 listener: (event: Event) => this.onMeasurementLinkEvent(event),
                 selector: '.measurement-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onBackButtonEvent(event),
+                selector: '.back-button'
             }
         ];
 
@@ -139,7 +147,11 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             this._container.classList.add('old-androids');
         }
 
-        this.container().classList.add('homescreen');
+        if (this._landingPage === ConsentPage.HOMESCREEN) {
+            const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
+            myChoicesElement.classList.add('show-back-button');
+        }
+        this.showPage(this._landingPage);
     }
 
     public show(): void {
@@ -188,19 +200,19 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         }, 1500);
     }
 
-    private showPage(page: Page) {
+    private showPage(page: ConsentPage) {
         this._currentPage = page;
 
         let classToAdd: string;
 
         switch (page) {
-            case Page.HOMESCREEN:
+            case ConsentPage.HOMESCREEN:
                 classToAdd = 'homescreen';
                 break;
-            case Page.INTRO:
+            case ConsentPage.INTRO:
                 classToAdd = 'intro';
                 break;
-            case Page.MY_CHOICES:
+            case ConsentPage.MY_CHOICES:
                 classToAdd = 'mychoices';
                 break;
             default:
@@ -279,7 +291,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private onOptionsEvent(event: Event) {
         event.preventDefault();
 
-        this.showPage(Page.MY_CHOICES);
+        this.showPage(ConsentPage.MY_CHOICES);
     }
 
     private onThirdPartiesLinkEvent(event: Event): void {
@@ -310,5 +322,10 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private onMeasurementLinkEvent(event: Event): void {
         event.preventDefault();
         this._privacyRowItemContainer.showParagraphAndScrollToSection(PrivacyTextParagraph.MEASUREMENT);
+    }
+
+    private onBackButtonEvent(event: Event): void {
+        event.preventDefault();
+        this.showPage(ConsentPage.HOMESCREEN);
     }
 }

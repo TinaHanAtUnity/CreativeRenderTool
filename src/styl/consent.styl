@@ -100,13 +100,6 @@
     justify-content: flex-end;
     padding: .5 * $default-size;
   }
-
-  .back-button {
-    $consent-privacy-close-button-default();
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
 }
 
 #consent-my-choices {
@@ -117,6 +110,20 @@
   height: 80%;
   border-radius: .5 * $default-size;
   background: $white;
+
+  .back-button {
+    $consent-privacy-close-button-default();
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+  }
+
+  &.show-back-button {
+    .back-button {
+      display: block;
+    }
+  }
 
   .consent-settings {
     position: relative;
