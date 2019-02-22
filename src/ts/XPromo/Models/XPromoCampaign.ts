@@ -28,7 +28,6 @@ export interface IXPromoCampaign extends ICampaign {
     clickAttributionUrlFollowsRedirects?: boolean;
     bypassAppSheet: boolean;
     store: StoreName;
-    trackingUrls?: { [eventName: string]: string[] };
     videoEventUrls: { [eventType: string]: string };
 }
 
@@ -53,7 +52,6 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
             clickAttributionUrlFollowsRedirects: ['boolean', 'undefined'],
             bypassAppSheet: ['boolean'],
             store: ['number'],
-            trackingUrls: ['object', 'undefined'],
             videoEventUrls: ['object']
         }, campaign);
     }
@@ -126,14 +124,6 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
         return this.get('bypassAppSheet');
     }
 
-    public getTrackingUrlsForEvent(eventName: string): string[] {
-        const trackingUrls = this.get('trackingUrls');
-        if (trackingUrls) {
-            return (<any>trackingUrls)[eventName] || [];
-        }
-        return [];
-    }
-
     public getVideoEventUrl(eventType: string): string {
         return this.get('videoEventUrls')[eventType];
     }
@@ -173,32 +163,38 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
         return false;
     }
 
-    public getDTO(): { [key: string]: any } {
-        let gameIcon: any;
+    public getDTO(): { [key: string]: unknown } {
+        let gameIcon: unknown;
         const gameIconObject = this.getGameIcon();
         if (gameIconObject) {
             gameIcon = gameIconObject.getDTO();
         }
 
-        let landscapeImage: any;
+        let squareImage: unknown;
+        const squareImageObject = this.getSquare();
+        if (squareImageObject) {
+            squareImage = squareImageObject.getDTO();
+        }
+
+        let landscapeImage: unknown;
         const landscapeImageObject = this.getLandscape();
         if (landscapeImageObject) {
             landscapeImage = landscapeImageObject.getDTO();
         }
 
-        let portraitImage: any;
+        let portraitImage: unknown;
         const portraitImageObject = this.getPortrait();
         if (portraitImageObject) {
             portraitImage = portraitImageObject.getDTO();
         }
 
-        let video: any;
+        let video: unknown;
         const videoObject = this.getVideo();
         if (videoObject) {
             video = videoObject.getDTO();
         }
 
-        let streamingVideo: any;
+        let streamingVideo: unknown;
         const streamingVideoObject = this.getStreamingVideo();
         if (streamingVideoObject) {
             streamingVideo = streamingVideoObject.getDTO();
@@ -212,6 +208,7 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
             'gameIcon': gameIcon,
             'rating': this.getRating(),
             'ratingCount': this.getRatingCount(),
+            'squareImage': squareImage,
             'landscapeImage': landscapeImage,
             'portraitImage': portraitImage,
             'video': video,

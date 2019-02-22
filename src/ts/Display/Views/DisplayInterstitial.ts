@@ -1,24 +1,28 @@
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/ICore';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 
 import { View } from 'Core/Views/View';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 export interface IDisplayInterstitialHandler extends IGDPREventHandler {
     onDisplayInterstitialClose(): void;
 }
 
-export class DisplayInterstitial extends View<IDisplayInterstitialHandler> implements IPrivacyHandler {
+export class DisplayInterstitial extends View<IDisplayInterstitialHandler> implements IPrivacyHandlerView {
 
     public readonly onPrivacyOpened: Observable0 = new Observable0();
     public readonly onPrivacyClosed: Observable0 = new Observable0();
 
+    private _core: ICoreApi;
+    private _deviceInfo: DeviceInfo;
     private _placement: Placement;
     private _campaign: DisplayInterstitialCampaign;
 
@@ -34,9 +38,11 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     private _timers: number[] = [];
     private _showGDPRBanner: boolean;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: DisplayInterstitialCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
-        super(nativeBridge, 'display-interstitial');
+    constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, placement: Placement, campaign: DisplayInterstitialCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+        super(platform, 'display-interstitial');
 
+        this._core = core;
+        this._deviceInfo = deviceInfo;
         this._placement = placement;
         this._campaign = campaign;
         this._template = new Template(DisplayInterstitialTemplate);
@@ -91,8 +97,9 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
         window.removeEventListener('message', this._messageListener);
         super.hide();
 
-        if (this._privacy.container().parentElement) {
-            document.body.removeChild(this._privacy.container());
+        const privacyContainer = this._privacy.container();
+        if (privacyContainer && privacyContainer.parentElement) {
+            privacyContainer.parentElement.removeChild(privacyContainer);
         }
 
         for (const timer of this._timers) {
@@ -108,20 +115,12 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
         this.onPrivacyOpened.unsubscribe();
     }
 
-    public onPrivacy(url: string): void {
-        // do nothing
-    }
-
     public onPrivacyClose(): void {
         if (this._privacy) {
             this._privacy.hide();
         }
 
         this.onPrivacyClosed.trigger();
-    }
-
-    public onGDPROptOut(optOutEnabled: boolean): void {
-        // do nothing
     }
 
     private choosePrivacyShown(): void {
@@ -139,7 +138,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     private updateProgressCircle(container: HTMLElement, progress: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
+        if(this._platform === Platform.ANDROID && (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() < 15) {
             wrapperElement.style.display = 'none';
             this._container.style.display = 'none';
             /* tslint:disable:no-unused-expression */
@@ -192,7 +191,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
                 // this._handlers.forEach(handler => handler.onDisplayInterstitialClick(e.data.href));
                 break;
             default:
-                this._nativeBridge.Sdk.logWarning(`Unknown message: ${e.data.type}`);
+                this._core.Sdk.logWarning(`Unknown message: ${e.data.type}`);
         }
     }
 }

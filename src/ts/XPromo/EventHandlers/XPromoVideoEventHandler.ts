@@ -32,8 +32,12 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
         super.onPrepared(url, duration, width, height);
 
         const overlay = this._adUnit.getOverlay();
-        if(TestEnvironment.get('debugOverlayEnabled') && overlay) {
-            overlay.setDebugMessage('XPromo');
+        if (overlay) {
+            overlay.setCallButtonVisible(true);
+
+            if(TestEnvironment.get('debugOverlayEnabled')) {
+                overlay.setDebugMessage('XPromo');
+            }
         }
     }
 
@@ -43,11 +47,12 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
         });
 
         const trackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('start');
+
         for (const url of trackingUrls) {
             this._thirdPartyEventManager.sendWithGet('xpromo start', this._xpromoCampaign.getSession().getId(), url);
         }
 
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
+        this._ads.Listener.sendStartEvent(this._placement.getId());
     }
 
     protected handleFirstQuartileEvent(progress: number): void {

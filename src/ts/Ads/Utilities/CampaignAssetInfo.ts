@@ -1,3 +1,4 @@
+import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
@@ -7,7 +8,6 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 
 export enum VideoType {
     CACHE,
@@ -30,10 +30,13 @@ export class CampaignAssetInfo {
                 return true;
             }
         } else if(campaign instanceof PromoCampaign) {
-            const resource = campaign.getCreativeResource();
-            if (resource) {
-                return resource.isCached();
+            const resourceList = campaign.getRequiredAssets();
+            for (const resource of resourceList) {
+                if(resource.isCached()) {
+                    return false;
+                }
             }
+            return true;
         } else if(campaign instanceof AdMobCampaign) {
             const video = campaign.getVideo();
             if (video && video.getVideo() && video.getVideo().isCached()) {

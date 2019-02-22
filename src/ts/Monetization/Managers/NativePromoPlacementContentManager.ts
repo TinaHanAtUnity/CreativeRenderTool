@@ -1,16 +1,16 @@
-import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { Campaign } from 'Ads/Models/Campaign';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { Campaign } from 'Ads/Models/Campaign';
+import { IMonetizationApi } from 'Monetization/IMonetization';
+import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 
- export class NativePromoPlacementContentEventManager {
+export class NativePromoPlacementContentEventManager {
     private _configuration: AdsConfiguration;
 
-    constructor(nativeBridge: NativeBridge, configuration: AdsConfiguration, nativePromoEventHandler: NativePromoEventHandler)  {
+    constructor(monetization: IMonetizationApi, configuration: AdsConfiguration, nativePromoEventHandler: NativePromoEventHandler)  {
         this._configuration = configuration;
 
-        nativeBridge.Monetization.PlacementContents.onPlacementContentCustomEvent.subscribe((placementId, data) => {
+        monetization.PlacementContents.onPlacementContentCustomEvent.subscribe((placementId, data) => {
             const campaign = this.getCampaign(placementId);
             if (campaign === null) {
                 return;

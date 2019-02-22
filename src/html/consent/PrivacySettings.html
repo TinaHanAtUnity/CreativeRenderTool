@@ -1,0 +1,124 @@
+<div class="safe-area-content">
+    <div class="close-area">
+        <div class="close-button">
+            <span>Close</span>
+        </div>
+    </div>
+    <div class="view-container">
+        <div class="back-button">
+            <span class="consent-icon-arrow"></span>
+        </div>
+        <div class="main-view-container page-container">
+            <div class="privacy-logo">
+                <span class="icon-gdpr"></span>
+            </div>
+
+            <div class="title">
+                <span>Ads privacy settings</span>
+            </div>
+            <div class="description">
+                <p class="text">We always try to deliver the best possible experience for gamers. We collect your
+                    information only in order to provide you with personalized gameplay and relevant ads.</p>
+            </div>
+            <div class="button-container">
+                <div class="personalization-button settings-button">
+                    <span class="consent-icon-person2"></span>
+                    <span class="button-text">Personalization settings</span>
+                </div>
+                <div class="delete-data-button settings-button">
+                    <span class="consent-icon-lock"></span>
+                    <span class="button-text">Delete your data</span>
+                </div>
+                <div class="button-row-container button-container">
+                    <div class="report-ad-button row-button">
+                        <span class="button-text">Report Ad</span>
+                    </div>
+                    <div class="build-info-button row-button">
+                        <span class="button-text">Build info</span>
+                    </div>
+                </div>
+            </div>
+            <div class="info-container">
+
+            </div>
+        </div>
+        <div class="personalization-container page-container">
+            <div class="heading"><span>Your personalization settings</span></div>
+            <div class="text">
+                <p>
+                    You can choose to continue to have a personalized experience, or to have a generic one. This will apply
+                    to both advertising that comes from Unity directly as well as from advertising partners.
+                </p>
+            </div>
+            <div class="checkbox-group-container">
+            </div>
+        </div>
+        <div class="view-your-data-container page-container">
+            <div class="heading"><span>Your data & deletion options</span></div>
+            <div class="text">
+                <p>
+                    You can delete any data Unity has about you. Doing this will also opt you out of personalized ad experiences.
+                </p>
+            </div>
+            <div class="delete-data-container text">
+                <span class="delete-data-confirmed-text">
+                    We will process your request and your data for profile purposes will be deleted in 30 days. We will
+                    also opt you out of personalized ads immediately. Please note we may retain your data for invoicing
+                    and fraud prevention purposes for 180 days.
+                </span>
+                <div id="delete-your-data-button">
+                    <span class="consent-icon-alert"></span>
+                    <span class="button-text">Delete your data</span>
+                </div>
+                <div class="delete-data-confirm">
+                    <div class="heading2">
+                        <p>
+                            Are you sure?
+                        </p>
+                    </div>
+                    <div class="delete-data-confirm-buttons">
+                        <div id="delete-data-yes">Delete data</div>
+                        <div id="delete-data-cancel">Cancel</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="report-ad-container page-container">
+            <div class="heading"><span>Report advertisement</span></div>
+            <div class="text">
+                <p>
+                    Are you facing issues with your current advertisement? You can report this ad to Unity and let us
+                    know. Reporting this ad will close this ad and forfeit any rewards received from watching it.
+                </p>
+            </div>
+            <ul class="radio-group-container">
+                <% for (var k in data.reportReasons) { %>
+                <div class="radio-item-container">
+                    <input id="<%= data.reportKeys[k] %>" class="report-choice-radio" name="report-reason" type="radio">
+                    <label for="<%= data.reportKeys[k] %>">
+                        <%= (data.reportReasons[k] === null || typeof data.reportReasons[k] === "undefined") ? "N/A" : data.reportReasons[k] %></label>
+                </div>
+                <% } %>
+            </ul>
+            <div class="text-small">
+                <p>
+                    Disclaimer: Reporting will close your advertisement and forfeit any rewards received from watching it.
+                </p>
+            </div>
+            <div class="report-container">
+                <div class="report-button">Report</div>
+                <span class="report-confirmed-text text"></span>
+            </div>
+        </div>
+        <div class="build-info-container page-container">
+            <div class="heading"><span>Build info</span></div>
+            <p></p>
+            <% for (var k in data.buildInformation) { %>
+            <p class="build-information-item text">
+                <span class="build-information-key"><%= k %>:</span>
+                <span class="build-information-value"><%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>
+            </p>
+            <% } %>
+        </div>
+    </div>
+</div>

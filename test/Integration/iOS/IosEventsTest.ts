@@ -10,8 +10,11 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
+import { fakeARUtils } from 'TestHelpers/FakeARUtils';
+import * as sinon from 'sinon';
 
 describe('IosEventsTest', () => {
+    const sandbox = sinon.createSandbox();
 
     let currentGameId: number;
     const videoEvents = ['video_start', 'first_quartile', 'midpoint', 'third_quartile', 'video_end'];
@@ -53,8 +56,10 @@ describe('IosEventsTest', () => {
         xhr.onerror = () => {
             throw new Error(xhr.statusText);
         };
-        xhr.open('GET', 'https://fake-ads-backend.applifier.info/setup/first_perf_then_vast?token=373a221f4df5c659f2df918f899fa403');
+        xhr.open('GET', 'https://fake-ads-backend.unityads.unity3d.com/setup/first_perf_then_vast?token=373a221f4df5c659f2df918f899fa403');
         xhr.send();
+
+        fakeARUtils(sandbox);
     });
 
     afterEach(function(done) {
@@ -69,8 +74,10 @@ describe('IosEventsTest', () => {
         xhr.onerror = () => {
             throw new Error(xhr.statusText);
         };
-        xhr.open('GET', 'https://fake-ads-backend.applifier.info/fabulous/' + currentGameId + '/remove?token=373a221f4df5c659f2df918f899fa403');
+        xhr.open('GET', 'https://fake-ads-backend.unityads.unity3d.com/fabulous/' + currentGameId + '/remove?token=373a221f4df5c659f2df918f899fa403');
         xhr.send();
+
+        sandbox.restore();
     });
 
     it('should include all operational events on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
@@ -80,11 +87,13 @@ describe('IosEventsTest', () => {
         let startCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if(++readyCount === 1) {
-                    UnityAds.show(placement);
-                }
-                if(startCount === 1) {
-                    UnityAds.show(placement);
+                if(placement === 'video' || placement === 'defaultVideoAndPictureZone') {
+                    if(++readyCount === 1) {
+                        UnityAds.show(placement);
+                    }
+                    if(startCount === 1) {
+                        UnityAds.show(placement);
+                    }
                 }
             },
             onUnityAdsStart: (placement: string) => {
@@ -127,9 +136,9 @@ describe('IosEventsTest', () => {
 
         AbstractAdUnit.setAutoClose(true);
 
-        ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
-        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
         UnityAds.initialize(Platform.IOS, currentGameId.toString(), listener, true);
     });

@@ -1,0 +1,384 @@
+@import "components.styl";
+
+#privacy-settings {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9999;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, .5);
+
+  .safe-area-content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .close-area {
+    position: relative;
+    flex-grow: 1;
+  }
+
+  .close-button {
+    position: absolute;
+    padding: .35 * $default-size $default-size;
+    border-radius: 3 * $default-size;
+    background: $privacy-close-button;
+    color: $privacy-close-button-text;
+    font-weight: $privacy-title-font-weight;
+    font-size: $privacy-heading-font-size;
+  }
+
+  .page-container {
+    padding: $default-size 2 * $default-size;
+  }
+
+  .view-container {
+    position: relative;
+    overflow: auto;
+    padding-bottom: 1rem;
+    min-height: 80%;
+    max-height: 80%;
+    width: 100%;
+    border-top-left-radius: $default-size;
+    border-top-right-radius: $default-size;
+    background: $white;
+  }
+
+  .back-button {
+    $privacy-back-button-default();
+    padding: 2 * $default-size 2 * $default-size $default-size 2 * $default-size;
+  }
+
+  .main-view-container {
+    text-align: center;
+
+    .privacy-logo {
+      padding: $default-size;
+      color: $black;
+      font-size: 1.5 * $default-size;
+    }
+
+    .settings-button {
+      display: flex;
+      flex-direction: column;
+      margin: .5 * $default-size 0;
+      padding: $default-size;
+      border-radius: .25 * $default-size;
+      background: $white-smoke;
+      text-align: center;
+      font-weight: $privacy-title-font-weight;
+      font-size: $privacy-text-font-size;
+    }
+
+    .settings-button {
+      font-weight: $privacy-title-font-weight;
+    }
+
+    .button-row-container {
+      display: flex;
+      flex-direction: row;
+
+      .row-button {
+        flex-grow: 1;
+        padding: $default-size;
+        border-radius: .25 * $default-size;
+        background: $white-smoke;
+        text-align: center;
+        font-weight: $privacy-title-font-weight;
+        font-size: $privacy-text-font-size;
+      }
+
+      .report-ad-button {
+        margin-right: .5 * $default-size;
+      }
+    }
+
+    .info-container {
+      padding-top: $default-size;
+    }
+  }
+
+  .report-ad-container {
+    .report-button {
+      $privacy-blue-button-default();
+      position: relative;
+      padding: .75 * $default-size $default-size;
+    }
+  }
+
+  .checkbox-group-container {
+    $checkbox-group-container($default-scale-size, $privacy-text-font-size);
+  }
+
+  .radio-group-container {
+    $radio-group-container-blue($default-scale-size, $privacy-text-font-size);
+    font-weight: $privacy-text-font-weight;
+    line-height: 1.25 * $default-size;
+  }
+
+  &.initial {
+    .back-button {
+      display: none;
+    }
+    .view-container {
+      animation: page-animation-min-to-max .3s ease-out;
+    }
+  }
+
+  &:not(.initial) {
+    .view-container {
+      min-height: 0;
+      max-height: 80%;
+      animation: page-animation-max-to-min .3s ease-out;
+    }
+    .main-view-container {
+      display: none;
+    }
+  }
+  &:not(.personalization) {
+    .personalization-container {
+      display: none;
+    }
+  }
+  &:not(.data) {
+    .view-your-data-container {
+      display: none;
+    }
+  }
+  &:not(.report) {
+    .report-ad-container {
+      display: none;
+    }
+  }
+  &:not(.build-info) {
+    .build-info-container {
+      display: none;
+    }
+  }
+
+  .title {
+    font-weight: $privacy-main-title-font-weight;
+  }
+
+  .heading {
+    font-weight: $privacy-main-title-font-weight;
+    font-size: $privacy-heading-font-size;
+  }
+
+  .heading2 {
+    font-weight: $privacy-title-font-weight;
+    font-size: $privacy-text-font-size;
+  }
+
+  .text {
+    font-weight: $privacy-text-font-weight;
+    font-size: $privacy-text-font-size;
+  }
+
+  .text-small {
+    font-weight: $privacy-text-font-weight = 300;
+    font-size: $default-font-size * .5;
+  }
+
+  .delete-data-container {
+    min-height: 4 * $default-size;
+  }
+
+  #delete-your-data-button {
+    padding: $default-size 0;
+    color: $privacy-red;
+    text-align: left;
+    font-weight: $privacy-title-font-weight;
+    font-size: $privacy-heading-font-size;
+
+    .consent-icon-alert {
+      padding: 0 .25 * $default-size 0 0;
+    }
+  }
+
+  .delete-data-confirm {
+    display: none;
+  }
+
+  .delete-data-confirm-buttons {
+    display: flex;
+    align-content: flex-start;
+  }
+
+  #delete-data-cancel,
+  #delete-data-yes {
+    padding: .75 * $default-size 1.5 * $default-size;
+  }
+
+  #delete-data-yes {
+    $consent-button-default();
+    border: 1px solid $privacy-red;
+    background: $privacy-red;
+    color: $white;
+  }
+
+  #delete-data-cancel {
+    $privacy-white-button-default();
+    margin-left: .5 * $default-size;
+  }
+
+  .delete-data-confirmed-text {
+    display: none;
+  }
+
+  .delete-data-container.active {
+    #delete-your-data-button {
+      display: none;
+    }
+
+    .delete-data-confirm {
+      display: block;
+    }
+  }
+
+  .delete-data-confirmed-text {
+    display: none;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 100ms ease-in;
+  }
+
+  .delete-data-container.data-deletion-confirmed {
+    #delete-your-data-button {
+      display: none;
+    }
+
+    .delete-data-confirm {
+      display: none;
+    }
+
+    .delete-data-confirmed-text {
+      display: block;
+      opacity: 1;
+    }
+  }
+
+  .page-link {
+    color: $blue;
+    cursor: pointer;
+  }
+
+  @keyframes page-animation-min-to-max {
+    0% {
+      min-height: 0;
+      max-height: 50%;
+    }
+    50% {
+      min-height: 10%;
+      max-height: 10%;
+    }
+
+    100% {
+      min-height: 80%;
+      max-height: 80%;
+    }
+  }
+
+  @keyframes page-animation-max-to-min {
+    0% {
+      min-height: 80%;
+      max-height: 80%;
+    }
+    50% {
+      min-height: 10%;
+      max-height: 10%;
+    }
+
+    100% {
+      min-height: 0;
+      max-height: 80%;
+    }
+  }
+}
+
+body {
+  &.portrait #privacy-settings {
+
+    .close-button {
+      bottom: 1.25 * $default-size;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+
+  &.landscape #privacy-settings {
+
+    .close-button {
+      top: 1.25 * $default-size;
+      right: 1.25 * $default-size;
+    }
+
+    .view-container {
+      left: 22%;
+      min-height: 85%;
+      max-height: 85%;
+      width: 56%;
+    }
+
+    &:not(.initial) {
+      .view-container {
+        min-height: 0;
+        max-height: 85%;
+        animation: page-animation-max-to-min .3s ease-out;
+      }
+      .main-view-container {
+        display: none;
+      }
+    }
+  }
+}
+
+$iphone-x-paddings() {
+  #privacy-settings {
+    .safe-area-content {
+      padding-top: constant(safe-area-inset-top);
+      padding-right: constant(safe-area-inset-right);
+      padding-left: constant(safe-area-inset-left);
+
+      padding-top: env(safe-area-inset-top);
+      padding-right: env(safe-area-inset-right);
+      padding-left: env(safe-area-inset-left);
+    }
+
+    .view-container {
+      padding-bottom: constant(safe-area-inset-bottom);
+      padding-bottom: env(safe-area-inset-bottom); // @stylint ignore
+    }
+  }
+}
+
+/* iPhone X & iPhone XS */
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+  html {
+    $iphone-x-paddings();
+  }
+}
+
+/* iPhone XS Max */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+  html {
+    $iphone-x-paddings();
+  }
+}
+
+/* iPhone XR */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+  html {
+    $iphone-x-paddings();
+  }
+}

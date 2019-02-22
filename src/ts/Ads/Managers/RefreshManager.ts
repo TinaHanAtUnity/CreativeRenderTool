@@ -1,15 +1,14 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
-import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
-import { INativeResponse } from 'Core/Utilities/Request';
+import { INativeResponse } from 'Core/Managers/RequestManager';
 import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
-import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export abstract class RefreshManager {
-    public static NoFillDelay = 3600;
-    public static ErrorRefillDelay = 3600;
-    public static ParsingErrorRefillDelay = 60;
+    public static NoFillDelayInSeconds = 3600;
+    public static ErrorRefillDelayInSeconds = 3600;
+    public static ParsingErrorRefillDelayInSeconds = 60;
 
     public abstract getCampaign(placementId: string): Campaign | undefined;
     public abstract setCurrentAdUnit(adUnit: AbstractAdUnit): void;

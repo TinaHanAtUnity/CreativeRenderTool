@@ -1,5 +1,5 @@
+import { ICoreApi } from 'Core/ICore';
 import { ISchema, Model } from 'Core/Models/Model';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MetaData } from 'Core/Utilities/MetaData';
 
 export interface IMetaData {
@@ -25,7 +25,7 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
         return this.get('keys');
     }
 
-    public fetch(nativeBridge: NativeBridge, keys?: string[]): Promise<boolean> {
+    public fetch(core: ICoreApi, keys?: string[]): Promise<boolean> {
         let finalKeys: string[] = [];
         if (!keys) {
             finalKeys = this.getKeys();
@@ -33,17 +33,17 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
             finalKeys = keys;
         }
 
-        return this.getValues(nativeBridge, finalKeys).then((data) => {
+        return this.getValues(core, finalKeys).then((data) => {
             return this.setValues(data);
         });
     }
 
-    protected setValues(data: { [key: string]: any }): boolean {
+    protected setValues(data: { [key: string]: unknown }): boolean {
         let success = false;
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
                 try {
-                    this.set(<any>key, data[key]);
+                    this.set(<keyof T>key, <T[keyof T]>data[key]);
                 } catch (e) {
                     return false;
                 }
@@ -55,14 +55,14 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
         return success;
     }
 
-    private getValues(nativeBridge: NativeBridge, keys: string[]): Promise<{}> {
-        const returnObject: { [key: string]: any } = {};
-        const metaData: MetaData = new MetaData(nativeBridge);
+    private getValues(core: ICoreApi, keys: string[]): Promise<{}> {
+        const returnObject: { [key: string]: unknown } = {};
+        const metaData: MetaData = new MetaData(core);
         return metaData.hasCategory(this.getCategory()).then(exists => {
             if(!exists) {
                 return Promise.resolve([]);
             }
-            return Promise.all(keys.map((key) => metaData.get<any>(this.getCategory() + '.' + key, false).then(([found, value]) => {
+            return Promise.all(keys.map((key) => metaData.get<unknown>(this.getCategory() + '.' + key, false).then(([found, value]) => {
                 if(found) {
                     returnObject[key] = value;
                 }

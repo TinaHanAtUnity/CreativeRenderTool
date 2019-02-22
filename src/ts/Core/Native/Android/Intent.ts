@@ -1,9 +1,14 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
+export enum IntentFlag {
+    FLAG_GRANT_READ_URI_PERMISSION = 1,
+    FLAG_ACTIVITY_NEW_TASK = 268435456
+}
+
 export interface IntentExtra {
     key: string;
-    value: any;
+    value: unknown;
 }
 
 export interface IntentData {

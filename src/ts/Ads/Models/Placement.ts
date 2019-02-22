@@ -1,4 +1,4 @@
-import { Campaign } from 'Ads/Models/Campaign';
+import { Campaign, ICampaignTrackingUrls } from 'Ads/Models/Campaign';
 import { Model } from 'Core/Models/Model';
 
 export enum PlacementState {
@@ -9,7 +9,27 @@ export enum PlacementState {
     NO_FILL
 }
 
-interface IPlacement {
+export type PlacementAuctionType = 'cpm' | 'ltv';
+export const DefaultPlacementAuctionType = 'cpm';
+
+export interface IRawPlacement {
+    id: string;
+    name: string;
+    default: boolean;
+    allowSkip: boolean;
+    skipEndCardOnClose: boolean;
+    disableVideoControlsFade: boolean;
+    disableBackButton: boolean;
+    muteVideo: boolean;
+    skipInSeconds: number;
+    useDeviceOrientationForVideo: boolean;
+    adTypes: string[];
+    refreshDelay: number;
+    position?: string;
+    auctionType?: string;
+}
+
+export interface IPlacement {
     id: string;
     name: string;
     default: boolean;
@@ -31,13 +51,15 @@ interface IPlacement {
     previousState: PlacementState;
     placementStateChanged: boolean;
     currentCampaign: Campaign | undefined;
+    currentTrackingUrls: ICampaignTrackingUrls | undefined;
     refreshDelay: number | undefined;
     position: string | undefined;
+    auctionType: PlacementAuctionType;
 }
 
 export class Placement extends Model<IPlacement> {
 
-    constructor(data: any) {
+    constructor(data: IRawPlacement) {
         super('Placement', {
             id: ['string'],
             name: ['string'],
@@ -54,8 +76,10 @@ export class Placement extends Model<IPlacement> {
             previousState: ['number'],
             placementStateChanged: ['boolean'],
             currentCampaign: ['object', 'undefined'],
+            currentTrackingUrls: ['object', 'undefined'],
             refreshDelay: ['number', 'undefined'],
-            position: ['string', 'undefined']
+            position: ['string', 'undefined'],
+            auctionType: ['string']
         });
 
         this.set('id', data.id);
@@ -82,6 +106,7 @@ export class Placement extends Model<IPlacement> {
         this.set('state', PlacementState.NOT_AVAILABLE);
         this.set('refreshDelay', data.refreshDelay);
         this.set('position', data.position || 'bottomcenter');
+        this.set('auctionType', <PlacementAuctionType>data.auctionType || DefaultPlacementAuctionType);
     }
 
     public getId(): string {
@@ -128,6 +153,10 @@ export class Placement extends Model<IPlacement> {
         return this.get('state');
     }
 
+    public getAuctionType(): PlacementAuctionType {
+        return this.get('auctionType');
+    }
+
     public setState(state: PlacementState): void {
         if (this.getState() !== state) {
             this.set('previousState', this.getState());
@@ -154,6 +183,14 @@ export class Placement extends Model<IPlacement> {
 
     public setCurrentCampaign(campaign: Campaign | undefined): void {
         this.set('currentCampaign', campaign);
+    }
+
+    public getCurrentTrackingUrls(): ICampaignTrackingUrls | undefined {
+        return this.get('currentTrackingUrls');
+    }
+
+    public setCurrentTrackingUrls(trackingUrls: ICampaignTrackingUrls | undefined) {
+        this.set('currentTrackingUrls', trackingUrls);
     }
 
     public getRealtimeData(): string | undefined {
@@ -184,7 +221,7 @@ export class Placement extends Model<IPlacement> {
         return false;
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'id': this.getId(),
             'name': this.getName(),

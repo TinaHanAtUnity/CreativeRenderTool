@@ -85,7 +85,7 @@ const onChangeOrientation = () => {
             iosOrientation = 'ios-portrait';
     }
 
-    document.body.classList.remove(...['ios-landscape-left', 'ios-landscape-right', 'ios-portrait-upside-down']);
+    document.body.classList.remove(...['ios-portrait', 'ios-landscape-left', 'ios-landscape-right', 'ios-portrait-upside-down']);
 
     if(iosOrientation) {
         document.body.classList.add(iosOrientation);
@@ -117,6 +117,5 @@ if(typeof location !== 'undefined' && location.href.indexOf('build/browser') ===
     const extWindow = <IExtendedWindow> window;
     extWindow.nativebridge = nativeBridge;
     extWindow.webview = new WebView(nativeBridge);
-
     document.addEventListener('DOMContentLoaded', () => extWindow.webview.initialize(), false);
 }

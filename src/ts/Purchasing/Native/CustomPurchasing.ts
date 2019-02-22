@@ -1,7 +1,8 @@
-import { NativeApi, ApiPackage } from 'Core/Native/Bridge/NativeApi';
-import { Observable1, Observable2 } from 'Core/Utilities/Observable';
-import { ITransactionDetails, IProduct, ITransactionErrorDetails } from 'Purchasing/PurchasingAdapter';
+import { EventCategory } from 'Core/Constants/EventCategory';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable1 } from 'Core/Utilities/Observable';
+import { IProduct, ITransactionDetails, ITransactionErrorDetails } from 'Purchasing/PurchasingAdapter';
 
 export enum CustomPurchasingEvent {
     PRODUCTS_RETRIEVED,
@@ -15,14 +16,14 @@ export class CustomPurchasingApi extends NativeApi {
     public readonly onTransactionError = new Observable1<ITransactionErrorDetails>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'CustomPurchasing', ApiPackage.PURCHASING_CORE);
+        super(nativeBridge, 'CustomPurchasing', ApiPackage.PURCHASING_CORE, EventCategory.CUSTOM_PURCHASING);
     }
 
     public available(): Promise<boolean> {
         return this._nativeBridge.invoke(this._fullApiClassName, 'available', []);
     }
 
-    public purchaseItem(productId: string, extras: any) {
+    public purchaseItem(productId: string, extras: unknown) {
         return this._nativeBridge.invoke(this._fullApiClassName, 'purchaseItem', [productId, extras]);
     }
 
@@ -30,16 +31,16 @@ export class CustomPurchasingApi extends NativeApi {
         return this._nativeBridge.invoke(this._fullApiClassName, 'refreshCatalog', []);
     }
 
-    public handleEvent(event: string, parameters: any[]) {
+    public handleEvent(event: string, parameters: unknown[]) {
         switch (event) {
         case CustomPurchasingEvent[CustomPurchasingEvent.PRODUCTS_RETRIEVED]:
-            this.onProductsRetrieved.trigger(parameters[0]);
+            this.onProductsRetrieved.trigger(<IProduct[]>parameters[0]);
             break;
         case CustomPurchasingEvent[CustomPurchasingEvent.TRANSACTION_COMPLETE]:
-            this.onTransactionComplete.trigger(parameters[0]);
+            this.onTransactionComplete.trigger(<ITransactionDetails>parameters[0]);
             break;
         case CustomPurchasingEvent[CustomPurchasingEvent.TRANSACTION_ERROR]:
-            const details: ITransactionErrorDetails = parameters[0];
+            const details = <ITransactionErrorDetails>parameters[0];
             details.store = this.translateStore(details.store);
             this.onTransactionError.trigger(details);
             break;

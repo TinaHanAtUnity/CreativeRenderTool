@@ -1,21 +1,27 @@
-import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
+import {
+    IVideoOverlayDownloadParameters,
+    OverlayEventHandlerWithDownloadSupport
+} from 'Ads/EventHandlers/OverlayEventHandlerWithDownloadSupport';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IStoreHandler } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 
-export class PerformanceOverlayEventHandler extends OverlayEventHandler<PerformanceCampaign> {
+export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownloadSupport<PerformanceCampaign> {
 
-    private _trackingUrls: {[key: string]: string[]};
     protected _performanceAdUnit: PerformanceAdUnit;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
 
-    constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters) {
-        super(nativeBridge, adUnit, parameters, parameters.adUnitStyle);
+    constructor(adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters, storeHandler: IStoreHandler) {
+        super(adUnit, parameters, storeHandler, parameters.adUnitStyle);
         this._performanceAdUnit = adUnit;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
-        this._trackingUrls = parameters.campaign.getTrackingUrls();
+    }
+
+    public onOverlayDownload(parameters: IVideoOverlayDownloadParameters): void {
+        super.onOverlayDownload(parameters);
+        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.CLICK);
     }
 
     public onOverlaySkip(position: number): void {

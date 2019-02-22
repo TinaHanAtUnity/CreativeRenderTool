@@ -28,9 +28,14 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
         super.onPrepared(url, duration, width, height);
 
         const overlay = this._adUnit.getOverlay();
-        if(TestEnvironment.get('debugOverlayEnabled') && overlay) {
-            overlay.setDebugMessage('Performance Ad');
+        if (overlay) {
+            overlay.setCallButtonVisible(true);
+
+            if (TestEnvironment.get('debugOverlayEnabled')) {
+                overlay.setDebugMessage('Performance Ad');
+            }
         }
+
         this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.LOADED_IMPRESSION);
     }
 
@@ -40,6 +45,7 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
 
     protected handleStartEvent(progress: number): void {
         super.handleStartEvent(progress);
+        const trackingUrls = this._campaign.getTrackingUrlsForEvent(ICometTrackingUrlEvents.START);
         this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.START);
     }
 

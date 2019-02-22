@@ -1,3 +1,4 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { Platform } from 'Core/Constants/Platform';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
@@ -8,10 +9,12 @@ export enum ApiPackage {
     PURCHASING_CORE,
     ANALYTICS,
     AR,
-    BANNER
+    BANNER,
+    CHINA
 }
 
 export abstract class NativeApi {
+
     private static _apiPackageMapping = {
         [ApiPackage.CORE]: {android: 'com.unity3d.services.core.api', ios: 'USRVApi'},
         [ApiPackage.ADS]: {android: 'com.unity3d.services.ads.api', ios: 'UADSApi'},
@@ -19,7 +22,8 @@ export abstract class NativeApi {
         [ApiPackage.PURCHASING_CORE]: {android: 'com.unity3d.services.purchasing.core.api', ios: 'UPURApi'},
         [ApiPackage.ANALYTICS]: {android: 'com.unity3d.services.analytics.core.api', ios: 'UANAApi'},
         [ApiPackage.AR]: {android: 'com.unity3d.services.ar.api', ios: 'UARApi'},
-        [ApiPackage.BANNER]: {android: 'com.unity3d.services.banners.api', ios: 'UADSApi'}
+        [ApiPackage.BANNER]: {android: 'com.unity3d.services.banners.api', ios: 'UADSApi'},
+        [ApiPackage.CHINA]: {android: 'com.unity3d.services.china.api', ios: ''}
     };
 
     protected _nativeBridge: NativeBridge;
@@ -27,14 +31,17 @@ export abstract class NativeApi {
     protected _apiPackage: ApiPackage;
     protected _fullApiClassName: string;
 
-    constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage) {
+    protected constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage, eventCategory?: EventCategory) {
         this._nativeBridge = nativeBridge;
         this._apiClass = apiClass;
         this._apiPackage = apiPackage;
         this._fullApiClassName = this.getFullApiClassName();
+        if(typeof eventCategory !== 'undefined') {
+            nativeBridge.addEventHandler(eventCategory, this);
+        }
     }
 
-    public handleEvent(event: string, parameters: any[]) {
+    public handleEvent(event: string, parameters: unknown[]) {
         throw new Error(this._apiClass + ' event ' + event + ' does not have an observable');
     }
 

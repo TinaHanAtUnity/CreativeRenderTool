@@ -1,3 +1,4 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable3, Observable4 } from 'Core/Utilities/Observable';
@@ -13,21 +14,21 @@ export class ResolveApi extends NativeApi {
     public readonly onFailed = new Observable4<string, string, string, string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Resolve', ApiPackage.CORE);
+        super(nativeBridge, 'Resolve', ApiPackage.CORE, EventCategory.RESOLVE);
     }
 
     public resolve(id: string, host: string): Promise<string> {
         return this._nativeBridge.invoke<string>(this._fullApiClassName, 'resolve', [id, host]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case ResolveEvent[ResolveEvent.COMPLETE]:
-                this.onComplete.trigger(parameters[0], parameters[1], parameters[2]);
+                this.onComplete.trigger(<string>parameters[0], <string>parameters[1], <string>parameters[2]);
                 break;
 
             case ResolveEvent[ResolveEvent.FAILED]:
-                this.onFailed.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
+                this.onFailed.trigger(<string>parameters[0], <string>parameters[1], <string>parameters[2], <string>parameters[3]);
                 break;
 
             default:

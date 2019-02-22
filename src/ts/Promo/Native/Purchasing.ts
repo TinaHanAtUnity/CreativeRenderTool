@@ -1,3 +1,4 @@
+import { EventCategory } from 'Core/Constants/EventCategory';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable1 } from 'Core/Utilities/Observable';
@@ -19,7 +20,7 @@ export class PurchasingApi extends NativeApi {
     public readonly onIAPSendEvent = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Purchasing', ApiPackage.ADS);
+        super(nativeBridge, 'Purchasing', ApiPackage.ADS, EventCategory.PURCHASING);
     }
 
     public initializePurchasing(): Promise<void> {
@@ -38,26 +39,26 @@ export class PurchasingApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'initiatePurchasingCommand', [event]);
     }
 
-    public handleEvent(event: string, parameters: any[]): void {
+    public handleEvent(event: string, parameters: unknown[]): void {
         switch(event) {
             case PurchasingEvent[PurchasingEvent.COMMAND]:
-                this.onCommandResult.trigger(parameters[0]);
+                this.onCommandResult.trigger(<string>parameters[0]);
                 break;
 
             case PurchasingEvent[PurchasingEvent.VERSION]:
-                this.onGetPromoVersion.trigger(parameters[0]);
+                this.onGetPromoVersion.trigger(<string>parameters[0]);
                 break;
 
             case PurchasingEvent[PurchasingEvent.CATALOG]:
-                this.onGetPromoCatalog.trigger(parameters[0]);
+                this.onGetPromoCatalog.trigger(<string>parameters[0]);
                 break;
 
             case PurchasingEvent[PurchasingEvent.INITIALIZATION]:
-                this.onInitialize.trigger(parameters[0]);
+                this.onInitialize.trigger(<string>parameters[0]);
                 break;
 
             case PurchasingEvent[PurchasingEvent.EVENT]:
-                this.onIAPSendEvent.trigger(parameters[0]);
+                this.onIAPSendEvent.trigger(<string>parameters[0]);
                 break;
 
             default:

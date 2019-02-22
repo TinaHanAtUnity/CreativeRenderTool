@@ -1,6 +1,19 @@
-import { Placement } from 'Ads/Models/Placement';
-import { ISchema, Model } from 'Core/Models/Model';
+import { IRawPlacement, Placement } from 'Ads/Models/Placement';
+import { IRawGamePrivacy, GamePrivacy, IRawUserPrivacy, UserPrivacy } from 'Ads/Models/Privacy';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
+import { ISchema, Model } from 'Core/Models/Model';
+
+export interface IRawAdsConfiguration {
+    assetCaching: string;
+    placements: IRawPlacement[];
+    defaultPlacement: string;
+    gdprEnabled: boolean;
+    optOutRecorded: boolean;
+    optOutEnabled: boolean;
+    defaultBannerPlacement: string | undefined;
+    gamePrivacy: IRawGamePrivacy | undefined;
+    userPrivacy: IRawUserPrivacy | undefined;
+}
 
 export interface IAdsConfiguration {
     cacheMode: CacheMode;
@@ -10,6 +23,8 @@ export interface IAdsConfiguration {
     optOutRecorded: boolean;
     optOutEnabled: boolean;
     defaultBannerPlacement: Placement | undefined;
+    gamePrivacy: GamePrivacy;
+    userPrivacy: UserPrivacy;
 }
 
 export class AdsConfiguration extends Model<IAdsConfiguration> {
@@ -20,7 +35,9 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         gdprEnabled: ['boolean'],
         optOutRecorded: ['boolean'],
         optOutEnabled: ['boolean'],
-        defaultBannerPlacement: ['string', 'undefined']
+        defaultBannerPlacement: ['string', 'undefined'],
+        gamePrivacy: ['object'],
+        userPrivacy: ['object']
     };
 
     constructor(data: IAdsConfiguration) {
@@ -105,7 +122,15 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         this.set('optOutEnabled', optOutEnabled);
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getGamePrivacy(): GamePrivacy {
+        return this.get('gamePrivacy');
+    }
+
+    public getUserPrivacy(): UserPrivacy {
+        return this.get('userPrivacy');
+    }
+
+    public getDTO(): { [key: string]: unknown } {
         const placements = [];
         for(const placement in this.getPlacements()) {
             if(this.getPlacements().hasOwnProperty(placement)) {
@@ -121,8 +146,11 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
         return {
             'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
             'placements': placements,
-            'defaultPlacement': defaultPlacementId
+            'defaultPlacement': defaultPlacementId,
+            'gamePrivacy': this.getGamePrivacy().getDTO(),
+            'userPrivacy': this.getUserPrivacy().getDTO(),
+            'optOutEnabled': this.isOptOutEnabled(),
+            'optOutRecorded': this.isOptOutEnabled()
         };
     }
-
 }

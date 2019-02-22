@@ -1,6 +1,5 @@
 import { ICampaignErrorHandler } from 'Ads/Errors/CampaignErrorHandlerFactory';
 import { CampaignError } from 'Ads/Errors/CampaignError';
-import { INativeResponse } from 'Core/Utilities/Request';
 
 export class DefaultCampaignErrorHandler implements ICampaignErrorHandler {
     public handleCampaignError(campaignError: CampaignError): Promise<void> {

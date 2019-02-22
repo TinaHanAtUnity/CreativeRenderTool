@@ -1,25 +1,22 @@
-import { FocusManager } from 'Core/Managers/FocusManager';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi } from 'Core/ICore';
 import { Observable0 } from 'Core/Utilities/Observable';
 
 export class WakeUpManager {
     public readonly onNetworkConnected = new Observable0();
 
-    private _nativeBridge: NativeBridge;
-    private _focusManager: FocusManager;
+    private _core: ICoreApi;
     private _firstConnection: number;
     private _connectionEvents: number;
 
-    constructor(nativeBridge: NativeBridge, focusManager: FocusManager) {
-        this._nativeBridge = nativeBridge;
-        this._focusManager = focusManager;
+    constructor(core: ICoreApi) {
+        this._core = core;
         this._firstConnection = Date.now();
         this._connectionEvents = 0;
-        this._nativeBridge.Connectivity.onConnected.subscribe((wifi, networkType) => this.onConnected(wifi, networkType));
+        this._core.Connectivity.onConnected.subscribe((wifi, networkType) => this.onConnected(wifi, networkType));
     }
 
     public setListenConnectivity(status: boolean): Promise<void> {
-        return this._nativeBridge.Connectivity.setListeningStatus(status);
+        return this._core.Connectivity.setListeningStatus(status);
     }
 
     private onConnected(wifi: boolean, networkType: number) {
@@ -35,7 +32,7 @@ export class WakeUpManager {
             if(this._connectionEvents <= 10) {
                 this.onNetworkConnected.trigger();
             } else if(this._connectionEvents === 11) {
-                this._nativeBridge.Sdk.logWarning('Unity Ads has received more than 10 connection events in 30 minutes, now ignoring connection events');
+                this._core.Sdk.logWarning('Unity Ads has received more than 10 connection events in 30 minutes, now ignoring connection events');
             }
         }
     }

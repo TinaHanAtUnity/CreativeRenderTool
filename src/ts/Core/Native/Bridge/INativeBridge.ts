@@ -1,5 +1,5 @@
 export interface INativeBridge {
-    handleCallback(results: any[][]): void;
-    handleEvent(parameters: any[]): void;
-    handleInvocation(parameters: any[]): void;
+    handleCallback(results: unknown[][]): void;
+    handleEvent(parameters: unknown[]): void;
+    handleInvocation(parameters: unknown[]): void;
 }

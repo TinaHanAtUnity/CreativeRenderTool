@@ -1,6 +1,6 @@
 import { Model } from 'Core/Models/Model';
 import { VastAd } from 'VAST/Models/VastAd';
-import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
+import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { CampaignError } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
@@ -8,21 +8,21 @@ import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 
 interface IVast {
     ads: VastAd[];
-    errorURLTemplates: string[];
+    parseErrorURLTemplates: string[];
     additionalTrackingEvents: { [eventName: string]: string[] };
 }
 
 export class Vast extends Model<IVast> {
 
-    constructor(ads: VastAd[], errorURLTemplates: any[]) {
+    constructor(ads: VastAd[], parseErrorURLTemplates: unknown[]) {
         super('Vast', {
             ads: ['array'],
-            errorURLTemplates: ['array'],
+            parseErrorURLTemplates: ['array'],
             additionalTrackingEvents: ['object']
         });
 
         this.set('ads', ads);
-        this.set('errorURLTemplates', errorURLTemplates);
+        this.set('parseErrorURLTemplates', <string[]>parseErrorURLTemplates);
         this.set('additionalTrackingEvents', {});
     }
 
@@ -35,11 +35,11 @@ export class Vast extends Model<IVast> {
         if (ad) {
             const adErrorUrls = ad.getErrorURLTemplates();
             if (adErrorUrls instanceof Array) {
-                return adErrorUrls.concat(this.get('errorURLTemplates') || []);
+                return adErrorUrls.concat(this.get('parseErrorURLTemplates') || []);
             }
         }
 
-        return this.get('errorURLTemplates');
+        return this.get('parseErrorURLTemplates');
     }
 
     public getErrorURLTemplate(): string | null {
@@ -161,7 +161,7 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
-    public getLandscapeOrientedCompanionAd(): VastCreativeCompanionAd | null {
+    public getLandscapeOrientedCompanionAd(): VastCreativeStaticResourceCompanionAd | null {
         const ad = this.getAd();
         if (ad) {
             const companionAds = ad.getCompanionAds();
@@ -186,7 +186,7 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
-    public getPortraitOrientedCompanionAd(): VastCreativeCompanionAd | null {
+    public getPortraitOrientedCompanionAd(): VastCreativeStaticResourceCompanionAd | null {
         const ad = this.getAd();
         if (ad) {
             const companionAds = ad.getCompanionAds();
@@ -233,6 +233,27 @@ export class Vast extends Model<IVast> {
         return null;
     }
 
+    public getCompanionClickTrackingUrls(): string[] {
+        const ad = this.getAd();
+        if (ad) {
+            const companionAds = ad.getCompanionAds();
+
+            if (companionAds) {
+                for (const companionAd of companionAds) {
+                    const urls = companionAd.getCompanionClickTrackingURLTemplates();
+                    const height = companionAd.getHeight();
+                    const width = companionAd.getWidth();
+                    const creativeType = companionAd.getCreativeType();
+                    const validCompanion = this.isValidPortraitCompanion(creativeType, height, width) || this.isValidLandscapeCompanion(creativeType, height, width);
+                    if (urls.length > 0 && validCompanion) {
+                        return urls;
+                    }
+                }
+            }
+        }
+        return [];
+    }
+
     public getVideoMediaFiles(): VastMediaFile[] {
         const ad = this.getAd();
         const mediaFiles: VastMediaFile[] = [];
@@ -252,7 +273,7 @@ export class Vast extends Model<IVast> {
         return mediaFiles;
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         const ads = [];
         for (const ad of this.get('ads')) {
             ads.push(ad.getDTO());
@@ -260,7 +281,7 @@ export class Vast extends Model<IVast> {
 
         return {
             'ads': ads,
-            'errorURLTemplates': this.get('errorURLTemplates'),
+            'parseErrorURLTemplates': this.get('parseErrorURLTemplates'),
             'additionalTrackingEvents': this.get('additionalTrackingEvents')
         };
     }
@@ -271,6 +292,30 @@ export class Vast extends Model<IVast> {
             return ad.getCompanionCreativeViewTrackingUrls();
         }
         return [];
+    }
+
+    public isVPAIDCampaign(): boolean {
+        const ad = this.getAd();
+        let vpaidMediaCount = 0;
+        let mediaCount = 0;
+        if (ad) {
+            const creatives = ad.getCreatives();
+            for (const creative of creatives) {
+                const mediaFiles = creative.getMediaFiles();
+                for (const mediaFile of mediaFiles) {
+                    mediaCount += 1;
+                    if (mediaFile.getApiFramework() === 'VPAID') {
+                        vpaidMediaCount += 1;
+                    }
+                }
+            }
+        }
+
+        if (vpaidMediaCount > 0 && vpaidMediaCount === mediaCount) {
+            // then all mediaFiles are VPAID
+            return true;
+        }
+        return false;
     }
 
     private isValidLandscapeCompanion(creativeType: string | null, height: number, width: number): boolean {
@@ -292,6 +337,7 @@ export class Vast extends Model<IVast> {
 
     private isSupportedMIMEType(MIMEType: string): boolean {
         const playableMIMEType = 'video/mp4';
-        return MIMEType.toLowerCase() === playableMIMEType;
+        MIMEType = MIMEType.toLowerCase();
+        return MIMEType === playableMIMEType;
     }
 }

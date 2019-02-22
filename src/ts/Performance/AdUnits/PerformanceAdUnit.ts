@@ -3,16 +3,18 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { SliderPerformanceEndScreen } from 'Performance/Views/SliderPerformanceEndScreen';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
+import { DownloadManager } from 'China/Managers/DownloadManager';
+import { DeviceIdManager } from 'China/Managers/DeviceIdManager';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen | SliderPerformanceEndScreen;
     adUnitStyle?: AdUnitStyle;
-    privacy: AbstractPrivacy;
+    downloadManager?: DownloadManager;
+    deviceIdManager?: DeviceIdManager;
 }
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
@@ -22,8 +24,8 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
     private _performanceCampaign: PerformanceCampaign;
     private _thirdPartyEventManager: ThirdPartyEventManager;
 
-    constructor(nativeBridge: NativeBridge, parameters: IPerformanceAdUnitParameters) {
-        super(nativeBridge, parameters);
+    constructor(parameters: IPerformanceAdUnitParameters) {
+        super(parameters);
 
         parameters.overlay.setSpinnerEnabled(!CampaignAssetInfo.isCached(parameters.campaign));
 
@@ -38,14 +40,19 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
     }
 
     public hide(): Promise<void> {
-        const endScreen = this.getEndScreen();
-        if(endScreen) {
-            endScreen.hide();
-            endScreen.container().parentElement!.removeChild(endScreen.container());
+        if (this._endScreen) {
+            this._endScreen.hide();
+            const endScreenContainer = this._endScreen.container();
+            if (endScreenContainer && endScreenContainer.parentElement) {
+                endScreenContainer.parentElement.removeChild(endScreenContainer);
+            }
         }
         if (this._privacy) {
             this._privacy.hide();
-            this._privacy.container().parentElement!.removeChild(this._privacy.container());
+            const privacyContainer = this._privacy.container();
+            if (privacyContainer && privacyContainer.parentElement) {
+                privacyContainer.parentElement.removeChild(privacyContainer);
+            }
         }
 
         return super.hide();
@@ -57,6 +64,27 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
     public getEndScreen(): PerformanceEndScreen | SliderPerformanceEndScreen | undefined {
         return this._endScreen;
+    }
+
+    public setDownloadStatusMessage(message: string): void {
+        const downloadMessageText = document.body.getElementsByClassName('download-message-text')[0];
+        if (downloadMessageText) {
+            downloadMessageText.innerHTML = message;
+        }
+    }
+
+    public disableDownloadButton(): void {
+        const downloadContainer = document.body.getElementsByClassName('download-container')[0];
+        if (downloadContainer) {
+            downloadContainer.classList.add('disabled');
+        }
+    }
+
+    public enableDownloadButton(): void {
+        const downloadContainer = document.body.getElementsByClassName('download-container')[0];
+        if (downloadContainer) {
+            downloadContainer.classList.remove('disabled');
+        }
     }
 
     public onVideoError(): void {

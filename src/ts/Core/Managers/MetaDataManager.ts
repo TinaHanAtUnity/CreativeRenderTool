@@ -1,25 +1,26 @@
+import { ICoreApi } from 'Core/ICore';
 import { BaseMetaData } from 'Core/Models/MetaData/BaseMetaData';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export class MetaDataManager {
-    private _metaDataCache: { [key: string]: any } = {};
-    private _nativeBridge: NativeBridge;
 
-    constructor(nativeBridge: NativeBridge) {
-        this._nativeBridge = nativeBridge;
+    private _metaDataCache: { [key: string]: unknown } = {};
+    private _core: ICoreApi;
+
+    constructor(core: ICoreApi) {
+        this._core = core;
     }
 
-    public fetch<T extends BaseMetaData>(MetaDataConstructor: { new(): T}, cache: boolean = true, keys?: string[]): Promise<T | undefined> {
+    public fetch<T extends BaseMetaData>(MetaDataConstructor: new() => T, cache: boolean = true, keys?: string[]): Promise<T | undefined> {
         let metaData: T = new MetaDataConstructor();
 
         if (this._metaDataCache[metaData.getCategory()]) {
-            metaData = this._metaDataCache[metaData.getCategory()];
+            metaData = <T>this._metaDataCache[metaData.getCategory()];
             if(!keys) {
                 return Promise.resolve(metaData);
             }
         }
 
-        return metaData.fetch(this._nativeBridge, keys).then((success) => {
+        return metaData.fetch(this._core, keys).then((success) => {
             if (success) {
                 if(cache) {
                     this._metaDataCache[metaData.getCategory()] = metaData;

@@ -3,7 +3,7 @@
 $iphone-x-overlay-styles() {
   @media (orientation: portrait) {
     &.show-gdpr-banner .bottom-container .center .gdpr-pop-up {
-      border-radius: $new-video-overlay-styles.tab-border-radius;
+      border-radius: $video-overlay-styles.tab-border-radius;
     }
   }
 
@@ -12,7 +12,7 @@ $iphone-x-overlay-styles() {
       width: 40%;
 
       .gdpr-text {
-        font-size: $new-video-overlay-styles.base-size * .29;
+        font-size: $video-overlay-styles.base-size * .29;
       }
     }
 
@@ -23,7 +23,7 @@ $iphone-x-overlay-styles() {
       }
 
       .gdpr-button .tab {
-        bottom: $new-video-overlay-styles.base-size * .28;
+        bottom: $video-overlay-styles.base-size * .28;
       }
     }
   }
@@ -44,8 +44,8 @@ $iphone-x-overlay-styles() {
   }
 
   .button-left {
-    width: "calc(constant(safe-area-inset-left) + %s)" % $new-video-overlay-styles.touchable-area-width;
-    width: "calc(env(safe-area-inset-left) + %s)" % $new-video-overlay-styles.touchable-area-width; // @stylint ignore;
+    width: "calc(constant(safe-area-inset-left) + %s)" % $video-overlay-styles.touchable-area-width;
+    width: "calc(env(safe-area-inset-left) + %s)" % $video-overlay-styles.touchable-area-width; // @stylint ignore;
   }
 
   .button-right .tab {
@@ -54,26 +54,84 @@ $iphone-x-overlay-styles() {
   }
 
   .button-right {
-    width: "calc(constant(safe-area-inset-right) + %s)" % $new-video-overlay-styles.touchable-area-width;
-    width: "calc(env(safe-area-inset-right) + %s)" % $new-video-overlay-styles.touchable-area-width; // @stylint ignore;
+    width: "calc(constant(safe-area-inset-right) + %s)" % $video-overlay-styles.touchable-area-width;
+    width: "calc(env(safe-area-inset-right) + %s)" % $video-overlay-styles.touchable-area-width; // @stylint ignore;
   }
 
 
   .call-button {
-    width: "calc(constant(safe-area-inset-right) + %s)" % $new-video-overlay-styles.call-button-width;
-    width: "calc(env(safe-area-inset-right) + %s)" % $new-video-overlay-styles.call-button-width; // @stylint ignore;
+    width: "calc(constant(safe-area-inset-right) + %s)" % $video-overlay-styles.call-button-width;
+    width: "calc(env(safe-area-inset-right) + %s)" % $video-overlay-styles.call-button-width; // @stylint ignore;
   }
 
   .gdpr-button {
-    left: "calc(%s + constant(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width;
-    left: "calc(%s + env(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width; // @stylint ignore;
+    left: "calc(%s + constant(safe-area-inset-left))" % $video-overlay-styles.touchable-area-width;
+    left: "calc(%s + env(safe-area-inset-left))" % $video-overlay-styles.touchable-area-width; // @stylint ignore;
   }
 }
 
-$iphone-x-styles() {
-  #mraid,
-  #playable-mraid {
-    #mraid-iframe:not(.fullscreen) {
+.ar-phone-x-top {
+  display: none;
+}
+
+.ar-phone-x-bottom {
+  display: none;
+}
+
+.ar-phone-x-left {
+  display: none;
+}
+
+.ar-phone-x-right {
+  display: none;
+}
+
+$privacy-button-iphone-x-top() {
+  .privacy-button {
+    top: constant(safe-area-inset-top);
+    left: constant(safe-area-inset-left);
+
+    top: env(safe-area-inset-top);
+    left: env(safe-area-inset-left);
+  }
+}
+
+$privacy-button-iphone-x-bottom() {
+  .privacy-button {
+    bottom: constant(safe-area-inset-bottom);
+    left: constant(safe-area-inset-left);
+
+    bottom: env(safe-area-inset-bottom);
+    left: env(safe-area-inset-left);
+  }
+}
+
+$gdpr-pop-up-top() {
+  .gdpr-pop-up {
+    top: constant(safe-area-inset-top);
+    left: constant(safe-area-inset-left);
+    width: calc(100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+
+    top: env(safe-area-inset-top);
+    left: env(safe-area-inset-left);
+    width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+  }
+}
+
+$gdpr-pop-up-bottom() {
+  .gdpr-pop-up {
+    bottom: constant(safe-area-inset-bottom);
+    left: constant(safe-area-inset-left);
+    width: calc(100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+
+    bottom: env(safe-area-inset-bottom);
+    left: env(safe-area-inset-left);
+    width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+  }
+}
+
+$iphone-x-mraid-styles() {
+    #mraid-iframe {
       padding-top: constant(safe-area-inset-top);
       padding-right: constant(safe-area-inset-right);
       padding-bottom: constant(safe-area-inset-bottom);
@@ -89,6 +147,58 @@ $iphone-x-styles() {
       height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     }
 
+    .ar-phone-x-top {
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: block;
+      width: 100%;
+      background: $black;
+
+      height: env(safe-area-inset-top);
+
+      height: constant(safe-area-inset-top);
+    }
+
+    .ar-phone-x-bottom {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      display: block;
+      width: 100%;
+      background: $black;
+
+      height: env(safe-area-inset-bottom);
+
+      height: constant(safe-area-inset-bottom);
+    }
+
+    .ar-phone-x-left {
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: block;
+      height: 100%;
+      background: $black;
+
+      width: env(safe-area-inset-left);
+
+      width: constant(safe-area-inset-left);
+    }
+
+    .ar-phone-x-right {
+      position: fixed;
+      top: 0;
+      right: 0;
+      display: block;
+      height: 100%;
+      background: $black;
+
+      width: env(safe-area-inset-right);
+
+      width: constant(safe-area-inset-right);
+    }
+
     .close-region {
       top: constant(safe-area-inset-top);
       right: constant(safe-area-inset-right);
@@ -97,12 +207,59 @@ $iphone-x-styles() {
       right: env(safe-area-inset-right);
     }
 
-    .privacy-button {
-      bottom: constant(safe-area-inset-bottom);
-      left: constant(safe-area-inset-left);
+    .camera-permission-panel {
+      .gdpr-link {
+        bottom: calc(.5rem + constant(safe-area-inset-bottom));
 
-      bottom: env(safe-area-inset-bottom);
-      left: env(safe-area-inset-left);
+        bottom: calc(.5rem + env(safe-area-inset-bottom));
+      }
+      .show-learn-more-button {
+        bottom: calc(-.5rem + constant(safe-area-inset-bottom));
+
+        bottom: calc(-.5rem + env(safe-area-inset-bottom));
+      }
+    }
+}
+
+$iphone-x-styles() {
+
+  #gdpr-consent-settings {
+    .safe-area-content {
+      padding-top: constant(safe-area-inset-top);
+      padding-right: constant(safe-area-inset-right);
+      padding-bottom: constant(safe-area-inset-bottom);
+      padding-left: constant(safe-area-inset-left);
+
+      padding-top: env(safe-area-inset-top);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+    }
+  }
+
+  #promo {
+    iframe {
+      padding-top: constant(safe-area-inset-top);
+      padding-right: constant(safe-area-inset-right);
+      padding-bottom: constant(safe-area-inset-bottom);
+      padding-left: constant(safe-area-inset-left);
+      width: calc(100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+      height: calc(100vh - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
+
+      padding-top: env(safe-area-inset-top);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+      height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+
+    .privacy-button {
+      padding-top: constant(safe-area-inset-top);
+      padding-left: constant(safe-area-inset-left);
+
+      padding-top: env(safe-area-inset-top);
+      padding-left: env(safe-area-inset-left);
     }
 
     .gdpr-pop-up {
@@ -115,30 +272,75 @@ $iphone-x-styles() {
       left: env(safe-area-inset-left);
       width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
     }
+  }
 
-    .camera-permission-panel {
-        .gdpr-link {
-          bottom: calc(.5rem + constant(safe-area-inset-bottom));
+  #webplayer-mraid {
+    $iphone-x-mraid-styles();
+    $privacy-button-iphone-x-top();
+    $gdpr-pop-up-top();
+  }
 
-          bottom: calc(.5rem + env(safe-area-inset-bottom));
-        }
-        .show-learn-more-button {
-          bottom: calc(-.5rem + constant(safe-area-inset-bottom));
-
-          bottom: calc(-.5rem + env(safe-area-inset-bottom));
-        }
-    }
+  #extended-mraid, #mraid {
+    $iphone-x-mraid-styles();
+    $privacy-button-iphone-x-bottom();
+    $gdpr-pop-up-bottom();
   }
 
   .landscape {
-    #playable-mraid {
+    #extended-mraid {
+
+      .gdpr-pop-up {
+        &.mraid-container {
+          top: inherit;
+          bottom: 0;
+          width: calc(50vw - env(safe-area-inset-left));
+        }
+      }
+
       .camera-permission-panel {
         .show-learn-more-button {
           right: constant(safe-area-inset-right);
-  
+
           right: env(safe-area-inset-right);
         }
       }
+    }
+  }
+
+  #admob {
+    #admob-iframe {
+      padding-top: constant(safe-area-inset-top);
+      padding-right: constant(safe-area-inset-right);
+      padding-bottom: constant(safe-area-inset-bottom);
+      padding-left: constant(safe-area-inset-left);
+      width: calc(100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+      height: calc(100vh - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
+
+      padding-top: env(safe-area-inset-top);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+      height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+
+    .privacy-button {
+      padding-right: constant(safe-area-inset-right);
+      padding-bottom: constant(safe-area-inset-bottom);
+
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .gdpr-pop-up {
+      bottom: constant(safe-area-inset-bottom);
+      left: constant(safe-area-inset-left);
+      width: calc(100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+
+
+      bottom: env(safe-area-inset-bottom);
+      left: env(safe-area-inset-left);
+      width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
     }
   }
 
@@ -165,8 +367,10 @@ $iphone-x-styles() {
       top: env(safe-area-inset-top);
       right: env(safe-area-inset-right);
     }
+  }
 
-    .tencent-advertisement {
+  #vast-end-screen {
+    .china-advertisement {
       top: constant(safe-area-inset-top);
       left: constant(safe-area-inset-left);
 
@@ -180,18 +384,6 @@ $iphone-x-styles() {
 
       bottom: env(safe-area-inset-bottom);
       left: env(safe-area-inset-left);
-    }
-  }
-
-  #end-screen {
-    .unityads-logo {
-      bottom: constant(safe-area-inset-bottom);
-      bottom: env(safe-area-inset-bottom); // @stylint ignore;
-    }
-
-    &.use-gdpr-privacy-icon .unityads-logo {
-      bottom: calc(constant(safe-area-inset-bottom) + .5rem);
-      bottom: calc(env(safe-area-inset-bottom) + .5rem); // @stylint ignore;
     }
   }
 
@@ -252,14 +444,6 @@ $iphone-x-styles() {
     }
   }
 
-  .tencent-advertisement {
-    top: constant(safe-area-inset-top);
-    left: constant(safe-area-inset-left);
-
-    top: env(safe-area-inset-top);
-    left: env(safe-area-inset-left);
-  }
-
   .slide-up {
     slide-animation(.4s, ease-in, -250%);
   }
@@ -281,5 +465,104 @@ $iphone-x-styles() {
     width: calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right));
     height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   }
+}
 
+$iphone-x-performance-end-screen-styles() {
+  .performance-end-screen {
+    .portrait #end-screen {
+      padding: 0;
+      padding-top: env(safe-area-inset-top);
+      padding-top: constant(safe-area-inset-top); // @stylint ignore;
+      width: 100vw;
+      height: calc(100vh - env(safe-area-inset-top));
+      height: calc(100vh - constant(safe-area-inset-top)); // @stylint ignore;
+
+      .bottom-container {
+        margin-bottom: env(safe-area-inset-bottom);
+        margin-bottom: constant(safe-area-inset-bottom); // @stylint ignore;
+      }
+    }
+
+    .landscape #end-screen {
+      padding: 0;
+      height: 100vh;
+
+      .china-advertisement {
+        right: auto;
+        left: 0;
+        margin-right: 0;
+        margin-left: 1em;
+      }
+      .bottom-container {
+        margin-bottom: constant(safe-area-inset-bottom);
+        margin-bottom: env(safe-area-inset-bottom); // @stylint ignore
+
+        .privacy-button {
+          right: 0;
+          left: auto;
+          margin-right: 1em;
+          margin-left: 0;
+        }
+      }
+
+      &.show-gdpr-banner .gdpr-pop-up {
+        padding-bottom: constant(safe-area-inset-bottom);
+        padding-bottom: env(safe-area-inset-bottom); // @stylint ignore
+
+        .gdpr-text {
+          padding-bottom: 0;
+        }
+      }
+    }
+
+    .ios-landscape-right #end-screen {
+      padding-right: env(safe-area-inset-right);
+      padding-right: constant(safe-area-inset-right); // @stylint ignore
+      width: calc(100vw - env(safe-area-inset-right));
+      width: calc(100vw - constant(safe-area-inset-right)); // @stylint ignore
+    }
+
+    .ios-landscape-left #end-screen {
+      padding-left: env(safe-area-inset-left);
+      padding-left: constant(safe-area-inset-left); // @stylint ignore
+      width: calc(100vw - env(safe-area-inset-left));
+      width: calc(100vw - constant(safe-area-inset-left)); // @stylint ignore
+
+      .bottom-container .privacy-button {
+        right: env(safe-area-inset-right);
+        right: constant(safe-area-inset-right);   // @stylint ignore
+      }
+    }
+
+    #privacy {
+      height: calc(100% - constant(safe-area-inset-top));
+      height: calc(100% - env(safe-area-inset-top)); // @stylint ignore
+
+      .pop-up {
+        margin: 5% auto 5% auto;
+      }
+    }
+
+    .landscape  #privacy {
+      height: 100%;
+    }
+
+    .ios-landscape-right #privacy {
+      left: 0;
+      width: calc(100% - env(safe-area-inset-left));
+    }
+
+    .ios-landscape-left #privacy {
+      width: calc(100% - env(safe-area-inset-right));
+    }
+
+    #end-screen .end-screen-info-background{
+      @media (orientation: portrait) {
+        /* iPhone X & iPhone XS */
+        @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+          font-size: $default-px-size * 1.5;
+        }
+      }
+    }
+  }
 }

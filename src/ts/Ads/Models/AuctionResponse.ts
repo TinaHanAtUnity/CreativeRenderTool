@@ -1,8 +1,40 @@
 import { Model } from 'Core/Models/Model';
 import { JsonParser } from 'Core/Utilities/JsonParser';
+import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
+import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
+
+export enum AuctionStatusCode {
+    NORMAL = 0,
+    FREQUENCY_CAP_REACHED = 999
+}
+
+export interface IRawAuctionResponse {
+    auctionId?: string;
+    correlationId: string;
+    placements: { [key: string]: string };
+    media: { [key: string]: IAuctionResponse };
+    realtimeData?: { [key: string]: string };
+    statusCode?: number;
+}
+
+export interface IRawAuctionV5Response {
+    auctionId?: string;
+    correlationId: string;
+    placements: { [key: string]: { mediaId: string; trackingId: string } };
+    realtimeData?: { [key: string]: string };
+    media: { [key: string]: IAuctionResponse };
+    tracking: { [key: string]: ICampaignTrackingUrls | undefined };
+    statusCode?: number;
+}
+
+export interface IRawRealtimeResponse {
+    correlationId: string;
+    placements: { [key: string]: string };
+    media: { [key: string]: IAuctionResponse };
+}
 
 export interface IAuctionResponse {
-    placements: string[];
+    placements: AuctionPlacement[];
     contentType: string;
     content: string;
     cacheTTL: number | undefined;
@@ -13,20 +45,21 @@ export interface IAuctionResponse {
     correlationId: string;
     appCategory: string | undefined;
     appSubCategory: string | undefined;
-    advertiserCampaignId: string | undefined;
-    advertiserDomain: string | undefined;
-    advertiserBundleId: string | undefined;
+    campaignId: string | undefined;
+    advDomain: string | undefined;
+    bundleId: string | undefined;
     useWebViewUserAgentForTracking: boolean | undefined;
     buyerId: string | undefined;
     mediaId: string;
     width: number | undefined;
     height: number | undefined;
     isMoatEnabled: boolean | undefined;
-    isMediaExperiment: boolean | undefined;
+    statusCode: number | undefined;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
-    constructor(placements: string[], data: any, mediaId: string, correlationId: string) {
+
+    constructor(placements: AuctionPlacement[], data: IAuctionResponse, mediaId: string, correlationId: string, statusCode?: number) {
         super('AuctionResponse', {
             placements: ['array'],
             contentType: ['string'],
@@ -39,42 +72,42 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             appCategory: ['string', 'undefined'],
             appSubCategory: ['string', 'undefined'],
             correlationId: ['string'],
-            advertiserCampaignId: ['string', 'undefined'],
-            advertiserDomain: ['string', 'undefined'],
-            advertiserBundleId: ['string', 'undefined'],
+            campaignId: ['string', 'undefined'],
+            advDomain: ['string', 'undefined'],
+            bundleId: ['string', 'undefined'],
             useWebViewUserAgentForTracking: ['boolean', 'undefined'],
             buyerId: ['string', 'undefined'],
             mediaId: ['string'],
             width: ['number', 'undefined'],
             height: ['number', 'undefined'],
             isMoatEnabled: ['boolean', 'undefined'],
-            isMediaExperiment: ['boolean', 'undefined']
+            statusCode: ['number', 'undefined']
         });
 
         this.set('placements', placements);
         this.set('contentType', data.contentType);
         this.set('content', data.content);
         this.set('cacheTTL', data.cacheTTL);
-        this.set('trackingUrls', data.trackingUrls);
+        this.set('trackingUrls', data.trackingUrls ? data.trackingUrls : {}); // todo: hack for auction v5 test, trackingUrls should be removed from this model once auction v5 is unconditionally adopted
         this.set('adType', data.adType);
         this.set('creativeId', data.creativeId);
         this.set('seatId', data.seatId);
         this.set('correlationId', correlationId);
         this.set('appCategory', data.appCategory);
         this.set('appSubCategory', data.appSubCategory);
-        this.set('advertiserCampaignId', data.campaignId);
-        this.set('advertiserDomain', data.advDomain);
-        this.set('advertiserBundleId', data.bundleId);
+        this.set('campaignId', data.campaignId);
+        this.set('advDomain', data.advDomain);
+        this.set('bundleId', data.bundleId);
         this.set('useWebViewUserAgentForTracking', data.useWebViewUserAgentForTracking || false);
         this.set('buyerId', data.buyerId);
         this.set('mediaId', mediaId);
         this.set('width', data.width);
         this.set('height', data.height);
         this.set('isMoatEnabled', data.isMoatEnabled);
-        this.set('isMediaExperiment', data.isMediaExperiment);
+        this.set('statusCode', statusCode);
     }
 
-    public getPlacements(): string[] {
+    public getPlacements(): AuctionPlacement[] {
         return this.get('placements');
     }
 
@@ -86,7 +119,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('content');
     }
 
-    public getJsonContent(): any {
+    public getJsonContent(): unknown {
         return JsonParser.parse(this.getContent());
     }
 
@@ -123,15 +156,15 @@ export class AuctionResponse extends Model<IAuctionResponse> {
     }
 
     public getAdvertiserDomain(): string | undefined {
-        return this.get('advertiserDomain');
+        return this.get('advDomain');
     }
 
     public getAdvertiserCampaignId(): string | undefined {
-        return this.get('advertiserCampaignId');
+        return this.get('campaignId');
     }
 
     public getAdvertiserBundleId(): string | undefined {
-        return this.get('advertiserBundleId');
+        return this.get('bundleId');
     }
 
     public getUseWebViewUserAgentForTracking(): boolean | undefined {
@@ -158,11 +191,11 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('isMoatEnabled');
     }
 
-    public isMediaExperiment(): boolean | undefined {
-        return this.get('isMediaExperiment');
+    public getStatusCode(): number | undefined {
+        return this.get('statusCode');
     }
 
-    public getDTO(): {[key: string]: any } {
+    public getDTO(): {[key: string]: unknown } {
         return {
             'placements': this.getPlacements(),
             'contentType': this.getContentType(),

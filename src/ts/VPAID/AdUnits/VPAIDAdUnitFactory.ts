@@ -1,5 +1,4 @@
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
@@ -9,46 +8,31 @@ import { VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
 import { VPAIDEndScreenEventHandler } from 'VPAID/EventHandlers/VPAIDEndScreenEventHandler';
 import { Closer } from 'Ads/Views/Closer';
 import { VPAID } from 'VPAID/Views/VPAID';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
-export class VPAIDAdUnitFactory extends AbstractAdUnitFactory {
+export class VPAIDAdUnitFactory extends AbstractAdUnitFactory<VPAIDCampaign, IVPAIDAdUnitParameters> {
 
-    public createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): VPAIDAdUnit {
-        // WebPlayerContainer will always be defined, checking and throwing just to remove the undefined type.
-        if (!parameters.webPlayerContainer) {
-            throw new Error('is undefined, should not get here.');
+    public createAdUnit(parameters: IVPAIDAdUnitParameters): VPAIDAdUnit {
+        const vpaidAdUnit = new VPAIDAdUnit(parameters);
+
+        const vpaidEventHandler = new VPAIDEventHandler(vpaidAdUnit, {
+            ads: parameters.ads,
+            core: parameters.core,
+            closer: parameters.closer,
+            endScreen: parameters.endScreen,
+            operativeEventManager: parameters.operativeEventManager,
+            thirdPartyEventManager: parameters.thirdPartyEventManager,
+            placement: parameters.placement,
+            campaign: parameters.campaign
+        });
+        parameters.vpaid.addEventHandler(vpaidEventHandler);
+        const overlayEventHandler = new VPAIDOverlayEventHandler(vpaidAdUnit, parameters);
+        parameters.closer.addEventHandler(overlayEventHandler);
+
+        if(parameters.campaign.hasEndScreen() && parameters.endScreen) {
+            const endScreenEventHandler = new VPAIDEndScreenEventHandler(vpaidAdUnit, parameters);
+            parameters.endScreen.addEventHandler(endScreenEventHandler);
         }
-
-        const privacy = this.createPrivacy(nativeBridge, parameters);
-        const showGDPRBanner = this.showGDPRBanner(parameters);
-        const closer = new Closer(nativeBridge, parameters.placement, privacy, showGDPRBanner);
-        const vpaid = new VPAID(nativeBridge, parameters.webPlayerContainer, parameters.campaign, parameters.placement);
-        let endScreen: VPAIDEndScreen | undefined;
-
-        const vpaidAdUnitParameters: IVPAIDAdUnitParameters = {
-            ... parameters,
-            vpaid: vpaid,
-            closer: closer,
-            privacy: privacy
-        };
-
-        if(parameters.campaign.hasEndScreen()) {
-            endScreen = new VPAIDEndScreen(nativeBridge, parameters.campaign, parameters.clientInfo.getGameId());
-            vpaidAdUnitParameters.endScreen = endScreen;
-        }
-
-        const vpaidAdUnit = new VPAIDAdUnit(nativeBridge, vpaidAdUnitParameters);
-
-        const vpaidEventHandler = new VPAIDEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
-        vpaid.addEventHandler(vpaidEventHandler);
-        const overlayEventHandler = new VPAIDOverlayEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
-        closer.addEventHandler(overlayEventHandler);
-
-        if(parameters.campaign.hasEndScreen() && endScreen) {
-            const endScreenEventHandler = new VPAIDEndScreenEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
-            endScreen.addEventHandler(endScreenEventHandler);
-        }
-        Privacy.setupReportListener(privacy, vpaidAdUnit);
 
         return vpaidAdUnit;
     }

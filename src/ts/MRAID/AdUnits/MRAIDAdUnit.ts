@@ -9,38 +9,41 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { EventType } from 'Ads/Models/Session';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { EndScreen } from 'Ads/Views/EndScreen';
+import { IARApi } from 'AR/AR';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { FinishState } from 'Core/Constants/FinishState';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
     endScreen?: EndScreen;
-    privacy: AbstractPrivacy;
+    ar: IARApi;
+    webPlayerContainer: WebPlayerContainer;
 }
 
 export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
 
-    private _operativeEventManager: OperativeEventManager;
-    private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _mraid: MRAIDView<IMRAIDViewHandler>;
-    private _options: any;
-    private _orientationProperties: IOrientationProperties;
-    private _endScreen?: EndScreen;
-    private _showingMRAID: boolean;
-    private _clientInfo: ClientInfo;
-    private _placement: Placement;
-    private _campaign: MRAIDCampaign;
-    private _privacy: AbstractPrivacy;
-    private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
+    protected _operativeEventManager: OperativeEventManager;
+    protected _thirdPartyEventManager: ThirdPartyEventManager;
+    protected _mraid: MRAIDView<IMRAIDViewHandler>;
+    protected _ar: IARApi;
+    protected _options: unknown;
+    protected _orientationProperties: IOrientationProperties;
+    protected _endScreen?: EndScreen;
+    protected _showingMRAID: boolean;
+    protected _clientInfo: ClientInfo;
+    protected _placement: Placement;
+    protected _campaign: MRAIDCampaign;
+    protected _privacy: AbstractPrivacy;
+    protected _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
 
-    constructor(nativeBridge: NativeBridge, parameters: IMRAIDAdUnitParameters) {
-        super(nativeBridge, parameters);
+    constructor(parameters: IMRAIDAdUnitParameters) {
+        super(parameters);
 
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
@@ -51,6 +54,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
         this._privacy = parameters.privacy;
+        this._ar = parameters.ar;
 
         this._mraid.render();
         document.body.appendChild(this._mraid.container());
@@ -74,18 +78,21 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowing(true);
         this.setShowingMRAID(true);
         this._mraid.show();
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
+        this._ads.Listener.sendStartEvent(this._placement.getId());
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });
-        this.sendTrackingEvent('impression');
+
+        if (!CustomFeatures.isLoopMeSeat(this._campaign.getSeatId())) {
+            this.sendImpression();
+        }
 
         this._container.addEventHandler(this);
 
         const views: string[] = ['webview'];
 
         const isARCreative = ARUtil.isARCreative(this._campaign);
-        const isARSupported = isARCreative ? ARUtil.isARSupported(this._nativeBridge) : Promise.resolve<boolean>(false);
+        const isARSupported = isARCreative ? ARUtil.isARSupported(this._ar) : Promise.resolve<boolean>(false);
 
         return isARSupported.then(arSupported => {
             if (arSupported) {
@@ -105,36 +112,18 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowing(false);
         this.setShowingMRAID(false);
 
-        this._mraid.hide();
-        if(this._endScreen) {
-            this._endScreen.hide();
-            this._endScreen.container().parentElement!.removeChild(this._endScreen.container());
+        if (this._mraid) {
+            this._mraid.hide();
         }
+        this.removeEndScreenContainer();
+        this.removePrivacyContainer();
 
-        if(this._privacy) {
-            this._privacy.hide();
-            this._privacy.container().parentElement!.removeChild(this._privacy.container());
-        }
-
-        const operativeEventParams = this.getOperativeEventParams();
-        const finishState = this.getFinishState();
-        if(finishState === FinishState.COMPLETED) {
-            if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
-                this._operativeEventManager.sendThirdQuartile(operativeEventParams);
-            }
-            if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
-                this._operativeEventManager.sendView(operativeEventParams);
-            }
-            this.sendTrackingEvent('complete');
-        } else if(finishState === FinishState.SKIPPED) {
-            this._operativeEventManager.sendSkip(operativeEventParams);
-        }
-
+        this.sendFinishOperativeEvents();
         this.onFinish.trigger();
-        this._mraid.container().parentElement!.removeChild(this._mraid.container());
+        this.removeMraidContainer();
         this.unsetReferences();
 
-        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this._container.removeEventHandler(this);
 
         return this._container.close().then(() => {
@@ -152,6 +141,10 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendClick(): void {
         this.sendTrackingEvent('click');
+    }
+
+    public sendImpression(): void {
+        this.sendTrackingEvent('impression');
     }
 
     public getEndScreen(): EndScreen | undefined {
@@ -209,13 +202,13 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         // EMPTY
     }
 
-    private unsetReferences() {
+    protected unsetReferences() {
         delete this._mraid;
         delete this._endScreen;
         delete this._privacy;
     }
 
-    private sendTrackingEvent(eventName: string): void {
+    protected sendTrackingEvent(eventName: string): void {
         const sessionId = this._campaign.getSession().getId();
 
         if(this._additionalTrackingEvents && this._additionalTrackingEvents[eventName]) {
@@ -229,10 +222,58 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
     }
 
-    private getOperativeEventParams(): IOperativeEventParams {
+    protected getOperativeEventParams(): IOperativeEventParams {
         return {
             placement: this._placement,
             asset: this._campaign.getResourceUrl()
         };
+    }
+
+    protected removeEndScreenContainer() {
+        if(this._endScreen) {
+            this._endScreen.hide();
+
+            const endScreenContainer = this._endScreen.container();
+            if (endScreenContainer && endScreenContainer.parentElement) {
+                endScreenContainer.parentElement.removeChild(this._endScreen.container());
+            }
+        }
+    }
+
+    protected removePrivacyContainer() {
+        if (this._privacy) {
+            const privacyContainer = this._privacy.container();
+            if (privacyContainer && privacyContainer.parentElement) {
+                privacyContainer.parentElement.removeChild(privacyContainer);
+            }
+        }
+    }
+
+    protected removeMraidContainer() {
+        if (this._mraid) {
+            const mraidContainer = this._mraid.container();
+            if (mraidContainer && mraidContainer.parentElement) {
+                mraidContainer.parentElement.removeChild(mraidContainer);
+            }
+        }
+    }
+
+    protected sendFinishOperativeEvents() {
+        const operativeEventParams = this.getOperativeEventParams();
+        const finishState = this.getFinishState();
+
+        if(finishState === FinishState.COMPLETED) {
+            if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+                this._operativeEventManager.sendThirdQuartile(operativeEventParams);
+            }
+
+            if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
+                this._operativeEventManager.sendView(operativeEventParams);
+            }
+
+            this.sendTrackingEvent('complete');
+        } else if(finishState === FinishState.SKIPPED) {
+            this._operativeEventManager.sendSkip(operativeEventParams);
+        }
     }
 }

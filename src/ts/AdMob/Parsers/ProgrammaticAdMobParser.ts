@@ -5,21 +5,64 @@ import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ICoreApi, ICore } from 'Core/ICore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 import { FileId } from 'Core/Utilities/FileId';
-import { Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { VastParser } from 'VAST/Utilities/VastParser';
+import { RequestError } from 'Core/Errors/RequestError';
+import { AdmobParsingTest, ABGroup } from 'Core/Models/ABGroup';
+import { ProgrammaticTrackingService, ProgrammaticTrackingErrorName } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { SdkStats } from 'Ads/Utilities/SdkStats';
+
+export enum AdmobUrlQueryParameters {
+    TIMESTAMP = 'ts',
+    VIDEO_ID = 'video_id'
+}
 
 export class ProgrammaticAdMobParser extends CampaignParser {
+
     public static ContentType = 'programmatic/admob-video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
+
+    private _core: ICoreApi;
+    private _requestManager: RequestManager;
+    private _abGroup: ABGroup;
+    private _pts: ProgrammaticTrackingService;
+    private _mediaFileUrl: string;
+
+    constructor(core: ICore) {
+        super(core.NativeBridge.getPlatform());
+        this._core = core.Api;
+        this._requestManager = core.RequestManager;
+        this._abGroup = core.Config.getAbGroup();
+        this._pts = core.Ads.ProgrammaticTrackingService;
+    }
+
+    public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
-        const platform = nativeBridge.getPlatform();
-        const videoPromise = this.getVideoFromMarkup(markup, request, session, platform).catch((e) => {
-            nativeBridge.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
+        const videoPromise = this.getVideoFromMarkup(markup, session).catch((e) => {
+            this._core.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
+            if (AdmobParsingTest.isValid(this._abGroup) && e instanceof RequestError) {
+                // Video attempting to be shown is no longer being hosted by Admob
+                this._pts.reportError(ProgrammaticTrackingErrorName.AdmobTestHttpError, 'AdMob', this.seatID);
+                if (e.nativeResponse) {
+                    SessionDiagnostics.trigger('admob_http_parse_error', {
+                        videoId: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.VIDEO_ID),
+                        urlTimestamp: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP),
+                        adRequestTimestamp: Math.floor(SdkStats.getAdRequestTimestamp() / 1000),
+                        failureTimestamp: Math.floor(Date.now() / 1000),
+                        initialVideoUrl: this._mediaFileUrl,
+                        responseCode: e.nativeResponse.responseCode,
+                        redirectedUrl: e.nativeResponse.url,
+                        headers: e.nativeResponse.headers,
+                        response: e.nativeResponse.response
+                    }, session);
+                }
+                throw e;
+            }
             return null;
         });
 
@@ -28,21 +71,23 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 this.updateFileID(video);
             }
             const baseCampaignParams: ICampaign = {
-                id: this.getProgrammaticCampaignId(nativeBridge),
+                id: this.getProgrammaticCampaignId(),
                 willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
+                contentType: ProgrammaticAdMobParser.ContentType,
                 adType: response.getAdType() || undefined,
                 correlationId: response.getCorrelationId() || undefined,
                 creativeId: response.getCreativeId() || undefined,
                 seatId: response.getSeatId() || undefined,
                 meta: undefined,
                 session: session,
-                mediaId: response.getMediaId()
+                mediaId: response.getMediaId(),
+                trackingUrls: response.getTrackingUrls() || {},
+                backupCampaign: false
             };
 
             const adMobCampaignParams: IAdMobCampaign = {
                 ... baseCampaignParams,
                 dynamicMarkup: markup,
-                trackingUrls: response.getTrackingUrls(),
                 useWebViewUserAgentForTracking: true,
                 video: video
             };
@@ -52,7 +97,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
 
     }
 
-    private getVideoFromMarkup(markup: string, request: Request, session: Session, platform: Platform): Promise<AdMobVideo> {
+    private getVideoFromMarkup(markup: string, session: Session): Promise<AdMobVideo> {
         try {
             const dom = new DOMParser().parseFromString(markup, 'text/html');
             if (!dom) {
@@ -63,24 +108,24 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 return Promise.reject(new Error('Could not find script tag within body'));
             }
             const scriptSrc = scriptTag.textContent;
-            const mediaFileURL = this.getVideoFromScriptSource(scriptSrc!);
+            this._mediaFileUrl = this.getVideoFromScriptSource(scriptSrc!);
 
-            return this.getRealVideoURL(mediaFileURL, request).then((realVideoURL: string) => {
+            return this.getRealVideoURL(this._mediaFileUrl).then((realVideoURL: string) => {
                 return new Promise<AdMobVideo>((resolve, reject) => {
                     const mimeType = Url.getQueryParameter(realVideoURL, 'mime');
                     let extension: string | null = null;
                     if (mimeType) {
                         extension = mimeType.split('/')[1];
                     }
-                    if (platform === Platform.ANDROID) {
+                    if (this._platform === Platform.ANDROID) {
                         resolve(new AdMobVideo({
-                            mediaFileURL: mediaFileURL,
+                            mediaFileURL: this._mediaFileUrl,
                             video: new Video(realVideoURL, session),
                             extension: null
                         }));
-                    } else if (extension && platform === Platform.IOS) {
+                    } else if (extension && this._platform === Platform.IOS) {
                         resolve(new AdMobVideo({
-                            mediaFileURL: mediaFileURL,
+                            mediaFileURL: this._mediaFileUrl,
                             video: new Video(realVideoURL, session),
                             extension: extension
                         }));
@@ -95,8 +140,8 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         }
     }
 
-    private getRealVideoURL(videoURL: string, request: Request): Promise<string> {
-        return request.followRedirectChain(videoURL);
+    private getRealVideoURL(videoURL: string): Promise<string> {
+        return this._requestManager.followRedirectChain(videoURL);
     }
 
     private getVideoFromScriptSource(src: string): string {
@@ -116,8 +161,9 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         return new VastParser().parseVast(xml);
     }
 
-    private sanitizeXML(xml: string): string {
-        return this.replaceHexChars(xml).replace(/\\n/g, '');
+    private sanitizeXML(xml: string) {
+        xml = this.replaceHexChars(xml);
+        return xml.replace(/\\n/g, '');
     }
 
     private replaceHexChars(str: string) {

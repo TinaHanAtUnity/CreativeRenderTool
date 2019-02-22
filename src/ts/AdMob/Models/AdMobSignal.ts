@@ -1,6 +1,6 @@
 import { Model } from 'Core/Models/Model';
 import * as protobuf from 'protobufjs/minimal';
-import { unity_proto } from '../../../proto/unity_proto.js';
+import { unity_proto } from 'unity_proto';
 
 interface IAdMobSignal {
     sdkVersion: string;
@@ -584,7 +584,7 @@ export class AdMobSignal extends Model<IAdMobSignal> {
         return str;
     }
 
-    public getDTO(): { [key: string]: any } {
+    public getDTO(): { [key: string]: unknown } {
         return {
             'sdkVersion': this.getSdkVersion(),
             'batteryLevel': this.getBatteryLevel(),

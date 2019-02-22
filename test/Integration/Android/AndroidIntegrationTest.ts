@@ -7,8 +7,19 @@ import { UnityAds } from 'Backend/UnityAds';
 import { Platform } from 'Core/Constants/Platform';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
+import { fakeARUtils } from 'TestHelpers/FakeARUtils';
+import * as sinon from 'sinon';
 
 describe('AndroidIntegrationTest', () => {
+    const sandbox = sinon.createSandbox();
+
+    beforeEach(() => {
+        fakeARUtils(sandbox);
+    });
+
+    afterEach(() => {
+        sandbox.restore();
+    });
 
     it('should handle happy path on Android', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(10000);
@@ -47,9 +58,9 @@ describe('AndroidIntegrationTest', () => {
         UnityAds.getBackend().Api.DeviceInfo.setScreenHeight(1776);
         UnityAds.getBackend().Api.DeviceInfo.setTimeZone('GMT+02:00');
 
-        ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
-        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        ConfigManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        CampaignManager.setBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
+        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.unityads.unity3d.com');
 
         UnityAds.initialize(Platform.ANDROID, '456', listener, true);
     });

@@ -12,7 +12,6 @@ import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { Url } from 'Core/Utilities/Url';
@@ -21,6 +20,7 @@ import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
+    webPlayerContainer: WebPlayerContainer;
 }
 
 export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
@@ -28,7 +28,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _view: DisplayInterstitial;
-    private _options: any;
+    private _options: unknown;
     private _campaign: DisplayInterstitialCampaign;
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
@@ -46,8 +46,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     private _topWebViewAreaHeight: number;
     private readonly _topWebViewAreaMinHeight = 60;
 
-    constructor(nativeBridge: NativeBridge, parameters: IDisplayInterstitialAdUnitParameters) {
-        super(nativeBridge, parameters);
+    constructor(parameters: IDisplayInterstitialAdUnitParameters) {
+        super(parameters);
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._view = parameters.view;
@@ -55,7 +55,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         this._placement = parameters.placement;
         this._deviceInfo = parameters.deviceInfo;
         this._clientInfo = parameters.clientInfo;
-        this._webPlayerContainer = parameters.webPlayerContainer!;
+        this._webPlayerContainer = parameters.webPlayerContainer;
 
         this._view.render();
         document.body.appendChild(this._view.container());
@@ -63,7 +63,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         this._options = parameters.options;
         this.setShowing(false);
 
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (parameters.platform === Platform.ANDROID) {
             this._topWebViewAreaHeight = Math.floor(this.getAndroidViewSize(this._topWebViewAreaMinHeight, this.getScreenDensity()));
         } else {
             this._topWebViewAreaHeight = this._topWebViewAreaMinHeight;
@@ -78,7 +78,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         return this.setWebPlayerViews().then(() => {
             this._view.show();
             this.onStart.trigger();
-            this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
+            this._ads.Listener.sendStartEvent(this._placement.getId());
             this.sendStartEvents();
             this._container.addEventHandler(this);
             this.setupPrivacyObservers();
@@ -99,13 +99,18 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         this._webPlayerContainer.onPageStarted.unsubscribe(this._onPageStartedObserver);
         this._webPlayerContainer.shouldOverrideUrlLoading.unsubscribe(this._shouldOverrideUrlLoadingObserver);
 
-        this._view.hide();
-        this.onFinish.trigger();
+        if (this._view) {
+            this._view.hide();
+            const viewContainer = this._view.container();
+            if (viewContainer && viewContainer.parentElement) {
+                viewContainer.parentElement.removeChild(viewContainer);
+            }
+        }
 
-        this._view.container().parentElement!.removeChild(this._view.container());
+        this.onFinish.trigger();
         this.unsetReferences();
 
-        this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         return this._container.close().then(() => {
             return this._webPlayerContainer.clearSettings().then(() => {
                 this.onClose.trigger();
@@ -160,7 +165,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     }
 
     private getScreenDensity(): number {
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (this._platform === Platform.ANDROID) {
             return (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity();
         }
         return 0;
@@ -174,7 +179,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         let creativeWidth = screenWidth;
         let creativeHeight = screenHeight;
 
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this.hasCreativeSize()) {
+        if(this._platform === Platform.ANDROID && this.hasCreativeSize()) {
             const screenDensity = this.getScreenDensity();
             creativeWidth = Math.floor(this.getAndroidViewSize(this._campaign.getWidth() || screenWidth, screenDensity));
             creativeHeight = Math.floor(this.getAndroidViewSize(this._campaign.getHeight() || screenHeight, screenDensity));
@@ -194,7 +199,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     }
 
     private onPageStarted(url: string): void {
-        this._nativeBridge.Sdk.logDebug('DisplayInterstitialAdUnit: onPageStarted triggered for url: ' + url);
+        this._core.Sdk.logDebug('DisplayInterstitialAdUnit: onPageStarted triggered for url: ' + url);
         if(!this._receivedOnPageStart) {
             this._receivedOnPageStart = true;
             return;
@@ -216,14 +221,14 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
             return;
         }
         this._handlingShouldOverrideUrlLoading = true;
-        if (this._nativeBridge.getPlatform() === Platform.IOS && url === 'about:blank') {
+        if (this._platform && url === 'about:blank') {
             this.setWebplayerSettings(false).then(() => {
                 this._handlingShouldOverrideUrlLoading = false;
             });
             return;
         }
-        this._nativeBridge.Sdk.logDebug('DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: "' + url);
-        if (!url || !Url.isProtocolWhitelisted(url, this._nativeBridge.getPlatform())) {
+        this._core.Sdk.logDebug('DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: "' + url);
+        if (!url || !Url.isProtocolWhitelisted(url, this._platform)) {
             this._handlingShouldOverrideUrlLoading = false;
             return;
         }
@@ -232,10 +237,10 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
 
     private openUrlInBrowser(url: string): Promise<void> {
         let openPromise: Promise<void>;
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            openPromise = this._nativeBridge.UrlScheme.open(url);
+        if (this._platform === Platform.IOS) {
+            openPromise = this._core.iOS!.UrlScheme.open(url);
         } else {
-            openPromise = this._nativeBridge.Intent.launch({
+            openPromise = this._core.Android!.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': url
             });
@@ -244,7 +249,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         return Promise.resolve(openPromise).then(() => {
             this._handlingShouldOverrideUrlLoading = false;
         }).catch((e) => {
-            this._nativeBridge.Sdk.logWarning('DisplayInterstitialAdUnit: Cannot open url: "' + url + '": ' + e);
+            this._core.Sdk.logWarning('DisplayInterstitialAdUnit: Cannot open url: "' + url + '": ' + e);
             this._handlingShouldOverrideUrlLoading = false;
         });
     }
@@ -254,25 +259,28 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     }
 
     private sendStartEvents(): void {
+        const trackingUrls = this._campaign.getTrackingUrlsForEvent('impression');
+
         for (const url of (this._campaign).getTrackingUrlsForEvent('impression')) {
             this._thirdPartyEventManager.sendWithGet('display impression', this._campaign.getSession().getId(), url);
         }
+
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });
     }
 
     private setWebPlayerViews(): Promise<void> {
-        const platform = this._nativeBridge.getPlatform();
+        const platform = this._platform;
         let webPlayerSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos;
         if (platform === Platform.ANDROID) {
             webPlayerSettings = {
-                'setJavaScriptCanOpenWindowsAutomatically': [true],
-                'setSupportMultipleWindows': [false]
+                setJavaScriptCanOpenWindowsAutomatically: [true],
+                setSupportMultipleWindows: [false]
             };
         } else {
             webPlayerSettings = {
-                'javaScriptCanOpenWindowsAutomatically': true
+                javaScriptCanOpenWindowsAutomatically: true
             };
         }
         return this._webPlayerContainer.setSettings(webPlayerSettings, {}).then(() => {
@@ -284,7 +292,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
 
     private setWebPlayerData(data: string, mimeType: string, encoding: string): Promise<void> {
         return this._webPlayerContainer.setData(data, mimeType, encoding).catch((error) => {
-            this._nativeBridge.Sdk.logError(JSON.stringify(error));
+            this._core.Sdk.logError(JSON.stringify(error));
             Diagnostics.trigger('webplayer_set_data_error', new DiagnosticError(error, {data: data, mimeType: mimeType, encoding: encoding}));
             this.setFinishState(FinishState.ERROR);
             this.hide();
@@ -297,8 +305,14 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
 
     private setWebplayerSettings(shouldOverrideUrlLoadingReturnValue: boolean): Promise<void> {
         const eventSettings = {
-            'onPageStarted': {'sendEvent': true},
-            'shouldOverrideUrlLoading': {'sendEvent': true, 'returnValue': shouldOverrideUrlLoadingReturnValue, 'callSuper': false}
+            onPageStarted: {
+                sendEvent: true
+            },
+            shouldOverrideUrlLoading: {
+                sendEvent: true,
+                returnValue: shouldOverrideUrlLoadingReturnValue,
+                callSuper: false
+            }
         };
         return this._webPlayerContainer.setEventSettings(eventSettings);
     }

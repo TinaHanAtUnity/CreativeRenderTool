@@ -10,6 +10,8 @@ export class CometCampaignLoader extends CampaignLoader {
             return undefined;
         }
 
+        campaign.backupCampaign = true;
+
         if(campaign.session) {
             campaign.session = this.loadSession(campaign.session);
         }
@@ -20,6 +22,10 @@ export class CometCampaignLoader extends CampaignLoader {
 
         if(campaign.gameIcon) {
             campaign.gameIcon = this.loadImage(campaign.gameIcon, campaign.session);
+        }
+
+        if(campaign.squareImage) {
+            campaign.squareImage = this.loadImage(campaign.squareImage, campaign.session);
         }
 
         if(campaign.landscapeImage) {

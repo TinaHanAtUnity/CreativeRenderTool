@@ -1,17 +1,26 @@
-import { BannerAdUnit, IBannerAdUnitParameters } from 'Banners/AdUnits/BannerAdUnit';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { DisplayHTMLBannerAdUnit } from 'Banners/AdUnits/DisplayHTMLBannerAdUnit';
+import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
+import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
 
 export class BannerAdUnitFactory {
-    public static createAdUnit(nativeBridge: NativeBridge, parameters: IBannerAdUnitParameters): BannerAdUnit {
+
+    public static ContentTypeJS = 'programmatic/banner-js';
+    public static ContentTypeHTML = 'programmatic/banner-html';
+
+    public canCreateAdUnit(contentType: string): boolean {
+        return contentType === BannerAdUnitFactory.ContentTypeJS || contentType === BannerAdUnitFactory.ContentTypeHTML;
+    }
+
+    public createAdUnit(parameters: IBannerAdUnitParameters): IBannerAdUnit {
         if (parameters.campaign instanceof BannerCampaign) {
-            return this.createBannerAdUnit(nativeBridge, parameters);
+            return this.createBannerAdUnit(parameters);
         } else {
             throw new Error('Unknown campaign instance type');
         }
     }
 
-    private static createBannerAdUnit(nativeBridge: NativeBridge, parameters: IBannerAdUnitParameters): BannerAdUnit {
-        return new BannerAdUnit(nativeBridge, parameters);
+    private createBannerAdUnit(parameters: IBannerAdUnitParameters): IBannerAdUnit {
+        return new DisplayHTMLBannerAdUnit(parameters);
     }
 }

@@ -1,0 +1,520 @@
+@import "vars.styl";
+@import "gdpr-pop-up.styl";
+@import "iphone-x-series.styl";
+
+$video-overlay-styles = {
+  base-size: unit(16px/16, "em") * $default-size,
+  tab-font-color: "#f1f1f1",
+}
+
+$video-overlay-styles.touchable-area-height = $video-overlay-styles.base-size * 2;
+$video-overlay-styles.touchable-area-width = $video-overlay-styles.base-size * 2.2;
+$video-overlay-styles.call-button-width = $video-overlay-styles.base-size * 6;
+// @stylint off
+$video-overlay-styles.tab-border-radius = $video-overlay-styles.base-size * 0.2;
+$video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.3;
+// @stylint on
+
+#video-overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  color: $white;
+  font-size: 16px;
+  transition: opacity .45s ease-in;
+
+  .top-container,
+  .show-skip-button {
+    display: none;
+  }
+
+  .bottom-container {
+    display: block;
+    height: .3 * $video-overlay-styles.base-size;
+
+    .left-corner,
+    .center {
+      display: none;
+    }
+
+    .left-corner,
+    .right-corner {
+      top: auto;
+      bottom: .3 * $video-overlay-styles.base-size;
+    }
+  }
+
+  &.fade-in .skip-button,
+  .skip-button {
+    display: none;
+  }
+
+  &.fade-in {
+    .top-container,
+    .show-skip-button {
+      display: block;
+    }
+
+    .bottom-container {
+      .left-corner,
+      .center {
+        display: block;
+      }
+    }
+  }
+
+  .skip-button:not(.close-icon-skip) {
+    .icon-skip {
+      display: block;
+    }
+    .icon-close {
+      display: none;
+    }
+  }
+
+  .skip-button.close-icon-skip {
+    .icon-skip {
+      display: none;
+    }
+    .icon-close {
+      display: block;
+    }
+  }
+
+  .button {
+    width: $video-overlay-styles.touchable-area-width;
+    height: $video-overlay-styles.touchable-area-height;
+  }
+
+  .margin-fixer {
+    position: relative;
+  }
+
+  .right-corner,
+  .left-corner {
+    z-index: 10;
+  }
+
+  .right-corner {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .left-corner {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .top-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: $video-overlay-styles.touchable-area-height;
+
+    .left-corner,
+    .right-corner {
+      top: .3 * $video-overlay-styles.base-size;
+    }
+  }
+
+  .bottom-container {
+    position: absolute;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    align-items: center;
+    width: 100%;
+    height: $video-overlay-styles.touchable-area-height;
+
+    .center,
+    .tab {
+      top: auto;
+      bottom: $video-overlay-styles.tab-vertical-margin;
+    }
+
+    .center {
+      position: absolute;
+      z-index: 1;
+      margin: auto;
+      width: 100%;
+    }
+  }
+
+  .button-right {
+    right: 0;
+    left: auto;
+
+    .tab {
+      right: 0;
+      left: auto;
+      border-radius: $video-overlay-styles.tab-border-radius 0 0 $video-overlay-styles.tab-border-radius;
+    }
+  }
+
+  .tab {
+    position: absolute;
+    top: $video-overlay-styles.tab-vertical-margin;
+    left: 0;
+    width: $video-overlay-styles.base-size * 2;
+    height: $video-overlay-styles.base-size * 1.5;
+    border-radius: 0 $video-overlay-styles.tab-border-radius $video-overlay-styles.tab-border-radius 0;
+    background-color: rgba(0, 0, 0, .54);
+    color: $video-overlay-styles.tab-font-color;
+    text-align: center;
+    text-shadow: $video-overlay-styles.base-size * .01 $video-overlay-styles.base-size * .01 $video-overlay-styles.base-size * .025 rgba(0, 0, 0, .8), 0 0 $video-overlay-styles.base-size * .1 rgba(0, 0, 0, 1);
+    font-weight: 300;
+  }
+
+  .icon,
+  .text {
+    font-size: $video-overlay-styles.base-size * .65;
+  }
+
+  .gdpr-button {
+    position: absolute;
+    top: 0;
+    left: $video-overlay-styles.touchable-area-width;
+
+    .tab {
+      bottom: $video-overlay-styles.base-size * .54;
+      width: $video-overlay-styles.base-size;
+      height: $video-overlay-styles.base-size;
+      border-radius: $video-overlay-styles.tab-border-radius;
+    }
+
+    .icon-container {
+      line-height: .8em;
+    }
+    .icon {
+      font-size: $video-overlay-styles.base-size * .5;
+    }
+  }
+
+  .call-button .tab {
+    line-height: $video-overlay-styles.base-size * 1.31;
+  }
+
+  .call-button {
+    transform: translateX(120%);
+    transition: transform .3s ease-in;
+  }
+
+  .show-call-button {
+    transform: translateX(0%);
+  }
+
+  .vast-button {
+    display: none;
+    width: $video-overlay-styles.call-button-width;
+
+    .tab {
+      width: $video-overlay-styles.call-button-width;
+      text-align: left;
+    }
+
+    .text {
+      margin-left: $video-overlay-styles.base-size * .8;
+      text-align: center;
+    }
+
+    .go-text {
+      position: absolute;
+      margin-top: $video-overlay-styles.base-size * .55;
+      margin-left: $video-overlay-styles.base-size *  .55;
+      width: $video-overlay-styles.base-size *  2.4;
+      height: $video-overlay-styles.base-size * 1.7;
+      border: 1px solid;
+      border-radius: $video-overlay-styles.base-size * .25;
+      font-size: $video-overlay-styles.base-size * .8;
+      line-height: $video-overlay-styles.base-size * 1.85;
+      transform: translateX(200%);
+      transition: transform .6s ease-in;
+    }
+  }
+
+  .show-go-text {
+    .go-text {
+      transform: translateX(0%);
+    }
+  }
+
+  .install-button {
+    display: none;
+    width: 7.5 * $video-overlay-styles.base-size;
+    height: 3 * $video-overlay-styles.base-size;
+
+    .tab {
+      width: 7.5 * $video-overlay-styles.base-size;
+      height: 2.3 * $video-overlay-styles.base-size;
+      text-align: left;
+    }
+
+    .download-wrapper {
+      $video-overlay-styles-download-element-height = $video-overlay-styles.base-size * 1.7;
+      $video-overlay-styles-download-element-margin = $video-overlay-styles.base-size * .3;
+      $video-overlay-styles-download-element-border-radius = $video-overlay-styles.base-size * .25;
+
+      position: relative;
+
+      .game-icon {
+        $set-image($video-overlay-styles-download-element-height, $video-overlay-styles-download-element-height, $video-overlay-styles-download-element-border-radius);
+        margin: $video-overlay-styles-download-element-margin;
+      }
+
+      .download-container {
+        position: absolute;
+        top: 0;
+        left: $video-overlay-styles-download-element-height + 2 * $video-overlay-styles-download-element-margin;
+        width: $video-overlay-styles.base-size * 4.5;
+        height: $video-overlay-styles-download-element-height;
+        border-radius: $video-overlay-styles-download-element-border-radius;
+        background: $blue;
+        color: $white;
+        text-align: center;
+        line-height: $video-overlay-styles.base-size * 1.5;
+      }
+
+      .download-text {
+        text-shadow: none;
+        font-size: $video-overlay-styles.base-size * .65;
+      }
+    }
+  }
+
+  .timer-container,
+  .icon-container {
+    line-height: $video-overlay-styles.base-size * 1.55;
+  }
+
+  .icon-volume-mute {
+    display: none;
+  }
+
+  .icon-volume {
+    display: block;
+  }
+
+  .muted {
+    .icon-volume-mute {
+      display: block;
+    }
+
+    .icon-volume {
+      display: none;
+    }
+  }
+
+  .timer {
+    font-size: $video-overlay-styles.base-size * .6;
+  }
+
+  .buffering-spinner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: none;
+    margin: auto;
+    width: 100px;
+    height: 65px;
+  }
+
+  .spinner-animation {
+    margin: 0 auto;
+    width: 24px;
+    height: 24px;
+    border: 4px solid $white;
+    border-right-color: transparent;
+    border-left-color: transparent;
+    border-radius: 200px;
+    animation: spinner 1s linear infinite;
+  }
+
+  .debug-message-text {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    display: none;
+  }
+
+  @keyframes spinner {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .spinner-text {
+    margin-top: 10px;
+    color: $white;
+    text-align: center;
+    text-shadow: 1px 1px $black;
+    font-weight: bold;
+  }
+
+  .china-advertisement {
+    $china-overlay($default-scale-size);
+    opacity: .58;
+  }
+
+  .china-advertisement.with-skip-button {
+    padding-top: 0;
+  }
+
+  &:not(.show-gdpr-banner) {
+    .gdpr-pop-up {
+      display: none;
+    }
+  }
+
+  &.show-gdpr-banner {
+    .gdpr-pop-up {
+      $gdpr-pop-up($video-overlay-styles.base-size);
+      position: static;
+      margin: auto;
+      width: 50%;
+      height: $video-overlay-styles.base-size * 1.5;
+      border-radius: $video-overlay-styles.tab-border-radius;
+      pointer-events: 1;
+
+      .icon-gdpr {
+        font-size: $video-overlay-styles.base-size * .5;
+      }
+
+      .gdpr-text {
+        color: $black;
+        font-size: $video-overlay-styles.base-size * .35;
+      }
+    }
+  }
+
+  &:not(.show-gdpr-button) {
+    .gdpr-button {
+      display: none;
+    }
+  }
+
+  &.show-gdpr-button {
+    .gdpr-button {
+      display: block;
+      pointer-events: 1;
+    }
+  }
+
+
+  /**
+  * Portrait layout customization
+  */
+
+  @media (orientation: portrait) {
+    &.show-gdpr-banner {
+      .bottom-container {
+        height: $video-overlay-styles.touchable-area-height * 2;
+
+        .left-corner,
+        .right-corner {
+          bottom: auto;
+        }
+
+        .center {
+          bottom: 0;
+
+          .gdpr-pop-up {
+            width: 90%;
+            border-radius: $video-overlay-styles.tab-border-radius $video-overlay-styles.tab-border-radius 0 0;
+          }
+        }
+      }
+    }
+  }
+
+  /**
+  * Landscape sizes
+  */
+  @media (orientation: landscape) {
+    .content {
+      @media (max-width: 392px) {
+        font-size: $video-overlay-styles.base-size * .6;
+      }
+
+      @media (min-width: 472px) and (max-width: 593px) {
+        font-size: $video-overlay-styles.base-size * 1.2;
+      }
+
+      @media (min-width: 594px) and (max-width: 792px) {
+        font-size: $video-overlay-styles.base-size * 1.5;
+      }
+
+      @media (min-width: 792px) and (max-width: 840px) {
+        font-size: $video-overlay-styles.base-size * 2;
+      }
+
+      @media (min-width: 840px) and (max-width: 959px) {
+        font-size: $video-overlay-styles.base-size * 2.1;
+      }
+
+      @media (min-width: 960px) {
+        font-size: $video-overlay-styles.base-size * 2.2;
+      }
+    }
+  }
+
+  /**
+  * Portrait sizes
+  */
+  @media (orientation: portrait) {
+    .content {
+      @media (max-width: 320px) {
+        font-size: $video-overlay-styles.base-size * 1.2;
+      }
+
+      @media (min-width: 321px) and (max-width: 359px) {
+        font-size: $video-overlay-styles.base-size * 1.5;
+      }
+
+      @media (min-width: 360px) and (max-width: 413px) {
+        font-size: $video-overlay-styles.base-size * 1.7;
+      }
+
+      @media (min-width: 414px) and (max-width: 480px) {
+        font-size: $video-overlay-styles.base-size * 1.9;
+      }
+
+      @media (min-width: 481px) and (max-width: 568px) {
+        font-size: $video-overlay-styles.base-size * 2;
+      }
+
+      @media (min-width: 569px) {
+        font-size: $video-overlay-styles.base-size * 2.4;
+      }
+    }
+  }
+
+  /**
+  * iPhone X & iPhone XS safe area customizations
+  */
+  @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+    $iphone-x-overlay-styles();
+  }
+
+  /**
+  * iPhone XS Max safe area customizations
+  */
+  @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+    $iphone-x-overlay-styles();
+  }
+
+  /**
+  * iPhone XR safe area customizations
+  */
+  @media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+    $iphone-x-overlay-styles();
+  }
+}

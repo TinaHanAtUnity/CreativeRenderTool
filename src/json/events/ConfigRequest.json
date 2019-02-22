@@ -62,12 +62,6 @@
       "body": false
     },
     {
-      "parameter": "gamerId",
-      "required": "no",
-      "queryString": true,
-      "body": false
-    },
-    {
       "parameter": "deviceMake",
       "required": "android",
       "queryString": true,
@@ -111,6 +105,24 @@
     },
     {
       "parameter": "adapterVersion",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "imei",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "analyticsUserId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "analyticsSessionId",
       "required": "no",
       "queryString": true,
       "body": false

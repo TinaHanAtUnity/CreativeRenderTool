@@ -1,7 +1,7 @@
 import { BackendApi } from 'Backend/BackendApi';
 
 export class Analytics extends BackendApi {
-    public addExtras(extras: any) {
+    public addExtras(extras: unknown) {
         return;
     }
 }
