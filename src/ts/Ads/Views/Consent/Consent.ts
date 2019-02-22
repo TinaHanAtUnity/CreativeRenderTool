@@ -17,10 +17,9 @@ import {
     PrivacyTextParagraph
 } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 
-export interface IUnityConsentViewParameters {
+export interface IConsentViewParameters {
     platform: Platform;
     privacyManager: UserPrivacyManager;
-    consentSettingsView: UnityConsentSettings;
     apiLevel?: number;
     landingPage: ConsentPage;
 }
@@ -43,7 +42,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private _landingPage: ConsentPage;
     private _currentPage: ConsentPage;
 
-    constructor(parameters: IUnityConsentViewParameters) {
+    constructor(parameters: IConsentViewParameters) {
         super(parameters.platform, 'consent');
 
         this._apiLevel = parameters.apiLevel;
