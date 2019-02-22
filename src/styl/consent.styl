@@ -347,24 +347,33 @@
     font-weight: $privacy-main-title-font-weight;
   }
   .description {
-    color: $privacy-text-color;
+    color: $consent-text-font-color;
     font-weight: $privacy-text-font-weight;
     font-size: $privacy-text-font-size;
     line-height: $default-size;
   }
 
   .accept-all {
-    $privacy-blue-button-default();
-    margin-bottom: .5 * $default-size;
+    margin-bottom: .75 * $default-size;
+    border: 1px solid $blue;
+    background-color: $blue;
+    color: $white;
   }
 
   .show-choices {
-    $privacy-white-button-default();
+    border: 1px solid $privacy-light-gray;
+    background-color: $white;
+    color: $consent-text-font-color;
   }
 
   .consent-button {
     position: relative;
-    padding: $default-size;
+    padding: .75 * $default-size $default-size;
+    border-radius: $default-size * 4;
+    text-align: center;
+    font-weight: $privacy-title-font-weight;
+    font-size: $privacy-heading-font-size;
+
   }
 
   .page-link {
