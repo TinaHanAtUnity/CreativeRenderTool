@@ -10,9 +10,10 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Url } from 'Core/Utilities/Url';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe(Platform[platform] + ' - RequestTest', () => {
+    describe(Platform[platform] + ' - RequestManagerTest', () => {
         let backend: Backend;
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
@@ -326,10 +327,10 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                 });
             });
 
-            it('should not make HEAD request if clickUrl is appStoreUrlTemplate with skipAppStoreUrl true', () => {
-                const redirectUrl: string = 'https://play.google.com/store/apps/details?id=com.playgendary.tanks';
+            it('should not make HEAD request if requestUrl is appStoreUrlTemplate', () => {
+                const redirectUrl: string = platform === Platform.ANDROID ? 'https://play.google.com/store/apps/details?id=com.playgendary.tanks' : 'https://itunes.apple.com/app/id490099807?mt=8';
                 sinon.spy(request, 'head');
-                return request.followRedirectChain(redirectUrl, true, true).catch(() => {
+                return request.followRedirectChain(redirectUrl, true, Url.getAppStoreUrlTemplates(platform)).catch(() => {
                     return redirectUrl;
                 }).then((url) => {
                     sinon.assert.notCalled(<sinon.SinonSpy>request.head);

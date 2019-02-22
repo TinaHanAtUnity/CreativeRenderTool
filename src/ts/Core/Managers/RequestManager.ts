@@ -47,9 +47,6 @@ export class RequestManager {
     public static RedirectResponseCodes = new RegExp('30[0-8]');
     public static ErrorResponseCodes = new RegExp('[4-5][0-9]{2}');
 
-    private static GoogleAppStoreUrlTemplate = 'https://play.google.com';
-    private static AppleAppStoreUrlTemplate = 'https://itunes.apple.com';
-
     public static getHeader(headers: [string, string][], headerName: string): string | null {
         for(const header of headers) {
             const key = header[0];
@@ -216,7 +213,7 @@ export class RequestManager {
     }
 
     // Follows the redirects of a URL, returning the final location.
-    public followRedirectChain(url: string, useWebViewUserAgentForTracking = false, skipAppStoreUrl = false): Promise<string> {
+    public followRedirectChain(url: string, useWebViewUserAgentForTracking = false, redirectBreakers?: string[]): Promise<string> {
         let redirectCount = 0;
         const headers: [string, string][] = [];
         if (useWebViewUserAgentForTracking && typeof navigator !== 'undefined' && navigator.userAgent) {
@@ -229,10 +226,14 @@ export class RequestManager {
                 if (redirectCount >= RequestManager._redirectLimit) {
                     reject(new Error('redirect limit reached'));
                 } else if (requestUrl.indexOf('http') === -1) {
-                    // market:// or itunes:// urls can be opened directly
+                // market:// or itunes:// urls can be opened directly
                     resolve(requestUrl);
-                } else if (skipAppStoreUrl && this.isAppStoreUrl(requestUrl)) {
-                    resolve(requestUrl);
+                } else if (redirectBreakers) {
+                    for (const breaker of redirectBreakers) {
+                        if (requestUrl.indexOf(breaker) !== -1) {
+                            resolve(requestUrl);
+                        }
+                    }
                 } else {
                     this.head(requestUrl, headers).then((response: INativeResponse) => {
                         if (RequestManager.is3xxRedirect(response.responseCode)) {
@@ -252,10 +253,6 @@ export class RequestManager {
             };
             makeRequest(url);
         });
-    }
-
-    private isAppStoreUrl(url: string): boolean {
-        return url.indexOf(RequestManager.AppleAppStoreUrlTemplate) !== -1 || url.indexOf(RequestManager.GoogleAppStoreUrlTemplate) !== -1;
     }
 
     private getOptions(options?: IRequestOptions): IRequestOptions {

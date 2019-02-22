@@ -4,6 +4,7 @@ import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { WebViewTopCalculator } from 'Ads/Utilities/WebPlayer/WebViewTopCalculator';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { CTAClickHandlingTest } from 'Core/Models/ABGroup';
+import { Url } from 'Core/Utilities/Url';
 
 export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements IMRAIDViewHandler {
 
@@ -17,8 +18,9 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
 
         this._mraidView.setCallButtonEnabled(false);
 
+        const redirectBreakers = CTAClickHandlingTest.isValid(this._abGroup) ? Url.getAppStoreUrlTemplates(this._platform) : [];
         const ctaClickedTime = Date.now();
-        return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking(), CTAClickHandlingTest.isValid(this._abGroup)).then((storeUrl) => {
+        return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking(), redirectBreakers).then((storeUrl) => {
             if (this._jaegerSpan) {
                 this._jaegerSpan.addAnnotation(`onMRAIDClick from ProgrammaticMRAIDEventHandler after followRedirectChain success ${storeUrl}`);
             }

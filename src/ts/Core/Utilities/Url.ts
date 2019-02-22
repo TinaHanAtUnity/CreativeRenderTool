@@ -183,8 +183,18 @@ export class Url {
         return false;
     }
 
+    public static getAppStoreUrlTemplates(platform: Platform): string[] {
+        if (platform === Platform.IOS) {
+            return this.iosAppStoreUrlTemplates;
+        } else {
+            return this.androidAppStoreUrlTemplates;
+        }
+    }
+
     private static iosWhitelistedProtocols = ['itunes', 'itms', 'itmss', 'http', 'https'];
     private static androidWhitelistedProtocols = ['market', 'http', 'https'];
+    private static iosAppStoreUrlTemplates = ['https://itunes.apple.com'];
+    private static androidAppStoreUrlTemplates = ['https://play.google.com'];
 
     private static isNumber(c: string): boolean {
         return c.match(/^[0-9a-fA-F]$/) !== null;
