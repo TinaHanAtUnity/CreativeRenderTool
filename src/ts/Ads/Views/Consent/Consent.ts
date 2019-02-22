@@ -300,36 +300,42 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
     private onThirdPartiesLinkEvent(event: Event): void {
         event.preventDefault();
-        this._privacyRowItemContainer.showParagraphAndScrollToSection(PrivacyTextParagraph.THIRD_PARTIES);
+        this.showMyChoicesPageAndScrollToParagraph(PrivacyTextParagraph.THIRD_PARTIES);
     }
 
     private onDataLinkEvent(event: Event): void {
         event.preventDefault();
-        this._privacyRowItemContainer.showParagraphAndScrollToSection(PrivacyTextParagraph.DATA);
+        this.showMyChoicesPageAndScrollToParagraph(PrivacyTextParagraph.DATA);
     }
 
     private onDemographicInfoLinkEvent(event: Event): void {
         event.preventDefault();
-        this._privacyRowItemContainer.showParagraphAndScrollToSection(PrivacyTextParagraph.DEMOGRAPHIC_INFO);
+        this.showMyChoicesPageAndScrollToParagraph(PrivacyTextParagraph.DEMOGRAPHIC_INFO);
     }
 
     private onMobileIdentifiersLinkEvent(event: Event): void {
         event.preventDefault();
-        this._privacyRowItemContainer.showParagraphAndScrollToSection(PrivacyTextParagraph.MOBILE_IDENTIFIERS);
+        this.showMyChoicesPageAndScrollToParagraph(PrivacyTextParagraph.MOBILE_IDENTIFIERS);
     }
 
     private onPersonalizationLink(event: Event): void {
         event.preventDefault();
-        this._privacyRowItemContainer.showParagraphAndScrollToSection(PrivacyTextParagraph.PERSONALIZATION);
+        this.showMyChoicesPageAndScrollToParagraph(PrivacyTextParagraph.PERSONALIZATION);
     }
 
     private onMeasurementLinkEvent(event: Event): void {
         event.preventDefault();
-        this._privacyRowItemContainer.showParagraphAndScrollToSection(PrivacyTextParagraph.MEASUREMENT);
+        this.showMyChoicesPageAndScrollToParagraph(PrivacyTextParagraph.MEASUREMENT);
     }
 
     private onBackButtonEvent(event: Event): void {
         event.preventDefault();
         this.showPage(ConsentPage.HOMESCREEN);
+    }
+
+    private showMyChoicesPageAndScrollToParagraph(paragraph: PrivacyTextParagraph): void {
+        this.showPage(ConsentPage.MY_CHOICES);
+        this._privacyRowItemContainer.showParagraphAndScrollToSection(paragraph);
+
     }
 }
