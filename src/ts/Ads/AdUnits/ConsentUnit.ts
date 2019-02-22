@@ -30,8 +30,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     private _donePromiseResolve: () => void;
     private _showing: boolean;
     private _adUnitContainer: AdUnitContainer;
-    // private _unityConsentView: UnityConsent;
-    private _unityConsentView: Consent;
+    private _unityConsentView: UnityConsent | Consent;
     private _consentSettingsView: UnityConsentSettings;
     private _platform: Platform;
     private _privacyManager: UserPrivacyManager;
@@ -60,6 +59,16 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                 ... viewParams,
                 apiLevel: (<AndroidDeviceInfo>parameters.deviceInfo).getApiLevel()
             };
+        }
+
+        // todo:
+        const abtest = true;
+
+        if (abtest) {
+            this._unityConsentView = new Consent(viewParams);
+        } else {
+            this._unityConsentView = new UnityConsent(viewParams);
+
         }
 
         this._unityConsentView = new Consent(viewParams);
@@ -162,11 +171,15 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         setTimeout(() => {
             if(consent.hasOwnProperty('all')) {
                 this._core.Sdk.logInfo('setting autoAcceptConsent with All True based on ' + JSON.stringify(consent));
-                // this._unityConsentView.testAutoConsent();
+                this._unityConsentView.testAutoConsentAll();
             }
             if(consent.hasOwnProperty('ads')) {
                 this._core.Sdk.logInfo('setting autoAcceptConsent with Personalized Consent based on ' + JSON.stringify(consent));
-                this._consentSettingsView.testAutoConsent(consent);
+                if (this._consentSettingsView) {
+                    this._consentSettingsView.testAutoConsent(consent);
+                } else if (this._unityConsentView instanceof Consent) {
+                    this._unityConsentView.testAutoConsent(consent);
+                }
             }
         }, 3000);
     }

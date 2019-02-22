@@ -70,7 +70,7 @@ export class UnityConsent extends View<IConsentViewHandler> {
         ];
     }
 
-    public testAutoConsent() {
+    public testAutoConsentAll() {
         event = new Event('testAutoConsent');
         this.onAgreeEvent(event);
     }

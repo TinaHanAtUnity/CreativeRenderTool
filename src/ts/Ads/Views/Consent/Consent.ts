@@ -126,10 +126,15 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._privacyRowItemContainer.addEventHandler(this);
     }
 
-    // public testAutoConsent(consent: IPermissions): void {
-    //     this.triggerOnPersonalizedConsent(consent);
-    //     this._handlers.forEach(handler => handler.onClose());
-    // }
+    public testAutoConsentAll() {
+        event = new Event('testAutoConsent');
+        this.onAcceptAllEvent(event);
+    }
+
+    public testAutoConsent(consent: IPermissions): void {
+        this._handlers.forEach(handler => handler.onConsent(consent, GDPREventSource.USER));
+        this._handlers.forEach(handler => handler.onClose());
+    }
 
     public render(): void {
         super.render();
@@ -256,7 +261,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             ads: true,
             external: true
         };
-        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
+        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.USER));
         const element = (<HTMLElement>this._container.querySelector('.agree'));
         this.closeWithAnimation(element);
     }
@@ -269,7 +274,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             ads: false,
             external: false
         };
-        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
+        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.USER));
         const element = (<HTMLElement>this._container.querySelector('.disagree'));
 
         this.closeWithAnimation(element);
@@ -283,7 +288,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             ads: this._switchGroup.isPersonalizedAdsChecked(),
             external: this._switchGroup.isAds3rdPartyChecked()
         };
-        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.NO_REVIEW));
+        this._handlers.forEach(handler => handler.onConsent(permissions, GDPREventSource.USER));
         const element = (<HTMLElement>this._container.querySelector('.save-my-choices'));
         this.closeWithAnimation(element);
     }
