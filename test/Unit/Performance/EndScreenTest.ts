@@ -22,6 +22,7 @@ describe('EndScreenTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let configuration: CoreConfiguration;
+    let privacy: Privacy;
 
     beforeEach(() => {
         platform = Platform.ANDROID;
@@ -37,7 +38,7 @@ describe('EndScreenTest', () => {
     const createEndScreen = (language : string) : PerformanceEndScreen => {
         const privacyManager = sinon.createStubInstance(UserPrivacyManager);
         const campaign = TestFixtures.getCampaign();
-        const privacy = new Privacy(platform, campaign, privacyManager, false, false);
+        privacy = new Privacy(platform, campaign, privacyManager, false, false);
         const params : IEndScreenParameters = {
             platform,
             core,
@@ -63,5 +64,11 @@ describe('EndScreenTest', () => {
         endScreen.render();
         const downloadElement = endScreen.container().querySelectorAll('.download-text')[0];
         assert.equal(downloadElement.innerHTML, 'Lataa ilmaiseksi');
+        const container = privacy.container();
+        if (container && container.parentElement) {
+            container.parentElement.removeChild(container);
+        } else {
+            assert.fail(`${container.parentElement}`);
+        }
     });
 });

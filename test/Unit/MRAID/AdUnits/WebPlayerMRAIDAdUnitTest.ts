@@ -53,6 +53,7 @@ describe('WebPlayerMraidAdUnit', () => {
 
     afterEach(() => {
         sandbox.restore();
+        mraidAdUnit.setShowing(true);
         return mraidAdUnit.hide();
     });
 
@@ -67,8 +68,8 @@ describe('WebPlayerMraidAdUnit', () => {
         webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
 
-        (<sinon.SinonSpy>mraidView.container).restore();
-        sandbox.stub(mraidView, 'container').returns(document.createElement('div'));
+        const viewContainer = document.createElement('div');
+        (<sinon.SinonStub>mraidView.container).returns(viewContainer);
 
         const userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
         const wakeUpManager = new WakeUpManager(core);
@@ -150,8 +151,8 @@ describe('WebPlayerMraidAdUnit', () => {
     });
 
     const getAdUnitFromView = (view: MRAIDView<IMRAIDViewHandler>, mraidParams: IMRAIDAdUnitParameters, plat: Platform) => {
-        (<sinon.SinonSpy>view.container).restore();
-        sandbox.stub(view, 'container').returns(document.createElement('div'));
+        const container = document.createElement('div');
+        (<sinon.SinonStub>view.container).returns(container);
 
         mraidParams.mraid = view;
         mraidParams.platform = plat;
@@ -177,6 +178,11 @@ describe('WebPlayerMraidAdUnit', () => {
                 webPlayerSetEventSettings = <sinon.SinonSpy>webPlayerContainer.setEventSettings;
 
                 return adUnit.show();
+            });
+
+            afterEach(() => {
+                adUnit.setShowing(true);
+                return adUnit.hide();
             });
 
             it('should open the container with webview and webplayer', () => {
@@ -417,6 +423,8 @@ describe('WebPlayerMraidAdUnit', () => {
                 const onContainerForegroundSpy = sandbox.spy(adUnit, 'onContainerForeground');
                 adUnit.onContainerShow();
                 sinon.assert.called(onContainerForegroundSpy);
+                adUnit.setShowing(true);
+                return adUnit.hide();
             });
         });
 
@@ -438,6 +446,11 @@ describe('WebPlayerMraidAdUnit', () => {
                 loadWebplayerSpy = <sinon.SinonStub>view.loadWebPlayer;
 
                 return adUnit.onContainerForegroundMRAID();
+            });
+
+            afterEach(() => {
+                adUnit.setShowing(true);
+                return adUnit.hide();
             });
 
             it('should set the webview view frame with a minimized height', () => {

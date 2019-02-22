@@ -3,21 +3,15 @@ import { VideoEventHandler } from 'Ads/EventHandlers/VideoEventHandler';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
-import { AuctionV5Test, ABGroup } from 'Core/Models/ABGroup';
-import { ProgrammaticTrackingErrorName, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class PerformanceVideoEventHandler extends VideoEventHandler {
 
     private _performanceAdUnit: PerformanceAdUnit;
-    private _pts: ProgrammaticTrackingService;
-    private _abGroup: ABGroup;
 
     constructor(parameters: IVideoEventHandlerParams<PerformanceAdUnit>) {
         super(parameters);
         this._performanceAdUnit = parameters.adUnit;
         this._campaign = parameters.campaign;
-        this._pts = parameters.programmaticTrackingService;
-        this._abGroup = this._coreConfig.getAbGroup();
     }
 
     public onCompleted(url: string): void {
@@ -52,9 +46,6 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
     protected handleStartEvent(progress: number): void {
         super.handleStartEvent(progress);
         const trackingUrls = this._campaign.getTrackingUrlsForEvent(ICometTrackingUrlEvents.START);
-        if (trackingUrls.length === 0) {
-            this._pts.reportError(AuctionV5Test.isValid(this._abGroup) ? ProgrammaticTrackingErrorName.AuctionV5StartMissing : ProgrammaticTrackingErrorName.AuctionV4StartMissing, this._adUnit.description());
-        }
         this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.START);
     }
 

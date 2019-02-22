@@ -8,8 +8,6 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 
 export interface IRawPromoCampaign {
     expiry?: string;
-    creativeUrl?: string;
-    dynamicMarkup: string | undefined;
     limitedTimeOffer: IRawLimitedTimeOfferData | undefined;
     costs: IRawProductInfo[];
     payouts: IRawProductInfo[];
@@ -20,8 +18,6 @@ export interface IRawPromoCampaign {
 }
 
 export interface IPromoCampaign extends ICampaign {
-    dynamicMarkup: string | undefined;
-    creativeAsset: HTML | undefined;
     limitedTimeOffer: LimitedTimeOffer | undefined;
     costs: ProductInfo[];
     payouts: ProductInfo[];
@@ -34,8 +30,6 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
     constructor(campaign: IPromoCampaign) {
         super('PromoCampaign', {
             ... Campaign.Schema,
-            dynamicMarkup: ['string', 'undefined'],
-            creativeAsset: ['object', 'undefined'],
             portraitAssets: ['object', 'undefined'],
             landscapeAssets: ['object', 'undefined'],
             limitedTimeOffer: ['object', 'undefined'],
@@ -46,13 +40,7 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
     }
 
     public isConnectionNeeded(): boolean {
-        const resource = this.getCreativeResource();
-        // If the static resource is not cached we will need to download it, therefore
-        // a connection is necessary.
-        if (resource) {
-            return !resource.getFileId();
-        }
-        return false;
+        return true;
     }
 
     private createTrackingEventUrlsWithProductType(productType: string): { [url: string]: string[] } {
@@ -97,10 +85,6 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         return [];
     }
 
-    public getCreativeResource(): HTML | undefined {
-        return this.get('creativeAsset');
-    }
-
     public getPortraitAssets(): PromoOrientationAsset | undefined {
         return this.get('portraitAssets');
     }
@@ -109,25 +93,16 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         return this.get('landscapeAssets');
     }
 
-    public getDynamicMarkup(): string | undefined {
-        return this.get('dynamicMarkup');
-    }
-
     public getIapProductId(): string {
         return this.get('premiumProduct').getId();
     }
 
     public getRequiredAssets() : Asset[] {
         const assetList: Asset[] = [];
-        const creativeResource = this.getCreativeResource();
-        if (this.isUsingServerTemplate() && creativeResource) {
-            assetList.push(creativeResource);
-        } else {
-            const orientationResources = this.getOrientationResources();
-            for(const orientationResource of orientationResources) {
-                assetList.push(orientationResource.getButtonAsset().getImage());
-                assetList.push(orientationResource.getBackgroundAsset().getImage());
-            }
+        const orientationResources = this.getOrientationResources();
+        for(const orientationResource of orientationResources) {
+            assetList.push(orientationResource.getButtonAsset().getImage());
+            assetList.push(orientationResource.getBackgroundAsset().getImage());
         }
         return assetList;
     }
@@ -161,13 +136,4 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         return this.get('limitedTimeOffer');
     }
 
-    public isUsingServerTemplate(): boolean {
-        const orientationResources = [this.getPortraitAssets(), this.getLandscapeAssets()];
-        for(const orientationResource of orientationResources) {
-            if (orientationResource) {
-                return false;
-            }
-        }
-        return true;
-    }
 }
