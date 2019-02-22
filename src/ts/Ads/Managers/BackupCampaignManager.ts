@@ -30,7 +30,7 @@ export class BackupCampaignManager {
     private _deviceInfo: DeviceInfo;
 
     private _campaignCount: number = 0;
-    private _enable: boolean = true;
+    private _enabled: boolean = true;
 
     constructor(platform: Platform, core: ICoreApi, storageBridge: StorageBridge, coreConfiguration: CoreConfiguration, deviceInfo: DeviceInfo) {
         this._platform = platform;
@@ -43,7 +43,7 @@ export class BackupCampaignManager {
     // todo: once auction v5 is unconditionally adopoted, trackingUrls should not be optional
     public storePlacement(placement: Placement, mediaId: string, trackingUrls?: ICampaignTrackingUrls) {
         // never store if backup campaign disabled
-        if(!this._enable) {
+        if(!this._enabled) {
             return;
         }
 
@@ -74,7 +74,7 @@ export class BackupCampaignManager {
 
     public storeCampaign(campaign: Campaign) {
         // never store if backup campaign disabled
-        if(!this._enable) {
+        if(!this._enabled) {
             return;
         }
 
@@ -115,7 +115,7 @@ export class BackupCampaignManager {
 
     public loadCampaign(placement: Placement): Promise<Campaign | undefined> {
         // never load campaign, if backup campaign disabled
-        if(!this._enable) {
+        if(!this._enabled) {
             return Promise.resolve(undefined);
         }
 
@@ -174,7 +174,7 @@ export class BackupCampaignManager {
     }
 
     public setEnabled(value: boolean) {
-        this._enable = value;
+        this._enabled = value;
     }
 
     private getCampaignType(campaign: Campaign): string | undefined {
