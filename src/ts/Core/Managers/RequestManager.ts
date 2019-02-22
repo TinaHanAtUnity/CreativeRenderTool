@@ -226,7 +226,7 @@ export class RequestManager {
                 if (redirectCount >= RequestManager._redirectLimit) {
                     reject(new Error('redirect limit reached'));
                 } else if (requestUrl.indexOf('http') === -1) {
-                // market:// or itunes:// urls can be opened directly
+                    // market:// or itunes:// urls can be opened directly
                     resolve(requestUrl);
                 } else if (redirectBreakers) {
                     for (const breaker of redirectBreakers) {
