@@ -45,22 +45,25 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         const cacheTTL = response.getCacheTTL();
         const videoPromise = this.getVideoFromMarkup(markup, session).catch((e) => {
             this._core.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
-            if (AdmobParsingTest.isValid(this._abGroup) && e instanceof RequestError) {
-                // Video attempting to be shown is no longer being hosted by Admob
+
+            // Video URL returns a bad http response
+            if (AdmobParsingTest.isValid(this._abGroup) && e instanceof RequestError && e.nativeResponse) {
                 this._pts.reportError(ProgrammaticTrackingErrorName.AdmobTestHttpError, 'AdMob', this.seatID);
-                if (e.nativeResponse) {
-                    SessionDiagnostics.trigger('admob_http_parse_error', {
-                        videoId: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.VIDEO_ID),
-                        urlTimestamp: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP),
-                        adRequestTimestamp: Math.floor(SdkStats.getAdRequestTimestamp() / 1000),
-                        failureTimestamp: Math.floor(Date.now() / 1000),
-                        initialVideoUrl: this._mediaFileUrl,
-                        responseCode: e.nativeResponse.responseCode,
-                        redirectedUrl: e.nativeResponse.url,
-                        headers: e.nativeResponse.headers,
-                        response: e.nativeResponse.response
-                    }, session);
-                }
+                const failureTimestamp = Math.floor(Date.now() / 1000);
+                const urlTimestamp = Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP);
+
+                SessionDiagnostics.trigger('admob_http_parse_error', {
+                    videoId: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.VIDEO_ID),
+                    urlTimestamp: urlTimestamp,
+                    adRequestTimestamp: Math.floor(SdkStats.getAdRequestTimestamp() / 1000),
+                    failureTimestamp: failureTimestamp,
+                    tsDifference: urlTimestamp ? failureTimestamp - +urlTimestamp : undefined,
+                    initialVideoUrl: this._mediaFileUrl,
+                    responseCode: e.nativeResponse.responseCode,
+                    redirectedUrl: e.nativeResponse.url,
+                    headers: e.nativeResponse.headers,
+                    response: e.nativeResponse.response
+                }, session);
                 throw e;
             }
             return null;
