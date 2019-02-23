@@ -327,13 +327,24 @@ import { Url } from 'Core/Utilities/Url';
                 });
             });
 
-            it('should not make HEAD request if requestUrl is appStoreUrlTemplate', () => {
+            it('should not make HEAD request if requestUrl is given redirectBreaker string format', () => {
                 const redirectUrl: string = platform === Platform.ANDROID ? 'https://play.google.com/store/apps/details?id=com.playgendary.tanks' : 'https://itunes.apple.com/app/id490099807?mt=8';
                 sinon.spy(request, 'head');
                 return request.followRedirectChain(redirectUrl, true, Url.getAppStoreUrlTemplates(platform)).catch(() => {
                     return redirectUrl;
                 }).then((url) => {
                     sinon.assert.notCalled(<sinon.SinonSpy>request.head);
+                    assert.equal(url, redirectUrl);
+                });
+            });
+
+            it('should make HEAD request if requestUrl is not give redirect breaker format', () => {
+                const redirectUrl: string = platform === Platform.ANDROID ? 'https://google.com' : 'https://apple.com';
+                sinon.spy(request, 'head');
+                return request.followRedirectChain(redirectUrl, true, Url.getAppStoreUrlTemplates(platform)).catch(() => {
+                    return redirectUrl;
+                }).then((url) => {
+                    sinon.assert.called(<sinon.SinonSpy>request.head);
                     assert.equal(url, redirectUrl);
                 });
             });

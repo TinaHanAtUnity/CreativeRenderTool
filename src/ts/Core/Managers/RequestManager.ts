@@ -228,13 +228,16 @@ export class RequestManager {
                 } else if (requestUrl.indexOf('http') === -1) {
                     // market:// or itunes:// urls can be opened directly
                     resolve(requestUrl);
-                } else if (redirectBreakers) {
-                    for (const breaker of redirectBreakers) {
-                        if (requestUrl.indexOf(breaker) !== -1) {
-                            resolve(requestUrl);
+                } else {
+                    if (redirectBreakers) {
+                        for (const breaker of redirectBreakers) {
+                            if (requestUrl.indexOf(breaker) !== -1) {
+                                resolve(requestUrl);
+                                return;
+                            }
                         }
                     }
-                } else {
+
                     this.head(requestUrl, headers).then((response: INativeResponse) => {
                         if (RequestManager.is3xxRedirect(response.responseCode)) {
                             const location = RequestManager.getHeader(response.headers, 'location');
