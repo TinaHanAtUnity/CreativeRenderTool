@@ -184,11 +184,19 @@ export class Url {
     }
 
     public static getAppStoreUrlTemplates(platform: Platform): string[] {
-        if (platform === Platform.IOS) {
-            return this.iosAppStoreUrlTemplates;
-        } else {
-            return this.androidAppStoreUrlTemplates;
+        let appStoreUrlTemplates: string[] = [];
+
+        switch (platform) {
+            case Platform.IOS:
+                appStoreUrlTemplates = this.iosAppStoreUrlTemplates;
+                break;
+            case Platform.ANDROID:
+                appStoreUrlTemplates = this.androidAppStoreUrlTemplates;
+                break;
+            default:
         }
+
+        return appStoreUrlTemplates;
     }
 
     private static iosWhitelistedProtocols = ['itunes', 'itms', 'itmss', 'http', 'https'];
