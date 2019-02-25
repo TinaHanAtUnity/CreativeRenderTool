@@ -56,8 +56,6 @@ export class PromoCampaignParser extends CampaignParser {
             };
             const promoCampaignParams: IPromoCampaign = {
                 ... baseCampaignParams,
-                dynamicMarkup: promoJson.dynamicMarkup,
-                creativeAsset: promoJson.creativeUrl ? new HTML(promoJson.creativeUrl, session) : undefined,
                 limitedTimeOffer: this.getLimitedTimeOffer(promoJson),
                 costs: this.getProductInfoList(promoJson.costs),
                 payouts: this.getProductInfoList(promoJson.payouts),
