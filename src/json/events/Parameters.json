@@ -554,7 +554,7 @@
   },
   {
     "key": "isPromoCatalogAvailable",
-    "type": "object",
+    "type": "boolean",
     "description": "Flag describing if the developer has a set up a catalog for their IAP Promo Placement",
     "provider": "SDK",
     "platforms": "all"
