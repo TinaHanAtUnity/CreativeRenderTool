@@ -533,7 +533,8 @@ $switch-group-container() {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #cecece;
+    background-color: #FAFAFA;
+    border: 2px solid #E3E3E3;
     border-radius: 34px;
     transition: .15s ease-in-out;
   }
@@ -544,8 +545,6 @@ $switch-group-container() {
     content: "";
     height: 24px;
     width: 24px;
-    left: 2px;
-    bottom: 2px;
     background-color: white;
     border-radius: 50%;
     transition: .15s ease-in-out;
@@ -554,6 +553,7 @@ $switch-group-container() {
 
   [type="checkbox"]:checked + label {
     background-color: $consent-blue;
+    border: 2px solid $consent-blue;
   }
 
   [type="checkbox"]:focus + label {
