@@ -508,6 +508,7 @@ export class Ads implements IAds {
 
         if(TestEnvironment.get('campaignId')) {
             CampaignManager.setCampaignId(TestEnvironment.get('campaignId'));
+            this.BackupCampaignManager.deleteBackupCampaigns();
         }
 
         if(TestEnvironment.get('sessionId')) {

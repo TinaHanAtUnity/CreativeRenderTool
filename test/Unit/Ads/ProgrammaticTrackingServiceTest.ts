@@ -85,34 +85,7 @@ describe('Ads/Utilities', () => {
                     }
                 ]
             }
-        },
-        {
-            input: ProgrammaticTrackingErrorName.AuctionV4StartMissing,
-            expected: {
-                metrics: [
-                    {
-                        tags: [
-                            'ads_sdk2_eevt:auction_v4_missing_start',
-                            ...tagBuilder
-                        ]
-                    }
-                ]
-            }
-        },
-        {
-            input: ProgrammaticTrackingErrorName.AuctionV5StartMissing,
-            expected: {
-                metrics: [
-                    {
-                        tags: [
-                            'ads_sdk2_eevt:auction_v5_missing_start',
-                            ...tagBuilder
-                        ]
-                    }
-                ]
-            }
         }];
-
         tests.forEach((t) => {
             it(`should send "${t.expected}" when "${t.input}" is passed in`, () => {
                 const promise = programmaticTrackingService.reportError(t.input, adType, seatId);
