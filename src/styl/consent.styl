@@ -127,10 +127,12 @@
 
   .consent-settings {
     position: relative;
-    overflow: auto;
+    overflow: scroll;
     padding: 1.5 * $default-size;
     border-radius: .5 * $default-size;
     background: $white;
+    // enable momentum scrolling on iOS
+    -webkit-overflow-scrolling: touch;
   }
 
   .consent-title {
@@ -275,7 +277,7 @@
   }
 
   .intro-title {
-    padding: 0 1.5 * $default-size;
+    padding: 0 1.25 * $default-size;
     font-weight: $privacy-main-title-font-weight;
     font-size: $consent-main-title-font-size;
   }
