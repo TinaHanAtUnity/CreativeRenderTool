@@ -32,7 +32,7 @@ export class AppleStoreManager extends StoreManager {
         const timestamp = Date.now();
 
         // todo: add some error handling
-        if(transaction.productId && transaction.receipt) {
+        if(transaction.hasOriginalTransaction && transaction.productId && transaction.receipt) {
             this._appleStore.getProductInfo(transaction.productId).then(product => {
                 if(product.price && product.priceLocale.currencyCode) {
                     const storeTransaction = new StoreTransaction(timestamp, transaction.productId, product.price, product.priceLocale.currencyCode, transaction.receipt);
