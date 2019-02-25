@@ -180,10 +180,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     }
 
     private isHttpResponseError(e: unknown): boolean {
-        if (e instanceof RequestError && e.nativeResponse && AdmobParsingTest.isValid(this._abGroup)) {
-            return true;
-        }
-        return false;
+        return !!(e instanceof RequestError && e.nativeResponse && AdmobParsingTest.isValid(this._abGroup));
     }
 
     private reportHttpFailure(e: RequestError, session: Session): void {
