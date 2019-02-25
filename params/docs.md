@@ -90,7 +90,7 @@
 | analyticsSessionId | string | Unity Analytics session ID in Unity Engine (does not apply to analytics events Unity Ads SDK is sending), note: sent as string to avoid problems with 64 bit integers being over JavaScript safe number limit | SDK | all |
 | isBackupCampaign | boolean | Flag describing if the campaign was loaded from server or from backup stored on device | SDK | all |
 | privacy | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
-
+| isPromoCatalogAvailable | object | Flag describing if the developer has a set up a catalog for their IAP Promo Placement | SDK | all |
 
 
 ### Configuration request
@@ -180,6 +180,7 @@
 | imei | no | True | False | string | IMEI or MEID from getDeviceId  | SDK | android |
 | abGroup | no | False | True | number | AB Group number assigned to this user from configuration | Server | all |
 | privacy | yes | False | True | object | Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK | SDK | all |
+| isPromoCatalogAvailable | yes | False | True | object | Flag describing if the developer has a set up a catalog for their IAP Promo Placement | SDK | all |
 
 
 

@@ -63,7 +63,10 @@ export class PurchasingUtilities {
             return this._purchasingAdapter.initialize().catch((e) => {
                 // Logging occurs in the purchasing adapter
             });
-        }).then(() => this._isInitialized = true);
+        }).then(() => {
+            this._isInitialized = true;
+            this._purchasingAdapter.refreshCatalog();
+        });
     }
 
     public static isInitialized(): boolean {

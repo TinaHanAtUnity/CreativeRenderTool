@@ -108,13 +108,16 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         return new Promise<IProduct[]>((resolve, reject) => {
             const observer = this._promo.Purchasing.onGetPromoCatalog.subscribe((promoCatalogJSON) => {
                 this._promo.Purchasing.onGetPromoCatalog.unsubscribe(observer);
+                if(promoCatalogJSON === null || promoCatalogJSON === 'NULL' || promoCatalogJSON === undefined) {
+                    reject(this.logIssue('Promo catalog JSON is null', 'catalog_json_null'));
+                }
                 if(promoCatalogJSON === '') {
                     reject(this.logIssue('Promo catalog JSON is empty', 'catalog_json_empty'));                }
                 try {
                     const products: IProduct[] = JSON.parse(promoCatalogJSON);
                     resolve(products);
                 } catch(err) {
-                    reject(this.logIssue(`Promo catalog JSON failed to parse with the following string: ${promoCatalogJSON}`, 'catalog_json_parse_failure'));
+                    reject(this.logIssue(`Promo catalog JSON failed to parse with the following string: ${promoCatalogJSON}`, 'catalog_json_malformatted'));
                 }
             });
             this._promo.Purchasing.getPromoCatalog().catch((e) => {
