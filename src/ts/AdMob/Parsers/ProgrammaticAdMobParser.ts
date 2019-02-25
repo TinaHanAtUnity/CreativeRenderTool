@@ -46,8 +46,8 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         const videoPromise = this.getVideoFromMarkup(markup, session).catch((e) => {
             this._core.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
 
-            if (this.isHTTPResponseError(e)) {
-                this.reportHTTPFailure(e, session);
+            if (this.isHttpResponseError(e)) {
+                this.reportHttpFailure(e, session);
                 throw e;
             }
 
@@ -179,14 +179,14 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         return null;
     }
 
-    private isHTTPResponseError(e: unknown): boolean {
+    private isHttpResponseError(e: unknown): boolean {
         if (e instanceof RequestError && e.nativeResponse && AdmobParsingTest.isValid(this._abGroup)) {
             return true;
         }
         return false;
     }
 
-    private reportHTTPFailure(e: RequestError, session: Session): void {
+    private reportHttpFailure(e: RequestError, session: Session): void {
         this._pts.reportError(ProgrammaticTrackingErrorName.AdmobTestHttpError, 'AdMob', this.seatID);
         const failureTimestamp = Math.floor(Date.now() / 1000);
         const urlTimestamp = Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP);
