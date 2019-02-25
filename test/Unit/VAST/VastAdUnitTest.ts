@@ -33,6 +33,7 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
 import EventTestVast from 'xml/EventTestVast.xml';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { IStoreApi } from 'Store/IStore';
 
 describe('VastAdUnitTest', () => {
 
@@ -42,6 +43,7 @@ describe('VastAdUnitTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let store: IStoreApi;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let vastAdUnit: VastAdUnit;
     let focusManager: FocusManager;
@@ -84,6 +86,7 @@ describe('VastAdUnitTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        store = TestFixtures.getStoreApi(nativeBridge);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo(core);
         const storageBridge = new StorageBridge(core);
@@ -142,6 +145,7 @@ describe('VastAdUnitTest', () => {
             platform,
             core,
             ads,
+            store,
             privacy,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,

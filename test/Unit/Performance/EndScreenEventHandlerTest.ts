@@ -46,6 +46,7 @@ import { DownloadStatus } from 'China/Native/Android/Download';
 import { DeviceIdManager } from 'China/Managers/DeviceIdManager';
 import { IChinaApi } from 'China/IChina';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { IStoreApi } from 'Store/IStore';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -54,6 +55,7 @@ describe('EndScreenEventHandlerTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let store: IStoreApi;
     let container: AdUnitContainer;
     let overlay: VideoOverlay;
     let endScreen: PerformanceEndScreen;
@@ -83,6 +85,7 @@ describe('EndScreenEventHandlerTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
+            store = TestFixtures.getStoreApi(nativeBridge);
 
             storageBridge = new StorageBridge(core);
             campaign = TestFixtures.getCampaign();
@@ -149,6 +152,7 @@ describe('EndScreenEventHandlerTest', () => {
                 platform,
                 core,
                 ads,
+                store,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -176,6 +180,7 @@ describe('EndScreenEventHandlerTest', () => {
                 platform,
                 core,
                 ads,
+                store,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
                 deviceInfo: deviceInfo,
@@ -235,6 +240,7 @@ describe('EndScreenEventHandlerTest', () => {
                         platform,
                         core,
                         ads,
+                        store,
                         thirdPartyEventManager: thirdPartyEventManager,
                         operativeEventManager: operativeEventManager,
                         deviceInfo: deviceInfo,
@@ -293,6 +299,7 @@ describe('EndScreenEventHandlerTest', () => {
                         platform,
                         core,
                         ads,
+                        store,
                         thirdPartyEventManager: thirdPartyEventManager,
                         operativeEventManager: operativeEventManager,
                         deviceInfo: deviceInfo,
@@ -960,6 +967,7 @@ describe('EndScreenEventHandlerTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
+            store = TestFixtures.getStoreApi(nativeBridge);
 
             storageBridge = new StorageBridge(core);
             campaign = TestFixtures.getCampaign();
@@ -1029,6 +1037,7 @@ describe('EndScreenEventHandlerTest', () => {
                 platform,
                 core,
                 ads,
+                store,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -1056,6 +1065,7 @@ describe('EndScreenEventHandlerTest', () => {
                 platform,
                 core,
                 ads,
+                store,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
                 deviceInfo: deviceInfo,
@@ -1230,7 +1240,7 @@ describe('EndScreenEventHandlerTest', () => {
                 endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
                 sinon.stub(campaign, 'getClickAttributionUrlFollowsRedirects').returns(false);
                 sinon.stub(campaign, 'getBypassAppSheet').returns(false);
-                sinon.stub(ads.iOS!.AppSheet, 'canOpen').returns(Promise.resolve(true));
+                sinon.stub(store.iOS!.AppSheet, 'canOpen').returns(Promise.resolve(true));
 
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: '11111',
@@ -1243,13 +1253,13 @@ describe('EndScreenEventHandlerTest', () => {
 
             it('should open app sheet', () => {
                 const resolved = Promise.resolve();
-                sinon.stub(ads.iOS!.AppSheet, 'present').returns(resolved);
-                sinon.spy(ads.iOS!.AppSheet, 'destroy');
+                sinon.stub(store.iOS!.AppSheet, 'present').returns(resolved);
+                sinon.spy(store.iOS!.AppSheet, 'destroy');
 
                 return new Promise((resolve, reject) => setTimeout(resolve, 500)).then(() => {
-                    sinon.assert.called(<sinon.SinonSpy>ads.iOS!.AppSheet.present);
-                    sinon.assert.calledWith(<sinon.SinonSpy>ads.iOS!.AppSheet.present, {id: 11111});
-                    sinon.assert.called(<sinon.SinonSpy>ads.iOS!.AppSheet.destroy);
+                    sinon.assert.called(<sinon.SinonSpy>store.iOS!.AppSheet.present);
+                    sinon.assert.calledWith(<sinon.SinonSpy>store.iOS!.AppSheet.present, {id: 11111});
+                    sinon.assert.called(<sinon.SinonSpy>store.iOS!.AppSheet.destroy);
                 });
             });
 

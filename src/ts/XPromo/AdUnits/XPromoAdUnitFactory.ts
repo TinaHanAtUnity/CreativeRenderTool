@@ -21,6 +21,7 @@ export class XPromoAdUnitFactory extends AbstractAdUnitFactory<XPromoCampaign, I
             platform: parameters.platform,
             core: parameters.core,
             ads: parameters.ads,
+            store: parameters.store,
             thirdPartyEventManager: parameters.thirdPartyEventManager,
             operativeEventManager: parameters.operativeEventManager,
             deviceInfo: parameters.deviceInfo,

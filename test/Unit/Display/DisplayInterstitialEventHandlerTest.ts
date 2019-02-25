@@ -25,6 +25,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
+import { IStoreApi } from 'Store/IStore';
 
 describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;
@@ -32,6 +33,7 @@ describe('DisplayInterstitialEventHandler', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let store: IStoreApi;
     let placement: Placement;
     let campaign: DisplayInterstitialCampaign;
     let sandbox: sinon.SinonSandbox;
@@ -52,6 +54,7 @@ describe('DisplayInterstitialEventHandler', () => {
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
+            store = TestFixtures.getStoreApi(nativeBridge);
             placement = new Placement({
                 id: '123',
                 name: 'test',
@@ -94,6 +97,7 @@ describe('DisplayInterstitialEventHandler', () => {
                 platform: platform,
                 core: core,
                 ads: ads,
+                store: store,
                 privacy: privacy,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,

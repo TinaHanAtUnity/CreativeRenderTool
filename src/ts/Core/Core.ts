@@ -229,13 +229,13 @@ export class Core implements ICore {
             this.Analytics = new Analytics(this);
             return Promise.all([configJson, this.Analytics.initialize()]);
         }).then(([configJson, gameSessionId]: [unknown, number]) => {
-            this.Ads = new Ads(configJson, this);
+            this.Store = new Store(this);
+            this.Ads = new Ads(configJson, this, this.Store);
             this.Ads.SessionManager.setGameSessionId(gameSessionId);
             this.Purchasing = new Purchasing(this);
 
             if(this.Config.isIapTrackingEnabled || true) { // todo: fix this before merging to master
-                const store: Store = new Store(this);
-                store.StoreManager.startTracking();
+                this.Store.StoreManager.startTracking();
             }
 
             return this.Ads.initialize(jaegerInitSpan);

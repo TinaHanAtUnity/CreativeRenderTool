@@ -7,6 +7,7 @@ import { GoogleStoreManager } from 'Store/Managers/GoogleStoreManager';
 import { AppleStoreManager } from 'Store/Managers/AppleStoreManager';
 import { Platform } from 'Core/Constants/Platform';
 import { ProductsApi } from 'Store/Native/iOS/Products';
+import { AppSheetApi } from 'Store/Native/iOS/AppSheet';
 
 export class Store implements IStore, IApiModule {
     public readonly Api: Readonly<IStoreApi>;
@@ -22,7 +23,8 @@ export class Store implements IStore, IApiModule {
                 Store: new AndroidStoreApi(core.NativeBridge)
             } : undefined,
             iOS: core.NativeBridge.getPlatform() === Platform.IOS ? {
-                Products: new ProductsApi(core.NativeBridge)
+                Products: new ProductsApi(core.NativeBridge),
+                AppSheet: new AppSheetApi(core.NativeBridge)
             } : undefined
         };
 

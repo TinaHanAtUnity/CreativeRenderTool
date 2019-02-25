@@ -36,6 +36,7 @@ import { ProgrammaticMRAIDEventHandler } from 'MRAID/EventHandlers/ProgrammaticM
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { IStoreApi } from 'Store/IStore';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
 
@@ -45,6 +46,7 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
         let container: AdUnitContainer;
         let core: ICoreApi;
         let ads: IAdsApi;
+        let store: IStoreApi;
         let ar: IARApi;
         let storageBridge: StorageBridge;
         let mraidView: MRAID;
@@ -76,6 +78,7 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
                 nativeBridge = TestFixtures.getNativeBridge(platform, backend);
                 core = TestFixtures.getCoreApi(nativeBridge);
                 ads = TestFixtures.getAdsApi(nativeBridge);
+                store = TestFixtures.getStoreApi(nativeBridge);
                 ar = TestFixtures.getARApi(nativeBridge);
                 storageBridge = new StorageBridge(core);
                 focusManager = new FocusManager(platform, core);
@@ -127,6 +130,7 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
                     platform,
                     core,
                     ads,
+                    store,
                     ar,
                     forceOrientation: Orientation.LANDSCAPE,
                     focusManager: focusManager,
