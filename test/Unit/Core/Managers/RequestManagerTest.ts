@@ -338,7 +338,7 @@ import { Url } from 'Core/Utilities/Url';
                 });
             });
 
-            it('should make HEAD request if requestUrl is not give redirect breaker format', () => {
+            it('should make HEAD request if requestUrl is not given redirect breaker format', () => {
                 const redirectUrl: string = platform === Platform.ANDROID ? 'https://google.com' : 'https://apple.com';
                 sinon.spy(request, 'head');
                 return request.followRedirectChain(redirectUrl, true, Url.getAppStoreUrlTemplates(platform)).catch(() => {
