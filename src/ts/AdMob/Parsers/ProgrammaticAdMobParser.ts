@@ -48,14 +48,19 @@ export class ProgrammaticAdMobParser extends CampaignParser {
             if (AdmobParsingTest.isValid(this._abGroup) && e instanceof RequestError) {
                 // Video attempting to be shown is no longer being hosted by Admob
                 this._pts.reportError(ProgrammaticTrackingErrorName.AdmobTestHttpError, 'AdMob', this.seatID);
-                SessionDiagnostics.trigger('admob_http_parse_error', {
-                    responseCode: e.nativeResponse ? e.nativeResponse.responseCode : 0,
-                    adRequestTimestamp: Math.floor(SdkStats.getAdRequestTimestamp() / 1000),
-                    urlTimestamp: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP),
-                    failureTimestamp: Math.floor(Date.now() / 1000),
-                    videoId: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.VIDEO_ID),
-                    videoFileUrl: this._mediaFileUrl
-                }, session);
+                if (e.nativeResponse) {
+                    SessionDiagnostics.trigger('admob_http_parse_error', {
+                        videoId: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.VIDEO_ID),
+                        urlTimestamp: Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP),
+                        adRequestTimestamp: Math.floor(SdkStats.getAdRequestTimestamp() / 1000),
+                        failureTimestamp: Math.floor(Date.now() / 1000),
+                        initialVideoUrl: this._mediaFileUrl,
+                        responseCode: e.nativeResponse.responseCode,
+                        redirectedUrl: e.nativeResponse.url,
+                        headers: e.nativeResponse.headers,
+                        response: e.nativeResponse.response
+                    }, session);
+                }
                 throw e;
             }
             return null;

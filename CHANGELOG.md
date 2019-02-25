@@ -1,7 +1,8 @@
-# Staged
+# Thu Feb 21 22:52:30 UTC 2019
 
 * Update 3rd party list [#8350](https://github.com/Applifier/unity-ads-webview/pull/8350)
 * Fix Privacy settings layout on iPhone X [#8300](https://github.com/Applifier/unity-ads-webview/pull/8300)
+* Update Admob Parsing SessionDiagnostic [#8369](https://github.com/Applifier/unity-ads-webview/pull/8369)
 
 # Wed Feb 20 21:17:27 UTC 2019
 
