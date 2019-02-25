@@ -99,6 +99,7 @@ export class AuctionRequest {
     private static AbGroup: number | undefined;
     private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
     private static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
+    private static TestModeUrl: string = 'https://auction.staging.unityads.unity3d.com/v5/test/games';
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
     private static SessionId: string | undefined;
@@ -142,6 +143,11 @@ export class AuctionRequest {
         this._metaDataManager = params.metaDataManager;
         this._adMobSignalFactory = params.adMobSignalFactory;
         this._sessionManager = params.sessionManager;
+        if(this._coreConfig.getTestMode()) {
+            this._baseURL = AuctionRequest.TestModeUrl;
+        } else {
+            this._baseURL = AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;
+        }
         this._baseURL = AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;
     }
 
