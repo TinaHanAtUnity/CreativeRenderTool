@@ -542,8 +542,8 @@ describe('UserPrivacyManagerTest', () => {
         });
 
         describe('when updating user privacy', () => {
-            function sendEvent(permissions: IPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER): Promise<any> {
-                return privacyManager.updateUserPrivacy(permissions, source).then(() => {
+            function sendEvent(permissions: IPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER, layout?: string): Promise<any> {
+                return privacyManager.updateUserPrivacy(permissions, source, layout).then(() => {
                     sinon.assert.calledOnce(httpKafkaStub);
                     return httpKafkaStub.firstCall.args[2];
                 });
@@ -582,6 +582,14 @@ describe('UserPrivacyManagerTest', () => {
                     assert.equal(eventData.coppa, false);
                     assert.equal(eventData.permissions, expectedPermissions);
                     assert.equal(eventData.group, expectedAbGroup);
+                    assert.equal(eventData.layout, '');
+                });
+            });
+
+            it('should send selected layout with consent event', () => {
+                return sendEvent(undefined, GDPREventSource.USER, 'selected_layout').then((eventData) => {
+                    assert.isDefined(eventData);
+                    assert.equal(eventData.layout, 'selected_layout');
                 });
             });
 

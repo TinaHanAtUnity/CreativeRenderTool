@@ -90,7 +90,7 @@ export class UserPrivacyManager {
         });
     }
 
-    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource): Promise<INativeResponse | void> {
+    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, layout = ''): Promise<INativeResponse | void> {
         const gamePrivacy = this._gamePrivacy;
 
         if (!gamePrivacy.isEnabled() || !isUnityConsentPermissions(permissions)) {
@@ -116,7 +116,7 @@ export class UserPrivacyManager {
         }
 
         this._userPrivacy.update(updatedPrivacy);
-        return this.sendUnityConsentEvent(permissions, source);
+        return this.sendUnityConsentEvent(permissions, source, layout);
     }
 
     private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPermissions }) {
@@ -151,10 +151,11 @@ export class UserPrivacyManager {
         return false;
     }
 
-    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource): Promise<INativeResponse> {
+    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource, layout: string): Promise<INativeResponse> {
         const infoJson: unknown = {
             adid: this._deviceInfo.getAdvertisingIdentifier(),
             group: this._coreConfig.getAbGroup(),
+            layout: layout,
             action: GDPREventAction.CONSENT,
             projectId: this._coreConfig.getUnityProjectId(),
             platform: Platform[this._platform].toLowerCase(),
