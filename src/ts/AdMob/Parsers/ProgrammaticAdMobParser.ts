@@ -179,11 +179,14 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         return null;
     }
 
-    private videoFailedFromHTTPResponse(e: unknown) {
-        return e instanceof RequestError && e.nativeResponse && AdmobParsingTest.isValid(this._abGroup);
+    private videoFailedFromHTTPResponse(e: unknown): boolean {
+        if (e instanceof RequestError && e.nativeResponse && AdmobParsingTest.isValid(this._abGroup)) {
+            return true;
+        }
+        return false;
     }
 
-    private reportHTTPFailure(e: RequestError, session: Session) {
+    private reportHTTPFailure(e: RequestError, session: Session): void {
         this._pts.reportError(ProgrammaticTrackingErrorName.AdmobTestHttpError, 'AdMob', this.seatID);
         const failureTimestamp = Math.floor(Date.now() / 1000);
         const urlTimestamp = Url.getQueryParameter(this._mediaFileUrl, AdmobUrlQueryParameters.TIMESTAMP);
