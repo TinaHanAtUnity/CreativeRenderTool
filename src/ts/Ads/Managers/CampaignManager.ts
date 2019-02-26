@@ -847,7 +847,7 @@ export class CampaignManager {
             body.volume = volume;
             body.requestSignal = requestSignal;
             body.ext = optionalSignal;
-            body.isPromoCatalogAvailable = false;
+            body.isPromoCatalogAvailable = PurchasingUtilities.isCatalogAvailable();
 
             if(fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;
@@ -855,10 +855,6 @@ export class CampaignManager {
 
             if(versionCode) {
                 body.versionCode = versionCode;
-            }
-
-            if (PurchasingUtilities.isInitialized()) {
-                body.isPromoCatalogAvailable = PurchasingUtilities.isCatalogValid();
             }
 
             return Promise.all([

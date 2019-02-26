@@ -140,6 +140,10 @@ export class PurchasingUtilities {
         return false;
     }
 
+    public static isCatalogAvailable(): boolean {
+        return this._isInitialized && this.isCatalogValid();
+    }
+
     public static isCatalogValid(): boolean {
         return (this._catalog !== undefined && this._catalog.getProducts() !== undefined && this._catalog.getSize() !== 0);
     }

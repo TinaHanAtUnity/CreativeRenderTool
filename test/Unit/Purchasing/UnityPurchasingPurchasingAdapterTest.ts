@@ -321,12 +321,12 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             const refreshCatalogPromise = purchasingAdapter.refreshCatalog();
 
             return triggerRefreshCatalog('')
-                .then(() => {
-                    return refreshCatalogPromise.then(() => assert.fail('RefreshCatalog worked when it shouldn\'t\'ve'))
-                        .catch((e) => {
-                            assert.equal(e.message, 'Promo catalog JSON is empty');
-                        });
-                });
+                    .then(() => {
+                        return refreshCatalogPromise.then(() => assert.fail('RefreshCatalog worked when it shouldn\'t\'ve'))
+                            .catch((e) => {
+                                assert.equal(e.message, 'Promo catalog JSON is empty');
+                            });
+                    });
         });
 
         it('should fail with catalog_json_parse_failure if catalog is invalid json string', () => {
