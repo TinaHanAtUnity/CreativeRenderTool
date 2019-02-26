@@ -78,7 +78,6 @@ export class CampaignManager {
     private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
     private static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
     private static TestModeUrl: string = 'https://auction.unityads.unity3d.com/v4/test/games';
-    private static TestModeV5Url: string = 'https://auction.unityads.unity3d.com/v5/test/games';
 
     private static CampaignId: string | undefined;
     private static SessionId: string | undefined;
@@ -666,9 +665,8 @@ export class CampaignManager {
 
     private getBaseUrl(): string {
         if(this._coreConfig.getTestMode()){
-            const testModeUrl: string = AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? CampaignManager.TestModeV5Url : CampaignManager.TestModeUrl;
             return [
-                testModeUrl,
+                CampaignManager.TestModeUrl,
                 this._clientInfo.getGameId(),
                 'requests'
             ].join('/');
