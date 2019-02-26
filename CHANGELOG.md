@@ -1,4 +1,4 @@
-# Merged
+# Tue Feb 26 23:30:30 UTC 2019
 
 * Update deprecated sandbox api with sinon.createSandbox() [#8396](https://github.com/Applifier/unity-ads-webview/pull/8396)
 * Send Promo Catalog Flag to Auction [#8374](https://github.com/Applifier/unity-ads-webview/pull/8374)
