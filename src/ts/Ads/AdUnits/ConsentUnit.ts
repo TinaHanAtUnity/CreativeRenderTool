@@ -6,13 +6,11 @@ import {
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { Platform } from 'Core/Constants/Platform';
-import { IUnityConsentViewParameters, UnityConsent } from 'Ads/Views/Consent/UnityConsent';
 import { Consent, ConsentPage, IConsentViewParameters } from 'Ads/Views/Consent/Consent';
 import { IConsentViewHandler } from 'Ads/Views/Consent/IConsentViewHandler';
 import { IPermissions } from 'Ads/Models/Privacy';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ICoreApi } from 'Core/ICore';
-import { UnityConsentSettings } from 'Ads/Views/Consent/UnityConsentSettings';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
@@ -30,8 +28,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     private _donePromiseResolve: () => void;
     private _showing: boolean;
     private _adUnitContainer: AdUnitContainer;
-    private _unityConsentView: UnityConsent | Consent;
-    private _consentSettingsView?: UnityConsentSettings;
+    private _unityConsentView: Consent;
     private _platform: Platform;
     private _privacyManager: UserPrivacyManager;
     private _adsConfig: AdsConfiguration;
@@ -44,34 +41,19 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
 
-        // todo:
-        const abtest = true;
-        if (abtest) {
-            let viewParams: IConsentViewParameters = {
-                platform: parameters.platform,
-                privacyManager: parameters.privacyManager,
-                landingPage: ConsentPage.INTRO
-            };
+        let viewParams: IConsentViewParameters = {
+            platform: parameters.platform,
+            privacyManager: parameters.privacyManager,
+            landingPage: ConsentPage.INTRO // // todo: A/B test
+        };
 
-            if (this._platform === Platform.ANDROID) {
-                viewParams = {
-                    ... viewParams,
-                    apiLevel: (<AndroidDeviceInfo>parameters.deviceInfo).getApiLevel()
-                };
-            }
-            this._unityConsentView = new Consent(viewParams);
-        } else {
-            this._consentSettingsView = new UnityConsentSettings(this._platform, parameters.privacyManager);
-            this._consentSettingsView.addEventHandler(this);
-            const viewParams: IUnityConsentViewParameters = {
-                platform: parameters.platform,
-                privacyManager: parameters.privacyManager,
-                consentSettingsView: this._consentSettingsView
+        if (this._platform === Platform.ANDROID) {
+            viewParams = {
+                ... viewParams,
+                apiLevel: (<AndroidDeviceInfo>parameters.deviceInfo).getApiLevel()
             };
-            this._unityConsentView = new UnityConsent(viewParams);
-
         }
-
+        this._unityConsentView = new Consent(viewParams);
         this._unityConsentView.addEventHandler(this);
     }
 
@@ -85,11 +67,6 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             this._unityConsentView.render();
             document.body.appendChild(this._unityConsentView.container());
 
-            if (this._consentSettingsView) {
-                this._consentSettingsView.render();
-                this._consentSettingsView.hide();
-                document.body.appendChild(this._consentSettingsView.container());
-            }
             this._unityConsentView.show();
 
             if(TestEnvironment.get('autoAcceptConsent')) {
@@ -116,9 +93,6 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                 document.body.removeChild(this._unityConsentView.container());
             }
 
-            if (this._consentSettingsView && this._consentSettingsView.container().parentElement) {
-                document.body.removeChild(this._consentSettingsView.container());
-            }
             // Fixes browser build for android. TODO: find a neater way
             setTimeout(() => {
                 this._donePromiseResolve();
@@ -175,11 +149,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             }
             if(consent.hasOwnProperty('ads')) {
                 this._core.Sdk.logInfo('setting autoAcceptConsent with Personalized Consent based on ' + JSON.stringify(consent));
-                if (this._consentSettingsView) {
-                    this._consentSettingsView.testAutoConsent(consent);
-                } else if (this._unityConsentView instanceof Consent) {
-                    this._unityConsentView.testAutoConsent(consent);
-                }
+                this._unityConsentView.testAutoConsent(consent);
             }
         }, 3000);
     }
