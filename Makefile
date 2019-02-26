@@ -278,11 +278,8 @@ watch-test: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 		"watchman-make -p build/test/UnitBundle.js -t test-unit" \
 		"watchman-make -p build/test/IntegrationBundle.js -t test-integration"
 
-start-server: stop-server
-	test ! -f server.pid && { nohup python3 -m http.server 8000 >/dev/null 2>&1 & echo $$! > server.pid; } && echo "Started local server" || true
-
-stop-server:
-	test -f server.pid && (kill $$(cat server.pid) >/dev/null 2>&1 || true) && rm server.pid && echo "Stopped local server" || true
+start-server: 
+	curl -s http://localhost:8000/tools/serverLauncher.command | grep -q "WebView Local Server" && echo "Server already running" || open tools/serverLauncher.command
 
 deploy:
 ifeq ($(TRAVIS_PULL_REQUEST), false)
