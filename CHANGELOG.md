@@ -2,6 +2,7 @@
 
 * Remove obsolete consent test code [#8373](https://github.com/Applifier/unity-ads-webview/pull/8373)
 * Edit Admob HTTP Test to only block on bad response codes [#8371](https://github.com/Applifier/unity-ads-webview/pull/8371)
+* Skipping redirection with redirectBreakers urls [#8349](https://github.com/Applifier/unity-ads-webview/pull/8349)
 
 # Thu Feb 21 22:52:30 UTC 2019
 
