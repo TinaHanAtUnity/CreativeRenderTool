@@ -551,5 +551,12 @@
     "description": "Contains the GDPR consent information, combines data received from configuration-service and data collected from user in SDK",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "isPromoCatalogAvailable",
+    "type": "boolean",
+    "description": "Flag describing if the developer has a set up a catalog for their IAP Promo Placement",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]
