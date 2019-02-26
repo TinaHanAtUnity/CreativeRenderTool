@@ -19,6 +19,8 @@ BRANCH=$1
 
 if [ $BRANCH == 2.0.6 ]; then
     BRANCH='master'
+elif [ $BRANCH == 3.0.1 ] then
+    BRANCH='3.0.1-rc2'
 elif [ $BRANCH == master ]; then
     BRANCH='development'
 fi
