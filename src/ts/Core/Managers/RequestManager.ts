@@ -213,7 +213,7 @@ export class RequestManager {
     }
 
     // Follows the redirects of a URL, returning the final location.
-    public followRedirectChain(url: string, useWebViewUserAgentForTracking = false): Promise<string> {
+    public followRedirectChain(url: string, useWebViewUserAgentForTracking = false, redirectBreakers?: string[]): Promise<string> {
         let redirectCount = 0;
         const headers: [string, string][] = [];
         if (useWebViewUserAgentForTracking && typeof navigator !== 'undefined' && navigator.userAgent) {
@@ -229,6 +229,15 @@ export class RequestManager {
                     // market:// or itunes:// urls can be opened directly
                     resolve(requestUrl);
                 } else {
+                    if (redirectBreakers) {
+                        for (const breaker of redirectBreakers) {
+                            if (requestUrl.indexOf(breaker) !== -1) {
+                                resolve(requestUrl);
+                                return;
+                            }
+                        }
+                    }
+
                     this.head(requestUrl, headers).then((response: INativeResponse) => {
                         if (RequestManager.is3xxRedirect(response.responseCode)) {
                             const location = RequestManager.getHeader(response.headers, 'location');
