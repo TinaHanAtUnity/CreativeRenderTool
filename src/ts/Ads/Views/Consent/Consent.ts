@@ -1,6 +1,5 @@
 import { View } from 'Core/Views/View';
 import { Template } from 'Core/Utilities/Template';
-import { UnityConsentSettings } from 'Ads/Views/Consent/UnityConsentSettings';
 import { Platform } from 'Core/Constants/Platform';
 import { GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { IPermissions } from 'Ads/Models/Privacy';
