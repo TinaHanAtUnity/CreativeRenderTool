@@ -52,6 +52,11 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
                 ... viewParams,
                 apiLevel: (<AndroidDeviceInfo>parameters.deviceInfo).getApiLevel()
             };
+        } else if (this._platform === Platform.IOS) {
+            viewParams = {
+                ... viewParams,
+                osVersion: parameters.deviceInfo.getOsVersion()
+            };
         }
         this._unityConsentView = new Consent(viewParams);
         this._unityConsentView.addEventHandler(this);

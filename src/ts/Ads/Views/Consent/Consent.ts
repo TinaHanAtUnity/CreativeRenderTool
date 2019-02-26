@@ -19,8 +19,9 @@ import {
 export interface IConsentViewParameters {
     platform: Platform;
     privacyManager: UserPrivacyManager;
-    apiLevel?: number;
     landingPage: ConsentPage;
+    apiLevel?: number;
+    osVersion?: string;
 }
 
 export enum ConsentPage {
@@ -32,6 +33,7 @@ export enum ConsentPage {
 export class Consent extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationSwitchGroupHandler {
 
     private _apiLevel?: number;
+    private _osVersion?: string;
 
     private _privacyManager: UserPrivacyManager;
     private _switchGroup: PersonalizationSwitchGroup;
@@ -44,8 +46,9 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     constructor(parameters: IConsentViewParameters) {
         super(parameters.platform, 'consent');
 
-        this._apiLevel = parameters.apiLevel;
         this._landingPage = parameters.landingPage;
+        this._apiLevel = parameters.apiLevel;
+        this._osVersion = parameters.osVersion;
 
         this._privacyManager = parameters.privacyManager;
 
@@ -147,7 +150,11 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
         // Android <= 4.4.4
         if (this._platform === Platform.ANDROID && this._apiLevel && this._apiLevel <= 19) {
-            this._container.classList.add('old-androids');
+            this._container.classList.add('android4-ios7-ios8');
+        } else if (this._platform === Platform.IOS && this._osVersion) {
+            if (this._osVersion.match(/^8/) || this._osVersion.match(/^7/)) {
+                this._container.classList.add('android4-ios7-ios8');
+            }
         }
 
         if (this._landingPage === ConsentPage.HOMESCREEN) {
