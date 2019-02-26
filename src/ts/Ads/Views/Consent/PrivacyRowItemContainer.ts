@@ -23,16 +23,15 @@ export enum PrivacyTextParagraph {
 export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandler> {
 
     private _userPrivacyManager: UserPrivacyManager;
-    private _dataDeletionConfirmation: boolean = false;
 
-    constructor(platform: Platform, userPrivacyManager: UserPrivacyManager, hideDataDeletionDialog: boolean = false) {
+    constructor(platform: Platform, userPrivacyManager: UserPrivacyManager, showChangingPrivacyChoiceItem: boolean = false) {
         super(platform, 'privacy-row-item-container', false);
 
         this._userPrivacyManager = userPrivacyManager;
         this._template = new Template(PrivacyRowItemContainerTemplate);
 
         this._templateData = {
-            hideDataDeletionDialog: hideDataDeletionDialog
+            showChangingPrivacyChoiceItem: showChangingPrivacyChoiceItem
         };
 
         this._bindings = [
@@ -48,8 +47,8 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onDataProtectionEvent(event),
-                selector: '.data-protection'
+                listener: (event: Event) => this.onDataTransferEvent(event),
+                selector: '.data-transfer'
             },
             {
                 event: 'click',
@@ -58,23 +57,13 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
             },
             {
                 event: 'click',
+                listener: (event: Event) => this.onChangingPrivacyChoiceEvent(event),
+                selector: '.changing-privacy-choice'
+            },
+            {
+                event: 'click',
                 listener: (event: Event) => this.onPrivacyPolicyEvent(event),
                 selector: '.privacy-policy'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onDataDeletionEvent(event),
-                selector: '.data-deletion-dialog-link, .data-deletion-reject'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onDataDeletionConfirmationEvent(event),
-                selector: '#data-deletion-confirm'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onOpenDataDeletionEvent(event),
-                selector: '.data-deletion-link'
             }
         ];
     }
@@ -88,7 +77,7 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
                 paragraphElement = rowItemElement = this._container.querySelector('.third-party');
                 break;
             case PrivacyTextParagraph.DATA:
-                paragraphElement = rowItemElement = this._container.querySelector('.data-protection');
+                paragraphElement = rowItemElement = this._container.querySelector('.what-we-collect');
                 break;
             case PrivacyTextParagraph.DEMOGRAPHIC_INFO:
                 rowItemElement = this._container.querySelector('.what-we-collect');
@@ -139,10 +128,10 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
         this.toggleDescription(element);
     }
 
-    private onDataProtectionEvent(event: Event): void {
+    private onDataTransferEvent(event: Event): void {
         event.preventDefault();
 
-        const element = this._container.querySelector('.data-protection');
+        const element = this._container.querySelector('.data-transfer');
         this.toggleDescription(element);
     }
 
@@ -150,6 +139,13 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
         event.preventDefault();
 
         const element = this._container.querySelector('.third-party');
+        this.toggleDescription(element);
+    }
+
+    private onChangingPrivacyChoiceEvent(event: Event): void {
+        event.preventDefault();
+
+        const element = this._container.querySelector('.changing-privacy-choice');
         this.toggleDescription(element);
     }
 
@@ -170,38 +166,8 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
         }
     }
 
-    private onDataDeletionEvent(event: Event): void {
-        event.preventDefault();
-
-        if (this._dataDeletionConfirmation) {
-            return;
-        }
-
-        const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
-        confirmationContainer.classList.toggle('active');
-    }
-
-    private onDataDeletionConfirmationEvent(event: Event): void {
-        event.preventDefault();
-        this._dataDeletionConfirmation = true;
-
-        const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
-        confirmationContainer.classList.toggle('active');
-
-        const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
-        requestContainer.classList.add('active');
-
-        this._handlers.forEach(handler => handler.onDataDeletion());
-
-    }
-
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onPrivacy((<HTMLLinkElement>event.target).href));
-    }
-
-    private onOpenDataDeletionEvent(event: Event): void {
-        event.preventDefault();
-        this._handlers.forEach(handler => handler.onShowDataDeletionDialog());
     }
 }

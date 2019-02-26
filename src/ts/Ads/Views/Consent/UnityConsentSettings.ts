@@ -44,7 +44,7 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
             }
         ];
 
-        this._infoContainer = new PrivacyRowItemContainer(platform, userPrivacyManager);
+        this._infoContainer = new PrivacyRowItemContainer(platform, userPrivacyManager, true);
         this._infoContainer.addEventHandler(this);
         this._checkboxGroup = new PersonalizationCheckboxGroup(platform, userPrivacyManager);
         this._checkboxGroup.addEventHandler(this);

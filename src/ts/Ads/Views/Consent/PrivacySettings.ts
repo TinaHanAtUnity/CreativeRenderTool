@@ -98,7 +98,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             }
         ];
 
-        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager, true);
+        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager);
         this._privacyRowItemContainer.addEventHandler(this);
 
         this._personalizationCheckBoxGroup = new PersonalizationCheckboxGroup(platform, this._userPrivacyManager);

@@ -121,7 +121,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
         this._switchGroup = new PersonalizationSwitchGroup(parameters.platform, parameters.privacyManager);
         this._switchGroup.addEventHandler(this);
-        this._privacyRowItemContainer = new PrivacyRowItemContainer(parameters.platform, parameters.privacyManager);
+        this._privacyRowItemContainer = new PrivacyRowItemContainer(parameters.platform, parameters.privacyManager, true);
         this._privacyRowItemContainer.addEventHandler(this);
     }
 
