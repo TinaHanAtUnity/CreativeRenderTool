@@ -61,7 +61,7 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
         let programmaticTrackingService: ProgrammaticTrackingService;
 
         before(() => {
-            sandbox = sinon.sandbox.create();
+            sandbox = sinon.createSandbox();
         });
 
         beforeEach(() => {
