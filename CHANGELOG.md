@@ -1,4 +1,4 @@
-# Pending
+# Tue Feb 26 17:47:06 UTC 2019
 
 * Remove obsolete consent test code [#8373](https://github.com/Applifier/unity-ads-webview/pull/8373)
 * Edit Admob HTTP Test to only block on bad response codes [#8371](https://github.com/Applifier/unity-ads-webview/pull/8371)
