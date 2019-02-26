@@ -279,7 +279,7 @@ watch-test: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 		"watchman-make -p build/test/IntegrationBundle.js -t test-integration"
 
 start-server: 
-	curl -s http://localhost:8000/tools/serverLauncher.command | grep -q "WebView Local Server" && echo "Server already running" || (open tools/serverLauncher.command || gnome-open tools/serverLauncher.command || xdg-open tools/serverLauncher.command)
+	curl -s http://localhost:8000/tools/serverLauncher.command | grep -q "WebView Local Server" && echo "Server already running" || (open tools/serverLauncher.command || gnome-open tools/serverLauncher.command || xdg-open tools/serverLauncher.command || ./tools/serverLauncher.command)
 
 deploy:
 ifeq ($(TRAVIS_PULL_REQUEST), false)
