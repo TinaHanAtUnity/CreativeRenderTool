@@ -1,3 +1,9 @@
+# Tue Feb 26 17:47:06 UTC 2019
+
+* Remove obsolete consent test code [#8373](https://github.com/Applifier/unity-ads-webview/pull/8373)
+* Edit Admob HTTP Test to only block on bad response codes [#8371](https://github.com/Applifier/unity-ads-webview/pull/8371)
+* Skipping redirection with redirectBreakers urls [#8349](https://github.com/Applifier/unity-ads-webview/pull/8349)
+
 # Thu Feb 21 22:52:30 UTC 2019
 
 * Update 3rd party list [#8350](https://github.com/Applifier/unity-ads-webview/pull/8350)
@@ -12,7 +18,6 @@
 * Remove support for promotions served by server [#8174](https://github.com/Applifier/unity-ads-webview/pull/8174)
 * Add Group 16 to Auction V5 Test [#8348](https://github.com/Applifier/unity-ads-webview/pull/8348)
 * Swap Bytedance AB Test and Reduce click_delay Diagnostic [#8347](https://github.com/Applifier/unity-ads-webview/pull/8347)
-
 
 # Wed Feb 20 01:03:52 UTC 2019
 

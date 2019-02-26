@@ -10,9 +10,10 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Url } from 'Core/Utilities/Url';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
-    describe(Platform[platform] + ' - RequestTest', () => {
+    describe(Platform[platform] + ' - RequestManagerTest', () => {
         let backend: Backend;
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
@@ -323,6 +324,28 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
                     assert.fail(`${redirectUrl} should not success on HEAD request`);
                 }).catch((e) => {
                     assert.equal(e.message, 'Fail response');
+                });
+            });
+
+            it('should not make HEAD request if requestUrl is given redirectBreaker string format', () => {
+                const redirectUrl: string = platform === Platform.ANDROID ? 'https://play.google.com/store/apps/details?id=com.playgendary.tanks' : 'https://itunes.apple.com/app/id490099807?mt=8';
+                sinon.spy(request, 'head');
+                return request.followRedirectChain(redirectUrl, true, Url.getAppStoreUrlTemplates(platform)).catch(() => {
+                    return redirectUrl;
+                }).then((url) => {
+                    sinon.assert.notCalled(<sinon.SinonSpy>request.head);
+                    assert.equal(url, redirectUrl);
+                });
+            });
+
+            it('should make HEAD request if requestUrl is not given redirect breaker format', () => {
+                const redirectUrl: string = platform === Platform.ANDROID ? 'https://google.com' : 'https://apple.com';
+                sinon.spy(request, 'head');
+                return request.followRedirectChain(redirectUrl, true, Url.getAppStoreUrlTemplates(platform)).catch(() => {
+                    return redirectUrl;
+                }).then((url) => {
+                    sinon.assert.called(<sinon.SinonSpy>request.head);
+                    assert.equal(url, redirectUrl);
                 });
             });
         });
