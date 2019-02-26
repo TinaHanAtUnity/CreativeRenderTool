@@ -1,3 +1,7 @@
+# Merged
+
+* Update deprecated sandbox api with sinon.createSandbox() [#8396](https://github.com/Applifier/unity-ads-webview/pull/8396)
+
 # Tue Feb 26 17:47:06 UTC 2019
 
 * Remove obsolete consent test code [#8373](https://github.com/Applifier/unity-ads-webview/pull/8373)
