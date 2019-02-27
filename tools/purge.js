@@ -287,7 +287,7 @@ let urlRoot = '/webview/' + branch;
 if(branch === '2.0.6') {
     urlRoot = '/webview/master';
 } else if(branch === '3.0.1') {
-    urlRoot = '/webview/3.0.1-rc2'
+    urlRoot = '/webview/3.0.1-rc2';
 }
 
 let purgeList = [
