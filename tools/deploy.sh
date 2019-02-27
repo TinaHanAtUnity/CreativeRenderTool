@@ -18,17 +18,18 @@ fi
 BRANCH=$1
 
 if [ $BRANCH == 2.0.6 ]; then
+    deploy_branch $BRANCH
     BRANCH='master'
 elif [ $BRANCH == 3.0.1 ]; then
+    deploy_branch $BRANCH
     BRANCH='3.0.1-rc2'
 elif [ $BRANCH == master ]; then
     BRANCH='development'
 fi
 
-gsutil -m cp -r -z "html, json" -a public-read deploy gs://unity-ads-webview-bucket/webview/$BRANCH
-aws s3 sync deploy s3://unityads-cdn-origin/webview/$BRANCH/ --acl public-read
+deploy_branch $BRANCH
 
-if [ $BRANCH == master ]; then
-    gsutil -m cp -r -z "html, json" -a public-read deploy gs://unity-ads-webview-bucket/webview/2.0.6
-    aws s3 sync deploy s3://unityads-cdn-origin/webview/2.0.6/ --acl public-read
-fi
+deploy_branch () {
+    gsutil -m cp -r -z "html, json" -a public-read deploy gs://unity-ads-webview-bucket/webview/$1
+    aws s3 sync deploy s3://unityads-cdn-origin/webview/$1/ --acl public-read
+}
