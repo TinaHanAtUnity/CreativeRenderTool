@@ -6,9 +6,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 
 export interface IPrivacyRowItemContainerHandler {
-    onDataDeletion(): void;
     onPrivacy(url: string): void;
-    onShowDataDeletionDialog(): void;
 }
 
 export enum PrivacyTextParagraph {

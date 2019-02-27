@@ -179,14 +179,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         }
     }
 
-    public onDataDeletion(): void {
-        this._switchGroup.checkCheckboxes(false);
-    }
-
-    public onShowDataDeletionDialog(): void {
-        // do nothing
-    }
-
     public onPrivacy(url: string): void {
         this._handlers.forEach(handler => handler.onPrivacy(url));
     }

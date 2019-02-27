@@ -116,14 +116,6 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         this.showView(ViewState.INITIAL);
     }
 
-    public onDataDeletion(): void {
-        this._personalizationCheckBoxGroup.checkCheckboxes(false);
-    }
-
-    public onShowDataDeletionDialog(): void {
-        this.showView(ViewState.DATA);
-    }
-
     public onPrivacy(url: string): void {
         this._handlers.forEach(handler => {
             if(handler.onPrivacy) {
