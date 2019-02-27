@@ -91,8 +91,8 @@ export class AndroidStoreApi extends NativeApi {
         super(nativeBridge, 'Store', ApiPackage.STORE, EventCategory.STORE);
     }
 
-    public initialize(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'initialize');
+    public initialize(intentName: string, intentPackage: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'initialize', [intentName, intentPackage]);
     }
 
     public startPurchaseTracking(trackAllActivities: boolean, exceptions: string[], purchaseTypes: string[]): Promise<void> {
