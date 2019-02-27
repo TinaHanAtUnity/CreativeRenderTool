@@ -40,7 +40,6 @@ import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampa
             bannerAdContext = banners.AdContext;
         });
 
-
         afterEach(() => sandbox.restore());
 
         const loadBannerAdUnit = () => {
@@ -100,16 +99,12 @@ import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampa
             });
         });
 
-        describe('No fill banner scenario', () =>{
-            const loadBannerAdUnit = () => {
+        describe('No fill banner scenario', () => {
+            beforeEach(() => {
                 adUnit = sandbox.createStubInstance(HTMLBannerAdUnit);
                 sandbox.stub(banners.CampaignManager, 'request').returns(Promise.reject(new NoFillError()));
                 sandbox.stub(banners.Api.Listener, 'sendErrorEvent');
                 sandbox.stub(banners.Api.Banner, 'load');
-            };
-
-            beforeEach(() => {
-                loadBannerAdUnit();
             });
 
             it('will fail when the request returns the error thing', () => {
