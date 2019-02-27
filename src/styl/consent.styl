@@ -470,6 +470,28 @@ body {
       margin-left: 1.5 * $default-size;
     }
   }
+
+  &.landscape #consent {
+    &.android4-ios7-ios8 {
+      #consent-homescreen {
+        .homescreen-container {
+          margin: 0;
+        }
+
+        .top-container {
+          left: 0;
+          margin: 0;
+          width: 50%;
+        }
+
+        .bottom-container {
+          left: 50%;
+          margin-left: .5 * $default-size;
+          width: 50%;
+        }
+      }
+    }
+  }
 }
 
 
