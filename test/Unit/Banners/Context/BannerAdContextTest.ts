@@ -6,10 +6,13 @@ import { Platform } from 'Core/Constants/Platform';
 import { IAds } from 'Ads/IAds';
 import { Backend } from 'Backend/Backend';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
+import 'mocha';
+import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
 import { HTMLBannerAdUnit } from 'Banners/AdUnits/HTMLBannerAdUnit';
 import { asStub } from 'TestHelpers/Functions';
+import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampaignManager';
 
 [
     Platform.IOS,
@@ -36,6 +39,7 @@ import { asStub } from 'TestHelpers/Functions';
             campaign = TestFixtures.getBannerCampaign();
             bannerAdContext = banners.AdContext;
         });
+
 
         afterEach(() => sandbox.restore());
 
@@ -92,6 +96,25 @@ import { asStub } from 'TestHelpers/Functions';
                     return Promise.resolve().then(() => {
                         sinon.assert.calledTwice(asStub(banners.CampaignManager.request));
                     });
+                });
+            });
+        });
+
+        describe('No fill banner scenario', () =>{
+            const loadBannerAdUnit = () => {
+                adUnit = sandbox.createStubInstance(HTMLBannerAdUnit);
+                sandbox.stub(banners.CampaignManager, 'request').returns(Promise.reject(new NoFillError()));
+                sandbox.stub(banners.Api.Listener, 'sendErrorEvent');
+                sandbox.stub(banners.Api.Banner, 'load');
+            };
+
+            beforeEach(() => {
+                loadBannerAdUnit();
+            });
+
+            it('will fail when the request returns the error thing', () => {
+                return bannerAdContext.load(placementId).catch((e) => {
+                    sinon.assert.called(asStub(banners.Api.Listener.sendErrorEvent));
                 });
             });
         });
