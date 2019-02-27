@@ -121,7 +121,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
             });
             this._promo.Purchasing.getPromoCatalog().catch((e) => {
                 this._promo.Purchasing.onGetPromoCatalog.unsubscribe(observer);
-                reject(this.logIssue('Purchasing Catalog failed to refresh', 'catalog_refresh_failed'));
+                reject(this.logIssue('Purchasing Catalog failed to refresh'));
             });
         });
     }
@@ -130,7 +130,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         if (promoCatalogJSON === 'NULL' || promoCatalogJSON === null || promoCatalogJSON === undefined) {
             return Promise.reject(this.logIssue('Promo catalog JSON is null', 'catalog_json_null'));
         } else if (promoCatalogJSON === '') {
-            return Promise.reject(this.logIssue('Promo catalog JSON is empty', 'catalog_json_empty'));
+            return Promise.reject(this.logIssue('Promo catalog JSON is empty'));
         }
 
         return Promise.resolve();
