@@ -162,7 +162,7 @@ describe('CometCampaignParser', () => {
                 let campaignJSON: any;
 
                 beforeEach(() => {
-                    sandbox = sinon.sandbox.create();
+                    sandbox = sinon.createSandbox();
                     sandbox.stub(SessionDiagnostics, 'trigger');
                     campaignJSON = JSON.parse(OnCometVideoPlcCampaign);
                     campaignJSON.content = JSON.parse(campaignJSON.content);

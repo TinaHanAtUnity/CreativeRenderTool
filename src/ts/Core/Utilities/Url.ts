@@ -183,8 +183,26 @@ export class Url {
         return false;
     }
 
+    public static getAppStoreUrlTemplates(platform: Platform): string[] {
+        let appStoreUrlTemplates: string[] = [];
+
+        switch (platform) {
+            case Platform.IOS:
+                appStoreUrlTemplates = this.iosAppStoreUrlTemplates;
+                break;
+            case Platform.ANDROID:
+                appStoreUrlTemplates = this.androidAppStoreUrlTemplates;
+                break;
+            default:
+        }
+
+        return appStoreUrlTemplates;
+    }
+
     private static iosWhitelistedProtocols = ['itunes', 'itms', 'itmss', 'http', 'https'];
     private static androidWhitelistedProtocols = ['market', 'http', 'https'];
+    private static iosAppStoreUrlTemplates = ['https://itunes.apple.com'];
+    private static androidAppStoreUrlTemplates = ['https://play.google.com'];
 
     private static isNumber(c: string): boolean {
         return c.match(/^[0-9a-fA-F]$/) !== null;

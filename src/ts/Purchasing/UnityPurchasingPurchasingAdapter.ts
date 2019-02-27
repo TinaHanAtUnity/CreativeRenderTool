@@ -108,20 +108,32 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
         return new Promise<IProduct[]>((resolve, reject) => {
             const observer = this._promo.Purchasing.onGetPromoCatalog.subscribe((promoCatalogJSON) => {
                 this._promo.Purchasing.onGetPromoCatalog.unsubscribe(observer);
-                if(promoCatalogJSON === '') {
-                    reject(this.logIssue('Promo catalog JSON is empty', 'catalog_json_empty'));                }
-                try {
-                    const products: IProduct[] = JSON.parse(promoCatalogJSON);
-                    resolve(products);
-                } catch(err) {
-                    reject(this.logIssue(`Promo catalog JSON failed to parse with the following string: ${promoCatalogJSON}`, 'catalog_json_parse_failure'));
-                }
+                this.validatePromoJSON(promoCatalogJSON).then(() => {
+                    try {
+                        const products: IProduct[] = JSON.parse(promoCatalogJSON);
+                        resolve(products);
+                    } catch(err) {
+                        reject(this.logIssue(`Promo catalog JSON failed to parse with the following string: ${promoCatalogJSON}`, 'catalog_json_malformatted'));
+                    }
+                }).catch((e) => {
+                    reject(e);
+                });
             });
             this._promo.Purchasing.getPromoCatalog().catch((e) => {
                 this._promo.Purchasing.onGetPromoCatalog.unsubscribe(observer);
-                reject(this.logIssue('Purchasing Catalog failed to refresh', 'catalog_refresh_failed'));
+                reject(this.logIssue('Purchasing Catalog failed to refresh'));
             });
         });
+    }
+
+    private validatePromoJSON(promoCatalogJSON: string): Promise<void> {
+        if (promoCatalogJSON === 'NULL' || promoCatalogJSON === null || promoCatalogJSON === undefined) {
+            return Promise.reject(this.logIssue('Promo catalog JSON is null', 'catalog_json_null'));
+        } else if (promoCatalogJSON === '') {
+            return Promise.reject(this.logIssue('Promo catalog JSON is empty'));
+        }
+
+        return Promise.resolve();
     }
 
     private logIssue(errorMessage: string, errorType?: string): Error {

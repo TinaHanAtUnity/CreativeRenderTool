@@ -5,7 +5,6 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 export class WebView {
 
     private readonly _core: Core;
-    private _showConsent: boolean = true;
 
     constructor(nativeBridge: NativeBridge) {
         if(window && window.addEventListener) {
@@ -29,10 +28,6 @@ export class WebView {
 
     public hideBanner(callback: INativeCallback) {
         this._core.Ads.hideBanner(callback);
-    }
-
-    public setShowConsent(val: boolean) {
-        this._showConsent = val;
     }
 
     private onError(event: ErrorEvent): boolean {
