@@ -12,7 +12,7 @@ import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { RequestError } from 'Core/Errors/RequestError';
-import { AdmobParsingTest, ABGroup } from 'Core/Models/ABGroup';
+import { ABGroup } from 'Core/Models/ABGroup';
 import { ProgrammaticTrackingService, ProgrammaticTrackingErrorName } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
@@ -180,7 +180,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     }
 
     private isHttpResponseError(e: unknown): boolean {
-        return !!(e instanceof RequestError && e.nativeResponse && AdmobParsingTest.isValid(this._abGroup));
+        return !!(e instanceof RequestError && e.nativeResponse);
     }
 
     private reportHttpFailure(e: RequestError, session: Session): void {

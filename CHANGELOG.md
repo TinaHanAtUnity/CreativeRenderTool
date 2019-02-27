@@ -1,7 +1,17 @@
-# Pending
+# Wed Feb 27 00:27:16 UTC 2019
+
+* Remove Puchasing Diagnostics [#8414](https://github.com/Applifier/unity-ads-webview/pull/8418)
+
+# Tue Feb 26 23:30:30 UTC 2019
+
+* Update deprecated sandbox api with sinon.createSandbox() [#8396](https://github.com/Applifier/unity-ads-webview/pull/8396)
+* Send Promo Catalog Flag to Auction [#8374](https://github.com/Applifier/unity-ads-webview/pull/8374)
+
+# Tue Feb 26 17:47:06 UTC 2019
 
 * Remove obsolete consent test code [#8373](https://github.com/Applifier/unity-ads-webview/pull/8373)
 * Edit Admob HTTP Test to only block on bad response codes [#8371](https://github.com/Applifier/unity-ads-webview/pull/8371)
+* Skipping redirection with redirectBreakers urls [#8349](https://github.com/Applifier/unity-ads-webview/pull/8349)
 
 # Thu Feb 21 22:52:30 UTC 2019
 

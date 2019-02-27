@@ -674,7 +674,7 @@ describe('Performance VideoEventHandlersTest', () => {
         let sandbox: sinon.SinonSandbox;
 
         beforeEach(() => {
-            sandbox = sinon.sandbox.create();
+            sandbox = sinon.createSandbox();
             sandbox.stub(Diagnostics, 'trigger');
             sinon.spy(ads.Android!.AdUnit, 'setViews');
             sinon.spy(performanceAdUnit, 'hide');
@@ -706,7 +706,7 @@ describe('Performance VideoEventHandlersTest', () => {
         let sandbox: sinon.SinonSandbox;
 
         beforeEach(() => {
-            sandbox = sinon.sandbox.create();
+            sandbox = sinon.createSandbox();
             sandbox.stub(Diagnostics, 'trigger');
             sinon.spy(ads.Android!.AdUnit, 'setViews');
             sinon.spy(performanceAdUnit, 'hide');

@@ -48,6 +48,7 @@ import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivac
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 import { ProgrammaticVastParserStrict } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
 export class CampaignManager {
 
@@ -854,6 +855,7 @@ export class CampaignManager {
             body.volume = volume;
             body.requestSignal = requestSignal;
             body.ext = optionalSignal;
+            body.isPromoCatalogAvailable = PurchasingUtilities.isCatalogAvailable();
 
             if(fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;
