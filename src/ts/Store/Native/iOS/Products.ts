@@ -2,6 +2,7 @@ import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { EventCategory } from 'Core/Constants/EventCategory';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
+import { PaymentTransactionState } from 'Store/Constants/iOS/PaymentTransactionState';
 
 enum IosStoreEvent {
     PRODUCT_REQUEST_COMPLETE,
@@ -16,7 +17,7 @@ export interface IApplePayment {
 
 export interface IAppleTransaction {
     productId: string;
-    transactionState: number;
+    transactionState: PaymentTransactionState;
     transactionDate: number;
     transactionIdentifier: string;
     hasOriginalTransaction: boolean;

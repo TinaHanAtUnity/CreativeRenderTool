@@ -4,6 +4,7 @@ import { IStoreApi } from 'Store/IStore';
 import { IAppleTransaction } from 'Store/Native/iOS/Products';
 import { StoreTransaction } from 'Store/Models/StoreTransaction';
 import { AppleStore } from 'Store/Utilities/AppleStore';
+import { PaymentTransactionState } from 'Store/Constants/iOS/PaymentTransactionState';
 
 export class AppleStoreManager extends StoreManager {
     private _appleStore: AppleStore;
@@ -32,7 +33,7 @@ export class AppleStoreManager extends StoreManager {
         const timestamp = Date.now();
 
         // todo: add some error handling
-        if(transaction.hasOriginalTransaction && transaction.productId && transaction.receipt) {
+        if(transaction.productId && transaction.receipt && transaction.transactionState && transaction.transactionState && transaction.transactionState === PaymentTransactionState.PURCHASED) {
             this._appleStore.getProductInfo(transaction.productId).then(product => {
                 if(product.price && product.priceLocale.currencyCode) {
                     const storeTransaction = new StoreTransaction(timestamp, transaction.productId, product.price, product.priceLocale.currencyCode, transaction.receipt);
