@@ -59,9 +59,6 @@
 
   &.android4-ios7-ios8 {
     .consent-button-container {
-      position: absolute;
-      bottom: 0;
-      left:0;
       padding: $default-size 0;
       width: 100%;
       justify-content: center;
@@ -106,7 +103,6 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   height: 80%;
   border-radius: .5 * $default-size;
   background: $white;
@@ -129,6 +125,7 @@
     position: relative;
     overflow: scroll;
     padding: 1.5 * $default-size;
+    height: 100%;
     border-radius: .5 * $default-size;
     background: $white;
     // enable momentum scrolling on iOS
@@ -142,11 +139,17 @@
   }
 
   .consent-button-container {
-    position: relative;
+    // use absolute position to ensure that buttons are always visible
+    position: absolute;
+    right:0;
+    bottom: 0;
+    left:0;
     display: flex;
-    flex-shrink: 0;
     justify-content: space-between;
     padding: $default-size $default-size;
+    border-bottom-right-radius: .5 * $default-size;
+    border-bottom-left-radius: .5 * $default-size;
+    background: $white;
     box-shadow: 0 0 3px 0 rgba(0, 0, 0, .19);
   }
 
@@ -225,6 +228,7 @@
   }
 
   .privacy-container {
+    padding-bottom: 5 * $default-size;
     #privacy-row-item-container {
       .row-item {
         margin: 0 0 0 0;
