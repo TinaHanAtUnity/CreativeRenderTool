@@ -93,7 +93,7 @@ describe('PlacementManagerTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             ads = TestFixtures.getAdsApi(nativeBridge);
             campaign = TestFixtures.getPromoCampaign();
-            sandbox = sinon.sandbox.create();
+            sandbox = sinon.createSandbox();
         });
 
         afterEach(() => {

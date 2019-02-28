@@ -16,7 +16,7 @@ import { BuildVerionCode } from 'Core/Constants/Android/BuildVerionCode';
 import { IChinaApi } from 'China/IChina';
 
 describe('DeviceIdManagerTest', () => {
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     let nativeBridge: NativeBridge;
     let deviceInfo: AndroidDeviceInfo;
     let core: ICoreApi;
