@@ -5,6 +5,7 @@
 * Update 3rd Party List [#8446](https://github.com/Applifier/unity-ads-webview/pull/8446)
 * Release AB Test for Blocking campaign refresh with Auction Status Code [#8448](https://github.com/Applifier/unity-ads-webview/pull/8448)
 * Close Privacy Settings view when clicking outside of the main content div [#8325](https://github.com/Applifier/unity-ads-webview/pull/8325)
+* Add Banner Nofill Callback [#8420](https://github.com/Applifier/unity-ads-webview/pull/8420)
 
 # Wed Feb 27 00:27:16 UTC 2019
 
