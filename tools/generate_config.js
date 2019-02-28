@@ -14,8 +14,6 @@ if(!process.env.BRANCH) {
 let branch = process.env.BRANCH;
 if(branch === '2.0.6') {
     branch = 'master';
-} else if(branch === '3.0.1') {
-    branch = '3.0.1-rc2';
 } else if(branch === 'master') {
     branch = 'development';
 }
