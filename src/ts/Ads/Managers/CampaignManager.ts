@@ -21,7 +21,7 @@ import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheStatus } from 'Core/Managers/CacheManager';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { ABGroup, AuctionV5Test, StatusCodeTest } from 'Core/Models/ABGroup';
+import { ABGroup, AuctionV5Test } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -78,6 +78,7 @@ export class CampaignManager {
 
     private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
     private static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
+    private static TestModeUrl: string = 'https://auction.unityads.unity3d.com/v4/test/games';
 
     private static CampaignId: string | undefined;
     private static SessionId: string | undefined;
@@ -181,7 +182,7 @@ export class CampaignManager {
                 if (response) {
                     this.setSDKSignalValues(requestTimestamp);
 
-                    if(AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
+                    if(!this._coreConfig.getTestMode() && AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
                         return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy).catch((e) => {
                             this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
                         });
@@ -664,6 +665,13 @@ export class CampaignManager {
     }
 
     private getBaseUrl(): string {
+        if(this._coreConfig.getTestMode()) {
+            return [
+                CampaignManager.TestModeUrl,
+                this._clientInfo.getGameId(),
+                'requests'
+            ].join('/');
+        }
         if(AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
             return [
                 CampaignManager.AuctionV5BaseUrl,
