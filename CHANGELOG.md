@@ -1,4 +1,4 @@
-# Pending
+# Thu Feb 28 23:58:23 UTC 2019
 
 * Enable Admob HTTP Parsing for the full network [#8425](https://github.com/Applifier/unity-ads-webview/pull/8425)
 * Add Test Adapter for Promo Test Mode [#8299](https://github.com/Applifier/unity-ads-webview/pull/8299)
