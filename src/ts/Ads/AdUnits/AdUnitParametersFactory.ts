@@ -45,8 +45,6 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
 
     private static _forceGDPRBanner: boolean;
 
-    private static _forceConsentPrivacy: boolean = false;
-
     private _platform: Platform;
     private _core: ICoreApi;
     private _ads: IAdsApi;
@@ -94,10 +92,6 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         this._playerMetadataServerId = playerMetadataServerId;
         const defaultParams = this.getBaseParameters();
         return this.createParameters(defaultParams);
-    }
-
-    public static setForcedConsentPrivacy(value: boolean) {
-        AbstractAdUnitParametersFactory._forceConsentPrivacy = value;
     }
 
     protected abstract createParameters(baseParams: IAdUnitParameters<T1>): T2;
@@ -152,7 +146,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected createPrivacy(): AbstractPrivacy {
         let privacy: AbstractPrivacy;
 
-        if (this._adsConfig.getGamePrivacy().isEnabled() || AbstractAdUnitParametersFactory._forceConsentPrivacy) {
+        if (this._adsConfig.getGamePrivacy().isEnabled()) {
             privacy = new PrivacySettings(this._platform, this._campaign, this._privacyManager, this._adsConfig.isGDPREnabled(), this._coreConfig.isCoppaCompliant());
         } else {
             privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._adsConfig.isGDPREnabled(), this._coreConfig.isCoppaCompliant());

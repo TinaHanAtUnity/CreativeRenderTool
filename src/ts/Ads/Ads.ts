@@ -78,7 +78,6 @@ import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { China } from 'China/China';
-import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 
 export class Ads implements IAds {
 
@@ -101,8 +100,6 @@ export class Ads implements IAds {
     public AssetManager: AssetManager;
     public CampaignManager: CampaignManager;
     public RefreshManager: CampaignRefreshManager;
-
-    private static _forcedGDPRConsent: boolean = false;
 
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
@@ -260,10 +257,6 @@ export class Ads implements IAds {
     }
 
     private isConsentShowRequired(): boolean {
-        if (Ads._forcedGDPRConsent) {
-            return true;
-        }
-
         const gamePrivacy = this.Config.getGamePrivacy();
         const userPrivacy = this.Config.getUserPrivacy();
 
@@ -551,11 +544,6 @@ export class Ads implements IAds {
 
         if(TestEnvironment.get('forcedGDPRBanner')) {
             AbstractAdUnitFactory.setForcedGDPRBanner(TestEnvironment.get('forcedGDPRBanner'));
-        }
-
-        if(TestEnvironment.get('forcedConsent')) {
-            Ads._forcedGDPRConsent =  TestEnvironment.get('forcedConsent');
-            AbstractAdUnitParametersFactory.setForcedConsentPrivacy(TestEnvironment.get('forcedConsent'));
         }
 
         let forcedARMRAID = false;
