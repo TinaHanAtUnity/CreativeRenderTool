@@ -48,4 +48,3 @@ export const WebPlayerMRAIDTest = new DisabledABTest();
 export const CTAClickHandlingTest = new ABTest(17);
 export const StatusCodeTest = new ABTest(17);
 export const InstallInRewardedVideos = new ABTest(7, 8);
-export const AdmobParsingTest = new ABTest(18);
