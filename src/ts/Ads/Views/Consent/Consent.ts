@@ -128,8 +128,8 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     }
 
     public testAutoConsentAll() {
-        event = new Event('testAutoConsent');
-        this.onAcceptAllEvent(event);
+        const testEvent = new Event('testAutoConsent');
+        this.onAcceptAllEvent(testEvent);
     }
 
     public testAutoConsent(consent: IPermissions): void {

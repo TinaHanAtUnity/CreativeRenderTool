@@ -24,7 +24,6 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationSwitchGroup
 
         this._template = new Template(SwitchGroupTemplate);
 
-        this._bindings = [];
         this._bindings = [
             {
                 event: 'change',
@@ -89,7 +88,6 @@ export class PersonalizationSwitchGroup extends View<IPersonalizationSwitchGroup
             this._container.querySelector('#third-party-switch')!.classList.add('disabled');
         } else {
             this._container.querySelector('#third-party-switch')!.classList.remove('disabled');
-
         }
     }
 

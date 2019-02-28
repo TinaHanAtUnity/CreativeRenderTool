@@ -71,8 +71,8 @@ export class UnityConsent extends View<IConsentViewHandler> {
     }
 
     public testAutoConsentAll() {
-        event = new Event('testAutoConsent');
-        this.onAgreeEvent(event);
+        const testEvent = new Event('testAutoConsent');
+        this.onAgreeEvent(testEvent);
     }
     private onAgreeEvent(event: Event) {
         event.preventDefault();
