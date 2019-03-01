@@ -69,7 +69,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.close-area'
+                selector: '.safe-area-content, .close-area'
             },
             {
                 event: 'click',
@@ -95,6 +95,12 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
                 event: 'swipedown',
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.close-area, close-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onViewContainerEvent(event),
+                selector: '.view-container'
+
             }
         ];
 
@@ -282,5 +288,11 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     private onDataDeletionCancelEvent(event: Event): void {
         event.preventDefault();
         (<HTMLElement>this._container.querySelector('.delete-data-container')).classList.remove('active');
+    }
+
+    private onViewContainerEvent(event: Event): void {
+        // Stop propagation to prevent closing the view
+        // Click event outside of .view-container div closes the view
+        event.stopPropagation();
     }
 }

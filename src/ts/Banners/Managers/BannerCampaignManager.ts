@@ -111,7 +111,7 @@ export class BannerCampaignManager {
                     if (nativeResponse.responseCode) {
                         jaegerSpan.addTag(JaegerTags.StatusCode, nativeResponse.responseCode.toString());
                     }
-                    if (AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
+                    if (!this._coreConfig.getTestMode() && AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
                         return this.parseAuctionV5BannerCampaign(nativeResponse, placement);
                     }
                     return this.parseBannerCampaign(nativeResponse, placement);
