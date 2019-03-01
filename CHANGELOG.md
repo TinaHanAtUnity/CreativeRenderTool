@@ -1,3 +1,8 @@
+# Staged
+
+* Update the consent flow [#8421](https://github.com/Applifier/unity-ads-webview/pull/8421)
+* Replace the checkbox group with switches in PrivacySettings view [#8449](https://github.com/Applifier/unity-ads-webview/pull/8449)
+
 # Thu Feb 28 23:58:23 UTC 2019
 
 * Enable Admob HTTP Parsing for the full network [#8425](https://github.com/Applifier/unity-ads-webview/pull/8425)
