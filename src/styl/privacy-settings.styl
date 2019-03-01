@@ -113,8 +113,16 @@
     }
   }
 
-  .checkbox-group-container {
-    $checkbox-group-container($default-scale-size, $privacy-text-font-size);
+  .personalization-container {
+    .checkbox-group-container {
+      $switch-group-container();
+      font-size: $privacy-text-font-size;
+    }
+
+    #third-party-switch.disabled {
+      opacity: .33;
+      pointer-events: none;
+    }
   }
 
   .radio-group-container {
@@ -168,6 +176,7 @@
   }
 
   .title {
+    margin-bottom: $default-size;
     font-weight: $privacy-main-title-font-weight;
   }
 
