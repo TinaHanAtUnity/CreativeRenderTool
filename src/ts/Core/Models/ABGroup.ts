@@ -45,6 +45,5 @@ export const FakeDisabledABTest = new DisabledABTest(16, 17);
 export const AuctionV5Test = new ABTest(15, 16);
 export const VastParsingStrictTest = new DisabledABTest();
 export const WebPlayerMRAIDTest = new DisabledABTest();
-export const CTAClickHandlingTest = new ABTest(17);
 export const InstallInRewardedVideos = new ABTest(7, 8);
 export const TimerlessBatchingTest = new ABTest(19);
