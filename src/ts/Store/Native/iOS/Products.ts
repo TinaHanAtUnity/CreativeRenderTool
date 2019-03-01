@@ -31,12 +31,21 @@ export interface IApplePriceLocale {
     currencySymbol: string;
 }
 
+export interface IAppleSubscription {
+    numberOfUnits: number;
+    periodUnit: number;
+    introductoryPrice: number;
+    introductorySubPeriodUnit: number;
+    introductorySubPeriodNumOfUnits: number;
+}
+
 export interface IAppleProduct {
     downloadable: boolean;
     localizedTitle: string;
     localizedDescription: string;
     price: number;
     priceLocale: IApplePriceLocale;
+    subscription?: IAppleSubscription;
 }
 
 export class ProductsApi extends NativeApi {
