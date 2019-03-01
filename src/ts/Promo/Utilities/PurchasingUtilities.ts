@@ -18,6 +18,7 @@ import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { IProduct, IPurchasingAdapter } from 'Purchasing/PurchasingAdapter';
 import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurchasingAdapter';
+import { TestModePurchasingAdapter } from 'Purchasing/TestModePurchasingAdapter';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 
@@ -183,7 +184,13 @@ export class PurchasingUtilities {
         }
     }
 
-    private static getPurchasingAdapter() {
+    private static getPurchasingAdapter() : Promise<IPurchasingAdapter> {
+        if (this._coreConfig.getTestMode()) {
+            return Promise.resolve().then(() => {
+                this._core.Sdk.logInfo('TestMode delegate is set');
+                return new TestModePurchasingAdapter(this._core);
+            });
+        }
         return this._purchasing.CustomPurchasing.available().then((isAvailable) => {
             if (isAvailable) {
                 this._core.Sdk.logInfo('CustomPurchasing delegate is set');
