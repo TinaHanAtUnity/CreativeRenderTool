@@ -106,6 +106,12 @@ describe('PurchasingUtilitiesTest', () => {
             expect((<any>PurchasingUtilities)._purchasingAdapter).to.be.an.instanceof(CustomPurchasingAdapter);
             assert.isTrue(PurchasingUtilities.isInitialized());
         });
+
+        it('should call purchasing adapters refreshCatalog', () => {
+            expect((<any>PurchasingUtilities)._purchasingAdapter).to.be.an.instanceof(CustomPurchasingAdapter);
+            sinon.assert.called(<sinon.SinonStub>purchasing.CustomPurchasing.refreshCatalog);
+        });
+
         xit('should not set purchasing adapter if getAdapter fails', () => {
             //
         });

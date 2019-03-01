@@ -63,7 +63,7 @@ import { IStoreApi } from 'Store/IStore';
         let programmaticTrackingService: ProgrammaticTrackingService;
 
         before(() => {
-            sandbox = sinon.sandbox.create();
+            sandbox = sinon.createSandbox();
         });
 
         beforeEach(() => {

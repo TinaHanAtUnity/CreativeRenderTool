@@ -56,7 +56,7 @@ describe('VastAdUnitTest', () => {
     let coreConfig: CoreConfiguration;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
     });
 
     beforeEach(() => {
