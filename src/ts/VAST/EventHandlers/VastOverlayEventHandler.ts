@@ -40,14 +40,18 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     }
 
     public onOverlaySkip(position: number): void {
-        super.onOverlaySkip(position);
-
-        const endScreen = this._vastAdUnit.getEndScreen();
-        if (endScreen) {
-            endScreen.show();
-            this._vastAdUnit.onFinish.trigger();
+        if (this._placement.skipEndCardOnClose()) {
+            super.onOverlayClose();
         } else {
-            this._vastAdUnit.hide();
+            super.onOverlaySkip(position);
+
+            const endScreen = this._vastAdUnit.getEndScreen();
+            if (endScreen) {
+                endScreen.show();
+                this._vastAdUnit.onFinish.trigger();
+            } else {
+                this._vastAdUnit.hide();
+            }
         }
     }
 
