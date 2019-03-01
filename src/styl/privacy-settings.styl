@@ -29,13 +29,8 @@
   }
 
   .close-button {
+    $consent-privacy-close-button-default();
     position: absolute;
-    padding: .35 * $default-size $default-size;
-    border-radius: 3 * $default-size;
-    background: $privacy-close-button;
-    color: $privacy-close-button-text;
-    font-weight: $privacy-title-font-weight;
-    font-size: $privacy-heading-font-size;
   }
 
   .page-container {
@@ -52,6 +47,8 @@
     border-top-left-radius: $default-size;
     border-top-right-radius: $default-size;
     background: $white;
+    // enable momentum scrolling on iOS
+    -webkit-overflow-scrolling: touch;
   }
 
   .back-button {
@@ -124,6 +121,10 @@
     $radio-group-container-blue($default-scale-size, $privacy-text-font-size);
     font-weight: $privacy-text-font-weight;
     line-height: 1.25 * $default-size;
+  }
+
+  .build-info-container {
+    word-break: break-all;
   }
 
   &.initial {

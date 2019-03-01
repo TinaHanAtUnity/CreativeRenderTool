@@ -104,7 +104,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             }
         ];
 
-        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager, true);
+        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager);
         this._privacyRowItemContainer.addEventHandler(this);
 
         this._personalizationCheckBoxGroup = new PersonalizationCheckboxGroup(platform, this._userPrivacyManager);
@@ -120,14 +120,6 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         (<HTMLElement>this._container.querySelector('.checkbox-group-container')).appendChild(this._personalizationCheckBoxGroup.container());
 
         this.showView(ViewState.INITIAL);
-    }
-
-    public onDataDeletion(): void {
-        this._personalizationCheckBoxGroup.checkCheckboxes(false);
-    }
-
-    public onShowDataDeletionDialog(): void {
-        this.showView(ViewState.DATA);
     }
 
     public onPrivacy(url: string): void {

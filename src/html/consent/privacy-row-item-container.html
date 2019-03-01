@@ -1,17 +1,16 @@
 <div class="row-item">
     <div class="what-we-collect row-item-title">
-        <span>What information we collect and use</span>
+        <span>What information we collect and how we use it</span>
         <div class="arrow-icon"><span class="consent-icon-chevron"></span></div>
     </div>
     <div class="description">
         <p>
-            <span class="heading2">What information we collect and how we use it</span>
-            Most of the information we use for this personalization is based on your device’s advertising ID (Apple’s
-            Advertising Identifier or Google Advertising Identifier) and your IP address.
+            Most of the information we use for this personalization is based on your device’s advertising
+            ID (Apple’s Advertising Identifier or Google Advertising Identifier) and your IP address.
         </p>
         <p>
-            From your interaction with this app, here is the information we use to predict which other apps might
-            interest you:
+            From your interaction with this app, here is an example of the information we use to predict
+            which other apps might interest you:
         </p>
         <p>
             <span id="phone-type" class="intended-span"></span>
@@ -24,66 +23,52 @@
             <span id="sorry-message" class="intended-span">Sorry. We were unable to deliver our collected information at this time.</span>
         </p>
         <p>
-            We would use this information to predict what type of game you might like to play when choosing an ad for
-            you. We might also arrange the game’s store according to tools and extras that you are more likely to want
-            to use in your game play, and,if your developer chooses, to alter your game play experience in order to
-            adjust for things like your skill level.
+            We would use this information to show ads for other games we think you would enjoy
+            and to customize your gameplay wherever possible. This may include arranging the game’s store
+            according to tools and extras that you are more likely to use or to alter your game experience
+            in order to adjust to your skill level.
+        </p>
+        <p>
+            We only retain personal data for 30 days; however, we may keep a transactional record using
+            your personal information for 180 days for billing and fraud prevention purposes.
         </p>
         <p class="measurement-paragraph">
             <span class="heading2">What do our partners collect (measurement and demographics)</span>
-            Our partners likewise may use your advertising ID and IP address to track what types items you like to buy
-            and build a profile about you according to your preferences and household demographic information.
-            Demographic information may include information like whether  you are single or married, have children,
-            approximate income etc.  Unity does not have demographic information itself, and we do not personalize your
-            experience based on anything other than how you play games and which games you play.  Please visit our third
-            parties’ privacy policies to see how you can get your information and how you can manage the information
-            they have about you.
         </p>
         <p>
-            Measurement may also include the collection of certain information off of your phone like how hard you are
-            pressing the screen on your phone (pressure point measurement).  The purpose of our partners collecting such
-            information is to prevent fraud by assessing whether it is a person likely viewing the ad or playing the
-            game (uneven pressure points) or if it is a bot put into the marketplace by a bad actor attempting to dupe
-            ad networks.
+            Our partners may use your advertising ID and IP address to build a profile about you
+            according to your preferences and household demographic information.  Demographic
+            information may include things like marital status or approximate income.  Please visit our
+            third parties’ privacy policies to see how you can access or delete the information they have
+            about you.
+        </p>
+        <p>
+            Information may also be collected from your phone, including how hard you are pressing the
+            screen (pressure point measurement).  The purpose of our partners collecting such
+            information is to prevent fraud by assessing whether it is a real person engaging with the
+            application (uneven pressure points), or a bot put into the marketplace by a bad actor
+            attempting to mislead ad networks.
         </p>
     </div>
 </div>
 <div class="row-item">
-    <div class="data-protection row-item-title">
-        <span>Learn more about data protection</span>
+    <div class="data-transfer row-item-title">
+        <span>Data transfer outside of the EU</span>
         <div class="arrow-icon"><span class="consent-icon-chevron"></span></div>
     </div>
     <div class="description">
         <p>
-            <span class="heading2">Changing your privacy choice</span>
-            You can access these options at any time by tapping the Unity Data Privacy icon when or after an ad appears.
+            Please note Unity may transfer and process your data on servers located in the United States.
+            We have committed through internal agreements and agreements with our third-party
+            processors to treat your data with the same protections as those afforded to you in the
+            European Economic Area if your data is collected in that region of the world.  For more
+            information on transfers, visit Unity’s <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a>.
         </p>
-
-        <% if(data.hideDataDeletionDialog) { %>
-        <p>
-            <span class="heading2">Data Management</span>
-            You can delete any data Unity has about your device by clicking <span class="data-deletion-link page-link">here</span>.
-        </p>
-        <% } else { %>
-        <p>
-            <span class="heading2">Data Management</span>
-            You can delete any data Unity has about your device by clicking <span class="data-deletion-dialog-link page-link">here</span>.
-        </p>
-        <p>
-            <span id="data-deletion-container">Are you sure? <span id="data-deletion-confirm" class="page-link">Yes</span>
-                    / <span class="data-deletion-reject page-link">No</span></span>
-            <span id="data-deletion-request-container">
-                We will process your request and your data for profile purposes will be deleted in 30 days. We will
-                also opt you out of personalized ads immediately. Please note we may retain your data for invoicing
-                and fraud prevention purposes for 180 days.
-            </span>
-        </p>
-        <% } %>
     </div>
 </div>
 <div class="row-item">
     <div class="third-party row-item-title">
-        <span>View our 3rd party ad partners</span>
+        <span>View our third-party ad partners</span>
         <div class="arrow-icon"><span class="consent-icon-chevron"></span></div>
     </div>
     <div class="description">
@@ -117,6 +102,20 @@
         </p>
     </div>
 </div>
+<% if(data.showChangingPrivacyChoiceItem) { %>
+<div class="row-item">
+    <div class="changing-privacy-choice row-item-title">
+        <span>Changing your privacy choice</span>
+        <div class="arrow-icon"><span class="consent-icon-chevron"></span></div>
+    </div>
+    <div class="description">
+        <p>
+            You can access these options at any time by tapping the Unity Data Privacy icon when or
+            after an ad appears.
+        </p>
+    </div>
+</div>
+<% } %>
 <div class="row-item">
     <div class="privacy-policy row-item-title">
         <span>Our Privacy Policy</span>
@@ -124,10 +123,11 @@
     </div>
     <div class="description">
         <p>
-            Our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> explains how we manage your
-            data and how we work with partners who serve ads. These partners may collect information about your
-            advertising ID from sources other than Unity to further personalize the ads you see. Please visit the
-            privacy policies of these third parties to review the compiled data they may have.
+            Our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> explains how we manage your data, including how and where in the world
+            we transfer data for processing, and how we work with partners who serve ads. These
+            partners may collect information about your advertising ID from sources other than Unity to
+            further personalize the ads you see. Please visit the privacy policies of these third parties to
+            review the compiled data they may have.
         </p>
     </div>
 </div>
