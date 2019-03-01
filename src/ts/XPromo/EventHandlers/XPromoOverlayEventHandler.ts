@@ -12,12 +12,16 @@ export class XPromoOverlayEventHandler extends OverlayEventHandlerWithDownloadSu
     }
 
     public onOverlaySkip(position: number): void {
-        super.onOverlaySkip(position);
+        if (this._placement.skipEndCardOnClose()) {
+            super.onOverlayClose();
+        } else {
+            super.onOverlaySkip(position);
 
-        const endScreen = this._xPromoAdUnit.getEndScreen();
-        if (endScreen) {
-            endScreen.show();
+            const endScreen = this._xPromoAdUnit.getEndScreen();
+            if (endScreen) {
+                endScreen.show();
+            }
+            this._xPromoAdUnit.onFinish.trigger();
         }
-        this._xPromoAdUnit.onFinish.trigger();
     }
 }
