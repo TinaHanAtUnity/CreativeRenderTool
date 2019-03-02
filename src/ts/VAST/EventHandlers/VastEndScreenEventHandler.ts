@@ -41,9 +41,9 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
             const ctaClickedTime = Date.now();
             const redirectBreakers = Url.getAppStoreUrlTemplates(this._platform);
             return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking, redirectBreakers).catch(() => {
-                return clickThroughURL!;
+                return clickThroughURL;
             }).then((storeUrl: string) => {
-                return this.openUrlOnCallButton(storeUrl, Date.now() - ctaClickedTime, clickThroughURL!);
+                return this.openUrlOnCallButton(storeUrl, Date.now() - ctaClickedTime, clickThroughURL);
             });
         }
         return Promise.reject(new Error('There is no clickthrough URL for video or companion'));
