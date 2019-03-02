@@ -7,27 +7,22 @@ import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Displ
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
 
+    public static ContentType = 'programmatic/static-interstitial';
     public static ContentTypeHtml = 'programmatic/static-interstitial-html';
     public static ContentTypeJs = 'programmatic/static-interstitial-js';
 
-    private _wrapWithScriptTag: boolean;
-
-    constructor(platform: Platform, wrapWithScriptTag: boolean) {
+    constructor(platform: Platform) {
         super(platform);
-        this._wrapWithScriptTag = wrapWithScriptTag;
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
-        let dynamicMarkup = decodeURIComponent(response.getContent());
-        if (this._wrapWithScriptTag) {
-            dynamicMarkup = '<script>' + dynamicMarkup + '</script>';
-        }
+        const dynamicMarkup = decodeURIComponent(response.getContent());
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
-            contentType: this._wrapWithScriptTag ? ProgrammaticStaticInterstitialParser.ContentTypeJs : ProgrammaticStaticInterstitialParser.ContentTypeHtml,
+            contentType: ProgrammaticStaticInterstitialParser.ContentType,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
             creativeId: response.getCreativeId() || undefined,
