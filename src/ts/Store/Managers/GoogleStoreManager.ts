@@ -4,6 +4,7 @@ import { IStoreApi } from 'Store/IStore';
 import { IGooglePurchaseData, IGooglePurchaseStatus } from 'Store/Native/Android/Store';
 import { GoogleStore } from 'Store/Utilities/GoogleStore';
 import { StoreTransaction } from 'Store/Models/StoreTransaction';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export class GoogleStoreManager extends StoreManager {
     private _googleStore: GoogleStore;
@@ -25,32 +26,20 @@ export class GoogleStoreManager extends StoreManager {
     }
 
     private onInitialized() {
-        this._store.Android!.Store.startPurchaseTracking(true, ['com.unity3d.player.UnityPlayerActivity', 'com.unity3d.services.ads.adunit.AdUnitActivity', 'com.unity3d.services.ads.adunit.AdUnitTransparentActivity'], ['inapp', 'subs']);
-
-        // todo: check isBillingSupported properly instead of just logging the result
         this._googleStore.isBillingSupported('inapp').then(result => {
-            this._core.Api.Sdk.logInfo('GOOGLE INAPP BILLING SUPPORTED: ' + result);
             if(result === 0) {
-                this._googleStore.getPurchases('inapp').then(purchases => {
-                    this._core.Api.Sdk.logInfo('GOOGLE INAPP PURCHASES AT START: ' + JSON.stringify(purchases));
+                this._store.Android!.Store.startPurchaseTracking(true, ['com.unity3d.player.UnityPlayerActivity', 'com.unity3d.services.ads.adunit.AdUnitActivity', 'com.unity3d.services.ads.adunit.AdUnitTransparentActivity'], ['inapp']);
+            } else {
+                Diagnostics.trigger('store_billing_not_supported', {
+                    result: result
                 });
             }
-        });
-
-        this._googleStore.isBillingSupported('subs').then(result => {
-            this._core.Api.Sdk.logInfo('GOOGLE SUBSCRIPTION BILLING SUPPORTED: ' + result);
-
-            if(result === 0) {
-                this._googleStore.getPurchases('subs').then(purchases => {
-                    this._core.Api.Sdk.logInfo('GOOGLE SUBSCRIPTION PURCHASES AT START: ' + JSON.stringify(purchases));
-                });
-            }
+        }).catch(error => {
+            Diagnostics.trigger('store_isbillingsupported_failed', {});
         });
     }
 
     private onPurchaseStatusOnResume(activity: string, data: IGooglePurchaseStatus) {
-        this._core.Api.Sdk.logInfo('GOOGLE PURCHASE STATUS ONRESUME: ' + activity + ' ' + JSON.stringify(data)); // todo: remove debug logging before merging to master
-
         const orderIds: string[] = [];
 
         if(data.inapp) {
@@ -65,8 +54,6 @@ export class GoogleStoreManager extends StoreManager {
     }
 
     private onPurchaseStatusOnStop(activity: string, data: IGooglePurchaseStatus) {
-        this._core.Api.Sdk.logInfo('GOOGLE PURCHASE STATUS ONSTOP: ' + activity + ' ' + JSON.stringify(data)); // todo: remove debug logging before merging to master
-
         if(data.inapp) {
             if(data.inapp.purchaseDataList && data.inapp.purchaseDataList.length > 0) {
                 data.inapp.purchaseDataList.forEach((purchaseData: IGooglePurchaseData, index: number) => {
@@ -74,16 +61,13 @@ export class GoogleStoreManager extends StoreManager {
                         if(data.inapp!.signatureList && data.inapp!.signatureList[index]) {
                             this.logNewPurchase(purchaseData, data.inapp!.signatureList[index]);
                         } else {
-                            this.logNewPurchase(purchaseData, 'SIGNATUREMISSING');
-                            // todo: proper error handling
+                            Diagnostics.trigger('store_signature_missing', {
+                                productId: purchaseData.productId
+                            });
                         }
                     }
                 });
             }
-
-            this._googleStore.getPurchaseHistory('inapp').then(history => {
-                this._core.Api.Sdk.logInfo('GOOGLE INAPP PURCHASE HISTORY: ' + JSON.stringify(history));
-            });
         }
     }
 
@@ -103,6 +87,10 @@ export class GoogleStoreManager extends StoreManager {
         this._googleStore.getSkuDetails(purchaseData.productId, 'inapp').then(skuDetails => {
             const transaction = new StoreTransaction(timestamp, purchaseData.productId, skuDetails.price_amount_micros / 1000000, skuDetails.price_currency_code, signature);
             this.onStoreTransaction.trigger(transaction);
+        }).catch(() => {
+            Diagnostics.trigger('store_getskudetails_failed', {
+                productId: purchaseData.productId
+            })
         });
     }
 }

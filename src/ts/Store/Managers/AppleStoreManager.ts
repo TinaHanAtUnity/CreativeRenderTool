@@ -5,6 +5,7 @@ import { IAppleTransaction } from 'Store/Native/iOS/Products';
 import { StoreTransaction } from 'Store/Models/StoreTransaction';
 import { AppleStore } from 'Store/Utilities/AppleStore';
 import { PaymentTransactionState } from 'Store/Constants/iOS/PaymentTransactionState';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export class AppleStoreManager extends StoreManager {
     private _appleStore: AppleStore;
@@ -22,8 +23,6 @@ export class AppleStoreManager extends StoreManager {
     }
 
     private onTransaction(data: IAppleTransaction[]): void {
-        this._core.Api.Sdk.logInfo('IOS TRANSACTION: ' + JSON.stringify(data)); // todo: remove debug logging before merging to master
-
         for(const transaction of data) {
             this.processTransaction(transaction);
         }
@@ -32,14 +31,23 @@ export class AppleStoreManager extends StoreManager {
     private processTransaction(transaction: IAppleTransaction) {
         const timestamp = Date.now();
 
-        // todo: add some error handling
         if(transaction.productId && transaction.receipt && transaction.transactionState && transaction.transactionState && transaction.transactionState === PaymentTransactionState.PURCHASED) {
             this._appleStore.getProductInfo(transaction.productId).then(product => {
                 if(product.price && product.priceLocale.currencyCode) {
                     const storeTransaction = new StoreTransaction(timestamp, transaction.productId, product.price, product.priceLocale.currencyCode, transaction.receipt);
 
                     this.onStoreTransaction.trigger(storeTransaction);
+                } else {
+                    Diagnostics.trigger('store_getproduct_info_missing', {
+                        productId: transaction.productId,
+                        price: product.price,
+                        currencyCode: product.priceLocale.currencyCode
+                    });
                 }
+            }).catch(() => {
+                Diagnostics.trigger('store_getproduct_failed', {
+                    productId: transaction.productId
+                });
             });
         }
     }
