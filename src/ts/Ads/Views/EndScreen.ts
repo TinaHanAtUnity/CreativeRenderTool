@@ -4,7 +4,7 @@ import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandlerView } from 'Ads/Views/AbstractPrivacy';
-import { ABGroup, DumbCloseButtonTest } from 'Core/Models/ABGroup';
+import { ABGroup, AccessibleCloseButtonTest } from 'Core/Models/ABGroup';
 import { Localization } from 'Core/Utilities/Localization';
 import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
@@ -120,8 +120,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         // Close Button Experiment
-        if (DumbCloseButtonTest.isValid(this._abGroup)) {
-            document.documentElement.classList.add('improved-close-styles-test');
+        if (AccessibleCloseButtonTest.isValid(this._abGroup)) {
+            document.documentElement.classList.add('accessible-close-button');
         }
     }
 

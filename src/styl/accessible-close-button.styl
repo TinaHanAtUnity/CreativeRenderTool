@@ -1,12 +1,12 @@
 @charset "UTF-8";
 
 @font-face {
-  font-family: "experiment";
-  src:url("../fonts/experiment/experiment.eot");
-  src:url("../fonts/experiment/experiment.eot?#iefix") format("embedded-opentype"),
-    url("../fonts/experiment/experiment.woff") format("woff"),
-    url("../fonts/experiment/experiment.ttf") format("truetype"),
-    url("../fonts/experiment/experiment.svg#experiment") format("svg");
+  font-family: "AccessibleCloseButton";
+  src:url("../fonts/experiment/AccessibleCloseButton.eot");
+  src:url("../fonts/experiment/AccessibleCloseButton.eot?#iefix") format("embedded-opentype"),
+    url("../fonts/experiment/AccessibleCloseButton.woff") format("woff"),
+    url("../fonts/experiment/AccessibleCloseButton.ttf") format("truetype"),
+    url("../fonts/experiment/AccessibleCloseButton.svg#experiment") format("svg");
   font-weight: normal;
   font-style: normal;
 
@@ -17,7 +17,7 @@ $icon-size($n) {
   width: $n;
 }
 
-.improved-close-styles-test {
+.accessible-close-button {
 	
 	// Portrait view specific
 	.portrait {
@@ -30,7 +30,6 @@ $icon-size($n) {
 			}
 		}
 	}
-
 
 	// IOS Specific fix,
 	// TODO: Find the platform agnostic solution for this one
@@ -47,7 +46,7 @@ $icon-size($n) {
 
 	#end-screen {
 		[data-icon]:before {
-			font-family: "experiment" !important;
+			font-family: "AccessibleCloseButton" !important;
 			content: attr(data-icon);
 			font-style: normal !important;
 			font-weight: normal !important;
@@ -60,7 +59,7 @@ $icon-size($n) {
 
 		[class^="experimental-"]:before,
 		[class*=" experimental-"]:before {
-			font-family: "experiment" !important;
+			font-family: "AccessibleCloseButton" !important;
 			font-style: normal !important;
 			font-weight: normal !important;
 			font-variant: normal !important;
@@ -71,7 +70,7 @@ $icon-size($n) {
 		}
 
 		.icon-close:before {
-			font-family: "experiment" !important;
+			font-family: "AccessibleCloseButton" !important;
 			display: block;
 			content: "\e000";
 		}

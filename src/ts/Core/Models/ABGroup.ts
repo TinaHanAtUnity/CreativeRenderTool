@@ -50,4 +50,4 @@ export const StatusCodeTest = new ABTest(17);
 export const InstallInRewardedVideos = new ABTest(7, 8);
 export const AdmobParsingTest = new ABTest(18);
 export const TimerlessBatchingTest = new ABTest(19);
-export const DumbCloseButtonTest = new ABTest(5, 6);
+export const AccessibleCloseButtonTest = new ABTest(5, 6);
