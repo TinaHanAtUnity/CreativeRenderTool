@@ -14,16 +14,15 @@ export abstract class StoreManager {
         this._core = core;
         this._store = store;
 
-        this.onStoreTransaction.subscribe((transaction) => this.sendTestTransaction(transaction));
+        this.onStoreTransaction.subscribe((transaction) => this.sendDiagnosticsTransaction(transaction));
     }
 
     public abstract startTracking(): void;
 
-    // todo: remove this test code before merging to master
-    public sendTestTransaction(transaction: StoreTransaction) {
-        this._core.Api.Sdk.logInfo('TEST TRANSACTION CAPTURED! TIMESTAMP: ' + transaction.getTimestamp() + ' PRODUCT ID: ' + transaction.getProductId() + ' AMOUNT: ' + transaction.getAmount() + ' CURRENCY: ' + transaction.getCurrency() + ' RECEIPT: ' + transaction.getReceipt());
-
-        Diagnostics.trigger('test_transaction', {
+    public sendDiagnosticsTransaction(transaction: StoreTransaction) {
+        // when feature has been validated in production, this functionality should be removed
+        // however this functionality is essential in rollout phase where we should compare SDK diagnostics with production data pipeline
+        Diagnostics.trigger('store_transaction', {
             timestamp: transaction.getTimestamp(),
             productId: transaction.getProductId(),
             amount: transaction.getAmount(),

@@ -83,7 +83,6 @@ export class GoogleStore {
 
     private onBillingSupportedError(operationId: number, error: AndroidStoreError, message: string) {
         this.finishBillingSupportedRequest(false, operationId);
-        // todo: add some error diagnostics
     }
 
     private onSkuDetailsResult(operationId: number, result: IGoogleSkuDetails[]) {
@@ -91,13 +90,11 @@ export class GoogleStore {
             this.finishSkuDetailsRequest(true, operationId, result[0]);
         } else {
             this.finishSkuDetailsRequest(false, operationId);
-            // todo: add some error diagnostics
         }
     }
 
     private onSkuDetailsError(operationId: number, error: AndroidStoreError, message: string) {
         this.finishSkuDetailsRequest(false, operationId);
-        // todo: add some error diagnostics
     }
 
     private onGetPurchasesResult(operationId: number, result: IGooglePurchases) {
@@ -106,7 +103,6 @@ export class GoogleStore {
 
     private onGetPurchasesError(operationId: number, error: AndroidStoreError, message: string) {
         this.finishGetPurchasesRequest(false, operationId);
-        // todo: add some error diagnostics
     }
 
     private onPurchaseHistoryResult(operationId: number, result: IGooglePurchases) {
@@ -115,7 +111,6 @@ export class GoogleStore {
 
     private onPurchaseHistoryError(operationId: number, error: AndroidStoreError, message: string) {
         this.finishPurchaseHistoryRequest(false, operationId);
-        // todo: add some error diagnostics
     }
 
     private finishBillingSupportedRequest(success: boolean, operationId: number, result?: number) {
