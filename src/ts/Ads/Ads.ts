@@ -295,10 +295,6 @@ export class Ads implements IAds {
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
 
-        if (!this._core.FocusManager.isAppForeground()) {
-            Diagnostics.trigger('ad_shown_in_background', {});
-        }
-
         if(this._showing) {
             // do not send finish event because there will be a finish event from currently open ad unit
             this.showError(false, placementId, 'Can\'t show a new ad unit when ad unit is already open');
