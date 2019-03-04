@@ -1,3 +1,7 @@
+# Merged
+
+* Remove ad_shown_in_background diagnostic [#8472](https://github.com/Applifier/unity-ads-webview/pull/8472)
+
 # Mon Mar  4 09:05:35 UTC 2019
 
 * Update the consent flow [#8421](https://github.com/Applifier/unity-ads-webview/pull/8421)
