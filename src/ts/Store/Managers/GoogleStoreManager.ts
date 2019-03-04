@@ -90,7 +90,7 @@ export class GoogleStoreManager extends StoreManager {
         }).catch(() => {
             Diagnostics.trigger('store_getskudetails_failed', {
                 productId: purchaseData.productId
-            })
+            });
         });
     }
 }
