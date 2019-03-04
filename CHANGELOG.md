@@ -1,6 +1,7 @@
 # Merged
 
 * Remove ad_shown_in_background diagnostic [#8472](https://github.com/Applifier/unity-ads-webview/pull/8472)
+* Remove click abtest and ByteDance hack, enable VastStrictParser test [#8474](https://github.com/Applifier/unity-ads-webview/pull/8474)
 
 # Mon Mar  4 09:05:35 UTC 2019
 
