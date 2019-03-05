@@ -1,3 +1,7 @@
+# Merged
+
+* Fixing banner tests [#8520](https://github.com/Applifier/unity-ads-webview/pull/8520)
+
 # Tue Mar  5 22:33:04 UTC 2019
 
 * Enable timerless autobatching on all groups [#8422](https://github.com/Applifier/unity-ads-webview/pull/8422)
