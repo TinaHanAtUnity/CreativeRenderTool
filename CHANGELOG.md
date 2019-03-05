@@ -1,3 +1,9 @@
+# Staged
+
+* Enable timerless autobatching on all groups [#8422](https://github.com/Applifier/unity-ads-webview/pull/8422)
+* Fix disabling backup campaigns with test metadata [#8370](https://github.com/Applifier/unity-ads-webview/pull/8370)
+* Clear outdated user privacy before show [#8424](https://github.com/Applifier/unity-ads-webview/pull/8424)
+
 # Tue Mar  5 12:56:11 UTC 2019
 
 * Remove ad_shown_in_background diagnostic [#8472](https://github.com/Applifier/unity-ads-webview/pull/8472)
