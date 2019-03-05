@@ -8,8 +8,7 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { ABGroup, CTAClickHandlingTest } from 'Core/Models/ABGroup';
+import { ABGroup } from 'Core/Models/ABGroup';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { Url } from 'Core/Utilities/Url';
 
@@ -80,16 +79,12 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if(clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
-            if (!CTAClickHandlingTest.isValid(this._abGroup) && CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
-                return this.openUrlOnCallButton(clickThroughURL, Date.now() - ctaClickedTime, clickThroughURL);
-            } else {
-                const redirectBreakers = CTAClickHandlingTest.isValid(this._abGroup) ? Url.getAppStoreUrlTemplates(this._platform) : [];
-                return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking, redirectBreakers).catch(() => {
-                    return clickThroughURL;
-                }).then((storeUrl: string) => {
-                    return this.openUrlOnCallButton(storeUrl, Date.now() - ctaClickedTime, clickThroughURL);
-                });
-            }
+            const redirectBreakers = Url.getAppStoreUrlTemplates(this._platform);
+            return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking, redirectBreakers).catch(() => {
+                return clickThroughURL;
+            }).then((storeUrl: string) => {
+                return this.openUrlOnCallButton(storeUrl, Date.now() - ctaClickedTime, clickThroughURL);
+            });
         } else {
             return Promise.reject(new Error('No clickThroughURL was defined'));
         }
