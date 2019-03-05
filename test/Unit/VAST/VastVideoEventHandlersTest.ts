@@ -72,7 +72,7 @@ describe('VastVideoEventHandler tests', () => {
     let programmaticTrackingService: ProgrammaticTrackingService;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
     });
 
     beforeEach(() => {

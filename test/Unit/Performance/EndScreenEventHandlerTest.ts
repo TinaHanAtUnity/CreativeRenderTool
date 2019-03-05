@@ -212,7 +212,7 @@ describe('EndScreenEventHandlerTest', () => {
         });
 
         describe('with store type standalone_android and appDownloadUrl', () => {
-            const sandbox = sinon.sandbox.create();
+            const sandbox = sinon.createSandbox();
             const apkCampaign = TestFixtures.getCampaignStandaloneAndroid();
 
             const downloadParameters = <IEndScreenDownloadParameters>{
