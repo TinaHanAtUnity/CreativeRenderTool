@@ -101,13 +101,11 @@ import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampa
 
         describe('No fill banner scenario', () => {
             beforeEach(() => {
-                adUnit = sandbox.createStubInstance(HTMLBannerAdUnit);
                 sandbox.stub(banners.CampaignManager, 'request').returns(Promise.reject(new NoFillError()));
                 sandbox.stub(banners.Api.Listener, 'sendErrorEvent');
-                sandbox.stub(banners.Api.Banner, 'load');
             });
 
-            it('will fail when the request returns the error thing', () => {
+            it('will fail when the banner request returns NoFillError', () => {
                 return bannerAdContext.load(placementId).catch((e) => {
                     sinon.assert.called(asStub(banners.Api.Listener.sendErrorEvent));
                 });
