@@ -286,17 +286,14 @@ export class Ads implements IAds {
             privacyManager: this.PrivacyManager,
             adUnitContainer: this.Container,
             adsConfig: this.Config,
-            core: this._core.Api
+            core: this._core.Api,
+            deviceInfo: this._core.DeviceInfo
         });
         return consentView.show(options);
     }
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
-
-        if (!this._core.FocusManager.isAppForeground()) {
-            Diagnostics.trigger('ad_shown_in_background', {});
-        }
 
         if(this._showing) {
             // do not send finish event because there will be a finish event from currently open ad unit
@@ -524,7 +521,7 @@ export class Ads implements IAds {
 
         if(TestEnvironment.get('campaignId')) {
             CampaignManager.setCampaignId(TestEnvironment.get('campaignId'));
-            this.BackupCampaignManager.deleteBackupCampaigns();
+            this.BackupCampaignManager.setEnabled(false);
         }
 
         if(TestEnvironment.get('sessionId')) {

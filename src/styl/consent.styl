@@ -1,0 +1,543 @@
+@import "components.styl";
+
+#consent {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  color: $consent-text-font-color;
+  font-size: $consent-text-font-size;
+
+  &.prevent-clicks {
+    pointer-events: none;
+  }
+
+  &:not(.intro) {
+    #consent-my-choices {
+      display: flex;
+    }
+    #consent-introduction {
+      display: none;
+    }
+
+    #consent-homescreen {
+      display: none;
+    }
+  }
+
+  &.intro {
+    #consent-my-choices {
+      display: none;
+    }
+    #consent-introduction {
+      display: block;
+    }
+
+    #consent-homescreen {
+      display: none;
+    }
+  }
+
+  &.homescreen {
+    #consent-my-choices {
+      display: none;
+    }
+    #consent-introduction {
+      display: none;
+    }
+
+    #consent-homescreen {
+      display: flex;
+    }
+  }
+
+
+  &.android4-ios7-ios8 {
+    .consent-button-container {
+      padding: $default-size 0;
+      width: 100%;
+      justify-content: center;
+      background: $white;
+    }
+
+    .consent-settings {
+      height: 100%;
+    }
+
+    .agree {
+      flex-grow: 0;
+    }
+
+    .save-my-choices {
+      flex-grow: 0;
+    }
+
+    .safe-area {
+      padding: 0;
+    }
+
+    .empty-block {
+      height: 6 * $default-size;
+    }
+  }
+
+  .safe-area {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: .5 * $default-size;
+  }
+}
+
+#consent-my-choices {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 80%;
+  border-radius: .5 * $default-size;
+  background: $white;
+
+  .back-button {
+    $consent-privacy-close-button-default();
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+  }
+
+  &.show-back-button {
+    .back-button {
+      display: block;
+    }
+  }
+
+  .consent-settings {
+    position: relative;
+    overflow: scroll;
+    padding: 1.5 * $default-size;
+    height: 100%;
+    border-radius: .5 * $default-size;
+    background: $white;
+    // enable momentum scrolling on iOS
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .consent-title {
+    color: $black;
+    font-weight: $privacy-main-title-font-weight;
+    font-size: $consent-title-font-size;
+  }
+
+  .consent-button-container {
+    // use absolute position to ensure that buttons are always visible
+    position: absolute;
+    right:0;
+    bottom: 0;
+    left:0;
+    display: flex;
+    justify-content: space-between;
+    padding: $default-size $default-size;
+    border-bottom-right-radius: .5 * $default-size;
+    border-bottom-left-radius: .5 * $default-size;
+    background: $white;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, .19);
+  }
+
+  .consent-button {
+    position: relative;
+    align-self: center;
+    padding: .75 * $default-size $default-size;
+    border-radius: 2 * $default-size;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05);
+    text-align: center;
+    font-weight: $privacy-title-font-weight;
+    font-size: $consent-button-font-size;
+
+  }
+
+  .consent-button {
+    &.click-animation {
+      $click-animation();
+    }
+  }
+
+  .agree {
+    display: block;
+    flex-grow: 1;
+    background: $consent-blue;
+    color: $white;
+  }
+
+  .disagree {
+    display: block;
+    margin-left: $default-size;
+    border: 1px solid $consent-border-gray;
+    color: $black;
+  }
+
+  .save-my-choices {
+    display: none;
+    flex-grow: 1;
+    background: $consent-blue;
+    color: $white;
+  }
+
+  .consent-button-container:not(.show-save-my-choices-button) {
+    .agree {
+      display: block;
+    }
+
+    .disagree {
+      display: block;
+    }
+    .save-my-choices {
+      display: none;
+    }
+  }
+
+  .consent-button-container.show-save-my-choices-button {
+    .agree {
+      display: none;
+    }
+    .disagree {
+      display: none;
+    }
+    .save-my-choices {
+      display: block;
+    }
+  }
+
+  #third-party-switch.disabled {
+    opacity: .33;
+    pointer-events: none;
+  }
+
+  .switch-group-container {
+    $switch-group-container();
+    margin-top: .5 * $default-size;
+  }
+  .empty-block {
+    height: 5 * $default-size;
+  }
+  .privacy-container {
+    #privacy-row-item-container {
+      .row-item {
+        margin: 0 0 0 0;
+        padding: $default-size 0;
+        border-top: 1px solid $consent-divider-color;
+        border-bottom: 1px solid $white;
+      }
+
+      .row-item-title {
+        font-size: $consent-text-font-size;
+      }
+
+      .description {
+        color: $consent-text-font-color;
+        text-align: left;
+        font-weight: $consent-text-font-weight;
+        font-size: $consent-text-font-size;
+      }
+
+      .heading2 {
+        display: block;
+        font-weight: $privacy-main-title-font-weight;
+        font-size: $consent-text-font-size;
+      }
+
+      .arrow-icon {
+        margin-top: .25 * $default-size;
+        padding-right: 0;
+        font-size: $consent-text-font-size;
+        opacity: 1;
+      }
+
+      .heading2 {
+        font-size: $consent-text-font-size;
+      }
+    }
+  }
+}
+
+#consent-introduction {
+  position: relative;
+  border-radius: .5 * $default-size;
+  background: $white;
+  text-align: center;
+
+  .privacy-logo {
+    margin-top: 3 * $default-size;
+    margin-bottom: .25 * $default-size;
+    font-size: 2 * $consent-main-title-font-size;
+  }
+
+  .intro-title {
+    padding: 0 1.25 * $default-size;
+    font-weight: $privacy-main-title-font-weight;
+    font-size: $consent-main-title-font-size;
+  }
+
+  .intro-text {
+    padding: 0 1.75 * $default-size;
+  }
+
+  .bold {
+    font-weight: $privacy-main-title-font-weight;
+  }
+
+  .continue-button {
+    // padding: 1.25 * $default-size 2 * $default-size 2.5 * $default-size 2 * $default-size;
+    padding: .5 * $default-size 2 * $default-size 2 * $default-size 2 * $default-size;
+    color: $consent-blue;
+    font-size: $consent-title-font-size;
+  }
+
+  .unity-logo {
+    margin-bottom: $default-size;
+    font-size: $default-font-size * .65;
+    opacity: .18;
+  }
+}
+
+#consent-homescreen {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  justify-content: center;
+  text-align: center;
+
+  &.prevent-clicks {
+    pointer-events: none;
+  }
+
+  .homescreen-container {
+    position: relative;
+    align-self: center;
+    margin: 0 $default-size;
+    padding: 2 * $default-size 2 * $default-size 1.5 * $default-size 2 * $default-size;
+    border-radius: .5 * $default-size;
+    background: white;
+  }
+
+  .stripe {
+    display: none;
+  }
+
+  .item {
+    margin: 0 0 $default-size 0;
+  }
+
+  .privacy-logo {
+    color: $black;
+    text-align: center;
+    font-size: $privacy-text-font-size * 2;
+  }
+
+  .title {
+    font-weight: $privacy-main-title-font-weight;
+  }
+  .description {
+    color: $consent-text-font-color;
+    font-weight: $privacy-text-font-weight;
+    font-size: $privacy-text-font-size;
+    line-height: $default-size;
+  }
+
+  .accept-all {
+    margin-bottom: .75 * $default-size;
+    border: 1px solid $blue;
+    background-color: $blue;
+    color: $white;
+  }
+
+  .show-choices {
+    border: 1px solid $privacy-light-gray;
+    background-color: $white;
+    color: $consent-text-font-color;
+  }
+
+  .consent-button {
+    position: relative;
+    padding: .75 * $default-size $default-size;
+    border-radius: $default-size * 4;
+    text-align: center;
+    font-weight: $privacy-title-font-weight;
+    font-size: $privacy-heading-font-size;
+
+  }
+
+  .page-link {
+    text-decoration: underline;
+    // color: $blue;
+    cursor: pointer;
+
+  }
+
+  .unityads-logo {
+    $set-image(100%, $default-scale-size * $default-size, 0, "../img/unityads.png", contain);
+  }
+
+  .click-animation.agree {
+    $click-animation();
+  }
+}
+
+&.portrait {
+  #consent {
+    .back-button {
+      margin-top: -.5 * $default-size;
+      transform: translateY(-100%);
+    }
+  }
+}
+
+&.landscape {
+  #consent {
+    #consent-introduction,
+    #consent-my-choices {
+      left: 15%;
+      width: 70%;
+    }
+
+    #consent-my-choices {
+      height: 100%;
+    }
+
+    #consent-introduction {
+      .continue-button {
+        padding: .5 * $default-size 2 * $default-size $default-size 2 * $default-size;
+      }
+
+      .privacy-logo {
+        margin-top: 2rem;
+      }
+    }
+
+    .back-button {
+      margin-left: -.5 * $default-size;
+      transform: translateX(-100%);
+
+    }
+  }
+}
+
+body {
+  &.landscape #consent-homescreen {
+    .homescreen-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin: $default-size 2 * $default-size;
+    }
+
+    .homescreen-container {
+      position: relative;
+      align-self: center;
+      margin: 0 $default-size;
+      padding: 1.5 * $default-size 1.5 * $default-size $default-size 1.5 * $default-size;
+      border-radius: .5 * $default-size;
+      background: white;
+    }
+
+    .stripe {
+      position: absolute;
+      top: 0;
+      display: block;
+      width: 1px;
+      height: 100%;
+      background-color: $consent-divider-color;
+    }
+
+    .top-container {
+      flex: 0 1 50%;
+      margin-right: 1.5 * $default-size;
+    }
+
+    .bottom-container {
+      flex: 0 1 50%;
+      margin-left: 1.5 * $default-size;
+    }
+  }
+
+  &.landscape #consent {
+    &.android4-ios7-ios8 {
+      #consent-homescreen {
+        .homescreen-container {
+          margin: 0;
+        }
+
+        .top-container {
+          left: 0;
+          margin: 0;
+          width: 50%;
+        }
+
+        .bottom-container {
+          left: 50%;
+          margin-left: .5 * $default-size;
+          width: 50%;
+        }
+      }
+    }
+  }
+}
+
+
+$iphone-x-paddings() {
+  #consent {
+    .safe-area {
+      top: constant(safe-area-inset-top);
+      right: constant(safe-area-inset-right);
+      bottom: constant(safe-area-inset-bottom);
+      left: constant(safe-area-inset-left);
+
+      top: env(safe-area-inset-top);
+      right: env(safe-area-inset-right);
+      bottom: env(safe-area-inset-bottom);
+      left: env(safe-area-inset-left);
+
+      padding: 0 .5 * $default-size;
+    }
+  }
+
+  .landscape {
+    #consent {
+      .safe-area {
+        padding: .5 * $default-size 0 0 0;
+      }
+    }
+  }
+}
+
+/* iPhone X & iPhone XS */
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+  html {
+    $iphone-x-paddings();
+  }
+}
+
+/* iPhone XS Max */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+  html {
+    $iphone-x-paddings();
+  }
+}
+
+/* iPhone XR */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+  html {
+    $iphone-x-paddings();
+  }
+}

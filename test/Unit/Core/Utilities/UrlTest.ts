@@ -245,4 +245,11 @@ describe('UrlTest', () => {
             assert.equal(timestamp, '1549413290', 'Timestamp incorrect');
         });
     });
+
+    describe('getAppStoreUrlTemplates', () => {
+        it('should return correct app store url templates', () => {
+            const iosStoreTemplates = ['https://itunes.apple.com'];
+            assert.deepEqual(Url.getAppStoreUrlTemplates(Platform.IOS), iosStoreTemplates, 'iOS app store templates are not matching');
+        });
+    });
 });

@@ -31,7 +31,7 @@ describe('DisplayInterstitialTest', () => {
 
     function viewUnitTests() {
         beforeEach(() => {
-            sandbox = sinon.sandbox.create();
+            sandbox = sinon.createSandbox();
             const platform = Platform.ANDROID;
             backend = TestFixtures.getBackend(platform);
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
