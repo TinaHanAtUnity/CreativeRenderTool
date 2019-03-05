@@ -4,6 +4,8 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { Platform } from 'Core/Constants/Platform';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import { StringUtil } from 'Core/Utilities/StringUtil';
+import { CampaignError } from 'Ads/Errors/CampaignError';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
 
@@ -16,6 +18,10 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
         const dynamicMarkup = decodeURIComponent(response.getContent());
+        if (!StringUtil.startWithHTMLTag(dynamicMarkup)) {
+            throw new CampaignError('Display ad content is not in HTML format', ProgrammaticStaticInterstitialParser.ContentTypeHtml, undefined, undefined, undefined, response.getSeatId());
+        }
+
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
