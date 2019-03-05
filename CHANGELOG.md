@@ -1,4 +1,16 @@
-# Staged
+# Merged
+
+* Fixing banner tests [#8520](https://github.com/Applifier/unity-ads-webview/pull/8520)
+
+# Tue Mar  5 22:33:04 UTC 2019
+
+* Enable timerless autobatching on all groups [#8422](https://github.com/Applifier/unity-ads-webview/pull/8422)
+* Fix disabling backup campaigns with test metadata [#8370](https://github.com/Applifier/unity-ads-webview/pull/8370)
+* Clear outdated user privacy before show [#8424](https://github.com/Applifier/unity-ads-webview/pull/8424)
+* Swap ab group 16 with 18 for Auction v5 test [#8521](https://github.com/Applifier/unity-ads-webview/pull/8521)
+* Hack in fix for 3.0.1 future deployments [#8419](https://github.com/Applifier/unity-ads-webview/pull/8419)
+
+# Tue Mar  5 12:56:11 UTC 2019
 
 * Remove ad_shown_in_background diagnostic [#8472](https://github.com/Applifier/unity-ads-webview/pull/8472)
 * Remove click abtest and ByteDance hack, enable VastStrictParser test [#8474](https://github.com/Applifier/unity-ads-webview/pull/8474)

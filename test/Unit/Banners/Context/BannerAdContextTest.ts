@@ -28,8 +28,10 @@ import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampa
         let sandbox: sinon.SinonSandbox;
         let adUnit: IBannerAdUnit;
         const placementId = 'banner';
+        let clock: sinon.SinonFakeTimers;
 
         beforeEach(() => {
+            clock = sinon.useFakeTimers();
             sandbox = sinon.createSandbox();
             backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
@@ -40,7 +42,10 @@ import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampa
             bannerAdContext = banners.AdContext;
         });
 
-        afterEach(() => sandbox.restore());
+        afterEach(() => {
+            sandbox.restore();
+            clock.restore();
+        });
 
         const loadBannerAdUnit = () => {
             adUnit = sandbox.createStubInstance(HTMLBannerAdUnit);
@@ -69,13 +74,8 @@ import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampa
         });
 
         describe('Refreshing a banner ad unit', () => {
-            let clock: sinon.SinonFakeTimers;
             beforeEach(() => {
-                clock = sinon.useFakeTimers();
                 return loadBannerAdUnit();
-            });
-            afterEach(() => {
-                clock.restore();
             });
             context('if not shown yet', () => {
                 it('should not refresh after 30 seconds', () => {
@@ -101,13 +101,11 @@ import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampa
 
         xdescribe('No fill banner scenario', () => {
             beforeEach(() => {
-                adUnit = sandbox.createStubInstance(HTMLBannerAdUnit);
                 sandbox.stub(banners.CampaignManager, 'request').returns(Promise.reject(new NoFillError()));
                 sandbox.stub(banners.Api.Listener, 'sendErrorEvent');
-                sandbox.stub(banners.Api.Banner, 'load');
             });
 
-            it('will fail when the request returns the error thing', () => {
+            it('will fail when the banner request returns NoFillError', () => {
                 return bannerAdContext.load(placementId).catch((e) => {
                     sinon.assert.called(asStub(banners.Api.Listener.sendErrorEvent));
                 });
