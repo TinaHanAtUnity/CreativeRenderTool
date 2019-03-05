@@ -44,7 +44,7 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
             }
         ];
 
-        this._infoContainer = new PrivacyRowItemContainer(platform, userPrivacyManager);
+        this._infoContainer = new PrivacyRowItemContainer(platform, userPrivacyManager, true);
         this._infoContainer.addEventHandler(this);
         this._checkboxGroup = new PersonalizationCheckboxGroup(platform, userPrivacyManager);
         this._checkboxGroup.addEventHandler(this);
@@ -75,14 +75,6 @@ export class UnityConsentSettings extends View<IConsentViewHandler> implements I
         this.show();
         this._checkboxGroup.show();
         this._infoContainer.showParagraphAndScrollToSection(paragraph);
-    }
-
-    public onDataDeletion(): void {
-        this._checkboxGroup.checkCheckboxes(false);
-    }
-
-    public onShowDataDeletionDialog(): void {
-        // do nothing
     }
 
     public onPrivacy(url: string): void {
