@@ -28,8 +28,10 @@ import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampa
         let sandbox: sinon.SinonSandbox;
         let adUnit: IBannerAdUnit;
         const placementId = 'banner';
+        let clock: sinon.SinonFakeTimers;
 
         beforeEach(() => {
+            clock = sinon.useFakeTimers();
             sandbox = sinon.createSandbox();
             backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
@@ -40,7 +42,10 @@ import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampa
             bannerAdContext = banners.AdContext;
         });
 
-        afterEach(() => sandbox.restore());
+        afterEach(() => {
+            sandbox.restore();
+            clock.restore();
+        });
 
         const loadBannerAdUnit = () => {
             adUnit = sandbox.createStubInstance(HTMLBannerAdUnit);
@@ -69,13 +74,8 @@ import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampa
         });
 
         describe('Refreshing a banner ad unit', () => {
-            let clock: sinon.SinonFakeTimers;
             beforeEach(() => {
-                clock = sinon.useFakeTimers();
                 return loadBannerAdUnit();
-            });
-            afterEach(() => {
-                clock.restore();
             });
             context('if not shown yet', () => {
                 it('should not refresh after 30 seconds', () => {
