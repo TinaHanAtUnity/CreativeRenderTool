@@ -1,13 +1,10 @@
-# Merged
-
-* Swap ab group 16 with 18 for Auction v5 test [#8421](https://github.com/Applifier/unity-ads-webview/pull/8421)
-* Hack in fix for 3.0.1 future deployments [#8419](https://github.com/Applifier/unity-ads-webview/pull/8419)
-
 # Staged
 
 * Enable timerless autobatching on all groups [#8422](https://github.com/Applifier/unity-ads-webview/pull/8422)
 * Fix disabling backup campaigns with test metadata [#8370](https://github.com/Applifier/unity-ads-webview/pull/8370)
 * Clear outdated user privacy before show [#8424](https://github.com/Applifier/unity-ads-webview/pull/8424)
+* Swap ab group 16 with 18 for Auction v5 test [#8421](https://github.com/Applifier/unity-ads-webview/pull/8421)
+* Hack in fix for 3.0.1 future deployments [#8419](https://github.com/Applifier/unity-ads-webview/pull/8419)
 
 # Tue Mar  5 12:56:11 UTC 2019
 
