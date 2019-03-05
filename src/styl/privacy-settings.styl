@@ -29,13 +29,8 @@
   }
 
   .close-button {
+    $consent-privacy-close-button-default();
     position: absolute;
-    padding: .35 * $default-size $default-size;
-    border-radius: 3 * $default-size;
-    background: $privacy-close-button;
-    color: $privacy-close-button-text;
-    font-weight: $privacy-title-font-weight;
-    font-size: $privacy-heading-font-size;
   }
 
   .page-container {
@@ -52,6 +47,8 @@
     border-top-left-radius: $default-size;
     border-top-right-radius: $default-size;
     background: $white;
+    // enable momentum scrolling on iOS
+    -webkit-overflow-scrolling: touch;
   }
 
   .back-button {
@@ -116,14 +113,26 @@
     }
   }
 
-  .checkbox-group-container {
-    $checkbox-group-container($default-scale-size, $privacy-text-font-size);
+  .personalization-container {
+    .checkbox-group-container {
+      $switch-group-container();
+      font-size: $privacy-text-font-size;
+    }
+
+    #third-party-switch.disabled {
+      opacity: .33;
+      pointer-events: none;
+    }
   }
 
   .radio-group-container {
     $radio-group-container-blue($default-scale-size, $privacy-text-font-size);
     font-weight: $privacy-text-font-weight;
     line-height: 1.25 * $default-size;
+  }
+
+  .build-info-container {
+    word-break: break-all;
   }
 
   &.initial {
@@ -167,6 +176,7 @@
   }
 
   .title {
+    margin-bottom: $default-size;
     font-weight: $privacy-main-title-font-weight;
   }
 

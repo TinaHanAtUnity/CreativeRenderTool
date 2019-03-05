@@ -21,7 +21,7 @@ import { IChinaApi } from 'China/IChina';
 describe('DownloadManagerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     let nativeBridge: NativeBridge;
     let deviceInfo: AndroidDeviceInfo;
     let core: ICoreApi;

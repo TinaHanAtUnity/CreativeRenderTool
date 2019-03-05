@@ -124,6 +124,12 @@ export class UserPrivacy extends Model<IUserPrivacy> {
         this.set('permissions', data.permissions);
     }
 
+    public clear(): void {
+        this.set('method', PrivacyMethod.DEFAULT);
+        this.set('version', 0);
+        this.set('permissions', { profiling: false });
+    }
+
     public getDTO(): { [key: string]: unknown } {
         return {
             'method': this.getMethod(),

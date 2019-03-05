@@ -286,17 +286,14 @@ export class Ads implements IAds {
             privacyManager: this.PrivacyManager,
             adUnitContainer: this.Container,
             adsConfig: this.Config,
-            core: this._core.Api
+            core: this._core.Api,
+            deviceInfo: this._core.DeviceInfo
         });
         return consentView.show(options);
     }
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
-
-        if (!this._core.FocusManager.isAppForeground()) {
-            Diagnostics.trigger('ad_shown_in_background', {});
-        }
 
         if(this._showing) {
             // do not send finish event because there will be a finish event from currently open ad unit
@@ -343,6 +340,10 @@ export class Ads implements IAds {
             campaign.setTrackingUrls(trackingUrls);
         }
 
+        // First ad request within a game session can be made using recorded privacy information.
+        // If game method has changed since, it should be reset before e.g. showing consent dialog
+        this.resetOutdatedUserPrivacy();
+
         if (placement.getRealtimeData() && !this.isConsentShowRequired()) {
             this._core.Api.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
             const start = Date.now();
@@ -378,6 +379,16 @@ export class Ads implements IAds {
             this.showConsentIfNeeded(options).then(() => {
                 this.showAd(placement, campaign, options);
             });
+        }
+    }
+
+    private resetOutdatedUserPrivacy() {
+        const gamePrivacy = this.Config.getGamePrivacy();
+        const userPrivacy = this.Config.getUserPrivacy();
+        const gdprApplies = gamePrivacy.getMethod() !== PrivacyMethod.DEFAULT;
+        const methodHasChanged = userPrivacy.getMethod() !== gamePrivacy.getMethod();
+        if (gdprApplies && methodHasChanged) {
+            userPrivacy.clear();
         }
     }
 
@@ -510,7 +521,7 @@ export class Ads implements IAds {
 
         if(TestEnvironment.get('campaignId')) {
             CampaignManager.setCampaignId(TestEnvironment.get('campaignId'));
-            this.BackupCampaignManager.deleteBackupCampaigns();
+            this.BackupCampaignManager.setEnabled(false);
         }
 
         if(TestEnvironment.get('sessionId')) {
