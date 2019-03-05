@@ -70,10 +70,6 @@ export class CustomFeatures {
 
     }
 
-    public static isByteDanceSeat(seatId: number | undefined): boolean {
-        return seatId === 9116 || seatId === 9154;
-    }
-
     public static isChinaSDK(platform: Platform, versionName: string): boolean {
         return platform === Platform.ANDROID
             && versionName.endsWith('china');
