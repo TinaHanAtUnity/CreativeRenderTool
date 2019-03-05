@@ -1,3 +1,7 @@
+# Merged
+
+* Swap ab group 16 with 18 for Auction v5 test [#8421](https://github.com/Applifier/unity-ads-webview/pull/8421)
+
 # Staged
 
 * Enable timerless autobatching on all groups [#8422](https://github.com/Applifier/unity-ads-webview/pull/8422)
