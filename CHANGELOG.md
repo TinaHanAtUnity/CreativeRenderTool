@@ -1,6 +1,7 @@
 # Merged
 
 * Swap ab group 16 with 18 for Auction v5 test [#8421](https://github.com/Applifier/unity-ads-webview/pull/8421)
+* Hack in fix for 3.0.1 future deployments [#8419](https://github.com/Applifier/unity-ads-webview/pull/8419)
 
 # Staged
 
