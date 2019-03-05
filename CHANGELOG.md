@@ -1,7 +1,21 @@
-# Pending
+# Tue Mar  5 12:56:11 UTC 2019
+
+* Remove ad_shown_in_background diagnostic [#8472](https://github.com/Applifier/unity-ads-webview/pull/8472)
+* Remove click abtest and ByteDance hack, enable VastStrictParser test [#8474](https://github.com/Applifier/unity-ads-webview/pull/8474)
+
+# Mon Mar  4 09:05:35 UTC 2019
+
+* Update the consent flow [#8421](https://github.com/Applifier/unity-ads-webview/pull/8421)
+* Replace the checkbox group with switches in PrivacySettings view [#8449](https://github.com/Applifier/unity-ads-webview/pull/8449)
+
+# Thu Feb 28 23:58:23 UTC 2019
 
 * Enable Admob HTTP Parsing for the full network [#8425](https://github.com/Applifier/unity-ads-webview/pull/8425)
 * Add Test Adapter for Promo Test Mode [#8299](https://github.com/Applifier/unity-ads-webview/pull/8299)
+* Update 3rd Party List [#8446](https://github.com/Applifier/unity-ads-webview/pull/8446)
+* Release AB Test for Blocking campaign refresh with Auction Status Code [#8448](https://github.com/Applifier/unity-ads-webview/pull/8448)
+* Close Privacy Settings view when clicking outside of the main content div [#8325](https://github.com/Applifier/unity-ads-webview/pull/8325)
+* Add Banner Nofill Callback [#8420](https://github.com/Applifier/unity-ads-webview/pull/8420)
 
 # Wed Feb 27 00:27:16 UTC 2019
 
