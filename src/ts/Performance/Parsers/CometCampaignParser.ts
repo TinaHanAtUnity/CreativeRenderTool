@@ -106,7 +106,7 @@ export class CometCampaignParser extends CampaignParser {
                 store: storeName,
                 appStoreId: json.appStoreId,
                 playableConfiguration: undefined,
-                targetGameId: json.gameId,
+                targetGameId: json.gameId
             };
             parameters.contentType = CometCampaignParser.ContentTypeMRAID;
 
