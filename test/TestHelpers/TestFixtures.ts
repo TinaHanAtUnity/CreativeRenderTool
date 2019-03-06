@@ -306,7 +306,8 @@ export class TestFixtures {
             bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: storeName,
             appStoreId: mraidContentJson.appStoreId,
-            playableConfiguration: undefined
+            playableConfiguration: undefined,
+            targetGameId: mraidContentJson.gameId
         };
     }
 
@@ -355,7 +356,8 @@ export class TestFixtures {
             store: undefined,
             appStoreId: mraidContentJson.appStoreId,
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
-            playableConfiguration: undefined
+            playableConfiguration: undefined,
+            targetGameId: mraidContentJson.gameId
         };
     }
 

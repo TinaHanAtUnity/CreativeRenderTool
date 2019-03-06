@@ -225,6 +225,9 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
                     kafkaObject.auctionId = '12345';
                     kafkaObject.abGroup = 99;
 
+                    kafkaObject.targetGameId = 53872;
+                    kafkaObject.campaignId = '58dec182f01b1c0cdef54f0f';
+
                     const resourceUrl = extendedMraidCampaign.getResourceUrl();
                     if (resourceUrl) {
                         kafkaObject.url = resourceUrl.getOriginalUrl();
@@ -247,6 +250,9 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
                     kafkaObject.backgroundTime = 5;
                     kafkaObject.auctionId = '12345';
                     kafkaObject.abGroup = 99;
+
+                    kafkaObject.targetGameId = 53872;
+                    kafkaObject.campaignId = '58dec182f01b1c0cdef54f0f';
 
                     const resourceUrl = extendedMraidCampaign.getResourceUrl();
                     if (resourceUrl) {
