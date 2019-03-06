@@ -383,8 +383,14 @@ export class VastParserStrict {
 
         const staticResourceElement = this.getFirstNodeWithName(companionAdElement, VastNodeName.STATIC_RESOURCE);
         if (staticResourceElement) {
-            const creativeType = staticResourceElement.getAttribute(VastAttributeNames.CREATIVE_TYPE);
-            companionAd.setCreativeType(creativeType);
+            let creativeType = staticResourceElement.getAttribute(VastAttributeNames.CREATIVE_TYPE);
+            if (!creativeType) {
+                // if 'creativeType' attribute not found try 'type'
+                creativeType = staticResourceElement.getAttribute(VastAttributeNames.TYPE);
+            }
+            if (creativeType) {
+                companionAd.setCreativeType(creativeType);
+            }
             const staticResourceUrl = this.parseVastUrl(this.parseNodeText(staticResourceElement), urlProtocol);
             if (staticResourceUrl) {
                 companionAd.setStaticResourceURL(staticResourceUrl);
