@@ -66,6 +66,10 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
         });
     }
 
+    protected sendTrackingEvents() {
+        this._adUnit.sendClick();
+    }
+
     private getTopViewHeight(width: number, height: number): number {
         const webViewResizer = new WebViewTopCalculator(this._deviceInfo, this._platform);
         return webViewResizer.getTopPosition(width, height);
