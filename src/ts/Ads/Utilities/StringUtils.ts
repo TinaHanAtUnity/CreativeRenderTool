@@ -1,5 +1,5 @@
 
-export class StringUtil {
+export class StringUtils {
 
     private static _htmlOpenTag: RegExp = /<\w+>/;
     // </charcters/> ... <//characters/>

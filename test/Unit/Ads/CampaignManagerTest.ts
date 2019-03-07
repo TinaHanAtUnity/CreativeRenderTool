@@ -860,12 +860,8 @@ describe('CampaignManager', () => {
             });
 
             return campaignManager.request().then(() => {
-                if (triggeredError) {
-                    throw triggeredError;
-                }
-
                 mockRequest.verify();
-                assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
+                assert.equal(triggeredError.message, ProgrammaticStaticInterstitialParser.ErrorMessage, 'Should trigger error when the content of display ad is not in HTML format');
             });
         });
     });
