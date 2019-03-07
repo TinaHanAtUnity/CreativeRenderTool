@@ -101,6 +101,7 @@ describe('WebPlayerMraidAdUnit', () => {
             platform: platform,
             core: core,
             ads: ads,
+            store: TestFixtures.getStoreApi(nativeBridge),
             ar: TestFixtures.getARApi(nativeBridge),
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: new FocusManager(platform, core),

@@ -13,6 +13,7 @@ export interface IRawCoreConfiguration {
     token: string;
     jaegerTracing?: boolean;
     organizationId: string;
+    iapTracking?: boolean;
 }
 
 export class CoreConfigurationParser {

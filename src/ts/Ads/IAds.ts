@@ -15,7 +15,6 @@ import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';
 import { AndroidAdUnitApi } from 'Ads/Native/Android/AdUnit';
 import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
 import { IosAdUnitApi } from 'Ads/Native/iOS/AdUnit';
-import { AppSheetApi } from 'Ads/Native/iOS/AppSheet';
 import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
 import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
@@ -37,7 +36,6 @@ export interface IAdsApi extends IModuleApi {
         VideoPlayer: AndroidVideoPlayerApi;
     };
     iOS?: {
-        AppSheet: AppSheetApi;
         AdUnit: IosAdUnitApi;
         VideoPlayer: IosVideoPlayerApi;
     };

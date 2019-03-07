@@ -21,5 +21,6 @@ export enum EventCategory {
     ANALYTICS,
     PERMISSIONS,
     DOWNLOAD,
-    INSTALL
+    INSTALL,
+    STORE
 }
