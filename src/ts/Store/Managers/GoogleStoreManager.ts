@@ -30,7 +30,7 @@ export class GoogleStoreManager extends StoreManager {
     private onInitialized() {
         this._googleStore.isBillingSupported('inapp').then(result => {
             if(result === 0) {
-                this._store.Android!.Store.startPurchaseTracking(true, ['com.unity3d.player.UnityPlayerActivity', 'com.unity3d.services.ads.adunit.AdUnitActivity', 'com.unity3d.services.ads.adunit.AdUnitTransparentActivity'], ['inapp']);
+                this._store.Android!.Store.startPurchaseTracking(true, ['com.unity3d.services.ads.adunit.AdUnitActivity', 'com.unity3d.services.ads.adunit.AdUnitTransparentActivity'], ['inapp']);
             } else {
                 Diagnostics.trigger('store_billing_not_supported', {
                     result: result
