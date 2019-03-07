@@ -1,3 +1,7 @@
+# Staged
+
+* Initial support for IAP purchase detection [#8477](https://github.com/Applifier/unity-ads-webview/pull/8477)
+
 # Thu Mar  7 12:37:10 UTC 2019
 
 * Close icon instead of skip [#8450](https://github.com/Applifier/unity-ads-webview/pull/8450)
