@@ -1,4 +1,12 @@
-# Merged
+# Staged
+
+* Initial support for IAP purchase detection [#8477](https://github.com/Applifier/unity-ads-webview/pull/8477)
+
+# Thu Mar  7 12:37:10 UTC 2019
+
+* Close icon instead of skip [#8450](https://github.com/Applifier/unity-ads-webview/pull/8450)
+
+# Thu Mar  7 00:43:38 UTC 2019
 
 * Fixing banner tests [#8520](https://github.com/Applifier/unity-ads-webview/pull/8520)
 

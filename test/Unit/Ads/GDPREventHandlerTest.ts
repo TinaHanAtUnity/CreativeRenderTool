@@ -25,6 +25,7 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { IStoreApi } from 'Store/IStore';
 
 describe('GDPREventHandlerTest', () => {
 
@@ -33,6 +34,7 @@ describe('GDPREventHandlerTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let store: IStoreApi;
     let adUnit: PerformanceAdUnit;
     let adUnitParameters: IPerformanceAdUnitParameters;
 
@@ -44,10 +46,12 @@ describe('GDPREventHandlerTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        store = TestFixtures.getStoreApi(nativeBridge);
         adUnitParameters = {
             platform,
             core,
             ads,
+            store,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: sinon.createStubInstance(FocusManager),
             container: sinon.createStubInstance(ViewController),
