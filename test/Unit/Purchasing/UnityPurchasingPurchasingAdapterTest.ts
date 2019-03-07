@@ -305,16 +305,28 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             });
         };
 
+        it('should fail with promo catalog null if purchasing catalog is null value', () => {
+            const refreshCatalogPromise = purchasingAdapter.refreshCatalog();
+
+            return triggerRefreshCatalog('NULL')
+                .then(() => {
+                    return refreshCatalogPromise.then(() => assert.fail('RefreshCatalog worked when it shouldn\'t\'ve'))
+                        .catch((e) => {
+                            assert.equal(e.message, 'Promo catalog JSON is null');
+                        });
+                });
+        });
+
         it('should fail with promo catalog empty if purchasing catalog is empty string', () => {
             const refreshCatalogPromise = purchasingAdapter.refreshCatalog();
 
             return triggerRefreshCatalog('')
-                .then(() => {
-                    return refreshCatalogPromise.then(() => assert.fail('RefreshCatalog worked when it shouldn\'t\'ve'))
-                        .catch((e) => {
-                            assert.equal(e.message, 'Promo catalog JSON is empty');
-                        });
-                });
+                    .then(() => {
+                        return refreshCatalogPromise.then(() => assert.fail('RefreshCatalog worked when it shouldn\'t\'ve'))
+                            .catch((e) => {
+                                assert.equal(e.message, 'Promo catalog JSON is empty');
+                            });
+                    });
         });
 
         it('should fail with catalog_json_parse_failure if catalog is invalid json string', () => {

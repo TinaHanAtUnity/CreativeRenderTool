@@ -1,3 +1,47 @@
+# Thu Mar  7 12:37:10 UTC 2019
+
+* Close icon instead of skip [#8450](https://github.com/Applifier/unity-ads-webview/pull/8450)
+
+# Thu Mar  7 00:43:38 UTC 2019
+
+* Fixing banner tests [#8520](https://github.com/Applifier/unity-ads-webview/pull/8520)
+
+# Tue Mar  5 22:33:04 UTC 2019
+
+* Enable timerless autobatching on all groups [#8422](https://github.com/Applifier/unity-ads-webview/pull/8422)
+* Fix disabling backup campaigns with test metadata [#8370](https://github.com/Applifier/unity-ads-webview/pull/8370)
+* Clear outdated user privacy before show [#8424](https://github.com/Applifier/unity-ads-webview/pull/8424)
+* Swap ab group 16 with 18 for Auction v5 test [#8521](https://github.com/Applifier/unity-ads-webview/pull/8521)
+* Hack in fix for 3.0.1 future deployments [#8419](https://github.com/Applifier/unity-ads-webview/pull/8419)
+
+# Tue Mar  5 12:56:11 UTC 2019
+
+* Remove ad_shown_in_background diagnostic [#8472](https://github.com/Applifier/unity-ads-webview/pull/8472)
+* Remove click abtest and ByteDance hack, enable VastStrictParser test [#8474](https://github.com/Applifier/unity-ads-webview/pull/8474)
+
+# Mon Mar  4 09:05:35 UTC 2019
+
+* Update the consent flow [#8421](https://github.com/Applifier/unity-ads-webview/pull/8421)
+* Replace the checkbox group with switches in PrivacySettings view [#8449](https://github.com/Applifier/unity-ads-webview/pull/8449)
+
+# Thu Feb 28 23:58:23 UTC 2019
+
+* Enable Admob HTTP Parsing for the full network [#8425](https://github.com/Applifier/unity-ads-webview/pull/8425)
+* Add Test Adapter for Promo Test Mode [#8299](https://github.com/Applifier/unity-ads-webview/pull/8299)
+* Update 3rd Party List [#8446](https://github.com/Applifier/unity-ads-webview/pull/8446)
+* Release AB Test for Blocking campaign refresh with Auction Status Code [#8448](https://github.com/Applifier/unity-ads-webview/pull/8448)
+* Close Privacy Settings view when clicking outside of the main content div [#8325](https://github.com/Applifier/unity-ads-webview/pull/8325)
+* Add Banner Nofill Callback [#8420](https://github.com/Applifier/unity-ads-webview/pull/8420)
+
+# Wed Feb 27 00:27:16 UTC 2019
+
+* Remove Puchasing Diagnostics [#8414](https://github.com/Applifier/unity-ads-webview/pull/8418)
+
+# Tue Feb 26 23:30:30 UTC 2019
+
+* Update deprecated sandbox api with sinon.createSandbox() [#8396](https://github.com/Applifier/unity-ads-webview/pull/8396)
+* Send Promo Catalog Flag to Auction [#8374](https://github.com/Applifier/unity-ads-webview/pull/8374)
+
 # Tue Feb 26 17:47:06 UTC 2019
 
 * Remove obsolete consent test code [#8373](https://github.com/Applifier/unity-ads-webview/pull/8373)

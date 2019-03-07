@@ -497,6 +497,74 @@ $checkbox-group-container($scale-size = $default-scale-size, $context-font-size 
   }
 }
 
+$switch-group-container() {
+  .switch-container {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: .5 * $default-size 0;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 28px;
+  }
+
+  .switch-label {
+    position: relative;
+    width: 80%;
+  }
+
+  [type="checkbox"]:checked,
+  [type="checkbox"]:not(:checked) {
+    position: absolute;
+    visibility: hidden;
+  }
+
+  [type="checkbox"]:checked + label,
+  [type="checkbox"]:not(:checked) + label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #FAFAFA;
+    border: 2px solid #E3E3E3;
+    border-radius: 34px;
+    transition: .15s ease-in-out;
+  }
+
+  [type="checkbox"]:checked + label:before,
+  [type="checkbox"]:not(:checked) + label:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    background-color: white;
+    border-radius: 50%;
+    transition: .15s ease-in-out;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  [type="checkbox"]:checked + label {
+    background-color: $consent-blue;
+    border: 2px solid $consent-blue;
+  }
+
+  [type="checkbox"]:focus + label {
+    box-shadow: 0 0 1px $consent-blue;
+  }
+
+  [type="checkbox"]:checked + label:before {
+    transform: translateX(18px);
+  }
+}
+
 $click-animation() {
   span {
     display: block;
@@ -538,6 +606,15 @@ $privacy-white-button-default() {
 $consent-button-default() {
   border-radius: $default-size * .4;
   text-align: center;
+  font-weight: $privacy-title-font-weight;
+  font-size: $privacy-heading-font-size;
+}
+
+$consent-privacy-close-button-default() {
+  padding: .35 * $default-size $default-size;
+  border-radius: 3 * $default-size;
+  background: $privacy-close-button;
+  color: $privacy-close-button-text;
   font-weight: $privacy-title-font-weight;
   font-size: $privacy-heading-font-size;
 }

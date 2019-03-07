@@ -54,7 +54,7 @@ describe('VastAdUnitTest', () => {
     let coreConfig: CoreConfiguration;
 
     before(() => {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
     });
 
     beforeEach(() => {
@@ -74,6 +74,7 @@ describe('VastAdUnitTest', () => {
             useDeviceOrientationForVideo: false,
             skipEndCardOnClose: false,
             disableVideoControlsFade: false,
+            useCloseIconInsteadOfSkipIcon: false,
             adTypes: [],
             refreshDelay: 1000,
             muteVideo: false

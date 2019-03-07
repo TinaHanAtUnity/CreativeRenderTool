@@ -172,6 +172,7 @@ export class TestFixtures {
             disableBackButton: false,
             useDeviceOrientationForVideo: false,
             skipEndCardOnClose: false,
+            useCloseIconInsteadOfSkipIcon: false,
             disableVideoControlsFade: false,
             refreshDelay: 1000,
             muteVideo: false,
