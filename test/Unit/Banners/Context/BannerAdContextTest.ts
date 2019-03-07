@@ -99,7 +99,7 @@ import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampa
             });
         });
 
-        xdescribe('No fill banner scenario', () => {
+        describe('No fill banner scenario', () => {
             beforeEach(() => {
                 sandbox.stub(banners.CampaignManager, 'request').returns(Promise.reject(new NoFillError()));
                 sandbox.stub(banners.Api.Listener, 'sendErrorEvent');
