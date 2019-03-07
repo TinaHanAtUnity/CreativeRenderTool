@@ -19,6 +19,8 @@ export class GoogleStoreManager extends StoreManager {
 
     public startTracking(): void {
         this._store.Android!.Store.onInitialized.subscribe(() => this.onInitialized());
+        this._store.Android!.Store.onInitializationFailed.subscribe(() => this.onInitializationFailed());
+        this._store.Android!.Store.onDisconnected.subscribe(() => this.onDisconnected());
         this._store.Android!.Store.onPurchaseStatusOnResume.subscribe((activity: string, data: IGooglePurchaseStatus) => this.onPurchaseStatusOnResume(activity, data));
         this._store.Android!.Store.onPurchaseStatusOnStop.subscribe((activity: string, data: IGooglePurchaseStatus) => this.onPurchaseStatusOnStop(activity, data));
 
@@ -37,6 +39,14 @@ export class GoogleStoreManager extends StoreManager {
         }).catch(error => {
             Diagnostics.trigger('store_isbillingsupported_failed', {});
         });
+    }
+
+    private onInitializationFailed() {
+        Diagnostics.trigger('store_initialization_failed', {});
+    }
+
+    private onDisconnected() {
+        Diagnostics.trigger('store_disconnected', {});
     }
 
     private onPurchaseStatusOnResume(activity: string, data: IGooglePurchaseStatus) {

@@ -7,6 +7,7 @@ import { PaymentTransactionState } from 'Store/Constants/iOS/PaymentTransactionS
 enum IosStoreEvent {
     PRODUCT_REQUEST_COMPLETE,
     PRODUCT_REQUEST_ERROR_NO_PRODUCTS,
+    PRODUCT_REQUEST_FAILED,
     RECEIVED_TRANSACTION
 }
 
@@ -51,6 +52,7 @@ export interface IAppleProduct {
 export class ProductsApi extends NativeApi {
     public readonly onProductRequestErrorNoProducts = new Observable1<number>();
     public readonly onProductRequestComplete = new Observable2<number, { [productId: string]: IAppleProduct }>();
+    public readonly onProductRequestFailed = new Observable2<number, string>();
     public readonly onTransaction = new Observable1<IAppleTransaction[]>();
 
     constructor(nativeBridge: NativeBridge) {
@@ -81,6 +83,10 @@ export class ProductsApi extends NativeApi {
 
             case IosStoreEvent[IosStoreEvent.PRODUCT_REQUEST_ERROR_NO_PRODUCTS]:
                 this.onProductRequestErrorNoProducts.trigger(<number>parameters[0]);
+                break;
+
+            case IosStoreEvent[IosStoreEvent.PRODUCT_REQUEST_FAILED]:
+                this.onProductRequestFailed.trigger(<number>parameters[0], <string>parameters[1]);
                 break;
 
             case IosStoreEvent[IosStoreEvent.RECEIVED_TRANSACTION]:

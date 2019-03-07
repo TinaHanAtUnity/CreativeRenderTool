@@ -15,6 +15,7 @@ export class AppleStore {
 
         this._store.iOS!.Products.onProductRequestComplete.subscribe((id, result) => this.onProductRequestComplete(id, result));
         this._store.iOS!.Products.onProductRequestErrorNoProducts.subscribe((id) => this.onProductRequestErrorNoProducts(id));
+        this._store.iOS!.Products.onProductRequestFailed.subscribe((id, error) => this.onProductRequestFailed(id, error));
     }
 
     public getProductInfo(productId: string): Promise<IAppleProduct> {
@@ -42,6 +43,10 @@ export class AppleStore {
     }
 
     private onProductRequestErrorNoProducts(requestId: number) {
+        this.finishProductRequest(false, requestId);
+    }
+
+    private onProductRequestFailed(requestId: number, errorMessage: string) {
         this.finishProductRequest(false, requestId);
     }
 

@@ -5,6 +5,8 @@ import { Observable0, Observable1, Observable2, Observable3 } from 'Core/Utiliti
 
 enum AndroidStoreEvent {
     INITIALIZED,
+    INITIALIZATION_FAILED,
+    DISCONNECTED,
     PURCHASE_STATUS_ON_RESUME,
     PURCHASE_STATUS_ON_STOP,
     PURCHASE_STATUS_ON_RESUME_ERROR,
@@ -74,6 +76,8 @@ export interface IGoogleSkuDetails {
 export class AndroidStoreApi extends NativeApi {
 
     public readonly onInitialized = new Observable0();
+    public readonly onInitializationFailed = new Observable0();
+    public readonly onDisconnected = new Observable0();
     public readonly onBillingSupportedResult = new Observable2<number, number>();
     public readonly onBillingSupportedError = new Observable3<number, AndroidStoreError, string>();
     public readonly onGetPurchasesResult = new Observable2<number, IGooglePurchases>();
@@ -123,6 +127,14 @@ export class AndroidStoreApi extends NativeApi {
         switch(event) {
             case AndroidStoreEvent[AndroidStoreEvent.INITIALIZED]:
                 this.onInitialized.trigger();
+                break;
+
+            case AndroidStoreEvent[AndroidStoreEvent.INITIALIZATION_FAILED]:
+                this.onInitializationFailed.trigger();
+                break;
+
+            case AndroidStoreEvent[AndroidStoreEvent.DISCONNECTED]:
+                this.onDisconnected.trigger();
                 break;
 
             case AndroidStoreEvent[AndroidStoreEvent.BILLING_SUPPORTED_RESULT]:
