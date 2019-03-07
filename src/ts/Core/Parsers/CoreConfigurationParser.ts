@@ -29,8 +29,7 @@ export class CoreConfigurationParser {
             projectId: configJson.projectId,
             token: configJson.token,
             jaegerTracing: configJson.jaegerTracing ? true : false,
-            organizationId: configJson.organizationId,
-            iapTracking: configJson.iapTracking ? true : false
+            organizationId: configJson.organizationId
         };
 
         const coreConfig = new CoreConfiguration(configurationParams);

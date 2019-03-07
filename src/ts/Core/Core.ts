@@ -225,10 +225,6 @@ export class Core implements ICore {
             this.Ads.SessionManager.setGameSessionId(gameSessionId);
             this.Purchasing = new Purchasing(this);
 
-            if(this.Config.isIapTrackingEnabled) {
-                this.Store.StoreManager.startTracking();
-            }
-
             return this.Ads.initialize(jaegerInitSpan);
         }).then(() => {
             this.JaegerManager.stop(jaegerInitSpan);
