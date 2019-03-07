@@ -1,6 +1,6 @@
 import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, PrivacyMethod, IPermissions, UserPrivacy } from 'Ads/Models/Privacy';
+import { GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -18,6 +18,7 @@ import { Observable2 } from 'Core/Utilities/Observable';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { ConsentPage } from 'Ads/Views/Consent/Consent';
 
 describe('UserPrivacyManagerTest', () => {
     const testGameId = '12345';
@@ -542,7 +543,7 @@ describe('UserPrivacyManagerTest', () => {
         });
 
         describe('when updating user privacy', () => {
-            function sendEvent(permissions: IPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER, layout?: string): Promise<any> {
+            function sendEvent(permissions: IPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER, layout?: ConsentPage): Promise<any> {
                 return privacyManager.updateUserPrivacy(permissions, source, layout).then(() => {
                     sinon.assert.calledTwice(httpKafkaStub); // First one is temporary diagnostics
                     return httpKafkaStub.secondCall.args[2];
@@ -588,9 +589,9 @@ describe('UserPrivacyManagerTest', () => {
             });
 
             it('should send selected layout with consent event', () => {
-                return sendEvent(undefined, GDPREventSource.USER, 'selected_layout').then((eventData) => {
+                return sendEvent(undefined, GDPREventSource.USER, ConsentPage.INTRO).then((eventData) => {
                     assert.isDefined(eventData);
-                    assert.equal(eventData.layout, 'selected_layout');
+                    assert.equal(eventData.layout, ConsentPage.INTRO);
                 });
             });
 
