@@ -62,6 +62,8 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     private _country: string | undefined;
     private _campaign: Campaign;
 
+    private _useCloseIconInsteadOfSkipIcon: boolean | undefined = false;
+
     constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
         super(parameters.platform, 'video-overlay', parameters.placement.muteVideo());
 
@@ -73,6 +75,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._campaign = parameters.campaign;
         this._showGDPRBanner = showGDPRBanner;
         this._showPrivacyDuringVideo = showPrivacyDuringVideo;
+        this._useCloseIconInsteadOfSkipIcon = parameters.placement.useCloseIconInsteadOfSkipIcon();
 
         this._templateData = {
             muted: parameters.placement.muteVideo()
@@ -157,7 +160,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
             this._chinaAdvertisementElement.style.display = 'block';
         }
 
-        if (CustomFeatures.isCloseIconSkipEnabled(this._gameId)) {
+        if (CustomFeatures.isCloseIconSkipEnabled(this._gameId) || this._useCloseIconInsteadOfSkipIcon) {
             this._skipButtonElement.classList.add('close-icon-skip');
         }
     }
