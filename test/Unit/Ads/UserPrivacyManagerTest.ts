@@ -444,6 +444,7 @@ describe('UserPrivacyManagerTest', () => {
                 'action': 'skip',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
+                'country': 'FF',
                 'gameId': testGameId
             }
         }, {
@@ -454,6 +455,7 @@ describe('UserPrivacyManagerTest', () => {
                 'action': 'consent',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
+                'country': 'FF',
                 'gameId': testGameId
             }
         }, {
@@ -464,6 +466,7 @@ describe('UserPrivacyManagerTest', () => {
                 'action': 'optout',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
+                'country': 'FF',
                 'gameId': testGameId
             }
         }, {
@@ -475,6 +478,7 @@ describe('UserPrivacyManagerTest', () => {
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'gameId': testGameId,
+                'country': 'FF',
                 'source': 'metadata'
             }
         }, {
@@ -486,6 +490,7 @@ describe('UserPrivacyManagerTest', () => {
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'gameId': testGameId,
+                'country': 'FF',
                 'source': 'user'
             }
         }, {
@@ -496,6 +501,7 @@ describe('UserPrivacyManagerTest', () => {
                 'action': 'optin',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
+                'country': 'FF',
                 'gameId': testGameId
             }
         }];
@@ -540,6 +546,7 @@ describe('UserPrivacyManagerTest', () => {
         beforeEach(() => {
             gamePrivacy.isEnabled.returns(true);
             gamePrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
+            (<sinon.SinonStub>coreConfig.getCountry).returns('FI');
         });
 
         describe('when updating user privacy', () => {
@@ -566,6 +573,7 @@ describe('UserPrivacyManagerTest', () => {
                     assert.equal(eventData.projectId, testUnityProjectId);
                     assert.equal(eventData.platform, 'android');
                     assert.equal(eventData.gameId, testGameId);
+                    assert.equal(eventData.country, 'FI');
                     assert.equal(eventData.source, GDPREventSource.USER);
                 });
             });

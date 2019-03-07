@@ -77,6 +77,7 @@ export class UserPrivacyManager {
             'action': action,
             'projectId': this._coreConfig.getUnityProjectId(),
             'platform': Platform[this._platform].toLowerCase(),
+            'country': this._coreConfig.getCountry(),
             'gameId': this._clientInfo.getGameId()
         };
         if (source) {
@@ -160,6 +161,7 @@ export class UserPrivacyManager {
             action: GDPREventAction.CONSENT,
             projectId: this._coreConfig.getUnityProjectId(),
             platform: Platform[this._platform].toLowerCase(),
+            country: this._coreConfig.getCountry(),
             gameId: this._clientInfo.getGameId(),
             source: source,
             method: PrivacyMethod.UNITY_CONSENT,
