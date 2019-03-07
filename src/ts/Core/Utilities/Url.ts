@@ -140,8 +140,17 @@ export class Url {
         return false;
     }
 
+    public static isValidUrlCharacters(url: string): boolean {
+        if (url && url.match(/^([\!\$\#\&-\;\=\?-\[\]_a-z~{}|\\^`]|[\u00A1-\uFFFF]|%[0-9a-fA-F]{2})+$/i)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static isValidProtocol(url: string): boolean {
-        if (url && (url.match(/^http:./i) || url.match(/^https:./i))) {
+        // itms-apps:// is the protocol for linking to an app store
+        if (url && (url.match(/^http:./i) || url.match(/^https:./i) || url.match(/^itms-apps:/i))) {
             return true;
         } else {
             return false;
