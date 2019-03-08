@@ -57,6 +57,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { IStoreApi } from 'Store/IStore';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -114,6 +115,7 @@ describe('CampaignRefreshManager', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let store: IStoreApi;
     let request: RequestManager;
     let storageBridge: StorageBridge;
     let assetManager: AssetManager;
@@ -144,6 +146,7 @@ describe('CampaignRefreshManager', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        store = TestFixtures.getStoreApi(nativeBridge);
         privacy = sinon.createStubInstance(AbstractPrivacy);
 
         storageBridge = new StorageBridge(core);
@@ -188,6 +191,7 @@ describe('CampaignRefreshManager', () => {
             platform,
             core,
             ads,
+            store,
             forceOrientation: Orientation.NONE,
             focusManager: focusManager,
             container: container,

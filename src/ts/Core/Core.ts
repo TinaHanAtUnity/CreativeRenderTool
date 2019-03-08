@@ -47,6 +47,7 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { Store } from 'Store/Store';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
 
@@ -75,6 +76,7 @@ export class Core implements ICore {
     public Analytics: Analytics;
     public Ads: Ads;
     public Purchasing: Purchasing;
+    public Store: Store;
 
     private _initialized = false;
     private _initializedAt: number;
@@ -218,9 +220,11 @@ export class Core implements ICore {
             this.Analytics = new Analytics(this);
             return Promise.all([configJson, this.Analytics.initialize()]);
         }).then(([configJson, gameSessionId]: [unknown, number]) => {
-            this.Ads = new Ads(configJson, this);
+            this.Store = new Store(this);
+            this.Ads = new Ads(configJson, this, this.Store);
             this.Ads.SessionManager.setGameSessionId(gameSessionId);
             this.Purchasing = new Purchasing(this);
+
             return this.Ads.initialize(jaegerInitSpan);
         }).then(() => {
             this.JaegerManager.stop(jaegerInitSpan);

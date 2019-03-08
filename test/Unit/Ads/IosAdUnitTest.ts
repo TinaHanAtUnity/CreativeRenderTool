@@ -30,6 +30,7 @@ import * as sinon from 'sinon';
 import { TestAdUnit } from 'TestHelpers/TestAdUnit';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { IStoreApi } from 'Store/IStore';
 
 describe('IosAdUnitTest', () => {
     let platform: Platform;
@@ -37,6 +38,7 @@ describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let store: IStoreApi;
     let container: ViewController;
     let testAdUnit: TestAdUnit;
     let focusManager: FocusManager;
@@ -56,6 +58,7 @@ describe('IosAdUnitTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        store = TestFixtures.getStoreApi(nativeBridge);
         const storageBridge = new StorageBridge(core);
         const clientInfo = TestFixtures.getClientInfo();
         focusManager = new FocusManager(platform, core);
@@ -92,6 +95,7 @@ describe('IosAdUnitTest', () => {
             platform,
             core,
             ads,
+            store,
             forceOrientation: Orientation.NONE,
             focusManager: focusManager,
             container: container,

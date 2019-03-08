@@ -8,7 +8,6 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -18,9 +17,8 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Observable0 } from 'Core/Utilities/Observable';
-import { IARApi } from 'AR/AR';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { IStoreApi } from 'Store/IStore';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -35,6 +33,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     platform: Platform;
     core: ICoreApi;
     ads: IAdsApi;
+    store: IStoreApi;
     coreConfig: CoreConfiguration;
     adsConfig: AdsConfiguration;
     request: RequestManager;
@@ -78,6 +77,7 @@ export abstract class AbstractAdUnit implements IAdUnit {
     protected readonly _platform: Platform;
     protected readonly _core: ICoreApi;
     protected readonly _ads: IAdsApi;
+    protected readonly _store: IStoreApi;
 
     private _showing: boolean;
     private _finishState: FinishState;
@@ -87,6 +87,7 @@ export abstract class AbstractAdUnit implements IAdUnit {
         this._platform = parameters.platform;
         this._core = parameters.core;
         this._ads = parameters.ads;
+        this._store = parameters.store;
         this._forceOrientation = parameters.forceOrientation;
         this._container = parameters.container;
         this._showing = false;

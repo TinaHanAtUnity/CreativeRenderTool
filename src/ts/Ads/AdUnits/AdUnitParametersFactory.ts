@@ -32,6 +32,7 @@ import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { VideoOverlayWithInstallInRewardedVideos } from 'Ads/Views/VideoOverlayWithInstallInRewardedVideo';
+import { IStoreApi } from 'Store/IStore';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -47,6 +48,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     private _platform: Platform;
     private _core: ICoreApi;
     private _ads: IAdsApi;
+    private _store: IStoreApi;
     private _focusManager: FocusManager;
     private _container: AdUnitContainer;
     private _deviceInfo: DeviceInfo;
@@ -68,6 +70,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         this._platform = core.NativeBridge.getPlatform();
         this._core = core.Api;
         this._ads = ads.Api;
+        this._store = core.Store.Api;
         this._focusManager = core.FocusManager;
         this._container = ads.Container;
         this._deviceInfo = core.DeviceInfo;
@@ -100,6 +103,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
             platform: this._platform,
             core: this._core,
             ads: this._ads,
+            store: this._store,
             forceOrientation: this._orientation,
             focusManager: this._focusManager,
             container: this._container,
