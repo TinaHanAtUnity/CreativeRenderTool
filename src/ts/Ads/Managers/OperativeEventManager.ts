@@ -26,7 +26,6 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
-import { randomBytes } from 'crypto';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: RequestManager;
