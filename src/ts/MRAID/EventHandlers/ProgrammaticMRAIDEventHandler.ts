@@ -67,6 +67,12 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
     }
 
     protected sendTrackingEvents() {
+        const clickUrl = this._campaign.getClickUrl();
+        if (clickUrl) {
+            const sessionId = this._campaign.getSession().getId();
+            this._thirdPartyEventManager.sendWithGet(`mraid click`, sessionId, clickUrl, this._campaign.getUseWebViewUserAgentForTracking());
+        }
+
         this._adUnit.sendClick();
     }
 
