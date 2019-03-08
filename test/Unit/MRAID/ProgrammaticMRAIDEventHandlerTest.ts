@@ -252,13 +252,6 @@ import { IStoreApi } from 'Store/IStore';
                             });
                         });
 
-                        it('should send a click with session manager', () => {
-                            sinon.stub(core.Android!.Intent, 'launch').resolves();
-                            programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
-                                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, asset: programmaticMraidAdUnitParams.campaign.getResourceUrl() });
-                            });
-                        });
-
                         it('should send a view with session manager', () => {
                             sinon.stub(core.Android!.Intent, 'launch').resolves();
                             programmaticMraidEventHandler.onMraidClick('http://example.net').then(() => {
