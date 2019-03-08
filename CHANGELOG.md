@@ -1,4 +1,4 @@
-# Merged
+# Fri Mar  8 03:59:13 UTC 2019
 
 * Don't send operative clicks for Programmatic MRAID [#8567](https://github.com/Applifier/unity-ads-webview/pull/8567)
 
