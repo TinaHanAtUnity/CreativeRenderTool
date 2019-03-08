@@ -26,6 +26,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IARApi } from 'AR/AR';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { IStoreApi } from 'Store/IStore';
 
 describe('PerformanceMRAIDEventHandlersTest', () => {
 
@@ -35,6 +36,7 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
     let container: AdUnitContainer;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let store: IStoreApi;
     let ar: IARApi;
     let mraidAdUnit: MRAIDAdUnit;
     let mraidView: MRAID;
@@ -61,6 +63,7 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
+            store = TestFixtures.getStoreApi(nativeBridge);
             ar = TestFixtures.getARApi(nativeBridge);
 
             sinon.spy(core.Android!.Intent, 'launch');
@@ -90,6 +93,7 @@ describe('PerformanceMRAIDEventHandlersTest', () => {
                 platform,
                 core,
                 ads,
+                store,
                 ar,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
