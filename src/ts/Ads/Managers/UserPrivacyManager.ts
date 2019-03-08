@@ -1,11 +1,12 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy,
+import {
+    GamePrivacy,
+    IAllPermissions,
+    IGranularPermissions,
     IPermissions,
     isUnityConsentPermissions,
     PrivacyMethod,
-    UserPrivacy,
-    IAllPermissions,
-    IGranularPermissions
+    UserPrivacy
 } from 'Ads/Models/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -267,6 +268,17 @@ export class UserPrivacyManager {
     private updateConfigurationWithConsent(consent: boolean) {
         this._adsConfig.setOptOutEnabled(!consent);
         this._adsConfig.setOptOutRecorded(true);
+
+        const gamePrivacy = this._adsConfig.getGamePrivacy();
+        if (gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT) {
+            gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
+            const userPrivacy = this._adsConfig.getUserPrivacy();
+            userPrivacy.update({
+                method: gamePrivacy.getMethod(),
+                version: gamePrivacy.getVersion(),
+                permissions: { profiling: consent }
+            });
+        }
     }
 
     private onStorageSet(eventType: string, data: UserPrivacyStorageData) {
