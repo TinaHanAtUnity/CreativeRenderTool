@@ -1,3 +1,7 @@
+# Merged
+
+* Don't send operative clicks for Programmatic MRAID [#8567](https://github.com/Applifier/unity-ads-webview/pull/8567)
+
 # Thu Mar  7 18:32:20 UTC 2019
 
 * Initial support for IAP purchase detection [#8477](https://github.com/Applifier/unity-ads-webview/pull/8477)
