@@ -320,7 +320,8 @@ export class OperativeEventManager {
                 const diagnosticData = {
                     url: url,
                     data: data,
-                    response: response
+                    response: response,
+                    campaign: this._campaign.getDTO()
                 };
                 SessionDiagnostics.trigger('operative_event_manager_failed_post', diagnosticData, this._campaign.getSession());
             }
