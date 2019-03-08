@@ -361,6 +361,32 @@ describe('UserPrivacyManagerTest', () => {
                 });
             });
         });
+
+        describe('when game uses UNITY_CONSENT', () => {
+            beforeEach(() => {
+                isGDPREnabled = true;
+                gamePrivacy.isEnabled.returns(true);
+                gamePrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
+            });
+
+            it('should not override the configuration', () => {
+                consent = undefined;
+                return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                    assert.fail('should throw');
+                }).catch(() => {
+                    sinon.assert.notCalled(gamePrivacy.setMethod);
+                });
+            });
+
+            it('should override the configuration if consent is given', () => {
+                consent = false;
+                return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                    sinon.assert.calledWith(gamePrivacy.setMethod, PrivacyMethod.DEVELOPER_CONSENT);
+                }).catch(() => {
+                    assert.fail('should not throw');
+                });
+            });
+        });
     });
 
     describe('Fetch personal information', () => {
