@@ -1,4 +1,4 @@
-# Pending
+# Sat Mar  9 00:15:01 UTC 2019
 
 * Adding session diagnostic for 10% of operative events that fail [#8591](https://github.com/Applifier/unity-ads-webview/pull/8591)
 * Re-enable setting monetization flag when Monetization module is initialized [#8590](https://github.com/Applifier/unity-ads-webview/pull/8590)
