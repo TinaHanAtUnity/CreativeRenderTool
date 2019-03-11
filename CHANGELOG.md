@@ -1,6 +1,7 @@
 # Merged
 
 * VastParserStrict allow 'itms-apps://' protocol in urls [#8545](https://github.com/Applifier/unity-ads-webview/pull/8545)
+* Fix styles for GDPR banner in video overlay [#8615](https://github.com/Applifier/unity-ads-webview/pull/8615)
 
 # Sat Mar  9 00:15:01 UTC 2019
 
