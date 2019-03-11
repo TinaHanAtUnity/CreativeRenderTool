@@ -1,3 +1,7 @@
+# Merged
+
+* VastParserStrict allow 'itms-apps://' protocol in urls [#8545](https://github.com/Applifier/unity-ads-webview/pull/8545)
+
 # Sat Mar  9 00:15:01 UTC 2019
 
 * Adding session diagnostic for 10% of operative events that fail [#8591](https://github.com/Applifier/unity-ads-webview/pull/8591)

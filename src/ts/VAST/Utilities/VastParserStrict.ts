@@ -417,7 +417,7 @@ export class VastParserStrict {
         }
         // decode http%3A%2F%2F && https%3A%2F%2F then re-encode url
         url = Url.encodeUrlWithQueryParams(Url.decodeProtocol(url));
-        if (Url.isValid(url)) {
+        if (Url.isValidUrlCharacters(url) && Url.isValidProtocol(url)) {
             return url;
         } else {
             return undefined;
