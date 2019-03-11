@@ -60,7 +60,7 @@ export class AppSheetApi extends NativeApi {
     public readonly onError = new Observable2<string, IAppSheetOptions>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AppSheet', ApiPackage.CORE, EventCategory.APPSHEET);
+        super(nativeBridge, 'AppSheet', ApiPackage.STORE, EventCategory.APPSHEET);
     }
 
     public canOpen(): Promise<boolean> {
