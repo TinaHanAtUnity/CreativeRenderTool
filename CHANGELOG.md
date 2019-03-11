@@ -4,6 +4,7 @@
 * Fix styles for GDPR banner in video overlay [#8615](https://github.com/Applifier/unity-ads-webview/pull/8615)
 * Improved server start stop [#8476](https://github.com/Applifier/unity-ads-webview/pull/8476)
 * VastParserStrict allow StaticResource with "type" attribute to parse [#8544](https://github.com/Applifier/unity-ads-webview/pull/8544)
+* Expose js console and errors + hook xmlhttprequest.open [#8298](https://github.com/Applifier/unity-ads-webview/pull/8298)
 
 # Sat Mar  9 00:15:01 UTC 2019
 
