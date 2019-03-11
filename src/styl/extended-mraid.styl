@@ -7,7 +7,7 @@ $permissions-max-width = 300px;
 $permissions-gray = #a6a6a6;
 $camera-permission-panel-color = #fafafa;
 $camera-permission-panel-height = 100vw;
-$ar-available-button-color = #0d2124;
+$ar-available-button-color = #0c292feb;
 
 #extended-mraid {
 
@@ -259,7 +259,9 @@ $ar-available-button-color = #0d2124;
     }
   }
 
-  @-webkit-keyframes bounceInRight {
+
+
+  @keyframes bounceInRight {
     from,
     60%,
     75%,
@@ -297,24 +299,41 @@ $ar-available-button-color = #0d2124;
     }
   }
 
-  .ar-available-button {
-    position: absolute;
-    top: 70vh;
-    right: 0;
-    z-index: 105;
-    display: none;
-    padding: 1.5em 1.5em 1.5em 1.5em;
-    min-width: 30vw;
-    border-radius: 1em 0 0 1em;
-    background: $ar-available-button-color;
-    color: white;
-
-    -webkit-animation: bounceInRight 1s;
-    animation: bounceInRight 1s;
+  .ar-available-button-wrapper {
+    overflow: hidden;
   }
 
-  .ar-available-button-wrapper {
-    overflow:hidden;
+  .ar-available-button {
+      position: absolute;
+      top: 70vh;
+      right: 0;
+      z-index: 99;
+      display: none;
+      padding: 0 1.7em 0 1.3em;
+      min-width: 30vw;
+      border-radius: .7em 0 0 .7em;
+      background: $ar-available-button-color;
+      color: $white;
+      line-height: 3em;
+      animation: bounceInRight 1s;
+  }
+
+  .ar-available-button p {
+    display: inline;
+    vertical-align: middle;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .icon-ar-camera {
+      display: inline-block;
+      margin-right: .6em;
+      height: auto;
+      vertical-align: middle;
+      font-weight: normal;
+      font-style: normal;
+      font-size: 1.5em;
+      -webkit-font-smoothing: antialiased;
   }
 
   .camera-permission-panel {
