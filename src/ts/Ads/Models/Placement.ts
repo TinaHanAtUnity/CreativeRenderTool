@@ -19,6 +19,7 @@ export interface IRawPlacement {
     allowSkip: boolean;
     skipEndCardOnClose: boolean;
     disableVideoControlsFade: boolean;
+    useCloseIconInsteadOfSkipIcon: boolean;
     disableBackButton: boolean;
     muteVideo: boolean;
     skipInSeconds: number;
@@ -43,6 +44,7 @@ export interface IPlacement {
 
     skipEndCardOnClose: boolean | undefined;
     disableVideoControlsFade: boolean | undefined;
+    useCloseIconInsteadOfSkipIcon: boolean | undefined;
 
     adTypes: string[] | undefined;
     realtimeData: string | undefined;
@@ -70,6 +72,7 @@ export class Placement extends Model<IPlacement> {
             muteVideo: ['boolean'],
             skipEndCardOnClose: ['boolean', 'undefined'],
             disableVideoControlsFade: ['boolean', 'undefined'],
+            useCloseIconInsteadOfSkipIcon: ['boolean', 'undefined'],
             adTypes: ['array', 'undefined'],
             realtimeData: ['string', 'undefined'],
             state: ['number'],
@@ -100,6 +103,8 @@ export class Placement extends Model<IPlacement> {
         this.set('skipEndCardOnClose', data.skipEndCardOnClose);
 
         this.set('disableVideoControlsFade', data.disableVideoControlsFade);
+
+        this.set('useCloseIconInsteadOfSkipIcon', data.useCloseIconInsteadOfSkipIcon);
 
         this.set('adTypes', data.adTypes);
 
@@ -143,6 +148,10 @@ export class Placement extends Model<IPlacement> {
 
     public disableVideoControlsFade(): boolean | undefined {
         return this.get('disableVideoControlsFade');
+    }
+
+    public useCloseIconInsteadOfSkipIcon(): boolean | undefined {
+        return this.get('useCloseIconInsteadOfSkipIcon');
     }
 
     public getAdTypes(): string[] | undefined {
@@ -232,6 +241,7 @@ export class Placement extends Model<IPlacement> {
             'muteVideo': this.muteVideo(),
             'skipEndCardOnClose': this.skipEndCardOnClose(),
             'disableVideoControlsFade': this.disableVideoControlsFade(),
+            'useCloseIconInsteadOfSkipIcon': this.useCloseIconInsteadOfSkipIcon(),
             'adTypes': this.getAdTypes(),
             'state': PlacementState[this.getState()].toLowerCase()
         };

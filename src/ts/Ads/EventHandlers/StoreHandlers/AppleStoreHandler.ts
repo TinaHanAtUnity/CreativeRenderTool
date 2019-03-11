@@ -45,7 +45,7 @@ export class AppleStoreHandler extends StoreHandler {
         if (isAppSheetBroken || parameters.bypassAppSheet) {
             this.openURL(appStoreUrl);
         } else {
-            this._ads.iOS!.AppSheet.canOpen().then(canOpenAppSheet => {
+            this._store.iOS!.AppSheet.canOpen().then(canOpenAppSheet => {
                 if (canOpenAppSheet) {
                     if (!parameters.appStoreId) {
                         Diagnostics.trigger('no_appstore_id', {
@@ -56,8 +56,8 @@ export class AppleStoreHandler extends StoreHandler {
                     const options = {
                         id: parseInt(parameters.appStoreId, 10)
                     };
-                    this._ads.iOS!.AppSheet.present(options).then(() => {
-                        this._ads.iOS!.AppSheet.destroy(options);
+                    this._store.iOS!.AppSheet.present(options).then(() => {
+                        this._store.iOS!.AppSheet.destroy(options);
                     }).catch(([error]) => {
                         if (error === 'APPSHEET_NOT_FOUND') {
                             this.openURL(appStoreUrl);
