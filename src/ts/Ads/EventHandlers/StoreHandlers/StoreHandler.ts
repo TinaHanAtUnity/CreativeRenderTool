@@ -21,6 +21,7 @@ import { ICoreApi } from 'Core/ICore';
 import { IAdsApi } from 'Ads/IAds';
 import { DownloadManager } from 'China/Managers/DownloadManager';
 import { DeviceIdManager } from 'China/Managers/DeviceIdManager';
+import { IStoreApi } from 'Store/IStore';
 
 export interface IStoreHandler {
     onDownload(parameters: IStoreHandlerDownloadParameters): void;
@@ -30,6 +31,7 @@ export interface IStoreHandlerParameters {
     platform: Platform;
     core: ICoreApi;
     ads: IAdsApi;
+    store: IStoreApi;
     thirdPartyEventManager: ThirdPartyEventManager;
     operativeEventManager: OperativeEventManager;
     deviceInfo?: DeviceInfo;
@@ -61,6 +63,7 @@ export abstract class StoreHandler implements IStoreHandler {
 
     protected _core: ICoreApi;
     protected _ads: IAdsApi;
+    protected _store: IStoreApi;
     protected _placement: Placement;
     protected _campaign: Campaign;
     protected _operativeEventManager: OperativeEventManager;
@@ -71,6 +74,7 @@ export abstract class StoreHandler implements IStoreHandler {
     protected constructor(parameters: IStoreHandlerParameters) {
         this._core = parameters.core;
         this._ads = parameters.ads;
+        this._store = parameters.store;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._operativeEventManager = parameters.operativeEventManager;
         this._placement = parameters.placement;

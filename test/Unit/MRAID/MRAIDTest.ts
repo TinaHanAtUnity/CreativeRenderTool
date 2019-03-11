@@ -46,6 +46,7 @@ describe('MRAID', () => {
             useDeviceOrientationForVideo: false,
             skipEndCardOnClose: false,
             disableVideoControlsFade: false,
+            useCloseIconInsteadOfSkipIcon: false,
             adTypes: [],
             refreshDelay: 1000,
             muteVideo: false

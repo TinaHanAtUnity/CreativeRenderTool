@@ -40,6 +40,7 @@ import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScree
 import EventTestVast from 'xml/EventTestVast.xml';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import { IStoreApi } from 'Store/IStore';
 
 describe('VastVideoEventHandler tests', () => {
     let platform: Platform;
@@ -47,6 +48,7 @@ describe('VastVideoEventHandler tests', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let store: IStoreApi;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
     let campaign: VastCampaign;
@@ -81,6 +83,7 @@ describe('VastVideoEventHandler tests', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        store = TestFixtures.getStoreApi(nativeBridge);
 
         storageBridge = new StorageBridge(core);
         focusManager = new FocusManager(platform, core);
@@ -102,6 +105,7 @@ describe('VastVideoEventHandler tests', () => {
             useDeviceOrientationForVideo: false,
             skipEndCardOnClose: false,
             disableVideoControlsFade: false,
+            useCloseIconInsteadOfSkipIcon: false,
             adTypes: [],
             refreshDelay: 1000,
             muteVideo: false
@@ -150,6 +154,7 @@ describe('VastVideoEventHandler tests', () => {
             platform,
             core,
             ads,
+            store,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
