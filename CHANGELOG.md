@@ -1,3 +1,10 @@
+# Merged
+
+* VastParserStrict allow 'itms-apps://' protocol in urls [#8545](https://github.com/Applifier/unity-ads-webview/pull/8545)
+* Fix styles for GDPR banner in video overlay [#8615](https://github.com/Applifier/unity-ads-webview/pull/8615)
+* Improved server start stop [#8476](https://github.com/Applifier/unity-ads-webview/pull/8476)
+* VastParserStrict allow StaticResource with "type" attribute to parse [#8544](https://github.com/Applifier/unity-ads-webview/pull/8544)
+
 # Sat Mar  9 00:15:01 UTC 2019
 
 * Adding session diagnostic for 10% of operative events that fail [#8591](https://github.com/Applifier/unity-ads-webview/pull/8591)
