@@ -3,7 +3,6 @@ import { IMRAIDViewHandler } from 'MRAID/Views/MRAIDView';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { WebViewTopCalculator } from 'Ads/Utilities/WebPlayer/WebViewTopCalculator';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
-import { CTAClickHandlingTest } from 'Core/Models/ABGroup';
 import { Url } from 'Core/Utilities/Url';
 
 export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements IMRAIDViewHandler {
@@ -18,7 +17,7 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
 
         this._mraidView.setCallButtonEnabled(false);
 
-        const redirectBreakers = CTAClickHandlingTest.isValid(this._abGroup) ? Url.getAppStoreUrlTemplates(this._platform) : [];
+        const redirectBreakers = Url.getAppStoreUrlTemplates(this._platform);
         const ctaClickedTime = Date.now();
         return this._request.followRedirectChain(url, this._campaign.getUseWebViewUserAgentForTracking(), redirectBreakers).then((storeUrl) => {
             if (this._jaegerSpan) {
@@ -65,6 +64,16 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
             this._mraidView.setCallButtonEnabled(true);
             this.sendTrackingEvents();
         });
+    }
+
+    protected sendTrackingEvents() {
+        const clickUrl = this._campaign.getClickUrl();
+        if (clickUrl) {
+            const sessionId = this._campaign.getSession().getId();
+            this._thirdPartyEventManager.sendWithGet(`mraid click`, sessionId, clickUrl, this._campaign.getUseWebViewUserAgentForTracking());
+        }
+
+        this._adUnit.sendClick();
     }
 
     private getTopViewHeight(width: number, height: number): number {

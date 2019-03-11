@@ -14,7 +14,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { toAbGroup, TimerlessBatchingTest } from 'Core/Models/ABGroup';
+import { toAbGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -47,9 +47,9 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { Store } from 'Store/Store';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
-import { UIWebViewBridge } from 'Core/Native/Bridge/UIWebViewBridge';
 
 export class Core implements ICore {
 
@@ -76,6 +76,7 @@ export class Core implements ICore {
     public Analytics: Analytics;
     public Ads: Ads;
     public Purchasing: Purchasing;
+    public Store: Store;
 
     private _initialized = false;
     private _initializedAt: number;
@@ -207,14 +208,6 @@ export class Core implements ICore {
         }).then(([[configJson, coreConfig]]) => {
             this.Config = coreConfig;
 
-            if(TimerlessBatchingTest.isValid(this.Config.getAbGroup())) {
-                this.NativeBridge.setAutoBatchEnabled(true);
-                this.NativeBridge.setTimerlessBatching(true);
-                if(this.NativeBridge.getPlatform() === Platform.IOS) {
-                    UIWebViewBridge.setAsync(true);
-                }
-            }
-
             HttpKafka.setConfiguration(this.Config);
             this.JaegerManager.setJaegerTracingEnabled(this.Config.isJaegerTracingEnabled());
 
@@ -227,16 +220,14 @@ export class Core implements ICore {
             this.Analytics = new Analytics(this);
             return Promise.all([configJson, this.Analytics.initialize()]);
         }).then(([configJson, gameSessionId]: [unknown, number]) => {
-            this.Ads = new Ads(configJson, this);
+            this.Store = new Store(this);
+            this.Ads = new Ads(configJson, this, this.Store);
             this.Ads.SessionManager.setGameSessionId(gameSessionId);
             this.Purchasing = new Purchasing(this);
+
             return this.Ads.initialize(jaegerInitSpan);
         }).then(() => {
             this.JaegerManager.stop(jaegerInitSpan);
-
-            if(this.NativeBridge.getPlatform() === Platform.ANDROID && !TimerlessBatchingTest.isValid(this.Config.getAbGroup())) {
-                this.NativeBridge.setAutoBatchEnabled(false);
-            }
         }).catch((error: { message: string; name: unknown }) => {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');

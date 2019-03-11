@@ -38,6 +38,7 @@ import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { IStoreHandlerParameters, StoreHandler } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandlerFactory';
+import { IStoreApi } from 'Store/IStore';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -46,6 +47,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let store: IStoreApi;
     let container: AdUnitContainer;
     let overlay: VideoOverlay;
     let endScreen: XPromoEndScreen;
@@ -79,6 +81,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
+            store = TestFixtures.getStoreApi(nativeBridge);
 
             storageBridge = new StorageBridge(core);
             campaign = TestFixtures.getXPromoCampaign();
@@ -147,6 +150,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 platform,
                 core,
                 ads,
+                store,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -174,6 +178,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 platform,
                 core,
                 ads,
+                store,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
                 deviceInfo: deviceInfo,
@@ -247,6 +252,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
+            store = TestFixtures.getStoreApi(nativeBridge);
 
             storageBridge = new StorageBridge(core);
 
@@ -312,6 +318,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 platform,
                 core,
                 ads,
+                store,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
@@ -339,6 +346,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 platform,
                 core,
                 ads,
+                store,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
                 deviceInfo: deviceInfo,

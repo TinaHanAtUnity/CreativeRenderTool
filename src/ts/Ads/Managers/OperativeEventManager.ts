@@ -25,6 +25,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: RequestManager;
@@ -314,7 +315,16 @@ export class OperativeEventManager {
             retryDelay: 10000,
             followRedirects: false,
             retryWithConnectionEvents: false
-        }).catch(() => {
+        }).catch((response) => {
+            if (Math.floor(Math.random() * 10) % 10 === 1) {
+                const diagnosticData = {
+                    url: url,
+                    data: data,
+                    response: response,
+                    campaign: this._campaign.getDTO()
+                };
+                SessionDiagnostics.trigger('operative_event_manager_failed_post', diagnosticData, this._campaign.getSession());
+            }
             new FailedOperativeEventManager(this._core, sessionId, eventId).storeFailedEvent(this._storageBridge, {
                url: url,
                data: data
