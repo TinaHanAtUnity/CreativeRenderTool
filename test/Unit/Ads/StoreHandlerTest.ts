@@ -17,6 +17,7 @@ import { ICoreApi } from 'Core/ICore';
 import { IARApi } from 'AR/AR';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import { IStoreApi } from 'Store/IStore';
 
 [Platform.ANDROID].forEach(platform => {
     describe('StoreHandler', () => {
@@ -25,6 +26,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
         let ads: IAdsApi;
+        let store: IStoreApi;
         let ar: IARApi;
         let purchasing: IPurchasingApi;
         let focusManager: FocusManager;
@@ -38,6 +40,7 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
+            store = TestFixtures.getStoreApi(nativeBridge);
             ar = TestFixtures.getARApi(nativeBridge);
             purchasing = TestFixtures.getPurchasingApi(nativeBridge);
             focusManager = new FocusManager(platform, core);
@@ -54,8 +57,8 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
                 beforeEach(() => {
                     campaign = TestFixtures.getCampaign();
-                    adUnit = TestFixtures.getPerformanceAdUnit(platform, core, ads, ar, purchasing);
-                    storeHandler = TestFixtures.getStoreHandler(platform, core, ads, campaign, adUnit, thirdPartyEventManager, nativeBridge);
+                    adUnit = TestFixtures.getPerformanceAdUnit(platform, core, ads, store, ar, purchasing);
+                    storeHandler = TestFixtures.getStoreHandler(platform, core, ads, store, campaign, adUnit, thirdPartyEventManager, nativeBridge);
                     downloadParameters = TestFixtures.getStoreHandlerDownloadParameters(campaign);
                     return adUnit.show();
                 });
@@ -78,8 +81,8 @@ import { IPurchasingApi } from 'Purchasing/IPurchasing';
 
                 beforeEach(() => {
                     campaign = TestFixtures.getXPromoCampaign();
-                    xPromoAdUnit = TestFixtures.getXPromoAdUnit(platform, core, ads, ar, purchasing);
-                    storeHandler = TestFixtures.getStoreHandler(platform, core, ads, campaign, xPromoAdUnit, thirdPartyEventManager, nativeBridge);
+                    xPromoAdUnit = TestFixtures.getXPromoAdUnit(platform, core, ads, store, ar, purchasing);
+                    storeHandler = TestFixtures.getStoreHandler(platform, core, ads, store, campaign, xPromoAdUnit, thirdPartyEventManager, nativeBridge);
                     downloadParameters = TestFixtures.getStoreHandlerDownloadParameters(campaign);
                     return xPromoAdUnit.show();
                 });

@@ -61,6 +61,7 @@ describe('MraidAdUnit', () => {
 
         const userPrivacyManager = sinon.createStubInstance(UserPrivacyManager);
         const core = TestFixtures.getCoreApi(nativeBridge);
+        const store = TestFixtures.getStoreApi(nativeBridge);
         const wakeUpManager = new WakeUpManager(core);
         const request = new RequestManager(platform, core, wakeUpManager);
         const storageBridge = new StorageBridge(core);
@@ -91,6 +92,7 @@ describe('MraidAdUnit', () => {
             platform: platform,
             core: core,
             ads: ads,
+            store: store,
             ar: TestFixtures.getARApi(nativeBridge),
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: new FocusManager(platform, core),
