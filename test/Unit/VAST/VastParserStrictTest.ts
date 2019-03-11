@@ -16,7 +16,7 @@ import VastCompanionAdWithoutClickThrough from 'xml/VastCompanionAdWithoutClickT
 import VastCompanionAdWithoutLandscapeImageXml from 'xml/VastCompanionAdWithoutLandscapeImage.xml';
 import VastCompanionAdWithoutPortraitImageXml from 'xml/VastCompanionAdWithoutPortraitImage.xml';
 import VastCompanionAdWithRelativeUrlsXml from 'xml/VastCompanionAdWithRelativeUrls.xml';
-import VastCompanionAdWithItmsAppsClickThroughXml from 'xml/VastCompanionAdWithItms-AppsClickThrough.xml';
+import VastStaticResourceWithTypeInsteadOfCreativeTypeXml from 'xml/VastStaticResourceWithTypeInsteadOfCreativeType.xml';
 
 import VastRaw from 'xml/VastRaw.xml';
 import VastWithSpaces from 'xml/VastWithSpaces.xml';
@@ -495,8 +495,8 @@ describe('VastParserStrict', () => {
                                 inputVast: WrappedVast
                             },
                             {
-                                message: 'Should successfully parse Vast xml with "itms-apps://" protocol click through url',
-                                inputVast: VastCompanionAdWithItmsAppsClickThroughXml
+                                message: 'Should successfully parse Vast StaticResource with "type" attribute instead of "CreativeType"',
+                                inputVast: VastStaticResourceWithTypeInsteadOfCreativeTypeXml
                             }
                         ];
                     tests.forEach((test) => {
