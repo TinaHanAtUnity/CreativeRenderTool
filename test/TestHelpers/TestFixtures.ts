@@ -902,7 +902,8 @@ export class TestFixtures {
             ResolveManager: new ResolveManager(api),
             MetaDataManager: new MetaDataManager(api),
             StorageBridge: new StorageBridge(api),
-            ClientInfo: this.getClientInfo(platform)
+            ClientInfo: this.getClientInfo(platform),
+            Config: this.getCoreConfiguration()
         };
         if (platform === Platform.ANDROID) {
             core.DeviceInfo = new AndroidDeviceInfo(api);
