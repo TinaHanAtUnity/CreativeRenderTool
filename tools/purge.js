@@ -286,6 +286,8 @@ let purgeAliBabaCloud = (urlRoot) => {
 let urlRoot = '/webview/' + branch;
 if(branch === '2.0.6') {
     urlRoot = '/webview/master';
+} else if(branch === '3.0.1') {
+    urlRoot = '/webview/3.0.1-rc2';
 }
 
 let purgeList = [
@@ -298,6 +300,10 @@ if(branch === '2.0.6') {
     purgeList.push(purgeAkamai('/webview/2.0.6'));
     purgeList.push(purgeHighwinds('/webview/2.0.6'));
     purgeList.push(purgeAliBabaCloud('/webview/2.0.6'));
+} else if(branch === '3.0.1') {
+    purgeList.push(purgeAkamai('/webview/3.0.1'));
+    purgeList.push(purgeHighwinds('/webview/3.0.1'));
+    purgeList.push(purgeAliBabaCloud('/webview/3.0.1'));
 }
 
 Promise.all(purgeList).then(() => {

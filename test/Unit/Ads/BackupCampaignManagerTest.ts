@@ -138,6 +138,24 @@ describe('BackupCampaignManagerTest', () => {
         assert.isTrue(storageBridge.isEmpty(), 'campaign data was queued to StorageBridge when test mode is active');
     });
 
+    it('should not store campaign data when manager is disabled', () => {
+        const platform = Platform.ANDROID;
+        const backend = TestFixtures.getBackend(platform);
+        const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        const core = TestFixtures.getCoreApi(nativeBridge);
+        const storageBridge: StorageBridge = new StorageBridge(core, 1);
+
+        const configuration = TestFixtures.getCoreConfiguration();
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, configuration, TestFixtures.getAndroidDeviceInfo(core));
+        const campaign: PerformanceCampaign = TestFixtures.getCampaign();
+
+        backupCampaignManager.setEnabled(false);
+
+        backupCampaignManager.storeCampaign(campaign);
+
+        assert.isTrue(storageBridge.isEmpty(), 'campaign data was queued to StorageBridge when manager disabled');
+    });
+
     it('should not store campaign data for pre-4.4 Android device', () => {
         const platform = Platform.ANDROID;
         const backend = TestFixtures.getBackend(platform);
@@ -167,6 +185,22 @@ describe('BackupCampaignManagerTest', () => {
 
         return backupCampaignManager.loadCampaign(TestFixtures.getPlacement()).then(campaign => {
             assert.isUndefined(campaign, 'campaign was loaded when test mode is active');
+        });
+    });
+
+    it('should not load campaigns when manager disabled', () => {
+        const configuration = TestFixtures.getCoreConfiguration();
+        const platform = Platform.ANDROID;
+        const backend = TestFixtures.getBackend(platform);
+        const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
+        const core = TestFixtures.getCoreApi(nativeBridge);
+        const storageBridge: StorageBridge = new StorageBridge(core, 1);
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(platform, core, storageBridge, configuration, TestFixtures.getAndroidDeviceInfo(core));
+
+        backupCampaignManager.setEnabled(false);
+
+        return backupCampaignManager.loadCampaign(TestFixtures.getPlacement()).then(campaign => {
+            assert.isUndefined(campaign, 'campaign was loaded when manager disabled');
         });
     });
 

@@ -33,6 +33,7 @@ import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 import { IARApi } from 'AR/AR';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
+import { IStoreApi } from 'Store/IStore';
 
 describe('VPAIDAdUnit', () => {
     let platform: Platform;
@@ -40,6 +41,7 @@ describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let store: IStoreApi;
     let ar: IARApi;
     let purchasing: IPurchasingApi;
     let webPlayerContainer: WebPlayerContainer;
@@ -52,6 +54,7 @@ describe('VPAIDAdUnit', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        store = TestFixtures.getStoreApi(nativeBridge);
         ar = TestFixtures.getARApi(nativeBridge);
         purchasing = TestFixtures.getPurchasingApi(nativeBridge);
 
@@ -64,6 +67,7 @@ describe('VPAIDAdUnit', () => {
             platform,
             core,
             ads,
+            store,
             webPlayerContainer,
             campaign: sinon.createStubInstance(VPAIDCampaign),
             closer: sinon.createStubInstance(Closer),

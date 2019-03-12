@@ -25,7 +25,6 @@ import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';
 import { AndroidAdUnitApi } from 'Ads/Native/Android/AdUnit';
 import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
 import { IosAdUnitApi } from 'Ads/Native/iOS/AdUnit';
-import { AppSheetApi } from 'Ads/Native/iOS/AppSheet';
 import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
 import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
@@ -78,6 +77,7 @@ import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { China } from 'China/China';
+import { IStore } from 'Store/IStore';
 
 export class Ads implements IAds {
 
@@ -108,15 +108,17 @@ export class Ads implements IAds {
     private _wasRealtimePlacement: boolean = false;
 
     private _core: ICore;
+    private _store: IStore;
 
     public Banners: Banners;
     public Monetization: Monetization;
     public AR: AR;
     public China: China;
 
-    constructor(config: unknown, core: ICore) {
+    constructor(config: unknown, core: ICore, store: IStore) {
         this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config, core.ClientInfo);
         this._core = core;
+        this._store = store;
 
         const platform = core.NativeBridge.getPlatform();
         this.Api = {
@@ -130,7 +132,6 @@ export class Ads implements IAds {
                 VideoPlayer: new AndroidVideoPlayerApi(core.NativeBridge)
             } : undefined,
             iOS: platform === Platform.IOS ? {
-                AppSheet: new AppSheetApi(core.NativeBridge),
                 AdUnit: new IosAdUnitApi(core.NativeBridge),
                 VideoPlayer: new IosVideoPlayerApi(core.NativeBridge)
             } : undefined
@@ -340,6 +341,10 @@ export class Ads implements IAds {
             campaign.setTrackingUrls(trackingUrls);
         }
 
+        // First ad request within a game session can be made using recorded privacy information.
+        // If game method has changed since, it should be reset before e.g. showing consent dialog
+        this.resetOutdatedUserPrivacy();
+
         if (placement.getRealtimeData() && !this.isConsentShowRequired()) {
             this._core.Api.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
             const start = Date.now();
@@ -375,6 +380,16 @@ export class Ads implements IAds {
             this.showConsentIfNeeded(options).then(() => {
                 this.showAd(placement, campaign, options);
             });
+        }
+    }
+
+    private resetOutdatedUserPrivacy() {
+        const gamePrivacy = this.Config.getGamePrivacy();
+        const userPrivacy = this.Config.getUserPrivacy();
+        const gdprApplies = gamePrivacy.getMethod() !== PrivacyMethod.DEFAULT;
+        const methodHasChanged = userPrivacy.getMethod() !== gamePrivacy.getMethod();
+        if (gdprApplies && methodHasChanged) {
+            userPrivacy.clear();
         }
     }
 
@@ -440,17 +455,17 @@ export class Ads implements IAds {
                     const appSheetOptions = {
                         id: parseInt(campaign.getAppStoreId(), 10)
                     };
-                    this.Api.iOS!.AppSheet.prepare(appSheetOptions).then(() => {
-                        const onCloseObserver = this.Api.iOS!.AppSheet.onClose.subscribe(() => {
-                            this.Api.iOS!.AppSheet.prepare(appSheetOptions);
+                    this._store.Api.iOS!.AppSheet.prepare(appSheetOptions).then(() => {
+                        const onCloseObserver = this._store.Api.iOS!.AppSheet.onClose.subscribe(() => {
+                            this._store.Api.iOS!.AppSheet.prepare(appSheetOptions);
                         });
                         this._currentAdUnit.onClose.subscribe(() => {
-                            this.Api.iOS!.AppSheet.onClose.unsubscribe(onCloseObserver);
+                            this._store.Api.iOS!.AppSheet.onClose.unsubscribe(onCloseObserver);
                             if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._core.ClientInfo.getGameId())) {
                                 // app sheet is not closed properly if the user opens or downloads the game. Reset the app sheet.
-                                this.Api.iOS!.AppSheet.destroy();
+                                this._store.Api.iOS!.AppSheet.destroy();
                             } else {
-                                this.Api.iOS!.AppSheet.destroy(appSheetOptions);
+                                this._store.Api.iOS!.AppSheet.destroy(appSheetOptions);
                             }
                         });
                     });
@@ -507,7 +522,7 @@ export class Ads implements IAds {
 
         if(TestEnvironment.get('campaignId')) {
             CampaignManager.setCampaignId(TestEnvironment.get('campaignId'));
-            this.BackupCampaignManager.deleteBackupCampaigns();
+            this.BackupCampaignManager.setEnabled(false);
         }
 
         if(TestEnvironment.get('sessionId')) {

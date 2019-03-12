@@ -11,7 +11,7 @@ import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';
 import { AndroidAdUnitApi } from 'Ads/Native/Android/AdUnit';
 import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
 import { IosAdUnitApi } from 'Ads/Native/iOS/AdUnit';
-import { AppSheetApi } from 'Ads/Native/iOS/AppSheet';
+import { AppSheetApi } from 'Store/Native/iOS/AppSheet';
 import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
 import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
@@ -159,6 +159,9 @@ import { ChinaAndroidDeviceInfoApi } from 'China/Native/Android/DeviceInfo';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import OnProgrammaticBannerCampaign from 'json/OnProgrammaticBannerCampaign.json';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
+import { IStoreApi } from 'Store/IStore';
+import { AndroidStoreApi } from 'Store/Native/Android/Store';
+import { ProductsApi } from 'Store/Native/iOS/Products';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -172,6 +175,7 @@ export class TestFixtures {
             disableBackButton: false,
             useDeviceOrientationForVideo: false,
             skipEndCardOnClose: false,
+            useCloseIconInsteadOfSkipIcon: false,
             disableVideoControlsFade: false,
             refreshDelay: 1000,
             muteVideo: false,
@@ -716,15 +720,15 @@ export class TestFixtures {
         return new VideoOverlay(overlayParams, TestFixtures.getPrivacy(platform, campaign), false, false);
     }
 
-    public static getPerformanceOverlayEventHandler(platform: Platform, core: ICoreApi, ads: IAdsApi, ar: IARApi, purchasing: IPurchasingApi, campaign: Campaign, adUnit: PerformanceAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): PerformanceOverlayEventHandler {
+    public static getPerformanceOverlayEventHandler(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi, purchasing: IPurchasingApi, campaign: Campaign, adUnit: PerformanceAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): PerformanceOverlayEventHandler {
         return new PerformanceOverlayEventHandler(
             adUnit,
-            TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, ar, purchasing),
-            TestFixtures.getStoreHandler(platform, core, ads, campaign, adUnit, thirdPartyEventManager, nativeBridge)
+            TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, store, ar, purchasing),
+            TestFixtures.getStoreHandler(platform, core, ads, store, campaign, adUnit, thirdPartyEventManager, nativeBridge)
         );
     }
 
-    public static getXPromoAdUnitParameters(platform: Platform, core: ICoreApi, ads: IAdsApi, ar: IARApi, purchasing: IPurchasingApi): IXPromoAdUnitParameters {
+    public static getXPromoAdUnitParameters(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi, purchasing: IPurchasingApi): IXPromoAdUnitParameters {
         const wakeUpManager = new WakeUpManager(core);
         const request = new RequestManager(platform, core, wakeUpManager);
         const campaign = TestFixtures.getXPromoCampaign();
@@ -734,6 +738,7 @@ export class TestFixtures {
             platform,
             core,
             ads,
+            store,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: new FocusManager(platform, core),
             container: new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core)),
@@ -756,7 +761,7 @@ export class TestFixtures {
         };
     }
 
-    public static getPerformanceAdUnitParameters(platform: Platform, core: ICoreApi, ads: IAdsApi, ar: IARApi, purchasing: IPurchasingApi): IPerformanceAdUnitParameters {
+    public static getPerformanceAdUnitParameters(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi, purchasing: IPurchasingApi): IPerformanceAdUnitParameters {
         const campaign = TestFixtures.getCampaign();
         const wakeUpManager = new WakeUpManager(core);
         const request = new RequestManager(platform, core, wakeUpManager);
@@ -766,6 +771,7 @@ export class TestFixtures {
             platform,
             core,
             ads,
+            store,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: new FocusManager(platform, core),
             container: new Activity(core, ads, TestFixtures.getAndroidDeviceInfo(core)),
@@ -788,12 +794,12 @@ export class TestFixtures {
         };
     }
 
-    public static getXPromoAdUnit(platform: Platform, core: ICoreApi, ads: IAdsApi, ar: IARApi, purchasing: IPurchasingApi): XPromoAdUnit {
-        return new XPromoAdUnit(TestFixtures.getXPromoAdUnitParameters(platform, core, ads, ar, purchasing));
+    public static getXPromoAdUnit(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi, purchasing: IPurchasingApi): XPromoAdUnit {
+        return new XPromoAdUnit(TestFixtures.getXPromoAdUnitParameters(platform, core, ads, store, ar, purchasing));
     }
 
-    public static getPerformanceAdUnit(platform: Platform, core: ICoreApi, ads: IAdsApi, ar: IARApi, purchasing: IPurchasingApi): PerformanceAdUnit {
-        return new PerformanceAdUnit(TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, ar, purchasing));
+    public static getPerformanceAdUnit(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, ar: IARApi, purchasing: IPurchasingApi): PerformanceAdUnit {
+        return new PerformanceAdUnit(TestFixtures.getPerformanceAdUnitParameters(platform, core, ads, store, ar, purchasing));
     }
 
     public static getStoreHandlerDownloadParameters(campaign: PerformanceCampaign|XPromoCampaign): IStoreHandlerDownloadParameters {
@@ -806,11 +812,12 @@ export class TestFixtures {
         };
     }
 
-    public static getStoreHandler(platform: Platform, core: ICoreApi, ads: IAdsApi, campaign: Campaign, adUnit: VideoAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): StoreHandler {
+    public static getStoreHandler(platform: Platform, core: ICoreApi, ads: IAdsApi, store: IStoreApi, campaign: Campaign, adUnit: VideoAdUnit, thirdPartyEventManager: ThirdPartyEventManager, nativeBridge: NativeBridge): StoreHandler {
         const storeHandlerParameters: IStoreHandlerParameters = {
             platform,
             core,
             ads,
+            store,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: TestFixtures.getOperativeEventManager(platform, core, ads, campaign),
             deviceInfo: TestFixtures.getAndroidDeviceInfo(core),
@@ -1006,9 +1013,21 @@ export class TestFixtures {
                 VideoPlayer: new AndroidVideoPlayerApi(nativeBridge)
             } : undefined,
             iOS: platform === Platform.IOS ? {
-                AppSheet: new AppSheetApi(nativeBridge),
                 AdUnit: new IosAdUnitApi(nativeBridge),
                 VideoPlayer: new IosVideoPlayerApi(nativeBridge)
+            } : undefined
+        };
+    }
+
+    public static getStoreApi(nativeBridge: NativeBridge): IStoreApi {
+        const platform = nativeBridge.getPlatform();
+        return {
+            Android: platform === Platform.ANDROID ? {
+                Store: new AndroidStoreApi(nativeBridge)
+            } : undefined,
+            iOS: platform === Platform.IOS ? {
+                Products: new ProductsApi(nativeBridge),
+                AppSheet: new AppSheetApi(nativeBridge)
             } : undefined
         };
     }
