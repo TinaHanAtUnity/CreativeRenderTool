@@ -19,6 +19,7 @@ export class MRAIDIFrameEventAdapter extends MRAIDEventAdapter {
         this._mraidHandlers[MRAIDEvents.STATE_CHANGE] = (msg) => this.handleCustomState(<string>msg.state);
         this._mraidHandlers[MRAIDEvents.SEND_STATS] = (msg) => this.handleSendStats(<number>msg.totalTime, <number>msg.playTime, <number>msg.frameCount);
         this._mraidHandlers[MRAIDEvents.AR] = (msg) => this.handleAr(<MessageEvent>msg);
+        this._mraidHandlers[MRAIDEvents.CONSOLE_LOG] = (msg) => this.handleConsoleLog(<MessageEvent>msg);
     }
 
     public connect() {
@@ -53,5 +54,9 @@ export class MRAIDIFrameEventAdapter extends MRAIDEventAdapter {
 
     private handleAr(event: MessageEvent) {
         this._handler.onBridgeAREvent(event);
+    }
+
+    private handleConsoleLog(event: MessageEvent) {
+        this._core.Sdk.logDebug(event.data.functionName + ': ' + event.data.args);
     }
 }
