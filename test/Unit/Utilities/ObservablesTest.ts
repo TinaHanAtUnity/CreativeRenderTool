@@ -6,36 +6,37 @@ import 'mocha';
 
 describe('Observables', () => {
     context('once', () => {
-        it('should only trigger the observable once', () => {
+        it('should emit only once', () => {
             let count = 0;
-            const myObserver = new Observable0();
-            Observables.once(myObserver, () => count++);
-            myObserver.trigger();
-            myObserver.trigger();
+            const source = new Observable0();
+            Observables.once(source, () => count++);
+            source.trigger();
+            source.trigger();
 
-            assert.equal(count, 1, 'Observable was called more than once.');
+            assert.equal(count, 1, 'Observer was notified more than once.');
         });
     });
     context('once1', () => {
-        it('should only trigger the observable once', () => {
-            let count = 0;
-            const myObserver = new Observable1<number>();
-            Observables.once1(myObserver, (n) => count++);
-            myObserver.trigger(0);
-            myObserver.trigger(1);
+        it('should emit only once', () => {
+            let current = 0;
+            const source = new Observable1<number>();
+            Observables.once1(source, (n) => current = n);
+            source.trigger(1);
+            source.trigger(0);
 
-            assert.equal(count, 1, 'Observable was called more than once.');
+            assert.equal(current, 1, 'Observer was notified more than once.');
         });
     });
     context('once2', () => {
-        it('should only trigger the observable once', () => {
-            let count = 0;
-            const myObserver = new Observable2<number, number>();
-            Observables.once2(myObserver, (n, m) => count++);
-            myObserver.trigger(0, 0);
-            myObserver.trigger(1, 1);
+        it('should emit only once', () => {
+            let current = [0, 0];
+            const source = new Observable2<number, number>();
+            Observables.once2(source, (n, m) => current = [n, m]);
+            source.trigger(1, 1);
+            source.trigger(0, 0);
 
-            assert.equal(count, 1, 'Observable was called more than once.');
+            assert.equal(current[0], 1, 'Observer was notified more than once.');
+            assert.equal(current[1], 1, 'Observer was notified more than once.');
         });
     });
 });
