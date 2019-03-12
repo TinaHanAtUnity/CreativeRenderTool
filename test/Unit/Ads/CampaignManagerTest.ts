@@ -1179,9 +1179,12 @@ describe('CampaignManager', () => {
         const ConfigurationAuctionPlcJson = JSON.parse(ConfigurationAuctionPlc);
 
         beforeEach(() => {
+            sinon.stub(AuctionV5Test, 'isValid').returns(true);
+
             contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
             assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             campaignManager = new CampaignManager(platform, core.Api, CoreConfigurationParser.parse(ConfigurationAuctionPlcJson), AdsConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
+
             mockRequest = sinon.mock(request);
         });
 
@@ -1202,8 +1205,6 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve({
                 response: AuctionV5Response
             }));
-
-            sinon.stub(AuctionV5Test, 'isValid').returns(true);
 
             campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign, trackingUrls: ICampaignTrackingUrls) => {
                 if(placement === 'premium') {

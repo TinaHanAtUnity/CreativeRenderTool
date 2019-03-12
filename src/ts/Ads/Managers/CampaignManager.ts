@@ -112,6 +112,7 @@ export class CampaignManager {
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
     private _deviceFreeSpace: number;
+    private _useAuctionV5: boolean;
 
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
         this._platform = platform;
@@ -130,6 +131,7 @@ export class CampaignManager {
         this._requesting = false;
         this._jaegerManager = jaegerManager;
         this._backupCampaignManager = backupCampaignManager;
+        this._useAuctionV5 = !this._coreConfig.getTestMode() && AuctionV5Test.isValid(this._coreConfig.getAbGroup()) && (this._adsConfig.getPlacementCount() < 10);
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -182,7 +184,7 @@ export class CampaignManager {
                 if (response) {
                     this.setSDKSignalValues(requestTimestamp);
 
-                    if(!this._coreConfig.getTestMode() && AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
+                    if(this._useAuctionV5) {
                         return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy).catch((e) => {
                             this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
                         });
@@ -546,7 +548,7 @@ export class CampaignManager {
         if(this._sessionManager.getGameSessionId() % 1000 === 99) {
             SessionDiagnostics.trigger('ad_received', {
                 contentType: response.getContentType(),
-                auctionProtocol: AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? 5 : 4,
+                auctionProtocol: this._useAuctionV5 ? 5 : 4,
                 abGroup: this._coreConfig.getAbGroup().valueOf()
             }, session);
         }
@@ -590,7 +592,7 @@ export class CampaignManager {
             if(this._sessionManager.getGameSessionId() % 1000 === 99) {
                 SessionDiagnostics.trigger('ad_ready', {
                     contentType: contentType,
-                    auctionProtocol: AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? 5 : 4,
+                    auctionProtocol: this._useAuctionV5 ? 5 : 4,
                     abGroup: this._coreConfig.getAbGroup().valueOf()
                 }, session);
             }
@@ -672,7 +674,7 @@ export class CampaignManager {
                 'requests'
             ].join('/');
         }
-        if(AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
+        if(this._useAuctionV5) {
             return [
                 CampaignManager.AuctionV5BaseUrl,
                 this._clientInfo.getGameId(),
