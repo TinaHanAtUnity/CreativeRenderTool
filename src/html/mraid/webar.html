@@ -1299,7 +1299,9 @@
             if (windowHooksInstalled) {
                 return;
             }
-            console.log = newConsoleLog;
+            // This hook was disabled since js console logging can now be enabled
+            // with 'debugJsConsole=true' metadata for all mraids
+            // console.log = newConsoleLog;
             window.requestAnimationFrame = newRequestAnimationFrame;
             window.cancelAnimationFrame = newCancelAnimationFrame;
             windowHooksInstalled = true;
@@ -1309,7 +1311,9 @@
             if (!windowHooksInstalled) {
                 return;
             }
-            console.log = oldConsoleLog;
+            // This unhook was disabled since js console logging can now be enabled
+            // with 'debugJsConsole=true' metadata for all mraids
+            // console.log = oldConsoleLog;
             window.requestAnimationFrame = oldRequestAnimationFrame;
             window.cancelAnimationFrame = oldCancelAnimationFrame;
             windowHooksInstalled = false;
