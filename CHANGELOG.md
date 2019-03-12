@@ -1,3 +1,7 @@
+# Merged
+
+* Revert "Don't send operative clicks for Programmatic MRAID" [#8639](https://github.com/Applifier/unity-ads-webview/pull/8639)
+
 # Tue Mar 12 01:05:27 UTC 2019
 
 * VastParserStrict allow 'itms-apps://' protocol in urls [#8545](https://github.com/Applifier/unity-ads-webview/pull/8545)
