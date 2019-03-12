@@ -1,6 +1,7 @@
 # Merged
 
 * Revert "Don't send operative clicks for Programmatic MRAID" [#8639](https://github.com/Applifier/unity-ads-webview/pull/8639)
+* Restrict Auction V5 for request with over 10 placement [#8638](https://github.com/Applifier/unity-ads-webview/pull/8638)
 
 # Tue Mar 12 01:05:27 UTC 2019
 
