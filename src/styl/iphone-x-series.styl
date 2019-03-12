@@ -106,7 +106,7 @@ $privacy-button-iphone-x-bottom() {
   }
 }
 
-$gdpr-pop-up-top() {
+$iphone-x-gdpr-pop-up-top() {
   .gdpr-pop-up {
     top: constant(safe-area-inset-top);
     left: constant(safe-area-inset-left);
@@ -118,7 +118,7 @@ $gdpr-pop-up-top() {
   }
 }
 
-$gdpr-pop-up-bottom() {
+$iphone-x-gdpr-pop-up-bottom() {
   .gdpr-pop-up {
     bottom: constant(safe-area-inset-bottom);
     left: constant(safe-area-inset-left);
@@ -277,13 +277,13 @@ $iphone-x-styles() {
   #webplayer-mraid {
     $iphone-x-mraid-styles();
     $privacy-button-iphone-x-top();
-    $gdpr-pop-up-top();
+    $iphone-x-gdpr-pop-up-top();
   }
 
   #extended-mraid, #mraid {
     $iphone-x-mraid-styles();
     $privacy-button-iphone-x-bottom();
-    $gdpr-pop-up-bottom();
+    $iphone-x-gdpr-pop-up-bottom();
   }
 
   .landscape {
