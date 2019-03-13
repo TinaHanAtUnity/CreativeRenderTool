@@ -5,7 +5,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Platform } from 'Core/Constants/Platform';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
 import * as sinon from 'sinon';
-import { InstallInRewardedVideos, toAbGroup } from 'Core/Models/ABGroup';
+import { toAbGroup } from 'Core/Models/ABGroup';
 
 describe('CustomFeatures', () => {
 
@@ -99,7 +99,7 @@ describe('CustomFeatures', () => {
 
             it('should return false when user is in AB group that does not have the test enabled', () => {
                 coreConfigStub.restore();
-                sinon.stub(coreConfig, 'getAbGroup').returns(toAbGroup(0));
+                sinon.stub(coreConfig, 'getAbGroup').returns(toAbGroup(5));
                 const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(campaign, coreConfig);
                 assert.isFalse(isEnabled);
             });
@@ -113,7 +113,7 @@ describe('CustomFeatures', () => {
 
             it('should return false when in AB group that does not have the test enabled', () => {
                 coreConfigStub.restore();
-                sinon.stub(coreConfig, 'getAbGroup').returns(toAbGroup(0));
+                sinon.stub(coreConfig, 'getAbGroup').returns(toAbGroup(5));
                 sinon.stub(IosUtils, 'isAppSheetBroken').returns(true);
                 const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(campaign, coreConfig);
                 assert.isFalse(isEnabled);
