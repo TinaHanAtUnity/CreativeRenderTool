@@ -14,11 +14,6 @@ export class VastVideoOverlay extends VideoOverlay implements IPrivacyHandlerVie
         this._hasEndcard = parameters.campaign.hasEndscreen();
     }
 
-    public render(): void {
-        super.render();
-        this.choosePrivacyShown();
-    }
-
     protected cleanUpPrivacy() {
         // Only delete if control of privacy doesn't need to be transferred to endscreen
         if (!this._hasEndcard && this._privacy) {
