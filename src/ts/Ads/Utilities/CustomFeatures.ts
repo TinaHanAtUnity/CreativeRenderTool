@@ -9,7 +9,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { toAbGroup, InstallInRewardedVideos } from 'Core/Models/ABGroup';
+import { toAbGroup, HoldOutInstallInRewardedVideos } from 'Core/Models/ABGroup';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
@@ -84,7 +84,7 @@ export class CustomFeatures {
     }
 
     public static isRewardedVideoInstallButtonEnabled(campaign: Campaign, coreConfig: CoreConfiguration) {
-        if (!InstallInRewardedVideos.isValid(coreConfig.getAbGroup())) {
+        if (HoldOutInstallInRewardedVideos.isValid(coreConfig.getAbGroup())) {
             return false;
         }
 
