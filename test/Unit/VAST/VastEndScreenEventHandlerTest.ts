@@ -34,6 +34,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { IStoreApi } from 'Store/IStore';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastEndScreenEventHandlerTest', () => {
@@ -42,6 +43,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
         let ads: IAdsApi;
+        let store: IStoreApi;
         let deviceInfo: DeviceInfo;
         let storageBridge: StorageBridge;
         let container: AdUnitContainer;
@@ -55,6 +57,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
+            store = TestFixtures.getStoreApi(nativeBridge);
 
             storageBridge = new StorageBridge(core);
             const focusManager = new FocusManager(platform, core);
@@ -116,6 +119,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
                 platform,
                 core,
                 ads,
+                store,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,

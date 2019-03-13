@@ -1,6 +1,6 @@
 import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
-import { IAppSheetOptions } from 'Ads/Native/iOS/AppSheet';
+import { IAppSheetOptions } from 'Store/Native/iOS/AppSheet';
 import { PerformanceAdUnit, IPerformanceAdUnitParameters } from 'Performance/AdUnits/PerformanceAdUnit';
 
 export enum AppSheetState {
@@ -20,15 +20,15 @@ export class IOSPerformanceAdUnit extends PerformanceAdUnit {
     constructor(parameters: IPerformanceAdUnitParameters) {
         super(parameters);
 
-        this._appSheetOpenObserver = this._ads.iOS!.AppSheet.onOpen.subscribe(() => {
+        this._appSheetOpenObserver = this._store.iOS!.AppSheet.onOpen.subscribe(() => {
             this.onAppSheetOpened();
         });
 
-        this._appSheetCloseObserver = this._ads.iOS!.AppSheet.onClose.subscribe(() => {
+        this._appSheetCloseObserver = this._store.iOS!.AppSheet.onClose.subscribe(() => {
             this.onAppSheetClosed();
         });
 
-        this._appSheetErrorObserver = this._ads.iOS!.AppSheet.onError.subscribe(() => {
+        this._appSheetErrorObserver = this._store.iOS!.AppSheet.onError.subscribe(() => {
             this.onAppSheetErrored();
         });
     }
@@ -66,9 +66,9 @@ export class IOSPerformanceAdUnit extends PerformanceAdUnit {
     }
 
     public hide(): Promise<void> {
-        this._ads.iOS!.AppSheet.onOpen.unsubscribe(this._appSheetOpenObserver);
-        this._ads.iOS!.AppSheet.onClose.unsubscribe(this._appSheetCloseObserver);
-        this._ads.iOS!.AppSheet.onError.unsubscribe(this._appSheetErrorObserver);
+        this._store.iOS!.AppSheet.onOpen.unsubscribe(this._appSheetOpenObserver);
+        this._store.iOS!.AppSheet.onClose.unsubscribe(this._appSheetCloseObserver);
+        this._store.iOS!.AppSheet.onError.unsubscribe(this._appSheetErrorObserver);
 
         return super.hide();
     }

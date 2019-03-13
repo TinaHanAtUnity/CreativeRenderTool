@@ -1,4 +1,34 @@
-# Merged
+# Tue Mar 12 21:19:07 UTC 2019
+
+* Revert "Don't send operative clicks for Programmatic MRAID" [#8639](https://github.com/Applifier/unity-ads-webview/pull/8639)
+* Restrict Auction V5 for request with over 10 placement [#8638](https://github.com/Applifier/unity-ads-webview/pull/8638)
+
+# Tue Mar 12 01:05:27 UTC 2019
+
+* VastParserStrict allow 'itms-apps://' protocol in urls [#8545](https://github.com/Applifier/unity-ads-webview/pull/8545)
+* Fix styles for GDPR banner in video overlay [#8615](https://github.com/Applifier/unity-ads-webview/pull/8615)
+* Improved server start stop [#8476](https://github.com/Applifier/unity-ads-webview/pull/8476)
+* VastParserStrict allow StaticResource with "type" attribute to parse [#8544](https://github.com/Applifier/unity-ads-webview/pull/8544)
+* Expose js console and errors + hook xmlhttprequest.open [#8298](https://github.com/Applifier/unity-ads-webview/pull/8298)
+
+# Sat Mar  9 00:15:01 UTC 2019
+
+* Adding session diagnostic for 10% of operative events that fail [#8591](https://github.com/Applifier/unity-ads-webview/pull/8591)
+* Re-enable setting monetization flag when Monetization module is initialized [#8590](https://github.com/Applifier/unity-ads-webview/pull/8590)
+
+# Fri Mar  8 04:20:03 UTC 2019
+
+* Don't send operative clicks for Programmatic MRAID [#8567](https://github.com/Applifier/unity-ads-webview/pull/8567)
+
+# Thu Mar  7 18:32:20 UTC 2019
+
+* Initial support for IAP purchase detection [#8477](https://github.com/Applifier/unity-ads-webview/pull/8477)
+
+# Thu Mar  7 12:37:10 UTC 2019
+
+* Close icon instead of skip [#8450](https://github.com/Applifier/unity-ads-webview/pull/8450)
+
+# Thu Mar  7 00:43:38 UTC 2019
 
 * Fixing banner tests [#8520](https://github.com/Applifier/unity-ads-webview/pull/8520)
 
