@@ -146,7 +146,7 @@ export class AuctionRequest {
         if(this._coreConfig.getTestMode()) {
             this._baseURL = AuctionRequest.TestModeUrl;
         } else {
-            this._baseURL = AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;
+            this._baseURL = AuctionV5Test.isValid(this._coreConfig.getAbGroup()) && this._adsConfig.getPlacementCount() < 10 ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;
         }
     }
 
