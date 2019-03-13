@@ -30,7 +30,9 @@ enum VastNodeName {
     COMPANION_CLICK_THROUGH = 'CompanionClickThrough',
     COMPANION_CLICK_TRACKING = 'CompanionClickTracking',
     PARSE_ERROR = 'parsererror',
-    VAST = 'VAST'
+    VAST = 'VAST',
+    EXTENSION = 'Extension',
+    AD_VERIFICATIONS = 'AdVerifications'
 }
 
 enum VastAttributeNames {
@@ -281,6 +283,10 @@ export class VastParserStrict {
                 // ignore element as it is not of a type we support
                 vastAd.addUnparseableCompanionAd(element.outerHTML);
             }
+        });
+
+        this.getNodesWithName(adElement, VastNodeName.EXTENSION).forEach((element: HTMLElement) => {
+            
         });
 
         return vastAd;
