@@ -111,7 +111,7 @@ export class BannerCampaignManager {
                     if (nativeResponse.responseCode) {
                         jaegerSpan.addTag(JaegerTags.StatusCode, nativeResponse.responseCode.toString());
                     }
-                    if (!this._coreConfig.getTestMode() && AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
+                    if (!this._coreConfig.getTestMode() && AuctionV5Test.isValid(this._coreConfig.getAbGroup()) && this._adsConfig.getPlacementCount() < 10) {
                         return this.parseAuctionV5BannerCampaign(nativeResponse, placement);
                     }
                     return this.parseBannerCampaign(nativeResponse, placement);
@@ -252,9 +252,5 @@ export class BannerCampaignManager {
 
     private getCampaignParser(contentType: string): CampaignParser {
         return BannerCampaignParserFactory.getCampaignParser(this._platform, contentType);
-    }
-
-    private getAbGroup() {
-        return this._coreConfig.getAbGroup();
     }
 }
