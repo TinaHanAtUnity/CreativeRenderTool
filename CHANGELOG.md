@@ -6,6 +6,8 @@
 * Add Accessible close button test [#8471](https://github.com/Applifier/unity-ads-webview/pull/8471)
 * Release abGroup 17 to roll out VastStrictParser for Programmatic Vast [#8680](https://github.com/Applifier/unity-ads-webview/pull/8680)
 * Consolidate display adType to one [#8616](https://github.com/Applifier/unity-ads-webview/pull/8616)
+* Add miller creativeid for analytics events [#8682](https://github.com/Applifier/unity-ads-webview/pull/8682)
+
 
 # Tue Mar 12 21:19:07 UTC 2019
 
