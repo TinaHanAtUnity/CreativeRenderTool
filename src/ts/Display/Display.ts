@@ -11,11 +11,11 @@ export class Display extends AbstractParserModule {
         const contentTypeHandlerMap: { [key: string]: IContentTypeHandler } = {};
         const factory = new DisplayInterstitialAdUnitFactory(new DisplayInterstitialAdUnitParametersFactory(core, ads));
         contentTypeHandlerMap[ProgrammaticStaticInterstitialParser.ContentTypeHtml] = {
-            parser: new ProgrammaticStaticInterstitialParser(core.NativeBridge.getPlatform(), false),
+            parser: new ProgrammaticStaticInterstitialParser(core.NativeBridge.getPlatform()),
             factory
         };
         contentTypeHandlerMap[ProgrammaticStaticInterstitialParser.ContentTypeJs] = {
-            parser: new ProgrammaticStaticInterstitialParser(core.NativeBridge.getPlatform(), true),
+            parser: new ProgrammaticStaticInterstitialParser(core.NativeBridge.getPlatform()),
             factory
         };
         super(contentTypeHandlerMap);
