@@ -187,7 +187,7 @@ export class BannerAdContext {
     }
 
     private getBannerRefreshDelay(): number {
-        return (this._placement.getRefreshDelay() || StandardRefreshDelay) * 1000;
+        return (this._placement.getBannerRefreshRate() || StandardRefreshDelay) * 1000;
     }
 
     private onAppForeground() {

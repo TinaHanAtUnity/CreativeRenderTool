@@ -559,7 +559,8 @@ describe('Event parameters should match specifications', () => {
                 useCloseIconInsteadOfSkipIcon: false,
                 adTypes: [],
                 refreshDelay: 1000,
-                muteVideo: false
+                muteVideo: false,
+                banner: {'refreshRate': 40}
             });
             realtimePlacement.setRealtimeData('XXXscootVids');
         });
