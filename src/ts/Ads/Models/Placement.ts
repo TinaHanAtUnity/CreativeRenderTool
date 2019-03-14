@@ -28,7 +28,7 @@ export interface IRawPlacement {
     refreshDelay: number;
     position?: string;
     auctionType?: string;
-    banner?: {[key: string]: number};
+    banner?: {refreshRate?: number};
 }
 
 export interface IPlacement {
@@ -116,7 +116,7 @@ export class Placement extends Model<IPlacement> {
         this.set('position', data.position || 'bottomcenter');
         this.set('auctionType', <PlacementAuctionType>data.auctionType || DefaultPlacementAuctionType);
 
-        if (data.banner && 'refreshRate' in data.banner) {
+        if(data.banner){
             this.set('bannerRefreshRate', data.banner.refreshRate);
         }
     }
