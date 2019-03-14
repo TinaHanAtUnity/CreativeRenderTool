@@ -23,6 +23,7 @@ import * as sinon from 'sinon';
 import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
+import { ICore } from 'Core/ICore';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('PlacementContentManager', () => {
@@ -35,6 +36,7 @@ import { ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
         let campaignManager: CampaignManager;
         let placementManager: PlacementManager;
         let configuration: AdsConfiguration;
+        let core: ICore;
 
         beforeEach(() => {
             configuration = TestFixtures.getAdsConfiguration();
@@ -43,6 +45,7 @@ import { ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
             ads = TestFixtures.getAdsApi(nativeBridge);
             monetization = TestFixtures.getMonetizationApi(nativeBridge);
             promo = TestFixtures.getPromoApi(nativeBridge);
+            core = TestFixtures.getCoreModule(nativeBridge);
 
             sinon.stub(monetization.PlacementContents, 'createPlacementContent').resolves();
             sinon.stub(monetization.PlacementContents, 'setPlacementContentState').resolves();
@@ -59,7 +62,7 @@ import { ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
                 'performanceId': TestFixtures.getXPromoCampaign()
             });
 
-            manager = new PlacementContentManager(monetization, promo, configuration, campaignManager, placementManager);
+            manager = new PlacementContentManager(monetization, promo, configuration, campaignManager, placementManager, core);
         });
 
         describe('creating placement content', () => {
@@ -303,22 +306,24 @@ import { ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
                 sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
             });
 
-            describe('if product is not in the catalog', () => {
+            describe('if catalog is available but product is not in the catalog', () => {
                 beforeEach(() => {
                     sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
+                    sandbox.stub(PurchasingUtilities, 'isCatalogAvailable').returns(true);
 
                     promo.Purchasing.onIAPSendEvent.trigger('{"type": "CatalogUpdated"}');
                     return new Promise((resolve) => setTimeout(resolve, 0));
                 });
 
-                it('should set the current placementContent state to waiting', () => {
-                    sinon.assert.calledWith(asStub(monetization.Listener.sendPlacementContentStateChanged), 'promoId', PlacementContentState.NOT_AVAILABLE, PlacementContentState.WAITING);
+                it('should set the current placementContent state to disabled', () => {
+                    sinon.assert.calledWith(asStub(monetization.Listener.sendPlacementContentStateChanged), 'promoId', PlacementContentState.NOT_AVAILABLE, PlacementContentState.DISABLED);
                 });
             });
 
-            describe('if product is in the catalog', () => {
+            describe('if catalog is available and product is in the catalog', () => {
                 beforeEach(() => {
                     sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
+                    sandbox.stub(PurchasingUtilities, 'isCatalogAvailable').returns(true);
 
                     promo.Purchasing.onIAPSendEvent.trigger('{"type": "CatalogUpdated"}');
                     return new Promise((resolve) => setTimeout(resolve, 0));
@@ -326,6 +331,19 @@ import { ILimitedTimeOffer } from 'Promo/Models/LimitedTimeOffer';
 
                 it('should mark placement as ready if product is in the catalog', () => {
                     sinon.assert.calledWith(asStub(monetization.Listener.sendPlacementContentReady), 'promoId');
+                });
+            });
+
+            describe('if catalog is not available', () => {
+                beforeEach(() => {
+                    sandbox.stub(PurchasingUtilities, 'isCatalogAvailable').returns(false);
+
+                    promo.Purchasing.onIAPSendEvent.trigger('{"type": "CatalogUpdated"}');
+                    return new Promise((resolve) => setTimeout(resolve, 0));
+                });
+
+                it('should mark placement as waiting', () => {
+                    sinon.assert.calledWith(asStub(monetization.Listener.sendPlacementContentStateChanged), 'promoId', PlacementContentState.NOT_AVAILABLE, PlacementContentState.WAITING);
                 });
             });
         });

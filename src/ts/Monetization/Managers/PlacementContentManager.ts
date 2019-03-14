@@ -3,7 +3,7 @@ import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
-import { Placement } from 'Ads/Models/Placement';
+import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { FinishState } from 'Core/Constants/FinishState';
 import { PlacementContentState } from 'Monetization/Constants/PlacementContentState';
 import { IMonetizationApi } from 'Monetization/IMonetization';
@@ -11,8 +11,11 @@ import { IPlacementContentType } from 'Monetization/Native/PlacementContents';
 import { IPromoApi } from 'Promo/IPromo';
 import { IRawProductInfo, ProductInfo } from 'Promo/Models/ProductInfo';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
-import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { PurchasingUtilities, ProductState } from 'Promo/Utilities/PurchasingUtilities';
 import { IProductData } from 'Promo/Models/Product';
+import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
+import { PromoErrorService } from 'Core/Utilities/PromoErrorService';
+import { ICore } from 'Core/ICore';
 
 export interface IPlacementContent {
     state: PlacementContentState;
@@ -40,12 +43,14 @@ export class PlacementContentManager {
     private _configuration: AdsConfiguration;
     private _placementContentMap: IPlacementContentMap = {};
     private _placementManager: PlacementManager;
+    private _core: ICore;
 
-    constructor(monetization: IMonetizationApi, promo: IPromoApi, configuration: AdsConfiguration, campaignManager: CampaignManager, placementManager: PlacementManager) {
+    constructor(monetization: IMonetizationApi, promo: IPromoApi, configuration: AdsConfiguration, campaignManager: CampaignManager, placementManager: PlacementManager, core: ICore) {
         this._monetization = monetization;
         this._promo = promo;
         this._configuration = configuration;
         this._placementManager = placementManager;
+        this._core = core;
         campaignManager.onCampaign.subscribe((placementId, campaign) => this.createPlacementContent(placementId, campaign));
         campaignManager.onNoFill.subscribe((placementId) => this.onPlacementNoFill(placementId));
         promo.Purchasing.onIAPSendEvent.subscribe((eventJSON) => this.handleSendIAPEvent(eventJSON));
@@ -60,13 +65,11 @@ export class PlacementContentManager {
                     state: PlacementContentState.WAITING
                 };
             }
-            const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
-            if (isPromoWithoutProduct) {
-                this.setPlacementContentState(placementId, PlacementContentState.WAITING);
-                return this._monetization.Listener.sendPlacementContentStateChanged(placementId, PlacementContentState.NOT_AVAILABLE, PlacementContentState.WAITING);
+            if (campaign instanceof PromoCampaign) {
+                this.handlePromoCampaign(placementId, campaign);
             } else {
                 this.setPlacementContentState(placementId, PlacementContentState.READY);
-                return this._monetization.Listener.sendPlacementContentReady(placementId);
+                this._monetization.Listener.sendPlacementContentReady(placementId);
             }
         });
     }
@@ -191,27 +194,59 @@ export class PlacementContentManager {
 
         if (jsonPayload.type === 'CatalogUpdated') {
             return PurchasingUtilities.refreshCatalog()
-            .then((catalog) => this.setAllPlacementContentStates());
+            .then(() => this.setPromoPlacementContentStates());
         } else {
             return Promise.reject();
         }
     }
 
-    private setAllPlacementContentStates(): Promise<void> {
-        const placementCampaignMap = this._placementManager.getPlacementCampaignMap('purchasing/iap');
+    private setPromoPlacementContentStates(): Promise<void> {
+        const placementCampaignMap = this._placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType);
         for (const placementId of Object.keys(placementCampaignMap)) {
             const campaign = placementCampaignMap[placementId];
-
-            const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
-            if (isPromoWithoutProduct) {
-                this.setPlacementContentState(placementId, PlacementContentState.WAITING);
-                this._monetization.Listener.sendPlacementContentStateChanged(placementId, PlacementContentState.NOT_AVAILABLE, PlacementContentState.WAITING);
-            } else {
-                this.setPlacementContentState(placementId, PlacementContentState.READY);
-                this._monetization.Listener.sendPlacementContentReady(placementId);
+            if (campaign instanceof PromoCampaign) {
+                this.handlePromoCampaign(placementId, campaign);
             }
         }
 
         return Promise.resolve();
+    }
+
+    private handlePromoCampaign(placementId: string, campaign: PromoCampaign) {
+        let prevState = PlacementContentState.NOT_AVAILABLE;
+        const placementContent = this._placementContentMap[placementId];
+        if (placementContent) {
+            prevState = placementContent.state;
+        }
+        const productId = campaign.getIapProductId();
+        const state = PurchasingUtilities.getProductState(productId);
+        switch (state) {
+            case ProductState.EXISTS_IN_CATALOG:
+                this.setPlacementContentState(placementId, PlacementContentState.READY);
+                this._monetization.Listener.sendPlacementContentReady(placementId);
+                break;
+            case ProductState.MISSING_PRODUCT_IN_CATALOG:
+                PromoErrorService.report(this._core.RequestManager, {
+                    auctionID: campaign.getSession().getId(),
+                    corrID: campaign.getCorrelationId(),
+                    country: this._core.Config.getCountry(),
+                    projectID: this._core.Config.getUnityProjectId(),
+                    gameID: this._core.ClientInfo.getGameId(),
+                    placementID: placementId,
+                    productID: productId,
+                    platform: this._core.NativeBridge.getPlatform(),
+                    gamerToken: this._core.Config.getToken(),
+                    errorCode: 102,
+                    errorMessage: 'placement missing productId'
+                });
+                this._core.Api.Sdk.logWarning(`Promo placement: ${placementId} does not have the corresponding product: ${productId} available in purchasing catalog`);
+                this.setPlacementContentState(placementId, PlacementContentState.DISABLED);
+                this._monetization.Listener.sendPlacementContentStateChanged(placementId, prevState, PlacementContentState.DISABLED);
+                break;
+            case ProductState.WAITING_FOR_CATALOG:
+                this.setPlacementContentState(placementId, PlacementContentState.WAITING);
+                this._monetization.Listener.sendPlacementContentStateChanged(placementId, prevState, PlacementContentState.WAITING);
+            default:
+        }
     }
 }
