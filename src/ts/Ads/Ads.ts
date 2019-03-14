@@ -212,6 +212,17 @@ export class Ads implements IAds {
                 });
             }
 
+            if (this._core.Config.getCountry() === 'CN' && this._core.NativeBridge.getPlatform() === Platform.ANDROID && this.SessionManager.getGameSessionId() % 1000 === 1) {
+                Promise.all([
+                    PermissionsUtil.checkPermissionInManifest(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.READ_PHONE_STATE),
+                    PermissionsUtil.checkPermissions(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.READ_PHONE_STATE)
+                ]).then(([readDeviceSupported, permissionInManifest]) => {
+                    Diagnostics.trigger('read_device_permission', {readDeviceSupported, permissionInManifest});
+                }).catch(error => {
+                    Diagnostics.trigger('read_device_permission_error', error);
+                });
+            }
+
             const parserModules: AbstractParserModule[] = [
                 new AdMob(this._core, this),
                 new Display(this._core, this),
