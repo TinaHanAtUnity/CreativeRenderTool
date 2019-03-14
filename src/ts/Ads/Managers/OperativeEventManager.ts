@@ -26,6 +26,7 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { SdkStats } from 'Ads/Utilities/SdkStats';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     request: RequestManager;
@@ -321,7 +322,9 @@ export class OperativeEventManager {
                     url: url,
                     data: data,
                     response: response,
-                    campaign: this._campaign.getDTO()
+                    campaign: this._campaign.getDTO(),
+                    eventType: event,
+                    auctionProtocol: SdkStats.getAuctionProtocol()
                 };
                 SessionDiagnostics.trigger('operative_event_manager_failed_post', diagnosticData, this._campaign.getSession());
             }

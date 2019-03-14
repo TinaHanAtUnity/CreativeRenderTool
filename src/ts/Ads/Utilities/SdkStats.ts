@@ -19,6 +19,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { AuctionV5Test } from 'Core/Models/ABGroup';
 
 interface ISdkStatsEvent {
     eventTimestamp: number;
@@ -94,6 +95,11 @@ export class SdkStats {
         });
 
         SdkStats._initialized = true;
+        SdkStats.setAuctionProtocol();
+    }
+
+    public static getAuctionProtocol(): number {
+        return SdkStats._auctionProtocol;
     }
 
     public static sendReadyEvent(placementId: string): void {
@@ -189,6 +195,29 @@ export class SdkStats {
     private static _cachingStarted: { [id: string]: number } = {};
     private static _cachingFinished: { [id: string]: number } = {};
     private static _frameSetStarted: { [id: string]: number } = {};
+    private static _auctionProtocol: number = 4;
+
+    private static setAuctionProtocol() {
+        if (SdkStats._initialized) {
+            if (SdkStats._coreConfig.getTestMode()) {
+                SdkStats._auctionProtocol = 4;
+                return;
+            }
+
+            if (SdkStats._adsConfig.getPlacementCount() < 10) {
+                SdkStats._auctionProtocol = 4;
+                return;
+            }
+
+            if (SdkStats._core.iOS) {
+                SdkStats._auctionProtocol = 5;
+            } else {    // Android abTest
+                if (AuctionV5Test.isValid(SdkStats._coreConfig.getAbGroup())) {
+                    SdkStats._auctionProtocol = 5;
+                }
+            }
+        }
+    }
 
     private static isTestActive(): boolean {
         const gameSessionId = SdkStats._sessionManager.getGameSessionId();
