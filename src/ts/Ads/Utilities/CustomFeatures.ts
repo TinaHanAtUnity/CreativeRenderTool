@@ -4,12 +4,10 @@ import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import ZyngaGamesJson from 'json/custom_features/ZyngaGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import { Campaign } from 'Ads/Models/Campaign';
-import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { toAbGroup, InstallInRewardedVideos } from 'Core/Models/ABGroup';
+import { toAbGroup, HoldOutInstallInRewardedVideos } from 'Core/Models/ABGroup';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
@@ -41,7 +39,9 @@ export class CustomFeatures {
                 creativeId === '109091853' ||
                 creativeId === '109091754' ||
                 creativeId === '114617576' || // Hellfest
-                creativeId === '114617336';   // Hellfest
+                creativeId === '114617336' || // Hellfest
+                creativeId === '145941071' || // Miller Lite Fallback
+                creativeId === '145940860';   // Miller Lite Fallback
     }
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {
@@ -84,7 +84,7 @@ export class CustomFeatures {
     }
 
     public static isRewardedVideoInstallButtonEnabled(campaign: Campaign, coreConfig: CoreConfiguration) {
-        if (!InstallInRewardedVideos.isValid(coreConfig.getAbGroup())) {
+        if (HoldOutInstallInRewardedVideos.isValid(coreConfig.getAbGroup())) {
             return false;
         }
 
