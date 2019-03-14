@@ -212,7 +212,7 @@ export class Ads implements IAds {
                 });
             }
 
-            if (this._core.NativeBridge.getPlatform() === Platform.ANDROID && this.SessionManager.getGameSessionId() % 1000 === 0) {
+            if (this._core.Config.getCountry() === 'CN' && this._core.NativeBridge.getPlatform() === Platform.ANDROID && this.SessionManager.getGameSessionId() % 100 === 0) {
                 Promise.all([
                     PermissionsUtil.checkPermissionInManifest(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.READ_PHONE_STATE),
                     PermissionsUtil.checkPermissions(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.READ_PHONE_STATE)
