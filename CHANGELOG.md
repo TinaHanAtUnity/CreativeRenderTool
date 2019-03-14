@@ -1,3 +1,32 @@
+# Thu Mar 14 08:37:20 UTC 2019
+
+* Experiment to test more accessible mraid close button in playables [#8614](https://github.com/Applifier/unity-ads-webview/pull/8614)
+* Show GDPR banner also in Performance VideoOverlay [#8637](https://github.com/Applifier/unity-ads-webview/pull/8637)
+* Add Reverse AB Test for "install now" button in rewarded ads [#8522](https://github.com/Applifier/unity-ads-webview/pull/8522)
+* Add Accessible close button test [#8471](https://github.com/Applifier/unity-ads-webview/pull/8471)
+* Release abGroup 17 to roll out VastStrictParser for Programmatic Vast [#8680](https://github.com/Applifier/unity-ads-webview/pull/8680)
+* Consolidate display adType to one [#8616](https://github.com/Applifier/unity-ads-webview/pull/8616)
+* Add miller creativeid for analytics events [#8682](https://github.com/Applifier/unity-ads-webview/pull/8682)
+
+
+# Tue Mar 12 21:19:07 UTC 2019
+
+* Revert "Don't send operative clicks for Programmatic MRAID" [#8639](https://github.com/Applifier/unity-ads-webview/pull/8639)
+* Restrict Auction V5 for request with over 10 placement [#8638](https://github.com/Applifier/unity-ads-webview/pull/8638)
+
+# Tue Mar 12 01:05:27 UTC 2019
+
+* VastParserStrict allow 'itms-apps://' protocol in urls [#8545](https://github.com/Applifier/unity-ads-webview/pull/8545)
+* Fix styles for GDPR banner in video overlay [#8615](https://github.com/Applifier/unity-ads-webview/pull/8615)
+* Improved server start stop [#8476](https://github.com/Applifier/unity-ads-webview/pull/8476)
+* VastParserStrict allow StaticResource with "type" attribute to parse [#8544](https://github.com/Applifier/unity-ads-webview/pull/8544)
+* Expose js console and errors + hook xmlhttprequest.open [#8298](https://github.com/Applifier/unity-ads-webview/pull/8298)
+
+# Sat Mar  9 00:15:01 UTC 2019
+
+* Adding session diagnostic for 10% of operative events that fail [#8591](https://github.com/Applifier/unity-ads-webview/pull/8591)
+* Re-enable setting monetization flag when Monetization module is initialized [#8590](https://github.com/Applifier/unity-ads-webview/pull/8590)
+
 # Fri Mar  8 04:20:03 UTC 2019
 
 * Don't send operative clicks for Programmatic MRAID [#8567](https://github.com/Applifier/unity-ads-webview/pull/8567)

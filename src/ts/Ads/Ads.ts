@@ -57,6 +57,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Display } from 'Display/Display';
 import { Monetization } from 'Monetization/Monetization';
 import { MRAID } from 'MRAID/MRAID';
+import { MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Performance } from 'Performance/Performance';
 import { Promo } from 'Promo/Promo';
@@ -580,6 +581,10 @@ export class Ads implements IAds {
             }
 
             CampaignManager.setCampaignResponse(response);
+        }
+
+        if(TestEnvironment.get('debugJsConsole')) {
+            MRAIDView.setDebugJsConsole(TestEnvironment.get('debugJsConsole'));
         }
     }
 }
