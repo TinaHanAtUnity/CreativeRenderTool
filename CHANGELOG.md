@@ -1,4 +1,4 @@
-# Pending
+# Thu Mar 14 08:37:20 UTC 2019
 
 * Experiment to test more accessible mraid close button in playables [#8614](https://github.com/Applifier/unity-ads-webview/pull/8614)
 * Show GDPR banner also in Performance VideoOverlay [#8637](https://github.com/Applifier/unity-ads-webview/pull/8637)
