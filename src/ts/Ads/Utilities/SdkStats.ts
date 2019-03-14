@@ -204,7 +204,7 @@ export class SdkStats {
                 return;
             }
 
-            if (SdkStats._adsConfig.getPlacementCount() < 10) {
+            if (SdkStats._adsConfig.getPlacementCount() >= 10) {
                 SdkStats._auctionProtocol = 4;
                 return;
             }
