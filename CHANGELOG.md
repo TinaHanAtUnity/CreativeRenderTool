@@ -1,3 +1,13 @@
+# Fri Mar 15 14:46:01 UTC 2019
+
+* Change consent layout [#8711](https://github.com/Applifier/unity-ads-webview/pull/8711)
+
+# Fri Mar 15 12:36:40 UTC 2019
+
+* Promo fix where landscape font size was incorrect [#8686](https://github.com/Applifier/unity-ads-webview/pull/8686)
+* Fix the call to icon-size to use correct name [#8690](https://github.com/Applifier/unity-ads-webview/pull/8690)
+* Additional fields for consent layout A/B tests [#8372](https://github.com/Applifier/unity-ads-webview/pull/8372)
+
 # Thu Mar 14 08:37:20 UTC 2019
 
 * Experiment to test more accessible mraid close button in playables [#8614](https://github.com/Applifier/unity-ads-webview/pull/8614)
@@ -7,7 +17,6 @@
 * Release abGroup 17 to roll out VastStrictParser for Programmatic Vast [#8680](https://github.com/Applifier/unity-ads-webview/pull/8680)
 * Consolidate display adType to one [#8616](https://github.com/Applifier/unity-ads-webview/pull/8616)
 * Add miller creativeid for analytics events [#8682](https://github.com/Applifier/unity-ads-webview/pull/8682)
-
 
 # Tue Mar 12 21:19:07 UTC 2019
 
