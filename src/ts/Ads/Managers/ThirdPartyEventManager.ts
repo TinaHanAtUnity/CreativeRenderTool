@@ -94,7 +94,7 @@ export class ThirdPartyEventManager {
         }
         return request.catch(error => {
             const urlParts = Url.parse(url);
-            const auctionProtocol = SdkStats.getAuctionProtocol();
+            const auctionProtocol = RequestManager.getAuctionProtocol();
             const diagnosticData = {
                 request: error.nativeRequest,
                 event: event,

@@ -9,13 +9,13 @@ import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
 import { fakeARUtils } from 'TestHelpers/FakeARUtils';
 import * as sinon from 'sinon';
-import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 describe('IosIntegrationTest V4', () => {
     const sandbox = sinon.createSandbox();
 
     beforeEach(() => {
-        SdkStats.setTestAuctionProtocol(4);
+        RequestManager.setTestAuctionProtocol(4);
         fakeARUtils(sandbox);
     });
 

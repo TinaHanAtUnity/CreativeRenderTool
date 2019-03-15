@@ -12,7 +12,7 @@ import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
 import { fakeARUtils } from 'TestHelpers/FakeARUtils';
 import * as sinon from 'sinon';
-import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 describe('IosEventsTest V4', () => {
     const sandbox = sinon.createSandbox();
@@ -44,7 +44,7 @@ describe('IosEventsTest V4', () => {
     };
 
     beforeEach(function(done) {
-        SdkStats.setTestAuctionProtocol(4);
+        RequestManager.setTestAuctionProtocol(4);
         // tslint:disable:no-invalid-this
         this.timeout(15000);
         // tslint:enable

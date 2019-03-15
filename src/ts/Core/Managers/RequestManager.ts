@@ -5,6 +5,9 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { AuctionV5Test } from 'Core/Models/ABGroup';
 
 const enum RequestStatus {
     COMPLETE,
@@ -74,6 +77,7 @@ export class RequestManager {
     private static _callbacks: { [key: number]: CallbackContainer<INativeResponse> } = {};
     private static _requests: { [key: number]: INativeRequest } = {};
     private static _authorizations: { host: RegExp; authorizationHeader: string }[] = [];
+    private static _auctionProtocol: number | undefined;
 
     private static getDefaultRequestOptions(): IRequestOptions {
         return {
@@ -98,6 +102,37 @@ export class RequestManager {
         this._core.Request.onComplete.subscribe((rawId, url, response, responseCode, headers) => this.onRequestComplete(rawId, url, response, responseCode, headers));
         this._core.Request.onFailed.subscribe((rawId, url, error) => this.onRequestFailed(rawId, url, error));
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
+    }
+
+    public static setAuctionProtocol(coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, platform: Platform) {
+        if (!RequestManager._auctionProtocol) {
+            if (coreConfig.getTestMode()) {
+                RequestManager._auctionProtocol = 4;
+                return;
+            }
+
+            if (adsConfig.getPlacementCount() >= 10) {
+                RequestManager._auctionProtocol = 4;
+                return;
+            }
+
+            if (platform === Platform.IOS) {
+                RequestManager._auctionProtocol = 5;
+            } else {    // Android abTest
+                RequestManager._auctionProtocol = AuctionV5Test.isValid(coreConfig.getAbGroup()) ? 5 : 4;
+            }
+        }
+    }
+
+    public static setTestAuctionProtocol(protocol: number) {
+        RequestManager._auctionProtocol = protocol;
+    }
+
+    public static getAuctionProtocol(): number {
+        if (RequestManager._auctionProtocol) {
+            return RequestManager._auctionProtocol;
+        }
+        return 4; // default protocol
     }
 
     public static setAuthorizationHeaderForHost(hostRegex: string, authorizationHeader: string) {

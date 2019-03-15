@@ -145,7 +145,7 @@ export class AuctionRequest {
         if(this._coreConfig.getTestMode()) {
             this._baseURL = AuctionRequest.TestModeUrl;
         } else {
-            this._baseURL = SdkStats.getAuctionProtocol() === 5 ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;
+            this._baseURL = RequestManager.getAuctionProtocol() === 5 ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;
         }
     }
 

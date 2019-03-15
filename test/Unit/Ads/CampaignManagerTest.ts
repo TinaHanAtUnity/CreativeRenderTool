@@ -97,7 +97,6 @@ import { VPAIDAdUnitParametersFactory } from 'VPAID/AdUnits/VPAIDAdUnitParameter
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { VPAIDAdUnitFactory } from 'VPAID/AdUnits/VPAIDAdUnitFactory';
-import { SdkStats } from 'Ads/Utilities/SdkStats';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -1102,7 +1101,7 @@ describe('CampaignManager', () => {
                 const parser = contentTypeHandlerManager.getParser(ProgrammaticMraidParser.ContentType);
                 (<any>parser)._platform = platform;
 
-                sinon.stub(SdkStats, 'getAuctionProtocol').returns(4);
+                sinon.stub(RequestManager, 'getAuctionProtocol').returns(4);
 
                 assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
                 campaignManager = new CampaignManager(platform, core.Api, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
@@ -1181,7 +1180,7 @@ describe('CampaignManager', () => {
         const ConfigurationAuctionPlcJson = JSON.parse(ConfigurationAuctionPlc);
 
         beforeEach(() => {
-            sinon.stub(SdkStats, 'getAuctionProtocol').returns(5);
+            sinon.stub(RequestManager, 'getAuctionProtocol').returns(5);
 
             contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
             assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);

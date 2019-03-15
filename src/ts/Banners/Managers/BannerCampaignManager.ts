@@ -110,7 +110,7 @@ export class BannerCampaignManager {
                     if (nativeResponse.responseCode) {
                         jaegerSpan.addTag(JaegerTags.StatusCode, nativeResponse.responseCode.toString());
                     }
-                    if (SdkStats.getAuctionProtocol() === 5) {
+                    if (RequestManager.getAuctionProtocol() === 5) {
                         return this.parseAuctionV5BannerCampaign(nativeResponse, placement);
                     }
                     return this.parseBannerCampaign(nativeResponse, placement);

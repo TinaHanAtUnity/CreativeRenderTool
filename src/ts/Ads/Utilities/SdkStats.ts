@@ -95,14 +95,6 @@ export class SdkStats {
         });
 
         SdkStats._initialized = true;
-        SdkStats.setAuctionProtocol();
-    }
-
-    public static getAuctionProtocol(): number {
-        if (SdkStats._auctionProtocol) {
-            return SdkStats._auctionProtocol;
-        }
-        return 4;
     }
 
     public static sendReadyEvent(placementId: string): void {
@@ -178,10 +170,6 @@ export class SdkStats {
         return SdkStats._frameSetStarted[placementId];
     }
 
-    public static setTestAuctionProtocol(protocol: number) {
-        SdkStats._auctionProtocol = protocol;
-    }
-
     private static _core: ICoreApi;
     private static _request: RequestManager;
     private static _coreConfig: CoreConfiguration;
@@ -202,29 +190,6 @@ export class SdkStats {
     private static _cachingStarted: { [id: string]: number } = {};
     private static _cachingFinished: { [id: string]: number } = {};
     private static _frameSetStarted: { [id: string]: number } = {};
-    private static _auctionProtocol: number | undefined;
-
-    private static setAuctionProtocol() {
-        if (SdkStats._initialized && !SdkStats._auctionProtocol) {
-            if (SdkStats._coreConfig.getTestMode()) {
-                SdkStats._auctionProtocol = 4;
-                return;
-            }
-
-            if (SdkStats._adsConfig.getPlacementCount() >= 10) {
-                SdkStats._auctionProtocol = 4;
-                return;
-            }
-
-            if (SdkStats._core.iOS) {
-                SdkStats._auctionProtocol = 5;
-            } else {    // Android abTest
-                if (AuctionV5Test.isValid(SdkStats._coreConfig.getAbGroup())) {
-                    SdkStats._auctionProtocol = 5;
-                }
-            }
-        }
-    }
 
     private static isTestActive(): boolean {
         const gameSessionId = SdkStats._sessionManager.getGameSessionId();
