@@ -18,6 +18,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ITemplateData } from 'Core/Views/View';
+import { ConsentPage } from 'Ads/Views/Consent/Consent';
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -76,6 +77,7 @@ export class UserPrivacyManager {
             'action': action,
             'projectId': this._coreConfig.getUnityProjectId(),
             'platform': Platform[this._platform].toLowerCase(),
+            'country': this._coreConfig.getCountry(),
             'gameId': this._clientInfo.getGameId()
         };
         if (source) {
@@ -90,7 +92,7 @@ export class UserPrivacyManager {
         });
     }
 
-    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource): Promise<INativeResponse | void> {
+    public updateUserPrivacy(permissions: IPermissions, source: GDPREventSource, layout? : ConsentPage): Promise<INativeResponse | void> {
         const gamePrivacy = this._gamePrivacy;
 
         if (!gamePrivacy.isEnabled() || !isUnityConsentPermissions(permissions)) {
@@ -116,7 +118,7 @@ export class UserPrivacyManager {
         }
 
         this._userPrivacy.update(updatedPrivacy);
-        return this.sendUnityConsentEvent(permissions, source);
+        return this.sendUnityConsentEvent(permissions, source, layout);
     }
 
     private hasUserPrivacyChanged(updatedPrivacy: { method: PrivacyMethod; version: number; permissions: IPermissions }) {
@@ -151,12 +153,15 @@ export class UserPrivacyManager {
         return false;
     }
 
-    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource): Promise<INativeResponse> {
+    private sendUnityConsentEvent(permissions: IPermissions, source: GDPREventSource, layout = ''): Promise<INativeResponse> {
         const infoJson: unknown = {
             adid: this._deviceInfo.getAdvertisingIdentifier(),
+            group: this._coreConfig.getAbGroup(),
+            layout: layout,
             action: GDPREventAction.CONSENT,
             projectId: this._coreConfig.getUnityProjectId(),
             platform: Platform[this._platform].toLowerCase(),
+            country: this._coreConfig.getCountry(),
             gameId: this._clientInfo.getGameId(),
             source: source,
             method: PrivacyMethod.UNITY_CONSENT,
