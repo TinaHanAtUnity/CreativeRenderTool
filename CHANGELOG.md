@@ -1,7 +1,8 @@
-# Merged
+# Staged
 
 * Diagnostics of READ_PHONE_STATE permission for China Android 1% [#8687](https://github.com/Applifier/unity-ads-webview/pull/8687)
 * Making creativeType case agnostic [#8685](https://github.com/Applifier/unity-ads-webview/pull/8685)
+* V5 Rolling out iOS and diagnostics for failed send events [#8688](https://github.com/Applifier/unity-ads-webview/pull/8688) 
 
 # Fri Mar 15 14:46:01 UTC 2019
 
