@@ -40,7 +40,7 @@ import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCam
 import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
 import { CampaignError } from 'Ads/Errors/CampaignError';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { INativeResponse, RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
@@ -112,7 +112,7 @@ export class CampaignManager {
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
     private _deviceFreeSpace: number;
-    private _auctionProtocol: number;
+    private _auctionProtocol: AuctionProtocol;
 
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
         this._platform = platform;
@@ -184,7 +184,7 @@ export class CampaignManager {
                 if (response) {
                     this.setSDKSignalValues(requestTimestamp);
 
-                    if(this._auctionProtocol === 5) {
+                    if(this._auctionProtocol === AuctionProtocol.V5) {
                         return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy).catch((e) => {
                             this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
                         });
@@ -674,7 +674,7 @@ export class CampaignManager {
                 'requests'
             ].join('/');
         }
-        if(this._auctionProtocol === 5) {
+        if(this._auctionProtocol === AuctionProtocol.V5) {
             return [
                 CampaignManager.AuctionV5BaseUrl,
                 this._clientInfo.getGameId(),

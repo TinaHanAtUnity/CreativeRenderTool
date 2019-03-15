@@ -21,7 +21,7 @@ import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -1101,7 +1101,7 @@ describe('CampaignManager', () => {
                 const parser = contentTypeHandlerManager.getParser(ProgrammaticMraidParser.ContentType);
                 (<any>parser)._platform = platform;
 
-                sinon.stub(RequestManager, 'getAuctionProtocol').returns(4);
+                sinon.stub(RequestManager, 'getAuctionProtocol').returns(AuctionProtocol.V4);
 
                 assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
                 campaignManager = new CampaignManager(platform, core.Api, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
@@ -1180,7 +1180,7 @@ describe('CampaignManager', () => {
         const ConfigurationAuctionPlcJson = JSON.parse(ConfigurationAuctionPlc);
 
         beforeEach(() => {
-            sinon.stub(RequestManager, 'getAuctionProtocol').returns(5);
+            sinon.stub(RequestManager, 'getAuctionProtocol').returns(AuctionProtocol.V5);
 
             contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
             assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
