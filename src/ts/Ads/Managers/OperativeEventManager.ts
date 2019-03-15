@@ -321,7 +321,9 @@ export class OperativeEventManager {
                     url: url,
                     data: data,
                     response: response,
-                    campaign: this._campaign.getDTO()
+                    campaign: this._campaign.getDTO(),
+                    eventType: event,
+                    auctionProtocol: RequestManager.getAuctionProtocol()
                 };
                 SessionDiagnostics.trigger('operative_event_manager_failed_post', diagnosticData, this._campaign.getSession());
             }
