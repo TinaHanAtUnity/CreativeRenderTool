@@ -1,3 +1,7 @@
+# Merged
+
+* Promo fix where landscape font size was incorrect [#8686](https://github.com/Applifier/unity-ads-webview/pull/8686)
+
 # Thu Mar 14 08:37:20 UTC 2019
 
 * Experiment to test more accessible mraid close button in playables [#8614](https://github.com/Applifier/unity-ads-webview/pull/8614)
@@ -7,7 +11,6 @@
 * Release abGroup 17 to roll out VastStrictParser for Programmatic Vast [#8680](https://github.com/Applifier/unity-ads-webview/pull/8680)
 * Consolidate display adType to one [#8616](https://github.com/Applifier/unity-ads-webview/pull/8616)
 * Add miller creativeid for analytics events [#8682](https://github.com/Applifier/unity-ads-webview/pull/8682)
-
 
 # Tue Mar 12 21:19:07 UTC 2019
 
