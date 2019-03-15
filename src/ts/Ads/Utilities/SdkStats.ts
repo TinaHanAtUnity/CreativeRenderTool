@@ -19,7 +19,6 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
-import { AuctionV5Test } from 'Core/Models/ABGroup';
 
 interface ISdkStatsEvent {
     eventTimestamp: number;

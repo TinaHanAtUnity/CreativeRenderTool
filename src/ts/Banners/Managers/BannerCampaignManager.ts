@@ -22,7 +22,6 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
-import { SdkStats } from 'Ads/Utilities/SdkStats';
 
 export class NoFillError extends Error {
     public response: INativeResponse;

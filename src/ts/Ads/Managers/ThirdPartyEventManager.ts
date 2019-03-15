@@ -8,7 +8,6 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
-import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 enum ThirdPartyEventMethod {
