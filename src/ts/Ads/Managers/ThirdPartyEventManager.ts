@@ -109,8 +109,8 @@ export class ThirdPartyEventManager {
                 error = new DiagnosticError(new Error(error.message), diagnosticData);
             }
             // Auction V5 start dip investigation
-            if (auctionProtocol === 5 && (event.indexOf('start') !== -1 || event.indexOf('impression') !== -1)) {
-                Diagnostics.trigger('third_party_sendevent_failed_v5', diagnosticData);
+            if (event.toLowerCase().indexOf('start') !== -1 || event.toLowerCase().indexOf('impression') !== -1) {
+                Diagnostics.trigger('third_party_sendevent_failed', diagnosticData);
             }
             return Analytics.trigger('third_party_event_failed', error);
         });
