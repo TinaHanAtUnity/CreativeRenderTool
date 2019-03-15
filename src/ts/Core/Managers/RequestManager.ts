@@ -20,6 +20,11 @@ const enum RequestMethod {
     HEAD
 }
 
+export enum AuctionProtocol {
+    V4 = 4,
+    V5 = 5
+}
+
 interface IRequestOptions {
     retries: number;
     retryDelay: number;
@@ -77,7 +82,7 @@ export class RequestManager {
     private static _callbacks: { [key: number]: CallbackContainer<INativeResponse> } = {};
     private static _requests: { [key: number]: INativeRequest } = {};
     private static _authorizations: { host: RegExp; authorizationHeader: string }[] = [];
-    private static _auctionProtocol: number | undefined;
+    private static _auctionProtocol: AuctionProtocol | undefined;
 
     private static getDefaultRequestOptions(): IRequestOptions {
         return {
@@ -107,32 +112,32 @@ export class RequestManager {
     public static setAuctionProtocol(coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, platform: Platform) {
         if (!RequestManager._auctionProtocol) {
             if (coreConfig.getTestMode()) {
-                RequestManager._auctionProtocol = 4;
+                RequestManager._auctionProtocol = AuctionProtocol.V4;
                 return;
             }
 
             if (adsConfig.getPlacementCount() >= 10) {
-                RequestManager._auctionProtocol = 4;
+                RequestManager._auctionProtocol = AuctionProtocol.V4;
                 return;
             }
 
             if (platform === Platform.IOS) {
-                RequestManager._auctionProtocol = 5;
+                RequestManager._auctionProtocol = AuctionProtocol.V5;
             } else {    // Android abTest
-                RequestManager._auctionProtocol = AuctionV5Test.isValid(coreConfig.getAbGroup()) ? 5 : 4;
+                RequestManager._auctionProtocol = AuctionV5Test.isValid(coreConfig.getAbGroup()) ? AuctionProtocol.V5 : AuctionProtocol.V4;
             }
         }
     }
 
-    public static setTestAuctionProtocol(protocol: number) {
+    public static setTestAuctionProtocol(protocol: AuctionProtocol) {
         RequestManager._auctionProtocol = protocol;
     }
 
-    public static getAuctionProtocol(): number {
+    public static getAuctionProtocol(): AuctionProtocol {
         if (RequestManager._auctionProtocol) {
             return RequestManager._auctionProtocol;
         }
-        return 4; // default protocol
+        return AuctionProtocol.V4; // default protocol
     }
 
     public static setAuthorizationHeaderForHost(hostRegex: string, authorizationHeader: string) {

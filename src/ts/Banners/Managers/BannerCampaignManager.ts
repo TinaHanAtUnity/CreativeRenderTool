@@ -15,7 +15,7 @@ import { ICoreApi } from 'Core/ICore';
 import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { INativeResponse, RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -109,7 +109,7 @@ export class BannerCampaignManager {
                     if (nativeResponse.responseCode) {
                         jaegerSpan.addTag(JaegerTags.StatusCode, nativeResponse.responseCode.toString());
                     }
-                    if (RequestManager.getAuctionProtocol() === 5) {
+                    if (RequestManager.getAuctionProtocol() === AuctionProtocol.V5) {
                         return this.parseAuctionV5BannerCampaign(nativeResponse, placement);
                     }
                     return this.parseBannerCampaign(nativeResponse, placement);
