@@ -4,6 +4,7 @@ import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { IPermissions, isUnityConsentPermissions } from 'Ads/Models/Privacy';
+import { ConsentPage } from 'Ads/Views/Consent/Consent';
 
 export interface IPrivacyEventHandlerParameters {
     platform: Platform;
@@ -70,7 +71,7 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     public onPersonalizedConsent(permissions: IPermissions): void {
         const gamePrivacy = this._configuration.getGamePrivacy();
         if (gamePrivacy.isEnabled() && isUnityConsentPermissions(permissions)) {
-            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER);
+            this._privacyManager.updateUserPrivacy(permissions, GDPREventSource.USER, ConsentPage.MY_CHOICES);
         }
     }
 }
