@@ -255,11 +255,13 @@ export class CampaignRefreshManager extends RefreshManager {
 
         if(session) {
             SessionDiagnostics.trigger(diagnosticsType, {
-                error: error
+                error: error,
+                auctionProtocol: RequestManager.getAuctionProtocol()
             }, session);
         } else {
             Diagnostics.trigger(diagnosticsType, {
-                error: error
+                error: error,
+                auctionProtocol: RequestManager.getAuctionProtocol()
             });
         }
         this._core.Sdk.logError(JSON.stringify(error));
