@@ -1,4 +1,4 @@
-# Staging
+# Fri Mar 15 12:36:40 UTC 2019
 
 * Promo fix where landscape font size was incorrect [#8686](https://github.com/Applifier/unity-ads-webview/pull/8686)
 * Fix the call to icon-size to use correct name [#8690](https://github.com/Applifier/unity-ads-webview/pull/8690)
