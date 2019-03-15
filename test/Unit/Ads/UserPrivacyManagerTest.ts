@@ -1,6 +1,6 @@
 import { GDPREventAction, GDPREventSource, UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy, PrivacyMethod, IPermissions, UserPrivacy } from 'Ads/Models/Privacy';
+import { GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -18,6 +18,7 @@ import { Observable2 } from 'Core/Utilities/Observable';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { ConsentPage } from 'Ads/Views/Consent/Consent';
 
 describe('UserPrivacyManagerTest', () => {
     const testGameId = '12345';
@@ -469,6 +470,7 @@ describe('UserPrivacyManagerTest', () => {
                 'action': 'skip',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
+                'country': 'FF',
                 'gameId': testGameId
             }
         }, {
@@ -479,6 +481,7 @@ describe('UserPrivacyManagerTest', () => {
                 'action': 'consent',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
+                'country': 'FF',
                 'gameId': testGameId
             }
         }, {
@@ -489,6 +492,7 @@ describe('UserPrivacyManagerTest', () => {
                 'action': 'optout',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
+                'country': 'FF',
                 'gameId': testGameId
             }
         }, {
@@ -500,6 +504,7 @@ describe('UserPrivacyManagerTest', () => {
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'gameId': testGameId,
+                'country': 'FF',
                 'source': 'metadata'
             }
         }, {
@@ -511,6 +516,7 @@ describe('UserPrivacyManagerTest', () => {
                 'projectId': testUnityProjectId,
                 'platform': 'android',
                 'gameId': testGameId,
+                'country': 'FF',
                 'source': 'user'
             }
         }, {
@@ -521,6 +527,7 @@ describe('UserPrivacyManagerTest', () => {
                 'action': 'optin',
                 'projectId': testUnityProjectId,
                 'platform': 'android',
+                'country': 'FF',
                 'gameId': testGameId
             }
         }];
@@ -565,11 +572,12 @@ describe('UserPrivacyManagerTest', () => {
         beforeEach(() => {
             gamePrivacy.isEnabled.returns(true);
             gamePrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
+            (<sinon.SinonStub>coreConfig.getCountry).returns('FI');
         });
 
         describe('when updating user privacy', () => {
-            function sendEvent(permissions: IPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER): Promise<any> {
-                return privacyManager.updateUserPrivacy(permissions, source).then(() => {
+            function sendEvent(permissions: IPermissions = anyConsent, source: GDPREventSource = GDPREventSource.USER, layout?: ConsentPage): Promise<any> {
+                return privacyManager.updateUserPrivacy(permissions, source, layout).then(() => {
                     sinon.assert.calledTwice(httpKafkaStub); // First one is temporary diagnostics
                     return httpKafkaStub.secondCall.args[2];
                 });
@@ -591,6 +599,7 @@ describe('UserPrivacyManagerTest', () => {
                     assert.equal(eventData.projectId, testUnityProjectId);
                     assert.equal(eventData.platform, 'android');
                     assert.equal(eventData.gameId, testGameId);
+                    assert.equal(eventData.country, 'FI');
                     assert.equal(eventData.source, GDPREventSource.USER);
                 });
             });
@@ -599,12 +608,24 @@ describe('UserPrivacyManagerTest', () => {
                 const expectedPermissions: IPermissions = { gameExp: false, ads: true, external: true };
                 (<sinon.SinonStub>coreConfig.isCoppaCompliant).returns(false);
 
+                const expectedAbGroup = 19;
+                (<sinon.SinonStub>coreConfig.getAbGroup).returns(expectedAbGroup);
+
                 return sendEvent(expectedPermissions, GDPREventSource.USER).then((eventData) => {
                     assert.isDefined(eventData);
                     assert.equal(eventData.method, PrivacyMethod.UNITY_CONSENT);
                     assert.equal(eventData.version, gamePrivacy.getVersion());
                     assert.equal(eventData.coppa, false);
                     assert.equal(eventData.permissions, expectedPermissions);
+                    assert.equal(eventData.group, expectedAbGroup);
+                    assert.equal(eventData.layout, '');
+                });
+            });
+
+            it('should send selected layout with consent event', () => {
+                return sendEvent(undefined, GDPREventSource.USER, ConsentPage.INTRO).then((eventData) => {
+                    assert.isDefined(eventData);
+                    assert.equal(eventData.layout, ConsentPage.INTRO);
                 });
             });
 

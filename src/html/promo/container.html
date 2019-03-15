@@ -315,7 +315,7 @@
 
         <div class="promo-background landscape" style="background-image: url('<%= data.landscapeBackgroundImage && data.landscapeBackgroundImage.replace("file://", "") %>')">
             <button class="btn-promo" onclick="purchase()" style="top: <%= data.landscapeButtonCoordinatesTop %>; left: <%= data.landscapeButtonCoordinatesLeft %>; width: <%= data.landscapeButtonSizeWidth %>; height: <%= data.landscapeButtonSizeHeight %>; background-image: url('<%= data.landscapeButtonImage && data.landscapeButtonImage.replace("file://", "") %>')">
-                <span class="price-text" style="font-family: '<%= data.landscapePriceTextFontFamily %>'; color: <%= data.landscapePriceTextFontColor %>; font-size: <%= data.landscapePriceTextFontSize %>vh"><%= data.localizedPrice %></span>
+                <span class="price-text" style="font-family: '<%= data.landscapePriceTextFontFamily %>'; color: <%= data.landscapePriceTextFontColor %>; font-size: <%= data.landscapePriceTextFontSize %>vw"><%= data.localizedPrice %></span>
             </button>
 
             <div class="set-size charts-container pie-wrapper progress" style="visibility: hidden">
