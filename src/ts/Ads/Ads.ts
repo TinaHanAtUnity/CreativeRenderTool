@@ -79,6 +79,7 @@ import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 export class Ads implements IAds {
 
@@ -212,6 +213,17 @@ export class Ads implements IAds {
                 });
             }
 
+            if (this._core.Config.getCountry() === 'CN' && this._core.NativeBridge.getPlatform() === Platform.ANDROID && this.SessionManager.getGameSessionId() % 100 === 0) {
+                Promise.all([
+                    PermissionsUtil.checkPermissionInManifest(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.READ_PHONE_STATE),
+                    PermissionsUtil.checkPermissions(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.READ_PHONE_STATE)
+                ]).then(([readDeviceSupported, permissionInManifest]) => {
+                    Diagnostics.trigger('read_device_permission', {readDeviceSupported, permissionInManifest});
+                }).catch(error => {
+                    Diagnostics.trigger('read_device_permission_error', error);
+                });
+            }
+
             const parserModules: AbstractParserModule[] = [
                 new AdMob(this._core, this),
                 new Display(this._core, this),
@@ -231,11 +243,15 @@ export class Ads implements IAds {
                 }
             });
 
+            RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform());
+
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this._core.JaegerManager, this.BackupCampaignManager);
             this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
 
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
+
             promo.initialize();
+
             this.Monetization.Api.Listener.isMonetizationEnabled().then((enabled) => {
                 if(enabled) {
                     this.Monetization.initialize();

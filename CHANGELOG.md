@@ -1,9 +1,28 @@
-# Pending
+# Mon Mar 18 15:45:41 UTC 2019
+
+* Diagnostics of READ_PHONE_STATE permission for China Android 1% [#8687](https://github.com/Applifier/unity-ads-webview/pull/8687)
+* Making creativeType case agnostic [#8685](https://github.com/Applifier/unity-ads-webview/pull/8685)
+* V5 Rolling out iOS and diagnostics for failed send events [#8688](https://github.com/Applifier/unity-ads-webview/pull/8688) 
+
+# Fri Mar 15 14:46:01 UTC 2019
+
+* Change consent layout [#8711](https://github.com/Applifier/unity-ads-webview/pull/8711)
+
+# Fri Mar 15 12:36:40 UTC 2019
+
+* Promo fix where landscape font size was incorrect [#8686](https://github.com/Applifier/unity-ads-webview/pull/8686)
+* Fix the call to icon-size to use correct name [#8690](https://github.com/Applifier/unity-ads-webview/pull/8690)
+* Additional fields for consent layout A/B tests [#8372](https://github.com/Applifier/unity-ads-webview/pull/8372)
+
+# Thu Mar 14 08:37:20 UTC 2019
 
 * Experiment to test more accessible mraid close button in playables [#8614](https://github.com/Applifier/unity-ads-webview/pull/8614)
 * Show GDPR banner also in Performance VideoOverlay [#8637](https://github.com/Applifier/unity-ads-webview/pull/8637)
 * Add Reverse AB Test for "install now" button in rewarded ads [#8522](https://github.com/Applifier/unity-ads-webview/pull/8522)
 * Add Accessible close button test [#8471](https://github.com/Applifier/unity-ads-webview/pull/8471)
+* Release abGroup 17 to roll out VastStrictParser for Programmatic Vast [#8680](https://github.com/Applifier/unity-ads-webview/pull/8680)
+* Consolidate display adType to one [#8616](https://github.com/Applifier/unity-ads-webview/pull/8616)
+* Add miller creativeid for analytics events [#8682](https://github.com/Applifier/unity-ads-webview/pull/8682)
 
 # Tue Mar 12 21:19:07 UTC 2019
 
