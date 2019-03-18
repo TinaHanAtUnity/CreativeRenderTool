@@ -286,7 +286,7 @@ export class VastParserStrict {
         });
 
         this.getNodesWithName(adElement, VastNodeName.EXTENSION).forEach((element: HTMLElement) => {
-            
+            // TODO parse extension
         });
 
         return vastAd;
