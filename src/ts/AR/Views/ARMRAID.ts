@@ -82,6 +82,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             {
                 event: 'click',
                 listener: (event: Event) => {
+                    this.hideARPermissionPanel();
                     this.onShowAr();
                 },
                 selector: '.permission-accept-button'
@@ -474,8 +475,9 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private onShowAr() {
         this._permissionResultObserver = this._core.Permissions.onPermissionsResult.subscribe((permission, granted) => {
-            if(permission === PermissionTypes.CAMERA) {
-                this.onCameraPermissionEvent(granted);
+            if(permission === PermissionTypes.CAMERA && granted) {
+                // send event only if permission is granted, otherwise would reload fallback scene
+                this.onCameraPermissionEvent(true);
             }
         });
 
