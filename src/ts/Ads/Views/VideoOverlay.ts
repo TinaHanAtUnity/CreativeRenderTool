@@ -14,8 +14,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { ABGroup, SkipUnderTimerExperiment } from 'Core/Models/ABGroup';
-
 
 export interface IVideoOverlayParameters<T extends Campaign> {
     platform: Platform;
@@ -91,7 +89,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
             this._templateData.gameIcon = this._campaign.getGameIcon() ? this._campaign.getGameIcon().getUrl() : '';
         }
 
-        if (SkipUnderTimerExperiment.isValid(parameters.coreConfig.getAbGroup()) && parameters.placement.allowSkip()) {
+        if (CustomFeatures.isSkipUnderTimerExperimentEnabled(parameters.coreConfig, parameters.placement)) {
             this._templateData._skipUnderTimerExperimentEnabled = true;
             this._skipUnderTimerExperimentEnabled = true;
         }
