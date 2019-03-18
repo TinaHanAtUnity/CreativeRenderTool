@@ -8,6 +8,7 @@ import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 enum ThirdPartyEventMethod {
     POST,
@@ -92,16 +93,23 @@ export class ThirdPartyEventManager {
         }
         return request.catch(error => {
             const urlParts = Url.parse(url);
+            const auctionProtocol = RequestManager.getAuctionProtocol();
+            const diagnosticData = {
+                request: error.nativeRequest,
+                event: event,
+                sessionId: sessionId,
+                url: url,
+                response: error.nativeResponse,
+                host: urlParts.host,
+                protocol: urlParts.protocol,
+                auctionProtocol: auctionProtocol
+            };
             if(error instanceof RequestError) {
-                error = new DiagnosticError(new Error(error.message), {
-                    request: error.nativeRequest,
-                    event: event,
-                    sessionId: sessionId,
-                    url: url,
-                    response: error.nativeResponse,
-                    host: urlParts.host,
-                    protocol: urlParts.protocol
-                });
+                error = new DiagnosticError(new Error(error.message), diagnosticData);
+            }
+            // Auction V5 start dip investigation
+            if (event.toLowerCase().indexOf('start') !== -1 || event.toLowerCase().indexOf('impression') !== -1) {
+                Diagnostics.trigger('third_party_sendevent_failed', diagnosticData);
             }
             return Analytics.trigger('third_party_event_failed', error);
         });

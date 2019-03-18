@@ -7,6 +7,7 @@
 - Python (`brew install python3`) for the local webserver
 - Watchman (`brew install watchman`) for watching tests
 - exiftool (`brew install exiftool`) for integration tests
+- hub (`brew install hub`) for release scripts
 
 ### Optional
 
