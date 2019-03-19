@@ -5,7 +5,6 @@ import { ICoreApi } from 'Core/ICore';
 import { Localization } from 'Core/Utilities/Localization';
 import { Observable0, Observable1 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
-import { XHRequest } from 'Core/Utilities/XHRequest';
 import { View } from 'Core/Views/View';
 import PromoTpl from 'html/Promo.html';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
@@ -74,16 +73,9 @@ export class Promo extends View<{}> implements IPrivacyHandlerView {
         super.render();
 
         this._iframe = this._container.querySelector('iframe');
-        if (this._promoCampaign.isUsingServerTemplate()) {
-            this.getPromoMarkup().then((markup) => {
-                if (markup) {
-                    const tpl = new Template(markup, this._localization);
-                    this._iframe!.setAttribute('srcdoc', tpl.render(this._templateData ? this._templateData : {}));
-                }
-            });
-        } else {
+        if (this._iframe) {
             const tpl = new Template(this._promoIndexTemplate, this._localization);
-            this._iframe!.setAttribute('srcdoc', tpl.render(this._templateData ? this._templateData : {}));
+            this._iframe.setAttribute('srcdoc', tpl.render(this._templateData ? this._templateData : {}));
         }
         this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
@@ -158,37 +150,6 @@ export class Promo extends View<{}> implements IPrivacyHandlerView {
         }
 
         this._privacy.show();
-    }
-
-    private getPromoMarkup(): Promise<string> {
-        return this.getStaticMarkup().then((markup) => {
-            return this.replaceDynamicMarkupPlaceholder(markup);
-        }).catch((e) => {
-            this._core.Sdk.logError('failed to get promo markup: ' + e);
-            return '';
-        });
-    }
-
-    private getStaticMarkup(): Promise<string> {
-        const resourceUrl = this._promoCampaign.getCreativeResource();
-        if(resourceUrl) {
-            if (this._platform === Platform.ANDROID) {
-                return XHRequest.get(resourceUrl.getUrl());
-            } else {
-                const fileId = resourceUrl.getFileId();
-                if (fileId) {
-                    return this._core.Cache.getFileContent(fileId, 'UTF-8');
-                } else {
-                    return XHRequest.get(resourceUrl.getOriginalUrl());
-                }
-            }
-        }
-        return Promise.reject(new Error('No creative resource found for campaign'));
-    }
-
-    private replaceDynamicMarkupPlaceholder(markup: string): string {
-        const dynamicMarkup = this._promoCampaign.getDynamicMarkup();
-        return dynamicMarkup ? markup.replace('{UNITY_DYNAMIC_MARKUP}', dynamicMarkup) : markup;
     }
 
     private setupTemplateData(campaign: PromoCampaign, placement: Placement) {

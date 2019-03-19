@@ -34,7 +34,7 @@ import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { IPurchasing } from 'Purchasing/IPurchasing';
-import { IChina } from 'China/IChina';
+import { IStore } from 'Store/IStore';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -80,4 +80,5 @@ export interface ICore extends IApiModule {
     Ads: IAds;
     Analytics: IAnalytics;
     Purchasing: IPurchasing;
+    Store: IStore;
 }

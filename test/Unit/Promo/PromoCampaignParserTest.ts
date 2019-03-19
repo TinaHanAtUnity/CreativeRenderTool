@@ -75,10 +75,7 @@ describe('PromoCampaignParser', () => {
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
                 assert.equal(campaign.getIapProductId(), content.premiumProduct.productId, 'IAP Product ID is not equal');
-                assert.equal(campaign.getDynamicMarkup(), content.dynamicMarkup, 'Dynamic Markup is not equal');
-                assert.equal(campaign.getCreativeResource()!.getUrl(), content.creativeUrl, 'Creative URL is not equal');
                 assert.equal(campaign.getLimitedTimeOffer()!.getDuration(), 86400, 'Limited Time Offer duration is not equal');
-                assert.equal(campaign.isUsingServerTemplate(), true, 'Should not be using webview template');
             });
         });
 
@@ -113,10 +110,7 @@ describe('PromoCampaignParser', () => {
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
                 assert.equal(campaign.getIapProductId(), content.premiumProduct.productId, 'IAP Product ID is not equal');
-                assert.equal(campaign.getDynamicMarkup(), content.dynamicMarkup, 'Dynamic Markup is not equal');
-                assert.equal(campaign.getCreativeResource()!.getUrl(), content.creativeUrl, 'Creative URL is not equal');
                 assert.equal(campaign.getLimitedTimeOffer()!.getDuration(), 86400, 'Limited Time Offer duration is not equal');
-                assert.equal(campaign.isUsingServerTemplate(), false, 'Should be using server');
                 const portraitAsset = campaign.getPortraitAssets()!;
                 assert.equal(portraitAsset.getBackgroundAsset().getImage().getOriginalUrl(), content.portrait.background.url, 'portrait background url does not match');
                 assert.equal(portraitAsset.getBackgroundAsset().getSize().getWidth(), content.portrait.background.size.width, 'portrait background width does not match');

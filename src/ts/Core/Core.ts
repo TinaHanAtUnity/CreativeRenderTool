@@ -20,6 +20,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { UnityInfo } from 'Core/Models/UnityInfo';
 import { BroadcastApi } from 'Core/Native/Android/Broadcast';
 import { IntentApi } from 'Core/Native/Android/Intent';
 import { LifecycleApi } from 'Core/Native/Android/Lifecycle';
@@ -42,13 +43,13 @@ import { StorageApi } from 'Core/Native/Storage';
 import { CoreConfigurationParser, IRawCoreConfiguration } from 'Core/Parsers/CoreConfigurationParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
+import { JsonParser } from 'Core/Utilities/JsonParser';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
-import { Purchasing } from 'Purchasing/Purchasing';
-import { JsonParser } from 'Core/Utilities/JsonParser';
-import { UnityInfo } from 'Core/Models/UnityInfo';
+import { Store } from 'Store/Store';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
+import { Purchasing } from 'Purchasing/Purchasing';
 
 export class Core implements ICore {
 
@@ -75,6 +76,7 @@ export class Core implements ICore {
     public Analytics: Analytics;
     public Ads: Ads;
     public Purchasing: Purchasing;
+    public Store: Store;
 
     private _initialized = false;
     private _initializedAt: number;
@@ -218,16 +220,14 @@ export class Core implements ICore {
             this.Analytics = new Analytics(this);
             return Promise.all([configJson, this.Analytics.initialize()]);
         }).then(([configJson, gameSessionId]: [unknown, number]) => {
-            this.Ads = new Ads(configJson, this);
+            this.Store = new Store(this);
+            this.Ads = new Ads(configJson, this, this.Store);
             this.Ads.SessionManager.setGameSessionId(gameSessionId);
             this.Purchasing = new Purchasing(this);
+
             return this.Ads.initialize(jaegerInitSpan);
         }).then(() => {
             this.JaegerManager.stop(jaegerInitSpan);
-
-            if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
-                this.NativeBridge.setAutoBatchEnabled(false);
-            }
         }).catch((error: { message: string; name: unknown }) => {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');

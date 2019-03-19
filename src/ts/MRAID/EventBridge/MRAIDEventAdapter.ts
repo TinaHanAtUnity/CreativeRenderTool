@@ -38,8 +38,9 @@ export enum MRAIDEvents {
     STATE_CHANGE        = 'customMraidState',
     RESIZE_WEBVIEW      = 'resizeWebview',
     SEND_STATS          = 'sendStats',
+    AR                  = 'ar',
     AR_READY_SHOW       = 'arReadyShow',
-    AR                  = 'ar'
+    CONSOLE_LOG         = 'consoleLog'
 }
 
 export abstract class MRAIDEventAdapter implements IMRAIDAdapter {

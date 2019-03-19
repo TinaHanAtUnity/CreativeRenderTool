@@ -6,10 +6,13 @@ import { Platform } from 'Core/Constants/Platform';
 import { IAds } from 'Ads/IAds';
 import { Backend } from 'Backend/Backend';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
+import 'mocha';
+import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
 import { HTMLBannerAdUnit } from 'Banners/AdUnits/HTMLBannerAdUnit';
 import { asStub } from 'TestHelpers/Functions';
+import { BannerCampaignManager, NoFillError } from 'Banners/Managers/BannerCampaignManager';
 
 [
     Platform.IOS,
@@ -25,8 +28,10 @@ import { asStub } from 'TestHelpers/Functions';
         let sandbox: sinon.SinonSandbox;
         let adUnit: IBannerAdUnit;
         const placementId = 'banner';
+        let clock: sinon.SinonFakeTimers;
 
         beforeEach(() => {
+            clock = sinon.useFakeTimers();
             sandbox = sinon.createSandbox();
             backend = TestFixtures.getBackend(platform);
             const nativeBridge = TestFixtures.getNativeBridge(platform, backend);
@@ -37,7 +42,10 @@ import { asStub } from 'TestHelpers/Functions';
             bannerAdContext = banners.AdContext;
         });
 
-        afterEach(() => sandbox.restore());
+        afterEach(() => {
+            sandbox.restore();
+            clock.restore();
+        });
 
         const loadBannerAdUnit = () => {
             adUnit = sandbox.createStubInstance(HTMLBannerAdUnit);
@@ -66,13 +74,8 @@ import { asStub } from 'TestHelpers/Functions';
         });
 
         describe('Refreshing a banner ad unit', () => {
-            let clock: sinon.SinonFakeTimers;
             beforeEach(() => {
-                clock = sinon.useFakeTimers();
                 return loadBannerAdUnit();
-            });
-            afterEach(() => {
-                clock.restore();
             });
             context('if not shown yet', () => {
                 it('should not refresh after 30 seconds', () => {
@@ -92,6 +95,19 @@ import { asStub } from 'TestHelpers/Functions';
                     return Promise.resolve().then(() => {
                         sinon.assert.calledTwice(asStub(banners.CampaignManager.request));
                     });
+                });
+            });
+        });
+
+        describe('No fill banner scenario', () => {
+            beforeEach(() => {
+                sandbox.stub(banners.CampaignManager, 'request').returns(Promise.reject(new NoFillError()));
+                sandbox.stub(banners.Api.Listener, 'sendErrorEvent');
+            });
+
+            it('will fail when the banner request returns NoFillError', () => {
+                return bannerAdContext.load(placementId).catch((e) => {
+                    sinon.assert.called(asStub(banners.Api.Listener.sendErrorEvent));
                 });
             });
         });

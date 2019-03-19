@@ -23,7 +23,6 @@ import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHan
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { StatusCodeTest } from 'Core/Models/ABGroup';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { AuctionStatusCode } from 'Ads/Models/AuctionResponse';
 import { TimeUtils } from 'Ads/Utilities/TimeUtils';
@@ -256,11 +255,13 @@ export class CampaignRefreshManager extends RefreshManager {
 
         if(session) {
             SessionDiagnostics.trigger(diagnosticsType, {
-                error: error
+                error: error,
+                auctionProtocol: RequestManager.getAuctionProtocol()
             }, session);
         } else {
             Diagnostics.trigger(diagnosticsType, {
-                error: error
+                error: error,
+                auctionProtocol: RequestManager.getAuctionProtocol()
             });
         }
         this._core.Sdk.logError(JSON.stringify(error));
@@ -316,7 +317,7 @@ export class CampaignRefreshManager extends RefreshManager {
     private onAdPlanReceived(refreshDelay: number, campaignCount: number, auctionStatusCode: number) {
         this._campaignCount = campaignCount;
 
-        if (StatusCodeTest.isValid(this._coreConfig.getAbGroup()) && auctionStatusCode === AuctionStatusCode.FREQUENCY_CAP_REACHED) {
+        if (auctionStatusCode === AuctionStatusCode.FREQUENCY_CAP_REACHED) {
             const nowInMilliSec = Date.now();
             this._refillTimestamp = nowInMilliSec + TimeUtils.getNextUTCDayDeltaSeconds(nowInMilliSec) * 1000;
 

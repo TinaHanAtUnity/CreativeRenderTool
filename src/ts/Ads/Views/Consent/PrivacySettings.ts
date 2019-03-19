@@ -6,7 +6,7 @@ import { Template } from 'Core/Utilities/Template';
 
 import PrivacySettingsTemplate from 'html/consent/PrivacySettings.html';
 import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Consent/PrivacyRowItemContainer';
-import { PersonalizationCheckboxGroup } from 'Ads/Views/Consent/PersonalizationCheckboxGroup';
+import { PersonalizationSwitchGroup } from 'Ads/Views/Consent/PersonalizationSwitchGroup';
 import { IPermissions } from 'Ads/Models/Privacy';
 
 enum ViewState {
@@ -26,7 +26,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
     private _campaign: Campaign;
 
     private _privacyRowItemContainer: PrivacyRowItemContainer;
-    private _personalizationCheckBoxGroup: PersonalizationCheckboxGroup;
+    private _personalizationSwitchGroup: PersonalizationSwitchGroup;
 
     constructor(platform: Platform, campaign: Campaign, privacyManager: UserPrivacyManager,
                 gdprEnabled: boolean,
@@ -69,7 +69,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.close-area'
+                selector: '.safe-area-content, .close-area'
             },
             {
                 event: 'click',
@@ -95,13 +95,19 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
                 event: 'swipedown',
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.close-area, close-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onViewContainerEvent(event),
+                selector: '.view-container'
+
             }
         ];
 
-        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager, true);
+        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager);
         this._privacyRowItemContainer.addEventHandler(this);
 
-        this._personalizationCheckBoxGroup = new PersonalizationCheckboxGroup(platform, this._userPrivacyManager);
+        this._personalizationSwitchGroup = new PersonalizationSwitchGroup(platform, this._userPrivacyManager);
     }
 
     public render(): void {
@@ -110,18 +116,10 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         this._privacyRowItemContainer.render();
         (<HTMLElement>this._container.querySelector('.info-container')).appendChild(this._privacyRowItemContainer.container());
 
-        this._personalizationCheckBoxGroup.render();
-        (<HTMLElement>this._container.querySelector('.checkbox-group-container')).appendChild(this._personalizationCheckBoxGroup.container());
+        this._personalizationSwitchGroup.render();
+        (<HTMLElement>this._container.querySelector('.checkbox-group-container')).appendChild(this._personalizationSwitchGroup.container());
 
         this.showView(ViewState.INITIAL);
-    }
-
-    public onDataDeletion(): void {
-        this._personalizationCheckBoxGroup.checkCheckboxes(false);
-    }
-
-    public onShowDataDeletionDialog(): void {
-        this.showView(ViewState.DATA);
     }
 
     public onPrivacy(url: string): void {
@@ -219,9 +217,9 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
 
     private triggerPersonalizedConsent(): void {
         const consent: IPermissions = {
-            gameExp: this._personalizationCheckBoxGroup.isPersonalizedExperienceChecked(),
-            ads: this._personalizationCheckBoxGroup.isPersonalizedAdsChecked(),
-            external: this._personalizationCheckBoxGroup.isAds3rdPartyChecked()
+            gameExp: this._personalizationSwitchGroup.isPersonalizedExperienceChecked(),
+            ads: this._personalizationSwitchGroup.isPersonalizedAdsChecked(),
+            external: this._personalizationSwitchGroup.isAds3rdPartyChecked()
         };
 
         this._handlers.forEach(handler => {
@@ -261,9 +259,8 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             if (state === classToAdd) {
                 this.container().classList.add(classToAdd);
 
-                // todo: needed to set the length of the line connecting main and sub checkboxes
                 if (state === 'personalization') {
-                    this._personalizationCheckBoxGroup.show();
+                    this._personalizationSwitchGroup.show();
                 }
             } else {
                 this.container().classList.remove(state);
@@ -283,12 +280,18 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         dataDeletionContainer.classList.remove('active');
         dataDeletionContainer.classList.add('data-deletion-confirmed');
 
-        this._personalizationCheckBoxGroup.checkCheckboxes(false);
+        this._personalizationSwitchGroup.checkCheckboxes(false);
         this.triggerPersonalizedConsent();
     }
 
     private onDataDeletionCancelEvent(event: Event): void {
         event.preventDefault();
         (<HTMLElement>this._container.querySelector('.delete-data-container')).classList.remove('active');
+    }
+
+    private onViewContainerEvent(event: Event): void {
+        // Stop propagation to prevent closing the view
+        // Click event outside of .view-container div closes the view
+        event.stopPropagation();
     }
 }

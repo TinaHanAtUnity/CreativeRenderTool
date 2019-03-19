@@ -29,13 +29,8 @@
   }
 
   .close-button {
+    $consent-privacy-close-button-default();
     position: absolute;
-    padding: .35 * $default-size $default-size;
-    border-radius: 3 * $default-size;
-    background: $privacy-close-button;
-    color: $privacy-close-button-text;
-    font-weight: $privacy-title-font-weight;
-    font-size: $privacy-heading-font-size;
   }
 
   .page-container {
@@ -52,6 +47,8 @@
     border-top-left-radius: $default-size;
     border-top-right-radius: $default-size;
     background: $white;
+    // enable momentum scrolling on iOS
+    -webkit-overflow-scrolling: touch;
   }
 
   .back-button {
@@ -116,14 +113,26 @@
     }
   }
 
-  .checkbox-group-container {
-    $checkbox-group-container($default-scale-size, $privacy-text-font-size);
+  .personalization-container {
+    .checkbox-group-container {
+      $switch-group-container();
+      font-size: $privacy-text-font-size;
+    }
+
+    #third-party-switch.disabled {
+      opacity: .33;
+      pointer-events: none;
+    }
   }
 
   .radio-group-container {
     $radio-group-container-blue($default-scale-size, $privacy-text-font-size);
     font-weight: $privacy-text-font-weight;
     line-height: 1.25 * $default-size;
+  }
+
+  .build-info-container {
+    word-break: break-all;
   }
 
   &.initial {
@@ -167,6 +176,7 @@
   }
 
   .title {
+    margin-bottom: $default-size;
     font-weight: $privacy-main-title-font-weight;
   }
 
@@ -340,5 +350,45 @@ body {
         display: none;
       }
     }
+  }
+}
+
+$iphone-x-paddings() {
+  #privacy-settings {
+    .safe-area-content {
+      padding-top: constant(safe-area-inset-top);
+      padding-right: constant(safe-area-inset-right);
+      padding-left: constant(safe-area-inset-left);
+
+      padding-top: env(safe-area-inset-top);
+      padding-right: env(safe-area-inset-right);
+      padding-left: env(safe-area-inset-left);
+    }
+
+    .view-container {
+      padding-bottom: constant(safe-area-inset-bottom);
+      padding-bottom: env(safe-area-inset-bottom); // @stylint ignore
+    }
+  }
+}
+
+/* iPhone X & iPhone XS */
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+  html {
+    $iphone-x-paddings();
+  }
+}
+
+/* iPhone XS Max */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+  html {
+    $iphone-x-paddings();
+  }
+}
+
+/* iPhone XR */
+@media only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) {
+  html {
+    $iphone-x-paddings();
   }
 }

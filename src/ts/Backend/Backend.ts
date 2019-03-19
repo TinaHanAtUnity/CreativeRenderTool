@@ -27,6 +27,8 @@ import { IosPreferences } from 'Backend/Api/IosPreferences';
 import { AndroidPreferences } from 'Backend/Api/AndroidPreferences';
 import { Download } from 'Backend/Api/Download';
 import { BannerListener } from 'Backend/Api/BannerListener';
+import { AndroidStore } from 'Backend/Api/AndroidStore';
+import { Products } from 'Backend/Api/Products';
 
 interface IInvocation {
     className: string;
@@ -56,9 +58,11 @@ interface IBackendApi {
     Placement: Placement;
     Purchasing: Purchasing;
     Preferences: AndroidPreferences | IosPreferences;
+    Products: Products;
     Request: Request;
     Sdk: Sdk;
     Storage: Storage;
+    Store: AndroidStore;
     UrlScheme: UrlScheme;
     VideoPlayer: VideoPlayer;
     Download: Download;
@@ -92,11 +96,13 @@ export class Backend implements IWebViewBridge {
             Placement: new Placement(this),
             PlacementContents: new PlacementContents(this),
             Preferences: platform === Platform.IOS ? new IosPreferences(this) : new AndroidPreferences(this),
+            Products: new Products(this),
             Purchasing: new Purchasing(this),
             Request: new Request(this),
             Resolve: new Resolve(this),
             Sdk: new Sdk(this),
             Storage: new Storage(this),
+            Store: new AndroidStore(this),
             UrlScheme: new UrlScheme(this),
             VideoPlayer: new VideoPlayer(this),
             Download: new Download(this),

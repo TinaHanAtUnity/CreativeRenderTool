@@ -1,8 +1,7 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
-import { ICoreApi, ICore } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { ICore } from 'Core/ICore';
 import { Vast } from 'VAST/Models/Vast';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';

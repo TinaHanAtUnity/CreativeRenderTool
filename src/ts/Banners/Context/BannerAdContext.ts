@@ -90,6 +90,7 @@ export class BannerAdContext {
             this.setState(BannerLoadState.Loading);
             return this.loadBannerAdUnit().catch((e) => {
                 if (e instanceof NoFillError) {
+                    this.sendBannerError(new Error(`Banner placement ${placementId} returned no fill`));
                     this.setUpBannerRefresh();
                 }
                 throw e;

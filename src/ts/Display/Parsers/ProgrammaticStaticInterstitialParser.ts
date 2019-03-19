@@ -4,30 +4,31 @@ import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { Platform } from 'Core/Constants/Platform';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import { CampaignError } from 'Ads/Errors/CampaignError';
+import { StringUtils } from 'Ads/Utilities/StringUtils';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
 
     public static ContentTypeHtml = 'programmatic/static-interstitial-html';
     public static ContentTypeJs = 'programmatic/static-interstitial-js';
+    public static ErrorMessage = 'Display ad content is not in HTML format';
 
-    private _wrapWithScriptTag: boolean;
-
-    constructor(platform: Platform, wrapWithScriptTag: boolean) {
+    constructor(platform: Platform) {
         super(platform);
-        this._wrapWithScriptTag = wrapWithScriptTag;
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
-        let dynamicMarkup = decodeURIComponent(response.getContent());
-        if (this._wrapWithScriptTag) {
-            dynamicMarkup = '<script>' + dynamicMarkup + '</script>';
+        const dynamicMarkup = decodeURIComponent(response.getContent());
+        if (!StringUtils.startWithHTMLTag(dynamicMarkup)) {
+            throw new CampaignError(ProgrammaticStaticInterstitialParser.ErrorMessage, ProgrammaticStaticInterstitialParser.ContentTypeHtml, undefined, undefined, undefined, response.getSeatId());
         }
+
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
-            contentType: this._wrapWithScriptTag ? ProgrammaticStaticInterstitialParser.ContentTypeJs : ProgrammaticStaticInterstitialParser.ContentTypeHtml,
+            contentType: ProgrammaticStaticInterstitialParser.ContentTypeHtml,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
             creativeId: response.getCreativeId() || undefined,

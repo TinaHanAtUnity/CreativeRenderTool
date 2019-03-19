@@ -26,7 +26,6 @@ export abstract class Observable<T> {
             }
         }
     }
-
 }
 
 export class Observable0 extends Observable<IObserver0> {

@@ -3,18 +3,18 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import ZyngaGamesJson from 'json/custom_features/ZyngaGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
+import iOSV5GamesJson from 'json/custom_features/iOSV5Games.json';
 import { Campaign } from 'Ads/Models/Campaign';
-import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { toAbGroup, InstallInRewardedVideos } from 'Core/Models/ABGroup';
+import { HoldOutInstallInRewardedVideos } from 'Core/Models/ABGroup';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
 const ZyngaGameIds = setGameIds(ZyngaGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
+const iOSV5GameIds = setGameIds(iOSV5GamesJson);
 
 function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
@@ -41,7 +41,9 @@ export class CustomFeatures {
                 creativeId === '109091853' ||
                 creativeId === '109091754' ||
                 creativeId === '114617576' || // Hellfest
-                creativeId === '114617336';   // Hellfest
+                creativeId === '114617336' || // Hellfest
+                creativeId === '145941071' || // Miller Lite Fallback
+                creativeId === '145940860';   // Miller Lite Fallback
     }
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {
@@ -70,10 +72,6 @@ export class CustomFeatures {
 
     }
 
-    public static isByteDanceSeat(seatId: number | undefined): boolean {
-        return seatId === 9116 || seatId === 9154;
-    }
-
     public static isChinaSDK(platform: Platform, versionName: string): boolean {
         return platform === Platform.ANDROID
             && versionName.endsWith('china');
@@ -87,8 +85,12 @@ export class CustomFeatures {
         return this.existsInList(ZyngaGameIds, gameId);
     }
 
+    public static isIOSV5Games(gameId: string): boolean {
+        return this.existsInList(iOSV5GameIds, gameId);
+    }
+
     public static isRewardedVideoInstallButtonEnabled(campaign: Campaign, coreConfig: CoreConfiguration) {
-        if (!InstallInRewardedVideos.isValid(coreConfig.getAbGroup())) {
+        if (HoldOutInstallInRewardedVideos.isValid(coreConfig.getAbGroup())) {
             return false;
         }
 

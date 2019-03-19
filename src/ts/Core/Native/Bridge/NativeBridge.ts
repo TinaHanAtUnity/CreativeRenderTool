@@ -34,11 +34,8 @@ export class NativeBridge implements INativeBridge {
     private _platform: Platform;
     private _backend: IWebViewBridge;
 
-    private _allowAutoBatching = true;
     private _autoBatchEnabled: boolean;
     private _autoBatch?: BatchInvocation;
-    private _autoBatchTimer?: number;
-    private _autoBatchInterval = 1;
 
     private _eventHandlers: { [key: string]: NativeApi } = {};
 
@@ -56,26 +53,16 @@ export class NativeBridge implements INativeBridge {
 
     public invoke<T>(className: string, methodName: string, parameters?: unknown[]): Promise<T> {
         if(this._autoBatchEnabled) {
-            if(!this._autoBatch) {
+            if(this._autoBatch) {
+                return this._autoBatch.queue<T>(className, methodName, parameters);
+            } else {
                 this._autoBatch = new BatchInvocation(this);
             }
-            const promise = this._autoBatch.queue<T>(className, methodName, parameters);
-            if(!this._autoBatchTimer) {
-                this._autoBatchTimer = window.setTimeout(() => {
-                    if(this._autoBatch) {
-                        this.invokeBatch(this._autoBatch);
-                        delete this._autoBatch;
-                        delete this._autoBatchTimer;
-                    }
-                }, this._autoBatchInterval);
-            }
-            return promise;
-        } else {
-            const batch = new BatchInvocation(this);
-            const promise = batch.queue<T>(className, methodName, parameters);
-            this.invokeBatch(batch);
-            return promise;
         }
+        const batch = new BatchInvocation(this);
+        const promise = batch.queue<T>(className, methodName, parameters);
+        this.invokeBatch(batch);
+        return promise;
     }
 
     public handleCallback(results: unknown[][]): void {
@@ -103,6 +90,12 @@ export class NativeBridge implements INativeBridge {
             }
             delete this._callbackTable[id];
         });
+        if(this._autoBatchEnabled) {
+            if(this._autoBatch && this._autoBatch.getBatch().length > 0) {
+                this.invokeBatch(this._autoBatch);
+            }
+            delete this._autoBatch;
+        }
     }
 
     public addEventHandler(eventCategory: EventCategory, nativeApi: NativeApi) {
@@ -136,14 +129,8 @@ export class NativeBridge implements INativeBridge {
         return this._platform;
     }
 
-    public setAllowAutoBatching(value: boolean) {
-        this._allowAutoBatching = value;
-    }
-
     public setAutoBatchEnabled(enabled: boolean) {
-        if(this._allowAutoBatching) {
-            this._autoBatchEnabled = enabled;
-        }
+        this._autoBatchEnabled = enabled;
     }
 
     private invokeBatch(batch: BatchInvocation): void {

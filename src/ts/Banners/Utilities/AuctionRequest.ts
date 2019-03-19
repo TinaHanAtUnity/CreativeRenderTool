@@ -8,7 +8,7 @@ import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { INativeResponse, RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -18,7 +18,6 @@ import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { StorageType } from 'Core/Native/Storage';
 import { Url } from 'Core/Utilities/Url';
-import { AuctionV5Test } from 'Core/Models/ABGroup';
 
 export interface IAuctionResponse {
     correlationId: string;
@@ -99,6 +98,7 @@ export class AuctionRequest {
     private static AbGroup: number | undefined;
     private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
     private static AuctionV5BaseUrl: string = 'https://auction.unityads.unity3d.com/v5/games';
+    private static TestModeUrl: string = 'https://auction.unityads.unity3d.com/v4/test/games';
     private static CampaignId: string | undefined;
     private static Country: string | undefined;
     private static SessionId: string | undefined;
@@ -142,7 +142,11 @@ export class AuctionRequest {
         this._metaDataManager = params.metaDataManager;
         this._adMobSignalFactory = params.adMobSignalFactory;
         this._sessionManager = params.sessionManager;
-        this._baseURL = AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;
+        if(this._coreConfig.getTestMode()) {
+            this._baseURL = AuctionRequest.TestModeUrl;
+        } else {
+            this._baseURL = RequestManager.getAuctionProtocol() === AuctionProtocol.V5 ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;
+        }
     }
 
     public request(): Promise<IAuctionResponse> {

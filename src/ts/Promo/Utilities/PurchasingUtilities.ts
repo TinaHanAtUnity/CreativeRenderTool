@@ -18,6 +18,7 @@ import { CustomPurchasingAdapter } from 'Purchasing/CustomPurchasingAdapter';
 import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import { IProduct, IPurchasingAdapter } from 'Purchasing/PurchasingAdapter';
 import { UnityPurchasingPurchasingAdapter } from 'Purchasing/UnityPurchasingPurchasingAdapter';
+import { TestModePurchasingAdapter } from 'Purchasing/TestModePurchasingAdapter';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 
@@ -63,7 +64,10 @@ export class PurchasingUtilities {
             return this._purchasingAdapter.initialize().catch((e) => {
                 // Logging occurs in the purchasing adapter
             });
-        }).then(() => this._isInitialized = true);
+        }).then(() => {
+            this._isInitialized = true;
+            this._purchasingAdapter.refreshCatalog();
+        });
     }
 
     public static isInitialized(): boolean {
@@ -137,6 +141,10 @@ export class PurchasingUtilities {
         return false;
     }
 
+    public static isCatalogAvailable(): boolean {
+        return this._isInitialized && this.isCatalogValid();
+    }
+
     public static isCatalogValid(): boolean {
         return (this._catalog !== undefined && this._catalog.getProducts() !== undefined && this._catalog.getSize() !== 0);
     }
@@ -176,7 +184,13 @@ export class PurchasingUtilities {
         }
     }
 
-    private static getPurchasingAdapter() {
+    private static getPurchasingAdapter() : Promise<IPurchasingAdapter> {
+        if (this._coreConfig.getTestMode()) {
+            return Promise.resolve().then(() => {
+                this._core.Sdk.logInfo('TestMode delegate is set');
+                return new TestModePurchasingAdapter(this._core);
+            });
+        }
         return this._purchasing.CustomPurchasing.available().then((isAvailable) => {
             if (isAvailable) {
                 this._core.Sdk.logInfo('CustomPurchasing delegate is set');
