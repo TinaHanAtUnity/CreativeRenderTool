@@ -92,6 +92,7 @@ export class AuctionRequest {
 
     public static setBaseUrl(baseUrl: string): void {
         AuctionRequest.BaseUrl = baseUrl + '/v4/games';
+        AuctionRequest.AuctionV5BaseUrl = baseUrl + '/v5/games';
     }
 
     private static CampaignResponse: string;
