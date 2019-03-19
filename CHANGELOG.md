@@ -1,3 +1,7 @@
+# Merged
+
+* Introduce Observables utility class [#8475](https://github.com/Applifier/unity-ads-webview/pull/8475)
+
 # Mon Mar 18 15:45:41 UTC 2019
 
 * Diagnostics of READ_PHONE_STATE permission for China Android 1% [#8687](https://github.com/Applifier/unity-ads-webview/pull/8687)
