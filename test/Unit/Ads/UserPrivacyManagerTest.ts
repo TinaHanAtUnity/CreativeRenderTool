@@ -574,7 +574,7 @@ describe('UserPrivacyManagerTest', () => {
             sandbox = sinon.createSandbox();
             gamePrivacy.isEnabled.returns(true);
             gamePrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
-            sandbox.stub(Math, 'random').returns(1);
+            sandbox.stub(Math, 'random').returns(0);
             (<sinon.SinonStub>coreConfig.getCountry).returns('FI');
         });
 

@@ -102,7 +102,7 @@ export class CustomFeatures {
     }
 
     public static shouldSampleAtOnePercent(): boolean {
-        // will only return true when Math.random returns 1
+        // will only return true when Math.random returns 0
         if (Math.floor(Math.random() * 100) % 100 === 0) {
             return true;
         } else {
