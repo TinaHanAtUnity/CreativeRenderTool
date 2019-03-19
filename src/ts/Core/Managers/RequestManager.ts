@@ -125,7 +125,7 @@ export class RequestManager {
 
             if (adsConfig.getPlacementCount() >= 10) {
                 RequestManager._auctionProtocol = AuctionProtocol.V4;
-                if (Math.floor(Math.random() * 100) % 100 === 1) {
+                if (CustomFeatures.shouldSampleAtOnePercent()) {
                     Diagnostics.trigger('config_placement_over_10', {
                         placementCount: adsConfig.getPlacementCount()
                     });
