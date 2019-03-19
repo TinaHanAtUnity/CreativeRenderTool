@@ -8,6 +8,8 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AuctionV5Test } from 'Core/Models/ABGroup';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 const enum RequestStatus {
     COMPLETE,
@@ -109,15 +111,25 @@ export class RequestManager {
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
     }
 
-    public static setAuctionProtocol(coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, platform: Platform) {
+    public static setAuctionProtocol(coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, platform: Platform, clientInfo: ClientInfo) {
         if (!RequestManager._auctionProtocol) {
             if (coreConfig.getTestMode()) {
                 RequestManager._auctionProtocol = AuctionProtocol.V4;
                 return;
             }
 
+            if (CustomFeatures.isIOSV5Games(clientInfo.getGameId())) {
+                RequestManager._auctionProtocol = AuctionProtocol.V5;
+                return;
+            }
+
             if (adsConfig.getPlacementCount() >= 10) {
                 RequestManager._auctionProtocol = AuctionProtocol.V4;
+                if (Math.floor(Math.random() * 100) % 100 === 1) {
+                    Diagnostics.trigger('config_placement_over_10', {
+                        placementCount: adsConfig.getPlacementCount()
+                    });
+                }
                 return;
             }
 
