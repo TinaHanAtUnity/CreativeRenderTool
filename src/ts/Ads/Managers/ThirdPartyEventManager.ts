@@ -99,7 +99,7 @@ export class ThirdPartyEventManager {
                 event: event,
                 sessionId: sessionId,
                 url: url,
-                response: error.nativeResponse,
+                response: error,
                 host: urlParts.host,
                 protocol: urlParts.protocol,
                 auctionProtocol: auctionProtocol

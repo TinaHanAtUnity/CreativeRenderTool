@@ -1,3 +1,10 @@
+# Tue Mar 19 17:27:24 UTC 2019
+
+* Introduce Observables utility class [#8475](https://github.com/Applifier/unity-ads-webview/pull/8475)
+* More loggings and locking v5 for ios test games [#8735](https://github.com/Applifier/unity-ads-webview/pull/8735)
+* Changing analytics to accept level index as a string rather than an int [#8733](https://github.com/Applifier/unity-ads-webview/pull/8733)
+* Override Unity consent from metadata if present [#8683](https://github.com/Applifier/unity-ads-webview/pull/8683)
+
 # Mon Mar 18 15:45:41 UTC 2019
 
 * Diagnostics of READ_PHONE_STATE permission for China Android 1% [#8687](https://github.com/Applifier/unity-ads-webview/pull/8687)
