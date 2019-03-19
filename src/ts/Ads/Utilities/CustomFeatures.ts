@@ -100,4 +100,13 @@ export class CustomFeatures {
     private static existsInList(gameIdList: string[], gameId: string): boolean {
         return gameIdList.indexOf(gameId) !== -1;
     }
+
+    public static shouldSampleAtOnePercent(): boolean {
+        // will only return true when Math.random returns 1
+        if (Math.floor(Math.random() * 100) % 100 === 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
