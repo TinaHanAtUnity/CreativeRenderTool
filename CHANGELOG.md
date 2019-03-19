@@ -1,4 +1,4 @@
-# Pending
+# Tue Mar 19 23:37:16 UTC 2019
 
 * Diagnostics for consent should be sampling at a 1% rate [#8760](https://github.com/Applifier/unity-ads-webview/pull/8760)
 
