@@ -568,11 +568,18 @@ describe('UserPrivacyManagerTest', () => {
 
     describe('updateUserPrivacy', () => {
         const anyConsent: IPermissions = { gameExp: false, ads: false, external: false };
+        let sandbox: sinon.SinonSandbox;
 
         beforeEach(() => {
+            sandbox = sinon.createSandbox();
             gamePrivacy.isEnabled.returns(true);
             gamePrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
+            sandbox.stub(Math, 'random').returns(0);
             (<sinon.SinonStub>coreConfig.getCountry).returns('FI');
+        });
+
+        afterEach(() => {
+            sandbox.restore();
         });
 
         describe('when updating user privacy', () => {
