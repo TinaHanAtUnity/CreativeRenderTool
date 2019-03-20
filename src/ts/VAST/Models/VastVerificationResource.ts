@@ -10,7 +10,7 @@ interface IVastVerificationResource {
 export class VastVerificationResource extends Model<IVastVerificationResource> {
 
     constructor(resourceUrl: string, apiFramework: string, browserOptional?: boolean, type?: string) {
-        super('VastVerificationExecutableResource', {
+        super('VastVerificationResource', {
             resourceUrl: ['string'],
             apiFramework: ['string'],
             browserOptional: ['boolean', 'null'],

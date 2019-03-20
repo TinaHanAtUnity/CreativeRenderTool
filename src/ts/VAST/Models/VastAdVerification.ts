@@ -2,14 +2,14 @@ import { Model } from 'Core/Models/Model';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 
 interface IVastAdVerification {
-    verificationResources: VastVerificationResource[];  // javascript and other
+    verificationResources: VastVerificationResource[];  // javascript only
     trackingEvents: { [eventName: string]: string[] };
     verificationParameters: string | null;
 }
 
-export class VastAdVerifications extends Model<IVastAdVerification> {
+export class VastAdVerification extends Model<IVastAdVerification> {
 
-    constructor(verificationResources: VastVerificationResource[], trackingEvents?: { [eventName: string]: string[] }, verificationParameters?: string) {
+    constructor(verificationResources: VastVerificationResource[], verificationParameters?: string, trackingEvents?: { [eventName: string]: string[] }) {
         super('VastAdVerifications', {
             verificationResources: ['array'],
             trackingEvents: ['object'],
@@ -31,6 +31,15 @@ export class VastAdVerifications extends Model<IVastAdVerification> {
 
     public getVerificationParameters(): string | null {
         return this.get('verificationParameters');
+    }
+
+    public addTrackingEvent(eventName: string, trackingUrl: string) {
+        const trackingEvents = this.get('trackingEvents');
+        if (trackingEvents[eventName]) {
+            trackingEvents[eventName].push(trackingUrl);
+        } else {
+            trackingEvents[eventName] = [trackingUrl];
+        }
     }
 
     public getDTO() : { [key: string]: unknown } {

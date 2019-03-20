@@ -10,6 +10,8 @@ import { Url } from 'Core/Utilities/Url';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { VastAdValidator } from 'VAST/Validators/VastAdValidator';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
+import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
+import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -32,7 +34,11 @@ enum VastNodeName {
     PARSE_ERROR = 'parsererror',
     VAST = 'VAST',
     EXTENSION = 'Extension',
-    AD_VERIFICATIONS = 'AdVerifications'
+    VERIFICATION = 'Verification',
+    AD_VERIFICATIONS = 'AdVerifications',
+    JS_RESOURCE = 'JavaScriptResource',
+    EX_RESOURCE = 'ExecutableResource',
+    VERIFICATION_PARAMETERS = 'VerificationParameters'
 }
 
 enum VastAttributeNames {
@@ -48,7 +54,8 @@ enum VastAttributeNames {
     WIDTH = 'width',
     HEIGHT = 'height',
     API_FRAMEWORK = 'apiFramework',
-    CREATIVE_TYPE = 'creativeType'
+    CREATIVE_TYPE = 'creativeType',
+    BROWSER_OPTIONAL = 'browserOptional'
 }
 
 export class VastParserStrict {
@@ -286,10 +293,48 @@ export class VastParserStrict {
         });
 
         this.getNodesWithName(adElement, VastNodeName.EXTENSION).forEach((element: HTMLElement) => {
-            // TODO parse extension
+            const extType = element.getAttribute(VastAttributeNames.TYPE);
+            if (extType && extType === VastNodeName.AD_VERIFICATIONS) {
+                const verifications = this.parseAdVerification(element, urlProtocol);
+            }
         });
 
         return vastAd;
+    }
+
+    private parseAdVerification(verificationElement: HTMLElement, urlProtocol: string): VastAdVerification[] {
+        const vastAdVerifications: VastAdVerification[] = [];
+        const elements = this.getChildrenNodesWithName(verificationElement, VastNodeName.VERIFICATION);
+        for (const elem of elements) {
+            const vastVerificationResources: VastVerificationResource[] = [];
+            const jsResources = this.getNodesWithName(elem, VastNodeName.JS_RESOURCE);
+            for (const jsRes of jsResources) {
+                const resourceUrl = this.parseVastUrl(this.parseNodeText(jsRes), urlProtocol);
+                const apiFramework = jsRes.getAttribute(VastAttributeNames.API_FRAMEWORK);
+                const browserOptional = jsRes.getAttribute(VastAttributeNames.BROWSER_OPTIONAL) === 'false' ? false : true;
+                if (resourceUrl && apiFramework) {
+                    const vastVerificationResource = new VastVerificationResource(resourceUrl, apiFramework, browserOptional);
+                    vastVerificationResources.push(vastVerificationResource);
+                }
+            }
+            const verificationParams =  this.getFirstNodeWithName(elem, VastNodeName.VERIFICATION_PARAMETERS);
+            let verificationParamText;
+            if (verificationParams) {
+                verificationParamText = this.parseNodeText(verificationParams);
+            }
+
+            const vastAdVerification = new VastAdVerification(vastVerificationResources, verificationParamText);
+            this.getNodesWithName(elem, VastNodeName.TRACKING).forEach((element: HTMLElement) => {
+                const url = this.parseVastUrl(this.parseNodeText(element), urlProtocol);
+                const eventName = element.getAttribute(VastAttributeNames.EVENT);
+                if (eventName && url) {
+                    vastAdVerification.addTrackingEvent(eventName, url);
+                }
+            });
+            vastAdVerifications.push(vastAdVerification);
+        }
+
+        return vastAdVerifications;
     }
 
     private getIntAttribute(element: HTMLElement, attribute: string): number {
