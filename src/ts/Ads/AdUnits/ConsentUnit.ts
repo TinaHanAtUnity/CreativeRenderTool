@@ -14,8 +14,10 @@ import { ICoreApi } from 'Core/ICore';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ABGroup, ConsentAltTitle } from 'Core/Models/ABGroup';
 
 export interface IConsentUnitParameters {
+    abGroup: ABGroup;
     platform: Platform;
     privacyManager: UserPrivacyManager;
     adUnitContainer: AdUnitContainer;
@@ -41,12 +43,13 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         this._privacyManager = parameters.privacyManager;
         this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
-        this._landingPage = ConsentPage.HOMESCREEN; // // todo: A/B test
+        this._landingPage = ConsentPage.HOMESCREEN;
 
         let viewParams: IConsentViewParameters = {
             platform: parameters.platform,
             privacyManager: parameters.privacyManager,
-            landingPage: this._landingPage
+            landingPage: this._landingPage,
+            useAltTitle: ConsentAltTitle.isValid(parameters.abGroup)
         };
 
         if (this._platform === Platform.ANDROID) {

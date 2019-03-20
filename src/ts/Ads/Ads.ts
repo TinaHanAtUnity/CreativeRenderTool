@@ -302,6 +302,7 @@ export class Ads implements IAds {
         }
 
         const consentView = new ConsentUnit({
+            abGroup: this._core.Config.getAbGroup(),
             platform: this._core.NativeBridge.getPlatform(),
             privacyManager: this.PrivacyManager,
             adUnitContainer: this.Container,
