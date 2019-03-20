@@ -3,49 +3,44 @@ import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 
 interface IVastAdVerification {
     verificationResources: VastVerificationResource[];  // javascript only
-    trackingEvents: { [eventName: string]: string[] };
+    verificationTrackingEvent: string | null;
     verificationParameters: string | null;
 }
 
 export class VastAdVerification extends Model<IVastAdVerification> {
 
-    constructor(verificationResources: VastVerificationResource[], verificationParameters?: string, trackingEvents?: { [eventName: string]: string[] }) {
+    constructor(verificationResources: VastVerificationResource[], parameters?: string, trackingEvent?: string) {
         super('VastAdVerifications', {
             verificationResources: ['array'],
-            trackingEvents: ['object'],
+            verificationTrackingEvent: ['string', 'null'],
             verificationParameters: ['string', 'null']
         });
 
         this.set('verificationResources', verificationResources);
-        this.set('trackingEvents', trackingEvents || {});
-        this.set('verificationParameters', verificationParameters || null);
+        this.set('verificationTrackingEvent', trackingEvent || null);
+        this.set('verificationParameters', parameters || null);
     }
 
     public getVerficationResources(): VastVerificationResource[] {
         return this.get('verificationResources');
     }
 
-    public getTrackingEvents(): { [eventName: string]: string[] } {
-        return this.get('trackingEvents');
+    public getVerificationNotExecutedTrackingEvent(): string | null {
+        return this.get('verificationTrackingEvent');
     }
 
     public getVerificationParameters(): string | null {
         return this.get('verificationParameters');
     }
 
-    public addTrackingEvent(eventName: string, trackingUrl: string) {
-        const trackingEvents = this.get('trackingEvents');
-        if (trackingEvents[eventName]) {
-            trackingEvents[eventName].push(trackingUrl);
-        } else {
-            trackingEvents[eventName] = [trackingUrl];
-        }
+    public setVerificationNotExecutedTrackingEvent(trackingUrl: string) {
+        this.set('verificationTrackingEvent', trackingUrl);
     }
 
     public getDTO() : { [key: string]: unknown } {
         return {
             'verificationResources': this.getVerficationResources(),
-            'trackingEvents': this.getTrackingEvents(),
+            'verificationTrackingEvent': this.getVerificationNotExecutedTrackingEvent(),
             'verificationParameters': this.getVerificationParameters()
         };
     }

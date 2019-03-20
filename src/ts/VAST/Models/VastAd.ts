@@ -92,6 +92,10 @@ export class VastAd extends Model<IVastAd> {
         this.get('unparseableCompanionAds').push(companionAd);
     }
 
+    public addAdVerifications(verfications: VastAdVerification[]) {
+        this.set('adVerifications', this.get('adVerifications').concat(verfications));
+    }
+
     public getErrorURLTemplates(): string[] {
         return this.get('errorURLTemplates');
     }

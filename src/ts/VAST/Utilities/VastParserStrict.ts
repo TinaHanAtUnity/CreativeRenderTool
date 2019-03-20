@@ -58,6 +58,10 @@ enum VastAttributeNames {
     BROWSER_OPTIONAL = 'browserOptional'
 }
 
+enum VastAttributeValues {
+    VERIFICATION_NOT_EXECUTED = 'verificationNotExecuted'
+}
+
 export class VastParserStrict {
 
     private static DEFAULT_MAX_WRAPPER_DEPTH = 8;
@@ -296,6 +300,7 @@ export class VastParserStrict {
             const extType = element.getAttribute(VastAttributeNames.TYPE);
             if (extType && extType === VastNodeName.AD_VERIFICATIONS) {
                 const verifications = this.parseAdVerification(element, urlProtocol);
+                vastAd.addAdVerifications(verifications);
             }
         });
 
@@ -304,7 +309,7 @@ export class VastParserStrict {
 
     private parseAdVerification(verificationElement: HTMLElement, urlProtocol: string): VastAdVerification[] {
         const vastAdVerifications: VastAdVerification[] = [];
-        const elements = this.getChildrenNodesWithName(verificationElement, VastNodeName.VERIFICATION);
+        const elements = this.getNodesWithName(verificationElement, VastNodeName.VERIFICATION);
         for (const elem of elements) {
             const vastVerificationResources: VastVerificationResource[] = [];
             const jsResources = this.getNodesWithName(elem, VastNodeName.JS_RESOURCE);
@@ -327,8 +332,8 @@ export class VastParserStrict {
             this.getNodesWithName(elem, VastNodeName.TRACKING).forEach((element: HTMLElement) => {
                 const url = this.parseVastUrl(this.parseNodeText(element), urlProtocol);
                 const eventName = element.getAttribute(VastAttributeNames.EVENT);
-                if (eventName && url) {
-                    vastAdVerification.addTrackingEvent(eventName, url);
+                if (eventName && eventName === VastAttributeValues.VERIFICATION_NOT_EXECUTED && url) {
+                    vastAdVerification.setVerificationNotExecutedTrackingEvent(url);
                 }
             });
             vastAdVerifications.push(vastAdVerification);

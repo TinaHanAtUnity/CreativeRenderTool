@@ -23,6 +23,7 @@ import VastWithSpaces from 'xml/VastWithSpaces.xml';
 import WrappedVast from 'xml/WrappedVast.xml';
 import EventTestVast from 'xml/EventTestVast.xml';
 import VastAboutBlank from 'xml/VastAboutBlank.xml';
+import VastAdVerificationAsExtension from 'xml/VastWithExtensionAdVerification.xml';
 
 describe('VastParserStrict', () => {
 
@@ -32,8 +33,6 @@ describe('VastParserStrict', () => {
         let backend: Backend;
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
-
-        const vastRaw = VastRaw;
 
         beforeEach(() => {
             platform = Platform.ANDROID;
@@ -506,6 +505,26 @@ describe('VastParserStrict', () => {
                                 vastParser.parseVast(test.inputVast);
                             });
                         });
+                    });
+                });
+            });
+
+            describe('Extension', () => {
+                describe('ad verification as extension', () => {
+                    it('retrieve ad verification element', () => {
+                        const vast = TestFixtures.getVastParserStrict().parseVast(VastAdVerificationAsExtension);
+                        console.log('vast ad -- ' + vast.getAds().length);
+                        const vastAdVerifications = vast.getAds()[0].getAdVerifications();
+                        assert.equal(vastAdVerifications.length, 1, 'Should have one AdVerification element grabbed from Extension');
+
+                        const vastAdVerification = vastAdVerifications[0];
+                        it('Should match expected verification parameters', () => {
+                            assert.equal(vastAdVerification.getVerificationParameters(), '{"tracking_events":{"complete":["https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;acvw=[VIEWABILITY];gv=[GOOGLE_VIEWABILITY];ecn1=1;etm1=0;eid1=210005;"],"firstquartile":["https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;acvw=[VIEWABILITY];gv=[GOOGLE_VIEWABILITY];ecn1=1;etm1=0;eid1=210002;"],"fullscreen":["https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;acvw=[VIEWABILITY];gv=[GOOGLE_VIEWABILITY];ecn1=1;etm1=0;eid1=210009;"],"fully_viewable_audible_half_duration_impression":["https://pagead2.googlesyndication.com/pcs/activeview?xai=AKAOjsuXk0QTK2y8ob8J76waywIhg3Z5ZrhC3C1XAiINoaGF11aC2jM_OurJFYm16jg4M0WfD-HYMzEYaI8ARe20&sig=Cg0ArKJSzJHmkZ_iMsAhEAE&id=lidarv&acvw=[VIEWABILITY]&gv=[GOOGLE_VIEWABILITY]","https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;acvw=[VIEWABILITY];gv=[GOOGLE_VIEWABILITY];ecn1=1;etm1=0;eid1=200102;"],"measurable_impression":["https://pagead2.googlesyndication.com/pcs/activeview?xai=AKAOjsuXk0QTK2y8ob8J76waywIhg3Z5ZrhC3C1XAiINoaGF11aC2jM_OurJFYm16jg4M0WfD-HYMzEYaI8ARe20&sig=Cg0ArKJSzJHmkZ_iMsAhEAE&id=lidarv&acvw=[VIEWABILITY]&gv=[GOOGLE_VIEWABILITY]&avm=1","https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;acvw=[VIEWABILITY];gv=[GOOGLE_VIEWABILITY];ecn1=1;etm1=0;eid1=200101;"],"midpoint":["https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;acvw=[VIEWABILITY];gv=[GOOGLE_VIEWABILITY];ecn1=1;etm1=0;eid1=210003;"],"mute":["https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;acvw=[VIEWABILITY];gv=[GOOGLE_VIEWABILITY];ecn1=1;etm1=0;eid1=210006;"],"pause":["https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;acvw=[VIEWABILITY];gv=[GOOGLE_VIEWABILITY];ecn1=1;etm1=0;eid1=210008;"],"start":["https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;acvw=[VIEWABILITY];gv=[GOOGLE_VIEWABILITY];dc_rfl=[URL_SIGNALS];ecn1=1;etm1=0;eid1=210001;"],"thirdquartile":["https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;acvw=[VIEWABILITY];gv=[GOOGLE_VIEWABILITY];ecn1=1;etm1=0;eid1=210004;"],"unmute":["https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;acvw=[VIEWABILITY];gv=[GOOGLE_VIEWABILITY];ecn1=1;etm1=0;eid1=210007;"],"viewable_impression":["https://pagead2.googlesyndication.com/pcs/activeview?xai=AKAOjsuXk0QTK2y8ob8J76waywIhg3Z5ZrhC3C1XAiINoaGF11aC2jM_OurJFYm16jg4M0WfD-HYMzEYaI8ARe20&sig=Cg0ArKJSzJHmkZ_iMsAhEAE&id=lidarv&acvw=[VIEWABILITY]&gv=[GOOGLE_VIEWABILITY]","https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1; acvw=[VIEWABILITY];gv=[GOOGLE_VIEWABILITY];ecn1=1;etm1=0;eid1=200000;"]}}');
+                        });
+                        assert.equal(vastAdVerification.getVerificationNotExecutedTrackingEvent(), 'https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;ecn1=1;etm1=0;eid1=210014;errorcode=%5BREASON%5D', 'Should match expected verification tracking url');
+
+                        const javaResource = vastAdVerification.getVerficationResources()[0];
+                        assert.equal(javaResource.getResourceUrl(), 'https://www.googletagservices.com/activeview/js/current/lidar_video_dsp.js', 'Should have expected java script resource url');
                     });
                 });
             });
