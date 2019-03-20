@@ -20,6 +20,7 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ITemplateData } from 'Core/Views/View';
 import { ConsentPage } from 'Ads/Views/Consent/Consent';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -171,10 +172,12 @@ export class UserPrivacyManager {
             permissions: permissions
         };
 
-        Diagnostics.trigger('consent_send_event', {
-            adsConfig: JSON.stringify(this._adsConfig.getDTO()),
-            permissions: JSON.stringify(permissions)
-        });
+        if (CustomFeatures.shouldSampleAtOnePercent()) {
+            Diagnostics.trigger('consent_send_event', {
+                adsConfig: JSON.stringify(this._adsConfig.getDTO()),
+                permissions: JSON.stringify(permissions)
+            });
+        }
 
         return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
     }
