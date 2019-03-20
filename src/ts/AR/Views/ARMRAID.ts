@@ -445,12 +445,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private showARPermissionPanel() {
         if (this._arCameraAlreadyAccepted) {
             this.onShowAr();
-        } else {
-            this._cameraPermissionPanel.classList.remove('hidden');
-            this._cameraPermissionPanel.style.display = 'block';
-            this._iframe.classList.add('mraid-iframe-camera-permission-dialog');
-            this._gdprBanner.classList.add('mraid-container');
+            return;
         }
+
+        this._cameraPermissionPanel.classList.remove('hidden');
+        this._cameraPermissionPanel.style.display = 'block';
+        this._iframe.classList.add('mraid-iframe-camera-permission-dialog');
+        this._gdprBanner.classList.add('mraid-container');
     }
 
     private hideARPermissionPanel() {
