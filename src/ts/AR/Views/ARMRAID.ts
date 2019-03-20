@@ -478,15 +478,17 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._permissionResultObserver = this._core.Permissions.onPermissionsResult.subscribe((permission, granted) => {
             if(permission === PermissionTypes.CAMERA && granted) {
                 // send event only if permission is granted, otherwise would reload fallback scene
+                this.sendMraidAnalyticsEvent('permission_dialog_ar_mode', undefined);
                 this.onCameraPermissionEvent(true);
             }
         });
 
         PermissionsUtil.requestPermission(this._platform, this._core, PermissionTypes.CAMERA);
-        this.sendMraidAnalyticsEvent('permission_dialog_ar_mode', undefined);
+        this.sendMraidAnalyticsEvent('permission_dialog_system_show', undefined);
     }
 
     private onShowFallback() {
+        this.sendMraidAnalyticsEvent('permission_dialog_fallback_mode', undefined);
         this.hideLoadingScreen();
         this.onCameraPermissionEvent(false);
     }
