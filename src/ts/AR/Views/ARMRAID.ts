@@ -253,6 +253,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private showMRAIDAd() {
+        // do not start timer if already running, may happen when switching between fallback and AR modes
+        if(this._updateInterval) {
+            return;
+        }
+
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
             this._closeRemaining = ARMRAID.CloseLength;
@@ -277,7 +282,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }, 1000);
         } else {
             this._closeRemaining = ARMRAID.CloseLength;
-            const updateInterval = setInterval(() => {
+            this._updateInterval = window.setInterval(() => {
                 const progress = (ARMRAID.CloseLength - this._closeRemaining) / ARMRAID.CloseLength;
                 if(progress >= 0.75 && !this._didReward) {
                     this._handlers.forEach(handler => handler.onMraidReward());
@@ -288,7 +293,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                     this.updateProgressCircle(this._closeElement, progress);
                 }
                 if (this._closeRemaining <= 0) {
-                    clearInterval(updateInterval);
+                    clearInterval(this._updateInterval);
                     this._canClose = true;
                     this._closeElement.style.opacity = '1';
                     this.updateProgressCircle(this._closeElement, 1);
