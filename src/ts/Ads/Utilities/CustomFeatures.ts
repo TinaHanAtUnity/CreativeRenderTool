@@ -109,4 +109,13 @@ export class CustomFeatures {
             return false;
         }
     }
+
+    public static shouldSampleAtTenPercent(): boolean {
+        // will only return true when Math.random returns 1
+        if (Math.floor(Math.random() * 10) % 10 === 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
