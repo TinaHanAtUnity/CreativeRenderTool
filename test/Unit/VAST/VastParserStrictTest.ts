@@ -513,7 +513,6 @@ describe('VastParserStrict', () => {
                 describe('ad verification as extension', () => {
                     it('retrieve ad verification element', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastAdVerificationAsExtension);
-                        console.log('vast ad -- ' + vast.getAds().length);
                         const vastAdVerifications = vast.getAds()[0].getAdVerifications();
                         assert.equal(vastAdVerifications.length, 1, 'Should have one AdVerification element grabbed from Extension');
 
