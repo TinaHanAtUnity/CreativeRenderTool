@@ -5,11 +5,12 @@ import { ICoreApi } from 'Core/ICore';
 import { Localization } from 'Core/Utilities/Localization';
 import { Observable0, Observable1 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
-import { View } from 'Core/Views/View';
+import { View, TemplateDataType, ITemplateData } from 'Core/Views/View';
 import PromoTpl from 'html/Promo.html';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import PromoIndexTpl from 'html/promo/container.html';
+import { PromoOrientationAsset } from 'Promo/Models/PromoOrientationAsset';
 
 export class Promo extends View<{}> implements IPrivacyHandlerView {
 
@@ -153,64 +154,58 @@ export class Promo extends View<{}> implements IPrivacyHandlerView {
     }
 
     private setupTemplateData(campaign: PromoCampaign, placement: Placement) {
+        const portraitPrefix = 'portrait';
+        const landscapePrefix = 'landscape';
+        const portraitCSSKey = '{DATA_FONT_PORTRAIT}';
+        const landscapeCSSKey = '{DATA_FONT_LANDSCAPE}';
         if(campaign) {
             this._templateData = {
                 'localizedPrice': PurchasingUtilities.getProductPrice(campaign.getIapProductId()),
-                'isRewardedPromo': !placement.allowSkip(), // Support older promo version
                 'rewardedPromoTimerDuration': !placement.allowSkip() ? 5 : 0
             };
-            let portraitFontURL = '';
-            let landscapeFontURL = '';
             const portraitAssets = campaign.getPortraitAssets();
-            if (portraitAssets) {
-                const buttonCoordinates = portraitAssets.getButtonAsset().getCoordinates();
-                if (buttonCoordinates) {
-                    this._templateData.portraitButtonCoordinatesTop = buttonCoordinates.getTop();
-                    this._templateData.portraitButtonCoordinatesLeft = buttonCoordinates.getLeft();
-                }
-                const buttonSize = portraitAssets.getButtonAsset().getSize();
-                this._templateData.portraitButtonSizeWidth = buttonSize.getWidth();
-                this._templateData.portraitButtonSizeHeight = buttonSize.getHeight();
-                const font = portraitAssets.getButtonAsset().getFont();
-                if (font) {
-                    this._templateData.portraitPriceTextFontFamily = font.getFamily();
-                    this._templateData.portraitPriceTextFontColor = font.getColor();
-                    this._templateData.portraitPriceTextFontSize = font.getSize();
-                    portraitFontURL = font.getUrl();
-                }
-                const backgroundSize = portraitAssets.getBackgroundAsset().getSize();
-                this._templateData.portraitBackgroundImageWidth = backgroundSize.getWidth();
-                this._templateData.portraitBackgroundImageHeight = backgroundSize.getHeight();
-                this._templateData.portraitBackgroundImage = portraitAssets.getBackgroundAsset().getImage().getUrl();
-                this._templateData.portraitButtonImage = portraitAssets.getButtonAsset().getImage().getUrl();
-            }
             const landscapeAssets = campaign.getLandscapeAssets();
-            if (landscapeAssets) {
-                const buttonCoordinates = landscapeAssets.getButtonAsset().getCoordinates();
-                if (buttonCoordinates) {
-                    this._templateData.landscapeButtonCoordinatesTop = buttonCoordinates.getTop();
-                    this._templateData.landscapeButtonCoordinatesLeft = buttonCoordinates.getLeft();
-                }
-                const buttonSize = landscapeAssets.getButtonAsset().getSize();
-                if (buttonSize) {
-                    this._templateData.landscapeButtonSizeWidth = buttonSize.getWidth();
-                    this._templateData.landscapeButtonSizeHeight = buttonSize.getHeight();
-                }
-                const font = landscapeAssets.getButtonAsset().getFont();
-                if (font) {
-                    this._templateData.landscapePriceTextFontFamily = font.getFamily();
-                    this._templateData.landscapePriceTextFontColor = font.getColor();
-                    this._templateData.landscapePriceTextFontSize = font.getSize();
-                    landscapeFontURL = font.getUrl();
-                }
-                const backgroundSize = landscapeAssets.getBackgroundAsset().getSize();
-                this._templateData.landscapeBackgroundImageWidth = backgroundSize.getWidth();
-                this._templateData.landscapeBackgroundImageHeight = backgroundSize.getHeight();
-                this._templateData.landscapeBackgroundImage = landscapeAssets.getBackgroundAsset().getImage().getUrl();
-                this._templateData.landscapeButtonImage = landscapeAssets.getButtonAsset().getImage().getUrl();
+            if (portraitAssets) {
+                this.setupOrientationData(portraitPrefix, portraitCSSKey, portraitAssets);
+            } else if (landscapeAssets) {
+                this.setupOrientationData(portraitPrefix, portraitCSSKey, landscapeAssets);
             }
-            this._promoIndexTemplate = this._promoIndexTemplate.replace('{DATA_FONT_PORTRAIT}', portraitFontURL);
-            this._promoIndexTemplate = this._promoIndexTemplate.replace('{DATA_FONT_LANDSCAPE}', landscapeFontURL);
+            if (landscapeAssets) {
+                this.setupOrientationData(landscapePrefix, landscapeCSSKey, landscapeAssets);
+            } else if (portraitAssets) {
+                this.setupOrientationData(landscapePrefix, landscapeCSSKey, portraitAssets);
+            }
         }
+    }
+
+    private setupOrientationData(prefix: string, fontCSSKey: string, orientationAsset: PromoOrientationAsset) {
+        const map: { [key: string]: TemplateDataType | ITemplateData } = {};
+        let fontURL = '';
+        const buttonCoordinates = orientationAsset.getButtonAsset().getCoordinates();
+        if (buttonCoordinates) {
+            map.ButtonCoordinatesTop = buttonCoordinates.getTop();
+            map.ButtonCoordinatesLeft = buttonCoordinates.getLeft();
+        }
+        const buttonSize = orientationAsset.getButtonAsset().getSize();
+        map.ButtonSizeWidth = buttonSize.getWidth();
+        map.ButtonSizeHeight = buttonSize.getHeight();
+        const font = orientationAsset.getButtonAsset().getFont();
+        if (font) {
+            map.PriceTextFontFamily = font.getFamily();
+            map.PriceTextFontColor = font.getColor();
+            map.PriceTextFontSize = font.getSize();
+            fontURL = font.getUrl();
+        }
+        const backgroundSize = orientationAsset.getBackgroundAsset().getSize();
+        map.BackgroundImageWidth = backgroundSize.getWidth();
+        map.BackgroundImageHeight = backgroundSize.getHeight();
+        map.BackgroundImage = orientationAsset.getBackgroundAsset().getImage().getUrl();
+        map.ButtonImage = orientationAsset.getButtonAsset().getImage().getUrl();
+        for (const key in map) {
+            if (map.hasOwnProperty(key)) {
+                this._templateData[prefix + key] = map[key];
+            }
+        }
+        this._promoIndexTemplate = this._promoIndexTemplate.replace(fontCSSKey, fontURL);
     }
 }
