@@ -23,6 +23,8 @@ export interface IVideoOverlayParameters<T extends Campaign> {
 export class ProgressBarVideoOverlay extends VideoOverlay {
 public _videoRemained: number;
     private _progressBar: HTMLElement;
+    private _topContainer: HTMLElement;
+    private _progressBarWrapper: HTMLElement;
 
     constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
         super(parameters, privacy, showGDPRBanner, true);
@@ -30,30 +32,53 @@ public _videoRemained: number;
 
     public setVideoProgress(value: number): void {
         super.setVideoProgress(value);
-        this._videoRemained = this._videoDuration - this._videoProgress;
-        // console.log(this._videoRemained);
-        if (this._progressBar.style.transition === '' && this._progressBar.style.webkitTransition === '') {
-            this.setCssTransition();
+        const delta = (value - this._videoProgress) || 0;
+        this._videoProgress = value;
+        const progressInPercentages = Math.ceil(100 / this._videoDuration * this._videoProgress);
+        if (delta >= 0) {
+            if (this._progressBar.style.transition === '' && this._progressBar.style.webkitTransition === '') {
+                this.setCssTransition();
+            }
             this._progressBar.style.width = '100%';
+        } else {
+            this.removeCssTransition();
+            this._progressBar.style.width = `${progressInPercentages}%`;
         }
+
     }
 
     private setCssTransition(): void {
-
         const transitionRule = `width ${(this._videoDuration - this._videoProgress) / 1000}s linear`;
-        // const progressInPercentages = Math.ceil(100 / this._videoDuration * this._videoProgress);
-        // this._progressBar.style.width = `${progressInPercentages}%`;
         this._progressBar.style.transition = transitionRule;
         this._progressBar.style.webkitTransition = transitionRule;
     }
 
+    private removeCssTransition(): void {
+        this._progressBar.style.transition = '';
+        this._progressBar.style.webkitTransition = '';
+    }
+
+    // private setCssTransition(): void {
+    //     const progressInPercentages = Math.ceil(100 / this._videoDuration * this._videoProgress);
+
+    //     const transitionRule = `width ${(this._videoDuration - this._videoProgress) / 1000}s linear`;
+    //     // const progressInPercentages = Math.ceil(100 / this._videoDuration * this._videoProgress);
+    //     // this._progressBar.style.width = `${progressInPercentages}%`;
+    //     // this._progressBar.style.transition = transitionRule;
+    //     // this._progressBar.style.webkitTransition = transitionRule;
+    // }
+
     public render(): void {
         super.render();
-        const topContainer = this._container.querySelector('.top-container');
-        if (topContainer) {
-            const progressBar = document.createElement('span');
-            progressBar.classList.add('progress-bar');
-            this._progressBar = topContainer.insertBefore(progressBar, topContainer.childNodes[0] || null);
+        this._topContainer = <HTMLElement>this._container.querySelector('.top-container');
+
+        if (this._topContainer) {
+            this._progressBarWrapper = <HTMLElement>document.createElement('div');
+            this._progressBar = <HTMLElement>document.createElement('span');
+            this._progressBar.classList.add('progress-bar');
+            this._progressBarWrapper.classList.add('progress-wrapper');
+            this._progressBarWrapper.appendChild(this._progressBar);
+            this._topContainer.insertBefore(this._progressBarWrapper, this._topContainer.childNodes[0] || null);
         }
     }
 }
