@@ -1,3 +1,7 @@
+# Merged
+
+* VastParserStrict test for AdMob video and update some diagnostics logs [#8783](https://github.com/Applifier/unity-ads-webview/pull/8783)
+
 # Thu Mar 21 16:56:12 UTC 2019
 
 * Set metadata serverUrl also to auction v5 [#8758](https://github.com/Applifier/unity-ads-webview/pull/8758)
