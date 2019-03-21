@@ -1,4 +1,4 @@
-# Pending
+# Thu Mar 21 16:56:12 UTC 2019
 
 * Set metadata serverUrl also to auction v5 [#8758](https://github.com/Applifier/unity-ads-webview/pull/8758)
 * Promo supports missing orientation [#8736](https://github.com/Applifier/unity-ads-webview/pull/8736)
