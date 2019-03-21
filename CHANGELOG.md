@@ -2,6 +2,7 @@
 
 * VastParserStrict test for AdMob video and update some diagnostics logs [#8783](https://github.com/Applifier/unity-ads-webview/pull/8783)
 * Fix Banner Ads Click Callback [#8784](https://github.com/Applifier/unity-ads-webview/pull/8784)
+* A/B test previous consent title [#8807](https://github.com/Applifier/unity-ads-webview/pull/8807)
 
 # Thu Mar 21 16:56:12 UTC 2019
 
