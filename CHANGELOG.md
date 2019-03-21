@@ -4,6 +4,8 @@
 * Promo supports missing orientation [#8736](https://github.com/Applifier/unity-ads-webview/pull/8736)
 * Whitelist carnival creative for analytics [#8782](https://github.com/Applifier/unity-ads-webview/pull/8782)
 * Promo background should cover entire background for iPhoneX [#8759](https://github.com/Applifier/unity-ads-webview/pull/8759)
+* Use auction v4 if creativeUrl is used [#8806](https://github.com/Applifier/unity-ads-webview/pull/8806)
+* Do not show Unity Consent in COPPA games [#8808](https://github.com/Applifier/unity-ads-webview/pull/8808)
 
 # Tue Mar 19 23:37:16 UTC 2019
 
