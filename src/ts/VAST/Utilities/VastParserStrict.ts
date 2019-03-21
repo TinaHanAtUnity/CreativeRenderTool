@@ -55,7 +55,8 @@ enum VastAttributeNames {
     HEIGHT = 'height',
     API_FRAMEWORK = 'apiFramework',
     CREATIVE_TYPE = 'creativeType',
-    BROWSER_OPTIONAL = 'browserOptional'
+    BROWSER_OPTIONAL = 'browserOptional',
+    VENDOR = 'vendor'
 }
 
 enum VastAttributeValues {
@@ -312,6 +313,7 @@ export class VastParserStrict {
         const elements = this.getNodesWithName(verificationElement, VastNodeName.VERIFICATION);
         for (const elem of elements) {
             const vastVerificationResources: VastVerificationResource[] = [];
+            const vendor = elem.getAttribute(VastAttributeNames.VENDOR) || '';
             const jsResources = this.getNodesWithName(elem, VastNodeName.JS_RESOURCE);
             for (const jsRes of jsResources) {
                 const resourceUrl = this.parseVastUrl(this.parseNodeText(jsRes), urlProtocol);
@@ -328,7 +330,7 @@ export class VastParserStrict {
                 verificationParamText = this.parseNodeText(verificationParams);
             }
 
-            const vastAdVerification = new VastAdVerification(vastVerificationResources, verificationParamText);
+            const vastAdVerification = new VastAdVerification(vendor, vastVerificationResources, verificationParamText);
             this.getNodesWithName(elem, VastNodeName.TRACKING).forEach((element: HTMLElement) => {
                 const url = this.parseVastUrl(this.parseNodeText(element), urlProtocol);
                 const eventName = element.getAttribute(VastAttributeNames.EVENT);
