@@ -23,6 +23,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IntentApi } from 'Core/Native/Android/Intent';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('DisplayHTMLBannerAdUnit', () => {
@@ -31,11 +32,12 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
         let backend: Backend;
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
-        let banners: IBannersApi;
+        let bannersApi: IBannersApi;
         let campaign: BannerCampaign;
         let thirdPartyEventManager: ThirdPartyEventManager;
         let webPlayerContainer: WebPlayerContainer;
         let programmaticTrackingService: ProgrammaticTrackingService;
+        let bannerAdUnitParameters: IBannerAdUnitParameters;
 
         const getBannerCampaign = (session: Session) => {
             const campaignData = JSON.parse(ValidBannerCampaignJSON);
@@ -45,6 +47,8 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                 trackingUrls: campaignData.trackingUrls
             };
         };
+
+        const placementId = 'unity-test-banner-placement-id';
 
         beforeEach(() => {
             backend = TestFixtures.getBackend(platform);
@@ -58,13 +62,15 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                 core.iOS!.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
             }
 
-            banners = TestFixtures.getBannersApi(nativeBridge);
-            (<any>banners.Banner).onBannerAttachedState = new Observable1<boolean>();
-            (<any>banners.Banner).onBannerLoaded = new Observable0();
-            (<any>banners.Banner).onBannerOpened = new Observable0();
-            sinon.stub(banners.Banner, 'load').callsFake(() => {
-                return Promise.resolve().then(() => banners.Banner.onBannerLoaded.trigger());
+            bannersApi = TestFixtures.getBannersApi(nativeBridge);
+            (<any>bannersApi.Banner).onBannerAttachedState = new Observable1<boolean>();
+            (<any>bannersApi.Banner).onBannerLoaded = new Observable0();
+            (<any>bannersApi.Banner).onBannerOpened = new Observable0();
+            sinon.stub(bannersApi.Banner, 'load').callsFake(() => {
+                return Promise.resolve().then(() => bannersApi.Banner.onBannerLoaded.trigger());
             });
+
+            sinon.spy(bannersApi.Listener, 'sendClickEvent');
 
             campaign = new BannerCampaign(getBannerCampaign(TestFixtures.getSession()));
 
@@ -83,14 +89,18 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
-            adUnit = new DisplayHTMLBannerAdUnit({
+            bannerAdUnitParameters = {
                 platform,
                 core,
                 campaign,
                 webPlayerContainer,
                 thirdPartyEventManager,
-                programmaticTrackingService
-            });
+                programmaticTrackingService,
+                bannersApi,
+                placementId
+            };
+
+            adUnit = new DisplayHTMLBannerAdUnit(bannerAdUnitParameters);
         });
 
         describe('load', () => {
@@ -189,6 +199,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                             const url = 'http://unity3d.com';
                             webPlayerContainer.onCreateWebView.trigger(url);
                             sinon.assert.calledWith(asSpy(core.iOS!.UrlScheme.open), url);
+                            sinon.assert.calledWith(<sinon.SinonSpy>bannersApi.Listener.sendClickEvent, placementId);
                         });
                     });
                 });
@@ -204,6 +215,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
                                 'action': 'android.intent.action.VIEW',
                                 'uri': url
                             });
+                            sinon.assert.calledWith(<sinon.SinonSpy>bannersApi.Listener.sendClickEvent, placementId);
                         });
                     });
                 });
