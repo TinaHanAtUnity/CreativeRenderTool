@@ -1,6 +1,9 @@
 # Pending
 
-* set metadata serverUrl also to auction v5 [#8758](https://github.com/Applifier/unity-ads-webview/pull/8758)
+* Set metadata serverUrl also to auction v5 [#8758](https://github.com/Applifier/unity-ads-webview/pull/8758)
+* Promo supports missing orientation [#8736](https://github.com/Applifier/unity-ads-webview/pull/8736)
+* Whitelist carnival creative for analytics [#8782](https://github.com/Applifier/unity-ads-webview/pull/8782)
+* Promo background should cover entire background for iPhoneX [#8759](https://github.com/Applifier/unity-ads-webview/pull/8759)
 
 # Tue Mar 19 23:37:16 UTC 2019
 
