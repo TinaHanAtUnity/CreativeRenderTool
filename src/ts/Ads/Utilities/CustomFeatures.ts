@@ -43,7 +43,8 @@ export class CustomFeatures {
                 creativeId === '114617576' || // Hellfest
                 creativeId === '114617336' || // Hellfest
                 creativeId === '145941071' || // Miller Lite Fallback
-                creativeId === '145940860';   // Miller Lite Fallback
+                creativeId === '145940860' || // Miller Lite Fallback
+                creativeId === '147367465';   // Carnival Creative
     }
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {
@@ -104,6 +105,15 @@ export class CustomFeatures {
     public static shouldSampleAtOnePercent(): boolean {
         // will only return true when Math.random returns 0
         if (Math.floor(Math.random() * 100) % 100 === 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static shouldSampleAtTenPercent(): boolean {
+        // will only return true when Math.random returns 1
+        if (Math.floor(Math.random() * 10) % 10 === 1) {
             return true;
         } else {
             return false;
