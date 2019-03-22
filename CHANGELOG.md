@@ -1,4 +1,4 @@
-# Staged
+# Fri Mar 22 01:15:43 UTC 2019
 
 * VastParserStrict test for AdMob video and update some diagnostics logs [#8783](https://github.com/Applifier/unity-ads-webview/pull/8783)
 * Fix Banner Ads Click Callback [#8784](https://github.com/Applifier/unity-ads-webview/pull/8784)
