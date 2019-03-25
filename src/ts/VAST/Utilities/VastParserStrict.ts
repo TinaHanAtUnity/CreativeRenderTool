@@ -310,36 +310,35 @@ export class VastParserStrict {
 
     private parseAdVerification(verificationElement: HTMLElement, urlProtocol: string): VastAdVerification[] {
         const vastAdVerifications: VastAdVerification[] = [];
-        const elements = this.getNodesWithName(verificationElement, VastNodeName.VERIFICATION);
-        for (const elem of elements) {
+        this.getNodesWithName(verificationElement, VastNodeName.VERIFICATION).forEach((element: HTMLElement) => {
             const vastVerificationResources: VastVerificationResource[] = [];
-            const vendor = elem.getAttribute(VastAttributeNames.VENDOR) || '';
-            const jsResources = this.getNodesWithName(elem, VastNodeName.JS_RESOURCE);
-            for (const jsRes of jsResources) {
-                const resourceUrl = this.parseVastUrl(this.parseNodeText(jsRes), urlProtocol);
-                const apiFramework = jsRes.getAttribute(VastAttributeNames.API_FRAMEWORK);
-                const browserOptional = jsRes.getAttribute(VastAttributeNames.BROWSER_OPTIONAL) === 'false' ? false : true;
+            const vendor = element.getAttribute(VastAttributeNames.VENDOR) || '';
+            this.getNodesWithName(element, VastNodeName.JS_RESOURCE).forEach((jsElement: HTMLElement) => {
+                const resourceUrl = this.parseVastUrl(this.parseNodeText(jsElement), urlProtocol);
+                const apiFramework = jsElement.getAttribute(VastAttributeNames.API_FRAMEWORK);
+                const browserOptional = jsElement.getAttribute(VastAttributeNames.BROWSER_OPTIONAL) === 'false' ? false : true;
                 if (resourceUrl && apiFramework) {
                     const vastVerificationResource = new VastVerificationResource(resourceUrl, apiFramework, browserOptional);
                     vastVerificationResources.push(vastVerificationResource);
                 }
-            }
-            const verificationParams =  this.getFirstNodeWithName(elem, VastNodeName.VERIFICATION_PARAMETERS);
+            });
+
+            const verificationParams = this.getFirstNodeWithName(element, VastNodeName.VERIFICATION_PARAMETERS);
             let verificationParamText;
             if (verificationParams) {
                 verificationParamText = this.parseNodeText(verificationParams);
             }
 
             const vastAdVerification = new VastAdVerification(vendor, vastVerificationResources, verificationParamText);
-            this.getNodesWithName(elem, VastNodeName.TRACKING).forEach((element: HTMLElement) => {
-                const url = this.parseVastUrl(this.parseNodeText(element), urlProtocol);
-                const eventName = element.getAttribute(VastAttributeNames.EVENT);
+            this.getNodesWithName(element, VastNodeName.TRACKING).forEach((trackingElement: HTMLElement) => {
+                const url = this.parseVastUrl(this.parseNodeText(trackingElement), urlProtocol);
+                const eventName = trackingElement.getAttribute(VastAttributeNames.EVENT);
                 if (eventName && eventName === VastAttributeValues.VERIFICATION_NOT_EXECUTED && url) {
                     vastAdVerification.setVerificationNotExecutedTrackingEvent(url);
                 }
             });
             vastAdVerifications.push(vastAdVerification);
-        }
+        });
 
         return vastAdVerifications;
     }
