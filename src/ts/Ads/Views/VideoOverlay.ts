@@ -208,7 +208,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._videoProgress = value;
         this._skipRemaining = this._skipDuration - this._videoProgress;
 
-        let timerCount: Number;
+        let timerCount: number;
 
         if (this._skipUnderTimerExperimentEnabled) {
             timerCount = Math.ceil((this._skipRemaining) / 1000);
