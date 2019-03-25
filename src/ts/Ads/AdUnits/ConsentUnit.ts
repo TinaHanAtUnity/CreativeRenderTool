@@ -14,8 +14,10 @@ import { ICoreApi } from 'Core/ICore';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ABGroup, ConsentAltTitle } from 'Core/Models/ABGroup';
 
 export interface IConsentUnitParameters {
+    abGroup: ABGroup;
     platform: Platform;
     privacyManager: UserPrivacyManager;
     adUnitContainer: AdUnitContainer;
@@ -29,7 +31,8 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
     private _showing: boolean;
     private _adUnitContainer: AdUnitContainer;
     private _unityConsentView: Consent;
-    private _platform: Platform;
+    private readonly _platform: Platform;
+    private readonly _landingPage: ConsentPage;
     private _privacyManager: UserPrivacyManager;
     private _adsConfig: AdsConfiguration;
     private _core: ICoreApi;
@@ -40,11 +43,13 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
         this._privacyManager = parameters.privacyManager;
         this._adsConfig = parameters.adsConfig;
         this._core = parameters.core;
+        this._landingPage = ConsentPage.HOMESCREEN;
 
         let viewParams: IConsentViewParameters = {
             platform: parameters.platform,
             privacyManager: parameters.privacyManager,
-            landingPage: ConsentPage.INTRO // // todo: A/B test
+            landingPage: this._landingPage,
+            useAltTitle: ConsentAltTitle.isValid(parameters.abGroup)
         };
 
         if (this._platform === Platform.ANDROID) {
@@ -122,7 +127,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
 
     // IConsentViewHandler
     public onConsent(permissions: IPermissions, source: GDPREventSource): void {
-        this._privacyManager.updateUserPrivacy(permissions, source);
+        this._privacyManager.updateUserPrivacy(permissions, source, this._landingPage);
     }
 
     // IConsentViewHandler

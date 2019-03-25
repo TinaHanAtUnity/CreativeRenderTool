@@ -23,11 +23,11 @@ export interface IAnalyticsEvent<T extends IAnalyticsMessage> {
 }
 
 interface IAnalyticsLevelUpEvent extends IAnalyticsCustomParams {
-    new_level_index: number;
+    new_level_index: string;
 }
 
 interface IAnalyticsLevelFailedEvent extends IAnalyticsCustomParams {
-    level_index: number;
+    level_index: string;
 }
 
 interface IAnalyticsItemEvent extends IAnalyticsCustomParams {

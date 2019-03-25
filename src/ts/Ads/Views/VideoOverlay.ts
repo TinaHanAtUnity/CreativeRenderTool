@@ -153,6 +153,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     public render(): void {
         super.render();
         this.setupElementReferences();
+        this.choosePrivacyShown();
 
         if (this._country === 'CN' && this._chinaAdvertisementElement) {
             this._chinaAdvertisementElement.style.display = 'block';

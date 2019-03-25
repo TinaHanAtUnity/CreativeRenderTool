@@ -22,12 +22,13 @@ export interface IConsentViewParameters {
     landingPage: ConsentPage;
     apiLevel?: number;
     osVersion?: string;
+    useAltTitle: boolean;
 }
 
 export enum ConsentPage {
-    HOMESCREEN,
-    INTRO,
-    MY_CHOICES
+    HOMESCREEN = 'homescreen',
+    INTRO = 'intro',
+    MY_CHOICES = 'mychoices'
 }
 
 export class Consent extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationSwitchGroupHandler {
@@ -53,6 +54,9 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._privacyManager = parameters.privacyManager;
 
         this._template = new Template(ConsentTemplate);
+        this._templateData = {
+            useAltTitle: parameters.useAltTitle
+        };
 
         this._bindings = [
             {
@@ -205,26 +209,10 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private showPage(page: ConsentPage) {
         this._currentPage = page;
 
-        let classToAdd: string;
-
-        switch (page) {
-            case ConsentPage.HOMESCREEN:
-                classToAdd = 'homescreen';
-                break;
-            case ConsentPage.INTRO:
-                classToAdd = 'intro';
-                break;
-            case ConsentPage.MY_CHOICES:
-                classToAdd = 'mychoices';
-                break;
-            default:
-                classToAdd = 'mychoices';
-        }
-
-        const states = ['homescreen', 'intro', 'mychoices'];
+        const states = [ConsentPage.HOMESCREEN, ConsentPage.INTRO, ConsentPage.MY_CHOICES];
         states.forEach(state => {
-            if (state === classToAdd) {
-                this.container().classList.add(classToAdd);
+            if (state === page) {
+                this.container().classList.add(page);
             } else {
                 this.container().classList.remove(state);
             }

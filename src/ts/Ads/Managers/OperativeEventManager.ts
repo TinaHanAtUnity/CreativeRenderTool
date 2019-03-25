@@ -315,15 +315,21 @@ export class OperativeEventManager {
             retryDelay: 10000,
             followRedirects: false,
             retryWithConnectionEvents: false
-        }).catch((response) => {
-            if (Math.floor(Math.random() * 10) % 10 === 1) {
+        }).catch((error) => {
+            if (CustomFeatures.shouldSampleAtTenPercent()) {
                 const diagnosticData = {
+                    request: error.nativeRequest,
+                    event: event,
+                    sessionId: sessionId,
                     url: url,
+                    response: error,
                     data: data,
-                    response: response,
-                    campaign: this._campaign.getDTO()
+                    campaignId: this._campaign.getId(),
+                    creativeId: this._campaign.getCreativeId(),
+                    seatId: this._campaign.getSeatId(),
+                    auctionProtocol: RequestManager.getAuctionProtocol()
                 };
-                SessionDiagnostics.trigger('operative_event_manager_failed_post', diagnosticData, this._campaign.getSession());
+                Diagnostics.trigger('operative_event_manager_failed_post', diagnosticData);
             }
             new FailedOperativeEventManager(this._core, sessionId, eventId).storeFailedEvent(this._storageBridge, {
                url: url,

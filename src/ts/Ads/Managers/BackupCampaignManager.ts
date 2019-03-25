@@ -19,6 +19,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { FileId } from 'Core/Utilities/FileId';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 export class BackupCampaignManager {
     private static _maxExpiryDelay: number = 7 * 24 * 3600 * 1000; // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
@@ -141,7 +142,8 @@ export class BackupCampaignManager {
                                 Diagnostics.trigger('backup_campaign_loading_failed', {
                                     type: type,
                                     data: data,
-                                    willExpireAt: willexpireat
+                                    willExpireAt: willexpireat,
+                                    auctionProtocol: RequestManager.getAuctionProtocol()
                                 });
                             }
                         }

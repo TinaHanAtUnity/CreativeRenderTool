@@ -26,7 +26,10 @@ describe('VastCreativeCompanionAdValidatorTest', () => {
                 assert.lengthOf(errors, 0, JSON.stringify(errors));
             };
             const creativeTypes: string[] = (<any>VastCreativeStaticResourceCompanionAdValidator)._supportedCreativeTypes;
-            creativeTypes.map((type) => {
+            // creativeType should work regardless of case
+            creativeTypes.concat(creativeTypes.map((type) => {
+                return type.toUpperCase();
+            })).map((type) => {
                 test(type);
             });
         });
