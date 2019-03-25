@@ -45,7 +45,6 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
 
     protected handleStartEvent(progress: number): void {
         super.handleStartEvent(progress);
-        const trackingUrls = this._campaign.getTrackingUrlsForEvent(ICometTrackingUrlEvents.START);
         this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.START);
     }
 

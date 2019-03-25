@@ -9,11 +9,13 @@ import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
 import { fakeARUtils } from 'TestHelpers/FakeARUtils';
 import * as sinon from 'sinon';
+import { RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 
-describe('IosVastTest', () => {
+describe('IosVastTest V4', () => {
     const sandbox = sinon.createSandbox();
 
     beforeEach(() => {
+        RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
         fakeARUtils(sandbox);
     });
 

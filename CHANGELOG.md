@@ -1,3 +1,60 @@
+# Fri Mar 22 01:15:43 UTC 2019
+
+* VastParserStrict test for AdMob video and update some diagnostics logs [#8783](https://github.com/Applifier/unity-ads-webview/pull/8783)
+* Fix Banner Ads Click Callback [#8784](https://github.com/Applifier/unity-ads-webview/pull/8784)
+* A/B test previous consent title [#8807](https://github.com/Applifier/unity-ads-webview/pull/8807)
+
+# Thu Mar 21 16:56:12 UTC 2019
+
+* Set metadata serverUrl also to auction v5 [#8758](https://github.com/Applifier/unity-ads-webview/pull/8758)
+* Promo supports missing orientation [#8736](https://github.com/Applifier/unity-ads-webview/pull/8736)
+* Whitelist carnival creative for analytics [#8782](https://github.com/Applifier/unity-ads-webview/pull/8782)
+* Promo background should cover entire background for iPhoneX [#8759](https://github.com/Applifier/unity-ads-webview/pull/8759)
+* Use auction v4 if creativeUrl is used [#8806](https://github.com/Applifier/unity-ads-webview/pull/8806)
+* Do not show Unity Consent in COPPA games [#8808](https://github.com/Applifier/unity-ads-webview/pull/8808)
+
+# Tue Mar 19 23:37:16 UTC 2019
+
+* Diagnostics for consent should be sampling at a 1% rate [#8760](https://github.com/Applifier/unity-ads-webview/pull/8760)
+
+# Tue Mar 19 17:27:24 UTC 2019
+
+* Introduce Observables utility class [#8475](https://github.com/Applifier/unity-ads-webview/pull/8475)
+* More loggings and locking v5 for ios test games [#8735](https://github.com/Applifier/unity-ads-webview/pull/8735)
+* Changing analytics to accept level index as a string rather than an int [#8733](https://github.com/Applifier/unity-ads-webview/pull/8733)
+* Override Unity consent from metadata if present [#8683](https://github.com/Applifier/unity-ads-webview/pull/8683)
+
+# Mon Mar 18 15:45:41 UTC 2019
+
+* Diagnostics of READ_PHONE_STATE permission for China Android 1% [#8687](https://github.com/Applifier/unity-ads-webview/pull/8687)
+* Making creativeType case agnostic [#8685](https://github.com/Applifier/unity-ads-webview/pull/8685)
+* V5 Rolling out iOS and diagnostics for failed send events [#8688](https://github.com/Applifier/unity-ads-webview/pull/8688) 
+
+# Fri Mar 15 14:46:01 UTC 2019
+
+* Change consent layout [#8711](https://github.com/Applifier/unity-ads-webview/pull/8711)
+
+# Fri Mar 15 12:36:40 UTC 2019
+
+* Promo fix where landscape font size was incorrect [#8686](https://github.com/Applifier/unity-ads-webview/pull/8686)
+* Fix the call to icon-size to use correct name [#8690](https://github.com/Applifier/unity-ads-webview/pull/8690)
+* Additional fields for consent layout A/B tests [#8372](https://github.com/Applifier/unity-ads-webview/pull/8372)
+
+# Thu Mar 14 08:37:20 UTC 2019
+
+* Experiment to test more accessible mraid close button in playables [#8614](https://github.com/Applifier/unity-ads-webview/pull/8614)
+* Show GDPR banner also in Performance VideoOverlay [#8637](https://github.com/Applifier/unity-ads-webview/pull/8637)
+* Add Reverse AB Test for "install now" button in rewarded ads [#8522](https://github.com/Applifier/unity-ads-webview/pull/8522)
+* Add Accessible close button test [#8471](https://github.com/Applifier/unity-ads-webview/pull/8471)
+* Release abGroup 17 to roll out VastStrictParser for Programmatic Vast [#8680](https://github.com/Applifier/unity-ads-webview/pull/8680)
+* Consolidate display adType to one [#8616](https://github.com/Applifier/unity-ads-webview/pull/8616)
+* Add miller creativeid for analytics events [#8682](https://github.com/Applifier/unity-ads-webview/pull/8682)
+
+# Tue Mar 12 21:19:07 UTC 2019
+
+* Revert "Don't send operative clicks for Programmatic MRAID" [#8639](https://github.com/Applifier/unity-ads-webview/pull/8639)
+* Restrict Auction V5 for request with over 10 placement [#8638](https://github.com/Applifier/unity-ads-webview/pull/8638)
+
 # Tue Mar 12 01:05:27 UTC 2019
 
 * VastParserStrict allow 'itms-apps://' protocol in urls [#8545](https://github.com/Applifier/unity-ads-webview/pull/8545)
