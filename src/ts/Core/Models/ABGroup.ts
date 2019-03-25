@@ -49,3 +49,4 @@ export const WebPlayerMRAIDTest = new DisabledABTest();
 // Two hold out groups that should not get the install now button in rewarded videos
 export const HoldOutInstallInRewardedVideos = new ABTest(5, 6);
 export const VastStrictAdMobTest = new ABTest(14, 17);
+export const SkipUnderTimerExperiment = new ABTest(7, 8);

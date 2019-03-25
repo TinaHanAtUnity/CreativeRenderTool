@@ -14,6 +14,8 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { ABGroup, SkipUnderTimerExperiment } from 'Core/Models/ABGroup';
+
 
 export interface IVideoOverlayParameters<T extends Campaign> {
     platform: Platform;
@@ -54,6 +56,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     protected _callButtonElement: HTMLElement;
     private _timerElement: HTMLElement;
     private _chinaAdvertisementElement: HTMLElement;
+    private _timerButton: HTMLElement;
 
     private _fadeTimer?: number;
     private _areControlsVisible: boolean = false;
@@ -63,6 +66,8 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     private _campaign: Campaign;
 
     private _useCloseIconInsteadOfSkipIcon: boolean | undefined = false;
+
+    private _skipUnderTimerExperimentEnabled: boolean = false;
 
     constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
         super(parameters.platform, 'video-overlay', parameters.placement.muteVideo());
@@ -84,6 +89,11 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         if (this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
             this._templateData.showInstallButton = true;
             this._templateData.gameIcon = this._campaign.getGameIcon() ? this._campaign.getGameIcon().getUrl() : '';
+        }
+
+        if (SkipUnderTimerExperiment.isValid(parameters.coreConfig.getAbGroup()) && parameters.placement.allowSkip()) {
+            this._templateData._skipUnderTimerExperimentEnabled = true;
+            this._skipUnderTimerExperimentEnabled = true;
         }
 
         this._bindings = [
@@ -200,13 +210,22 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._videoProgress = value;
         this._skipRemaining = this._skipDuration - this._videoProgress;
 
-        const timerCount = Math.ceil((this._videoDuration - this._videoProgress) / 1000);
+        let timerCount: Number;
+
+        if (this._skipUnderTimerExperimentEnabled) {
+            timerCount = Math.ceil((this._skipRemaining) / 1000);
+        } else {
+            timerCount = Math.ceil((this._videoDuration - this._videoProgress) / 1000);
+        }
 
         if (typeof timerCount === 'number' && !isNaN(timerCount) && timerCount > 0) {
             this._timerElement.innerText = timerCount.toString();
         }
 
         if (this._skipRemaining <= 0) {
+            if (this._skipUnderTimerExperimentEnabled) {
+                this.hideTimerButton();
+            }
             this.showSkipButton();
             this._chinaAdvertisementElement.classList.add('with-skip-button');
         }
@@ -373,6 +392,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._timerElement = <HTMLElement>this._container.querySelector('.timer');
         this._chinaAdvertisementElement = <HTMLLIElement>this._container.querySelector('.china-advertisement');
+        this._timerButton = <HTMLElement>this._container.querySelector('.timer-button');
     }
 
     private showSkipButton() {
@@ -382,6 +402,10 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
                 this.showCallButton();
             }
         }
+    }
+
+    private hideTimerButton() {
+        this._timerButton.style.display = 'none';
     }
 
     private resetFadeTimer() {
