@@ -46,3 +46,4 @@ export const AuctionV5Test = new ABTest(15, 18);
 export const VastParsingStrictTest = new ABTest(17);
 export const WebPlayerMRAIDTest = new DisabledABTest();
 export const InstallInRewardedVideos = new ABTest(7, 8);
+export const ProgressBarVideoTest = new ABTest(5, 6);

@@ -34,6 +34,7 @@ import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { VideoOverlayWithInstallInRewardedVideos } from 'Ads/Views/VideoOverlayWithInstallInRewardedVideo';
 import { IStoreApi } from 'Store/IStore';
+import { ABGroup, ProgressBarVideoTest } from 'Core/Models/ABGroup';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
@@ -66,6 +67,8 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
 
     private _playerMetadataServerId: string;
     private _options: unknown;
+
+    private _abGroup: ABGroup;
 
     constructor(core: ICore, ads: IAds) {
         this._platform = core.NativeBridge.getPlatform();
@@ -210,10 +213,15 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
         let overlay: AbstractVideoOverlay;
 
         if (CustomFeatures.isRewardedVideoInstallButtonEnabled(this._campaign, this._coreConfig)) {
-            // overlay = new VideoOverlayWithInstallInRewardedVideos(parameters, parameters.privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-            overlay = new ProgressBarVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+            if (ProgressBarVideoTest.isValid(this._abGroup)) {
+                overlay = new ProgressBarVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+            }
+            overlay = new VideoOverlayWithInstallInRewardedVideos(parameters, parameters.privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         } else {
-            overlay = new ProgressBarVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+            if (ProgressBarVideoTest.isValid(this._abGroup)) {
+                overlay = new ProgressBarVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+            }
+            overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
