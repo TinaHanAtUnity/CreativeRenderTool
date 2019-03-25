@@ -60,9 +60,6 @@ describe('ProgrammaticVPAIDParser', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
                 assert.isTrue(campaign instanceof VPAIDCampaign, 'Campaign was not an VPAIDCampaign');
 
-                const json = JSON.parse(ProgrammaticVPAIDCampaign);
-                const vast = new VastParser().parseVast(decodeURIComponent(json.content));
-
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
                 assert.equal(campaign.getVPAID().getScriptUrl(), 'https://fake-ads-backend.unityads.unity3d.com/get_file/js/vpaid_sample.js', 'Script URL is not equal');

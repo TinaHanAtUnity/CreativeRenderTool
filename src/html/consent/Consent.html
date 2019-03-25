@@ -5,7 +5,13 @@
                 <div class="privacy-logo item">
                     <span class="icon-gdpr"></span>
                 </div>
-                <div class="title item"><span class="centered-title">Can the Unity cookie collect and use your data to tailor your ads and experience?</span></div>
+                <div class="title item">
+                    <% if(data.useAltTitle) { %>
+                    <span class="centered-title">Can we use your data to tailor your ads and experience?</span>
+                    <% } else { %>
+                    <span class="centered-title">Can the Unity cookie collect and use your data to tailor your ads and experience?</span>
+                    <% } %>
+                </div>
                 <div class="description item">
                     <p>Unity and our <span class="third-parties-link page-link">third-parties</span>
                         will collect <span class="data-link page-link">data</span>, including

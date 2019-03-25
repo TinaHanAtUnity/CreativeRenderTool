@@ -8,7 +8,7 @@ import { ICoreApi, ICore } from 'Core/ICore';
 import { IBannerAdUnitParameters } from 'Banners/AdUnits/HTMLBannerAdUnit';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IAds } from 'Ads/IAds';
-import { IBanners } from 'Banners/IBanners';
+import { IBannersApi, IBanners } from 'Banners/IBanners';
 
 export class BannerAdUnitParametersFactory {
 
@@ -18,6 +18,7 @@ export class BannerAdUnitParametersFactory {
     private _webPlayerContainer: WebPlayerContainer;
     private _thirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
     private _programmaticTrackingService: ProgrammaticTrackingService;
+    private _bannersApi: IBannersApi;
 
     constructor(banner: IBanners, ads: IAds, core: ICore) {
         this._platform = core.NativeBridge.getPlatform();
@@ -26,6 +27,7 @@ export class BannerAdUnitParametersFactory {
         this._thirdPartyEventManagerFactory = ads.ThirdPartyEventManagerFactory;
         this._webPlayerContainer = banner.WebPlayerContainer;
         this._programmaticTrackingService = ads.ProgrammaticTrackingService;
+        this._bannersApi = banner.Api;
     }
 
     public create(campaign: BannerCampaign, placement: Placement): Promise<IBannerAdUnitParameters> {
@@ -39,7 +41,9 @@ export class BannerAdUnitParametersFactory {
                 [ThirdPartyEventMacro.SDK_VERSION]: this._clientInfo.getSdkVersion().toString()
             }),
             programmaticTrackingService: this._programmaticTrackingService,
-            webPlayerContainer: this._webPlayerContainer
+            webPlayerContainer: this._webPlayerContainer,
+            bannersApi: this._bannersApi,
+            placementId: placement.getId()
         });
     }
 }
