@@ -1,6 +1,7 @@
 # Merged
 
 * Remove accessible close button tests [#8834](https://github.com/Applifier/unity-ads-webview/pull/8834)
+* Parse \<AdVerifications\> for Open Measurement support [#8830](https://github.com/Applifier/unity-ads-webview/pull/8830)
 
 # Fri Mar 22 01:15:43 UTC 2019
 
