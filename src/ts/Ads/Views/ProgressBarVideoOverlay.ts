@@ -30,8 +30,8 @@ export class ProgressBarVideoOverlay extends VideoOverlay {
 
   public setVideoProgress(value: number): void {
     super.setVideoProgress(value);
-    const delta = (value - super._videoProgress) || 0;
-    const progressInPercentages = Math.ceil(100 / super._videoDuration * super._videoProgress);
+    const delta = (value - this._videoProgress) || 0;
+    const progressInPercentages = Math.ceil(100 / this._videoDuration * this._videoProgress);
     if (delta >= 0) {
       if (this._progressBar.style.transition === '' && this._progressBar.style.webkitTransition === '') {
         this.setCssTransition();
@@ -40,6 +40,9 @@ export class ProgressBarVideoOverlay extends VideoOverlay {
     } else {
       this.removeCssTransition();
       this._progressBar.style.width = `${progressInPercentages}%`;
+    }
+    if (progressInPercentages >= 100 && this._progressBarWrapper) {
+      this._progressBarWrapper.remove();
     }
   }
 
