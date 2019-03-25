@@ -32,7 +32,7 @@ export class VastAdVerification extends Model<IVastAdVerification> {
         return this.get('verificationResources');
     }
 
-    public getVerificationNotExecutedTrackingEvent(): string | null {
+    public getVerificationTrackingEvent(): string | null {
         return this.get('verificationTrackingEvent');
     }
 
@@ -40,7 +40,7 @@ export class VastAdVerification extends Model<IVastAdVerification> {
         return this.get('verificationParameters');
     }
 
-    public setVerificationNotExecutedTrackingEvent(trackingUrl: string) {
+    public setVerificationTrackingEvent(trackingUrl: string) {
         this.set('verificationTrackingEvent', trackingUrl);
     }
 
@@ -48,7 +48,7 @@ export class VastAdVerification extends Model<IVastAdVerification> {
         return {
             'verificationVendor': this.getVerificationVendor(),
             'verificationResources': this.getVerficationResources(),
-            'verificationTrackingEvent': this.getVerificationNotExecutedTrackingEvent(),
+            'verificationTrackingEvent': this.getVerificationTrackingEvent(),
             'verificationParameters': this.getVerificationParameters()
         };
     }

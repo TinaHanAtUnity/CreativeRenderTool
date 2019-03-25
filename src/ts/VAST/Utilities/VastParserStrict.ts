@@ -35,7 +35,7 @@ enum VastNodeName {
     VAST = 'VAST',
     EXTENSION = 'Extension',
     VERIFICATION = 'Verification',
-    AD_VERIFICATIONS = 'AdVerifications',
+    AD_VERIFICATIONS = 'AdVerifications',   // for VAST 4.1
     JS_RESOURCE = 'JavaScriptResource',
     EX_RESOURCE = 'ExecutableResource',
     VERIFICATION_PARAMETERS = 'VerificationParameters'
@@ -60,7 +60,11 @@ enum VastAttributeNames {
 }
 
 enum VastAttributeValues {
-    VERIFICATION_NOT_EXECUTED = 'verificationNotExecuted'
+    VERIFICATION_NOT_EXECUTED = 'verificationNotExecuted'   // for VAST 3.x and under
+}
+
+enum VastExtensionType {
+    AD_VERIFICATIONS = 'AdVerifications'
 }
 
 export class VastParserStrict {
@@ -299,7 +303,7 @@ export class VastParserStrict {
 
         this.getNodesWithName(adElement, VastNodeName.EXTENSION).forEach((element: HTMLElement) => {
             const extType = element.getAttribute(VastAttributeNames.TYPE);
-            if (extType && extType === VastNodeName.AD_VERIFICATIONS) {
+            if (extType && extType === VastExtensionType.AD_VERIFICATIONS) {
                 const verifications = this.parseAdVerification(element, urlProtocol);
                 vastAd.addAdVerifications(verifications);
             }
@@ -334,7 +338,7 @@ export class VastParserStrict {
                 const url = this.parseVastUrl(this.parseNodeText(trackingElement), urlProtocol);
                 const eventName = trackingElement.getAttribute(VastAttributeNames.EVENT);
                 if (eventName && eventName === VastAttributeValues.VERIFICATION_NOT_EXECUTED && url) {
-                    vastAdVerification.setVerificationNotExecutedTrackingEvent(url);
+                    vastAdVerification.setVerificationTrackingEvent(url);
                 }
             });
             vastAdVerifications.push(vastAdVerification);

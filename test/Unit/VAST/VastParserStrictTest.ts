@@ -510,7 +510,7 @@ describe('VastParserStrict', () => {
             });
 
             describe('Extension', () => {
-                describe('ad verification as extension', () => {
+                describe('ad verification as extension for VAST 3.x and under', () => {
                     it('retrieve ad verification element', () => {
                         const vast = TestFixtures.getVastParserStrict().parseVast(VastAdVerificationAsExtension);
                         const vastAdVerifications = vast.getAds()[0].getAdVerifications();
@@ -527,7 +527,7 @@ describe('VastParserStrict', () => {
                         });
 
                         it('Should match verification tracking url', () => {
-                            assert.equal(vastAdVerification.getVerificationNotExecutedTrackingEvent(), 'https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;ecn1=1;etm1=0;eid1=210014;errorcode=%5BREASON%5D');
+                            assert.equal(vastAdVerification.getVerificationTrackingEvent(), 'https://ade.googlesyndication.com/ddm/activity/dc_oe=ChMI_fCpv9fh4AIVxYRiCh0PFAIcEAAYACDsur8c;met=1;ecn1=1;etm1=0;eid1=210014;errorcode=%5BREASON%5D');
                         });
 
                         it('Should have java script resource url', () => {
