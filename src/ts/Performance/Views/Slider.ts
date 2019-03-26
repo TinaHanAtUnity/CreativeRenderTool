@@ -164,14 +164,20 @@ export class Slider {
     private generateSlideHTML = (id: string, image?: HTMLImageElement) => {
         const src = image && image.src;
         const style = {};
-        const item = this.createElement('div', id, ['slider-item', 'slider-item']);
-        const img = this.createElement('img', id + 'img', ['slider-item-image']);
 
         if (src) {
-            img.src = src;
+            Object.assign(style, {
+                'background-image': `url(${src})`
+            });
         }
 
-        item.appendChild(img);
+        const item = this.createElement('div', id, ['slider-item', 'slider-item']);
+        const span = this.createElement('span', id + 'img', [], style);
+
+        if (image !== undefined) {
+            item.appendChild(image);
+            item.appendChild(span);
+        }
 
         return item;
     }
