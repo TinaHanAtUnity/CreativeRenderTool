@@ -70,6 +70,7 @@ export class CampaignManager {
 
     public static setBaseUrl(baseUrl: string): void {
         CampaignManager.BaseUrl = baseUrl + '/v4/games';
+        CampaignManager.AuctionV5BaseUrl = baseUrl + '/v5/games';
     }
 
     protected static CampaignResponse: string | undefined;

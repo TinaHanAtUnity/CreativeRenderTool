@@ -362,6 +362,32 @@ describe('UserPrivacyManagerTest', () => {
                 });
             });
         });
+
+        describe('when game uses UNITY_CONSENT', () => {
+            beforeEach(() => {
+                isGDPREnabled = true;
+                gamePrivacy.isEnabled.returns(true);
+                gamePrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
+            });
+
+            it('should not override the configuration', () => {
+                consent = undefined;
+                return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                    assert.fail('should throw');
+                }).catch(() => {
+                    sinon.assert.notCalled(gamePrivacy.setMethod);
+                });
+            });
+
+            it('should override the configuration if consent is given', () => {
+                consent = false;
+                return privacyManager.getConsentAndUpdateConfiguration().then(() => {
+                    sinon.assert.calledWith(gamePrivacy.setMethod, PrivacyMethod.DEVELOPER_CONSENT);
+                }).catch(() => {
+                    assert.fail('should not throw');
+                });
+            });
+        });
     });
 
     describe('Fetch personal information', () => {
@@ -542,11 +568,18 @@ describe('UserPrivacyManagerTest', () => {
 
     describe('updateUserPrivacy', () => {
         const anyConsent: IPermissions = { gameExp: false, ads: false, external: false };
+        let sandbox: sinon.SinonSandbox;
 
         beforeEach(() => {
+            sandbox = sinon.createSandbox();
             gamePrivacy.isEnabled.returns(true);
             gamePrivacy.getMethod.returns(PrivacyMethod.UNITY_CONSENT);
+            sandbox.stub(Math, 'random').returns(0);
             (<sinon.SinonStub>coreConfig.getCountry).returns('FI');
+        });
+
+        afterEach(() => {
+            sandbox.restore();
         });
 
         describe('when updating user privacy', () => {

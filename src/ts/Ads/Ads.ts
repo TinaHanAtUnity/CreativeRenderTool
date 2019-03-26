@@ -297,9 +297,20 @@ export class Ads implements IAds {
             return Promise.resolve();
         }
 
-        Diagnostics.trigger('consent_show', {adsConfig: JSON.stringify(this.Config.getDTO())});
+        if (CustomFeatures.shouldSampleAtOnePercent()) {
+            Diagnostics.trigger('consent_show', {adsConfig: JSON.stringify(this.Config.getDTO())});
+        }
+
+        if (this._core.Config.isCoppaCompliant()) {
+            Diagnostics.trigger('consent_with_coppa', {
+                coreConfig: this._core.Config.getDTO(),
+                adsConfig: this.Config.getDTO()
+            });
+            return Promise.resolve();
+        }
 
         const consentView = new ConsentUnit({
+            abGroup: this._core.Config.getAbGroup(),
             platform: this._core.NativeBridge.getPlatform(),
             privacyManager: this.PrivacyManager,
             adUnitContainer: this.Container,

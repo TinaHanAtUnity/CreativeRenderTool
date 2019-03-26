@@ -10,6 +10,8 @@ import { Url } from 'Core/Utilities/Url';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { VastAdValidator } from 'VAST/Validators/VastAdValidator';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
+import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
+import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -30,7 +32,13 @@ enum VastNodeName {
     COMPANION_CLICK_THROUGH = 'CompanionClickThrough',
     COMPANION_CLICK_TRACKING = 'CompanionClickTracking',
     PARSE_ERROR = 'parsererror',
-    VAST = 'VAST'
+    VAST = 'VAST',
+    EXTENSION = 'Extension',
+    VERIFICATION = 'Verification',
+    AD_VERIFICATIONS = 'AdVerifications',   // for VAST 4.1
+    JS_RESOURCE = 'JavaScriptResource',
+    EX_RESOURCE = 'ExecutableResource',
+    VERIFICATION_PARAMETERS = 'VerificationParameters'
 }
 
 enum VastAttributeNames {
@@ -46,7 +54,17 @@ enum VastAttributeNames {
     WIDTH = 'width',
     HEIGHT = 'height',
     API_FRAMEWORK = 'apiFramework',
-    CREATIVE_TYPE = 'creativeType'
+    CREATIVE_TYPE = 'creativeType',
+    BROWSER_OPTIONAL = 'browserOptional',
+    VENDOR = 'vendor'
+}
+
+enum VastAttributeValues {
+    VERIFICATION_NOT_EXECUTED = 'verificationNotExecuted'   // for VAST 3.x and under
+}
+
+enum VastExtensionType {
+    AD_VERIFICATIONS = 'AdVerifications'
 }
 
 export class VastParserStrict {
@@ -283,7 +301,50 @@ export class VastParserStrict {
             }
         });
 
+        this.getNodesWithName(adElement, VastNodeName.EXTENSION).forEach((element: HTMLElement) => {
+            const extType = element.getAttribute(VastAttributeNames.TYPE);
+            if (extType && extType === VastExtensionType.AD_VERIFICATIONS) {
+                const verifications = this.parseAdVerification(element, urlProtocol);
+                vastAd.addAdVerifications(verifications);
+            }
+        });
+
         return vastAd;
+    }
+
+    private parseAdVerification(verificationElement: HTMLElement, urlProtocol: string): VastAdVerification[] {
+        const vastAdVerifications: VastAdVerification[] = [];
+        this.getNodesWithName(verificationElement, VastNodeName.VERIFICATION).forEach((element: HTMLElement) => {
+            const vastVerificationResources: VastVerificationResource[] = [];
+            const vendor = element.getAttribute(VastAttributeNames.VENDOR) || '';
+            this.getNodesWithName(element, VastNodeName.JS_RESOURCE).forEach((jsElement: HTMLElement) => {
+                const resourceUrl = this.parseVastUrl(this.parseNodeText(jsElement), urlProtocol);
+                const apiFramework = jsElement.getAttribute(VastAttributeNames.API_FRAMEWORK);
+                const browserOptional = jsElement.getAttribute(VastAttributeNames.BROWSER_OPTIONAL) === 'false' ? false : true;
+                if (resourceUrl && apiFramework) {
+                    const vastVerificationResource = new VastVerificationResource(resourceUrl, apiFramework, browserOptional);
+                    vastVerificationResources.push(vastVerificationResource);
+                }
+            });
+
+            const verificationParams = this.getFirstNodeWithName(element, VastNodeName.VERIFICATION_PARAMETERS);
+            let verificationParamText;
+            if (verificationParams) {
+                verificationParamText = this.parseNodeText(verificationParams);
+            }
+
+            const vastAdVerification = new VastAdVerification(vendor, vastVerificationResources, verificationParamText);
+            this.getNodesWithName(element, VastNodeName.TRACKING).forEach((trackingElement: HTMLElement) => {
+                const url = this.parseVastUrl(this.parseNodeText(trackingElement), urlProtocol);
+                const eventName = trackingElement.getAttribute(VastAttributeNames.EVENT);
+                if (eventName && eventName === VastAttributeValues.VERIFICATION_NOT_EXECUTED && url) {
+                    vastAdVerification.setVerificationTrackingEvent(url);
+                }
+            });
+            vastAdVerifications.push(vastAdVerification);
+        });
+
+        return vastAdVerifications;
     }
 
     private getIntAttribute(element: HTMLElement, attribute: string): number {

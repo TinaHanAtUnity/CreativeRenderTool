@@ -1,11 +1,12 @@
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { GamePrivacy,
+import {
+    GamePrivacy,
+    IAllPermissions,
+    IGranularPermissions,
     IPermissions,
     isUnityConsentPermissions,
     PrivacyMethod,
-    UserPrivacy,
-    IAllPermissions,
-    IGranularPermissions
+    UserPrivacy
 } from 'Ads/Models/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -19,6 +20,7 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { ITemplateData } from 'Core/Views/View';
 import { ConsentPage } from 'Ads/Views/Consent/Consent';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 interface IUserSummary extends ITemplateData {
     deviceModel: string;
@@ -170,10 +172,12 @@ export class UserPrivacyManager {
             permissions: permissions
         };
 
-        Diagnostics.trigger('consent_send_event', {
-            adsConfig: JSON.stringify(this._adsConfig.getDTO()),
-            permissions: JSON.stringify(permissions)
-        });
+        if (CustomFeatures.shouldSampleAtOnePercent()) {
+            Diagnostics.trigger('consent_send_event', {
+                adsConfig: JSON.stringify(this._adsConfig.getDTO()),
+                permissions: JSON.stringify(permissions)
+            });
+        }
 
         return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
     }
@@ -272,6 +276,19 @@ export class UserPrivacyManager {
     private updateConfigurationWithConsent(consent: boolean) {
         this._adsConfig.setOptOutEnabled(!consent);
         this._adsConfig.setOptOutRecorded(true);
+
+        const gamePrivacy = this._adsConfig.getGamePrivacy();
+        if (gamePrivacy.getMethod() === PrivacyMethod.UNITY_CONSENT) {
+            gamePrivacy.setMethod(PrivacyMethod.DEVELOPER_CONSENT);
+            const userPrivacy = this._adsConfig.getUserPrivacy();
+            userPrivacy.update({
+                method: gamePrivacy.getMethod(),
+                version: gamePrivacy.getVersion(),
+                permissions: {
+                    profiling: consent
+                }
+            });
+        }
     }
 
     private onStorageSet(eventType: string, data: UserPrivacyStorageData) {

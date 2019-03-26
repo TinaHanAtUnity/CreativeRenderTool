@@ -61,6 +61,10 @@ export class GamePrivacy extends Model<IGamePrivacy> {
         return this.get('method');
     }
 
+    public setMethod(method: PrivacyMethod): void {
+        this.set('method', method);
+    }
+
     public getVersion(): number {
         if (this.getMethod() === PrivacyMethod.UNITY_CONSENT) {
             return CurrentUnityConsentVersion;

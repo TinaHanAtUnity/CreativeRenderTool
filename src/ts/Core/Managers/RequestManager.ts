@@ -10,6 +10,7 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AuctionV5Test } from 'Core/Models/ABGroup';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
 const enum RequestStatus {
     COMPLETE,
@@ -113,6 +114,11 @@ export class RequestManager {
 
     public static setAuctionProtocol(coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, platform: Platform, clientInfo: ClientInfo) {
         if (!RequestManager._auctionProtocol) {
+            if(TestEnvironment.get('creativeUrl')) {
+                RequestManager._auctionProtocol = AuctionProtocol.V4;
+                return;
+            }
+
             if (coreConfig.getTestMode()) {
                 RequestManager._auctionProtocol = AuctionProtocol.V4;
                 return;
@@ -125,7 +131,7 @@ export class RequestManager {
 
             if (adsConfig.getPlacementCount() >= 10) {
                 RequestManager._auctionProtocol = AuctionProtocol.V4;
-                if (Math.floor(Math.random() * 100) % 100 === 1) {
+                if (CustomFeatures.shouldSampleAtOnePercent()) {
                     Diagnostics.trigger('config_placement_over_10', {
                         placementCount: adsConfig.getPlacementCount()
                     });
