@@ -35,7 +35,7 @@ export class Slider {
         minPercentToSlide: null,
         autoplay: true,
         direction: 'left',
-        interval:5
+        interval:50000
     }) {
         this.options = options;
 
@@ -164,17 +164,14 @@ export class Slider {
     private generateSlideHTML = (id: string, image?: HTMLImageElement) => {
         const src = image && image.src;
         const style = {};
+        const item = this.createElement('div', id, ['slider-item', 'slider-item']);
+        const img = this.createElement('img', id + 'img', ['slider-item-image']);
 
         if (src) {
-            Object.assign(style, {
-                'background-image': `url(${src})`
-            });
+            img.src = src;
         }
 
-        const item = this.createElement('div', id, ['slider-item', 'slider-item']);
-        const span = this.createElement('span', id+'img', ['slider-item-image'], style);
-
-        item.appendChild(span);
+        item.appendChild(img);
 
         return item;
     }
