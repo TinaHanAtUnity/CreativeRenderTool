@@ -40,7 +40,7 @@ export class VastCreativeStaticResourceCompanionAdValidator implements IValidato
         const creativeType = companionAd.getCreativeType();
         if (creativeType === null) {
             this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" is missing required "creativeType" attribute`));
-        } else if (VastCreativeStaticResourceCompanionAdValidator._supportedCreativeTypes.indexOf(creativeType) === -1) {
+        } else if (VastCreativeStaticResourceCompanionAdValidator._supportedCreativeTypes.indexOf(creativeType.toLowerCase()) === -1) {
             this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" attribute "creativeType=${creativeType}" is not supported`));
         }
     }

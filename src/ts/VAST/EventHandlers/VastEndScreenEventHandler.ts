@@ -7,8 +7,9 @@ import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { ABGroup, CTAClickHandlingTest } from 'Core/Models/ABGroup';
+import { ABGroup } from 'Core/Models/ABGroup';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
+import { Url } from 'Core/Utilities/Url';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
@@ -34,22 +35,16 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     public onVastEndScreenClick(): Promise<void> {
         this.setCallButtonEnabled(false);
 
-        let clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
-        if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId()) && this._vastCampaign.getVast().getCompanionClickTrackingUrls().length === 0) {
-            clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
-        }
+        const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
         if (clickThroughURL) {
             const useWebViewUserAgentForTracking = this._vastCampaign.getUseWebViewUserAgentForTracking();
             const ctaClickedTime = Date.now();
-            if (!CTAClickHandlingTest.isValid(this._abGroup) && CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId())) {
-                return this.openUrlOnCallButton(clickThroughURL, Date.now() - ctaClickedTime, clickThroughURL);
-            } else {
-                return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking).then((url: string) => {
-                    return this.openUrlOnCallButton(url, Date.now() - ctaClickedTime, clickThroughURL!);
-                }).catch(() => {
-                    return this.openUrlOnCallButton(clickThroughURL!, Date.now() - ctaClickedTime, clickThroughURL!);
-                });
-            }
+            const redirectBreakers = Url.getAppStoreUrlTemplates(this._platform);
+            return this._request.followRedirectChain(clickThroughURL, useWebViewUserAgentForTracking, redirectBreakers).catch(() => {
+                return clickThroughURL;
+            }).then((storeUrl: string) => {
+                return this.openUrlOnCallButton(storeUrl, Date.now() - ctaClickedTime, clickThroughURL);
+            });
         }
         return Promise.reject(new Error('There is no clickthrough URL for video or companion'));
     }
@@ -71,9 +66,6 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private openUrlOnCallButton(url: string, clickDuration: number, clickUrl: string): Promise<void> {
         return this.onOpenUrl(url).then(() => {
             this.setCallButtonEnabled(true);
-            if (CustomFeatures.isByteDanceSeat(this._vastCampaign.getSeatId()) && this._vastCampaign.getVast().getCompanionClickTrackingUrls().length === 0) {
-                this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
-            }
             this._vastAdUnit.sendCompanionClickTrackingEvent(this._vastCampaign.getSession().getId());
             this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._vastCampaign.getSession().getId());
 

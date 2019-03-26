@@ -61,6 +61,10 @@ export class GamePrivacy extends Model<IGamePrivacy> {
         return this.get('method');
     }
 
+    public setMethod(method: PrivacyMethod): void {
+        this.set('method', method);
+    }
+
     public getVersion(): number {
         if (this.getMethod() === PrivacyMethod.UNITY_CONSENT) {
             return CurrentUnityConsentVersion;
@@ -122,6 +126,12 @@ export class UserPrivacy extends Model<IUserPrivacy> {
         this.set('method', data.method);
         this.set('version', data.version);
         this.set('permissions', data.permissions);
+    }
+
+    public clear(): void {
+        this.set('method', PrivacyMethod.DEFAULT);
+        this.set('version', 0);
+        this.set('permissions', { profiling: false });
     }
 
     public getDTO(): { [key: string]: unknown } {

@@ -12,6 +12,7 @@ import { PromoEvents } from 'Promo/Utilities/PromoEvents';
 import { IProduct, IPurchasingAdapter, ITransactionDetails } from 'Purchasing/PurchasingAdapter';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
+import { Observables } from 'Core/Utilities/Observables';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -106,22 +107,33 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
 
     public refreshCatalog(): Promise<IProduct[]> {
         return new Promise<IProduct[]>((resolve, reject) => {
-            const observer = this._promo.Purchasing.onGetPromoCatalog.subscribe((promoCatalogJSON) => {
-                this._promo.Purchasing.onGetPromoCatalog.unsubscribe(observer);
-                if(promoCatalogJSON === '') {
-                    reject(this.logIssue('Promo catalog JSON is empty', 'catalog_json_empty'));                }
-                try {
-                    const products: IProduct[] = JSON.parse(promoCatalogJSON);
-                    resolve(products);
-                } catch(err) {
-                    reject(this.logIssue(`Promo catalog JSON failed to parse with the following string: ${promoCatalogJSON}`, 'catalog_json_parse_failure'));
-                }
+            const observer = Observables.once1(this._promo.Purchasing.onGetPromoCatalog, (promoCatalogJSON) => {
+                this.validatePromoJSON(promoCatalogJSON).then(() => {
+                    try {
+                        const products: IProduct[] = JSON.parse(promoCatalogJSON);
+                        resolve(products);
+                    } catch(err) {
+                        reject(this.logIssue(`Promo catalog JSON failed to parse with the following string: ${promoCatalogJSON}`, 'catalog_json_malformatted'));
+                    }
+                }).catch((e) => {
+                    reject(e);
+                });
             });
             this._promo.Purchasing.getPromoCatalog().catch((e) => {
                 this._promo.Purchasing.onGetPromoCatalog.unsubscribe(observer);
-                reject(this.logIssue('Purchasing Catalog failed to refresh', 'catalog_refresh_failed'));
+                reject(this.logIssue('Purchasing Catalog failed to refresh'));
             });
         });
+    }
+
+    private validatePromoJSON(promoCatalogJSON: string): Promise<void> {
+        if (promoCatalogJSON === 'NULL' || promoCatalogJSON === null || promoCatalogJSON === undefined) {
+            return Promise.reject(this.logIssue('Promo catalog JSON is null', 'catalog_json_null'));
+        } else if (promoCatalogJSON === '') {
+            return Promise.reject(this.logIssue('Promo catalog JSON is empty'));
+        }
+
+        return Promise.resolve();
     }
 
     private logIssue(errorMessage: string, errorType?: string): Error {
@@ -179,8 +191,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
 
     private initializeIAPPromo(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            const observer = this._promo.Purchasing.onInitialize.subscribe((isReady) => {
-                this._promo.Purchasing.onInitialize.unsubscribe(observer);
+            const observer = Observables.once1(this._promo.Purchasing.onInitialize, (isReady) => {
                 if (isReady !== 'True') {
                     reject(this.logIssue('Purchasing SDK not detected. You have likely configured a promo placement but have not included the Unity Purchasing SDK in your game.'));
                 } else {
@@ -196,8 +207,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
 
     private checkPromoVersion(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            const promoVersionObserver = this._promo.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
-                this._promo.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
+            const observer = Observables.once1(this._promo.Purchasing.onGetPromoVersion, (promoVersion) => {
                 if(!this.isPromoVersionSupported(promoVersion)) {
                     reject(this.logIssue(`Promo version: ${promoVersion} is not supported. Initialize UnityPurchasing 1.16+ to ensure Promos are marked as ready`));
                 } else {
@@ -205,7 +215,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
                 }
             });
             this._promo.Purchasing.getPromoVersion().catch(() => {
-                this._promo.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
+                this._promo.Purchasing.onGetPromoVersion.unsubscribe(observer);
                 reject(this.logIssue('Promo version check failed'));
             });
         });
@@ -221,7 +231,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
 
     private sendPurchasingCommand(iapPayload: IPromoPayload): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            const observer = this._promo.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
+            const observer = Observables.once1(this._promo.Purchasing.onCommandResult, (isCommandSuccessful) => {
                 if (isCommandSuccessful === 'True') {
                     if (iapPayload.request === IPromoRequest.SETIDS) {
                         this._isInitialized = true;

@@ -19,6 +19,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { FileId } from 'Core/Utilities/FileId';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 export class BackupCampaignManager {
     private static _maxExpiryDelay: number = 7 * 24 * 3600 * 1000; // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
@@ -30,6 +31,7 @@ export class BackupCampaignManager {
     private _deviceInfo: DeviceInfo;
 
     private _campaignCount: number = 0;
+    private _enabled: boolean = true;
 
     constructor(platform: Platform, core: ICoreApi, storageBridge: StorageBridge, coreConfiguration: CoreConfiguration, deviceInfo: DeviceInfo) {
         this._platform = platform;
@@ -41,6 +43,11 @@ export class BackupCampaignManager {
 
     // todo: once auction v5 is unconditionally adopoted, trackingUrls should not be optional
     public storePlacement(placement: Placement, mediaId: string, trackingUrls?: ICampaignTrackingUrls) {
+        // never store if backup campaign disabled
+        if(!this._enabled) {
+            return;
+        }
+
         // never store data when in test mode
         if(this._coreConfiguration.getTestMode()) {
             return;
@@ -67,6 +74,11 @@ export class BackupCampaignManager {
     }
 
     public storeCampaign(campaign: Campaign) {
+        // never store if backup campaign disabled
+        if(!this._enabled) {
+            return;
+        }
+
         // never store data when in test mode
         if(this._coreConfiguration.getTestMode()) {
             return;
@@ -103,6 +115,11 @@ export class BackupCampaignManager {
     }
 
     public loadCampaign(placement: Placement): Promise<Campaign | undefined> {
+        // never load campaign, if backup campaign disabled
+        if(!this._enabled) {
+            return Promise.resolve(undefined);
+        }
+
         // test mode should never use stored production campaigns even when they would be available in storage
         if(this._coreConfiguration.getTestMode()) {
             return Promise.resolve(undefined);
@@ -125,7 +142,8 @@ export class BackupCampaignManager {
                                 Diagnostics.trigger('backup_campaign_loading_failed', {
                                     type: type,
                                     data: data,
-                                    willExpireAt: willexpireat
+                                    willExpireAt: willexpireat,
+                                    auctionProtocol: RequestManager.getAuctionProtocol()
                                 });
                             }
                         }
@@ -155,6 +173,10 @@ export class BackupCampaignManager {
         const operation = new StorageOperation(StorageType.PRIVATE);
         operation.delete('backupcampaign');
         this._storageBridge.queue(operation);
+    }
+
+    public setEnabled(value: boolean) {
+        this._enabled = value;
     }
 
     private getCampaignType(campaign: Campaign): string | undefined {

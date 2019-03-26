@@ -53,10 +53,22 @@ describe('UrlTest', () => {
         });
     });
 
+    describe('isValidUrlCharacters', () => {
+        it('should validate legal urls', () => {
+            assert.isTrue(Url.isValidUrlCharacters('https://www.unity3d.com!$#&-;=?-[]'));
+        });
+
+        it('should not validate illegal urls', () => {
+            assert.isFalse(Url.isValidUrlCharacters('https://www.unity3d.com/%ZONE%'));
+            assert.isFalse(Url.isValidUrlCharacters('https://bs.serving-sys.com/Serving?cn=display&c=23&pl=VAST&pli=19864721&PluID=0&pos=9317&ncu=https://i.w55c.net/cl?t=1&btid=YTdmNGEwZTItZGJmYi00YWJmLTgxYTYtOGQ1Y2QxNDE0YjU0fFRGdVE2WmU1T0p8MTQ4MjQyODcyMTAyNHwxfDBGUkxJUmFKejF8MFJkUlU2cmgyMHwzMGM1ZWY3YS1iNTk0LTRjMzEtODQ1OC02ZmM3YTdjZDQ5MzFfZ2FfR0VOX0VYfDI1ODIzMzd8fHx8MTcuMFB8VVNE&ei=TREMOR&rurl=&ord=2611507143758033&cim=1\n\n\n<SCRIPT  language=\'JavaScript1.1\' SRC=\"https://pixel.adsafeprotected.com/rjss/st/69577/12006978/skeleton.js\"></SCRIPT>\n<NOSCRIPT><IMG SRC=\"https://pixel.adsafeprotected.com/rfw/st/69577/12006977/skeleton.gif\" BORDER=0 WIDTH=1 HEIGHT=1 ALT=\"\"></NOSCRIPT>&cb=1482428721026'));
+        });
+    });
+
     describe('isValidProtocol', () => {
         it('should validate legal url protocols', () => {
             assert.isTrue(Url.isValidProtocol('https://www.unity3d.com'), 'https:// is a valid protocol');
             assert.isTrue(Url.isValidProtocol('http://www.unity3d.com'), 'http:// is a valid protocol');
+            assert.isTrue(Url.isValidProtocol('itms-apps://www.unity3d.com'), 'itms-apps:// is a valid protocol');
         });
 
         it('should not validate illegal url protocols', () => {
@@ -243,6 +255,13 @@ describe('UrlTest', () => {
 
             const timestamp = Url.getQueryParameter(mediaUrl, AdmobUrlQueryParameters.TIMESTAMP);
             assert.equal(timestamp, '1549413290', 'Timestamp incorrect');
+        });
+    });
+
+    describe('getAppStoreUrlTemplates', () => {
+        it('should return correct app store url templates', () => {
+            const iosStoreTemplates = ['https://itunes.apple.com'];
+            assert.deepEqual(Url.getAppStoreUrlTemplates(Platform.IOS), iosStoreTemplates, 'iOS app store templates are not matching');
         });
     });
 });

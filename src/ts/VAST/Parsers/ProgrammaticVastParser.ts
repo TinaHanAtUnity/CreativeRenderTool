@@ -17,7 +17,6 @@ import { ICore, ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class ProgrammaticVastParser extends CampaignParser {

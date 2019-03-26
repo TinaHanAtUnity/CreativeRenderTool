@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="3.0">
+  <Ad id="1000002">
+    <InLine>
+      <AdSystem>MediaForce</AdSystem>
+      <Impression><![CDATA[https://tux-pool-use.perf-serving.com/vast/event/imp/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/]]></Impression>
+      <Error><![CDATA[https://tux-pool-use.perf-serving.com/vast/event/error/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/?error_code=[ERRORCODE]]]></Error>
+      <Creatives>
+        <Creative id="1000002">
+          <Linear>
+            <Duration>00:00:21</Duration>
+            <TrackingEvents>
+              <Tracking event="start"><![CDATA[https://tux-pool-use.perf-serving.com/vast/event/start/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/]]></Tracking>
+              <Tracking event="skip"><![CDATA[https://tux-pool-use.perf-serving.com/vast/event/skip/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/]]></Tracking>
+              <Tracking event="firstQuartile"><![CDATA[https://tux-pool-use.perf-serving.com/vast/event/first_quartile/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/]]></Tracking>
+              <Tracking event="midpoint"><![CDATA[https://tux-pool-use.perf-serving.com/vast/event/midpoint/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/]]></Tracking>
+              <Tracking event="thirdQuartile"><![CDATA[https://tux-pool-use.perf-serving.com/vast/event/third_quartile/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/]]></Tracking>
+              <Tracking event="complete"><![CDATA[https://tux-pool-use.perf-serving.com/vast/event/complete/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/]]></Tracking>
+            </TrackingEvents>
+            <VideoClicks>
+              <ClickThrough><![CDATA[https://tux-pool-use.perf-serving.com/click/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/]]></ClickThrough>
+            </VideoClicks>
+            <MediaFiles>
+              <MediaFile height="1280" width="720" type="video/mp4" bitrate="3261" delivery="progressive" scalable="false" maintainAspectRatio="false"><![CDATA[https://d31otfhas71ais.cloudfront.net/videos/hof/CityOfQueens_vertical_720x1280.mp4]]></MediaFile>
+              <MediaFile height="854" width="480" type="video/mp4" bitrate="1157" delivery="progressive" scalable="false" maintainAspectRatio="false"><![CDATA[https://d31otfhas71ais.cloudfront.net/videos/hof/CityOfQueens_vertical_480x854.mp4]]></MediaFile>
+              <MediaFile height="480" width="270" type="video/mp4" bitrate="434" delivery="progressive" scalable="false" maintainAspectRatio="false"><![CDATA[https://d31otfhas71ais.cloudfront.net/videos/hof/CityOfQueens_vertical_270x480.mp4]]></MediaFile>
+            </MediaFiles>
+          </Linear>
+          <CompanionAds required="any">
+            <Companion width="1024" height="768">
+              <StaticResource type="image/jpeg"><![CDATA[https://d31otfhas71ais.cloudfront.net/images/hof/HoF_1024x768_001.jpg]]></StaticResource>
+              <CompanionClickThrough><![CDATA[https://tux-pool-use.perf-serving.com/click/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/?cs=1024x768]]></CompanionClickThrough>
+              <TrackingEvents>
+                <Tracking event="creativeView"><![CDATA[https://tux-pool-use.perf-serving.com/vast/event/creative_view/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/?cs=1024x768]]></Tracking>
+              </TrackingEvents>
+            </Companion>
+            <Companion width="768" height="1024">
+              <StaticResource type="image/jpeg"><![CDATA[https://d31otfhas71ais.cloudfront.net/images/hof/HoF_768x1024_001.jpg]]></StaticResource>
+              <CompanionClickThrough><![CDATA[https://tux-pool-use.perf-serving.com/click/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/?cs=768x1024]]></CompanionClickThrough>
+              <TrackingEvents>
+                <Tracking event="creativeView"><![CDATA[https://tux-pool-use.perf-serving.com/vast/event/creative_view/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/?cs=768x1024]]></Tracking>
+              </TrackingEvents>
+            </Companion>
+            <Companion width="480" height="320">
+              <StaticResource type="image/jpeg"><![CDATA[https://d31otfhas71ais.cloudfront.net/images/hof/HoF_480x320_001.jpg]]></StaticResource>
+              <CompanionClickThrough><![CDATA[https://tux-pool-use.perf-serving.com/click/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/?cs=480x320]]></CompanionClickThrough>
+              <TrackingEvents>
+                <Tracking event="creativeView"><![CDATA[https://tux-pool-use.perf-serving.com/vast/event/creative_view/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/?cs=480x320]]></Tracking>
+              </TrackingEvents>
+            </Companion>
+            <Companion width="320" height="480">
+              <StaticResource type="image/jpeg"><![CDATA[https://d31otfhas71ais.cloudfront.net/images/hof/HoF_320x480_001.jpg]]></StaticResource>
+              <CompanionClickThrough><![CDATA[https://tux-pool-use.perf-serving.com/click/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/?cs=320x480]]></CompanionClickThrough>
+              <TrackingEvents>
+                <Tracking event="creativeView"><![CDATA[https://tux-pool-use.perf-serving.com/vast/event/creative_view/ShwVG2QtztQvuhyOu1H-edX5dWVVOuOZLbGZ-X3p58JXfL1n5ZbIn3GZgMlAJ4hC5F0lQ1sgHItUs0KGwXalwaTCtbjdx6kWeUIrSbMZqsPy6cQuctCkPRH21sPX2RgJUujn68qaPinS-bYzWDT1B8h2P9ZQNDZmv-8Ynqd3wQEj2vgwymi6nbc/?cs=320x480]]></Tracking>
+              </TrackingEvents>
+            </Companion>
+          </CompanionAds>
+        </Creative>
+      </Creatives>
+    </InLine>
+  </Ad>
+</VAST>

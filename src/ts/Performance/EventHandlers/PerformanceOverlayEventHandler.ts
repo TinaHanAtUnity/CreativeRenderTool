@@ -25,14 +25,17 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownl
     }
 
     public onOverlaySkip(position: number): void {
-        super.onOverlaySkip(position);
+        if (this._placement.skipEndCardOnClose()) {
+            super.onOverlayClose();
+        } else {
+            super.onOverlaySkip(position);
 
-        const endScreen = this._performanceAdUnit.getEndScreen();
-        if (endScreen) {
-            endScreen.show();
+            const endScreen = this._performanceAdUnit.getEndScreen();
+            if (endScreen) {
+                endScreen.show();
+            }
+            this._performanceAdUnit.onFinish.trigger();
         }
-        this._performanceAdUnit.onFinish.trigger();
-
         this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.SKIP);
     }
 }

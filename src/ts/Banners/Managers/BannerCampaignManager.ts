@@ -15,14 +15,12 @@ import { ICoreApi } from 'Core/ICore';
 import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { INativeResponse, RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
-import { AuctionV5Test } from 'Core/Models/ABGroup';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class NoFillError extends Error {
@@ -111,7 +109,7 @@ export class BannerCampaignManager {
                     if (nativeResponse.responseCode) {
                         jaegerSpan.addTag(JaegerTags.StatusCode, nativeResponse.responseCode.toString());
                     }
-                    if (AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
+                    if (RequestManager.getAuctionProtocol() === AuctionProtocol.V5) {
                         return this.parseAuctionV5BannerCampaign(nativeResponse, placement);
                     }
                     return this.parseBannerCampaign(nativeResponse, placement);
@@ -252,9 +250,5 @@ export class BannerCampaignManager {
 
     private getCampaignParser(contentType: string): CampaignParser {
         return BannerCampaignParserFactory.getCampaignParser(this._platform, contentType);
-    }
-
-    private getAbGroup() {
-        return this._coreConfig.getAbGroup();
     }
 }

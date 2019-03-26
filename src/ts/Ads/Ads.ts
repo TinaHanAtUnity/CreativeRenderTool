@@ -25,7 +25,6 @@ import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';
 import { AndroidAdUnitApi } from 'Ads/Native/Android/AdUnit';
 import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
 import { IosAdUnitApi } from 'Ads/Native/iOS/AdUnit';
-import { AppSheetApi } from 'Ads/Native/iOS/AppSheet';
 import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
 import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
@@ -58,6 +57,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Display } from 'Display/Display';
 import { Monetization } from 'Monetization/Monetization';
 import { MRAID } from 'MRAID/MRAID';
+import { MRAIDView } from 'MRAID/Views/MRAIDView';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Performance } from 'Performance/Performance';
 import { Promo } from 'Promo/Promo';
@@ -78,6 +78,8 @@ import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { ConsentUnit } from 'Ads/AdUnits/ConsentUnit';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 import { China } from 'China/China';
+import { IStore } from 'Store/IStore';
+import { RequestManager } from 'Core/Managers/RequestManager';
 
 export class Ads implements IAds {
 
@@ -108,15 +110,17 @@ export class Ads implements IAds {
     private _wasRealtimePlacement: boolean = false;
 
     private _core: ICore;
+    private _store: IStore;
 
     public Banners: Banners;
     public Monetization: Monetization;
     public AR: AR;
     public China: China;
 
-    constructor(config: unknown, core: ICore) {
+    constructor(config: unknown, core: ICore, store: IStore) {
         this.Config = AdsConfigurationParser.parse(<IRawAdsConfiguration>config, core.ClientInfo);
         this._core = core;
+        this._store = store;
 
         const platform = core.NativeBridge.getPlatform();
         this.Api = {
@@ -130,7 +134,6 @@ export class Ads implements IAds {
                 VideoPlayer: new AndroidVideoPlayerApi(core.NativeBridge)
             } : undefined,
             iOS: platform === Platform.IOS ? {
-                AppSheet: new AppSheetApi(core.NativeBridge),
                 AdUnit: new IosAdUnitApi(core.NativeBridge),
                 VideoPlayer: new IosVideoPlayerApi(core.NativeBridge)
             } : undefined
@@ -210,6 +213,17 @@ export class Ads implements IAds {
                 });
             }
 
+            if (this._core.Config.getCountry() === 'CN' && this._core.NativeBridge.getPlatform() === Platform.ANDROID && this.SessionManager.getGameSessionId() % 100 === 0) {
+                Promise.all([
+                    PermissionsUtil.checkPermissionInManifest(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.READ_PHONE_STATE),
+                    PermissionsUtil.checkPermissions(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.READ_PHONE_STATE)
+                ]).then(([readDeviceSupported, permissionInManifest]) => {
+                    Diagnostics.trigger('read_device_permission', {readDeviceSupported, permissionInManifest});
+                }).catch(error => {
+                    Diagnostics.trigger('read_device_permission_error', error);
+                });
+            }
+
             const parserModules: AbstractParserModule[] = [
                 new AdMob(this._core, this),
                 new Display(this._core, this),
@@ -229,11 +243,15 @@ export class Ads implements IAds {
                 }
             });
 
+            RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
+
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this._core.JaegerManager, this.BackupCampaignManager);
             this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
 
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
+
             promo.initialize();
+
             this.Monetization.Api.Listener.isMonetizationEnabled().then((enabled) => {
                 if(enabled) {
                     this.Monetization.initialize();
@@ -279,24 +297,32 @@ export class Ads implements IAds {
             return Promise.resolve();
         }
 
-        Diagnostics.trigger('consent_show', {adsConfig: JSON.stringify(this.Config.getDTO())});
+        if (CustomFeatures.shouldSampleAtOnePercent()) {
+            Diagnostics.trigger('consent_show', {adsConfig: JSON.stringify(this.Config.getDTO())});
+        }
+
+        if (this._core.Config.isCoppaCompliant()) {
+            Diagnostics.trigger('consent_with_coppa', {
+                coreConfig: this._core.Config.getDTO(),
+                adsConfig: this.Config.getDTO()
+            });
+            return Promise.resolve();
+        }
 
         const consentView = new ConsentUnit({
+            abGroup: this._core.Config.getAbGroup(),
             platform: this._core.NativeBridge.getPlatform(),
             privacyManager: this.PrivacyManager,
             adUnitContainer: this.Container,
             adsConfig: this.Config,
-            core: this._core.Api
+            core: this._core.Api,
+            deviceInfo: this._core.DeviceInfo
         });
         return consentView.show(options);
     }
 
     public show(placementId: string, options: unknown, callback: INativeCallback): void {
         callback(CallbackStatus.OK);
-
-        if (!this._core.FocusManager.isAppForeground()) {
-            Diagnostics.trigger('ad_shown_in_background', {});
-        }
 
         if(this._showing) {
             // do not send finish event because there will be a finish event from currently open ad unit
@@ -343,6 +369,10 @@ export class Ads implements IAds {
             campaign.setTrackingUrls(trackingUrls);
         }
 
+        // First ad request within a game session can be made using recorded privacy information.
+        // If game method has changed since, it should be reset before e.g. showing consent dialog
+        this.resetOutdatedUserPrivacy();
+
         if (placement.getRealtimeData() && !this.isConsentShowRequired()) {
             this._core.Api.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
             const start = Date.now();
@@ -378,6 +408,16 @@ export class Ads implements IAds {
             this.showConsentIfNeeded(options).then(() => {
                 this.showAd(placement, campaign, options);
             });
+        }
+    }
+
+    private resetOutdatedUserPrivacy() {
+        const gamePrivacy = this.Config.getGamePrivacy();
+        const userPrivacy = this.Config.getUserPrivacy();
+        const gdprApplies = gamePrivacy.getMethod() !== PrivacyMethod.DEFAULT;
+        const methodHasChanged = userPrivacy.getMethod() !== gamePrivacy.getMethod();
+        if (gdprApplies && methodHasChanged) {
+            userPrivacy.clear();
         }
     }
 
@@ -443,17 +483,17 @@ export class Ads implements IAds {
                     const appSheetOptions = {
                         id: parseInt(campaign.getAppStoreId(), 10)
                     };
-                    this.Api.iOS!.AppSheet.prepare(appSheetOptions).then(() => {
-                        const onCloseObserver = this.Api.iOS!.AppSheet.onClose.subscribe(() => {
-                            this.Api.iOS!.AppSheet.prepare(appSheetOptions);
+                    this._store.Api.iOS!.AppSheet.prepare(appSheetOptions).then(() => {
+                        const onCloseObserver = this._store.Api.iOS!.AppSheet.onClose.subscribe(() => {
+                            this._store.Api.iOS!.AppSheet.prepare(appSheetOptions);
                         });
                         this._currentAdUnit.onClose.subscribe(() => {
-                            this.Api.iOS!.AppSheet.onClose.unsubscribe(onCloseObserver);
+                            this._store.Api.iOS!.AppSheet.onClose.unsubscribe(onCloseObserver);
                             if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._core.ClientInfo.getGameId())) {
                                 // app sheet is not closed properly if the user opens or downloads the game. Reset the app sheet.
-                                this.Api.iOS!.AppSheet.destroy();
+                                this._store.Api.iOS!.AppSheet.destroy();
                             } else {
-                                this.Api.iOS!.AppSheet.destroy(appSheetOptions);
+                                this._store.Api.iOS!.AppSheet.destroy(appSheetOptions);
                             }
                         });
                     });
@@ -510,7 +550,7 @@ export class Ads implements IAds {
 
         if(TestEnvironment.get('campaignId')) {
             CampaignManager.setCampaignId(TestEnvironment.get('campaignId'));
-            this.BackupCampaignManager.deleteBackupCampaigns();
+            this.BackupCampaignManager.setEnabled(false);
         }
 
         if(TestEnvironment.get('sessionId')) {
@@ -568,6 +608,10 @@ export class Ads implements IAds {
             }
 
             CampaignManager.setCampaignResponse(response);
+        }
+
+        if(TestEnvironment.get('debugJsConsole')) {
+            MRAIDView.setDebugJsConsole(TestEnvironment.get('debugJsConsole'));
         }
     }
 }

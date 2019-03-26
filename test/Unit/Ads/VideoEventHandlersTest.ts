@@ -54,6 +54,7 @@ import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEven
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { IStoreApi } from 'Store/IStore';
 
 describe('Vast VideoEventHandlersTest', () => {
 
@@ -62,6 +63,7 @@ describe('Vast VideoEventHandlersTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let store: IStoreApi;
     let overlay: VideoOverlay;
     let endScreen: VastEndScreen;
     let storageBridge: StorageBridge;
@@ -90,6 +92,7 @@ describe('Vast VideoEventHandlersTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        store = TestFixtures.getStoreApi(nativeBridge);
 
         storageBridge = new StorageBridge(core);
         focusManager = new FocusManager(platform, core);
@@ -151,6 +154,7 @@ describe('Vast VideoEventHandlersTest', () => {
             platform,
             core,
             ads,
+            store,
             privacy,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
@@ -289,6 +293,7 @@ describe('Performance VideoEventHandlersTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let store: IStoreApi;
     let overlay: VideoOverlay;
     let endScreen: PerformanceEndScreen;
     let storageBridge: StorageBridge;
@@ -317,6 +322,7 @@ describe('Performance VideoEventHandlersTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        store = TestFixtures.getStoreApi(nativeBridge);
 
         storageBridge = new StorageBridge(core);
         focusManager = new FocusManager(platform, core);
@@ -384,6 +390,7 @@ describe('Performance VideoEventHandlersTest', () => {
             platform,
             core,
             ads,
+            store,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
@@ -674,7 +681,7 @@ describe('Performance VideoEventHandlersTest', () => {
         let sandbox: sinon.SinonSandbox;
 
         beforeEach(() => {
-            sandbox = sinon.sandbox.create();
+            sandbox = sinon.createSandbox();
             sandbox.stub(Diagnostics, 'trigger');
             sinon.spy(ads.Android!.AdUnit, 'setViews');
             sinon.spy(performanceAdUnit, 'hide');
@@ -706,7 +713,7 @@ describe('Performance VideoEventHandlersTest', () => {
         let sandbox: sinon.SinonSandbox;
 
         beforeEach(() => {
-            sandbox = sinon.sandbox.create();
+            sandbox = sinon.createSandbox();
             sandbox.stub(Diagnostics, 'trigger');
             sinon.spy(ads.Android!.AdUnit, 'setViews');
             sinon.spy(performanceAdUnit, 'hide');
@@ -766,6 +773,7 @@ describe('xpromo VideoEventHandlersTest', () => {
     let nativeBridge: NativeBridge;
     let core: ICoreApi;
     let ads: IAdsApi;
+    let store: IStoreApi;
     let overlay: VideoOverlay;
     let storageBridge: StorageBridge;
     let container: AdUnitContainer;
@@ -794,6 +802,7 @@ describe('xpromo VideoEventHandlersTest', () => {
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
         core = TestFixtures.getCoreApi(nativeBridge);
         ads = TestFixtures.getAdsApi(nativeBridge);
+        store = TestFixtures.getStoreApi(nativeBridge);
 
         storageBridge = new StorageBridge(core);
         focusManager = new FocusManager(platform, core);
@@ -860,6 +869,7 @@ describe('xpromo VideoEventHandlersTest', () => {
             platform,
             core,
             ads,
+            store,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,

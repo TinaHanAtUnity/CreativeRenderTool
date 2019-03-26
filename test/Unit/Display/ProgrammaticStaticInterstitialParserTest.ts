@@ -12,7 +12,7 @@ import DisplayStaticInterstitialCampaignJS from 'json/campaigns/display/DisplayS
 import 'mocha';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
-describe('ProgrammaticVPAIDParser', () => {
+describe('ProgrammaticStaticInterstitialParser', () => {
     const placementId = 'TestPlacement';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
@@ -29,7 +29,7 @@ describe('ProgrammaticVPAIDParser', () => {
     describe('parsing an HTML campaign', () => {
 
         beforeEach(() => {
-            parser = new ProgrammaticStaticInterstitialParser(platform, false);
+            parser = new ProgrammaticStaticInterstitialParser(platform);
         });
 
         describe('with proper HTML payload', () => {
@@ -61,10 +61,10 @@ describe('ProgrammaticVPAIDParser', () => {
 
     describe('parsing a JS campaign', () => {
         beforeEach(() => {
-            parser = new ProgrammaticStaticInterstitialParser(platform, true);
+            parser = new ProgrammaticStaticInterstitialParser(platform);
         });
 
-        describe('with proper JS payload', () => {
+        describe('with wrapped JS payload', () => {
             let campaign: DisplayInterstitialCampaign;
             const parse = (data: any) => {
                 const auctionPlacement = new AuctionPlacement(placementId, mediaId);
@@ -86,7 +86,7 @@ describe('ProgrammaticVPAIDParser', () => {
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
-                assert.equal(campaign.getDynamicMarkup(), '<script>' + decodeURIComponent(json.content) + '</script>', 'Dynamic Markup is not equal');
+                assert.equal(campaign.getDynamicMarkup(), decodeURIComponent(json.content), 'Dynamic Markup is not equal');
             });
         });
     });

@@ -27,6 +27,7 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { IStoreApi } from 'Store/IStore';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('PrivacyEventHandlerTest', () => {
@@ -35,6 +36,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
         let nativeBridge: NativeBridge;
         let core: ICoreApi;
         let ads: IAdsApi;
+        let store: IStoreApi;
         let adUnitParameters: IPerformanceAdUnitParameters;
 
         let privacyEventHandler: PrivacyEventHandler;
@@ -44,10 +46,12 @@ import { RequestManager } from 'Core/Managers/RequestManager';
             nativeBridge = TestFixtures.getNativeBridge(platform, backend);
             core = TestFixtures.getCoreApi(nativeBridge);
             ads = TestFixtures.getAdsApi(nativeBridge);
+            store = TestFixtures.getStoreApi(nativeBridge);
             adUnitParameters = {
                 platform,
                 core,
                 ads,
+                store,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: sinon.createStubInstance(FocusManager),
                 container: sinon.createStubInstance(ViewController),

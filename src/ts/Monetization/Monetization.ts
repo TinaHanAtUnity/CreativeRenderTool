@@ -38,6 +38,8 @@ export class Monetization implements IApiModule, IMonetization {
     }
 
     public initialize() {
+        this._core.ClientInfo.setMonetizationInUse(true);
+
         this.PlacementContentManager = new PlacementContentManager(this.Api, this._promo.Api, this._ads.Config, this._ads.CampaignManager, this._ads.PlacementManager);
         this.NativePromoEventHandler = new NativePromoEventHandler(this._core.Api, this._ads.Api, this._purchasing.Api, this._core.ClientInfo, this._ads.ThirdPartyEventManagerFactory, this._core.MetaDataManager);
         this._ads.RefreshManager.subscribeNativePromoEvents(this.NativePromoEventHandler);

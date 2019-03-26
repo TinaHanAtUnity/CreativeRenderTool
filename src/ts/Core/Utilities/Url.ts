@@ -133,14 +133,19 @@ export class Url {
     public static isValid(url: string): boolean {
         // note: this is not an attempt for full URL validation, instead this just checks that protocol is http(s) and
         // all URL characters are legal following RFC3986, using ASCII character ranges &-; and ?-[ is intentional
-        if (url && (url.match(/^http:./i) || url.match(/^https:./i) && url.match(/^([\!\$\#\&-\;\=\?-\[\]_a-z~{}|\\^`]|[\u00A1-\uFFFF]|%[0-9a-fA-F]{2})+$/i))) {
+        if (url && (url.match(/^http:./i) || url.match(/^https:./i) && Url.isValidUrlCharacters(url))) {
             return true;
         }
         return false;
     }
 
+    public static isValidUrlCharacters(url: string): boolean {
+        return url && url.match(/^([\!\$\#\&-\;\=\?-\[\]_a-z~{}|\\^`]|[\u00A1-\uFFFF]|%[0-9a-fA-F]{2})+$/i) ? true : false;
+    }
+
     public static isValidProtocol(url: string): boolean {
-        if (url && (url.match(/^http:./i) || url.match(/^https:./i))) {
+        // itms-apps:// is the protocol for linking to an app store
+        if (url && (url.match(/^http:./i) || url.match(/^https:./i) || url.match(/^itms-apps:/i))) {
             return true;
         } else {
             return false;
@@ -182,8 +187,26 @@ export class Url {
         return false;
     }
 
+    public static getAppStoreUrlTemplates(platform: Platform): string[] {
+        let appStoreUrlTemplates: string[] = [];
+
+        switch (platform) {
+            case Platform.IOS:
+                appStoreUrlTemplates = this.iosAppStoreUrlTemplates;
+                break;
+            case Platform.ANDROID:
+                appStoreUrlTemplates = this.androidAppStoreUrlTemplates;
+                break;
+            default:
+        }
+
+        return appStoreUrlTemplates;
+    }
+
     private static iosWhitelistedProtocols = ['itunes', 'itms', 'itmss', 'http', 'https'];
     private static androidWhitelistedProtocols = ['market', 'http', 'https'];
+    private static iosAppStoreUrlTemplates = ['https://itunes.apple.com'];
+    private static androidAppStoreUrlTemplates = ['https://play.google.com'];
 
     private static isNumber(c: string): boolean {
         return c.match(/^[0-9a-fA-F]$/) !== null;
