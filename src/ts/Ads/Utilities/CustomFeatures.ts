@@ -102,7 +102,24 @@ export class CustomFeatures {
         return gameIdList.indexOf(gameId) !== -1;
     }
 
-<<<<<<< HEAD
+    public static shouldSampleAtOnePercent(): boolean {
+        // will only return true when Math.random returns 0
+        if (Math.floor(Math.random() * 100) % 100 === 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static shouldSampleAtTenPercent(): boolean {
+        // will only return true when Math.random returns 1
+        if (Math.floor(Math.random() * 10) % 10 === 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     // Following 2 functions could be merged at some point later
     public static isSliderEndScreenEnabled(campaignId: string): boolean {
         const targetCampaignIds = [
@@ -119,21 +136,23 @@ export class CustomFeatures {
             'com.supercell.brawlstars',
             'com.hcg.cok.gp'
         ];
+
         const randomGame = Math.floor(Math.random() * 3);
+
         return targetGameIds[randomGame];
-        }
+    }
 
     public static getScreenshotsUrls(campaignId: string): string[] {
         const campaignId_rnd = CustomFeatures.getSlideshowCampaignIDs();
         const screenshots: { [key: string]: string[] } = {
-            '343200656':[
+            '343200656': [
                 'https://unity-ads-test.s3.amazonaws.com/343200656/0.png',
                 'https://unity-ads-test.s3.amazonaws.com/343200656/4.png',
                 'https://unity-ads-test.s3.amazonaws.com/343200656/1.png',
                 'https://unity-ads-test.s3.amazonaws.com/343200656/2.png',
                 'https://unity-ads-test.s3.amazonaws.com/343200656/3.png'
             ],
-            'com.supercell.brawlstars':[
+            'com.supercell.brawlstars': [
                 'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/2.png',
                 'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/7.png',
                 'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/1.png',
@@ -150,7 +169,7 @@ export class CustomFeatures {
                 'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/8.png',
                 'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/13.png'
             ],
-            'com.hcg.cok.gp':[
+            'com.hcg.cok.gp': [
                 'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/5.png',
                 'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/0.png',
                 'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/4.png',
@@ -175,23 +194,5 @@ export class CustomFeatures {
             ]
         };
         return screenshots[campaignId_rnd];
-=======
-    public static shouldSampleAtOnePercent(): boolean {
-        // will only return true when Math.random returns 0
-        if (Math.floor(Math.random() * 100) % 100 === 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public static shouldSampleAtTenPercent(): boolean {
-        // will only return true when Math.random returns 1
-        if (Math.floor(Math.random() * 10) % 10 === 1) {
-            return true;
-        } else {
-            return false;
-        }
->>>>>>> master
     }
 }
