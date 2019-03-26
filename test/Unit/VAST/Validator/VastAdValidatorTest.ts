@@ -29,6 +29,7 @@ describe('VastAdValidatorTest', () => {
                 ['https://reddit.com/impression', 'https://google.com/impression/report?someQuery=test&other=no'],
                 ['https://reddit.com/wrapper/1234?someQuery=test&other=no'],
                 [companionAd, companionAd],
+                [],
                 []
             );
             const errors = new VastAdValidator(vastAd).getErrors();
@@ -46,8 +47,7 @@ describe('VastAdValidatorTest', () => {
                 'test');
             const companionAd = new VastCreativeStaticResourceCompanionAd('testId', 200, 200, 'invalid', 'http://google.com?someQuery=test&other=no', 'invalidClick', [], {
                 'click': ['', 'abc'],
-                'impression': ['abc?no=hello']
-            });
+                'impression': ['abc?no=hello']            });
             const vastAd = new VastAd(
                 'vastAdId',
                 [creative1, creative1],
@@ -55,6 +55,7 @@ describe('VastAdValidatorTest', () => {
                 ['', 'https://google.com/impression/report?someQuery=test&other=no'],
                 [''],
                 [companionAd, companionAd],
+                [],
                 []
             );
             const errors = new VastAdValidator(vastAd).getErrors();
