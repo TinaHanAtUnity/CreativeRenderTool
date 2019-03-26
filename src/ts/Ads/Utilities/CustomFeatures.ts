@@ -8,7 +8,8 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { HoldOutInstallInRewardedVideos } from 'Core/Models/ABGroup';
+import { HoldOutInstallInRewardedVideos, SkipUnderTimerExperiment } from 'Core/Models/ABGroup';
+import { Placement } from 'Ads/Models/Placement';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
@@ -96,6 +97,10 @@ export class CustomFeatures {
         }
 
         return (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign);
+    }
+
+    public static isSkipUnderTimerExperimentEnabled(coreConfig: CoreConfiguration, placement: Placement): boolean {
+        return SkipUnderTimerExperiment.isValid(coreConfig.getAbGroup()) && placement.allowSkip();
     }
 
     private static existsInList(gameIdList: string[], gameId: string): boolean {

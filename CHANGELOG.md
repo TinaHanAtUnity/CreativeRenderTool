@@ -1,3 +1,7 @@
+# Merged
+
+* Skip under timer experiment [#8835](https://github.com/Applifier/unity-ads-webview/pull/8835)
+
 # Staged
 
 * Remove accessible close button tests [#8834](https://github.com/Applifier/unity-ads-webview/pull/8834)
