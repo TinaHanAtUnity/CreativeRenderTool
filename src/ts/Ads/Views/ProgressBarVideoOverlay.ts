@@ -1,22 +1,6 @@
-import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { Platform } from 'Core/Constants/Platform';
+import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
 import { Campaign } from 'Ads/Models/Campaign';
-import { IAdsApi } from 'Ads/IAds';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-
-export interface IVideoOverlayParameters<T extends Campaign> {
-  platform: Platform;
-  ads: IAdsApi;
-  deviceInfo: DeviceInfo;
-  clientInfo: ClientInfo;
-  campaign: T;
-  coreConfig: CoreConfiguration;
-  placement: Placement;
-}
 
 export class ProgressBarVideoOverlay extends VideoOverlay {
 
