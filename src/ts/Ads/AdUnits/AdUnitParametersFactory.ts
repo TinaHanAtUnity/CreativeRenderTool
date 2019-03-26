@@ -211,17 +211,20 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
 
         let overlay: AbstractVideoOverlay;
+        const abGroup = parameters.coreConfig.getAbGroup();
 
         if (CustomFeatures.isRewardedVideoInstallButtonEnabled(this._campaign, this._coreConfig)) {
-            if (ProgressBarVideoTest.isValid(this._abGroup)) {
+            if (ProgressBarVideoTest.isValid(abGroup)) {
                 overlay = new ProgressBarVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+            } else {
+                overlay = new VideoOverlayWithInstallInRewardedVideos(parameters, parameters.privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
             }
-            overlay = new VideoOverlayWithInstallInRewardedVideos(parameters, parameters.privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         } else {
-            if (ProgressBarVideoTest.isValid(this._abGroup)) {
+            if (ProgressBarVideoTest.isValid(abGroup)) {
                 overlay = new ProgressBarVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+            } else {
+                overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
             }
-            overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
