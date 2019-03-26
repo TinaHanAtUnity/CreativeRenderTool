@@ -75,6 +75,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         this._campaign = parameters.campaign;
         this._showGDPRBanner = showGDPRBanner;
         this._showPrivacyDuringVideo = showPrivacyDuringVideo;
+        this._useCloseIconInsteadOfSkipIcon = parameters.placement.useCloseIconInsteadOfSkipIcon();
         this._templateData = {
             muted: parameters.placement.muteVideo()
         };
