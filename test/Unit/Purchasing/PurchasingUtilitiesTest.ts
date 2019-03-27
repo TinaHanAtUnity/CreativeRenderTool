@@ -135,18 +135,11 @@ describe('PurchasingUtilitiesTest', () => {
                 expect((<any>PurchasingUtilities)._purchasingAdapter).to.be.an.instanceof(CustomPurchasingAdapter);
                 sinon.assert.called(<sinon.SinonStub>purchasing.CustomPurchasing.refreshCatalog);
             });
-
-            xit('should not set purchasing adapter if getAdapter fails', () => {
-                //
-            });
         });
 
         describe('isInitialized', () => {
             it('should return true if Purchasing was initialized', () => {
                 assert.isTrue(PurchasingUtilities.isInitialized());
-            });
-            xit('should return false if purchasing fails to reach initialization', () => {
-                // assert.isFalse(PurchasingUtilities.isInitialized());
             });
         });
 
@@ -221,10 +214,6 @@ describe('PurchasingUtilitiesTest', () => {
 
                 it('should not store a product that is not returned by promo', () => {
                     assert.isFalse(PurchasingUtilities.isProductAvailable('myScooter'));
-                });
-
-                xit('should set the placement states for all promo placements', () => {
-                    //
                 });
             });
 
