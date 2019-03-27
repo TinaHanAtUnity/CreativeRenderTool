@@ -1,3 +1,7 @@
+# Staged
+
+* Disable skip under timer test until we have Zynga filter in place [#8860](https://github.com/Applifier/unity-ads-webview/pull/8860)
+
 # Tue Mar 26 20:58:25 UTC 2019
 
 * Skip under timer experiment [#8835](https://github.com/Applifier/unity-ads-webview/pull/8835)
