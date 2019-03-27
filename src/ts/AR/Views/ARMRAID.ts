@@ -455,13 +455,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._cameraPermissionPanel.classList.remove('hidden');
         this._cameraPermissionPanel.style.display = 'block';
-        this._iframe.classList.add('mraid-iframe-camera-permission-dialog');
         this._gdprBanner.classList.add('mraid-container');
     }
 
     private hideARPermissionPanel() {
         this._cameraPermissionPanel.classList.add('hidden');
-        this._iframe.classList.remove('mraid-iframe-camera-permission-dialog');
         this._gdprBanner.classList.remove('mraid-container');
     }
 
