@@ -474,7 +474,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         }, '*');
 
         this.showMRAIDAd();
-        this.hideARPermissionPanel();
     }
 
     private onShowAr() {
