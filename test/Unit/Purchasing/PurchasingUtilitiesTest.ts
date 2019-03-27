@@ -14,7 +14,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
-import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
+import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import IapPromoCatalog from 'json/IapPromoCatalog.json';
 import { IPromoApi } from 'Promo/IPromo';
 import { PromoEvents } from 'Promo/Utilities/PromoEvents';
@@ -84,8 +84,8 @@ describe('PurchasingUtilitiesTest', () => {
         sinon.stub(promo.Purchasing, 'initializePurchasing').returns(Promise.resolve());
         (<sinon.SinonStub>clientInfo.getSdkVersion).returns(3000);
 
-        const coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-        const adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+        const coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+        const adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
         placementManager = new PlacementManager(ads, adsConfig);
 
         sinon.stub(purchasing.CustomPurchasing, 'available').returns(Promise.resolve(true));
@@ -107,7 +107,7 @@ describe('PurchasingUtilitiesTest', () => {
             assert.isTrue(PurchasingUtilities.isInitialized());
         });
 
-        it('should call purchasing adapters refreshCatalog', () => {
+        it('should call purchasing adapters refreshCatalog with promos in the config', () => {
             expect((<any>PurchasingUtilities)._purchasingAdapter).to.be.an.instanceof(CustomPurchasingAdapter);
             sinon.assert.called(<sinon.SinonStub>purchasing.CustomPurchasing.refreshCatalog);
         });

@@ -19,6 +19,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
 describe('UnityPurchasingPurchasingAdapter', () => {
     let platform: Platform;
@@ -105,6 +106,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -127,6 +129,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
                 const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
                 purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(false);
 
                 return purchasingAdapter.initialize().then(() => {
                     sinon.assert.notCalled(<sinon.SinonSpy>metaDataManager.fetch);
@@ -140,6 +143,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -159,6 +163,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -180,6 +185,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -200,6 +206,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -221,6 +228,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 (<sinon.SinonStub>promo.Purchasing.initializePurchasing).rejects();
                 return purchasingAdapter.initialize().catch((e: any) => {
@@ -233,6 +241,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -253,6 +262,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -274,6 +284,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
                 const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -296,6 +307,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+            sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
         });
 
         const triggerRefreshCatalog = (value: string) => {
@@ -398,6 +410,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             sandbox = sinon.createSandbox();
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
             purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
             sandbox.stub(purchasingAdapter.onCatalogRefreshed, 'trigger');
         });
