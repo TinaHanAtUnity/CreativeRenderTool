@@ -285,12 +285,6 @@ export class VastParserStrict {
             }
         });
 
-        // for VAST 4.1
-        this.getChildrenNodesWithName(adElement, VastNodeName.AD_VERIFICATIONS).forEach((element: HTMLElement) => {
-            const verifications = this.parseAdVerification(element, urlProtocol);
-            vastAd.addAdVerifications(verifications);
-        });
-
         this.getNodesWithName(adElement, VastNodeName.LINEAR).forEach((element: HTMLElement) => {
             const creative = this.parseCreativeLinearElement(element, urlProtocol);
             vastAd.addCreative(creative);
@@ -307,7 +301,13 @@ export class VastParserStrict {
             }
         });
 
-        // for VAST 3.0/2.0
+        // parsing ad verification in VAST 4.1
+        this.getChildrenNodesWithName(adElement, VastNodeName.AD_VERIFICATIONS).forEach((element: HTMLElement) => {
+            const verifications = this.parseAdVerification(element, urlProtocol);
+            vastAd.addAdVerifications(verifications);
+        });
+
+        // parsing ad verification in VAST 3.0/2.0
         this.getNodesWithName(adElement, VastNodeName.EXTENSION).forEach((element: HTMLElement) => {
             const extType = element.getAttribute(VastAttributeNames.TYPE);
             if (extType && extType === VastExtensionType.AD_VERIFICATIONS) {
