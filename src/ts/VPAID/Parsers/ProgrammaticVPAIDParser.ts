@@ -4,12 +4,12 @@ import { Session } from 'Ads/Models/Session';
 import { ICore } from 'Core/ICore';
 import { Vast } from 'VAST/Models/Vast';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
-import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
+import { ProgrammaticVastParserStrict } from 'VAST/Parsers/ProgrammaticVastParser';
 import { IVPAIDCampaign, VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
 
-export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
+export class ProgrammaticVPAIDParser extends ProgrammaticVastParserStrict {
 
     public static ContentType = CampaignContentTypes.ProgrammaticVpaid;
 
