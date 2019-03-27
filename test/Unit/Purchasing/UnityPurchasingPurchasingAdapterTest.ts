@@ -438,6 +438,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         beforeEach(() => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
             setupFrameWorkMetaData('Unity');
 
@@ -479,6 +480,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         beforeEach(() => {
             const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
             setupFrameWorkMetaData('Unity');
 
