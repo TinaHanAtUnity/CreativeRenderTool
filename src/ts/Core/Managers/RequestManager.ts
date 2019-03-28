@@ -134,7 +134,7 @@ export class RequestManager {
         if (RequestManager._auctionProtocol) {
             return RequestManager._auctionProtocol;
         }
-        return AuctionProtocol.V5; // default protocol
+        return AuctionProtocol.V4; // default protocol for legacy Campaign unit tests
     }
 
     public static setAuthorizationHeaderForHost(hostRegex: string, authorizationHeader: string) {
