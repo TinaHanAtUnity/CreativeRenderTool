@@ -54,7 +54,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _arAndroidEnumsReceivedObserver: IObserver1<unknown>;
 
     private _hasCameraPermission = false;
-    private _permissionResultObserver: IObserver2<string, boolean>;
     private _viewable: boolean;
 
     constructor(platform: Platform, core: ICoreApi, ar: IARApi, deviceInfo: DeviceInfo, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
@@ -207,10 +206,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._ar.AR.Android.onAndroidEnumsReceived.unsubscribe(this._arAndroidEnumsReceivedObserver);
             }
             window.removeEventListener('deviceorientation', this._deviceorientationListener, false);
-
-            if (this._permissionResultObserver) {
-                this._core.Permissions.onPermissionsResult.unsubscribe(this._permissionResultObserver);
-            }
         }
 
         if(this._loadingScreenTimeout) {
@@ -477,9 +472,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private onShowAr() {
-        this._permissionResultObserver = this._core.Permissions.onPermissionsResult.subscribe((permission, granted) => {
-            this._core.Permissions.onPermissionsResult.unsubscribe(this._permissionResultObserver);
-            this._permissionResultObserver = null;
+        const observer = this._core.Permissions.onPermissionsResult.subscribe((permission, granted) => {
+            this._core.Permissions.onPermissionsResult.unsubscribe(observer);
 
             if(permission === PermissionTypes.CAMERA && granted) {
                 // send event only if permission is granted, otherwise would reload fallback scene
