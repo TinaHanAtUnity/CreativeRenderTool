@@ -35,7 +35,7 @@ export class Slider {
         minPercentToSlide: null,
         autoplay: true,
         direction: 'left',
-        interval:50000
+        interval: 50000
     }) {
         this.options = options;
 
@@ -157,6 +157,13 @@ export class Slider {
                 const image = new Image();
                 image.onload = () => {
                     resolve(this.generateSlideHTML(id, image));
+
+                    // TODO: This can be probable replaced when the metadata.json has data for us
+                    if (image.width > image.height) {
+                        this._rootEl.classList.add('landscape-slider-images');
+                    } else {
+                        this._rootEl.classList.add('portrait-slider-images');
+                    }
                 };
                 image.src = url;
             } else {

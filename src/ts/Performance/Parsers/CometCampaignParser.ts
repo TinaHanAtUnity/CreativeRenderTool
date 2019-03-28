@@ -169,7 +169,7 @@ export class CometCampaignParser extends CampaignParser {
                 const screenshotsUrls =  CustomFeatures.getScreenshotsUrls(parameters.id);
 
                 parameters.screenshots = screenshotsUrls.map(url => new Image(this.validateAndEncodeUrl(url, session), session));
-                    promise = Promise.resolve(new SliderPerformanceCampaign(parameters));
+                promise = Promise.resolve(new SliderPerformanceCampaign(parameters));
             } else {
                 promise = Promise.resolve(new PerformanceCampaign(parameters));
             }
