@@ -7,9 +7,7 @@ import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { AuctionV5Test } from 'Core/Models/ABGroup';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
 const enum RequestStatus {
@@ -124,30 +122,11 @@ export class RequestManager {
                 return;
             }
 
-            if (CustomFeatures.isIOSV5Games(clientInfo.getGameId())) {
-                RequestManager._auctionProtocol = AuctionProtocol.V5;
-                return;
-            }
-
-            if (adsConfig.getPlacementCount() >= 10) {
-                RequestManager._auctionProtocol = AuctionProtocol.V4;
-                if (CustomFeatures.shouldSampleAtOnePercent()) {
-                    Diagnostics.trigger('config_placement_over_10', {
-                        placementCount: adsConfig.getPlacementCount()
-                    });
-                }
-                return;
-            }
-
-            if (platform === Platform.IOS) {
-                RequestManager._auctionProtocol = AuctionProtocol.V5;
-            } else {    // Android abTest
-                RequestManager._auctionProtocol = AuctionV5Test.isValid(coreConfig.getAbGroup()) ? AuctionProtocol.V5 : AuctionProtocol.V4;
-            }
+            RequestManager._auctionProtocol = AuctionProtocol.V5;
         }
     }
 
-    public static setTestAuctionProtocol(protocol: AuctionProtocol) {
+    public static setTestAuctionProtocol(protocol: AuctionProtocol | undefined) {
         RequestManager._auctionProtocol = protocol;
     }
 
@@ -155,7 +134,7 @@ export class RequestManager {
         if (RequestManager._auctionProtocol) {
             return RequestManager._auctionProtocol;
         }
-        return AuctionProtocol.V4; // default protocol
+        return AuctionProtocol.V5; // default protocol
     }
 
     public static setAuthorizationHeaderForHost(hostRegex: string, authorizationHeader: string) {
