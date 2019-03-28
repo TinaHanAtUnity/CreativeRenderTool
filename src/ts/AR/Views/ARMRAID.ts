@@ -479,6 +479,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private onShowAr() {
         this._permissionResultObserver = this._core.Permissions.onPermissionsResult.subscribe((permission, granted) => {
             this._core.Permissions.onPermissionsResult.unsubscribe(this._permissionResultObserver);
+            this._permissionResultObserver = null;
 
             if(permission === PermissionTypes.CAMERA && granted) {
                 // send event only if permission is granted, otherwise would reload fallback scene
