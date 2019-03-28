@@ -17,7 +17,7 @@ const ZyngaGameIds = setGameIds(ZyngaGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
 const iOSV5GameIds = setGameIds(iOSV5GamesJson);
 
-function setGameIds(gameIdJson: string): string[] {
+export function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
     try {
         gameIds = JSON.parse(gameIdJson);

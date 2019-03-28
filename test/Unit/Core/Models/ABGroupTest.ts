@@ -1,9 +1,15 @@
 import { assert } from 'chai';
-import { toAbGroup, FakeEnabledABTest, FakeDisabledABTest } from 'Core/Models/ABGroup';
+import { toAbGroup, FakeEnabledABTest, FakeDisabledABTest, FilteredABTest, FakeFilteredABTest } from 'Core/Models/ABGroup';
+import { setGameIds } from 'Ads/Utilities/CustomFeatures';
+import ExcludedGamesJson from 'json/custom_features/ExcludedGameIds.json';
+import ExcludedOrganizationJson from 'json/custom_features/ExcludedOrganizationIds.json';
 import 'mocha';
 
 describe('ABGroupTests', () => {
     const validGroups = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ];
+
+    const ExcludedGameIds = setGameIds(ExcludedGamesJson);
+    const ExcludedOrganizationIds = setGameIds(ExcludedOrganizationJson);
 
     describe('toAbGroup', () => {
         it('should return test A/B group for number 99', () => {
@@ -45,6 +51,48 @@ describe('ABGroupTests', () => {
             }
             assert.isFalse(FakeDisabledABTest.isValid(99));
             assert.isFalse(FakeDisabledABTest.isValid(-1));
+        });
+    });
+
+    describe('FilteredABTest tests', () => {
+        beforeEach(() => {
+            FilteredABTest.setup('', undefined)
+        });
+
+        if (ExcludedGameIds.length > 0) {
+            it('excluded game ID, should return false for all A/B groups', () => {
+                FilteredABTest.setup(ExcludedGameIds[0], undefined);
+
+                for (const i of validGroups) {
+                    assert.isFalse(FakeFilteredABTest.isValid(toAbGroup(i)));
+                }
+                assert.isFalse(FakeFilteredABTest.isValid(99));
+                assert.isFalse(FakeFilteredABTest.isValid(-1));
+            });
+        }
+
+        if (ExcludedOrganizationIds.length > 0) {
+            it('excluded organization ID, should return false for all A/B groups', () => {
+                FilteredABTest.setup('', ExcludedOrganizationIds[0]);
+
+                for (const i of validGroups) {
+                    assert.isFalse(FakeFilteredABTest.isValid(toAbGroup(i)));
+                }
+                assert.isFalse(FakeFilteredABTest.isValid(99));
+                assert.isFalse(FakeFilteredABTest.isValid(-1));
+            });
+        }
+
+        it('should return true for A/B groups 16 and 17', () => {
+            assert.isTrue(FakeFilteredABTest.isValid(toAbGroup(16)));
+            assert.isTrue(FakeFilteredABTest.isValid(toAbGroup(17)));
+        });
+
+        it('should return false for other A/B groups', () => {
+            const invalidGroups = validGroups.filter(v => v !== 16 && v !== 17);
+            for (const i of invalidGroups) {
+                assert.isFalse(FakeFilteredABTest.isValid(toAbGroup(i)));
+            }
         });
     });
 });
