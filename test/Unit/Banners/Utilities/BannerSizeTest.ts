@@ -46,7 +46,7 @@ describe('BannerSize', () => {
         });
 
         it('should return 320x50 when screenHeight or screenWidth is over 7 inches', () => {
-            (<sinon.SinonStub>(<AndroidDeviceInfo>androidDeviceInfo).getScreenDensity).returns(200);
+            (<sinon.SinonStub>androidDeviceInfo.getScreenDensity).returns(200);
             const bannerDimensions = BannerSize.getPlatformDimensions(Platform.ANDROID, androidDeviceInfo);
             assert.equal(bannerDimensions, BannerSize.SmallBannerDimensions);
         });
