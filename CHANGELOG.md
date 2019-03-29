@@ -1,3 +1,7 @@
+# Fri Mar 29 16:50:36 UTC 2019
+
+* AR Delayed Camera Consent [#8326](https://github.com/Applifier/unity-ads-webview/pull/8326)
+
 # Thu Mar 28 17:45:30 UTC 2019
 
 * Disable skip under timer test until we have Zynga filter in place [#8860](https://github.com/Applifier/unity-ads-webview/pull/8860)

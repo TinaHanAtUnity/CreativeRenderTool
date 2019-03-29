@@ -7,6 +7,7 @@ $permissions-max-width = 300px;
 $permissions-gray = #a6a6a6;
 $camera-permission-panel-color = #fafafa;
 $camera-permission-panel-height = 100vw;
+$ar-available-button-color = #0c292feb;
 
 #extended-mraid {
 
@@ -65,10 +66,6 @@ $camera-permission-panel-height = 100vw;
 
   #mraid-iframe {
     $iframe-default();
-
-    &.mraid-iframe-camera-permission-dialog {
-      height: $camera-permission-panel-height;
-    }
   }
 
   .close-region {
@@ -258,6 +255,84 @@ $camera-permission-panel-height = 100vw;
     }
   }
 
+
+
+  @keyframes bounceInRight {
+    from,
+    60%,
+    75%,
+    90%,
+    to {
+      animation-timing-function: cubic-bezier(.215, .61, .355, 1);
+    }
+
+    from {
+      right: -5em;
+      padding-right: 6.5em;
+      opacity: 0;
+      transform: translate3d(3000px, 0, 0);
+    }
+
+    60% {
+      opacity: 1;
+      transform: translate3d(-25px, 0, 0);
+    }
+
+    75% {
+      transform: translate3d(10px, 0, 0);
+    }
+
+    90% {
+      right: -5em;
+      padding-right: 6.5em;
+      transform: translate3d(-5px, 0, 0);
+    }
+
+    to {
+      right: 0;
+      padding-right: 1.5em;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .ar-available-button-wrapper {
+    overflow: hidden;
+  }
+
+  .ar-available-button {
+      position: absolute;
+      top: 70vh;
+      right: 0;
+      z-index: 99;
+      display: none;
+      padding: 0 1.7em 0 1.3em;
+      min-width: 30vw;
+      border-radius: .7em 0 0 .7em;
+      background: $ar-available-button-color;
+      box-shadow: 0 .14em .2em .06em rgba(0, 0, 0, .4);
+      color: $white;
+      line-height: 3em;
+      animation: bounceInRight 1s;
+  }
+
+  .ar-available-button p {
+    display: inline;
+    vertical-align: middle;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .icon-ar-camera {
+      display: inline-block;
+      margin-right: .6em;
+      height: auto;
+      vertical-align: middle;
+      font-weight: normal;
+      font-style: normal;
+      font-size: 1.5em;
+      -webkit-font-smoothing: antialiased;
+  }
+
   .camera-permission-panel {
     position: absolute;
     top: $camera-permission-panel-height;
@@ -349,13 +424,6 @@ $camera-permission-panel-height = 100vw;
 
 .landscape {
   #extended-mraid {
-    #mraid-iframe {
-      &.mraid-iframe-camera-permission-dialog {
-        width: 50vw;
-        height: 100vh;
-      }
-    }
-
     .gdpr-pop-up {
       &.mraid-container {
         top: inherit;
@@ -496,12 +564,6 @@ $camera-permission-panel-height = 100vw;
 
 @media screen and (min-aspect-ratio: 8/19) {
   #extended-mraid {
-    #mraid-iframe {
-      &.mraid-iframe-camera-permission-dialog {
-        height: 120vw;
-      }
-    }
-
     .camera-permission-panel {
       top: 120vw;
     }
@@ -516,12 +578,6 @@ $camera-permission-panel-height = 100vw;
 
 @media screen and (min-aspect-ratio: 9/16) {
   #extended-mraid {
-    #mraid-iframe {
-      &.mraid-iframe-camera-permission-dialog {
-        height: 100vw;
-      }
-    }
-
     .camera-permission-panel {
       top: 100vw;
     }
@@ -536,12 +592,6 @@ $camera-permission-panel-height = 100vw;
 
 @media screen and (min-aspect-ratio: 3/4) {
   #extended-mraid {
-    #mraid-iframe {
-      &.mraid-iframe-camera-permission-dialog {
-        height: 70vw;
-      }
-    }
-
     .camera-permission-panel {
       top: 70vw;
     }
@@ -556,12 +606,6 @@ $camera-permission-panel-height = 100vw;
 
 @media screen and (min-aspect-ratio: 1/2) {
   #extended-mraid {
-    #mraid-iframe {
-      &.mraid-iframe-camera-permission-dialog {
-        height: 100vw;
-      }
-    }
-
     .camera-permission-panel {
       top: 100vw;
     }
@@ -576,12 +620,6 @@ $camera-permission-panel-height = 100vw;
 
 @media screen and (min-aspect-ratio: 2/3) {
   #extended-mraid {
-    #mraid-iframe {
-      &.mraid-iframe-camera-permission-dialog {
-        height: 80vw;
-      }
-    }
-
     .camera-permission-panel {
       top: 80vw;
     }
