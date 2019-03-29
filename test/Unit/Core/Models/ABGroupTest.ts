@@ -56,7 +56,7 @@ describe('ABGroupTests', () => {
 
     describe('FilteredABTest tests', () => {
         beforeEach(() => {
-            FilteredABTest.setup('', undefined)
+            FilteredABTest.setup('', undefined);
         });
 
         if (ExcludedGameIds.length > 0) {
