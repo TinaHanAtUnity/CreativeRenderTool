@@ -129,6 +129,8 @@ describe('CampaignManager', () => {
     };
 
     beforeEach(() => {
+        RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
+
         coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
         adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
 
@@ -1100,8 +1102,6 @@ describe('CampaignManager', () => {
                 // bad idea to do this, but need to update the platform inside the parser.
                 const parser = contentTypeHandlerManager.getParser(ProgrammaticMraidParser.ContentType);
                 (<any>parser)._platform = platform;
-
-                sinon.stub(RequestManager, 'getAuctionProtocol').returns(AuctionProtocol.V4);
 
                 assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
                 campaignManager = new CampaignManager(platform, core.Api, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
