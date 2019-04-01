@@ -107,13 +107,13 @@ export class AuctionRequest {
     protected _platform: Platform;
     protected _core: ICoreApi;
     protected _response: INativeResponse;
+    protected _deviceInfo: DeviceInfo;
     private _coreConfig: CoreConfiguration;
     private _adsConfig: AdsConfiguration;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _metaDataManager: MetaDataManager;
     private _request: RequestManager;
     private _clientInfo: ClientInfo;
-    private _deviceInfo: DeviceInfo;
     private _sessionManager: SessionManager;
     private _placements: { [id: string]: Placement } = {};
     private _previousPlacementID: string | undefined;
