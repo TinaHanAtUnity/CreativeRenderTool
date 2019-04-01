@@ -40,13 +40,13 @@ describe('BannerSize', () => {
         });
 
         it('should return 728x90 when screenHeight or screenWidth is over 7 inches', () => {
-            (<sinon.SinonStub>androidDeviceInfo.getScreenDensity).returns(50);
+            (<sinon.SinonStub>androidDeviceInfo.getScreenDensity).returns(100);
             const bannerDimensions = BannerSize.getPlatformDimensions(Platform.ANDROID, androidDeviceInfo);
             assert.equal(bannerDimensions, BannerSize.LargeBannerDimensions);
         });
 
-        it('should return 320x50 when screenHeight or screenWidth is over 7 inches', () => {
-            (<sinon.SinonStub>androidDeviceInfo.getScreenDensity).returns(200);
+        it('should return 320x50 when screenHeight or screenWidth is under 7 inches', () => {
+            (<sinon.SinonStub>androidDeviceInfo.getScreenDensity).returns(101);
             const bannerDimensions = BannerSize.getPlatformDimensions(Platform.ANDROID, androidDeviceInfo);
             assert.equal(bannerDimensions, BannerSize.SmallBannerDimensions);
         });
