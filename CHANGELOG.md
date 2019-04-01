@@ -1,4 +1,4 @@
-# Pending
+# Mon Apr  1 23:35:56 UTC 2019
 
 * Add Smart Banner Dimension Calculations [#8929](https://github.com/Applifier/unity-ads-webview/pull/8929)
 * Update Campaign Errors to Normal Format for Auction V5 [#8907](https://github.com/Applifier/unity-ads-webview/pull/8907)
