@@ -1,4 +1,4 @@
-# Merged
+# Mon Apr  1 15:42:33 UTC 2019
 
 * Auction V5 rollout, mostly affecting Android [#8885](https://github.com/Applifier/unity-ads-webview/pull/8885)
 
