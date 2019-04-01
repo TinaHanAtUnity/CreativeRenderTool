@@ -505,7 +505,7 @@ export class CampaignManager {
                             return this.handlePlacementError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), campaigns[mediaId], 'campaign_caching_get_file_path_failed', session);
                         }
 
-                        return this.handlePlacementError(error, campaigns[mediaId], 'handle_auction_v5_campaign_error', session);
+                        return this.handleParseCampaignError(auctionResponse.getContentType(), error, campaigns[mediaId], session);
                     }));
                 } catch(error) {
                     this.handlePlacementError(error, campaigns[mediaId], 'error_creating_auction_v5_handle_campaign_chain', session);
