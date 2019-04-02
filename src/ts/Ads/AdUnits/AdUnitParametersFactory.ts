@@ -37,11 +37,11 @@ export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extend
 }
 
 export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> implements IAbstractAdUnitParametersFactory<T1, T2> {
+    private static _forceGDPRBanner: boolean;
+
     protected _campaign: T1;
     protected _placement: Placement;
     protected _orientation: Orientation;
-
-    private static _forceGDPRBanner: boolean;
 
     private _platform: Platform;
     private _core: ICoreApi;
@@ -63,6 +63,10 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
 
     private _playerMetadataServerId: string;
     private _options: unknown;
+
+    public static setForcedGDPRBanner(value: boolean) {
+        AbstractAdUnitParametersFactory._forceGDPRBanner = value;
+    }
 
     constructor(core: ICore, ads: IAds) {
         this._platform = core.NativeBridge.getPlatform();

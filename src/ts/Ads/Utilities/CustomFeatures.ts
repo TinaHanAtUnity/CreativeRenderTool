@@ -3,6 +3,7 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import ZyngaGamesJson from 'json/custom_features/ZyngaGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
+import AuctionV4GamesJson from 'json/custom_features/AuctionV4Games.json';
 import { Campaign } from 'Ads/Models/Campaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
@@ -14,6 +15,7 @@ const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
 const ZyngaGameIds = setGameIds(ZyngaGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
+const AuctionV4GameIds = setGameIds(AuctionV4GamesJson);
 
 function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
@@ -83,6 +85,10 @@ export class CustomFeatures {
 
     public static isZyngaGame(gameId: string): boolean {
         return this.existsInList(ZyngaGameIds, gameId);
+    }
+
+    public static isAuctionV4Game(gameId: string): boolean {
+        return this.existsInList(AuctionV4GameIds, gameId);
     }
 
     public static isSkipUnderTimerExperimentEnabled(coreConfig: CoreConfiguration, placement: Placement): boolean {
