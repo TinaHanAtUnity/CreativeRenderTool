@@ -24,7 +24,7 @@ export class Slider {
     private selectorWidth: number;
     private innerElements: string[];
     private currentSlide: number;
-    private transformProperty: string;
+    private transformProperty: string | number;
     private _slidesContainer: HTMLElement;
     private _rootEl: HTMLElement;
     private pointerDown: boolean;
@@ -35,7 +35,7 @@ export class Slider {
     constructor(urls: string[], config: ISliderOptions = {
         duration: 200,
         easing: 'ease-out',
-        slidesPerPage: 1.7,
+        slidesPerPage: 1.66,
         startIndex: 0,
         draggable: true,
         multipleDrag: false,
@@ -76,34 +76,35 @@ export class Slider {
         this.attachEvents();
         this._rootEl.style.overflow = 'hidden';
         this.buildSliderFrame();
+        // this.resizeContainer();
+    }
 
+    private resizeContainer(): void {
+        const widthItem = this.selectorWidth / this.slidesPerPage;
+        const itemsToBuild = this.config.loop ? this.innerElements.length + (this.slidesPerPage * 2) : this.innerElements.length;
+        this._slidesContainer.style.width = `${widthItem * itemsToBuild}px`;
     }
 
     private buildSliderFrame(): void {
-        const widthItem = this.selectorWidth / this.slidesPerPage;
-        const itemsToBuild = this.config.loop ? this.innerElements.length + (this.slidesPerPage * 2) : this.innerElements.length;
-
-        // Create frame and apply styling
-        // this.sliderFrame = document.createElement('div');
-        // this.enableTransition();
-
-        // if (this.config.draggable) {
-        //     this.selector.style.cursor = '-webkit-grab';
-        // }
 
         // Create a document fragment to put slides into it
         const docFragment = document.createDocumentFragment();
-        // const slideWrapper = document.createElement('div');
-        this._slidesContainer.style.width = `${widthItem * itemsToBuild}px`;
+        const cloneSlidesAmount = 3;
+        this.resizeContainer();
+
+        const blurredBackground = this.createElement('div', 'slider-blurred-background', ['slider-blurred-background'], {
+            'background-image': `url(${this.innerElements[0]})`
+        });
+
         // Loop through the slides, add styling and add them to document fragment
         if (this.config.loop) {
-            for (let i = this.innerElements.length - this.slidesPerPage; i < this.innerElements.length; i++) {
+            for (let i = this.innerElements.length - cloneSlidesAmount; i < this.innerElements.length; i++) {
                 const element = this.buildSliderFrameItem(this.innerElements[i]);
                 docFragment.appendChild(element);
             }
         }
-        for (const item of this.innerElements) {
-            const element = this.buildSliderFrameItem(item);
+        for (const i of this.innerElements) {
+            const element = this.buildSliderFrameItem(i);
             docFragment.appendChild(element);
         }
         if (this.config.loop) {
@@ -112,15 +113,16 @@ export class Slider {
                 docFragment.appendChild(element);
             }
         }
+        this._rootEl.innerHTML = '';
         this._slidesContainer.innerHTML = '';
         // Add fragment to the frame
-        // this.sliderFrame.appendChild(docFragment);
-        // slideWrapper.appendChild(docFragment);
         this._slidesContainer.appendChild(docFragment);
-        // Clear selector (just in case something is there) and insert a frame
-        // this._rootEl.appendChild(this.sliderFrame);
+        console.log('append');
+        this._rootEl.appendChild(this._slidesContainer);
+        // append blured background to the slider
+        this._rootEl.appendChild(blurredBackground);
 
-        // Go to currently active slide after initial build
+        // Go to active slide after initial build
         this.slideToCurrent(true);
     }
 
@@ -129,15 +131,15 @@ export class Slider {
         const offset = (this.config.rtl ? 1 : -1) * currentSlide * (this.selectorWidth / this.slidesPerPage);
 
         if (enableTransition) {
-            // https://youtu.be/cCOL7MC4Pl0
+            // explanation for this one - https://youtu.be/cCOL7MC4Pl0
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                     this.enableTransition();
-                    this._slidesContainer.style[this.transformProperty] = `translate3d(${offset}px, 0, 0)`;
+                    this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset}px, 0, 0)`;
                 });
             });
         } else {
-            this._slidesContainer.style[this.transformProperty] = `translate3d(${offset}px, 0, 0)`;
+            this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset}px, 0, 0)`;
         }
     }
 
@@ -153,9 +155,7 @@ export class Slider {
 
     private buildSliderFrameItem(url: string): HTMLDivElement {
         const elementContainer = document.createElement('div');
-        const slideWrapper = document.createElement('div');
         elementContainer.classList.add('slider-item');
-        // slideWrapper.classList.add('slide-wrapper');
         elementContainer.style.cssFloat = this.config.rtl ? 'right' : 'left';
         elementContainer.style.width = `${this.config.loop ? 100 / (this.innerElements.length + (this.slidesPerPage * 2)) : 100 / (this.innerElements.length)}%`;
         const style = {};
@@ -169,8 +169,6 @@ export class Slider {
         image.src = url;
 
         elementContainer.appendChild(image);
-        // slideWrapper.appendChild(elementContainer);
-        // console.log(slideWrapper)
         return elementContainer;
     }
 
@@ -211,6 +209,7 @@ export class Slider {
             this.currentSlide = this.innerElements.length <= this.slidesPerPage ? 0 : this.innerElements.length - this.slidesPerPage;
           }
         this.selectorWidth = this._rootEl.offsetWidth;
+        // this.resizeContainer();
         this.buildSliderFrame();
     }
 
@@ -248,7 +247,7 @@ export class Slider {
             const currentOffset = currentSlide * (this.selectorWidth / this.slidesPerPage);
             const dragOffset = (this.drag.endX - this.drag.startX);
             const offset = this.config.rtl ? currentOffset + dragOffset : currentOffset - dragOffset;
-            this._slidesContainer.style[this.transformProperty] = `translate3d(${(this.config.rtl ? 1 : -1) * offset}px, 0, 0)`;
+            this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${(this.config.rtl ? 1 : -1) * offset}px, 0, 0)`;
         }
 
     }
@@ -297,7 +296,7 @@ export class Slider {
             const currentOffset = currentSlide * (this.selectorWidth / this.slidesPerPage);
             const dragOffset = (this.drag.endX - this.drag.startX);
             const offset = this.config.rtl ? currentOffset + dragOffset : currentOffset - dragOffset;
-            this.sliderFrame.style[this.transformProperty] = `translate3d(${(this.config.rtl ? 1 : -1) * offset}px, 0, 0)`;
+            this.sliderFrame.style[<number>this.transformProperty] = `translate3d(${(this.config.rtl ? 1 : -1) * offset}px, 0, 0)`;
         }
     }
 
@@ -332,7 +331,7 @@ export class Slider {
           this.next(howManySliderToSlide);
         }
         this.slideToCurrent(slideToNegativeClone || slideToPositiveClone);
-
+        console.log(this.currentSlide);
     }
 
     private next(howManySlides = 1): void {
@@ -354,7 +353,7 @@ export class Slider {
                 const offset = (this.config.rtl ? 1 : -1) * moveTo * (this.selectorWidth / this.slidesPerPage);
                 const dragDistance = this.config.draggable ? this.drag.endX - this.drag.startX : 0;
 
-                this._slidesContainer.style[this.transformProperty] = `translate3d(${offset + dragDistance}px, 0, 0)`;
+                this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset + dragDistance}px, 0, 0)`;
                 this.currentSlide = mirrorSlideIndex + howManySlides;
             } else {
                 this.currentSlide = this.currentSlide + howManySlides;
@@ -386,7 +385,7 @@ export class Slider {
                 const offset = (this.config.rtl ? 1 : -1) * moveTo * (this.selectorWidth / this.slidesPerPage);
                 const dragDistance = this.config.draggable ? this.drag.endX - this.drag.startX : 0;
 
-                this._slidesContainer.style[this.transformProperty] = `translate3d(${offset + dragDistance}px, 0, 0)`;
+                this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset + dragDistance}px, 0, 0)`;
                 this.currentSlide = mirrorSlideIndex - howManySlides;
             } else {
                 this.currentSlide = this.currentSlide - howManySlides;
@@ -413,47 +412,8 @@ export class Slider {
           this.slidesPerPage = this.config.slidesPerPage;
         } else if (typeof this.config.slidesPerPage === 'object') {
           this.slidesPerPage = 1;
-        //   for (const viewport in <Object>this.config.slidesPerPage) {
-        //     if (window.innerWidth >= viewport) {
-        //       this.slidesPerPage = this.config.slidesPerPage[viewport];
-        //     }
-        //   }
         }
       }
-
-    // private createSlide(url: string, id: string): Promise<HTMLElement> {
-    //     return new Promise((resolve) => {
-    //         if (url) {
-    //             const image = new Image();
-    //             image.onload = () => {
-    //                 resolve(this.generateSlideHTML(id, image));
-    //             };
-    //             image.src = url;
-    //         } else {
-    //             resolve(this.generateSlideHTML(id));
-    //         }
-    //     });
-    // }
-
-    // private generateSlideHTML = (id: string, image?: HTMLImageElement) => {
-    //     const src = image && image.src;
-    //     const style = {};
-
-    //     if (src) {
-    //         Object.assign(style, {
-    //             'background-image': `url(${src})`
-    //         });
-    //     }
-
-    //     const item = this.createElement('div', id, ['slider-item', 'slider-item']);
-    //     const span = this.createElement('span', id + 'img', [], style);
-
-    //     if (image !== undefined) {
-    //         item.appendChild(image);
-    //         item.appendChild(span);
-    //     }
-    //     return item;
-    // }
 
     private createElement(name: string, id: string, className: string[] = [], style: { [key: string]: any } = {}): HTMLElement {
         const el = document.createElement(name);
@@ -470,4 +430,34 @@ export class Slider {
             el.style.setProperty(key, String(style[key]));
         });
     }
+
+        private static prepareIndicator(slider: Slider, wrapClassName: String, className: String, howMany: number, activeIndex: number, activeClass: String) {
+        const item = document.createElement('span');
+        const indicatorWrap = document.createElement('div');
+        const indicators = [];
+        let i;
+
+        indicatorWrap.className = 'slider-indicator';
+
+        item.className = 'slider-dot';
+        for(i = 1; i < howMany; i++) {
+            indicators.push(indicatorWrap.appendChild(<HTMLElement>item.cloneNode(false)));
+        }
+        indicators.push(indicatorWrap.appendChild(item));
+        indicators[activeIndex].className = 'slider-dot ' + activeClass;
+
+        slider._indicatorWrap = indicatorWrap;
+        slider._indicators = indicators;
+        slider._rootEl.appendChild(indicatorWrap);
+
+        setTimeout(() => {
+            indicatorWrap.style.left = (slider._width - parseFloat(getComputedStyle(indicatorWrap).width!.replace('px', ''))) / 2 + 'px';
+        }, 0);
+    }
+
+    private static updateIndicator(indicators: HTMLElement[], pre: number, cur: number) {
+        indicators[pre].className = 'slider-dot';
+        indicators[cur].className = 'slider-dot active';
+    }
+
 }
