@@ -46,6 +46,4 @@ export const ConsentAltTitle = new ABTest(9, 10);
 export const AuctionV5Test = new ABTest(15, 18);
 export const WebPlayerMRAIDTest = new DisabledABTest();
 
-// Two hold out groups that should not get the install now button in rewarded videos
-export const HoldOutInstallInRewardedVideos = new ABTest(5, 6);
 export const SkipUnderTimerExperiment = new DisabledABTest(7, 8);
