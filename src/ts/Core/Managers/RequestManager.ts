@@ -9,6 +9,7 @@ import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 const enum RequestStatus {
     COMPLETE,
@@ -118,6 +119,11 @@ export class RequestManager {
             }
 
             if (coreConfig.getTestMode()) {
+                RequestManager._auctionProtocol = AuctionProtocol.V4;
+                return;
+            }
+
+            if (CustomFeatures.isAuctionV4Game(clientInfo.getGameId())) {
                 RequestManager._auctionProtocol = AuctionProtocol.V4;
                 return;
             }
