@@ -15,7 +15,7 @@ const BitmangoGameIds = setGameIds(BitmangoGamesJson);
 const ZyngaGameIds = setGameIds(ZyngaGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
 
-export function setGameIds(gameIdJson: string): string[] {
+function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
     try {
         gameIds = JSON.parse(gameIdJson);
