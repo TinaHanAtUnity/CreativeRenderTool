@@ -229,7 +229,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
         }
 
         const isPerformanceCampaign = this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign;
-        if (isPerformanceCampaign && this._videoProgress > 5000) {
+        if (isPerformanceCampaign && !this._skipEnabled && this._videoProgress > 5000) {
             this.showCallButton();
             return;
         }
