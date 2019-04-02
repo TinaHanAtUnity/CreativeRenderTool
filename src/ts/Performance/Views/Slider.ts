@@ -43,8 +43,12 @@ export class Slider {
 
         this._rootEl = this.createElement('div', 'slider-root-container', ['slider-wrap']);
 
-        this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
+        const blurredBackground = this.createElement('div', 'slider-blurred-background', ['slider-blurred-background'], {
+            'background-image': `url(${urls[0]})`
+        });
+        this._rootEl.appendChild(blurredBackground);
 
+        this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
         this._rootEl.appendChild(this._slidesContainer);
 
         const allSlidesCreatedPromise = urls.map((url, index) => {
@@ -154,6 +158,13 @@ export class Slider {
                 const image = new Image();
                 image.onload = () => {
                     resolve(this.generateSlideHTML(id, image));
+
+                    // TODO: This can be probable replaced when the metadata.json has data for us
+                    if (image.width > image.height) {
+                        this._rootEl.classList.add('landscape-slider-images');
+                    } else {
+                        this._rootEl.classList.add('portrait-slider-images');
+                    }
                 };
                 image.src = url;
             } else {
@@ -163,21 +174,10 @@ export class Slider {
     }
 
     private generateSlideHTML = (id: string, image?: HTMLImageElement) => {
-        const src = image && image.src;
-        const style = {};
-
-        if (src) {
-            Object.assign(style, {
-                'background-image': `url(${src})`
-            });
-        }
-
         const item = this.createElement('div', id, ['slider-item', 'slider-item']);
-        const span = this.createElement('span', id + 'img', [], style);
 
         if (image !== undefined) {
             item.appendChild(image);
-            item.appendChild(span);
         }
 
         return item;
