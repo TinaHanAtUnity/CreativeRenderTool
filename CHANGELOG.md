@@ -1,3 +1,10 @@
+# Pending
+
+* Enable rewarded video overlay install now button for entire network [#8951](https://github.com/Applifier/unity-ads-webview/pull/8951)
+* Removing duplicated code for setForcedGDPRBanner [#8833](https://github.com/Applifier/unity-ads-webview/pull/8833)
+* Set URL parameters for Banner Consistently with Ads [#8953](https://github.com/Applifier/unity-ads-webview/pull/8953)
+* Change Reporting Behavior to Reward from End Cards [#8975](https://github.com/Applifier/unity-ads-webview/pull/8975)
+
 # Tue Apr  2 21:57:26 UTC 2019
 
 * V4 for Fanatee games that has 87 placements [#8952](https://github.com/Applifier/unity-ads-webview/pull/8952)
