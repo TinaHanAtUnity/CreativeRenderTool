@@ -1,3 +1,7 @@
+# Merged
+
+* V4 for Fanatee games that has 87 placements [#8952](https://github.com/Applifier/unity-ads-webview/pull/8952)
+
 # Mon Apr  1 23:35:56 UTC 2019
 
 * Add Smart Banner Dimension Calculations [#8907](https://github.com/Applifier/unity-ads-webview/pull/8907)
