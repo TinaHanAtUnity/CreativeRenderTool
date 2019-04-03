@@ -476,4 +476,12 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     public onBridgeAREvent(msg: MessageEvent) {
         this.onAREvent(msg).catch((reason) => this._core.Sdk.logError('AR message error: ' + reason.toString()));
     }
+
+    public onBridgeArReadyToShow(msg: MessageEvent) {
+        this.onArReadyToShowEvent(msg).catch((reason) => this._core.Sdk.logError('AR ready to show message error: ' + reason.toString()));
+    }
+
+    protected onArReadyToShowEvent(msg: MessageEvent): Promise<void> {
+        return Promise.resolve();
+    }
 }

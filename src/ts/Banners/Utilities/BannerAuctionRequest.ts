@@ -1,5 +1,6 @@
 import { Placement } from 'Ads/Models/Placement';
 import { AuctionRequest, IAuctionRequestParams } from 'Banners/Utilities/AuctionRequest';
+import { BannerSize } from 'Banners/Utilities/BannerSize';
 
 export class BannerAuctionRequest extends AuctionRequest {
 
@@ -9,11 +10,7 @@ export class BannerAuctionRequest extends AuctionRequest {
 
     protected createPlacementDTO(placement: Placement): { [key: string]: unknown } {
         const placementRequest = super.createPlacementDTO(placement);
-        // TODO replace with actual dimensions
-        placementRequest.dimensions = {
-            w: 320,
-            h: 50
-        };
+        placementRequest.dimensions = BannerSize.getPlatformDimensions(this._platform, this._deviceInfo);
         return placementRequest;
     }
 }

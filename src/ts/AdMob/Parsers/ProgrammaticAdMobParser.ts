@@ -10,9 +10,8 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { FileId } from 'Core/Utilities/FileId';
 import { Url } from 'Core/Utilities/Url';
 import { Vast } from 'VAST/Models/Vast';
-import { VastParser } from 'VAST/Utilities/VastParser';
 import { RequestError } from 'Core/Errors/RequestError';
-import { ABGroup, VastStrictAdMobTest } from 'Core/Models/ABGroup';
+import { ABGroup } from 'Core/Models/ABGroup';
 import { ProgrammaticTrackingService, ProgrammaticTrackingErrorName } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
@@ -147,10 +146,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     }
 
     private parseVAST(xml: string): Vast | null {
-        if (VastStrictAdMobTest.isValid(this._abGroup)) {
-            return new VastParserStrict().parseVast(xml);
-        }
-        return new VastParser().parseVast(xml);
+        return new VastParserStrict().parseVast(xml);
     }
 
     private sanitizeXML(xml: string) {

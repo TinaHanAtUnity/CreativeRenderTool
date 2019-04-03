@@ -9,6 +9,7 @@ import { Url } from 'Core/Utilities/Url';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 enum ThirdPartyEventMethod {
     POST,
@@ -108,9 +109,12 @@ export class ThirdPartyEventManager {
                 error = new DiagnosticError(new Error(error.message), diagnosticData);
             }
             // Auction V5 start dip investigation
-            if (event.toLowerCase().indexOf('start') !== -1 || event.toLowerCase().indexOf('impression') !== -1) {
-                Diagnostics.trigger('third_party_sendevent_failed', diagnosticData);
+            if (CustomFeatures.shouldSampleAtTenPercent()) {
+                if (event.toLowerCase().indexOf('start') !== -1 || event.toLowerCase().indexOf('impression') !== -1) {
+                    Diagnostics.trigger('third_party_sendevent_failed', diagnosticData);
+                }
             }
+
             return Analytics.trigger('third_party_event_failed', error);
         });
     }

@@ -1,5 +1,38 @@
-# Staged
+# Pending
 
+* Enable rewarded video overlay install now button for entire network [#8951](https://github.com/Applifier/unity-ads-webview/pull/8951)
+* Removing duplicated code for setForcedGDPRBanner [#8833](https://github.com/Applifier/unity-ads-webview/pull/8833)
+* Set URL parameters for Banner Consistently with Ads [#8953](https://github.com/Applifier/unity-ads-webview/pull/8953)
+* Change Reporting Behavior to Reward from End Cards [#8975](https://github.com/Applifier/unity-ads-webview/pull/8975)
+
+# Tue Apr  2 21:57:26 UTC 2019
+
+* V4 for Fanatee games that has 87 placements [#8952](https://github.com/Applifier/unity-ads-webview/pull/8952)
+
+# Mon Apr  1 23:35:56 UTC 2019
+
+* Add Smart Banner Dimension Calculations [#8907](https://github.com/Applifier/unity-ads-webview/pull/8907)
+* Update Campaign Errors to Normal Format for Auction V5 [#8929](https://github.com/Applifier/unity-ads-webview/pull/8929)
+
+# Mon Apr  1 15:42:33 UTC 2019
+
+* Auction V5 rollout, mostly affecting Android [#8885](https://github.com/Applifier/unity-ads-webview/pull/8885)
+
+# Fri Mar 29 16:50:36 UTC 2019
+
+* AR Delayed Camera Consent [#8326](https://github.com/Applifier/unity-ads-webview/pull/8326)
+
+# Thu Mar 28 17:45:30 UTC 2019
+
+* Disable skip under timer test until we have Zynga filter in place [#8860](https://github.com/Applifier/unity-ads-webview/pull/8860)
+* Using ProgrammaictVastParserStrict in ProgrammaticVPAIDParser [#8883](https://github.com/Applifier/unity-ads-webview/pull/8883)
+* Only Refresh catalog if promo exists in placement config [#8882](https://github.com/Applifier/unity-ads-webview/pull/8882)
+* \<AdVerification\> as standalone tag and REASON code for VAST 4.1 [#8859](https://github.com/Applifier/unity-ads-webview/pull/8859)
+
+# Tue Mar 26 20:58:25 UTC 2019
+
+* Skip under timer experiment [#8835](https://github.com/Applifier/unity-ads-webview/pull/8835)
+* Release VastParserStrict to AdMob and VPAID [#8836](https://github.com/Applifier/unity-ads-webview/pull/8836)
 * Remove accessible close button tests [#8834](https://github.com/Applifier/unity-ads-webview/pull/8834)
 * Parse \<AdVerifications\> for Open Measurement support [#8830](https://github.com/Applifier/unity-ads-webview/pull/8830)
 

@@ -22,9 +22,7 @@ export class PerformanceAdUnitFactory extends AbstractAdUnitFactory<PerformanceC
     }
 
     public createAdUnit(parameters: IPerformanceAdUnitParameters): PerformanceAdUnit {
-        const isIOS = parameters.platform === Platform.IOS;
-        const installButtonExperimentEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(parameters.campaign, parameters.coreConfig);
-        const useIOSPerformanceAdUnit = installButtonExperimentEnabled && isIOS;
+        const useIOSPerformanceAdUnit = parameters.platform === Platform.IOS;
         const performanceAdUnit = useIOSPerformanceAdUnit ? new IOSPerformanceAdUnit(parameters) : new PerformanceAdUnit(parameters);
 
         let performanceOverlayEventHandler: PerformanceOverlayEventHandler;
