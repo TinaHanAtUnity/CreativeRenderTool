@@ -1,11 +1,6 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { assert } from 'chai';
 import 'mocha';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
-import { IosUtils } from 'Ads/Utilities/IosUtils';
-import * as sinon from 'sinon';
-import { toAbGroup } from 'Core/Models/ABGroup';
 
 describe('CustomFeatures', () => {
 
