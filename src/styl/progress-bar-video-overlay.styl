@@ -1,5 +1,18 @@
 @import "vars.styl";
 
+#video-overlay.with-progress-bar {
+  .top-container {
+    visibility: hidden;
+    opacity: 0;
+  }
+  &.fade-in {
+    .top-container {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+}
+
 .progress-wrapper {
     position: absolute;
     top: 0;

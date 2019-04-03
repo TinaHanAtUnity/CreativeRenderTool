@@ -38,6 +38,7 @@ export class ProgressBarVideoOverlay extends VideoOverlay {
     this._progressBar.classList.add('progress-bar');
     this._progressBarWrapper.classList.add('progress-wrapper');
     this._progressBarWrapper.appendChild(this._progressBar);
+    this._container.classList.add('with-progress-bar');
     parentElement.insertBefore(this._progressBarWrapper, parentElement.childNodes[0] || null);
   }
 

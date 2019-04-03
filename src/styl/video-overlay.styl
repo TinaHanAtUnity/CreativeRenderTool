@@ -24,10 +24,7 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
   font-size: 16px;
   transition: opacity .45s ease-in;
 
-  .top-container {
-    visibility: hidden;
-    opacity: 0;
-  }
+  .top-container,
   .show-skip-button {
     display: none;
   }
@@ -54,10 +51,7 @@ $video-overlay-styles.tab-vertical-margin = $video-overlay-styles.base-size * 0.
   }
 
   &.fade-in {
-    .top-container {
-      visibility: visible;
-      opacity: 1;
-    }
+    .top-container,
     .show-skip-button {
       display: block;
     }
