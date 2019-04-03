@@ -42,7 +42,7 @@ export const FakeEnabledABTest = new ABTest(16, 17);
 export const FakeDisabledABTest = new DisabledABTest(16, 17);
 
 // Add actual A/B tests below
-export const ConsentAltTitle = new ABTest(9, 10);
+export const ConsentMyChoicesButtonTextTest = new ABTest(9, 10);
 export const AuctionV5Test = new ABTest(15, 18);
 export const WebPlayerMRAIDTest = new DisabledABTest();
 
