@@ -97,6 +97,7 @@ import { VPAIDAdUnitParametersFactory } from 'VPAID/AdUnits/VPAIDAdUnitParameter
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { VPAIDAdUnitFactory } from 'VPAID/AdUnits/VPAIDAdUnitFactory';
+import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -108,7 +109,7 @@ describe('CampaignManager', () => {
     let storageBridge: StorageBridge;
     let wakeUpManager: WakeUpManager;
     let request: RequestManager;
-    let vastParser: VastParser;
+    let vastParser: VastParserStrict;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
     let metaDataManager: MetaDataManager;
@@ -135,7 +136,7 @@ describe('CampaignManager', () => {
         adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
 
         clientInfo = TestFixtures.getClientInfo();
-        vastParser = TestFixtures.getVastParser();
+        vastParser = TestFixtures.getVastParserStrict();
         platform = Platform.ANDROID;
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
