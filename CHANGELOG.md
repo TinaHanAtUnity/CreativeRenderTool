@@ -1,4 +1,4 @@
-# Pending
+# Wed Apr  3 23:08:59 UTC 2019
 
 * Add more games to use V4 [#8999](https://github.com/Applifier/unity-ads-webview/pull/8999)
 * Replace consent title test with consent my choices button text test [#8997](https://github.com/Applifier/unity-ads-webview/pull/8997)
