@@ -45,7 +45,9 @@ export class CustomFeatures {
                 creativeId === '147367465' || // Carnival Creative
                 creativeId === '151099348' ||
                 creativeId === '151338976' ||
-                creativeId === '151337994';
+                creativeId === '151337994' ||
+                creativeId === '152919353' ||
+                creativeId === '153119177';
     }
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {
