@@ -1,11 +1,6 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { assert } from 'chai';
 import 'mocha';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
-import { IosUtils } from 'Ads/Utilities/IosUtils';
-import * as sinon from 'sinon';
-import { toAbGroup } from 'Core/Models/ABGroup';
 
 describe('CustomFeatures', () => {
 
@@ -39,23 +34,6 @@ describe('CustomFeatures', () => {
 
         it('should return false if gameId is anything besides 1300023 and 1300024', () => {
             const value = CustomFeatures.isTimehopApp('1300025');
-            assert.isFalse(value);
-        });
-    });
-
-    describe('isZyngaGame', () => {
-        it('should return true if gameId is 98530', () => {
-            const value = CustomFeatures.isZyngaGame('98530');
-            assert.isTrue(value);
-        });
-
-        it('should return true if gameId is 21739', () => {
-            const value = CustomFeatures.isZyngaGame('21739');
-            assert.isTrue(value);
-        });
-
-        it('should return false if gameId is 99999', () => {
-            const value = CustomFeatures.isZyngaGame('99999');
             assert.isFalse(value);
         });
     });

@@ -1,7 +1,6 @@
 import { Platform } from 'Core/Constants/Platform';
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
-import ZyngaGamesJson from 'json/custom_features/ZyngaGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import AuctionV4GamesJson from 'json/custom_features/AuctionV4Games.json';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -10,7 +9,6 @@ import { Placement } from 'Ads/Models/Placement';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
-const ZyngaGameIds = setGameIds(ZyngaGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
 const AuctionV4GameIds = setGameIds(AuctionV4GamesJson);
 
@@ -78,10 +76,6 @@ export class CustomFeatures {
 
     public static isTimerExpirationExperiment(gameId: string): boolean {
         return gameId === '1453434';
-    }
-
-    public static isZyngaGame(gameId: string): boolean {
-        return this.existsInList(ZyngaGameIds, gameId);
     }
 
     public static isAuctionV4Game(gameId: string): boolean {
