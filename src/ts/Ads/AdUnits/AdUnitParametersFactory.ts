@@ -31,8 +31,6 @@ import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 import { ProgressBarVideoOverlay } from 'Ads/Views/ProgressBarVideoOverlay';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { VideoOverlayWithInstallInRewardedVideos } from 'Ads/Views/VideoOverlayWithInstallInRewardedVideo';
 import { IStoreApi } from 'Store/IStore';
 import { ABGroup, ProgressBarVideoTest } from 'Core/Models/ABGroup';
 
@@ -212,18 +210,10 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
 
         let overlay: AbstractVideoOverlay;
         const abGroup = parameters.coreConfig.getAbGroup();
-        if (CustomFeatures.isRewardedVideoInstallButtonEnabled(this._campaign, this._coreConfig)) {
-            if (ProgressBarVideoTest.isValid(abGroup)) {
-                overlay = new ProgressBarVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-            } else {
-                overlay = new VideoOverlayWithInstallInRewardedVideos(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-            }
+        if (ProgressBarVideoTest.isValid(abGroup)) {
+            overlay = new ProgressBarVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         } else {
-            if (ProgressBarVideoTest.isValid(abGroup)) {
-                overlay = new ProgressBarVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-            } else {
-                overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
-            }
+            overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         }
 
         if (parameters.placement.disableVideoControlsFade()) {
