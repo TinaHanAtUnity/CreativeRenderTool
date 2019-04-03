@@ -19,7 +19,7 @@ export class ProgressBarVideoOverlay extends VideoOverlay {
     if (this._progressBar.style.transition === '' && this._progressBar.style.webkitTransition === '') {
       this.addCssTransition();
     }
-    this._progressBar.style.width =  `${progressInPercentages}%`;
+    this._progressBar.style.width = `${progressInPercentages}%`;
 
     if (progressInPercentages >= 100 && this._progressBarWrapper) {
       this._progressBarWrapper.remove();
