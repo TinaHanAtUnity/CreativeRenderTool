@@ -117,12 +117,11 @@ export class RequestManager {
             if (forceProtocol === '5') {
                 RequestManager._auctionProtocol = AuctionProtocol.V5;
                 return;
-            }
-            else if (forceProtocol === '4') {
+            } else if (forceProtocol === '4') {
                 RequestManager._auctionProtocol = AuctionProtocol.V4;
                 return;
             }
-            
+
             if(TestEnvironment.get('creativeUrl')) {
                 RequestManager._auctionProtocol = AuctionProtocol.V4;
                 return;
