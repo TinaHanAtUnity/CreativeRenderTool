@@ -1,5 +1,6 @@
 # Pending
 
+* Add more games to use V4 [#8999](https://github.com/Applifier/unity-ads-webview/pull/8999)
 * Replace consent title test with consent my choices button text test [#8997](https://github.com/Applifier/unity-ads-webview/pull/8997)
 * Enable rewarded video overlay install now button for entire network [#8951](https://github.com/Applifier/unity-ads-webview/pull/8951)
 * Removing duplicated code for setForcedGDPRBanner [#8833](https://github.com/Applifier/unity-ads-webview/pull/8833)
