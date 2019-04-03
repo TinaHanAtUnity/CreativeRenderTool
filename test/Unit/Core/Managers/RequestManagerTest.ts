@@ -85,6 +85,26 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
                 assert.equal(returnedProtocol, AuctionProtocol.V4);
             });
 
+            it(('should set V4 when using forceAuctionProtocol'), () => {
+                sinon.stub(TestEnvironment, 'get').withArgs('forceAuctionProtocol').returns('4');
+                sinon.stub(coreConfig, 'getTestMode').returns(false);
+                RequestManager.setTestAuctionProtocol(undefined);
+                RequestManager.setAuctionProtocol(coreConfig, adsConfig, platform, clientInfo);
+                const returnedProtocol = RequestManager.getAuctionProtocol();
+
+                assert.equal(returnedProtocol, AuctionProtocol.V4);
+            });
+
+            it(('should set V5 when using forceAuctionProtocol'), () => {
+                sinon.stub(TestEnvironment, 'get').withArgs('forceAuctionProtocol').returns('5');
+                sinon.stub(coreConfig, 'getTestMode').returns(false);
+                RequestManager.setTestAuctionProtocol(undefined);
+                RequestManager.setAuctionProtocol(coreConfig, adsConfig, platform, clientInfo);
+                const returnedProtocol = RequestManager.getAuctionProtocol();
+
+                assert.equal(returnedProtocol, AuctionProtocol.V5);
+            });
+
             it(('should set V5 otherwise'), () => {
                 sinon.stub(TestEnvironment, 'get').returns(false);
                 sinon.stub(coreConfig, 'getTestMode').returns(false);

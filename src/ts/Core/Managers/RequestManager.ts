@@ -113,6 +113,16 @@ export class RequestManager {
 
     public static setAuctionProtocol(coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, platform: Platform, clientInfo: ClientInfo) {
         if (!RequestManager._auctionProtocol) {
+            const forceProtocol = TestEnvironment.get('forceAuctionProtocol');
+            if (forceProtocol === '5') {
+                RequestManager._auctionProtocol = AuctionProtocol.V5;
+                return;
+            }
+            else if (forceProtocol === '4') {
+                RequestManager._auctionProtocol = AuctionProtocol.V4;
+                return;
+            }
+            
             if(TestEnvironment.get('creativeUrl')) {
                 RequestManager._auctionProtocol = AuctionProtocol.V4;
                 return;
