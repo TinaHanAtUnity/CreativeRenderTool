@@ -91,7 +91,6 @@ import { FakeIosDeviceInfo } from 'TestHelpers/FakeIosDeviceInfo';
 import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
-import { VastParser } from 'VAST/Utilities/VastParser';
 import { VPAID } from 'VPAID/Models/VPAID';
 import { IVPAIDCampaign, VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
@@ -590,7 +589,7 @@ export class TestFixtures {
     }
 
     public static getCompanionVastCampaign(): VastCampaign {
-        const vastParser = TestFixtures.getVastParser();
+        const vastParser = TestFixtures.getVastParserStrict();
         const vast = vastParser.parseVast(VastCompanionXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
     }
@@ -603,21 +602,21 @@ export class TestFixtures {
     }
 
     public static getEventVastCampaign(session?: Session): VastCampaign {
-        const vastParser = TestFixtures.getVastParser();
+        const vastParser = TestFixtures.getVastParserStrict();
         const vastXml = EventTestVast;
         const vast = vastParser.parseVast(vastXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345', session));
     }
 
     public static getCompanionVastCampaignWithoutImages(): VastCampaign {
-        const vastParser = TestFixtures.getVastParser();
+        const vastParser = TestFixtures.getVastParserStrict();
         const vastXml = VastCompanionAdWithoutImagesXml;
         const vast = vastParser.parseVast(vastXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
     }
 
     public static getCompanionVastCampaignWithoutCompanionAd(): VastCampaign {
-        const vastParser = TestFixtures.getVastParser();
+        const vastParser = TestFixtures.getVastParserStrict();
         const vastXml = VastAdWithoutCompanionAdXml;
         const vast = vastParser.parseVast(vastXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
@@ -863,13 +862,6 @@ export class TestFixtures {
             responseCode: 200,
             headers: [['location', 'http://foobar.com']]
         };
-    }
-
-    public static getVastParser(): VastParser {
-        let vastParser: VastParser;
-        const domParser = new DOMParser();
-        vastParser = new VastParser(domParser);
-        return vastParser;
     }
 
     public static getVastParserStrict(): VastParserStrict {
