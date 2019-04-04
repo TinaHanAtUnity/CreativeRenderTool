@@ -135,15 +135,15 @@ export class CustomFeatures {
     }
 
     // Following 2 functions could be merged at some point later
-    public static isSliderEndScreenEnabled(targetGameId: string): boolean {
+    public static isSliderEndScreenEnabled(targetGameAppStoreId: string): boolean {
         // TODO: Uncomment and remove hard coded true;
-        //return this.existsInList(SlideShowTargetGameIds, '' + targetGameId);
+        //return this.existsInList(SlideShowTargetGameIds, '' + targetGameAppStoreId);
         return true;
     }
 
-    public static getScreenshotsUrls(targetGameId: string): string[] {
+    public static getScreenshotsUrls(targetGameAppStoreId: string): string[] {
         // TODO: Remove line below for not forcing the slider
-        targetGameId = SlideShowTargetGameIds[Math.floor(Math.random() * 2)];
-        return SlideShowImages[targetGameId];
+        targetGameAppStoreId = SlideShowTargetGameIds[Math.floor(Math.random() * 2)];
+        return SlideShowImages[targetGameAppStoreId];
     }
 }

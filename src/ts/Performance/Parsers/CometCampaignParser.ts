@@ -165,9 +165,8 @@ export class CometCampaignParser extends CampaignParser {
 
             let promise;
 
-            const targetGameId = '' + parameters.gameId;
-            if (CustomFeatures.isSliderEndScreenEnabled(targetGameId)) {
-                const screenshotsUrls =  CustomFeatures.getScreenshotsUrls(targetGameId);
+            if (CustomFeatures.isSliderEndScreenEnabled(parameters.appStoreId)) {
+                const screenshotsUrls = CustomFeatures.getScreenshotsUrls(parameters.appStoreId);
 
                 parameters.screenshots = screenshotsUrls.map(url => new Image(this.validateAndEncodeUrl(url, session), session));
                 promise = Promise.resolve(new SliderPerformanceCampaign(parameters));
