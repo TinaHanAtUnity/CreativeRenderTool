@@ -1,3 +1,16 @@
+# Wed Apr  3 23:08:59 UTC 2019
+
+* Add more games to use V4 [#8999](https://github.com/Applifier/unity-ads-webview/pull/8999)
+* Replace consent title test with consent my choices button text test [#8997](https://github.com/Applifier/unity-ads-webview/pull/8997)
+* Enable rewarded video overlay install now button for entire network [#8951](https://github.com/Applifier/unity-ads-webview/pull/8951)
+* Removing duplicated code for setForcedGDPRBanner [#8833](https://github.com/Applifier/unity-ads-webview/pull/8833)
+* Set URL parameters for Banner Consistently with Ads [#8953](https://github.com/Applifier/unity-ads-webview/pull/8953)
+* Change Reporting Behavior to Reward from End Cards [#8975](https://github.com/Applifier/unity-ads-webview/pull/8975)
+
+# Tue Apr  2 21:57:26 UTC 2019
+
+* V4 for Fanatee games that has 87 placements [#8952](https://github.com/Applifier/unity-ads-webview/pull/8952)
+
 # Mon Apr  1 23:35:56 UTC 2019
 
 * Add Smart Banner Dimension Calculations [#8907](https://github.com/Applifier/unity-ads-webview/pull/8907)
