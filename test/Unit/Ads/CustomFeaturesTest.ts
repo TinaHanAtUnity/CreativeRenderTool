@@ -1,11 +1,6 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { assert } from 'chai';
 import 'mocha';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Core/Constants/Platform';
-import { IosUtils } from 'Ads/Utilities/IosUtils';
-import * as sinon from 'sinon';
-import { toAbGroup } from 'Core/Models/ABGroup';
 
 describe('CustomFeatures', () => {
 
@@ -79,45 +74,6 @@ describe('CustomFeatures', () => {
         it('should return false if gameId is 99999', () => {
             const value = CustomFeatures.isCloseIconSkipEnabled('99999');
             assert.isFalse(value);
-        });
-    });
-
-    describe('isRewardedVideoInstallButtonEnabled', () => {
-        const coreConfig = TestFixtures.getCoreConfiguration();
-        const campaign = TestFixtures.getCampaign();
-        let coreConfigStub: sinon.SinonStub;
-
-        beforeEach(() => {
-            coreConfigStub = sinon.stub(coreConfig, 'getAbGroup').returns(toAbGroup(7));
-        });
-
-        describe('Android', () => {
-            it('should return true when ABGroup is correct', () => {
-                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(campaign, coreConfig);
-                assert.isTrue(isEnabled);
-            });
-
-            it('should return false when user is in AB group that does not have the test enabled', () => {
-                coreConfigStub.restore();
-                sinon.stub(coreConfig, 'getAbGroup').returns(toAbGroup(5));
-                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(campaign, coreConfig);
-                assert.isFalse(isEnabled);
-            });
-        });
-
-        describe('iOS', () => {
-            it('should return true when ABGroup is correct', () => {
-                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(campaign, coreConfig);
-                assert.isTrue(isEnabled);
-            });
-
-            it('should return false when in AB group that does not have the test enabled', () => {
-                coreConfigStub.restore();
-                sinon.stub(coreConfig, 'getAbGroup').returns(toAbGroup(5));
-                sinon.stub(IosUtils, 'isAppSheetBroken').returns(true);
-                const isEnabled = CustomFeatures.isRewardedVideoInstallButtonEnabled(campaign, coreConfig);
-                assert.isFalse(isEnabled);
-            });
         });
     });
 });

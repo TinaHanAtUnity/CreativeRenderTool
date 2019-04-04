@@ -6,11 +6,7 @@
                     <span class="icon-gdpr"></span>
                 </div>
                 <div class="title item">
-                    <% if(data.useAltTitle) { %>
-                    <span class="centered-title">Can we use your data to tailor your ads and experience?</span>
-                    <% } else { %>
                     <span class="centered-title">Can the Unity cookie collect and use your data to tailor your ads and experience?</span>
-                    <% } %>
                 </div>
                 <div class="description item">
                     <p>Unity and our <span class="third-parties-link page-link">third-parties</span>
@@ -26,7 +22,13 @@
             <div class="bottom-container">
                 <div class="button-container item">
                     <div class="accept-all consent-button"><span>Accept</span></div>
-                    <div class="show-choices consent-button"><span>Show my choices</span></div>
+                    <div class="show-choices consent-button">
+                        <% if(data.useAltMyChoicesButtonText) { %>
+                        <span>Learn more</span>
+                        <% } else { %>
+                        <span>Show my choices</span>
+                        <% } %>
+                    </div>
                 </div>
                 <div class="logo-container">
                     <div class="unityads-logo"></div>
