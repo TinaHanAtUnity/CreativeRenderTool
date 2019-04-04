@@ -76,7 +76,7 @@ export class Slider {
         this.attachEvents();
         this._rootEl.style.overflow = 'hidden';
         this.buildSliderFrame();
-        // this.resizeContainer();
+        this.resizeContainer();
     }
 
     private resizeContainer(): void {
@@ -91,7 +91,7 @@ export class Slider {
         const docFragment = document.createDocumentFragment();
         const cloneSlidesAmount = 3;
         this.resizeContainer();
-
+        const promises = [];
         const blurredBackground = this.createElement('div', 'slider-blurred-background', ['slider-blurred-background'], {
             'background-image': `url(${this.innerElements[0]})`
         });
@@ -99,31 +99,67 @@ export class Slider {
         // Loop through the slides, add styling and add them to document fragment
         if (this.config.loop) {
             for (let i = this.innerElements.length - cloneSlidesAmount; i < this.innerElements.length; i++) {
-                const element = this.buildSliderFrameItem(this.innerElements[i]);
-                docFragment.appendChild(element);
+                promises.push(this.createSlide(this.innerElements[i]));
             }
         }
         for (const i of this.innerElements) {
-            const element = this.buildSliderFrameItem(i);
-            docFragment.appendChild(element);
+            promises.push(this.createSlide(i));
         }
         if (this.config.loop) {
             for (let i = 0; i < this.slidesPerPage; i++) {
-                const element = this.buildSliderFrameItem(this.innerElements[i]);
-                docFragment.appendChild(element);
+                promises.push(this.createSlide(this.innerElements[i]));
             }
         }
-        this._rootEl.innerHTML = '';
-        this._slidesContainer.innerHTML = '';
-        // Add fragment to the frame
-        this._slidesContainer.appendChild(docFragment);
-        console.log('append');
-        this._rootEl.appendChild(this._slidesContainer);
-        // append blured background to the slider
-        this._rootEl.appendChild(blurredBackground);
+        Promise.all(promises)
+            .then((results) => {
+                this._rootEl.innerHTML = '';
+                this._slidesContainer.innerHTML = '';
 
-        // Go to active slide after initial build
-        this.slideToCurrent(true);
+                for (const node of results) {
+                    this._slidesContainer.appendChild(node);
+                }
+
+                this._rootEl.appendChild(this._slidesContainer);
+                this._rootEl.appendChild(blurredBackground);
+                this.slideToCurrent(true);
+            })
+            .catch((e) => {
+                console.log(e);
+                // handle errors here
+            });
+    }
+
+    private createSlide(url: string): Promise<HTMLElement> {
+        return new Promise((resolve) => {
+            if (url) {
+                const image = new Image();
+                image.onload = () => {
+                    resolve(this.generateSlideHTML('id', image));
+
+                    // TODO: This can be probable replaced when the metadata.json has data for us
+                    if (image.width > image.height) {
+                        this._rootEl.classList.add('landscape-slider-images');
+                    } else {
+                        this._rootEl.classList.add('portrait-slider-images');
+                    }
+                };
+                image.src = url;
+            } else {
+                resolve(this.generateSlideHTML('íd'));
+            }
+        });
+    }
+
+    private generateSlideHTML = (id: string, image?: HTMLImageElement) => {
+        const item = this.createElement('div', id, ['slider-item', 'slider-item']);
+        item.style.cssFloat = this.config.rtl ? 'right' : 'left';
+        item.style.width = `${this.config.loop ? 100 / (this.innerElements.length + (this.slidesPerPage * 2)) : 100 / (this.innerElements.length)}%`;
+
+        if (image !== undefined) {
+            item.appendChild(image);
+        }
+
+        return item;
     }
 
     private slideToCurrent(enableTransition: boolean): void {
@@ -151,25 +187,6 @@ export class Slider {
     private disableTransition(): void {
         this._slidesContainer.style.webkitTransition = `all 0ms ${this.config.easing}`;
         this._slidesContainer.style.transition = `all 0ms ${this.config.easing}`;
-    }
-
-    private buildSliderFrameItem(url: string): HTMLDivElement {
-        const elementContainer = document.createElement('div');
-        elementContainer.classList.add('slider-item');
-        elementContainer.style.cssFloat = this.config.rtl ? 'right' : 'left';
-        elementContainer.style.width = `${this.config.loop ? 100 / (this.innerElements.length + (this.slidesPerPage * 2)) : 100 / (this.innerElements.length)}%`;
-        const style = {};
-
-        if (url) {
-            Object.assign(style, {
-                'background-image': `url(${url})`
-            });
-        }
-        const image = new Image();
-        image.src = url;
-
-        elementContainer.appendChild(image);
-        return elementContainer;
     }
 
     private attachEvents(): void {
@@ -209,8 +226,9 @@ export class Slider {
             this.currentSlide = this.innerElements.length <= this.slidesPerPage ? 0 : this.innerElements.length - this.slidesPerPage;
           }
         this.selectorWidth = this._rootEl.offsetWidth;
-        // this.resizeContainer();
+        this.resizeContainer();
         this.buildSliderFrame();
+        console.log('resize');
     }
 
     private touchstartHandler(e: TouchEvent): void {
@@ -431,33 +449,33 @@ export class Slider {
         });
     }
 
-        private static prepareIndicator(slider: Slider, wrapClassName: String, className: String, howMany: number, activeIndex: number, activeClass: String) {
-        const item = document.createElement('span');
-        const indicatorWrap = document.createElement('div');
-        const indicators = [];
-        let i;
+    // private static prepareIndicator(slider: Slider, wrapClassName: String, className: String, howMany: number, activeIndex: number, activeClass: String) {
+    //     const item = document.createElement('span');
+    //     const indicatorWrap = document.createElement('div');
+    //     const indicators = [];
+    //     let i;
 
-        indicatorWrap.className = 'slider-indicator';
+    //     indicatorWrap.className = 'slider-indicator';
 
-        item.className = 'slider-dot';
-        for(i = 1; i < howMany; i++) {
-            indicators.push(indicatorWrap.appendChild(<HTMLElement>item.cloneNode(false)));
-        }
-        indicators.push(indicatorWrap.appendChild(item));
-        indicators[activeIndex].className = 'slider-dot ' + activeClass;
+    //     item.className = 'slider-dot';
+    //     for(i = 1; i < howMany; i++) {
+    //         indicators.push(indicatorWrap.appendChild(<HTMLElement>item.cloneNode(false)));
+    //     }
+    //     indicators.push(indicatorWrap.appendChild(item));
+    //     indicators[activeIndex].className = 'slider-dot ' + activeClass;
 
-        slider._indicatorWrap = indicatorWrap;
-        slider._indicators = indicators;
-        slider._rootEl.appendChild(indicatorWrap);
+    //     slider._indicatorWrap = indicatorWrap;
+    //     slider._indicators = indicators;
+    //     slider._rootEl.appendChild(indicatorWrap);
 
-        setTimeout(() => {
-            indicatorWrap.style.left = (slider._width - parseFloat(getComputedStyle(indicatorWrap).width!.replace('px', ''))) / 2 + 'px';
-        }, 0);
-    }
+    //     setTimeout(() => {
+    //         indicatorWrap.style.left = (slider._width - parseFloat(getComputedStyle(indicatorWrap).width!.replace('px', ''))) / 2 + 'px';
+    //     }, 0);
+    // }
 
-    private static updateIndicator(indicators: HTMLElement[], pre: number, cur: number) {
-        indicators[pre].className = 'slider-dot';
-        indicators[cur].className = 'slider-dot active';
-    }
+    // private static updateIndicator(indicators: HTMLElement[], pre: number, cur: number) {
+    //     indicators[pre].className = 'slider-dot';
+    //     indicators[cur].className = 'slider-dot active';
+    // }
 
 }
