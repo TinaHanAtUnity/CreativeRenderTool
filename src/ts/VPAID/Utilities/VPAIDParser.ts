@@ -1,13 +1,13 @@
 import { Vast } from 'VAST/Models/Vast';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
-import { VastParser } from 'VAST/Utilities/VastParser';
 import { VPAID } from 'VPAID/Models/VPAID';
+import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 
 const VPAIDApiFramework = 'VPAID';
 const VPAIDJavascriptType = 'application/javascript';
 
 export class VPAIDParser {
-    private vastParser: VastParser = new VastParser();
+    private vastParser: VastParserStrict = new VastParserStrict();
 
     public parse(dom: string): VPAID {
         const vast = this.vastParser.parseVast(dom);

@@ -68,7 +68,6 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
-import { VastParser } from 'VAST/Utilities/VastParser';
 import IncorrectWrappedVast from 'xml/IncorrectWrappedVast.xml';
 import NonWrappedVast from 'xml/NonWrappedVast.xml';
 import NoVideoWrappedVast from 'xml/NoVideoWrappedVast.xml';
@@ -97,6 +96,7 @@ import { VPAIDAdUnitParametersFactory } from 'VPAID/AdUnits/VPAIDAdUnitParameter
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { VPAIDAdUnitFactory } from 'VPAID/AdUnits/VPAIDAdUnitFactory';
+import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -108,7 +108,7 @@ describe('CampaignManager', () => {
     let storageBridge: StorageBridge;
     let wakeUpManager: WakeUpManager;
     let request: RequestManager;
-    let vastParser: VastParser;
+    let vastParser: VastParserStrict;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
     let metaDataManager: MetaDataManager;
@@ -129,11 +129,13 @@ describe('CampaignManager', () => {
     };
 
     beforeEach(() => {
+        RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
+
         coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
         adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
 
         clientInfo = TestFixtures.getClientInfo();
-        vastParser = TestFixtures.getVastParser();
+        vastParser = TestFixtures.getVastParserStrict();
         platform = Platform.ANDROID;
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
@@ -490,7 +492,7 @@ describe('CampaignManager', () => {
                 const response = {
                     response: OnProgrammaticVastPlcCampaignIncorrect
                 };
-                return verifyErrorForResponse(response, 'VAST xml data is missing');
+                return verifyErrorForResponse(response, 'VAST xml was not parseable:\n   This page contains the following errors:error on line 33 at column 12: Opening and ending tag mismatch: VASTy line 0 and VAST\nBelow is a rendering of the page up to the first error.');
             });
 
             it('should trigger onError after requesting a wrapped vast placement with incorrect document element node name', () => {
@@ -509,7 +511,7 @@ describe('CampaignManager', () => {
                 const response = {
                     response: OnProgrammaticVastPlcCampaignNoData
                 };
-                return verifyErrorForResponse(response, 'VAST xml data is missing');
+                return verifyErrorForResponse(response, 'VAST xml was not parseable:\n   This page contains the following errors:error on line 1 at column 1: Document is empty\nBelow is a rendering of the page up to the first error.');
             });
 
             it('should trigger onError after requesting a wrapped vast placement when a failure occurred requesting the wrapped VAST', () => {
@@ -1100,8 +1102,6 @@ describe('CampaignManager', () => {
                 // bad idea to do this, but need to update the platform inside the parser.
                 const parser = contentTypeHandlerManager.getParser(ProgrammaticMraidParser.ContentType);
                 (<any>parser)._platform = platform;
-
-                sinon.stub(RequestManager, 'getAuctionProtocol').returns(AuctionProtocol.V4);
 
                 assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
                 campaignManager = new CampaignManager(platform, core.Api, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
