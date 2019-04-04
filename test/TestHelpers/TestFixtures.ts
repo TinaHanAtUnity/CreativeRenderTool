@@ -91,7 +91,6 @@ import { FakeIosDeviceInfo } from 'TestHelpers/FakeIosDeviceInfo';
 import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
-import { VastParser } from 'VAST/Utilities/VastParser';
 import { VPAID } from 'VPAID/Models/VPAID';
 import { IVPAIDCampaign, VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
@@ -863,13 +862,6 @@ export class TestFixtures {
             responseCode: 200,
             headers: [['location', 'http://foobar.com']]
         };
-    }
-
-    public static getVastParser(): VastParser {
-        let vastParser: VastParser;
-        const domParser = new DOMParser();
-        vastParser = new VastParser(domParser);
-        return vastParser;
     }
 
     public static getVastParserStrict(): VastParserStrict {

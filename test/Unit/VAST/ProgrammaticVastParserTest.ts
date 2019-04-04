@@ -4,7 +4,7 @@ import { Session } from 'Ads/Models/Session';
 import { Backend } from 'Backend/Backend';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { ICore, ICoreApi } from 'Core/ICore';
+import { ICore } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -19,8 +19,8 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticVastParser, ProgrammaticVastParserStrict } from 'VAST/Parsers/ProgrammaticVastParser';
-import { VastParser } from 'VAST/Utilities/VastParser';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 
 describe('ProgrammaticVastParser', () => {
     const placementId = 'TestPlacement';
@@ -67,7 +67,7 @@ describe('ProgrammaticVastParser', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
                 assert.isTrue(campaign instanceof VastCampaign, 'Campaign was not an VastCampaign');
 
-                const vastParser = new VastParser();
+                const vastParser = new VastParserStrict();
                 const json = JSON.parse(ProgrammaticVastCampaignFlat);
                 const vast = vastParser.parseVast(decodeURIComponent(json.content));
 
@@ -129,7 +129,7 @@ describe('ProgrammaticVastParserStrict', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
                 assert.isTrue(campaign instanceof VastCampaign, 'Campaign was not an VastCampaign');
 
-                const vastParser = new VastParser();
+                const vastParser = new VastParserStrict();
                 const json = JSON.parse(ProgrammaticVastCampaignFlat);
                 const vast = vastParser.parseVast(decodeURIComponent(json.content));
 
