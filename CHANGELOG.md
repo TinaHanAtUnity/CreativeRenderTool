@@ -2,6 +2,7 @@
 
 * Whitelist creatives for imply tracking for mraid [#9000](https://github.com/Applifier/unity-ads-webview/pull/9000)
 * Remove VastParser in favor of VastParserStrict [#9002](https://github.com/Applifier/unity-ads-webview/pull/9002)
+* Filtered abtest [#8906](https://github.com/Applifier/unity-ads-webview/pull/8906)
 
 # Wed Apr  3 23:08:59 UTC 2019
 
