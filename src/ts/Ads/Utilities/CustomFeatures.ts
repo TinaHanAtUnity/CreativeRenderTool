@@ -9,12 +9,26 @@ import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { HoldOutInstallInRewardedVideos } from 'Core/Models/ABGroup';
+import SliderEndScreenImages from 'json/experiments/SliderEndScreenImages.json';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
 const ZyngaGameIds = setGameIds(ZyngaGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
 const iOSV5GameIds = setGameIds(iOSV5GamesJson);
+const SlideShowImages = getSlideShowImages();
+const SlideShowTargetGameIds = Object.keys(SlideShowImages);
+
+function getSlideShowImages() {
+    let images;
+    try {
+        images = JSON.parse(SliderEndScreenImages);
+    } catch {
+        images = {};
+    }
+
+    return images;
+}
 
 function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
@@ -121,78 +135,15 @@ export class CustomFeatures {
     }
 
     // Following 2 functions could be merged at some point later
-    public static isSliderEndScreenEnabled(campaignId: string): boolean {
-        const targetCampaignIds = [
-            'TBD',
-            'TBD'
-        ];
-
+    public static isSliderEndScreenEnabled(targetGameAppStoreId: string): boolean {
+        // TODO: Uncomment and remove hard coded true;
+        //return this.existsInList(SlideShowTargetGameIds, '' + targetGameAppStoreId);
         return true;
     }
 
-    private static getSlideshowCampaignIDs(): string {
-        const targetGameIds = [
-            '343200656',
-            'com.supercell.brawlstars',
-            'com.hcg.cok.gp'
-        ];
-
-        const randomGame = Math.floor(Math.random() * 3);
-
-        return targetGameIds[randomGame];
-    }
-
-    public static getScreenshotsUrls(campaignId: string): string[] {
-        const campaignId_rnd = CustomFeatures.getSlideshowCampaignIDs();
-        const screenshots: { [key: string]: string[] } = {
-            '343200656': [
-                'https://unity-ads-test.s3.amazonaws.com/343200656/0.png',
-                'https://unity-ads-test.s3.amazonaws.com/343200656/4.png',
-                'https://unity-ads-test.s3.amazonaws.com/343200656/1.png',
-                'https://unity-ads-test.s3.amazonaws.com/343200656/2.png',
-                'https://unity-ads-test.s3.amazonaws.com/343200656/3.png'
-            ],
-            'com.supercell.brawlstars': [
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/2.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/7.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/1.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/0.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/4.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/3.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/12.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/5.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/10.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/9.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/14.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/11.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/6.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/8.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.supercell.brawlstars/13.png'
-            ],
-            'com.hcg.cok.gp': [
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/5.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/0.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/4.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/2.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/3.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/6.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/1.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/18.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/16.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/15.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/19.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/14.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/17.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/7.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/8.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/11.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/20.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/9.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/13.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/12.png',
-                'https://unity-ads-test.s3.amazonaws.com/com.hcg.cok.gp/10.png'
-            ]
-        };
-        return screenshots[campaignId_rnd];
+    public static getScreenshotsUrls(targetGameAppStoreId: string): string[] {
+        // TODO: Remove line below for not forcing the slider
+        targetGameAppStoreId = SlideShowTargetGameIds[Math.floor(Math.random() * 2)];
+        return SlideShowImages[targetGameAppStoreId];
     }
 }
