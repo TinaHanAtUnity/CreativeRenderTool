@@ -1,3 +1,7 @@
+# Merged
+
+* Whitelist creatives for imply tracking for mraid [#9000](https://github.com/Applifier/unity-ads-webview/pull/9000)
+
 # Wed Apr  3 23:08:59 UTC 2019
 
 * Add more games to use V4 [#8999](https://github.com/Applifier/unity-ads-webview/pull/8999)
