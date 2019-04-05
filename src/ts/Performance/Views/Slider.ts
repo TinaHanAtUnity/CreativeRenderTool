@@ -72,6 +72,7 @@ export class Slider {
             if(options.minPercentToSlide) {
                 this._compareDistance = this._width * options.minPercentToSlide;
             }
+            // console.log(this, this._slidesContainer, this._items, this._count, options.current, this._width);
 
             Slider.prepareSlideItem(this, this._slidesContainer, this._items, this._count, options.current, this._width);
             Slider.prepareIndicator(this, 'slider-indicator', 'slider-dot', this._count, this._current, 'active');
@@ -221,6 +222,7 @@ export class Slider {
             _count = 4;
         }
 
+
         lastIndex = _count - 1;
 
         if(_index > lastIndex || _index < 0) {
@@ -236,14 +238,17 @@ export class Slider {
         anyNode = <any>_list[lastIndex];
         anyNode.uuid = lastIndex;
 
+        console.log(_width);
+
         Slider.setTransformStyle(_list[0], 'translate3d(0, 0, 0)');
         Slider.setTransformStyle(_list[lastIndex], 'translate3d(-' + _width + 'px, 0, 0)');
 
         for (i = 1; i < lastIndex; i++) {
             item = _list[i];
+            // console.log((item as HTMLElement).offsetWidth);
             anyNode = <any>_list[0];
             anyNode.uuid = i;
-            Slider.setTransformStyle(item, 'translate3d(' + _width + 'px, 0, 0)');
+            Slider.setTransformStyle(item, 'translate3d(' + (item as HTMLElement).offsetWidth + 'px, 0, 0)');
         }
 
         slider._slidesContainer = container;
@@ -393,7 +398,7 @@ export class Slider {
 
         Slider.setTransformStyle(list[lastIndex], 'translate3d(-' + width + 'px, 0, 0)');
         for (i = 1; i < lastIndex; i++) {
-            Slider.setTransformStyle(list[i], 'translate3d(' + width + 'px, 0, 0)');
+            Slider.setTransformStyle(list[i], 'translate3d(' + (list[i] as HTMLElement).offsetWidth + 'px, 0, 0)');
         }
         indicatorWrap.style.left = (slider._width - parseFloat(getComputedStyle(indicatorWrap).width!.replace('px', ''))) / 2 + 'px';
     }

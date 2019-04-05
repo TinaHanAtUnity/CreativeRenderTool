@@ -1,6 +1,6 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
-import { Slider } from 'Performance/Views/Slider';
+import { Slider } from 'Performance/Views/SliderPoc';
 import SliderEndScreenTemplate from 'html/SliderEndScreen.html';
 import { detectOrientation } from 'Device';
 import {Template} from '../../Core/Utilities/Template';
@@ -42,12 +42,12 @@ export class SliderPerformanceEndScreen extends EndScreen {
         this._slider.attachTo(<HTMLElement>this.container().querySelector('.game-background-container'));
     }
 
-    public show(): void {
-        super.show();
-        this.resize();
-        this._slider.show();
-        window.addEventListener('resize', this.resize.bind(this), false);
-    }
+    // public show(): void {
+    //     super.show();
+    //     this.resize();
+    //     this._slider.show();
+    //     window.addEventListener('resize', this.resize.bind(this), false);
+    // }
 
     protected onDownloadEvent(event: Event): void {
         event.preventDefault();
@@ -65,12 +65,12 @@ export class SliderPerformanceEndScreen extends EndScreen {
         return SliderEndScreenTemplate;
     }
 
-    protected resize() {
-        const orientation = detectOrientation();
-        if (orientation === 'portrait') {
-            this._slider.resize(window.innerWidth, window.innerHeight / 2, true);
-        } else {
-            this._slider.resize(window.innerWidth / 2, window.innerHeight, true);
-        }
-    }
+    // protected resize() {
+    //     const orientation = detectOrientation();
+    //     if (orientation === 'portrait') {
+    //         this._slider.resize(window.innerWidth, window.innerHeight / 2, true);
+    //     } else {
+    //         this._slider.resize(window.innerWidth / 2, window.innerHeight, true);
+    //     }
+    // }
 }
