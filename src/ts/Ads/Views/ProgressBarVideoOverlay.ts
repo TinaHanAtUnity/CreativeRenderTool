@@ -1,15 +1,9 @@
-import { VideoOverlay, IVideoOverlayParameters } from 'Ads/Views/VideoOverlay';
-import { Campaign } from 'Ads/Models/Campaign';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { VideoOverlay } from 'Ads/Views/VideoOverlay';
 
 export class ProgressBarVideoOverlay extends VideoOverlay {
 
   private _progressBar: HTMLElement;
   private _progressBarWrapper: HTMLElement;
-
-  constructor(parameters: IVideoOverlayParameters<Campaign>, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo: boolean) {
-    super(parameters, privacy, showGDPRBanner, true);
-  }
 
   public setVideoProgress(value: number): void {
     super.setVideoProgress(value);
