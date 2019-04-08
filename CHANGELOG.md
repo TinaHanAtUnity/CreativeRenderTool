@@ -1,5 +1,17 @@
-# Pending
+# Merged 
 
+* Enable the 'Skip under timer experiment' as Zynga filtered AB test [#9024](https://github.com/Applifier/unity-ads-webview/pull/9024)
+
+# Fri Apr  5 18:04:16 UTC 2019
+
+* Whitelist creatives for imply tracking for mraid [#9000](https://github.com/Applifier/unity-ads-webview/pull/9000)
+* Remove VastParser in favor of VastParserStrict [#9002](https://github.com/Applifier/unity-ads-webview/pull/9002)
+* Filtered abtest [#8906](https://github.com/Applifier/unity-ads-webview/pull/8906)
+
+# Wed Apr  3 23:08:59 UTC 2019
+
+* Add more games to use V4 [#8999](https://github.com/Applifier/unity-ads-webview/pull/8999)
+* Replace consent title test with consent my choices button text test [#8997](https://github.com/Applifier/unity-ads-webview/pull/8997)
 * Enable rewarded video overlay install now button for entire network [#8951](https://github.com/Applifier/unity-ads-webview/pull/8951)
 * Removing duplicated code for setForcedGDPRBanner [#8833](https://github.com/Applifier/unity-ads-webview/pull/8833)
 * Set URL parameters for Banner Consistently with Ads [#8953](https://github.com/Applifier/unity-ads-webview/pull/8953)

@@ -42,7 +42,12 @@ export class CustomFeatures {
                 creativeId === '114617336' || // Hellfest
                 creativeId === '145941071' || // Miller Lite Fallback
                 creativeId === '145940860' || // Miller Lite Fallback
-                creativeId === '147367465';   // Carnival Creative
+                creativeId === '147367465' || // Carnival Creative
+                creativeId === '151099348' ||
+                creativeId === '151338976' ||
+                creativeId === '151337994' ||
+                creativeId === '152919353' ||
+                creativeId === '153119177';
     }
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {
