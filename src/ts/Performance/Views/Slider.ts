@@ -31,7 +31,6 @@ export class Slider {
     private pointerDown: boolean;
     private drag: IDragOptions;
     private slidesPerPage: number;
-    private sliderFrame: HTMLElement;
     private _ready: Promise<void> | null;
     private _resizeTimeId: number | null;
     private _timeId: number | null;
@@ -345,14 +344,14 @@ export class Slider {
             }
 
             this.drag.endX = e.pageX;
-            this.sliderFrame.style.webkitTransition = `all 0ms ${this.config.easing}`;
-            this.sliderFrame.style.transition = `all 0ms ${this.config.easing}`;
+            this._slidesContainer.style.webkitTransition = `all 0ms ${this.config.easing}`;
+            this._slidesContainer.style.transition = `all 0ms ${this.config.easing}`;
 
             const currentSlide = this.config.loop ? this.currentSlide + this.slidesPerPage : this.currentSlide;
             const currentOffset = currentSlide * (this.selectorWidth / this.slidesPerPage);
             const dragOffset = (this.drag.endX - this.drag.startX);
             const offset = this.config.rtl ? currentOffset + dragOffset : currentOffset - dragOffset;
-            this.sliderFrame.style[<number>this.transformProperty] = `translate3d(${(this.config.rtl ? 1 : -1) * offset}px, 0, 0)`;
+            this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${(this.config.rtl ? 1 : -1) * offset}px, 0, 0)`;
         }
     }
 
