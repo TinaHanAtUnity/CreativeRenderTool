@@ -54,10 +54,10 @@ import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { VastParser } from 'VAST/Utilities/VastParser';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IStoreApi } from 'Store/IStore';
+import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: IAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -105,7 +105,7 @@ export class TestAdUnit extends AbstractAdUnit {
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
-    let vastParser: VastParser;
+    let vastParser: VastParserStrict;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
     let campaignManager: CampaignManager;
@@ -140,7 +140,7 @@ describe('CampaignRefreshManager', () => {
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
-        vastParser = TestFixtures.getVastParser();
+        vastParser = TestFixtures.getVastParserStrict();
         platform = Platform.ANDROID;
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);

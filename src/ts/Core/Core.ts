@@ -14,7 +14,7 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { ResolveManager } from 'Core/Managers/ResolveManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { toAbGroup } from 'Core/Models/ABGroup';
+import { toAbGroup, FilteredABTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -190,6 +190,9 @@ export class Core implements ICore {
                 if(this.NativeBridge.getPlatform() === Platform.IOS && this.DeviceInfo.getLimitAdTracking()) {
                     this.ConfigManager.storeGamerToken(coreConfig.getToken());
                 }
+
+                FilteredABTest.setup(this.ClientInfo.getGameId(), coreConfig.getOrganizationId());
+
                 return [configJson, coreConfig];
             }).catch((error) => {
                 configSpan.addTag(JaegerTags.Error, 'true');
