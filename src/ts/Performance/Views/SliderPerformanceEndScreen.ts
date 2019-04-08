@@ -1,6 +1,6 @@
 import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
-import { Slider } from 'Performance/Views/SliderPoc';
+import { Slider } from 'Performance/Views/Slider';
 import SliderEndScreenTemplate from 'html/SliderEndScreen.html';
 import { detectOrientation } from 'Device';
 import {Template} from '../../Core/Utilities/Template';
