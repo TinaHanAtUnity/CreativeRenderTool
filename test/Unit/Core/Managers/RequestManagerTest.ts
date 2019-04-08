@@ -86,7 +86,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
             });
 
             it(('should set V4 when using forceAuctionProtocol'), () => {
-                sinon.stub(TestEnvironment, 'get').withArgs('forceAuctionProtocol').returns('4');
+                sinon.stub(TestEnvironment, 'get').withArgs('forceAuctionProtocol').returns('V4');
                 sinon.stub(coreConfig, 'getTestMode').returns(false);
                 RequestManager.setTestAuctionProtocol(undefined);
                 RequestManager.setAuctionProtocol(coreConfig, adsConfig, platform, clientInfo);
@@ -96,7 +96,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
             });
 
             it(('should set V5 when using forceAuctionProtocol'), () => {
-                sinon.stub(TestEnvironment, 'get').withArgs('forceAuctionProtocol').returns('5');
+                sinon.stub(TestEnvironment, 'get').withArgs('forceAuctionProtocol').returns('V5');
                 sinon.stub(coreConfig, 'getTestMode').returns(false);
                 RequestManager.setTestAuctionProtocol(undefined);
                 RequestManager.setAuctionProtocol(coreConfig, adsConfig, platform, clientInfo);
