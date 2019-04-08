@@ -199,7 +199,7 @@ export class Slider {
         window.addEventListener('resize', (this.resizeHandler).bind(this));
     }
 
-    public autoplay() {
+    private autoplay() {
         if (this._timeId !== null) {
             window.clearTimeout(this._timeId);
         }
@@ -209,6 +209,12 @@ export class Slider {
             this.next();
             this.autoplay();
         }, interval);
+    }
+
+    private stopAutoplay() {
+        if (this._timeId !== null) {
+            window.clearTimeout(this._timeId);
+        }
     }
 
     private attachEvents(): void {
@@ -269,6 +275,7 @@ export class Slider {
     }
 
     private touchstartHandler(e: TouchEvent): void {
+        this.stopAutoplay();
         e.stopPropagation();
         this.pointerDown = true;
         this.drag.startX = e.touches[0].pageX;
@@ -283,6 +290,7 @@ export class Slider {
           this.updateAfterDrag();
         }
         this.clearDrag();
+        this.autoplay();
     }
 
     private touchmoveHandler(e: TouchEvent): void {
@@ -308,6 +316,7 @@ export class Slider {
     }
 
     private mousedownHandler(e: MouseEvent): void {
+        this.stopAutoplay();
         e.preventDefault();
         e.stopPropagation();
         this.pointerDown = true;
@@ -322,6 +331,7 @@ export class Slider {
           this.updateAfterDrag();
         }
         this.clearDrag();
+        this.autoplay();
     }
 
     private mouseleaveHandler(e: MouseEvent): void {
