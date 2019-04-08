@@ -13,6 +13,13 @@ trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 deploy_branch () {
     gsutil -m cp -r -z "html, json" -a public-read deploy gs://unity-ads-webview-bucket/webview/$1
     aws s3 sync deploy s3://unityads-cdn-origin/webview/$1/ --acl public-read
+
+    (cd deploy/release && mv config.json config.json.bkp && cp config.json.cn config.json)
+    gsutil -m cp -r -z "html, json" -a public-read deploy gs://unity-ads-webview-cn-prd/webview/$1 ; exit_value=$?
+    (cd deploy/release && mv config.json.bkp config.json)
+    if [[ ${exit_value} -ne 0 ]]; then
+        exit ${exit_value}
+    fi
 }
 
 if [ $# != 1 ]; then
