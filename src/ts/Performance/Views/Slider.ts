@@ -68,7 +68,6 @@ export class Slider {
 
         const cloneSlidesAmount = 3;
         const allSlidesCreatedPromise = [];
-        const orderedArray = <any>[];
         const blurredBackground = this.createElement('div', 'slider-blurred-background', ['slider-blurred-background'], {
             'background-image': `url(${urls[0]})`
         });
@@ -78,25 +77,22 @@ export class Slider {
         if (this.config.loop) {
             for (let i = this.innerElements.length - cloneSlidesAmount; i < this.innerElements.length; i++) {
                 allSlidesCreatedPromise.push(this.createSlide(this.innerElements[i]));
-                orderedArray.push(this.createSlide(this.innerElements[i]));
             }
         }
         for (const i of this.innerElements) {
             allSlidesCreatedPromise.push(this.createSlide(i));
-            orderedArray.push(this.createSlide(i));
         }
         if (this.config.loop) {
             for (let i = 0; i < cloneSlidesAmount; i++) {
                 allSlidesCreatedPromise.push(this.createSlide(this.innerElements[i]));
-                orderedArray.push(this.createSlide(this.innerElements[i]));
             }
         }
 
-        this._ready = Promise.all(allSlidesCreatedPromise).then((result) => {
+        this._ready = Promise.all(allSlidesCreatedPromise).then((slides) => {
             this._slidesContainer.innerHTML = '';
-            for (let i in orderedArray) {
-                this._slidesContainer.append(result[i]);
-            }
+            slides.forEach((slide) => {
+                this._slidesContainer.append(slide);
+            });
             this._rootEl.appendChild(this._slidesContainer);
             this.selectorWidth = this._slidesContainer.offsetWidth;
             this.init();
