@@ -5,8 +5,10 @@ export class SliderPerformanceCampaign extends PerformanceCampaign {
         super(campaign);
     }
 
-    public getRequiredAssets() {
-        return this.getScreenshots();
+    public getOptionalAssets() {
+        const assets = super.getOptionalAssets();
+        assets.push(...this.getScreenshots());
+        return assets;
     }
 
     public getScreenshots() {
