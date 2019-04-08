@@ -60,7 +60,7 @@ describe('VastAdUnitTest', () => {
     });
 
     beforeEach(() => {
-        const vastParser = TestFixtures.getVastParser();
+        const vastParser = TestFixtures.getVastParserStrict();
 
         const vastXml = EventTestVast;
 
