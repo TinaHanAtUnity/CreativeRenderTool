@@ -20,8 +20,12 @@ export class ProgressBarVideoOverlay extends VideoOverlay {
   private addCssTransition(): void {
     // TODO: replace the magic number, as currently it's based on
     // the setVideoProgress method wich is called externally for every 250 ms.
-    const magicNumber = 0.2;
-    const transitionRule = `width ${magicNumber}s linear`;
+
+    // The 0.2 value is taken based on the value of _progressInterval in VideoAdUnit.ts which is = 250
+    // Used to smooth out slider animation
+    // This value must be equal or less than the _progressInterval value.
+
+    const transitionRule = `width ${0.2}s linear`;
     this._progressBar.style.transition = transitionRule;
     this._progressBar.style.webkitTransition = transitionRule;
   }
