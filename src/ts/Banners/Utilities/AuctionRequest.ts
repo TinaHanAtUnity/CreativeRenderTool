@@ -18,6 +18,7 @@ import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { StorageType } from 'Core/Native/Storage';
 import { Url } from 'Core/Utilities/Url';
+import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 
 export interface IAuctionResponse {
     correlationId: string;
@@ -107,13 +108,13 @@ export class AuctionRequest {
     protected _platform: Platform;
     protected _core: ICoreApi;
     protected _response: INativeResponse;
+    protected _deviceInfo: DeviceInfo;
     private _coreConfig: CoreConfiguration;
     private _adsConfig: AdsConfiguration;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _metaDataManager: MetaDataManager;
     private _request: RequestManager;
     private _clientInfo: ClientInfo;
-    private _deviceInfo: DeviceInfo;
     private _sessionManager: SessionManager;
     private _placements: { [id: string]: Placement } = {};
     private _previousPlacementID: string | undefined;
@@ -245,16 +246,7 @@ export class AuctionRequest {
             return Promise.resolve(this._url);
         }
         let url = this.getBaseURL();
-        if (this._deviceInfo.getAdvertisingIdentifier()) {
-            url = Url.addParameters(url, {
-                advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
-                limitAdTracking: this._deviceInfo.getLimitAdTracking()
-            });
-        } else if (this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
-            url = Url.addParameters(url, {
-                androidId: this._deviceInfo.getAndroidId()
-            });
-        }
+        url = Url.addParameters(url, TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo));
 
         url = Url.addParameters(url, {
             deviceModel: this._deviceInfo.getModel(),

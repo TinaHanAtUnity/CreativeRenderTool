@@ -66,7 +66,9 @@ export class PurchasingUtilities {
             });
         }).then(() => {
             this._isInitialized = true;
-            this._purchasingAdapter.refreshCatalog();
+            if (this.configurationIncludesPromoPlacement()) {
+                this._purchasingAdapter.refreshCatalog();
+            }
         });
     }
 
@@ -151,6 +153,20 @@ export class PurchasingUtilities {
 
     public static addCampaignPlacementIds(placementId: string, campaign: Campaign) {
         this._placementManager.addCampaignPlacementIds(placementId, campaign);
+    }
+
+    public static configurationIncludesPromoPlacement(): boolean {
+        if (this._coreConfig) {
+            const placements = this._adsConfig.getPlacements();
+            const placementIds = this._adsConfig.getPlacementIds();
+            for (const placementId of placementIds) {
+                const adTypes = placements[placementId].getAdTypes();
+                if (adTypes && adTypes.indexOf('IAP') > -1) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static _refreshPromise: Promise<void> | null;

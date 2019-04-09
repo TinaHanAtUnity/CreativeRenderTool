@@ -22,7 +22,7 @@ export interface IConsentViewParameters {
     landingPage: ConsentPage;
     apiLevel?: number;
     osVersion?: string;
-    useAltTitle: boolean;
+    useAltMyChoicesButtonText: boolean;
 }
 
 export enum ConsentPage {
@@ -55,7 +55,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
         this._template = new Template(ConsentTemplate);
         this._templateData = {
-            useAltTitle: parameters.useAltTitle
+            useAltMyChoicesButtonText: parameters.useAltMyChoicesButtonText
         };
 
         this._bindings = [

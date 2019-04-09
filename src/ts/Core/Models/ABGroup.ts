@@ -37,15 +37,36 @@ class DisabledABTest extends ABTest {
     }
 }
 
+export abstract class FilteredABTest extends ABTest {
+    protected static _gameId: string;
+    protected static _organizationId: string | undefined;
+
+    public static setup(gameId: string, organizationId: string | undefined) {
+        FilteredABTest._gameId = gameId;
+        FilteredABTest._organizationId = organizationId;
+    }
+
+    protected abstract isFiltered(): boolean;
+
+    public isValid(group: ABGroup): boolean {
+        return !this.isFiltered() && super.isValid(group);
+    }
+}
+
+class ZyngaFilteredABTest extends FilteredABTest {
+    protected isFiltered(): boolean {
+        return FilteredABTest._organizationId === '3418765';
+    }
+}
+
 // for unit tests
 export const FakeEnabledABTest = new ABTest(16, 17);
 export const FakeDisabledABTest = new DisabledABTest(16, 17);
+export const FakeZyngaFilteredABTest = new ZyngaFilteredABTest(16, 17);
 
 // Add actual A/B tests below
-export const ConsentAltTitle = new ABTest(9, 10);
+export const ConsentMyChoicesButtonTextTest = new ABTest(9, 10);
 export const AuctionV5Test = new ABTest(15, 18);
 export const WebPlayerMRAIDTest = new DisabledABTest();
 
-// Two hold out groups that should not get the install now button in rewarded videos
-export const HoldOutInstallInRewardedVideos = new ABTest(5, 6);
-export const VastStrictAdMobTest = new ABTest(14, 17);
+export const SkipUnderTimerExperiment = new ZyngaFilteredABTest(7, 8);

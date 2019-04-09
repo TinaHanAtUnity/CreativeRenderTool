@@ -15,7 +15,6 @@ export class IOSPerformanceAdUnit extends PerformanceAdUnit {
     private _appSheetOpenObserver: IObserver1<IAppSheetOptions>;
     private _appSheetCloseObserver: IObserver1<IAppSheetOptions>;
     private _appSheetErrorObserver: IObserver2<string, IAppSheetOptions>;
-    private _installButtonExperimentEnabled: boolean;
 
     constructor(parameters: IPerformanceAdUnitParameters) {
         super(parameters);

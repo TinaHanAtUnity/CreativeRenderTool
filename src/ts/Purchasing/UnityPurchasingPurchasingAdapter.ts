@@ -13,6 +13,7 @@ import { IProduct, IPurchasingAdapter, ITransactionDetails } from 'Purchasing/Pu
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { Observables } from 'Core/Utilities/Observables';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -56,7 +57,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
     }
 
     public initialize(): Promise<void> {
-        if (this.configurationIncludesPromoPlacement()) {
+        if (PurchasingUtilities.configurationIncludesPromoPlacement()) {
             this._initPromise = this.checkMadeWithUnity()
             .then(() => this.initializeIAPPromo())
             .then(() => this.checkPromoVersion())
@@ -153,20 +154,6 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
             gamerToken: this._coreConfiguration.getToken(),
             request: IPromoRequest.SETIDS
         };
-    }
-
-    private configurationIncludesPromoPlacement(): boolean {
-        if (this._coreConfiguration) {
-            const placements = this._adsConfiguration.getPlacements();
-            const placementIds = this._adsConfiguration.getPlacementIds();
-            for (const placementId of placementIds) {
-                const adTypes = placements[placementId].getAdTypes();
-                if (adTypes && adTypes.indexOf('IAP') > -1) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private handleSendIAPEvent(iapPayload: string): Promise<void> {
