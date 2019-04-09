@@ -1,15 +1,12 @@
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-
+import { VideoEventHandler} from 'Ads/EventHandlers/VideoEventHandler';
 export class ProgressBarVideoOverlay extends VideoOverlay {
 
   private _progressBar: HTMLElement;
   private _progressBarWrapper: HTMLElement;
-
   public setVideoProgress(value: number): void {
     super.setVideoProgress(value);
-
-    const progressInPercentages = Math.ceil(100 / this._videoDuration * this._videoProgress);
-
+    const progressInPercentages = (100 / this._videoDuration * this._videoProgress);
     if (this._progressBar.style.transition === '' && this._progressBar.style.webkitTransition === '') {
       this.addCssTransition();
     }
@@ -21,7 +18,10 @@ export class ProgressBarVideoOverlay extends VideoOverlay {
   }
 
   private addCssTransition(): void {
-    const transitionRule = `width 0.29s linear`;
+    // TODO: replace the magic number, as currently it's based on
+    // the setVideoProgress method wich is called externally for every 250 ms.
+    const magicNumber = 0.2;
+    const transitionRule = `width ${magicNumber}s linear`;
     this._progressBar.style.transition = transitionRule;
     this._progressBar.style.webkitTransition = transitionRule;
   }
