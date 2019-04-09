@@ -128,23 +128,28 @@ $dot-color = #fff;
 $dot-active-color = #099fde;
 $dot-radius = .25rem;
 
-.slider-indicator {
+.indicator-container {
+    width: 100%;
     position: absolute;
-    bottom: .5rem;
-    left: 0;
+    top: 2em;
     z-index: 10;
-    .slider-dot {
-        display: block;
-        float: left;
-        margin-right: .2rem;
-        margin-left: .2rem;
-        width: $dot-radius * 2;
-        height: $dot-radius * 2;
-        border-radius: 50%;
-        background-color: $dot-color;
+    display: flex;
+    pointer-events: none;
+    .slider-indicator {
+        margin: 0 auto;
+        .slider-dot {
+            display: block;
+            float: left;
+            margin-right: .2rem;
+            margin-left: .2rem;
+            width: $dot-radius * 2;
+            height: $dot-radius * 2;
+            border-radius: 50%;
+            background-color: $dot-color;
 
-        &.active {
-            background-color: $dot-active-color;
+            &.active {
+                background-color: $dot-active-color;
+            }
         }
     }
 }

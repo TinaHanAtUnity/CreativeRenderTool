@@ -472,6 +472,8 @@ export class Slider {
     private static prepareIndicator(slider: Slider, wrapClassName: String, className: String, howMany: number, activeIndex: number, activeClass: String) {
         const item = document.createElement('span');
         const indicatorWrap = document.createElement('div');
+        const indicatorContainer = document.createElement('div');
+        indicatorContainer.classList.add('indicator-container');
         const indicators = [];
         let i;
 
@@ -486,7 +488,8 @@ export class Slider {
 
         slider._indicatorWrap = indicatorWrap;
         slider._indicators = indicators;
-        slider._rootEl.appendChild(indicatorWrap);
+        indicatorContainer.appendChild(indicatorWrap);
+        slider._rootEl.appendChild(indicatorContainer);
 
         setTimeout(() => {
             indicatorWrap.style.left = 20 + 'px';
