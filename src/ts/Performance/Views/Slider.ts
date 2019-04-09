@@ -33,7 +33,7 @@ export class Slider {
     private slidesPerPage: number;
     private _ready: Promise<void> | null;
     private _resizeTimeId: number | null;
-    private _timeId: number | null;
+    private _autoplayTimeoutId: number | null;
     private _indicatorWrap: HTMLElement;
     private _indicators: HTMLElement[];
     private _isVisible: boolean;
@@ -106,6 +106,13 @@ export class Slider {
     public show(): void {
         this._isVisible = true;
         this.autoplay();
+    }
+
+    public hide(): void {
+        if (this._autoplayTimeoutId) {
+            this._isVisible = false;
+            clearTimeout(this._autoplayTimeoutId);
+        }
     }
 
     private slideToCurrent(enableTransition: boolean): void {
@@ -206,20 +213,20 @@ export class Slider {
             return;
         }
 
-        if (this._timeId !== null) {
-            window.clearTimeout(this._timeId);
+        if (this._autoplayTimeoutId !== null) {
+            window.clearTimeout(this._autoplayTimeoutId);
         }
 
         const interval = 3000;
-        this._timeId = window.setTimeout(() => {
+        this._autoplayTimeoutId = window.setTimeout(() => {
             this.next();
             this.autoplay();
         }, interval);
     }
 
     private stopAutoplay() {
-        if (this._timeId !== null) {
-            window.clearTimeout(this._timeId);
+        if (this._autoplayTimeoutId !== null) {
+            window.clearTimeout(this._autoplayTimeoutId);
         }
     }
 
