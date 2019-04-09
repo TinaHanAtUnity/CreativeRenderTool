@@ -5,11 +5,7 @@ export interface ISliderOptions {
     easing: string;
     slidesPerPage: number;
     startIndex: number;
-    draggable: boolean;
-    multipleDrag: boolean;
     threshold: number;
-    loop: boolean;
-    rtl: boolean;
 }
 
 export interface IDragOptions {
@@ -40,14 +36,10 @@ export class Slider {
 
     constructor(urls: string[], config: ISliderOptions = {
         duration: 200,
-        easing: 'ease-out',
+        easing: 'ease',
         slidesPerPage: 1.6666,
         startIndex: 0,
-        draggable: true,
-        multipleDrag: false,
-        threshold: 70,
-        loop: true,
-        rtl: false
+        threshold: 70
     }) {
         this.config = config;
         this.drag = {
@@ -63,9 +55,7 @@ export class Slider {
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
         this.slidesPerPage = this.config.slidesPerPage;
         this.innerElements = [].slice.call(urls);
-        this.currentSlide = this.config.loop ?
-            this.config.startIndex % this.innerElements.length :
-            Math.max(0, Math.min(this.config.startIndex, this.innerElements.length - this.slidesPerPage));
+        this.currentSlide = this.config.startIndex % this.innerElements.length;
         this.transformProperty = Slider.webkitOrNot();
 
         const cloneSlidesAmount = 3;
@@ -76,18 +66,14 @@ export class Slider {
 
         this._rootEl.appendChild(blurredBackground);
 
-        if (this.config.loop) {
-            for (let i = this.innerElements.length - cloneSlidesAmount; i < this.innerElements.length; i++) {
-                allSlidesCreatedPromise.push(this.createSlide(this.innerElements[i]));
-            }
+        for (let i = this.innerElements.length - cloneSlidesAmount; i < this.innerElements.length; i++) {
+            allSlidesCreatedPromise.push(this.createSlide(this.innerElements[i]));
         }
         for (const i of this.innerElements) {
             allSlidesCreatedPromise.push(this.createSlide(i));
         }
-        if (this.config.loop) {
-            for (let i = 0; i < cloneSlidesAmount; i++) {
-                allSlidesCreatedPromise.push(this.createSlide(this.innerElements[i]));
-            }
+        for (let i = 0; i < cloneSlidesAmount; i++) {
+            allSlidesCreatedPromise.push(this.createSlide(this.innerElements[i]));
         }
 
         this._ready = Promise.all(allSlidesCreatedPromise).then((slides) => {
@@ -117,9 +103,9 @@ export class Slider {
 
     private slideToCurrent(enableTransition: boolean): void {
         this.autoplay();
-        const currentSlide = this.config.loop ? this.currentSlide + this.slidesPerPage : this.currentSlide;
+        const currentSlide = this.currentSlide + this.slidesPerPage;
 
-        const offset = (this.config.rtl ? 1 : -1) * currentSlide * (this.selectorWidth / this.slidesPerPage);
+        const offset = -Math.abs(currentSlide * (this.selectorWidth / this.slidesPerPage));
         if (enableTransition) {
             // explanation for this one - https://youtu.be/cCOL7MC4Pl0
             requestAnimationFrame(() => {
@@ -148,8 +134,9 @@ export class Slider {
     private resizeContainer(): void {
         this.selectorWidth = this._rootEl.offsetWidth;
         const widthItem = this.selectorWidth / this.slidesPerPage;
-        const itemsToBuild = this.config.loop ? this.innerElements.length + (this.slidesPerPage * 2) : this.innerElements.length;
+        const itemsToBuild = this.innerElements.length + (this.slidesPerPage * 2);
         this._slidesContainer.style.width = `${widthItem * itemsToBuild}px`;
+        this.disableTransition();
         this.slideToCurrent(true);
     }
 
@@ -166,7 +153,8 @@ export class Slider {
         }
 
         // resize debounce
-        this._resizeTimeId = window.setTimeout(() => this.resizeContainer(), 200);
+        this.disableTransition();
+        this._resizeTimeId = window.setTimeout(() => this.resizeContainer(), 100);
     }
 
     private createSlide(url: string): Promise<HTMLElement> {
@@ -190,15 +178,14 @@ export class Slider {
         });
     }
 
-    private generateSlideHTML(id: string, image?: HTMLImageElement) {
+    private generateSlideHTML(id: string, image?: HTMLImageElement): HTMLElement {
         const item = this.createElement('div', id, ['slider-item', 'slider-item']);
-        item.style.cssFloat = this.config.rtl ? 'right' : 'left';
-        item.style.width = `${this.config.loop ? 100 / (this.innerElements.length + (this.slidesPerPage * 2)) : 100 / (this.innerElements.length)}%`;
+        item.style.cssFloat = 'left';
+        item.style.width = `${100 / (this.innerElements.length + (this.slidesPerPage * 2))}%`;
         if (image !== undefined) {
             item.appendChild(image);
             this._slidesContainer.appendChild(item);
         }
-
         return item;
     }
 
@@ -208,7 +195,7 @@ export class Slider {
         this._rootEl.style.overflow = 'hidden';
     }
 
-    private autoplay() {
+    private autoplay(): void {
         if (!this._isVisible) {
             return;
         }
@@ -224,42 +211,32 @@ export class Slider {
         }, interval);
     }
 
-    private stopAutoplay() {
+    private stopAutoplay(): void {
         if (this._autoplayTimeoutId !== null) {
             window.clearTimeout(this._autoplayTimeoutId);
         }
     }
 
     private addEventHandlers(): void {
+        // Keep track pointer hold and dragging distance
+        this.pointerDown = false;
+        this.drag = {
+            startX: 0,
+            endX: 0,
+            startY: 0,
+            letItGo: null,
+            preventClick: false
+        };
+
+        // Resize event
         window.addEventListener('resize', (this.resizeHandler).bind(this));
-        if (this.config.draggable) {
-            // Keep track pointer hold and dragging distance
-            this.pointerDown = false;
-            this.drag = {
-              startX: 0,
-              endX: 0,
-              startY: 0,
-              letItGo: null,
-              preventClick: false
-            };
-
-            // Touch events
-            this._slidesContainer.addEventListener('touchstart', (this.touchstartHandler).bind(this));
-            this._slidesContainer.addEventListener('touchend', (this.touchendHandler).bind(this));
-            this._slidesContainer.addEventListener('touchmove', (this.touchmoveHandler).bind(this));
-
-            // Mouse events
-            this._slidesContainer.addEventListener('mousedown', (this.mousedownHandler).bind(this));
-            this._slidesContainer.addEventListener('mouseup', (this.mouseupHandler).bind(this));
-            this._slidesContainer.addEventListener('mouseleave', (this.mouseleaveHandler).bind(this));
-            this._slidesContainer.addEventListener('mousemove', (this.mousemoveHandler).bind(this));
-
-            // Click
-            this._slidesContainer.addEventListener('click', (this.clickHandler).bind(this));
-        }
+        // Touch events
+        this._slidesContainer.addEventListener('touchstart', (this.touchstartHandler).bind(this));
+        this._slidesContainer.addEventListener('touchend', (this.touchendHandler).bind(this));
+        this._slidesContainer.addEventListener('touchmove', (this.touchmoveHandler).bind(this));
     }
 
-    public attachTo(container: HTMLElement) {
+    public attachTo(container: HTMLElement): void {
         container.appendChild(this._rootEl);
     }
 
@@ -273,7 +250,7 @@ export class Slider {
         return el;
     }
 
-    private setStyles(el: HTMLElement, style: { [key: string]: any } = {}) {
+    private setStyles(el: HTMLElement, style: { [key: string]: any } = {}): void {
         Object.keys(style).forEach((key) => {
             el.style.setProperty(key, String(style[key]));
         });
@@ -319,72 +296,14 @@ export class Slider {
             this._slidesContainer.style.webkitTransition = `all 0ms ${this.config.easing}`;
             this._slidesContainer.style.transition = `all 0ms ${this.config.easing}`;
 
-            const currentSlide = this.config.loop ? this.currentSlide + this.slidesPerPage : this.currentSlide;
+            const currentSlide = this.currentSlide + this.slidesPerPage;
             const currentOffset = currentSlide * (this.selectorWidth / this.slidesPerPage);
             const dragOffset = (this.drag.endX - this.drag.startX);
-            const offset = this.config.rtl ? currentOffset + dragOffset : currentOffset - dragOffset;
-            this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${(this.config.rtl ? 1 : -1) * offset}px, 0, 0)`;
+            const offset = currentOffset - dragOffset;
+            this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset * (-1)}px, 0, 0)`;
         }
 
     }
-
-    private mousedownHandler(e: MouseEvent): void {
-        this.stopAutoplay();
-        e.preventDefault();
-        e.stopPropagation();
-        this.pointerDown = true;
-        this.drag.startX = e.pageX;
-    }
-
-    private mouseupHandler(e: MouseEvent): void {
-        e.stopPropagation();
-        this.pointerDown = false;
-        this.enableTransition();
-        if (this.drag.endX) {
-          this.updateAfterDrag();
-        }
-        this.clearDrag();
-        this.autoplay();
-    }
-
-    private mouseleaveHandler(e: MouseEvent): void {
-        if (this.pointerDown) {
-            this.pointerDown = false;
-            this.drag.endX = e.pageX;
-            this.drag.preventClick = false;
-            this.enableTransition();
-            this.updateAfterDrag();
-            this.clearDrag();
-        }
-    }
-
-    private mousemoveHandler(e: MouseEvent): void {
-        e.preventDefault();
-        const target = <HTMLElement>e.target;
-        if (this.pointerDown) {
-            if (target.nodeName === 'A') {
-                this.drag.preventClick = true;
-            }
-
-            this.drag.endX = e.pageX;
-            this._slidesContainer.style.webkitTransition = `all 0ms ${this.config.easing}`;
-            this._slidesContainer.style.transition = `all 0ms ${this.config.easing}`;
-
-            const currentSlide = this.config.loop ? this.currentSlide + this.slidesPerPage : this.currentSlide;
-            const currentOffset = currentSlide * (this.selectorWidth / this.slidesPerPage);
-            const dragOffset = (this.drag.endX - this.drag.startX);
-            const offset = this.config.rtl ? currentOffset + dragOffset : currentOffset - dragOffset;
-            this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${(this.config.rtl ? 1 : -1) * offset}px, 0, 0)`;
-        }
-    }
-
-    private clickHandler(e: MouseEvent): void {
-        if (this.drag.preventClick) {
-            e.preventDefault();
-        }
-        this.drag.preventClick = false;
-    }
-
     private clearDrag(): void {
         this.drag = {
             startX: 0,
@@ -396,9 +315,9 @@ export class Slider {
     }
 
     private updateAfterDrag(): void {
-        const movement = (this.config.rtl ? -1 : 1) * (this.drag.endX - this.drag.startX);
+        const movement = this.drag.endX - this.drag.startX;
         const movementDistance = Math.abs(movement);
-        const howManySliderToSlide = this.config.multipleDrag ? Math.ceil(movementDistance / (this.selectorWidth / this.slidesPerPage)) : 1;
+        const howManySliderToSlide = Math.ceil(movementDistance / (this.selectorWidth / this.slidesPerPage));
 
         const slideToNegativeClone = movement > 0 && this.currentSlide - howManySliderToSlide < 0;
         const slideToPositiveClone = movement < 0 && this.currentSlide + howManySliderToSlide > this.innerElements.length - this.slidesPerPage;
@@ -418,28 +337,24 @@ export class Slider {
         }
 
         const beforeChange = this.currentSlide;
+        const isNewIndexClone = this.currentSlide + howManySlides > this.innerElements.length - this.slidesPerPage;
+        if (isNewIndexClone) {
+            this.disableTransition();
 
-        if (this.config.loop) {
-            const isNewIndexClone = this.currentSlide + howManySlides > this.innerElements.length - this.slidesPerPage;
-            if (isNewIndexClone) {
-                this.disableTransition();
+            const mirrorSlideIndex = this.currentSlide - this.innerElements.length;
+            const mirrorSlideIndexOffset = this.slidesPerPage;
+            const moveTo = mirrorSlideIndex + mirrorSlideIndexOffset;
+            const offset = moveTo * (-1) * (this.selectorWidth / this.slidesPerPage);
+            const dragDistance = this.drag.endX - this.drag.startX;
 
-                const mirrorSlideIndex = this.currentSlide - this.innerElements.length;
-                const mirrorSlideIndexOffset = this.slidesPerPage;
-                const moveTo = mirrorSlideIndex + mirrorSlideIndexOffset;
-                const offset = (this.config.rtl ? 1 : -1) * moveTo * (this.selectorWidth / this.slidesPerPage);
-                const dragDistance = this.config.draggable ? this.drag.endX - this.drag.startX : 0;
-
-                this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset + dragDistance}px, 0, 0)`;
-                this.currentSlide = mirrorSlideIndex + howManySlides;
-            } else {
-                this.currentSlide = this.currentSlide + howManySlides;
-            }
+            this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset + dragDistance}px, 0, 0)`;
+            this.currentSlide = mirrorSlideIndex + howManySlides;
         } else {
-            this.currentSlide = Math.min(this.currentSlide + howManySlides, this.innerElements.length - this.slidesPerPage);
+            this.currentSlide = this.currentSlide + howManySlides;
         }
+
         if (beforeChange !== this.currentSlide) {
-            this.slideToCurrent(this.config.loop);
+            this.slideToCurrent(true);
         }
     }
 
@@ -451,28 +366,24 @@ export class Slider {
 
         const beforeChange = this.currentSlide;
 
-        if (this.config.loop) {
-            const isNewIndexClone = this.currentSlide - howManySlides < 0;
-            if (isNewIndexClone) {
-                this.disableTransition();
+        const isNewIndexClone = this.currentSlide - howManySlides < 0;
+        if (isNewIndexClone) {
+            this.disableTransition();
 
-                const mirrorSlideIndex = this.currentSlide + this.innerElements.length;
-                const mirrorSlideIndexOffset = this.slidesPerPage;
-                const moveTo = mirrorSlideIndex + mirrorSlideIndexOffset;
-                const offset = (this.config.rtl ? 1 : -1) * moveTo * (this.selectorWidth / this.slidesPerPage);
-                const dragDistance = this.config.draggable ? this.drag.endX - this.drag.startX : 0;
+            const mirrorSlideIndex = this.currentSlide + this.innerElements.length;
+            const mirrorSlideIndexOffset = this.slidesPerPage;
+            const moveTo = mirrorSlideIndex + mirrorSlideIndexOffset;
+            const offset = moveTo * -1 * (this.selectorWidth / this.slidesPerPage);
+            const dragDistance = this.drag.endX - this.drag.startX;
 
-                this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset + dragDistance}px, 0, 0)`;
-                this.currentSlide = mirrorSlideIndex - howManySlides;
-            } else {
-                this.currentSlide = this.currentSlide - howManySlides;
-            }
+            this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset + dragDistance}px, 0, 0)`;
+            this.currentSlide = mirrorSlideIndex - howManySlides;
         } else {
-            this.currentSlide = Math.max(this.currentSlide - howManySlides, 0);
+            this.currentSlide = this.currentSlide - howManySlides;
         }
 
         if (beforeChange !== this.currentSlide) {
-            this.slideToCurrent(this.config.loop);
+            this.slideToCurrent(true);
         }
     }
 

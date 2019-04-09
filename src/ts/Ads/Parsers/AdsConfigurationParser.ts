@@ -63,17 +63,18 @@ export class AdsConfigurationParser {
     }
 
     private static parseCacheMode(configJson: IRawAdsConfiguration): CacheMode {
-        switch(configJson.assetCaching) {
-            case 'forced':
-                return CacheMode.FORCED;
-            case 'allowed':
-                return CacheMode.ALLOWED;
-            case 'disabled':
-                return CacheMode.DISABLED;
-            case 'adaptive':
-                return CacheMode.ADAPTIVE;
-            default:
-                throw new Error('Unknown assetCaching value "' + configJson.assetCaching + '"');
+        return CacheMode.DISABLED;
+        // switch(configJson.assetCaching) {
+        //     case 'forced':
+        //         return CacheMode.FORCED;
+        //     case 'allowed':
+        //         return CacheMode.ALLOWED;
+        //     case 'disabled':
+        //         return CacheMode.DISABLED;
+        //     case 'adaptive':
+        //         return CacheMode.ADAPTIVE;
+        //     default:
+        //         throw new Error('Unknown assetCaching value "' + configJson.assetCaching + '"');
         }
     }
 
