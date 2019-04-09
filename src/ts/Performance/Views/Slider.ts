@@ -124,6 +124,8 @@ export class Slider {
         } else {
             this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset}px, 0, 0)`;
         }
+
+        Slider.updateIndicator(this._indicators, Math.floor(currentSlide));
     }
 
     private enableTransition(): void {
@@ -491,9 +493,10 @@ export class Slider {
         }, 0);
     }
 
-    private static updateIndicator(indicators: HTMLElement[], pre: number, cur: number) {
-        indicators[pre].className = 'slider-dot';
-        indicators[cur].className = 'slider-dot active';
+    private static updateIndicator(indicators: HTMLElement[], currentIndex: number) {
+        const previousIndex = (currentIndex - 1) < 0 ? (indicators.length - 1) : (currentIndex - 1);
+        indicators[previousIndex].classList.remove('active');
+        indicators[currentIndex].classList.add('active');
     }
 
 }
