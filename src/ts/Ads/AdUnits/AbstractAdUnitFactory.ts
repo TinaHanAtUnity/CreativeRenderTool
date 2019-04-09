@@ -17,7 +17,6 @@ import { Placement } from 'Ads/Models/Placement';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
 
 export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends IAdUnitParameters<T>> {
-    private static _forceGDPRBanner: boolean = false;
     private _adUnitParametersFactory: IAbstractAdUnitParametersFactory<T, Params>;
 
     constructor(parametersFactory: IAbstractAdUnitParametersFactory<T, Params>) {
@@ -32,27 +31,6 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
     }
 
     protected abstract createAdUnit(parameters: Params): AbstractAdUnit;
-
-    public static setForcedGDPRBanner(value: boolean) {
-        AbstractAdUnitFactory._forceGDPRBanner = value;
-    }
-
-    protected createEndScreenParameters(privacy: AbstractPrivacy, targetGameName: string | undefined, parameters: IAdUnitParameters<Campaign>): IEndScreenParameters {
-        const showGDPRBanner = this.showGDPRBanner(parameters);
-        return {
-            platform: parameters.platform,
-            core: parameters.core,
-            language: parameters.deviceInfo.getLanguage(),
-            gameId: parameters.clientInfo.getGameId(),
-            targetGameName: targetGameName,
-            abGroup: parameters.coreConfig.getAbGroup(),
-            privacy: privacy,
-            showGDPRBanner: showGDPRBanner,
-            adUnitStyle: undefined,
-            campaignId: undefined,
-            osVersion: undefined
-        };
-    }
 
     protected prepareVideoPlayer<T1 extends VideoEventHandler, T2 extends VideoAdUnit, T3 extends Campaign, T4 extends OperativeEventManager, ParamsType extends IVideoEventHandlerParams<T2, T3, T4>>(VideoEventHandlerConstructor: new(p: ParamsType) => T1, params: ParamsType): T1 {
         const adUnit = params.adUnit;
@@ -113,17 +91,4 @@ export abstract class AbstractAdUnitFactory<T extends Campaign, Params extends I
             programmaticTrackingService: params.programmaticTrackingService
         };
     }
-
-    protected showGDPRBanner(parameters: IAdUnitParameters<Campaign>): boolean {
-        if (AbstractAdUnitFactory._forceGDPRBanner) {
-            return true;
-        }
-
-        if (PrivacyMethod.LEGITIMATE_INTEREST !== parameters.adsConfig.getGamePrivacy().getMethod()) {
-            return false;
-        }
-
-        return parameters.adsConfig.isGDPREnabled() ? !parameters.adsConfig.isOptOutRecorded() : false;
-    }
-
 }

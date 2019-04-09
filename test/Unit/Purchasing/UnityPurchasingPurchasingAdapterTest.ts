@@ -9,7 +9,6 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { Observable1 } from 'Core/Utilities/Observable';
-import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import { IPromoApi } from 'Promo/IPromo';
 import { IPurchasingAdapter } from 'Purchasing/PurchasingAdapter';
@@ -19,6 +18,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
 describe('UnityPurchasingPurchasingAdapter', () => {
     let platform: Platform;
@@ -89,6 +89,10 @@ describe('UnityPurchasingPurchasingAdapter', () => {
         (<any>promo.Purchasing).onCommandResult = new Observable1<string>();
         (<any>promo.Purchasing).onIAPSendEvent = new Observable1<string>();
         (<any>promo.Purchasing).onGetPromoCatalog = new Observable1<string>();
+
+        const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+        const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+        purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
     });
 
     afterEach(() => {
@@ -102,9 +106,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             });
 
             it('should fail with Game not made with Unity if framework metadata does not have unity as name', () => {
-                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -124,9 +126,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             });
 
             it('should resolve without calling sendPurchasingCommand if configuration does not include promo', () => {
-                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(false);
 
                 return purchasingAdapter.initialize().then(() => {
                     sinon.assert.notCalled(<sinon.SinonSpy>metaDataManager.fetch);
@@ -137,9 +137,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             });
 
             it('should fail with IAP Promo was not ready if purchasing is not ready', () => {
-                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -156,9 +154,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
             it('should fail with Promo version not supported if promo version is not 1.16 or above', () => {
                 const promoVersion = '1.15';
-                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -177,9 +173,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
             it('should fail with Promo version not supported if promo version split length is less than 2', () => {
                 const promoVersion = '1';
-                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -197,9 +191,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             });
 
             it('should fail and not set isInitialized to true if command result is false', () => {
-                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -218,9 +210,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             });
 
             it('should fail when initializePurchasing rejects', () => {
-                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 (<sinon.SinonStub>promo.Purchasing.initializePurchasing).rejects();
                 return purchasingAdapter.initialize().catch((e: any) => {
@@ -230,9 +220,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             });
 
             it('should fail when getPromoVersion rejects', () => {
-                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -250,9 +238,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             });
 
             it('should fail when initiatePurchasingCommand rejects', () => {
-                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -271,9 +257,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
             });
 
             it('should call SendPurchasingCommand on successful trigger of all underlying promises', () => {
-                const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+                sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
 
                 const initializePromise = purchasingAdapter.initialize();
 
@@ -293,9 +277,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
     describe('refreshCatalog', () => {
         beforeEach(() => {
-            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+            sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
         });
 
         const triggerRefreshCatalog = (value: string) => {
@@ -396,9 +378,7 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
         beforeEach(() => {
             sandbox = sinon.createSandbox();
-            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
+            sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
             sandbox.stub(purchasingAdapter.onCatalogRefreshed, 'trigger');
         });
 
@@ -423,12 +403,8 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
     describe('purchaseItem', () => {
         beforeEach(() => {
-            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-
+            sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
             setupFrameWorkMetaData('Unity');
-
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
         });
 
         it('should send the promo payload with Purchase request value', () => {
@@ -464,12 +440,8 @@ describe('UnityPurchasingPurchasingAdapter', () => {
 
     describe('onPromoClosed', () => {
         beforeEach(() => {
-            const adsConfiguration = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            const coreConfiguration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-
+            sinon.stub(PurchasingUtilities, 'configurationIncludesPromoPlacement').returns(true);
             setupFrameWorkMetaData('Unity');
-
-            purchasingAdapter = new UnityPurchasingPurchasingAdapter(core, promo, coreConfiguration, adsConfiguration, clientInfo, metaDataManager);
         });
 
         it('should send the promo payload with Close request value', () => {
