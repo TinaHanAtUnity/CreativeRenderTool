@@ -42,6 +42,11 @@ export class SliderPerformanceEndScreen extends EndScreen {
         this._slider.show();
     }
 
+    public hide(): void {
+        super.hide();
+        this._slider.hide();
+    }
+
     public render(): void {
         super.render();
         this._slider.attachTo(<HTMLElement>this.container().querySelector('.game-background-container'));
