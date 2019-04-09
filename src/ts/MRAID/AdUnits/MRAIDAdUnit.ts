@@ -141,11 +141,11 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendClick(): void {
-        this.sendTrackingEvent(TrackingEvent.IMPRESION);
+        this.sendTrackingEvent(TrackingEvent.CLICK);
     }
 
     public sendImpression(): void {
-        this.sendTrackingEvent(TrackingEvent.IMPRESION);
+        this.sendTrackingEvent(TrackingEvent.IMPRESSION);
     }
 
     public getEndScreen(): EndScreen | undefined {

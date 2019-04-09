@@ -256,7 +256,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     }
 
     private sendStartEvents(): void {
-        this.sendTrackingEvent(TrackingEvent.IMPRESION);
+        this.sendTrackingEvent(TrackingEvent.IMPRESSION);
 
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();

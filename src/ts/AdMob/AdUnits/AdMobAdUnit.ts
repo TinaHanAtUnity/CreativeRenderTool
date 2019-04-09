@@ -88,7 +88,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendImpressionEvent() {
-        this.sendTrackingEvent(TrackingEvent.IMPRESION);
+        this.sendTrackingEvent(TrackingEvent.IMPRESSION);
     }
 
     public sendClickEvent() {
@@ -108,7 +108,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendStartEvent() {
         this._ads.Listener.sendStartEvent(this._placement.getId());
-        this.sendTrackingEvent(TrackingEvent.SKIP);
+        this.sendTrackingEvent(TrackingEvent.START);
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });

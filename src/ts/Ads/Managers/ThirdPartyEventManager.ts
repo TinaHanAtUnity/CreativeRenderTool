@@ -20,7 +20,7 @@ export enum ThirdPartyEventMacro {
 }
 
 export enum TrackingEvent {
-    IMPRESION = 'impression',
+    IMPRESSION = 'impression',
     CLICK = 'click',
     START = 'start',
     SHOW = 'show',

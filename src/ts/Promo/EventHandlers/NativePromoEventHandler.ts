@@ -49,7 +49,7 @@ export class NativePromoEventHandler {
                 [ThirdPartyEventMacro.GAMER_SID]: playerMetadataServerId || ''
             });
         });
-        return this.sendTrackingEvent(TrackingEvent.IMPRESION, campaign);
+        return this.sendTrackingEvent(TrackingEvent.IMPRESSION, campaign);
     }
 
     public onPromoClosed(campaign: PromoCampaign) {

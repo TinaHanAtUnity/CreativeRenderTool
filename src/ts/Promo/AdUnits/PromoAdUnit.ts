@@ -55,7 +55,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowing(true);
         this._ads.Listener.sendStartEvent(this._placement.getId());
         this._promoView.show();
-        this.sendTrackingEvent(TrackingEvent.IMPRESION);
+        this.sendTrackingEvent(TrackingEvent.IMPRESSION);
 
         if (this._platform === Platform.ANDROID) {
             this._ads.Android!.AdUnit.onKeyDown.subscribe(this._keyDownListener);
