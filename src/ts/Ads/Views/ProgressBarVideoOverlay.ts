@@ -1,5 +1,4 @@
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
-import { VideoEventHandler} from 'Ads/EventHandlers/VideoEventHandler';
 export class ProgressBarVideoOverlay extends VideoOverlay {
 
   private _progressBar: HTMLElement;
