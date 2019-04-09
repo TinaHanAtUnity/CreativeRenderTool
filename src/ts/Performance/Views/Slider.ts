@@ -36,6 +36,7 @@ export class Slider {
     private _timeId: number | null;
     private _indicatorWrap: HTMLElement;
     private _indicators: HTMLElement[];
+    private _isVisible: boolean;
 
     constructor(urls: string[], config: ISliderOptions = {
         duration: 200,
@@ -57,13 +58,14 @@ export class Slider {
             preventClick: false
         };
 
+        this._isVisible = true;
         this._rootEl = this.createElement('div', 'slider-root-container', ['slider-wrap']);
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
         this.slidesPerPage = this.config.slidesPerPage;
         this.innerElements = [].slice.call(urls);
         this.currentSlide = this.config.loop ?
-        this.config.startIndex % this.innerElements.length :
-        Math.max(0, Math.min(this.config.startIndex, this.innerElements.length - this.slidesPerPage));
+            this.config.startIndex % this.innerElements.length :
+            Math.max(0, Math.min(this.config.startIndex, this.innerElements.length - this.slidesPerPage));
         this.transformProperty = Slider.webkitOrNot();
 
         const cloneSlidesAmount = 3;
@@ -97,9 +99,13 @@ export class Slider {
             this.selectorWidth = this._slidesContainer.offsetWidth;
             this.init();
             this.resizeContainer();
-            this.slideToCurrent(true);
             this._ready = null;
         });
+    }
+
+    public show(): void {
+        this._isVisible = true;
+        this.autoplay();
     }
 
     private slideToCurrent(enableTransition: boolean): void {
@@ -194,6 +200,10 @@ export class Slider {
     }
 
     private autoplay() {
+        if (!this._isVisible) {
+            return;
+        }
+
         if (this._timeId !== null) {
             window.clearTimeout(this._timeId);
         }
