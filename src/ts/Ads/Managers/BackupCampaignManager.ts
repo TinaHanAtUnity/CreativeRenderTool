@@ -20,6 +20,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { FileId } from 'Core/Utilities/FileId';
 import { RequestManager } from 'Core/Managers/RequestManager';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 export class BackupCampaignManager {
     private static _maxExpiryDelay: number = 7 * 24 * 3600 * 1000; // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
@@ -70,6 +71,14 @@ export class BackupCampaignManager {
             operation.set(rootKey + '.trackingurls', JSON.stringify(trackingUrls));
         }
 
+        if (this._platform === Platform.IOS && CustomFeatures.shouldSampleAtOnePercent()) {
+            Diagnostics.trigger('store_placement', {
+                mediaId: mediaId,
+                adTypes: JSON.stringify(placement.getAdTypes()),
+                trackingUrls: trackingUrls ? JSON.stringify(trackingUrls) : ''
+            });
+        }
+
         this._storageBridge.queue(operation);
     }
 
@@ -111,6 +120,14 @@ export class BackupCampaignManager {
             operation.set(rootKey + '.data', campaign.toJSON());
             operation.set(rootKey + '.willexpireat', willExpireAt);
             this._storageBridge.queue(operation);
+
+            if (this._platform === Platform.IOS && CustomFeatures.shouldSampleAtOnePercent()) {
+                Diagnostics.trigger('store_campaign', {
+                    campaignType: campaignType,
+                    data: campaign.toJSON(),
+                    willExpireAt: willExpireAt
+                });
+            }
         }
     }
 
