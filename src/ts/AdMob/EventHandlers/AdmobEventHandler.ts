@@ -8,7 +8,7 @@ import { IOpenableIntentsRequest, ITouchInfo } from 'AdMob/Views/AFMABridge';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Session } from 'Ads/Models/Session';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
@@ -139,7 +139,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     }
 
     public onTrackingEvent(event: string, data?: unknown) {
-        this._adUnit.sendTrackingEvent(event);
+        this._adUnit.sendTrackingEvent(<TrackingEvent>event);
         if (event === 'error') {
             SessionDiagnostics.trigger('admob_ad_error', data, this._campaign.getSession());
         } else if (event === 'stalled') {
