@@ -105,7 +105,6 @@ export class Slider {
     private slideToCurrent(enableTransition: boolean): void {
         this.autoplay();
         const currentSlide = this.config.loop ? this.currentSlide + this.slidesPerPage : this.currentSlide;
-        console.log(Math.floor(currentSlide));
 
         const offset = (this.config.rtl ? 1 : -1) * currentSlide * (this.selectorWidth / this.slidesPerPage);
         if (enableTransition) {
@@ -189,10 +188,9 @@ export class Slider {
     }
 
     private init(): void {
-        this.attachEvents();
+        this.addEventHandlers();
         Slider.prepareIndicator(this, 'slider-indicator', 'slider-dot', 3, 0, 'active');
         this._rootEl.style.overflow = 'hidden';
-        window.addEventListener('resize', (this.resizeHandler).bind(this));
     }
 
     private autoplay() {
@@ -213,7 +211,7 @@ export class Slider {
         }
     }
 
-    private attachEvents(): void {
+    private addEventHandlers(): void {
         window.addEventListener('resize', (this.resizeHandler).bind(this));
         if (this.config.draggable) {
             // Keep track pointer hold and dragging distance
