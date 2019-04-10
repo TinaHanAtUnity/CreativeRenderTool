@@ -15,6 +15,7 @@ import {
     PrivacyRowItemContainer,
     PrivacyTextParagraph
 } from 'Ads/Views/Consent/PrivacyRowItemContainer';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export interface IConsentViewParameters {
     platform: Platform;
@@ -320,6 +321,12 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     }
 
     private showMyChoicesPageAndScrollToParagraph(paragraph: PrivacyTextParagraph): void {
+        const kafkaObject: { [key: string]: unknown } = {};
+        kafkaObject.type = 'consent_paragraph_link_clicked';
+        kafkaObject.timestamp = Date.now();
+        // to get a rough estimate how often users click links on the homescreen
+        HttpKafka.sendEvent('ads.sdk2.diagnostics', KafkaCommonObjectType.EMPTY, kafkaObject);
+
         this.showPage(ConsentPage.MY_CHOICES);
         this._privacyRowItemContainer.showParagraphAndScrollToSection(paragraph);
 
