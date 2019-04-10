@@ -1,6 +1,7 @@
 # Merged
 
 * Remove custom kafka event from overlay install now button [#9051](https://github.com/Applifier/unity-ads-webview/pull/9051)
+* Remove borders from Show my choices CTA button (A/B test) [#9052](https://github.com/Applifier/unity-ads-webview/pull/9052)
 
 # Tue Apr  9 07:52:29 UTC 2019
 
