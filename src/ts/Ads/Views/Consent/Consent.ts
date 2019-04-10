@@ -23,6 +23,7 @@ export interface IConsentViewParameters {
     apiLevel?: number;
     osVersion?: string;
     useAltMyChoicesButtonText: boolean;
+    ctaABTest: boolean;
 }
 
 export enum ConsentPage {
@@ -44,6 +45,8 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private _landingPage: ConsentPage;
     private _currentPage: ConsentPage;
 
+    private _isCtaAbTest: boolean;
+
     constructor(parameters: IConsentViewParameters) {
         super(parameters.platform, 'consent');
 
@@ -52,6 +55,8 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._osVersion = parameters.osVersion;
 
         this._privacyManager = parameters.privacyManager;
+
+        this._isCtaAbTest = parameters.ctaABTest;
 
         this._template = new Template(ConsentTemplate);
         this._templateData = {
@@ -165,6 +170,12 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
             myChoicesElement.classList.add('show-back-button');
         }
+
+        if (this._isCtaAbTest) {
+            const homeScreenContainer = (<HTMLElement>this._container.querySelector('#consent-homescreen'));
+            homeScreenContainer.classList.add('no-borders-test');
+        }
+
         this.showPage(this._landingPage);
     }
 
