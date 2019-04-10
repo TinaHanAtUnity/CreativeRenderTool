@@ -3,6 +3,7 @@ import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Ads/Models/Campaign
 import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
 import { VPAID } from 'VPAID/Models/VPAID';
 import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export interface IVPAIDCampaign extends IProgrammaticCampaign {
     vpaid: VPAID;
@@ -66,7 +67,7 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
         return [];
     }
 
-    public getTrackingUrlsForEvent(eventName: string): string[] {
+    public getTrackingUrlsForEvent(eventName: TrackingEvent): string[] {
         return this.getVPAID().getTrackingEventUrls(eventName);
     }
 

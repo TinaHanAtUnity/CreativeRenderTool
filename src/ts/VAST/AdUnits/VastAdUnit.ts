@@ -1,5 +1,5 @@
 import { IVideoAdUnitParameters, VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { MOAT } from 'Ads/Views/MOAT';
 import { StreamType } from 'Core/Constants/Android/StreamType';
@@ -115,7 +115,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return this._endScreen;
     }
 
-    public sendTrackingEvent(eventName: string, sessionId: string): void {
+    public sendTrackingEvent(eventName: TrackingEvent, sessionId: string): void {
         const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {
@@ -157,7 +157,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public sendVideoClickTrackingEvent(sessionId: string): void {
-        this.sendTrackingEvent('click', sessionId);
+        this.sendTrackingEvent(TrackingEvent.CLICK, sessionId);
 
         const clickTrackingEventUrls = this._vastCampaign.getVast().getVideoClickTrackingURLs();
 

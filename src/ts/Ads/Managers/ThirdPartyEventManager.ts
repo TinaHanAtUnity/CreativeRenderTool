@@ -143,7 +143,7 @@ export class ThirdPartyEventManager {
             }
             // Auction V5 start dip investigation
             if (CustomFeatures.shouldSampleAtTenPercent()) {
-                if (event.toLowerCase().indexOf('start') !== -1 || event.toLowerCase().indexOf('impression') !== -1) {
+                if (event === TrackingEvent.START || event === TrackingEvent.IMPRESSION) {
                     Diagnostics.trigger('third_party_sendevent_failed', diagnosticData);
                 }
             }

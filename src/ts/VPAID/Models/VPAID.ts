@@ -2,6 +2,7 @@ import { Vast } from 'VAST/Models/Vast';
 import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class VPAID {
     private vast: Vast;
@@ -70,7 +71,7 @@ export class VPAID {
         return this.vast.getVideoClickTrackingURLs() || [];
     }
 
-    public getTrackingEventUrls(eventName: string) {
+    public getTrackingEventUrls(eventName: TrackingEvent) {
         return this.vast.getTrackingEventUrls(eventName);
     }
 
