@@ -21,6 +21,8 @@ import { Platform } from 'Core/Constants/Platform';
 import { FileId } from 'Core/Utilities/FileId';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { iOSCrashTest } from 'Core/Models/ABGroup';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 
 export class BackupCampaignManager {
     private static _maxExpiryDelay: number = 7 * 24 * 3600 * 1000; // if campaign expiration value is not set (e.g. comet campaigns), then expire campaign in seven days
@@ -30,16 +32,18 @@ export class BackupCampaignManager {
     private _storageBridge: StorageBridge;
     private _coreConfiguration: CoreConfiguration;
     private _deviceInfo: DeviceInfo;
+    private _clientInfo: ClientInfo;
 
     private _campaignCount: number = 0;
     private _enabled: boolean = true;
 
-    constructor(platform: Platform, core: ICoreApi, storageBridge: StorageBridge, coreConfiguration: CoreConfiguration, deviceInfo: DeviceInfo) {
+    constructor(platform: Platform, core: ICoreApi, storageBridge: StorageBridge, coreConfiguration: CoreConfiguration, deviceInfo: DeviceInfo, clientInfo: ClientInfo) {
         this._platform = platform;
         this._core = core;
         this._storageBridge = storageBridge;
         this._coreConfiguration = coreConfiguration;
         this._deviceInfo = deviceInfo;
+        this._clientInfo = clientInfo;
     }
 
     // todo: once auction v5 is unconditionally adopoted, trackingUrls should not be optional
@@ -71,7 +75,7 @@ export class BackupCampaignManager {
             operation.set(rootKey + '.trackingurls', JSON.stringify(trackingUrls));
         }
 
-        if (this._platform === Platform.IOS && CustomFeatures.shouldSampleAtOnePercent()) {
+        if (this._platform === Platform.IOS && iOSCrashTest.isValid(this._coreConfiguration.getAbGroup()) && CustomFeatures.isAuctionV4Game(this._clientInfo.getGameId())) {
             Diagnostics.trigger('store_placement', {
                 mediaId: mediaId,
                 adTypes: JSON.stringify(placement.getAdTypes()),
@@ -121,7 +125,7 @@ export class BackupCampaignManager {
             operation.set(rootKey + '.willexpireat', willExpireAt);
             this._storageBridge.queue(operation);
 
-            if (this._platform === Platform.IOS && CustomFeatures.shouldSampleAtOnePercent()) {
+            if (this._platform === Platform.IOS && iOSCrashTest.isValid(this._coreConfiguration.getAbGroup()) && CustomFeatures.isAuctionV4Game(this._clientInfo.getGameId())) {
                 Diagnostics.trigger('store_campaign', {
                     campaignType: campaignType,
                     data: campaign.toJSON(),
