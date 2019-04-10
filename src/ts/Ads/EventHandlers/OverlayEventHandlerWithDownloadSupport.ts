@@ -6,7 +6,6 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { IStoreHandler, IStoreHandlerDownloadParameters } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { IOperativeEventParams } from 'Ads/Managers/OperativeEventManager';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export interface IVideoOverlayDownloadParameters extends IStoreHandlerDownloadParameters {
     videoDuration: number;
@@ -35,7 +34,6 @@ export class OverlayEventHandlerWithDownloadSupport<T extends Campaign> extends 
             const operativeEventParams = this.getOperativeEventParams(parameters);
             this._operativeEventManager.sendThirdQuartile(operativeEventParams);
             this._operativeEventManager.sendView(operativeEventParams);
-            this.sendClickEventToKafka(parameters);
         }
         this._storeHandler.onDownload(parameters);
         if (parameters.skipEnabled) {
@@ -57,16 +55,5 @@ export class OverlayEventHandlerWithDownloadSupport<T extends Campaign> extends 
             adUnitStyle: parameters.adUnitStyle,
             asset: this._adUnit.getVideo()
         };
-    }
-
-    private sendClickEventToKafka(parameters: IVideoOverlayDownloadParameters) {
-        const currentSession = this._campaign.getSession();
-        const kafkaObject: { [key: string]: unknown } = {};
-        kafkaObject.type = 'rewarded_video_overlay_cta_button_click';
-        kafkaObject.auctionId = currentSession.getId();
-        kafkaObject.number1 = parameters.videoDuration / 1000;
-        kafkaObject.number2 = parameters.videoProgress / 1000;
-        kafkaObject.number3 = parameters.videoProgress / parameters.videoDuration;
-        HttpKafka.sendEvent('ads.sdk2.events.aui.experiments.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
 }
