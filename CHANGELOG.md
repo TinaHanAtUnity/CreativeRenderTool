@@ -1,6 +1,7 @@
-# Merged 
+# Tue Apr  9 07:52:29 UTC 2019
 
 * Enable the 'Skip under timer experiment' as Zynga filtered AB test [#9024](https://github.com/Applifier/unity-ads-webview/pull/9024)
+* Add More Games to the Auction V4 Games List [#9039](https://github.com/Applifier/unity-ads-webview/pull/9049)
 
 # Fri Apr  5 18:04:16 UTC 2019
 
