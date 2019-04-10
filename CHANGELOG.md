@@ -1,3 +1,7 @@
+# Merged
+
+* Remove custom kafka event from overlay install now button [#9051](https://github.com/Applifier/unity-ads-webview/pull/9051)
+
 # Tue Apr  9 07:52:29 UTC 2019
 
 * Enable the 'Skip under timer experiment' as Zynga filtered AB test [#9024](https://github.com/Applifier/unity-ads-webview/pull/9024)
