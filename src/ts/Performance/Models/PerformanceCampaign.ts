@@ -93,7 +93,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             adUnitStyle: ['object', 'undefined'],
             screenshots: ['array', 'undefined'],
             appDownloadUrl: ['string', 'undefined'],
-            screenshotsOrientation: ['string', 'undefined'],
+            screenshotsOrientation: ['string', 'undefined']
         }, campaign);
     }
 
