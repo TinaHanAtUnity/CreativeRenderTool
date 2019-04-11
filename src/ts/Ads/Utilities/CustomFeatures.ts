@@ -3,10 +3,8 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import ZyngaGamesJson from 'json/custom_features/ZyngaGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
-import iOSV5GamesJson from 'json/custom_features/iOSV5Games.json';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import SliderEndScreenImages from 'json/experiments/SliderEndScreenImages.json';
 import AuctionV4GamesJson from 'json/custom_features/AuctionV4Games.json';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { SkipUnderTimerExperiment } from 'Core/Models/ABGroup';
 import { Placement } from 'Ads/Models/Placement';
 
@@ -14,21 +12,7 @@ const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
 const ZyngaGameIds = setGameIds(ZyngaGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
-const iOSV5GameIds = setGameIds(iOSV5GamesJson);
-const SlideShowImages = getSlideShowImages();
-const SlideShowTargetGameIds = Object.keys(SlideShowImages);
 const AuctionV4GameIds = setGameIds(AuctionV4GamesJson);
-
-function getSlideShowImages() {
-    let images;
-    try {
-        images = JSON.parse(SliderEndScreenImages);
-    } catch {
-        images = {};
-    }
-
-    return images;
-}
 
 function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
@@ -133,18 +117,5 @@ export class CustomFeatures {
         } else {
             return false;
         }
-    }
-
-    // Following 2 functions could be merged at some point later
-    public static isSliderEndScreenEnabled(targetGameAppStoreId: string): boolean {
-        // TODO: Uncomment and remove hard coded true;
-        //return this.existsInList(SlideShowTargetGameIds, '' + targetGameAppStoreId);
-        return true;
-    }
-
-    public static getScreenshotsUrls(targetGameAppStoreId: string): string[] {
-        // TODO: Remove line below for not forcing the slider
-        targetGameAppStoreId = SlideShowTargetGameIds[Math.floor(Math.random() * 2)];
-        return SlideShowImages[targetGameAppStoreId];
     }
 }
