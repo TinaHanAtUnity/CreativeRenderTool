@@ -19,7 +19,7 @@ export interface IDragOptions {
 export class Slider {
     private config: ISliderOptions;
     private selectorWidth: number;
-    private innerElements: string[];
+    private imageUrls: string[];
     private currentSlide: number;
     private transformProperty: string | number;
     private _slidesContainer: HTMLElement;
@@ -40,7 +40,7 @@ export class Slider {
             easing: 'ease',
             slidesPerPage: 1.6666,
             startIndex: 0,
-            threshold: 70,
+            threshold: 70
         };
         this.drag = {
             startX: 0,
@@ -54,8 +54,11 @@ export class Slider {
         this._rootEl = this.createElement('div', 'slider-root-container', ['slider-wrap', `${imageOrientation}-slider-images`]);
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
         this.slidesPerPage = this.config.slidesPerPage;
-        this.innerElements = [].slice.call(urls);
-        this.currentSlide = this.config.startIndex % this.innerElements.length;
+
+        // TODO: Make sure we always have 3 images
+        // Note: Bit stupid way to make sure the first image is the middle one etc. when the carousel is shown to the user
+        this.imageUrls = [urls[1], urls[2], urls[0]];
+        this.currentSlide = this.config.startIndex % this.imageUrls.length;
         this.transformProperty = Slider.webkitOrNot();
 
         const cloneSlidesAmount = 3;
@@ -66,12 +69,12 @@ export class Slider {
 
         this._rootEl.appendChild(blurredBackground);
 
-        for (let i = this.innerElements.length - cloneSlidesAmount; i < this.innerElements.length; i++) {
-            allSlidesCreatedPromise.push(this.createSlide(this.innerElements[i]));
+        for (let i = this.imageUrls.length - cloneSlidesAmount; i < this.imageUrls.length; i++) {
+            allSlidesCreatedPromise.push(this.createSlide(this.imageUrls[i]));
         }
-        for (const i of this.innerElements) {
-            allSlidesCreatedPromise.push(this.createSlide(i));
-        }
+        this.imageUrls.forEach((url, i) => {
+            allSlidesCreatedPromise.push(this.createSlide(url));
+        });
 
         this._ready = Promise.all(allSlidesCreatedPromise).then((slides) => {
             this._slidesContainer.innerHTML = '';
@@ -131,7 +134,7 @@ export class Slider {
     private resizeContainer(): void {
         this.selectorWidth = this._rootEl.offsetWidth;
         const widthItem = this.selectorWidth / this.slidesPerPage;
-        const itemsToBuild = this.innerElements.length + (this.slidesPerPage * 2);
+        const itemsToBuild = this.imageUrls.length + (this.slidesPerPage * 2);
         this._slidesContainer.style.width = `${widthItem * itemsToBuild}px`;
         this.disableTransition();
         this.slideToCurrent(true);
@@ -156,22 +159,18 @@ export class Slider {
 
     private createSlide(url: string): Promise<HTMLElement> {
         return new Promise((resolve) => {
-            if (url) {
-                const image = new Image();
-                image.onload = () => {
-                    resolve(this.generateSlideHTML('id', image));
-                };
-                image.src = url;
-            } else {
-                resolve(this.generateSlideHTML('íd'));
-            }
+            const image = new Image();
+            image.onload = () => {
+                resolve(this.generateSlideHTML('id', image));
+            };
+            image.src = url;
         });
     }
 
     private generateSlideHTML(id: string, image?: HTMLImageElement): HTMLElement {
         const item = this.createElement('div', id, ['slider-item', 'slider-item']);
         item.style.cssFloat = 'left';
-        item.style.width = `${100 / (this.innerElements.length + (this.slidesPerPage * 2))}%`;
+        item.style.width = `${100 / (this.imageUrls.length + (this.slidesPerPage * 2))}%`;
         if (image !== undefined) {
             item.appendChild(image);
             this._slidesContainer.appendChild(item);
@@ -310,11 +309,11 @@ export class Slider {
         const howManySliderToSlide = Math.ceil(movementDistance / (this.selectorWidth / this.slidesPerPage));
 
         const slideToNegativeClone = movement > 0 && this.currentSlide - howManySliderToSlide < 0;
-        const slideToPositiveClone = movement < 0 && this.currentSlide + howManySliderToSlide > this.innerElements.length - this.slidesPerPage;
+        const slideToPositiveClone = movement < 0 && this.currentSlide + howManySliderToSlide > this.imageUrls.length - this.slidesPerPage;
 
-        if (movement > 0 && movementDistance > this.config.threshold && this.innerElements.length > this.slidesPerPage) {
+        if (movement > 0 && movementDistance > this.config.threshold && this.imageUrls.length > this.slidesPerPage) {
           this.prev(howManySliderToSlide);
-        } else if (movement < 0 && movementDistance > this.config.threshold && this.innerElements.length > this.slidesPerPage) {
+        } else if (movement < 0 && movementDistance > this.config.threshold && this.imageUrls.length > this.slidesPerPage) {
           this.next(howManySliderToSlide);
         }
         this.slideToCurrent(slideToNegativeClone || slideToPositiveClone);
@@ -322,16 +321,16 @@ export class Slider {
 
     private next(howManySlides = 1): void {
         // early return when there is nothing to slide
-        if (this.innerElements.length <= this.slidesPerPage) {
+        if (this.imageUrls.length <= this.slidesPerPage) {
             return;
         }
 
         const beforeChange = this.currentSlide;
-        const isNewIndexClone = this.currentSlide + howManySlides > this.innerElements.length - this.slidesPerPage;
+        const isNewIndexClone = this.currentSlide + howManySlides > this.imageUrls.length - this.slidesPerPage;
         if (isNewIndexClone) {
             this.disableTransition();
 
-            const mirrorSlideIndex = this.currentSlide - this.innerElements.length;
+            const mirrorSlideIndex = this.currentSlide - this.imageUrls.length;
             const mirrorSlideIndexOffset = this.slidesPerPage;
             const moveTo = mirrorSlideIndex + mirrorSlideIndexOffset;
             const offset = moveTo * (-1) * (this.selectorWidth / this.slidesPerPage);
@@ -350,7 +349,7 @@ export class Slider {
 
     private prev(howManySlides = 1): void {
         // early return when there is nothing to slide
-        if (this.innerElements.length <= this.slidesPerPage) {
+        if (this.imageUrls.length <= this.slidesPerPage) {
             return;
         }
 
@@ -360,7 +359,7 @@ export class Slider {
         if (isNewIndexClone) {
             this.disableTransition();
 
-            const mirrorSlideIndex = this.currentSlide + this.innerElements.length;
+            const mirrorSlideIndex = this.currentSlide + this.imageUrls.length;
             const mirrorSlideIndexOffset = this.slidesPerPage;
             const moveTo = mirrorSlideIndex + mirrorSlideIndexOffset;
             const offset = moveTo * -1 * (this.selectorWidth / this.slidesPerPage);
