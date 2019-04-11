@@ -1,0 +1,10 @@
+{
+  "homepage-title": "Can the Unity cookie collect and use your data to tailor your ads and experience?",
+  "homepage-main-text": "Unity and our <span class=\"third-parties-link page-link\">third-parties</span> will collect <span class=\"data-link page-link\">data</span>, including <span class=\"demographic-link page-link\">demographic information</span>, and use <span class=\"mobile-identifiers-link page-link\">mobile identifiers</span> for ads & gameplay <span class=\"personalization-link page-link\">personalization</span> and <span class=\"measurement-link page-link\">measurement</span>. You can access these options at any time by tapping the Unity Data Privacy icon when or after an ad appears.",
+  "homepage-accept-all": "Accept",
+  "homepage-show-my-choices": "Show my choices",
+
+  "save-my-choices": "Save my choices",
+  "agree-to-all": "Agree to all",
+  "no-thanks": "No thanks"
+}

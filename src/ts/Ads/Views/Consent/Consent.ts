@@ -15,11 +15,13 @@ import {
     PrivacyRowItemContainer,
     PrivacyTextParagraph
 } from 'Ads/Views/Consent/PrivacyRowItemContainer';
+import { Localization } from 'Core/Utilities/Localization';
 
 export interface IConsentViewParameters {
     platform: Platform;
     privacyManager: UserPrivacyManager;
     landingPage: ConsentPage;
+    language: string;
     apiLevel?: number;
     osVersion?: string;
     useAltMyChoicesButtonText: boolean;
@@ -58,7 +60,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
         this._isCtaAbTest = parameters.ctaABTest;
 
-        this._template = new Template(ConsentTemplate);
+        this._template = new Template(ConsentTemplate, new Localization(parameters.language, 'consent'));
         this._templateData = {
             useAltMyChoicesButtonText: parameters.useAltMyChoicesButtonText
         };
