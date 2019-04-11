@@ -77,7 +77,7 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
         return true;
     }
 
-    private getImpressionUrls(): string[] | null {
+    private getImpressionUrls(): string[] {
         return this.getVPAID().getImpressionUrls();
     }
 
@@ -106,10 +106,9 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
     }
 
     public setTrackingUrls(trackingUrls: ICampaignTrackingUrls) {
-        const impressionUrls = this.getImpressionUrls();
-        if (impressionUrls) {
-            trackingUrls = this.addTrackingUrlsToEvent(TrackingEvent.IMPRESSION, impressionUrls, trackingUrls);
-        }
+
+        trackingUrls = this.addTrackingUrlsToEvent(TrackingEvent.IMPRESSION, this.getImpressionUrls(), trackingUrls);
+        trackingUrls = this.addTrackingUrlsToEvent(TrackingEvent.CLICK, this.getVideoClickTrackingURLs(), trackingUrls);
 
         const companion = this.getCompanionAd();
         if (companion) {
@@ -117,21 +116,6 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
             trackingUrls = this.addTrackingUrlsToEvent(TrackingEvent.CREATIVE_VIEW, creativeViewUrls, trackingUrls);
         }
 
-        trackingUrls = this.addTrackingUrlsToEvent(TrackingEvent.CLICK, this.getVideoClickTrackingURLs(), trackingUrls);
-
         return trackingUrls;
-    }
-
-    private addCustomTracking(trackingUrls: ICampaignTrackingUrls) {
-        if (trackingUrls) {
-            Object.keys(trackingUrls).forEach((event) => {
-                const eventUrls = trackingUrls[event];
-                if (eventUrls) {
-                    eventUrls.forEach((eventUrl) => {
-                        this.getVPAID().addTrackingEventUrl(event, eventUrl);
-                    });
-                }
-            });
-        }
     }
 }

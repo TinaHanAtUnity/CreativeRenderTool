@@ -1,16 +1,13 @@
 import { IAdsApi } from 'Ads/IAds';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Closer } from 'Ads/Views/Closer';
-import { IARApi } from 'AR/AR';
 import { Backend } from 'Backend/Backend';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
-import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
@@ -137,10 +134,16 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
         });
 
         describe('on AdClickThru', () => {
+
+            beforeEach(() => {
+                parameters.campaign.setTrackingUrls({});
+            });
+
             const checkClickThroughTracking = () => {
-                const urls = parameters.campaign.getVideoClickTrackingURLs();
+                // Works because no additional tracking URLs are provided outside of the VPAID
+                const urls = parameters.campaign.getTrackingUrlsForEvent(TrackingEvent.CLICK);
                 for (const url of urls) {
-                    sinon.assert.calledWith(<sinon.SinonSpy>parameters.thirdPartyEventManager.sendWithGet, 'vpaid video click', TestFixtures.getSession().getId(), url);
+                    sinon.assert.calledWith(<sinon.SinonSpy>parameters.thirdPartyEventManager.sendWithGet, 'vpaid click', TestFixtures.getSession().getId(), url);
                 }
             };
 
@@ -162,8 +165,8 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
                 describe('when url is not passed', () => {
                     beforeEach(triggerVPAIDEvent('AdClickThru', null, null, true));
 
-                    it('should open the url from the VAST definition', () => {
-                        sinon.assert.calledWith(<sinon.SinonSpy>adUnit.openUrl, parameters.campaign.getVideoClickThroughURL());
+                    it('should open the url from the VAST definition included in the set of tracking URLs', () => {
+                        sinon.assert.calledWith(<sinon.SinonSpy>adUnit.openUrl, parameters.campaign.getTrackingUrlsForEvent(TrackingEvent.CLICK));
                     });
                     it('should send click tracking events', checkClickThroughTracking);
                 });
@@ -187,8 +190,8 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
                 describe('when url is not passed', () => {
                     beforeEach(triggerVPAIDEvent('AdClickThru', null, null, true));
 
-                    it('should open the url from the VAST definition', () => {
-                        sinon.assert.calledWith(<sinon.SinonSpy>adUnit.openUrl, parameters.campaign.getVideoClickThroughURL());
+                    it('should open the url from the VAST definition included in the set of tracking URLs', () => {
+                        sinon.assert.calledWith(<sinon.SinonSpy>adUnit.openUrl, parameters.campaign.getTrackingUrlsForEvent(TrackingEvent.CLICK));
                     });
                     it('should send click tracking events', checkClickThroughTracking);
                 });
