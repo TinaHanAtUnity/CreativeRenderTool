@@ -175,6 +175,11 @@ describe('UrlTest', () => {
             const url = 'http://test.com?param=%wb';
             assert.equal(Url.encodeUrlWithQueryParams(url), 'http://test.com?param=%25wb', 'Url not encoded as expected');
         });
+
+        it('should not cut off if = is given multiple times in query', () => {
+            const url = 'https://omax.admarvel.com/rtb/et?p=__pid=c02922366a53a3ef__sid=228693__bid=1251454__evt_name=load__rbid=194__cb=d63301fa-a41d-4d7c-a9ea-1f317ddfd9bf';
+            assert.equal(Url.encodeUrlWithQueryParams(url), 'https://omax.admarvel.com/rtb/et?p=__pid=c02922366a53a3ef__sid=228693__bid=1251454__evt_name=load__rbid=194__cb=d63301fa-a41d-4d7c-a9ea-1f317ddfd9bf', 'Url params not encoded as expected');
+        });
     });
 
     describe('validating UTF-8', () => {

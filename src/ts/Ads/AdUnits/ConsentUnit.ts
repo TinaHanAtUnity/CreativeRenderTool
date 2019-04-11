@@ -14,7 +14,7 @@ import { ICoreApi } from 'Core/ICore';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { ABGroup, ConsentMyChoicesButtonTextTest } from 'Core/Models/ABGroup';
+import { ABGroup, ConsentCTATest } from 'Core/Models/ABGroup';
 
 export interface IConsentUnitParameters {
     abGroup: ABGroup;
@@ -49,7 +49,8 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             platform: parameters.platform,
             privacyManager: parameters.privacyManager,
             landingPage: this._landingPage,
-            useAltMyChoicesButtonText: ConsentMyChoicesButtonTextTest.isValid(parameters.abGroup)
+            useAltMyChoicesButtonText: false, // will be re-tested later
+            ctaABTest: ConsentCTATest.isValid(parameters.abGroup)
         };
 
         if (this._platform === Platform.ANDROID) {
