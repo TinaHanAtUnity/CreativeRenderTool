@@ -72,9 +72,6 @@ export class Slider {
         for (const i of this.innerElements) {
             allSlidesCreatedPromise.push(this.createSlide(i));
         }
-        for (let i = 0; i < cloneSlidesAmount; i++) {
-            allSlidesCreatedPromise.push(this.createSlide(this.innerElements[i]));
-        }
 
         this._ready = Promise.all(allSlidesCreatedPromise).then((slides) => {
             this._slidesContainer.innerHTML = '';
