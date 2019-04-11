@@ -69,5 +69,5 @@ export const ConsentMyChoicesButtonTextTest = new ABTest(9, 10);
 export const AuctionV5Test = new ABTest(15, 18);
 export const WebPlayerMRAIDTest = new DisabledABTest();
 
-export const SkipUnderTimerExperiment = new DisabledABTest(7, 8);
-export const ProgressBarVideoTest = new ABTest(5, 6);
+export const SkipUnderTimerExperiment = new ZyngaFilteredABTest(7, 8);
+export const ProgressBarVideoTest = new ZyngaFilteredABTest(5, 6);
