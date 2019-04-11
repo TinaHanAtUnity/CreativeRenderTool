@@ -135,6 +135,17 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     public abstract getOptionalAssets(): Asset[];
     public abstract isConnectionNeeded(): boolean;
 
+    protected addTrackingUrlsToEvent(event: TrackingEvent, eventUrls: string[], trackingUrls: ICampaignTrackingUrls): ICampaignTrackingUrls {
+        for (const url of eventUrls) {
+            if (trackingUrls[event]) {
+                trackingUrls[event].push(url);
+            } else {
+                trackingUrls[event] = [url];
+            }
+        }
+        return trackingUrls;
+    }
+
     protected handleError(error: WebViewError) {
         SessionDiagnostics.trigger('set_model_value_failed', error, this.getSession());
         throw error;

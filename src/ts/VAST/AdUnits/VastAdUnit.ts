@@ -115,13 +115,8 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return this._endScreen;
     }
 
-    public sendTrackingEvent(eventName: TrackingEvent, sessionId: string): void {
-        const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
-        if (trackingEventUrls) {
-            for (const url of trackingEventUrls) {
-                this._thirdPartyEventManager.sendWithGet(`vast ${eventName}`, sessionId, url, this._vastCampaign.getUseWebViewUserAgentForTracking());
-            }
-        }
+    public sendTrackingEvent(eventName: TrackingEvent): void {
+        this._thirdPartyEventManager.sendTrackingEvents(this._vastCampaign, eventName, 'vast', this._vastCampaign.getUseWebViewUserAgentForTracking());
     }
 
     public getVideoClickThroughURL(): string | null {
@@ -142,30 +137,16 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
-    public sendCompanionClickTrackingEvent(sessionId: string): void {
-        const companionClickTrackingUrls = this._vastCampaign.getVast().getCompanionClickTrackingUrls();
-        for (const companionClickTrackingUrl of companionClickTrackingUrls) {
-            this._thirdPartyEventManager.sendWithGet('vast companion click', sessionId, companionClickTrackingUrl, this._vastCampaign.getUseWebViewUserAgentForTracking());
-        }
+    public sendCompanionClickTrackingEvent(): void {
+        this.sendTrackingEvent(TrackingEvent.VIDEO_ENDCARD_CLICK);
     }
 
-    public sendCompanionTrackingEvent(sessionId: string): void {
-        const companionTrackingUrls = this._vastCampaign.getVast().getCompanionCreativeViewTrackingUrls();
-        for (const url of companionTrackingUrls) {
-            this._thirdPartyEventManager.sendWithGet('companion', sessionId, url, this._vastCampaign.getUseWebViewUserAgentForTracking());
-        }
+    public sendCompanionTrackingEvent(): void {
+        this.sendTrackingEvent(TrackingEvent.COMPANION);
     }
 
-    public sendVideoClickTrackingEvent(sessionId: string): void {
-        this.sendTrackingEvent(TrackingEvent.CLICK, sessionId);
-
-        const clickTrackingEventUrls = this._vastCampaign.getVast().getVideoClickTrackingURLs();
-
-        if (clickTrackingEventUrls) {
-            for (const clickTrackingEventUrl of clickTrackingEventUrls) {
-                this._thirdPartyEventManager.sendWithGet('vast video click', sessionId, clickTrackingEventUrl, this._vastCampaign.getUseWebViewUserAgentForTracking());
-            }
-        }
+    public sendVideoClickTrackingEvent(): void {
+        this.sendTrackingEvent(TrackingEvent.CLICK);
     }
 
     public onContainerBackground(): void {

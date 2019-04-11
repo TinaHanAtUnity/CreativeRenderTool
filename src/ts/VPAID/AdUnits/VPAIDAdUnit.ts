@@ -113,23 +113,8 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
     }
 
-    public sendTrackingEvent(eventType: TrackingEvent) {
-        const urls = this._vpaidCampaign.getTrackingUrlsForEvent(eventType);
-        const sessionId = this._vpaidCampaign.getSession().getId();
-
-        for (const url of urls) {
-            this._thirdPartyEventManager.sendWithGet(`vpaid ${eventType}`, sessionId, url);
-        }
-    }
-
-    public sendImpressionTracking() {
-        const impressionUrls = this._vpaidCampaign.getImpressionUrls();
-        const sessionId = this._vpaidCampaign.getSession().getId();
-        if (impressionUrls) {
-            for (const impressionUrl of impressionUrls) {
-                this._thirdPartyEventManager.sendWithGet('vpaid impression', sessionId, impressionUrl);
-            }
-        }
+    public sendTrackingEvent(event: TrackingEvent) {
+        this._thirdPartyEventManager.sendTrackingEvents(this._vpaidCampaign, event, 'vpaid', this._vpaidCampaign.getUseWebViewUserAgentForTracking());
     }
 
     public mute() {

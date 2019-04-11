@@ -141,8 +141,8 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         return this._startTime;
     }
 
-    public sendTrackingEvent(event: TrackingEvent) {
-        this._thirdPartyEventManager.sendTrackingEvents(this._campaign, event, 'admob');
+    public sendTrackingEvent(event: TrackingEvent, useWebviewUserAgentForTracking?: boolean, headers?: [string, string][]) {
+        return this._thirdPartyEventManager.sendTrackingEvents(this._campaign, event, 'admob', useWebviewUserAgentForTracking, headers);
     }
 
     public sendClickSignalResponse(response: IClickSignalResponse) {

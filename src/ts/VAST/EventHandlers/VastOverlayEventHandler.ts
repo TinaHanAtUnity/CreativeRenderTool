@@ -61,12 +61,12 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             if (this._moat) {
                 this._moat.volumeChange(0);
             }
-            this._vastAdUnit.sendTrackingEvent(TrackingEvent.MUTE, this._vastCampaign.getSession().getId());
+            this._vastAdUnit.sendTrackingEvent(TrackingEvent.MUTE);
         } else {
             if (this._moat) {
                 this._moat.volumeChange(this._vastAdUnit.getVolume());
             }
-            this._vastAdUnit.sendTrackingEvent(TrackingEvent.UNMUTE, this._vastCampaign.getSession().getId());
+            this._vastAdUnit.sendTrackingEvent(TrackingEvent.UNMUTE);
         }
     }
 
@@ -94,7 +94,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private openUrlOnCallButton(url: string, clickDuration: number, clickUrl: string): Promise<void> {
         return this.openUrl(url).then(() => {
             this.setCallButtonEnabled(true);
-            this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+            this._vastAdUnit.sendVideoClickTrackingEvent();
 
             ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'vast_overlay', this._vastCampaign, this._abGroup.valueOf(), this._gameSessionId!);
         }).catch(() => {

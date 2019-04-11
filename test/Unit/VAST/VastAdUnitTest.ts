@@ -229,14 +229,14 @@ describe('VastAdUnitTest', () => {
         it('should call video click tracking url', () => {
             sandbox.stub(vastCampaign.getVast(), 'getVideoClickTrackingURLs').returns(['https://www.example.com/foo/?bar=baz&inga=42&quux', 'http://wwww.tremor.com/click']);
             sandbox.stub(thirdPartyEventManager, 'sendWithGet').returns(null);
-            vastAdUnit.sendVideoClickTrackingEvent('foo');
+            vastAdUnit.sendVideoClickTrackingEvent();
             sinon.assert.calledTwice(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet);
         });
 
         it('should not call thirdPartyEvent if there are no tracking urls', () => {
             sandbox.stub(vastCampaign.getVast(), 'getVideoClickTrackingURLs').returns([]);
             sandbox.stub(thirdPartyEventManager, 'sendWithGet').returns(null);
-            vastAdUnit.sendVideoClickTrackingEvent('foo');
+            vastAdUnit.sendVideoClickTrackingEvent();
             sinon.assert.notCalled(<sinon.SinonSpy>thirdPartyEventManager.sendWithGet);
         });
     });
@@ -246,7 +246,7 @@ describe('VastAdUnitTest', () => {
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             mockEventManager.expects('sendWithGet').withArgs('vast video click', '123', 'http://myTrackingURL.com/click');
 
-            vastAdUnit.sendVideoClickTrackingEvent('123');
+            vastAdUnit.sendVideoClickTrackingEvent();
             mockEventManager.verify();
         });
     });
@@ -314,7 +314,7 @@ describe('VastAdUnitTest', () => {
                 // make each tracking url expected.
                 mockEventManager.expects('sendWithGet').withExactArgs('companion', '123', companionTrackingUrl, useWebViewUserAgentForTracking);
             }
-            vastAdUnit.sendCompanionTrackingEvent('123');
+            vastAdUnit.sendCompanionTrackingEvent();
             mockEventManager.verify();
         });
 

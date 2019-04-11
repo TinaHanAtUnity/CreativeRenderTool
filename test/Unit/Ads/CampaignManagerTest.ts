@@ -122,13 +122,6 @@ describe('CampaignManager', () => {
     let contentTypeHandlerManager: ContentTypeHandlerManager;
     let adUnitParametersFactory: IAbstractAdUnitParametersFactory<Campaign, IAdUnitParameters<Campaign>>;
 
-    const onShowTrackingUrls: ICampaignTrackingUrls = {
-        'start': [
-            'www.testyboy.com',
-            'www.scottwise.com'
-        ]
-    };
-
     beforeEach(() => {
         RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
 
@@ -624,25 +617,23 @@ describe('CampaignManager', () => {
 
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
-                triggeredCampaign.setTrackingUrls(onShowTrackingUrls);
                 assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.START), [
+                assert.deepEqual(triggeredCampaign.getTrackingUrlsForEvent(TrackingEvent.START), [
                     'http://customTrackingUrl/start',
                     'http://customTrackingUrl/start2',
-                    'http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=?%SDK_VERSION%',
-                    'www.testyboy.com',
-                    'www.scottwise.com'
+                    'http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=?%SDK_VERSION%'
+
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.FIRST_QUARTILE), [
+                assert.deepEqual(triggeredCampaign.getTrackingUrlsForEvent(TrackingEvent.FIRST_QUARTILE), [
                     'http://customTrackingUrl/firstQuartile'
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.MIDPOINT), [
+                assert.deepEqual(triggeredCampaign.getTrackingUrlsForEvent(TrackingEvent.MIDPOINT), [
                     'http://customTrackingUrl/midpoint'
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.THIRD_QUARTILE), [
+                assert.deepEqual(triggeredCampaign.getTrackingUrlsForEvent(TrackingEvent.THIRD_QUARTILE), [
                     'http://customTrackingUrl/thirdQuartile'
                 ]);
-                assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls(TrackingEvent.COMPLETE), [
+                assert.deepEqual(triggeredCampaign.getTrackingUrlsForEvent(TrackingEvent.COMPLETE), [
                     'http://customTrackingUrl/complete'
                 ]);
             });
@@ -962,17 +953,14 @@ describe('CampaignManager', () => {
                     }
 
                     mockRequest.verify();
-                    triggeredCampaign.setTrackingUrls(onShowTrackingUrls);
                     assert.isTrue(triggeredCampaign instanceof VPAIDCampaign);
                     assert.equal(triggeredPlacement, 'video');
                     assert.equal(triggeredCampaign.getAdType(), 'vpaid-sample-ad-type');
                     assert.equal(triggeredCampaign.getCreativeId(), 'vpaid-sample-creative-id');
                     assert.equal(triggeredCampaign.getSeatId(), 900);
                     assert.equal(triggeredCampaign.getCorrelationId(), '885a17ef11f05deb34b72b');
-                    assert.deepEqual((<VPAIDCampaign>triggeredCampaign).getVPAID().getTrackingEventUrls(TrackingEvent.START), [
-                        'https://fake-ads-backend.unityads.unity3d.com/ack/333?event=vast-tracking-url',
-                        'www.testyboy.com',
-                        'www.scottwise.com'
+                    assert.deepEqual((<VPAIDCampaign>triggeredCampaign).getTrackingUrlsForEvent(TrackingEvent.START), [
+                        'https://fake-ads-backend.unityads.unity3d.com/ack/333?event=vast-tracking-url'
                     ]);
                 });
             });
@@ -990,7 +978,6 @@ describe('CampaignManager', () => {
                     }
 
                     mockRequest.verify();
-                    triggeredCampaign.setTrackingUrls(onShowTrackingUrls);
                     assert.isTrue(triggeredCampaign instanceof VastCampaign);
                     assert.equal(triggeredPlacement, 'video');
                     assert.equal(triggeredCampaign.getAdType(), 'vast-sample-ad-type');
@@ -998,11 +985,9 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredCampaign.getSeatId(), 900);
                     assert.equal(triggeredCampaign.getCorrelationId(), 'zzzz');
                     assert.equal((<VastCampaign>triggeredCampaign).getVideo().getUrl(), 'https://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
-                    assert.deepEqual((<VastCampaign>triggeredCampaign).getVast().getTrackingEventUrls(TrackingEvent.START), [
+                    assert.deepEqual((<VastCampaign>triggeredCampaign).getTrackingUrlsForEvent(TrackingEvent.START), [
                         'https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=HriweFDQPzT1jnyWbt-UA8UKb9IOsNlB9YIUyM9eE5ujdz4eYZgsoFvzcfOR0945o8vsJZHvyi000XO4SVoOkgxlWcUpHRArDKtM16J5jLAhZkWxULyJ0JywIVC3Tebds1o5ZYQ5_KsbpqCbO-q56Jd3AKgbIlTgIDjATlSFf8AiOl96Y81UkZutA8jx4E2sQTCKg1ar6uXQvuXV6KG4IYdx8Jr5e9ZFvgjy6kxbgbuyuEw2_SKzmBCsj3Q2qOM_YxDzaxd5xa2kJ5H9udVwtLUs8OnndWj-k0f__xj958kx6pBvcCwm-xfQiP8zA0DuMq7IHqGt9uvzuvcSN8XX3klwoaYNjZGcggH_AvNoJMPM2lfBidn6cPGOk9IXNNdvT7s42Ss05RSVVqIm87eGmWWVfoSut_UIMTMes1JtxuSuBKCk3abJdUm1GhdJ8OTF3mOVJ1vKj7M%3D',
-                        'https://www.dummy-url.com',
-                        'www.testyboy.com',
-                        'www.scottwise.com'
+                        'https://www.dummy-url.com'
                     ]);
                 });
             });

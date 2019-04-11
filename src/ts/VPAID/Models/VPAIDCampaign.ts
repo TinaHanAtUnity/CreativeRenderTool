@@ -28,8 +28,6 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
             advertiserBundleId: ['string', 'undefined'],
             buyerId: ['string', 'undefined']
         }, campaign);
-
-        this.addCustomTracking(campaign.trackingUrls);
     }
 
     public hasEndScreen(): boolean {
@@ -67,10 +65,6 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
         return [];
     }
 
-    public getTrackingUrlsForEvent(eventName: TrackingEvent): string[] {
-        return this.getVPAID().getTrackingEventUrls(eventName);
-    }
-
     public getVideoClickTrackingURLs(): string[] {
         return this.getVPAID().getVideoClickTrackingURLs();
     }
@@ -83,7 +77,7 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
         return true;
     }
 
-    public getImpressionUrls(): string[] | null {
+    private getImpressionUrls(): string[] | null {
         return this.getVPAID().getImpressionUrls();
     }
 
@@ -112,8 +106,20 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
     }
 
     public setTrackingUrls(trackingUrls: ICampaignTrackingUrls) {
-        super.setTrackingUrls(trackingUrls);
-        this.addCustomTracking(trackingUrls);
+        const impressionUrls = this.getImpressionUrls();
+        if (impressionUrls) {
+            trackingUrls = this.addTrackingUrlsToEvent(TrackingEvent.IMPRESSION, impressionUrls, trackingUrls);
+        }
+
+        const companion = this.getCompanionAd();
+        if (companion) {
+            const creativeViewUrls = companion.getEventTrackingUrls(TrackingEvent.CREATIVE_VIEW);
+            trackingUrls = this.addTrackingUrlsToEvent(TrackingEvent.CREATIVE_VIEW, creativeViewUrls, trackingUrls);
+        }
+
+        trackingUrls = this.addTrackingUrlsToEvent(TrackingEvent.CLICK, this.getVideoClickTrackingURLs(), trackingUrls);
+
+        return trackingUrls;
     }
 
     private addCustomTracking(trackingUrls: ICampaignTrackingUrls) {
