@@ -61,13 +61,13 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     }
 
     public onVastEndScreenShow(): void {
-        this._vastAdUnit.sendCompanionTrackingEvent();
+        this._vastAdUnit.sendCompanionTrackingEvent(this._vastCampaign.getSession().getId());
     }
 
     private openUrlOnCallButton(url: string, clickDuration: number, clickUrl: string): Promise<void> {
         return this.onOpenUrl(url).then(() => {
             this.setCallButtonEnabled(true);
-            this._vastAdUnit.sendCompanionClickTrackingEvent();
+            this._vastAdUnit.sendCompanionClickTrackingEvent(this._vastCampaign.getSession().getId());
             ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'vast_endscreen', this._vastCampaign, this._abGroup.valueOf(), this._gameSessionId);
         }).catch(() => {
             this.setCallButtonEnabled(true);

@@ -137,16 +137,31 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
-    public sendCompanionClickTrackingEvent(): void {
+    public sendCompanionClickTrackingEvent(sessionId: string): void {
         this.sendTrackingEvent(TrackingEvent.VIDEO_ENDCARD_CLICK);
+
+        const companionClickTrackingUrls = this._vastCampaign.getVast().getCompanionClickTrackingUrls();
+        for (const companionClickTrackingUrl of companionClickTrackingUrls) {
+            this._thirdPartyEventManager.sendWithGet('vast companion click', sessionId, companionClickTrackingUrl, this._vastCampaign.getUseWebViewUserAgentForTracking());
+        }
     }
 
-    public sendCompanionTrackingEvent(): void {
-        this.sendTrackingEvent(TrackingEvent.COMPANION);
+    public sendCompanionTrackingEvent(sessionId: string): void {
+        const companionTrackingUrls = this._vastCampaign.getVast().getCompanionCreativeViewTrackingUrls();
+        for (const url of companionTrackingUrls) {
+            this._thirdPartyEventManager.sendWithGet('companion', sessionId, url, this._vastCampaign.getUseWebViewUserAgentForTracking());
+        }
     }
 
-    public sendVideoClickTrackingEvent(): void {
+    public sendVideoClickTrackingEvent(sessionId: string): void {
         this.sendTrackingEvent(TrackingEvent.CLICK);
+
+        const clickTrackingEventUrls = this._vastCampaign.getVast().getVideoClickTrackingURLs();
+        if (clickTrackingEventUrls) {
+            for (const clickTrackingEventUrl of clickTrackingEventUrls) {
+                this._thirdPartyEventManager.sendWithGet('vast video click', sessionId, clickTrackingEventUrl, this._vastCampaign.getUseWebViewUserAgentForTracking());
+            }
+        }
     }
 
     public onContainerBackground(): void {

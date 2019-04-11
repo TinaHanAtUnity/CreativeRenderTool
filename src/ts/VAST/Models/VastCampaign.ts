@@ -4,7 +4,6 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
 import { Vast } from 'VAST/Models/Vast';
 import { ICampaignTrackingUrls } from 'Ads/Models/Campaign';
-import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export interface IVastCampaign extends IProgrammaticCampaign {
     vast: Vast;
@@ -40,6 +39,8 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             impressionUrls: ['array'],
             isMoatEnabled: ['boolean', 'undefined']
         }, campaign);
+
+        this.addCustomTracking(campaign.trackingUrls);
     }
 
     public getVast(): Vast {
@@ -112,21 +113,8 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
     }
 
     public setTrackingUrls(trackingUrls: ICampaignTrackingUrls) {
-        const impressionUrls = this.getImpressionUrls();
-        if (impressionUrls) {
-            trackingUrls = this.addTrackingUrlsToEvent(TrackingEvent.IMPRESSION, impressionUrls, trackingUrls);
-        }
-
-        const videoClickTrackingUrls = this.getVast().getVideoClickTrackingURLs();
-        if (videoClickTrackingUrls) {
-            trackingUrls = this.addTrackingUrlsToEvent(TrackingEvent.CLICK, videoClickTrackingUrls, trackingUrls);
-        }
-
-        const companionClickTrackingUrls = this.getVast().getCompanionClickTrackingUrls();
-        trackingUrls = this.addTrackingUrlsToEvent(TrackingEvent.VIDEO_ENDCARD_CLICK, companionClickTrackingUrls, trackingUrls);
-
-        const companionViewTrackingUrls = this.getVast().getCompanionCreativeViewTrackingUrls();
-        trackingUrls = this.addTrackingUrlsToEvent(TrackingEvent.COMPANION, companionViewTrackingUrls, trackingUrls);
+        super.setTrackingUrls(trackingUrls);
+        this.addCustomTracking(trackingUrls);
     }
 
     public getDTO(): { [key: string]: unknown } {
@@ -150,5 +138,18 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             'portrait': portrait,
             'landscape': landscape
         };
+    }
+
+    private addCustomTracking(trackingUrls: ICampaignTrackingUrls) {
+        if (trackingUrls) {
+            Object.keys(trackingUrls).forEach((event) => {
+                const eventUrls = trackingUrls[event];
+                if (eventUrls) {
+                    eventUrls.forEach((eventUrl) => {
+                        this.getVast().addTrackingEventUrl(event, eventUrl);
+                    });
+                }
+            });
+        }
     }
 }

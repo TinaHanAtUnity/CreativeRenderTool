@@ -88,7 +88,15 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     }
 
     public onVPAIDCompanionView() {
-        this._adUnit.sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);
+        const companion = this._vpaidCampaign.getCompanionAd();
+        const sessionId = this._vpaidCampaign.getSession().getId();
+
+        if (companion) {
+            const urls = companion.getEventTrackingUrls('creativeView');
+            for (const url of urls) {
+                this._thirdPartyEventManager.sendWithGet('vpaid companion creativeView', sessionId, url);
+            }
+        }
     }
 
     public onVPAIDStuck() {
@@ -163,6 +171,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
 
     private onAdImpression() {
         this._adUnit.sendTrackingEvent(TrackingEvent.IMPRESSION);
+        this._adUnit.sendImpressionTracking();
     }
 
     private onAdVideoStart() {
@@ -203,7 +212,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     }
 
     private onAdClickThru(url?: string, id?: string, playerHandles?: boolean) {
-        this._adUnit.sendTrackingEvent(TrackingEvent.CLICK);
+        this.sendClickTrackingEvents();
         if (playerHandles) {
             if (url) {
                 this._adUnit.openUrl(url);
@@ -223,6 +232,15 @@ export class VPAIDEventHandler implements IVPAIDHandler {
 
     private getClickThroughURL(): string | null {
         return this._vpaidCampaign.getVideoClickThroughURL();
+    }
+
+    private sendClickTrackingEvents() {
+        const urls = this._vpaidCampaign.getVideoClickTrackingURLs();
+        const sessionId = this._vpaidCampaign.getSession().getId();
+
+        for (const url of urls) {
+            this._thirdPartyEventManager.sendWithGet('vpaid video click', sessionId, url);
+        }
     }
 
     private getOperativeEventParams(): IOperativeEventParams {
