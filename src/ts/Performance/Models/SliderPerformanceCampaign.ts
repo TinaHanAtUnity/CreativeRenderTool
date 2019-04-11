@@ -1,4 +1,5 @@
 import { IPerformanceCampaign, PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { Asset } from 'Ads/Models/Assets/Asset';
 
 export class SliderPerformanceCampaign extends PerformanceCampaign {
     constructor(campaign: IPerformanceCampaign) {
@@ -6,8 +7,10 @@ export class SliderPerformanceCampaign extends PerformanceCampaign {
     }
 
     public getOptionalAssets() {
-        const assets = super.getOptionalAssets();
+        const assets: Asset[] = [];
+        assets.push(this.getGameIcon());
         assets.push(...this.getScreenshots());
+
         return assets;
     }
 
