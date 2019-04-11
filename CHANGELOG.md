@@ -1,3 +1,7 @@
+# Merged
+
+* Log iOS storage write event and remove Zynga custom feature [#9050](https://github.com/Applifier/unity-ads-webview/pull/9050)
+
 # Wed Apr 10 21:59:07 UTC 2019
 
 * Remove custom kafka event from overlay install now button [#9051](https://github.com/Applifier/unity-ads-webview/pull/9051)
