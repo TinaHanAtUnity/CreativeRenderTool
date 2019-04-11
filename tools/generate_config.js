@@ -54,7 +54,7 @@ fs.writeFileSync(output, JSON.stringify({
 }), options);
 
 const chinaUrl = [
-    'https://webview.unityads.unity3d.cn/webview',
+    'https://webview.unityads.unitychina.cn/webview',
     branch,
     commitId,
     target,
