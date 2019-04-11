@@ -3,21 +3,20 @@ import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import ZyngaGamesJson from 'json/custom_features/ZyngaGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
-import iOSV5GamesJson from 'json/custom_features/iOSV5Games.json';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
 import AuctionV4GamesJson from 'json/custom_features/AuctionV4Games.json';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { SkipUnderTimerExperiment } from 'Core/Models/ABGroup';
 import { Placement } from 'Ads/Models/Placement';
+import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
 const ZyngaGameIds = setGameIds(ZyngaGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
-const iOSV5GameIds = setGameIds(iOSV5GamesJson);
+const AuctionV4GameIds = setGameIds(AuctionV4GamesJson);
+
 const SliderEndScreenImages = parseSliderEndScreenImages();
 const SliderEndScreenTargetGameIds = Object.keys(SliderEndScreenImages);
-const AuctionV4GameIds = setGameIds(AuctionV4GamesJson);
 
 interface ISliderEndScreenImagesForGame {
     [key: string]: string[];
