@@ -52,13 +52,6 @@ export class SliderPerformanceEndScreen extends EndScreen {
         this._slider.attachTo(<HTMLElement>this.container().querySelector('.game-background-container'));
     }
 
-    // public show(): void {
-    //     super.show();
-    //     this.resize();
-    //     this._slider.show();
-    //     window.addEventListener('resize', this.resize.bind(this), false);
-    // }
-
     protected onDownloadEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onEndScreenDownload({
@@ -74,13 +67,4 @@ export class SliderPerformanceEndScreen extends EndScreen {
     protected getTemplate() {
         return SliderEndScreenTemplate;
     }
-
-    // protected resize() {
-    //     const orientation = detectOrientation();
-    //     if (orientation === 'portrait') {
-    //         this._slider.resize(window.innerWidth, window.innerHeight / 2, true);
-    //     } else {
-    //         this._slider.resize(window.innerWidth / 2, window.innerHeight, true);
-    //     }
-    // }
 }
