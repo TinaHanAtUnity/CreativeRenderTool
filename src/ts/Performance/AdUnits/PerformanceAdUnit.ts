@@ -11,7 +11,7 @@ import { DownloadManager } from 'China/Managers/DownloadManager';
 import { DeviceIdManager } from 'China/Managers/DeviceIdManager';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
-    endScreen: PerformanceEndScreen | SliderPerformanceEndScreen;
+    endScreen: PerformanceEndScreen;
     adUnitStyle?: AdUnitStyle;
     downloadManager?: DownloadManager;
     deviceIdManager?: DeviceIdManager;
@@ -19,7 +19,7 @@ export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<Per
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
-    private _endScreen: PerformanceEndScreen | SliderPerformanceEndScreen;
+    private _endScreen: PerformanceEndScreen;
     private _privacy: AbstractPrivacy;
     private _performanceCampaign: PerformanceCampaign;
     private _thirdPartyEventManager: ThirdPartyEventManager;
