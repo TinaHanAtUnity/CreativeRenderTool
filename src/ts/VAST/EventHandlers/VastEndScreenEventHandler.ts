@@ -68,6 +68,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         return this.onOpenUrl(url).then(() => {
             this.setCallButtonEnabled(true);
             this._vastAdUnit.sendCompanionClickTrackingEvent(this._vastCampaign.getSession().getId());
+            this._vastAdUnit.sendTrackingEvent(TrackingEvent.VIDEO_ENDCARD_CLICK);
             ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'vast_endscreen', this._vastCampaign, this._abGroup.valueOf(), this._gameSessionId);
         }).catch(() => {
             this.setCallButtonEnabled(true);

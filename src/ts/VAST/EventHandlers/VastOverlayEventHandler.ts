@@ -62,6 +62,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                 this._moat.volumeChange(0);
             }
             this._vastAdUnit.sendTrackingEvent(TrackingEvent.MUTE);
+        } else {
             if (this._moat) {
                 this._moat.volumeChange(this._vastAdUnit.getVolume());
             }

@@ -135,14 +135,10 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
 
         describe('on AdClickThru', () => {
 
-            beforeEach(() => {
-                parameters.campaign.setTrackingUrls({});
-            });
-
             const checkClickThroughTracking = () => {
                 const urls = parameters.campaign.getVideoClickTrackingURLs();
                 for (const url of urls) {
-                    sinon.assert.calledWith(<sinon.SinonSpy>parameters.thirdPartyEventManager.sendWithGet, 'vpaid click', TestFixtures.getSession().getId(), url);
+                    sinon.assert.calledWith(<sinon.SinonSpy>parameters.thirdPartyEventManager.sendWithGet, 'vpaid video click', TestFixtures.getSession().getId(), url);
                 }
             };
 
@@ -165,7 +161,7 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
                     beforeEach(triggerVPAIDEvent('AdClickThru', null, null, true));
 
                     it('should open the url from the VAST definition', () => {
-                        sinon.assert.calledWith(<sinon.SinonSpy>adUnit.openUrl, parameters.campaign.getVideoClickTrackingURLs());
+                        sinon.assert.calledWith(<sinon.SinonSpy>adUnit.openUrl, parameters.campaign.getVideoClickThroughURL());
                     });
                     it('should send click tracking events', checkClickThroughTracking);
                 });
@@ -190,7 +186,7 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
                     beforeEach(triggerVPAIDEvent('AdClickThru', null, null, true));
 
                     it('should open the url from the VAST definition', () => {
-                        sinon.assert.calledWith(<sinon.SinonSpy>adUnit.openUrl, parameters.campaign.getVideoClickTrackingURLs());
+                        sinon.assert.calledWith(<sinon.SinonSpy>adUnit.openUrl, parameters.campaign.getVideoClickThroughURL());
                     });
                     it('should send click tracking events', checkClickThroughTracking);
                 });

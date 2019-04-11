@@ -7,7 +7,6 @@ import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
@@ -104,30 +103,5 @@ describe('ThirdPartyEventManagerTest', () => {
         thirdPartyEventManager.sendWithGet('eventName', 'sessionId', urlTemplate);
         assert(requestSpy.calledOnce, 'request get should\'ve been called');
         assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/12346/123', 'Should have replaced %SDK_VERSION% from the url');
-    });
-
-    xdescribe('Sending Performance Tracking Urls', () => {
-
-        let campaign: PerformanceCampaign;
-        let sendEventStub: sinon.SinonSpy;
-
-        beforeEach(() => {
-            campaign = TestFixtures.getCampaign();
-            sendEventStub = sinon.spy(thirdPartyEventManager, 'sendWithGet');
-        });
-
-        Object.values(TrackingEvent).forEach((event) =>
-            it(`should send the tracking event: ${event}`, () => {
-                return thirdPartyEventManager.sendTrackingEvents(campaign, event, 'performance').then(() => {
-                    sinon.assert.calledWith(sendEventStub, event, campaign.getSession().getId(), campaign.getTrackingUrlsForEvent(event)[0]);
-                }).catch(() => {
-                    assert.fail(`Tracking url was not sent for event: ${event}`);
-                });
-            })
-        );
-
-        afterEach(() => {
-            sendEventStub.restore();
-        });
     });
 });
