@@ -13,6 +13,8 @@ import { IChina } from 'China/IChina';
 import { SkipUnderTimerExperiment } from 'Core/Models/ABGroup';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { PerformanceEndScreenWithCloseGuard } from 'Performance/Views/PerformanceEndScreenWithCloseGuard';
+import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
+import { SliderPerformanceEndScreen } from 'Performance/Views/SliderPerformanceEndScreen';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -45,6 +47,8 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
 
         if (CustomFeatures.isSkipUnderTimerExperimentEnabled(baseParams.coreConfig, baseParams.placement)) {
             endScreen = new PerformanceEndScreenWithCloseGuard(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } if (baseParams.campaign instanceof SliderPerformanceCampaign && CustomFeatures.isSliderEndScreenEnabled()) {
+            endScreen = new SliderPerformanceEndScreen(endScreenParameters, baseParams.campaign);
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }

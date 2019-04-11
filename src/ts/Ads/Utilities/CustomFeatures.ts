@@ -141,7 +141,7 @@ export class CustomFeatures {
     }
 
     // Following 2 functions could be merged at some point later
-    public static isSliderEndScreenEnabled(targetGameAppStoreId: string): boolean {
+    public static isSliderEndScreenEnabled(): boolean {
         // TODO: Uncomment and remove hard coded true;
         //return this.existsInList(SliderEndScreenTargetGameIds, '' + targetGameAppStoreId);
         return true;
