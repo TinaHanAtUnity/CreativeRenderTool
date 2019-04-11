@@ -126,12 +126,13 @@ body {
 
 $dot-color = #fff;
 $dot-active-color = #099fde;
-$dot-radius = .25rem;
+$dot-radius = 5px;
+$dot-margin = 5px;
 
 .indicator-container {
     width: 100%;
     position: absolute;
-    top: 2em;
+    bottom: 0.35em;
     z-index: 10;
     display: flex;
     pointer-events: none;
@@ -140,10 +141,10 @@ $dot-radius = .25rem;
         .slider-dot {
             display: block;
             float: left;
-            margin-right: .2rem;
-            margin-left: .2rem;
-            width: $dot-radius * 2;
-            height: $dot-radius * 2;
+            margin-right: $dot-margin;
+            margin-left: $dot-margin;
+            width: $dot-radius;
+            height: $dot-radius;
             border-radius: 50%;
             background-color: $dot-color;
 
