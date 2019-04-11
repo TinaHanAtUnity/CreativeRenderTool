@@ -70,3 +70,4 @@ export const AuctionV5Test = new ABTest(15, 18);
 export const WebPlayerMRAIDTest = new DisabledABTest();
 
 export const SkipUnderTimerExperiment = new ZyngaFilteredABTest(7, 8);
+export const SliderEndCardExperiment = new ZyngaFilteredABTest(5, 6);

@@ -5,7 +5,7 @@ import ZyngaGamesJson from 'json/custom_features/ZyngaGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import AuctionV4GamesJson from 'json/custom_features/AuctionV4Games.json';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { SkipUnderTimerExperiment } from 'Core/Models/ABGroup';
+import { SkipUnderTimerExperiment, SliderEndCardExperiment, ABGroup } from 'Core/Models/ABGroup';
 import { Placement } from 'Ads/Models/Placement';
 import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
 
@@ -141,10 +141,10 @@ export class CustomFeatures {
     }
 
     // Following 2 functions could be merged at some point later
-    public static isSliderEndScreenEnabled(targetGameAppStoreId: string): boolean {
-        // TODO: Uncomment and remove hard coded true;
-        //return this.existsInList(SliderEndScreenTargetGameIds, '' + targetGameAppStoreId);
-        return true;
+    public static isSliderEndScreenEnabled(abGroup: ABGroup, targetGameAppStoreId: string): boolean {
+        // TODO: Also check for the gameid in real use case;
+        //return SliderEndCardExperiment.isValid() && this.existsInList(SliderEndScreenTargetGameIds, '' + targetGameAppStoreId);
+        return SliderEndCardExperiment.isValid(abGroup);
     }
 
     public static getSliderEndScreenImagesForGame(targetGameAppStoreId: string): ISliderEndScreenImagesForGame {

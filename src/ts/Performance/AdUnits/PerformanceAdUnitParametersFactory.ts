@@ -45,10 +45,10 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
 
         let endScreen;
 
-        if (CustomFeatures.isSkipUnderTimerExperimentEnabled(baseParams.coreConfig, baseParams.placement)) {
-            endScreen = new PerformanceEndScreenWithCloseGuard(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
-        } if (baseParams.campaign instanceof SliderPerformanceCampaign && CustomFeatures.isSliderEndScreenEnabled()) {
+        if (baseParams.campaign instanceof SliderPerformanceCampaign) {
             endScreen = new SliderPerformanceEndScreen(endScreenParameters, baseParams.campaign);
+        } else if (CustomFeatures.isSkipUnderTimerExperimentEnabled(baseParams.coreConfig, baseParams.placement)) {
+            endScreen = new PerformanceEndScreenWithCloseGuard(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }

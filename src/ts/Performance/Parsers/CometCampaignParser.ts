@@ -20,6 +20,7 @@ import {
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
+import { ABGroup } from 'Core/Models/ABGroup';
 
 // Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
 export enum ICometTrackingUrlEvents {
@@ -43,10 +44,12 @@ export class CometCampaignParser extends CampaignParser {
     public static ContentTypeMRAID = 'comet/mraid-url';
 
     private _requestManager: RequestManager;
+    private _abGroup: ABGroup;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
         this._requestManager = core.RequestManager;
+        this._abGroup = core.Config.getAbGroup();
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -165,7 +168,7 @@ export class CometCampaignParser extends CampaignParser {
 
             let promise;
 
-            if (CustomFeatures.isSliderEndScreenEnabled(parameters.appStoreId)) {
+            if (CustomFeatures.isSliderEndScreenEnabled(this._abGroup, parameters.appStoreId)) {
                 const sliderImages = CustomFeatures.getSliderEndScreenImagesForGame(parameters.appStoreId);
                 const orientation = sliderImages && sliderImages.portrait && sliderImages.portrait.length === 0 ? 'landscape' : 'portrait';
                 parameters.screenshotsOrientation = orientation;
