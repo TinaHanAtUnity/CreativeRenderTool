@@ -166,9 +166,10 @@ export class CometCampaignParser extends CampaignParser {
             let promise;
 
             if (CustomFeatures.isSliderEndScreenEnabled(parameters.appStoreId)) {
-                const screenshotsUrls = CustomFeatures.getScreenshotsUrls(parameters.appStoreId);
-
-                parameters.screenshots = screenshotsUrls.map(url => new Image(this.validateAndEncodeUrl(url, session), session));
+                const sliderImages = CustomFeatures.getSliderEndScreenImagesForGame(parameters.appStoreId);
+                const orientation = sliderImages && sliderImages.portrait && sliderImages.portrait.length === 0 ? 'landscape' : 'portrait';
+                parameters.screenshotsOrientation = orientation;
+                parameters.screenshots = sliderImages[orientation].map(url => new Image(this.validateAndEncodeUrl(url, session), session));
                 promise = Promise.resolve(new SliderPerformanceCampaign(parameters));
             } else {
                 promise = Promise.resolve(new PerformanceCampaign(parameters));

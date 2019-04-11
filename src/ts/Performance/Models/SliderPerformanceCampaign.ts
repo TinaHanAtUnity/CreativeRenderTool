@@ -14,4 +14,10 @@ export class SliderPerformanceCampaign extends PerformanceCampaign {
     public getScreenshots() {
         return this.get('screenshots') || [];
     }
+
+    public getScreenshotsOrientation(): 'portrait' | 'landscape' {
+        // Note: In practice we don't need the default value but because the screenshotsOrientation is in
+        // IPerformanceCampaign interface it needs to be optional
+        return this.get('screenshotsOrientation') || 'portrait';
+    }
 }

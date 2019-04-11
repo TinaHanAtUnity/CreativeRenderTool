@@ -34,14 +34,14 @@ export class Slider {
     private _indicators: HTMLElement[];
     private _isVisible: boolean;
 
-    constructor(urls: string[], config: ISliderOptions = {
-        duration: 200,
-        easing: 'ease',
-        slidesPerPage: 1.6666,
-        startIndex: 0,
-        threshold: 70
-    }) {
-        this.config = config;
+    constructor(urls: string[], imageOrientation: 'portrait' | 'landscape') {
+        this.config = {
+            duration: 200,
+            easing: 'ease',
+            slidesPerPage: 1.6666,
+            startIndex: 0,
+            threshold: 70,
+        };
         this.drag = {
             startX: 0,
             endX: 0,
@@ -51,7 +51,7 @@ export class Slider {
         };
 
         this._isVisible = true;
-        this._rootEl = this.createElement('div', 'slider-root-container', ['slider-wrap']);
+        this._rootEl = this.createElement('div', 'slider-root-container', ['slider-wrap', `${imageOrientation}-slider-images`]);
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
         this.slidesPerPage = this.config.slidesPerPage;
         this.innerElements = [].slice.call(urls);
@@ -160,13 +160,6 @@ export class Slider {
                 const image = new Image();
                 image.onload = () => {
                     resolve(this.generateSlideHTML('id', image));
-
-                    // TODO: This can be probable replaced when the metadata.json has data for us
-                    if (image.width > image.height) {
-                        this._rootEl.classList.add('landscape-slider-images');
-                    } else {
-                        this._rootEl.classList.add('portrait-slider-images');
-                    }
                 };
                 image.src = url;
             } else {

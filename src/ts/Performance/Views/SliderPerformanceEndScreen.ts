@@ -34,7 +34,7 @@ export class SliderPerformanceEndScreen extends EndScreen {
             'screenshots': screenshots
         };
 
-        this._slider = new Slider(screenshots);
+        this._slider = new Slider(screenshots, campaign.getScreenshotsOrientation());
     }
 
     public show(): void {

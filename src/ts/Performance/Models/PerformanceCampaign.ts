@@ -64,6 +64,7 @@ export interface IPerformanceCampaign extends ICampaign {
     adUnitStyle: AdUnitStyle | undefined;
     appDownloadUrl?: string;
     screenshots?: Image[];
+    screenshotsOrientation?: 'portrait' | 'landscape';
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
@@ -91,7 +92,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             store: ['number'],
             adUnitStyle: ['object', 'undefined'],
             screenshots: ['array', 'undefined'],
-            appDownloadUrl: ['string', 'undefined']
+            appDownloadUrl: ['string', 'undefined'],
+            screenshotsOrientation: ['string', 'undefined'],
         }, campaign);
     }
 

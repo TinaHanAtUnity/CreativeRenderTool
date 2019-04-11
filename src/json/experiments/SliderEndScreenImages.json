@@ -1,12 +1,14 @@
 {
-    "com.unity3d.genericremote": [
-        "https://storage.googleapis.com/unity-ads-aui-prod-assets/343200656/81d418c0-fe0e-492c-bf8e-60b4332f4ff9.png",
-        "https://storage.googleapis.com/unity-ads-aui-prod-assets/343200656/3804f5e8-3f7c-4ea3-9381-5f631a7c718c.png",
-        "https://storage.googleapis.com/unity-ads-aui-prod-assets/343200656/99b14039-b4f1-4752-86c9-e96b647d70a2.png"
-    ],
-    "com.hcg.cok.gp": [
-        "https://storage.googleapis.com/unity-ads-aui-prod-assets/com.hcg.cok.gp/0bb9fc37-892c-4fb7-bb88-fc6d36e15791.jpg",
-        "https://storage.googleapis.com/unity-ads-aui-prod-assets/com.hcg.cok.gp/851d880c-6482-45f1-bc3f-e18c2929b8a1.jpg",
-        "https://storage.googleapis.com/unity-ads-aui-prod-assets/com.hcg.cok.gp/5d39f663-0612-4d08-bd85-6f867f385b09.jpg"
-    ]
+    "343200656": {
+        "landscape": [],
+        "portrait": ["https://storage.googleapis.com/unity-ads-aui-prod-assets/343200656/8369c64d-8457-4d45-b612-087ac86dba85.png", "https://storage.googleapis.com/unity-ads-aui-prod-assets/343200656/96dad2ad-6a2c-4479-bef1-80dbc061cc8b.png", "https://storage.googleapis.com/unity-ads-aui-prod-assets/343200656/c3b9149e-0e44-444a-b6d6-ab68fbc78672.png"]
+    },
+    "com.supercell.brawlstars": {
+        "landscape": ["https://storage.googleapis.com/unity-ads-aui-prod-assets/com.supercell.brawlstars/7492cf5a-32eb-453b-94e0-e71df23cfc68.jpg", "https://storage.googleapis.com/unity-ads-aui-prod-assets/com.supercell.brawlstars/54002bd0-8e1a-45cd-99ed-080176c0cefe.jpg", "https://storage.googleapis.com/unity-ads-aui-prod-assets/com.supercell.brawlstars/166c76c5-e1f8-411a-bf31-31d733181b9c.jpg"],
+        "portrait": []
+    },
+    "com.hcg.cok.gp": {
+        "landscape": [],
+        "portrait": ["https://storage.googleapis.com/unity-ads-aui-prod-assets/com.hcg.cok.gp/b4fc0359-3756-4c1b-a123-2b69d67ebb41.jpg", "https://storage.googleapis.com/unity-ads-aui-prod-assets/com.hcg.cok.gp/fb86aabd-5451-4441-8a1f-dc7b9c17c564.jpg", "https://storage.googleapis.com/unity-ads-aui-prod-assets/com.hcg.cok.gp/e070f621-d882-487e-8e6e-ed51dea8ec0f.jpg"]
+    }
 }
