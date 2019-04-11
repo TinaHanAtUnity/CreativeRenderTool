@@ -10,6 +10,7 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { iOSCrashTest } from 'Core/Models/ABGroup';
 
 const enum RequestStatus {
     COMPLETE,
@@ -123,7 +124,7 @@ export class RequestManager {
                 return;
             }
 
-            if (CustomFeatures.isAuctionV4Game(clientInfo.getGameId())) {
+            if (CustomFeatures.isAuctionV4Game(clientInfo.getGameId()) && !iOSCrashTest.isValid(coreConfig.getAbGroup())) {
                 RequestManager._auctionProtocol = AuctionProtocol.V4;
                 return;
             }
