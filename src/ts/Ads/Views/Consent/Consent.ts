@@ -321,9 +321,10 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     }
 
     private showMyChoicesPageAndScrollToParagraph(paragraph: PrivacyTextParagraph): void {
-        const kafkaObject: { [key: string]: unknown } = {};
-        kafkaObject.type = 'consent_paragraph_link_clicked';
-        kafkaObject.timestamp = Date.now();
+        const kafkaObject = {
+            type: 'consent_paragraph_link_clicked',
+            timestamp: Date.now()
+        };
         // to get a rough estimate how often users click links on the homescreen
         HttpKafka.sendEvent('ads.sdk2.diagnostics', KafkaCommonObjectType.EMPTY, kafkaObject);
 
