@@ -2,6 +2,7 @@
 
 * Log iOS storage write event and remove Zynga custom feature [#9050](https://github.com/Applifier/unity-ads-webview/pull/9050)
 * Force a specific auction protocol version [#8998](https://github.com/Applifier/unity-ads-webview/pull/8998)
+* Add stages for tests and deployment [#9076](https://github.com/Applifier/unity-ads-webview/pull/9076)
 
 # Wed Apr 10 21:59:07 UTC 2019
 
