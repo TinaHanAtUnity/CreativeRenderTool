@@ -80,6 +80,7 @@ import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
+import { DisableBackupCampaignsTest } from 'Core/Models/ABGroup';
 
 export class Ads implements IAds {
 
@@ -178,6 +179,10 @@ export class Ads implements IAds {
         }).then(() => {
             const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
+
+            if(DisableBackupCampaignsTest.isValid(this._core.Config.getAbGroup())) {
+                this.BackupCampaignManager.setEnabled(false);
+            }
 
             this.AssetManager = new AssetManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.CacheManager, this.Config.getCacheMode(), this._core.DeviceInfo, this._core.CacheBookkeeping, this.ProgrammaticTrackingService, this.BackupCampaignManager);
             if(this.SessionManager.getGameSessionId() % 10000 === 0) {
