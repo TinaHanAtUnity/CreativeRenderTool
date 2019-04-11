@@ -1,6 +1,8 @@
-# Merged
+# Wed Apr 10 21:59:07 UTC 2019
 
 * Remove custom kafka event from overlay install now button [#9051](https://github.com/Applifier/unity-ads-webview/pull/9051)
+* Remove borders from Show my choices CTA button (A/B test) [#9052](https://github.com/Applifier/unity-ads-webview/pull/9052)
+* Fix url cut off from multiple = character in query param [#9053](https://github.com/Applifier/unity-ads-webview/pull/9053)
 
 # Tue Apr  9 07:52:29 UTC 2019
 
