@@ -101,9 +101,9 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
         } else {
             urlPromise = this.createClickUrl(url, touchInfo);
         }
-        return urlPromise.then((attributionUrl) => {
-            // Separate event from Click for generated for Admob Attribution
-            return Promises.voidResult(this._thirdPartyEventManager.sendWithGet('admob click attribution', this._session.getId(), attributionUrl, true, headers));
+        return urlPromise.then((clickUrl) => {
+            // voidResult transforms promise to Promise<void>
+            return Promises.voidResult(this._thirdPartyEventManager.sendWithGet('admob click', this._session.getId(), clickUrl, true, headers));
         });
    }
 
@@ -139,7 +139,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     }
 
     public onTrackingEvent(event: string, data?: unknown) {
-        // TODO: Man test that this works
+        // TODO: Manually test that this works
         if (event in TrackingEvent) {
             this._adUnit.sendTrackingEvent(<TrackingEvent>event);
             if (event === TrackingEvent.ERROR) {

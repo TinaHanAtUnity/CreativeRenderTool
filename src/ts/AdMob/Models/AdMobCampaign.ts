@@ -77,10 +77,4 @@ export class AdMobCampaign extends ProgrammaticCampaign<IAdMobCampaign> {
     public isConnectionNeeded(): boolean {
         return true;
     }
-
-    public addClickAttributionUrl(url: string) {
-        const trackingUrls = this.getTrackingUrls();
-        trackingUrls[TrackingEvent.CLICK].push(url);
-        this.setTrackingUrls(trackingUrls);
-    }
 }
