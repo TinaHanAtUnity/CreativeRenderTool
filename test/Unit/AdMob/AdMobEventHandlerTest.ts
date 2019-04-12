@@ -208,8 +208,14 @@ const resolveAfter = (timeout: number): Promise<void> => {
 
         describe('tracking event', () => {
             it('should forward the event to the ad unit', () => {
-                admobEventHandler.onTrackingEvent(TrackingEvent.MIDPOINT);
+                // Send with raw string the same way AFMA container does
+                admobEventHandler.onTrackingEvent('midpoint');
                 (<sinon.SinonStub>adUnit.sendTrackingEvent).calledWith(TrackingEvent.MIDPOINT);
+            });
+
+            it('should not forward the event to the ad unit with incorrect event', () => {
+                admobEventHandler.onTrackingEvent('skidpoint');
+                sinon.assert.notCalled((<sinon.SinonStub>adUnit.sendTrackingEvent));
             });
         });
     });
