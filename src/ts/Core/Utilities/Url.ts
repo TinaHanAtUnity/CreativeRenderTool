@@ -60,8 +60,12 @@ export class Url {
         const queryParams: string[] = urlAndQuery[1].split('&');
         const encodedQueryPairs: string[] = [];
         for (const queryPair of queryParams) {
-            const queryParam = queryPair.split('=');
-            encodedQueryPairs.push(Url.encodeParam(queryParam[0]) + '=' + Url.encodeParam(queryParam[1]));
+            const queryParamSplitted = queryPair.split('=');
+            const encodedQueryParam: string[] = [];
+            for (const queryParam of queryParamSplitted) {
+                encodedQueryParam.push(Url.encodeParam(queryParam));
+            }
+            encodedQueryPairs.push(encodedQueryParam.join('='));
         }
 
         const encodedUri = Url.encode(uri);
