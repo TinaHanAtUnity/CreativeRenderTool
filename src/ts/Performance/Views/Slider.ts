@@ -38,7 +38,7 @@ export class Slider {
         this.config = {
             duration: 200,
             easing: 'ease',
-            slidesPerPage: 1.6666,
+            slidesPerPage: 1.2,
             startIndex: 0,
             threshold: 70
         };
