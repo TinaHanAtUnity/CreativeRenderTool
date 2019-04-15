@@ -22,3 +22,10 @@ import { DOMUtils } from 'Core/Utilities/DOMUtils';
 })(DOMParser));
 
 // tslint:enable:no-empty
+
+/**
+ *  Object.values() has issues with older Android Devices.
+ */
+Object.values = (obj: Object) => {
+    return Object.keys(obj).map((values) => obj[<keyof typeof obj>values]);
+};
