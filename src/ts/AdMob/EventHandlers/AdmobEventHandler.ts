@@ -139,16 +139,18 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     }
 
     public onTrackingEvent(event: string, data?: unknown) {
-        if (Object.values(TrackingEvent).includes(event)) {
-            this._adUnit.sendTrackingEvent(<TrackingEvent>event);
-            if (event === TrackingEvent.ERROR) {
-                SessionDiagnostics.trigger('admob_ad_error', data, this._campaign.getSession());
-            } else if (event === TrackingEvent.STALLED) {
-                Diagnostics.trigger('admob_ad_video_stalled', {
-                    data: data
-                });
+        Object.keys(TrackingEvent).map((eventType) => {
+            if (TrackingEvent[<keyof typeof TrackingEvent>eventType] === event) {
+                this._adUnit.sendTrackingEvent(<TrackingEvent>eventType);
+                if (event === TrackingEvent.ERROR) {
+                    SessionDiagnostics.trigger('admob_ad_error', data, this._campaign.getSession());
+                } else if (event === TrackingEvent.STALLED) {
+                    Diagnostics.trigger('admob_ad_video_stalled', {
+                        data: data
+                    });
+                }
             }
-        }
+        });
     }
 
     public onClickSignalRequest(touchInfo: ITouchInfo) {

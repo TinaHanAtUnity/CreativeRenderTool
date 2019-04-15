@@ -232,7 +232,7 @@ export class VastParserStrict {
                 for (const clickTrackingUrl of ad.getVideoClickTrackingURLTemplates()) {
                     parsedAd.addVideoClickTrackingURLTemplate(clickTrackingUrl);
                 }
-                for (const eventName of Object.values(TrackingEvent)) {
+                for (const eventName of Object.keys(TrackingEvent).map((event) => TrackingEvent[<keyof typeof TrackingEvent>event])) {
                     for (const url of parent.getTrackingEventUrls(eventName)) {
                         parsedVast.addTrackingEventUrl(eventName, url);
                     }
