@@ -16,6 +16,7 @@ import {
     PrivacyTextParagraph
 } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { ProgrammaticTrackingService, ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IConsentViewParameters {
     platform: Platform;
@@ -24,6 +25,7 @@ export interface IConsentViewParameters {
     apiLevel?: number;
     osVersion?: string;
     useAltMyChoicesButtonText: boolean;
+    pts: ProgrammaticTrackingService;
 }
 
 export enum ConsentPage {
@@ -41,6 +43,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private _switchGroup: PersonalizationSwitchGroup;
     private _privacyRowItemContainer: PrivacyRowItemContainer;
     private _consentButtonContainer: HTMLElement;
+    private _pts: ProgrammaticTrackingService;
 
     private _landingPage: ConsentPage;
     private _currentPage: ConsentPage;
@@ -51,7 +54,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._landingPage = parameters.landingPage;
         this._apiLevel = parameters.apiLevel;
         this._osVersion = parameters.osVersion;
-
+        this._pts = parameters.pts;
         this._privacyManager = parameters.privacyManager;
 
         this._template = new Template(ConsentTemplate);
@@ -321,15 +324,9 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     }
 
     private showMyChoicesPageAndScrollToParagraph(paragraph: PrivacyTextParagraph): void {
-        const kafkaObject = {
-            type: 'consent_paragraph_link_clicked',
-            timestamp: Date.now()
-        };
-        // to get a rough estimate how often users click links on the homescreen
-        HttpKafka.sendEvent('ads.sdk2.diagnostics', KafkaCommonObjectType.EMPTY, kafkaObject);
-
+        // To get a rough estimate how often users click links on the homescreen
+        this._pts.reportMetric(ProgrammaticTrackingMetricName.ConsentParagraphLinkClicked);
         this.showPage(ConsentPage.MY_CHOICES);
         this._privacyRowItemContainer.showParagraphAndScrollToSection(paragraph);
-
     }
 }
