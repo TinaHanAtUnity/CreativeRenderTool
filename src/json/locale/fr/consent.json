@@ -4,7 +4,13 @@
   "homepage-accept-all": "Accept",
   "homepage-show-my-choices": "Show my choices",
 
-  "save-my-choices": "Save my choices",
-  "agree-to-all": "Agree to all",
-  "no-thanks": "No thanks"
+  "my-choices-title": "Autorisez-vous les cookies Unity à collecter et à utiliser vos données pour personnaliser vos publicités et votre expérience ?",
+  "my-choices-switch-game-experience": "J'accepte que mes données soient utilisées pour me fournir une expérience de jeu personnalisée",
+  "my-choices-switch-personalized-ads": "J'accepte l'affichage de publicités et de contenu in-app Unity personnalisés",
+  "my-choices-switch-personalized-third-party": "J'accepte également les publicités et les mesures, y compris la collecte de données démographiques et autres par des partenaires externes",
+  "my-choices-text": "Unity et nos partenaires externes collectent des données, notamment des informations à caractère démographique, et utilisent les identifiants des mobiles pour personnaliser et évaluer les publicités et l'expérience de jeu.  Vous pouvez accéder à ces options à tout moment en vous rendant sur l'icône de la politique de confidentialité Unity, pendant ou après l'affichage d'une publicité.",
+
+  "save-my-choices": "Sauvegarder mes préférences",
+  "agree-to-all": "Tout accepter",
+  "no-thanks": "Non merci"
 }
