@@ -135,7 +135,7 @@ export class Slider {
         this.selectorWidth = this._rootEl.offsetWidth;
         const widthItem = this.selectorWidth / this.slidesPerPage;
         const itemsToBuild = this.imageUrls.length + (this.slidesPerPage * 2);
-        this._slidesContainer.style.width = `${(widthItem) * itemsToBuild}px`;
+        this._slidesContainer.style.width = `${widthItem * itemsToBuild}px`;
         this.disableTransition();
         this.slideToCurrent(true);
     }
@@ -168,7 +168,7 @@ export class Slider {
     }
 
     private generateSlideHTML(id: string, image?: HTMLImageElement): HTMLElement {
-        const item = this.createElement('div', null, ['slider-item', 'slider-item']);
+        const item = this.createElement('div', id, ['slider-item', 'slider-item']);
         item.style.width = `${100 / (this.imageUrls.length + (this.slidesPerPage * 2))}%`;
         if (image !== undefined) {
             item.appendChild(image);
@@ -228,11 +228,9 @@ export class Slider {
         container.appendChild(this._rootEl);
     }
 
-    private createElement(name: string, id: string | null, className: string[] = [], style: { [key: string]: any } = {}): HTMLElement {
+    private createElement(name: string, id: string, className: string[] = [], style: { [key: string]: any } = {}): HTMLElement {
         const el = document.createElement(name);
-        if (id) {
-            el.id = id;
-        }
+        el.id = id;
         el.classList.add(...className);
 
         this.setStyles(el, style);
