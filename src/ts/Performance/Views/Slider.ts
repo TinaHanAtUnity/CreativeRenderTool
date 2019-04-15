@@ -169,7 +169,6 @@ export class Slider {
 
     private generateSlideHTML(id: string, image?: HTMLImageElement): HTMLElement {
         const item = this.createElement('div', id, ['slider-item', 'slider-item']);
-        item.style.cssFloat = 'left';
         item.style.width = `${100 / (this.imageUrls.length + (this.slidesPerPage * 2))}%`;
         if (image !== undefined) {
             item.appendChild(image);
@@ -404,8 +403,12 @@ export class Slider {
     }
 
     private static updateIndicator(indicators: HTMLElement[], currentIndex: number) {
-        const previousIndex = (currentIndex - 1) < 0 ? (indicators.length - 1) : (currentIndex - 1);
-        indicators[previousIndex].classList.remove('active');
+        for (const indicator of indicators) {
+            indicator.classList.remove('active');
+        }
+        if (currentIndex > (indicators.length - 1)) {
+            currentIndex = 0;
+        }
         indicators[currentIndex].classList.add('active');
     }
 
