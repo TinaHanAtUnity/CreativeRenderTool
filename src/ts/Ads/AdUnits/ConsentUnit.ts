@@ -51,7 +51,6 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             platform: parameters.platform,
             privacyManager: parameters.privacyManager,
             landingPage: this._landingPage,
-            useAltMyChoicesButtonText: ConsentMyChoicesButtonTextTest.isValid(parameters.abGroup),
             pts: parameters.pts,
             useAltMyChoicesButtonText: false, // will be re-tested later
             ctaABTest: ConsentCTATest.isValid(parameters.abGroup)
