@@ -229,7 +229,7 @@ export class Slider {
         container.appendChild(this._rootEl);
     }
 
-    private createElement(name: string, id: string | null, className: string[] = [], style: { [key: string]: any } = {}): HTMLElement {
+    private createElement(name: string, id: string | null, className: string[] = [], style: { [key: string]: string } = {}): HTMLElement {
         const el = document.createElement(name);
         if (id) {
             el.id = id;
@@ -241,7 +241,7 @@ export class Slider {
         return el;
     }
 
-    private setStyles(el: HTMLElement, style: { [key: string]: any } = {}): void {
+    private setStyles(el: HTMLElement, style: { [key: string]: string } = {}): void {
         Object.keys(style).forEach((key) => {
             el.style.setProperty(key, String(style[key]));
         });
