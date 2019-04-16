@@ -143,7 +143,7 @@ export class ConfigManager {
             });
         }
 
-        const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo)
+        const trackingIDs = TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo);
         url = Url.addParameters(url, trackingIDs);
 
         if(framework) {
