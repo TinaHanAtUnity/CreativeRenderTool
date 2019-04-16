@@ -96,8 +96,9 @@ export class Slider {
     }
 
     public hide(): void {
+        this._isVisible = false;
+
         if (this._autoplayTimeoutId) {
-            this._isVisible = false;
             clearTimeout(this._autoplayTimeoutId);
         }
     }
