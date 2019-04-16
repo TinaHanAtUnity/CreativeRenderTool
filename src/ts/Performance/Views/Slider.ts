@@ -51,6 +51,7 @@ export class Slider {
         };
 
         this._isVisible = true;
+        imageOrientation === 'portrait' ? this.config.slidesPerPage = 1.666 : this.config.slidesPerPage = 1.2;
         this._rootEl = this.createElement('div', 'slider-root-container', ['slider-wrap', `${imageOrientation}-slider-images`]);
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
         this.slidesPerPage = this.config.slidesPerPage;
@@ -327,7 +328,7 @@ export class Slider {
         }
 
         const beforeChange = this.currentSlide;
-        const isNewIndexClone = this.currentSlide + howManySlides > this.imageUrls.length - this.slidesPerPage;
+        const isNewIndexClone = (this.currentSlide + howManySlides) - 1 > this.imageUrls.length - this.slidesPerPage;
         if (isNewIndexClone) {
             this.disableTransition();
 
