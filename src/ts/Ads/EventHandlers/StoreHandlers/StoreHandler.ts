@@ -20,7 +20,7 @@ import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { ICoreApi } from 'Core/ICore';
 import { IAdsApi } from 'Ads/IAds';
 import { DownloadManager } from 'China/Managers/DownloadManager';
-import { DeviceIdManager } from 'China/Managers/DeviceIdManager';
+import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { IStoreApi } from 'Store/IStore';
 
 export interface IStoreHandler {

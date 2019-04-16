@@ -91,6 +91,62 @@ describe('DeviceIdManagerTest', () => {
         });
     });
 
+    describe('when checking compliant', () => {
+        it ('should return true if all conditions are satisfied', () => {
+            const country = 'CN';
+            const optOutEnabled = false;
+            sandbox.stub(deviceInfo, 'getAdvertisingIdentifier').returns(undefined);
+            sandbox.stub(deviceInfo, 'getLimitAdTracking').returns(false);
+
+            assert.isTrue(deviceIdManager.isCompliant(country, optOutEnabled));
+        });
+
+        it ('should return false if country is not China', () => {
+            const country = 'FI';
+            const optOutEnabled = false;
+            sandbox.stub(deviceInfo, 'getAdvertisingIdentifier').returns(undefined);
+            sandbox.stub(deviceInfo, 'getLimitAdTracking').returns(false);
+
+            assert.isFalse(deviceIdManager.isCompliant(country, optOutEnabled));
+        });
+
+        it ('should return false if opt out of unity ads', () => {
+            const country = 'CN';
+            const optOutEnabled = true;
+            sandbox.stub(deviceInfo, 'getAdvertisingIdentifier').returns(undefined);
+            sandbox.stub(deviceInfo, 'getLimitAdTracking').returns(false);
+
+            assert.isFalse(deviceIdManager.isCompliant(country, optOutEnabled));
+        });
+
+        it ('should return false if advertising ID is present', () => {
+            const country = 'CN';
+            const optOutEnabled = false;
+            sandbox.stub(deviceInfo, 'getAdvertisingIdentifier').returns('advertisingIdentifier');
+            sandbox.stub(deviceInfo, 'getLimitAdTracking').returns(false);
+
+            assert.isFalse(deviceIdManager.isCompliant(country, optOutEnabled));
+        });
+
+        it ('should return false if limit ad tracking is on', () => {
+            const country = 'CN';
+            const optOutEnabled = false;
+            sandbox.stub(deviceInfo, 'getAdvertisingIdentifier').returns(undefined);
+            sandbox.stub(deviceInfo, 'getLimitAdTracking').returns(true);
+
+            assert.isFalse(deviceIdManager.isCompliant(country, optOutEnabled));
+        });
+
+        it ('should return false if all conditions are not met', () => {
+            const country = 'FI';
+            const optOutEnabled = true;
+            sandbox.stub(deviceInfo, 'getAdvertisingIdentifier').returns('advertisingIdentifier');
+            sandbox.stub(deviceInfo, 'getLimitAdTracking').returns(false);
+
+            assert.isFalse(deviceIdManager.isCompliant(country, optOutEnabled));
+        });
+    });
+
     describe('when reading device id', () => {
         beforeEach(() => {
             sandbox.stub(core.Storage, 'get').resolves();

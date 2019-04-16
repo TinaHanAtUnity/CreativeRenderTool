@@ -50,6 +50,7 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Store } from 'Store/Store';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
+import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 
 export class Core implements ICore {
 
@@ -68,6 +69,7 @@ export class Core implements ICore {
     public RequestManager: RequestManager;
     public CacheManager: CacheManager;
     public JaegerManager: JaegerManager;
+    public DeviceIdManager: DeviceIdManager;
     public ClientInfo: ClientInfo;
     public DeviceInfo: DeviceInfo;
     public UnityInfo: UnityInfo;
@@ -133,6 +135,7 @@ export class Core implements ICore {
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.DeviceInfo = new AndroidDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager, <AndroidDeviceInfo>this.DeviceInfo);
+                this.DeviceIdManager = new DeviceIdManager(this.Api, this.DeviceInfo);
             } else if(this.NativeBridge.getPlatform() === Platform.IOS) {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);
@@ -229,6 +232,12 @@ export class Core implements ICore {
             this.Purchasing = new Purchasing(this);
 
             return this.Ads.initialize(jaegerInitSpan);
+        }).then(() => {
+            if (this.DeviceIdManager && this.DeviceIdManager.isCompliant(this.Config.getCountry(), this.Ads.Config.isOptOutEnabled())) {
+                return this.DeviceIdManager.getDeviceIds().catch((error) => {
+                    Diagnostics.trigger('get_deviceid_failed', error);
+                });
+            }
         }).then(() => {
             this.JaegerManager.stop(jaegerInitSpan);
         }).catch((error: { message: string; name: unknown }) => {

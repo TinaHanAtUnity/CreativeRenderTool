@@ -154,7 +154,6 @@ import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { AndroidDownloadApi } from 'China/Native/Android/Download';
 import { AndroidInstallListenerApi } from 'China/Native/Android/InstallListener';
 import { IChinaApi } from 'China/IChina';
-import { ChinaAndroidDeviceInfoApi } from 'China/Native/Android/DeviceInfo';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import OnProgrammaticBannerCampaign from 'json/OnProgrammaticBannerCampaign.json';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
@@ -1074,8 +1073,7 @@ export class TestFixtures {
         return {
             Android: {
                 Download: new AndroidDownloadApi(nativeBridge),
-                InstallListener: new AndroidInstallListenerApi(nativeBridge),
-                DeviceInfo: new ChinaAndroidDeviceInfoApi(nativeBridge)
+                InstallListener: new AndroidInstallListenerApi(nativeBridge)
             }
         };
     }

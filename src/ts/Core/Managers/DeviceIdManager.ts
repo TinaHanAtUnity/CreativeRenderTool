@@ -81,12 +81,12 @@ export class DeviceIdManager {
     }
 
     /**
-     * Checks if SDK can and should collecting device ID's.
+     * Checks if SDK should collect device ID's.
      * @param country The country of the geolocation of the device according to IP address.
      * @param isOptOutEnabled The consent response from user.
      * @returns True if collecting device ID is okay, else false.
      */
-    public isLegal(country: string, isOptOutEnabled: boolean): boolean {
+    public isCompliant(country: string, isOptOutEnabled: boolean): boolean {
         if (country === 'CN'
             && !this._deviceInfo.getAdvertisingIdentifier()
             && !this._deviceInfo.getLimitAdTracking()

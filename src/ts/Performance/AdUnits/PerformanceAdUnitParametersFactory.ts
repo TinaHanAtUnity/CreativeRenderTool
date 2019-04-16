@@ -8,7 +8,7 @@ import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
 import { DownloadManager } from 'China/Managers/DownloadManager';
-import { DeviceIdManager } from 'China/Managers/DeviceIdManager';
+import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { IChina } from 'China/IChina';
 import { SkipUnderTimerExperiment } from 'Core/Models/ABGroup';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
@@ -22,9 +22,9 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
     constructor(core: ICore, ads: IAds, china?: IChina) {
         super(core, ads);
 
+        this._deviceIdManager = core.DeviceIdManager;
         if (china) {
             this._downloadManager = china.DownloadManager;
-            this._deviceIdManager = china.DeviceIdManager;
         }
     }
 

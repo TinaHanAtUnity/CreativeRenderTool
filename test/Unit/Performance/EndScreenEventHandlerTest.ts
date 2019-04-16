@@ -43,7 +43,7 @@ import { StoreHandlerFactory } from 'Ads/EventHandlers/StoreHandlers/StoreHandle
 import { Campaign } from 'Ads/Models/Campaign';
 import { DownloadManager, DownloadMessage, DownloadState } from 'China/Managers/DownloadManager';
 import { DownloadStatus } from 'China/Native/Android/Download';
-import { DeviceIdManager } from 'China/Managers/DeviceIdManager';
+import { DeviceIdManager } from 'Core/Managers/DeviceIdManager';
 import { IChinaApi } from 'China/IChina';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { IStoreApi } from 'Store/IStore';
@@ -293,7 +293,7 @@ describe('EndScreenEventHandlerTest', () => {
                     china = TestFixtures.getChinaApi(nativeBridge);
 
                     downloadManager = new DownloadManager(core, china, (<AndroidDeviceInfo>deviceInfo).getApiLevel());
-                    deviceIdManager = new DeviceIdManager(core, china, deviceInfo);
+                    deviceIdManager = new DeviceIdManager(core, deviceInfo);
 
                     const storeHandlerParameters: IStoreHandlerParameters = {
                         platform,
@@ -316,20 +316,6 @@ describe('EndScreenEventHandlerTest', () => {
                     endScreenEventHandler = new PerformanceEndScreenEventHandler(performanceAdUnit, performanceAdUnitParameters, storeHandler);
 
                     sandbox.stub(CustomFeatures, 'isChinaSDK').returns(true);
-                });
-
-                xit('should not collect device id if country is not china', (resolve) => {
-                    sandbox.stub(coreConfig, 'getCountry').returns('FI');
-                    sandbox.stub(<AndroidDeviceInfo>deviceInfo, 'getDeviceId1').returns(undefined);
-                    sandbox.stub(downloadManager, 'download').resolves(1);
-                    sandbox.stub(deviceIdManager, 'getDeviceIdsWithPermissionRequest').resolves();
-
-                    endScreenEventHandler.onEndScreenDownload(downloadParameters);
-
-                    setTimeout(() => {
-                        sinon.assert.notCalled(<sinon.SinonSpy>deviceIdManager.getDeviceIdsWithPermissionRequest);
-                        resolve();
-                    }, 5);
                 });
 
                 it('should start download if the current download state is not enqueuing', (resolve) => {
@@ -400,9 +386,8 @@ describe('EndScreenEventHandlerTest', () => {
                     }, 5);
                 });
 
-                describe('when collecting device id in china', () => {
+                describe('when collecting device id', () => {
                     beforeEach(() => {
-                        sandbox.stub(coreConfig, 'getCountry').returns('CN');
                         sandbox.stub(downloadManager, 'download').resolves(1);
                     });
 
