@@ -6,7 +6,6 @@ import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilit
 import { ICoreApi } from 'Core/ICore';
 import { Platform } from 'Core/Constants/Platform';
 import { BuildVerionCode } from 'Core/Constants/Android/BuildVerionCode';
-import { IChinaApi } from 'China/IChina';
 
 export enum DeviceIdMessage {
     PERMISSION_ERROR = 'Permission error',
@@ -20,47 +19,31 @@ export enum DeviceIdStorageKeys {
 
 export class DeviceIdManager {
     private _core : ICoreApi;
-    private _china : IChinaApi;
     private _deviceInfo: DeviceInfo;
 
-    constructor(core: ICoreApi, china: IChinaApi, deviceInfo: DeviceInfo) {
+    constructor(core: ICoreApi, deviceInfo: DeviceInfo) {
         this._core = core;
-        this._china = china;
         this._deviceInfo = deviceInfo;
     }
 
-    public fetchDeviceIds(): Promise<void> {
-        return new Promise<[string, string]>((resolve, reject) => {
-            if ((<AndroidDeviceInfo>this._deviceInfo).getApiLevel() <= BuildVerionCode.M) {
-                return this._china.Android.DeviceInfo.getDeviceId().then((deviceId) => {
-                    resolve([deviceId, deviceId]);
-                }).catch(reject);
-            } else {
-                const getDeviceId1 = this._china.Android.DeviceInfo.getDeviceIdWithSlot(0);
-                const getDeviceId2 = this._china.Android.DeviceInfo.getDeviceIdWithSlot(1);
-                return Promise.all([getDeviceId1, getDeviceId2]).then(resolve).catch(reject);
-            }
-        }).then(([deviceId1, deviceId2]) => {
-            if (deviceId1 && deviceId2) {
-                (<AndroidDeviceInfo>this._deviceInfo).setDeviceIds(deviceId1, deviceId2);
-            } else {
-                this._core.Sdk.logInfo('Device ids fetched were invalid');
-            }
-        }).catch((error) => {
-            this._core.Sdk.logWarning(JSON.stringify(error));
-        });
-    }
-
+    /**
+     * Collects device ID's from user's device and store them in device info model.
+     * @returns A promise that resolves if collection succeeds and rejects otherwise.
+     */
     public getDeviceIds(): Promise<void> {
         return PermissionsUtil.checkPermissions(Platform.ANDROID, this._core, PermissionTypes.READ_PHONE_STATE).then((result) => {
             if (result === CurrentPermission.ACCEPTED) {
-                return this.readAndStoreDeviceIds();
+                return this.fetchDeviceIds();
             } else {
                 return Promise.reject(new Error(DeviceIdMessage.PERMISSION_ERROR));
             }
         });
     }
 
+    /**
+     * Collects device ID's from user's device and store them in device info model. If permission has not been granted, request it if possible.
+     * @returns A promise that resolves if collection succeeds and rejects otherwise.
+     */
     public getDeviceIdsWithPermissionRequest(): Promise<void> {
         const deviceIdPromise = new Promise<void>((resolve, reject) => {
             this.getDeviceIds().then(resolve).catch((error) => {
@@ -68,7 +51,7 @@ export class DeviceIdManager {
                     Diagnostics.trigger('device_id_permission', 'Permission requested');
                     this.handlePermissionRequest(PermissionTypes.READ_PHONE_STATE).then(() => {
                         Diagnostics.trigger('device_id_permission', 'Permission granted upon request');
-                        return this.readAndStoreDeviceIds().then(resolve);
+                        return this.fetchDeviceIds().then(resolve);
                     }).catch(reject);
                 } else {
                     reject(error);
@@ -82,6 +65,10 @@ export class DeviceIdManager {
             });
     }
 
+    /**
+     * Loads stored device ID's from device storage.
+     * @returns A promise that resolves if the load succeeds and rejects otherwise.
+     */
     public loadStoredDeviceIds(): Promise<void> {
         return this.fetchStoredDeviceIds().then(([deviceId1, deviceId2]) => {
             if (deviceId1 && deviceId2) {
@@ -90,6 +77,45 @@ export class DeviceIdManager {
             } else {
                 return Promise.reject(new Error('Device ids not found in cache'));
             }
+        });
+    }
+
+    /**
+     * Checks if SDK can and should collecting device ID's.
+     * @param country The country of the geolocation of the device according to IP address.
+     * @param isOptOutEnabled The consent response from user.
+     * @returns True if collecting device ID is okay, else false.
+     */
+    public isLegal(country: string, isOptOutEnabled: boolean): boolean {
+        if (country === 'CN'
+            && !this._deviceInfo.getAdvertisingIdentifier()
+            && !this._deviceInfo.getLimitAdTracking()
+            && !isOptOutEnabled) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private fetchDeviceIds(): Promise<void> {
+        return new Promise<[string, string]>((resolve, reject) => {
+            if ((<AndroidDeviceInfo>this._deviceInfo).getApiLevel() <= BuildVerionCode.M) {
+                return this._core.DeviceInfo.Android!.getDeviceId().then((deviceId) => {
+                    resolve([deviceId, deviceId]);
+                }).catch(reject);
+            } else {
+                const getDeviceId1 = this._core.DeviceInfo.Android!.getDeviceIdWithSlot(0);
+                const getDeviceId2 = this._core.DeviceInfo.Android!.getDeviceIdWithSlot(1);
+                return Promise.all([getDeviceId1, getDeviceId2]).then(resolve).catch(reject);
+            }
+        }).then(([deviceId1, deviceId2]) => {
+            if (deviceId1 && deviceId2) {
+                (<AndroidDeviceInfo>this._deviceInfo).setDeviceIds(deviceId1, deviceId2);
+            } else {
+                this._core.Sdk.logInfo('Device ids fetched were invalid');
+            }
+        }).catch((error) => {
+            this._core.Sdk.logWarning(JSON.stringify(error));
         });
     }
 
