@@ -4,7 +4,6 @@ import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import AuctionV4GamesJson from 'json/custom_features/AuctionV4Games.json';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { Placement } from 'Ads/Models/Placement';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
