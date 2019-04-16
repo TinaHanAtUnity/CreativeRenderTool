@@ -14,8 +14,8 @@ import { ICoreApi } from 'Core/ICore';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { ABGroup, ConsentMyChoicesButtonTextTest } from 'Core/Models/ABGroup';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ABGroup, ConsentCTATest } from 'Core/Models/ABGroup';
 
 export interface IConsentUnitParameters {
     abGroup: ABGroup;
@@ -52,7 +52,9 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             privacyManager: parameters.privacyManager,
             landingPage: this._landingPage,
             useAltMyChoicesButtonText: ConsentMyChoicesButtonTextTest.isValid(parameters.abGroup),
-            pts: parameters.pts
+            pts: parameters.pts,
+            useAltMyChoicesButtonText: false, // will be re-tested later
+            ctaABTest: ConsentCTATest.isValid(parameters.abGroup)
         };
 
         if (this._platform === Platform.ANDROID) {

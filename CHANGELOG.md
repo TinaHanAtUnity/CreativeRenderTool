@@ -1,6 +1,19 @@
 # Merged
 
+* Progress bar overlay experiment in groups 5 & 6 [#8832](https://github.com/Applifier/unity-ads-webview/pull/8832)
+
+# Fri Apr 12 07:05:28 UTC 2019
+
+* Log iOS storage write event and remove Zynga custom feature [#9050](https://github.com/Applifier/unity-ads-webview/pull/9050)
+* Force a specific auction protocol version [#8998](https://github.com/Applifier/unity-ads-webview/pull/8998)
+* Add stages for tests and deployment [#9076](https://github.com/Applifier/unity-ads-webview/pull/9076)
+* Test for disabling backup campaigns [#9077](https://github.com/Applifier/unity-ads-webview/pull/9077)
+
+# Wed Apr 10 21:59:07 UTC 2019
+
 * Remove custom kafka event from overlay install now button [#9051](https://github.com/Applifier/unity-ads-webview/pull/9051)
+* Remove borders from Show my choices CTA button (A/B test) [#9052](https://github.com/Applifier/unity-ads-webview/pull/9052)
+* Fix url cut off from multiple = character in query param [#9053](https://github.com/Applifier/unity-ads-webview/pull/9053)
 
 # Tue Apr  9 07:52:29 UTC 2019
 
