@@ -16,6 +16,8 @@ export interface IDragOptions {
     preventClick: boolean;
 }
 
+type OnSlideCallback = (options: { automatic: boolean }) => void;
+
 export class Slider {
     private config: ISliderOptions;
     private selectorWidth: number;
@@ -33,8 +35,11 @@ export class Slider {
     private _indicatorWrap: HTMLElement;
     private _indicators: HTMLElement[];
     private _isVisible: boolean;
+    private _onSlideCallback: OnSlideCallback;
 
-    constructor(urls: string[], imageOrientation: 'portrait' | 'landscape') {
+    constructor(urls: string[], imageOrientation: 'portrait' | 'landscape', onSlideCallback: OnSlideCallback) {
+        this._onSlideCallback = onSlideCallback;
+
         this.config = {
             duration: 200,
             easing: 'ease',
@@ -94,13 +99,16 @@ export class Slider {
         });
     }
 
-    public show(): void {
+    public show(): boolean {
         this._isVisible = true;
 
-        // If this._ready has already resolved and set to null, slider is ready and autoplay can be started
+        // If this._ready has already resolved and set to null, slider was ready
         if (this._ready === null) {
             this.autoplay();
+            return true;
         }
+
+        return false;
     }
 
     public hide(): void {
@@ -111,12 +119,18 @@ export class Slider {
         }
     }
 
-    private slideToCurrent(enableTransition: boolean): void {
+    private slideToCurrent(slideOptions?: { enableTransition?: boolean; automatic?: boolean; triggeredByResize?: boolean }): void {
+        const defaultOptions = { enableTransition: true, automatic: false, triggeredByResize: false };
+        const options = slideOptions !== undefined ? { ...defaultOptions, ...slideOptions } : defaultOptions;
+        if (!options.triggeredByResize) {
+            this._onSlideCallback({ automatic: options.automatic });
+        }
+
         this.autoplay();
         const currentSlide = this.currentSlide + this.slidesPerPage;
 
         const offset = -Math.abs(currentSlide * (this.selectorWidth / this.slidesPerPage));
-        if (enableTransition) {
+        if (options.enableTransition) {
             // explanation for this one - https://youtu.be/cCOL7MC4Pl0
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
@@ -147,15 +161,15 @@ export class Slider {
         const itemsToBuild = this.imageUrls.length + (this.slidesPerPage * 2);
         this._slidesContainer.style.width = `${(widthItem) * itemsToBuild}px`;
         this.disableTransition();
-        this.slideToCurrent(true);
+        this.slideToCurrent({ triggeredByResize: true });
     }
 
     private resizeHandler(): void {
         if (this._ready === null) {
-            this.slideToCurrent(true);
+            this.slideToCurrent({ triggeredByResize: true });
         } else {
             this._ready.then(() => {
-                this.slideToCurrent(true);
+                this.slideToCurrent({ triggeredByResize: true });
             });
         }
         if(this._resizeTimeId) {
@@ -204,7 +218,7 @@ export class Slider {
 
         const interval = 3000;
         this._autoplayTimeoutId = window.setTimeout(() => {
-            this.next();
+            this.next(1, { automatic: true });
             this.autoplay();
         }, interval);
     }
@@ -327,11 +341,11 @@ export class Slider {
         } else if (movement < 0 && movementDistance > this.config.threshold && this.imageUrls.length > this.slidesPerPage) {
             this.next(howManySliderToSlide);
         } else {
-            this.slideToCurrent(slideToNegativeClone || slideToPositiveClone);
+            this.slideToCurrent({ enableTransition: slideToNegativeClone || slideToPositiveClone });
         }
     }
 
-    private next(howManySlides = 1): void {
+    private next(howManySlides = 1, options = { automatic: false }): void {
         // early return when there is nothing to slide
         if (this.imageUrls.length <= this.slidesPerPage) {
             return;
@@ -355,7 +369,7 @@ export class Slider {
         }
 
         if (beforeChange !== this.currentSlide) {
-            this.slideToCurrent(true);
+            this.slideToCurrent({ automatic: options.automatic });
         }
     }
 
@@ -384,7 +398,7 @@ export class Slider {
         }
 
         if (beforeChange !== this.currentSlide) {
-            this.slideToCurrent(true);
+            this.slideToCurrent();
         }
     }
 
@@ -422,7 +436,7 @@ export class Slider {
         if (currentIndex > (indicators.length - 1)) {
             currentIndex = 0;
         }
+
         indicators[currentIndex].classList.add('active');
     }
-
 }
