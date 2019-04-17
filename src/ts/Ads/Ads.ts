@@ -104,6 +104,8 @@ export class Ads implements IAds {
     public CampaignManager: CampaignManager;
     public RefreshManager: CampaignRefreshManager;
 
+    private static _forcedConsentUnit: boolean = false;
+
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
     private _creativeUrl?: string;
@@ -280,6 +282,10 @@ export class Ads implements IAds {
     }
 
     private isConsentShowRequired(): boolean {
+        if (Ads._forcedConsentUnit) {
+            return true;
+        }
+
         const gamePrivacy = this.Config.getGamePrivacy();
         const userPrivacy = this.Config.getUserPrivacy();
 
@@ -594,6 +600,13 @@ export class Ads implements IAds {
         if (TestEnvironment.get('forcedARMRAID')) {
             forcedARMRAID = TestEnvironment.get('forcedARMRAID');
             MRAIDAdUnitParametersFactory.setForcedARMRAID(forcedARMRAID);
+        }
+
+        let forcedConsentUnit = false;
+        if(TestEnvironment.get('forcedConsent')) {
+            forcedConsentUnit = TestEnvironment.get('forcedConsent');
+            Ads._forcedConsentUnit = forcedConsentUnit;
+            AbstractAdUnitParametersFactory.setForcedConsentUnit(forcedConsentUnit);
         }
 
         if(TestEnvironment.get('creativeUrl')) {

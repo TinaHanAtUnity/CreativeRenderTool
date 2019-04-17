@@ -487,7 +487,7 @@ export class CampaignManager {
             }
         }
 
-        this._core.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
+        this._core.Sdk.logInfo('AdPlan received with ' + campaignCount + ' campaigns and refreshDelay ' + refreshDelay);
         this.onAdPlanReceived.trigger(refreshDelay, campaignCount, auctionStatusCode);
 
         for(const mediaId in campaigns) {
