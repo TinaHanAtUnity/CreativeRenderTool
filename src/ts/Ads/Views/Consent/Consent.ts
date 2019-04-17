@@ -173,9 +173,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         }
 
         if (this._isCtaAbTest) {
-            const homeScreenContainer = (<HTMLElement>this._container.querySelector('#consent-homescreen'));
-            homeScreenContainer.classList.add('no-borders-test');
-
             const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
             myChoicesElement.classList.add('my-choices-button-order-test');
         }
