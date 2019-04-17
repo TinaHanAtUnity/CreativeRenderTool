@@ -15,7 +15,6 @@ import {
     PrivacyRowItemContainer,
     PrivacyTextParagraph
 } from 'Ads/Views/Consent/PrivacyRowItemContainer';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { ProgrammaticTrackingService, ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IConsentViewParameters {
