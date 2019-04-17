@@ -19,6 +19,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _muted: boolean = false;
     private _events: [number, string][] = [[0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
+    private _impressionSent = false;
 
     constructor(parameters: IVastAdUnitParameters) {
         super(parameters);
@@ -189,6 +190,14 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         } else {
             this.hide();
         }
+    }
+
+    public notifyImpressionOccurred(): void {
+        this._impressionSent = true;
+    }
+
+    public hasImpressionOccurred(): boolean {
+        return this._impressionSent;
     }
 
     private isValidURL(url: string | null): boolean {
