@@ -11,6 +11,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { Url } from 'Core/Utilities/Url';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -60,12 +61,12 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             if (this._moat) {
                 this._moat.volumeChange(0);
             }
-            this._vastAdUnit.sendTrackingEvent('mute', this._vastCampaign.getSession().getId());
+            this._vastAdUnit.sendTrackingEvent(TrackingEvent.MUTE);
         } else {
             if (this._moat) {
                 this._moat.volumeChange(this._vastAdUnit.getVolume());
             }
-            this._vastAdUnit.sendTrackingEvent('unmute', this._vastCampaign.getSession().getId());
+            this._vastAdUnit.sendTrackingEvent(TrackingEvent.UNMUTE);
         }
     }
 

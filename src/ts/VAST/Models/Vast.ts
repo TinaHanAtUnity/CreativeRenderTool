@@ -5,6 +5,7 @@ import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { CampaignError } from 'Ads/Errors/CampaignError';
 import { VastErrorInfo, VastErrorCode } from 'VAST/EventHandlers/VastCampaignErrorHandler';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 interface IVast {
     ads: VastAd[];
@@ -102,7 +103,7 @@ export class Vast extends Model<IVast> {
         return [];
     }
 
-    public getTrackingEventUrls(eventName: string): string[] {
+    public getTrackingEventUrls(eventName: TrackingEvent): string[] {
         const ad = this.getAd();
         if (ad) {
             const adTrackingEventUrls = ad.getTrackingEventUrls(eventName);
