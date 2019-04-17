@@ -15,7 +15,9 @@ export enum ProgrammaticTrackingMetricName {
     AdmobUserVideoSeeked = 'admob_user_video_seeked',
 
     BannerAdRequest = 'banner_ad_request',
-    BannerAdImpression = 'banner_ad_impression'
+    BannerAdImpression = 'banner_ad_impression',
+
+    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked'
 }
 
 export interface IProgrammaticTrackingData {
