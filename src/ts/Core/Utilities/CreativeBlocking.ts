@@ -9,13 +9,14 @@ export enum BlockingReason {
 }
 
 export class CreativeBlocking {
-    public static report(creativeId: string | undefined, seatId: number | undefined, type: BlockingReason, extraFields: {}): Promise<INativeResponse> {
+    public static report(creativeId: string | undefined, seatId: number | undefined, campaignId: string, type: BlockingReason, extraFields: {}): Promise<INativeResponse> {
 
         const kafkaObject: { [key: string]: unknown } = {
             ... extraFields,
             type: type,
             creativeId: creativeId,
-            seatId: seatId
+            seatId: seatId,
+            campaignId: campaignId
         };
 
         return HttpKafka.sendEvent('ads.creative.blocking', KafkaCommonObjectType.EMPTY, kafkaObject);
