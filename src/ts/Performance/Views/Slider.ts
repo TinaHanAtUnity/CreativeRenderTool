@@ -87,12 +87,20 @@ export class Slider {
             this.init();
             this.resizeContainer();
             this._ready = null;
+
+            if (this._isVisible) {
+                this.autoplay();
+            }
         });
     }
 
     public show(): void {
         this._isVisible = true;
-        this.autoplay();
+
+        // If this._ready has already resolved and set to null, slider is ready and autoplay can be started
+        if (this._ready === null) {
+            this.autoplay();
+        }
     }
 
     public hide(): void {
