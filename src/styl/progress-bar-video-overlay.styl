@@ -1,0 +1,40 @@
+@import "vars.styl";
+
+#video-overlay.with-progress-bar {
+  .top-container {
+    visibility: hidden;
+    opacity: 0;
+  }
+  &.fade-in {
+    .top-container {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+  .progress-wrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      width: 100%;
+      height: .14em;
+      background: $semi-transparent-background;
+    .progress-bar {
+      position: absolute;
+      width: 0;
+      height: 100%;
+      background-color: $blue;
+    }
+    .progress-bar:after {
+      position: relative;
+      top: 0;
+      right: -100%;
+      display: block;
+      width: 0;
+      height: 0;
+      border-top: .14em solid $blue;
+      border-right: .14em solid transparent;
+      content: "";
+    }
+  }
+}

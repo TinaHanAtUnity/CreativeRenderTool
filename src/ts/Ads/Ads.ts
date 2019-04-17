@@ -80,7 +80,6 @@ import { China } from 'China/China';
 import { IStore } from 'Store/IStore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
-import { DisableBackupCampaignsTest } from 'Core/Models/ABGroup';
 
 export class Ads implements IAds {
 
@@ -103,6 +102,8 @@ export class Ads implements IAds {
     public AssetManager: AssetManager;
     public CampaignManager: CampaignManager;
     public RefreshManager: CampaignRefreshManager;
+
+    private static _forcedConsentUnit: boolean = false;
 
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
@@ -180,9 +181,8 @@ export class Ads implements IAds {
             const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            if(DisableBackupCampaignsTest.isValid(this._core.Config.getAbGroup())) {
-                this.BackupCampaignManager.setEnabled(false);
-            }
+            // backup campaigns have been causing crashes so they have to be disabled for now, this issue should be reinvestigated at a later time.
+            this.BackupCampaignManager.setEnabled(false);
 
             this.AssetManager = new AssetManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.CacheManager, this.Config.getCacheMode(), this._core.DeviceInfo, this._core.CacheBookkeeping, this.ProgrammaticTrackingService, this.BackupCampaignManager);
             if(this.SessionManager.getGameSessionId() % 10000 === 0) {
@@ -280,6 +280,14 @@ export class Ads implements IAds {
     }
 
     private isConsentShowRequired(): boolean {
+        if (Ads._forcedConsentUnit) {
+            return true;
+        }
+
+        if (this._core.DeviceInfo.getLimitAdTracking()) {
+            return false;
+        }
+
         const gamePrivacy = this.Config.getGamePrivacy();
         const userPrivacy = this.Config.getUserPrivacy();
 
@@ -321,7 +329,8 @@ export class Ads implements IAds {
             adUnitContainer: this.Container,
             adsConfig: this.Config,
             core: this._core.Api,
-            deviceInfo: this._core.DeviceInfo
+            deviceInfo: this._core.DeviceInfo,
+            pts: this.ProgrammaticTrackingService
         });
         return consentView.show(options);
     }
@@ -594,6 +603,13 @@ export class Ads implements IAds {
         if (TestEnvironment.get('forcedARMRAID')) {
             forcedARMRAID = TestEnvironment.get('forcedARMRAID');
             MRAIDAdUnitParametersFactory.setForcedARMRAID(forcedARMRAID);
+        }
+
+        let forcedConsentUnit = false;
+        if(TestEnvironment.get('forcedConsent')) {
+            forcedConsentUnit = TestEnvironment.get('forcedConsent');
+            Ads._forcedConsentUnit = forcedConsentUnit;
+            AbstractAdUnitParametersFactory.setForcedConsentUnit(forcedConsentUnit);
         }
 
         if(TestEnvironment.get('creativeUrl')) {

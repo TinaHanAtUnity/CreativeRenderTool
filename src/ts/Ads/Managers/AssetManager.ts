@@ -409,7 +409,7 @@ export class AssetManager {
             this._pts.reportError(ProgrammaticTrackingErrorName.TooLargeFile, adType, seatId);
         }
 
-        CreativeBlocking.report(campaign.getCreativeId(), seatId, BlockingReason.FILE_TOO_LARGE, {
+        CreativeBlocking.report(campaign.getCreativeId(), seatId, campaign.getId(), BlockingReason.FILE_TOO_LARGE, {
             fileSize: Math.floor(totalSize / (1024 * 1024))
         });
     }
