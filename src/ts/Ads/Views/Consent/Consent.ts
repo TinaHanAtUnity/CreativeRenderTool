@@ -15,6 +15,7 @@ import {
     PrivacyRowItemContainer,
     PrivacyTextParagraph
 } from 'Ads/Views/Consent/PrivacyRowItemContainer';
+import { ProgrammaticTrackingService, ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IConsentViewParameters {
     platform: Platform;
@@ -23,6 +24,7 @@ export interface IConsentViewParameters {
     apiLevel?: number;
     osVersion?: string;
     useAltMyChoicesButtonText: boolean;
+    pts: ProgrammaticTrackingService;
     ctaABTest: boolean;
 }
 
@@ -41,6 +43,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private _switchGroup: PersonalizationSwitchGroup;
     private _privacyRowItemContainer: PrivacyRowItemContainer;
     private _consentButtonContainer: HTMLElement;
+    private _pts: ProgrammaticTrackingService;
 
     private _landingPage: ConsentPage;
     private _currentPage: ConsentPage;
@@ -53,7 +56,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._landingPage = parameters.landingPage;
         this._apiLevel = parameters.apiLevel;
         this._osVersion = parameters.osVersion;
-
+        this._pts = parameters.pts;
         this._privacyManager = parameters.privacyManager;
 
         this._isCtaAbTest = parameters.ctaABTest;
@@ -331,8 +334,9 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     }
 
     private showMyChoicesPageAndScrollToParagraph(paragraph: PrivacyTextParagraph): void {
+        // To get a rough estimate how often users click links on the homescreen
+        this._pts.reportMetric(ProgrammaticTrackingMetricName.ConsentParagraphLinkClicked);
         this.showPage(ConsentPage.MY_CHOICES);
         this._privacyRowItemContainer.showParagraphAndScrollToSection(paragraph);
-
     }
 }
