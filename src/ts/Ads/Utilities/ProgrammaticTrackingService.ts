@@ -16,6 +16,7 @@ export enum ProgrammaticTrackingMetricName {
 
     BannerAdRequest = 'banner_ad_request',
     BannerAdImpression = 'banner_ad_impression',
+    BannerAdRequestWithLAT = 'banner_ad_request_with_lat',
 
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked'
 }
