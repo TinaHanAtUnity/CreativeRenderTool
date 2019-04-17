@@ -315,11 +315,12 @@ export class Slider {
         const slideToPositiveClone = movement < 0 && this.currentSlide + howManySliderToSlide > this.imageUrls.length - this.slidesPerPage;
 
         if (movement > 0 && movementDistance > this.config.threshold && this.imageUrls.length > this.slidesPerPage) {
-          this.prev(howManySliderToSlide);
+            this.prev(howManySliderToSlide);
         } else if (movement < 0 && movementDistance > this.config.threshold && this.imageUrls.length > this.slidesPerPage) {
-          this.next(howManySliderToSlide);
+            this.next(howManySliderToSlide);
+        } else {
+            this.slideToCurrent(slideToNegativeClone || slideToPositiveClone);
         }
-        this.slideToCurrent(slideToNegativeClone || slideToPositiveClone);
     }
 
     private next(howManySlides = 1): void {
