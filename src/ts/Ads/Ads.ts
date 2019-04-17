@@ -286,6 +286,10 @@ export class Ads implements IAds {
             return true;
         }
 
+        if (this._core.DeviceInfo.getLimitAdTracking()) {
+            return false;
+        }
+
         const gamePrivacy = this.Config.getGamePrivacy();
         const userPrivacy = this.Config.getUserPrivacy();
 
