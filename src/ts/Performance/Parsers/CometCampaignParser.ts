@@ -18,7 +18,6 @@ import {
     StoreName
 } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 // Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
 export enum ICometTrackingUrlEvents {

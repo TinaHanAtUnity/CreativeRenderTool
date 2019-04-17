@@ -102,7 +102,8 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandlerView> {
 
         const creativeId = campaign.getCreativeId();
         const seatId = campaign.getSeatId();
-        CreativeBlocking.report(creativeId, seatId, BlockingReason.USER_REPORT, {
+        const campaignId = campaign.getId();
+        CreativeBlocking.report(creativeId, seatId, campaignId, BlockingReason.USER_REPORT, {
             message: reasonKey
         });
 
@@ -110,7 +111,8 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandlerView> {
             creativeId: creativeId,
             reason: reasonKey,
             adType: ad.description(),
-            seatId: seatId
+            seatId: seatId,
+            campaignId: campaignId
         };
         SessionDiagnostics.trigger('reported_ad', error, campaign.getSession());
     }

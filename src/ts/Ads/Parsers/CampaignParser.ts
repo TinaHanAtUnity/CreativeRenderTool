@@ -3,14 +3,13 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { Platform } from 'Core/Constants/Platform';
-import { ICoreApi } from 'Core/ICore';
-import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
 
 export abstract class CampaignParser {
 
     public creativeID: string | undefined;
     public seatID: number | undefined;
+    public campaignID: string;
 
     protected _platform: Platform;
     private _programmaticCampaignId: string;
@@ -24,6 +23,7 @@ export abstract class CampaignParser {
     public setCreativeIdentification(response: AuctionResponse) {
         this.creativeID = response.getCreativeId() || undefined;
         this.seatID = response.getSeatId() || undefined;
+        this.campaignID = response.getAdvertiserCampaignId() || this.getProgrammaticCampaignId();
     }
 
     protected getProgrammaticCampaignId(): string {
