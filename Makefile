@@ -289,6 +289,7 @@ ifeq ($(TRAVIS_PULL_REQUEST), false)
 	mkdir -p deploy/$(COMMIT_ID)
 	cp build/release/index.html deploy/release/index.html
 	cp build/release/config.json deploy/release/config.json
+	cp build/release/index.html deploy-china/release/index.html
 	cp build/release/config.json.cn deploy-china/release/config.json
 	cp build/test/index.html deploy/test/index.html
 	cp build/test/config.json deploy/test/config.json
