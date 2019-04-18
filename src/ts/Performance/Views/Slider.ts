@@ -388,7 +388,7 @@ export class Slider {
         }
     }
 
-    private static prepareIndicator(slider: Slider, wrapClassName: String, className: String, howMany: number, activeIndex: number, activeClass: String) {
+    private static prepareIndicator(slider: Slider, wrapClassName: string, className: string, howMany: number, activeIndex: number, activeClass: String) {
         const item = document.createElement('span');
         const indicatorWrap = document.createElement('div');
         const indicatorContainer = document.createElement('div');
@@ -396,9 +396,9 @@ export class Slider {
         const indicators = [];
         let i;
 
-        indicatorWrap.className = 'slider-indicator';
+        indicatorWrap.className = wrapClassName;
 
-        item.className = 'slider-dot';
+        item.className = className;
         for (i = 1; i < howMany; i++) {
             indicators.push(indicatorWrap.appendChild(<HTMLElement>item.cloneNode(false)));
         }
