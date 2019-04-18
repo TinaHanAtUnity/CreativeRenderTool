@@ -4,7 +4,7 @@ import { IClickSignalResponse, IOpenableIntentsResponse } from 'AdMob/Views/AFMA
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
@@ -58,7 +58,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._requestToViewTime = Date.now() - SdkStats.getAdRequestTimestamp();
         this.setShowing(true);
 
-        this.sendTrackingEvent('show');
+        this.sendTrackingEvent(TrackingEvent.SHOW);
         if (this._platform === Platform.ANDROID) {
             this._ads.Android!.AdUnit.onKeyDown.subscribe(this._keyDownListener);
         }
@@ -88,11 +88,11 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendImpressionEvent() {
-        this.sendTrackingEvent('impression');
+        this.sendTrackingEvent(TrackingEvent.IMPRESSION);
     }
 
     public sendClickEvent() {
-        this.sendTrackingEvent('click');
+        this.sendTrackingEvent(TrackingEvent.CLICK);
         this._operativeEventManager.sendClick(this.getOperativeEventParams());
 
         UserCountData.getClickCount(this._core).then((clickCount) => {
@@ -108,19 +108,19 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendStartEvent() {
         this._ads.Listener.sendStartEvent(this._placement.getId());
-        this.sendTrackingEvent('start');
+        this.sendTrackingEvent(TrackingEvent.START);
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });
     }
 
     public sendSkipEvent() {
-        this.sendTrackingEvent('skip');
+        this.sendTrackingEvent(TrackingEvent.SKIP);
         this._operativeEventManager.sendSkip(this.getOperativeEventParams());
     }
 
     public sendCompleteEvent() {
-        this.sendTrackingEvent('complete');
+        this.sendTrackingEvent(TrackingEvent.COMPLETE);
     }
 
     public sendRewardEvent() {
@@ -141,12 +141,8 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         return this._startTime;
     }
 
-    public sendTrackingEvent(event: string) {
-        const urls = this._campaign.getTrackingUrlsForEvent(event);
-
-        for (const url of urls) {
-            this._thirdPartyEventManager.sendWithGet(`admob ${event}`, this._campaign.getSession().getId(), url);
-        }
+    public sendTrackingEvent(event: TrackingEvent, useWebviewUserAgentForTracking?: boolean, headers?: [string, string][]) {
+        return this._thirdPartyEventManager.sendTrackingEvents(this._campaign, event, 'admob', useWebviewUserAgentForTracking, headers);
     }
 
     public sendClickSignalResponse(response: IClickSignalResponse) {

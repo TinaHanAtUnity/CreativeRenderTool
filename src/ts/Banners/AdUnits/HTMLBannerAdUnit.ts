@@ -1,7 +1,7 @@
 import { IBannerAdUnit } from 'Banners/AdUnits/IBannerAdUnit';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { Placement } from 'Ads/Models/Placement';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Template } from 'Core/Utilities/Template';
 import { BannerViewType } from 'Banners/Native/Banner';
@@ -97,7 +97,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
         if (url && url.indexOf('about:blank') === -1) {
             if (!this._clickEventsSent) {
                 this._clickEventsSent = true;
-                this.sendTrackingEvent('click');
+                this.sendTrackingEvent(TrackingEvent.CLICK);
                 this._bannersApi.Listener.sendClickEvent(this._placementId);
             }
             if (this._platform === Platform.IOS) {
@@ -111,13 +111,8 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
         }
     }
 
-    protected sendTrackingEvent(eventName: string): void {
-        const sessionId = this._campaign.getSession().getId();
-
-        const urls = this._campaign.getTrackingUrlsForEvent(eventName);
-        for (const url of urls) {
-            this._thirdPartyEventManager.sendWithGet(`banner ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
-        }
+    protected sendTrackingEvent(event: TrackingEvent) {
+        this._thirdPartyEventManager.sendTrackingEvents(this._campaign, event, 'banner', this._campaign.getUseWebViewUserAgentForTracking());
     }
 
     private setUpBannerPlayer(): Promise<void> {
@@ -163,7 +158,7 @@ export abstract class HTMLBannerAdUnit implements IBannerAdUnit {
     }
 
     private sendImpressionEvent() {
-        this.sendTrackingEvent('impression');
+        this.sendTrackingEvent(TrackingEvent.IMPRESSION);
         this._impressionEventsSent = true;
     }
 
