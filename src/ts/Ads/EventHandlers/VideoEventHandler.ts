@@ -179,7 +179,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                 isCached: CampaignAssetInfo.isCached(this._campaign)
             });
 
-            CreativeBlocking.report(this._campaign.getCreativeId(), this._campaign.getSeatId(), BlockingReason.VIDEO_TOO_LONG, {
+            CreativeBlocking.report(this._campaign.getCreativeId(), this._campaign.getSeatId(), this._campaign.getId(), BlockingReason.VIDEO_TOO_LONG, {
                 videoLength: duration
             });
 

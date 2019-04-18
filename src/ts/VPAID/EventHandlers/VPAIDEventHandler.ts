@@ -1,13 +1,13 @@
 import { IAdsApi } from 'Ads/IAds';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { Closer } from 'Ads/Views/Closer';
 import { FinishState } from 'Core/Constants/FinishState';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { ICoreApi } from 'Core/ICore';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
+import { VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDHandler } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
@@ -133,13 +133,13 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     }
 
     private onAdError() {
-        this._adUnit.sendTrackingEvent('error');
+        this._adUnit.sendTrackingEvent(TrackingEvent.ERROR);
         this._adUnit.setFinishState(FinishState.ERROR);
         this._adUnit.hide();
     }
 
     private onAdSkipped() {
-        this._adUnit.sendTrackingEvent('skip');
+        this._adUnit.sendTrackingEvent(TrackingEvent.SKIP);
         this._operativeEventManager.sendSkip(this.getOperativeEventParams());
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._adUnit.mute();
@@ -163,38 +163,38 @@ export class VPAIDEventHandler implements IVPAIDHandler {
 
     private onAdStarted() {
         this._ads.Listener.sendStartEvent(this._placement.getId());
-        this._adUnit.sendTrackingEvent('creativeView');
+        this._adUnit.sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this._adUnit.onStartProcessed.trigger();
         });
     }
 
     private onAdImpression() {
-        this._adUnit.sendTrackingEvent('impression');
+        this._adUnit.sendTrackingEvent(TrackingEvent.IMPRESSION);
         this._adUnit.sendImpressionTracking();
     }
 
     private onAdVideoStart() {
-        this._adUnit.sendTrackingEvent('start');
+        this._adUnit.sendTrackingEvent(TrackingEvent.START);
     }
 
     private onAdVideoFirstQuartile() {
-        this._adUnit.sendTrackingEvent('firstQuartile');
+        this._adUnit.sendTrackingEvent(TrackingEvent.FIRST_QUARTILE);
         this._operativeEventManager.sendFirstQuartile(this.getOperativeEventParams());
     }
 
     private onAdVideoMidpoint() {
-        this._adUnit.sendTrackingEvent('midpoint');
+        this._adUnit.sendTrackingEvent(TrackingEvent.MIDPOINT);
         this._operativeEventManager.sendMidpoint(this.getOperativeEventParams());
     }
 
     private onAdVideoThirdQuartile() {
-        this._adUnit.sendTrackingEvent('thirdQuartile');
+        this._adUnit.sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
         this._operativeEventManager.sendThirdQuartile(this.getOperativeEventParams());
     }
 
     private onAdVideoComplete() {
-        this._adUnit.sendTrackingEvent('complete');
+        this._adUnit.sendTrackingEvent(TrackingEvent.COMPLETE);
         this._adUnit.setFinishState(FinishState.COMPLETED);
         this._operativeEventManager.sendView(this.getOperativeEventParams());
     }
@@ -203,12 +203,12 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         if (this._adUnit.getFinishState() === FinishState.COMPLETED) {
             this.onAdStopped();
         } else {
-            this._adUnit.sendTrackingEvent('paused');
+            this._adUnit.sendTrackingEvent(TrackingEvent.PAUSED);
         }
     }
 
     private onAdPlaying() {
-        this._adUnit.sendTrackingEvent('resume');
+        this._adUnit.sendTrackingEvent(TrackingEvent.RESUME);
     }
 
     private onAdClickThru(url?: string, id?: string, playerHandles?: boolean) {

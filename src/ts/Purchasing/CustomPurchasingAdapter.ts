@@ -1,4 +1,4 @@
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
@@ -72,9 +72,9 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                 // send iap transaction event
                 const product: IProduct | undefined = this._products[productId];
                 if (product) {
+                    const purchaseKey = TrackingEvent.PURCHASE;
                     const events = campaign.getTrackingEventUrls();
                     if (events) {
-                        const purchaseKey = 'purchase';
                         const purchaseEventUrls = events[purchaseKey];
                         for (const url of purchaseEventUrls) {
                             const urlData = Url.parse(url);
@@ -112,7 +112,7 @@ export class CustomPurchasingAdapter implements IPurchasingAdapter {
                     // send iap transaction event
                     const events = campaign.getTrackingEventUrls();
                     if (events) {
-                        const purchaseKey = 'purchase';
+                        const purchaseKey = TrackingEvent.PURCHASE;
                         const purchaseEventUrls = events[purchaseKey];
                         for (const url of purchaseEventUrls) {
                             const urlData = Url.parse(url);
