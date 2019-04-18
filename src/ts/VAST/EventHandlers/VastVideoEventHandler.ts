@@ -5,6 +5,7 @@ import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 
@@ -98,9 +99,9 @@ export class VastVideoEventHandler extends VideoEventHandler {
         }
 
         this.sendThirdPartyVastImpressionEvent();
-        this.sendThirdPartyTrackingEvent('creativeView');
-        this.sendThirdPartyTrackingEvent('start');
-        this.sendThirdPartyTrackingEvent('impression');
+        this.sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);
+        this.sendTrackingEvent(TrackingEvent.START);
+        this.sendTrackingEvent(TrackingEvent.IMPRESSION);
     }
 
     public onPause(url: string): void {
@@ -131,22 +132,22 @@ export class VastVideoEventHandler extends VideoEventHandler {
 
     protected handleFirstQuartileEvent(progress: number): void {
         super.handleFirstQuartileEvent(progress);
-        this.sendThirdPartyTrackingEvent('firstQuartile');
+        this.sendTrackingEvent(TrackingEvent.FIRST_QUARTILE);
     }
 
     protected handleMidPointEvent(progress: number): void {
         super.handleMidPointEvent(progress);
-        this.sendThirdPartyTrackingEvent('midpoint');
+        this.sendTrackingEvent(TrackingEvent.MIDPOINT);
     }
 
     protected handleThirdQuartileEvent(progress: number): void {
         super.handleThirdQuartileEvent(progress);
-        this.sendThirdPartyTrackingEvent('thirdQuartile');
+        this.sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
     }
 
     protected handleCompleteEvent(url: string): void {
         super.handleCompleteEvent(url);
-        this.sendThirdPartyTrackingEvent('complete');
+        this.sendTrackingEvent(TrackingEvent.COMPLETE);
     }
 
     private sendThirdPartyVastImpressionEvent(): void {
@@ -159,7 +160,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         this._vastAdUnit.notifyImpressionOccurred();
     }
 
-    private sendThirdPartyTrackingEvent(eventName: string): void {
+    private sendTrackingEvent(eventName: TrackingEvent): void {
         const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {

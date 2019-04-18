@@ -6,7 +6,7 @@ import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { ITouchInfo } from 'AdMob/Views/AFMABridge';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Session } from 'Ads/Models/Session';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
@@ -208,8 +208,14 @@ const resolveAfter = (timeout: number): Promise<void> => {
 
         describe('tracking event', () => {
             it('should forward the event to the ad unit', () => {
-                admobEventHandler.onTrackingEvent('foo');
-                (<sinon.SinonStub>adUnit.sendTrackingEvent).calledWith('foo');
+                // Send with raw string the same way AFMA container does
+                admobEventHandler.onTrackingEvent('midpoint');
+                (<sinon.SinonStub>adUnit.sendTrackingEvent).calledWith(TrackingEvent.MIDPOINT);
+            });
+
+            it('should not forward the event to the ad unit with incorrect event', () => {
+                admobEventHandler.onTrackingEvent('skidpoint');
+                sinon.assert.notCalled((<sinon.SinonStub>adUnit.sendTrackingEvent));
             });
         });
     });
