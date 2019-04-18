@@ -220,7 +220,7 @@ export class Slider {
 
         const interval = 3000;
         this._autoplayTimeoutId = window.setTimeout(() => {
-            this.next(1, { automatic: true });
+            this.slideForward(1, { automatic: true });
             this.autoplay();
         }, interval);
     }
@@ -339,72 +339,58 @@ export class Slider {
         const slideToPositiveClone = movement < 0 && this.currentSlide + howManySliderToSlide > this.imageUrls.length - this.slidesPerPage;
 
         if (movement > 0 && movementDistance > this.config.threshold && this.imageUrls.length > this.slidesPerPage) {
-            this.prev(howManySliderToSlide);
+            this.slideBackward(howManySliderToSlide);
         } else if (movement < 0 && movementDistance > this.config.threshold && this.imageUrls.length > this.slidesPerPage) {
-            this.next(howManySliderToSlide);
+            this.slideForward(howManySliderToSlide);
         } else {
             this.slideToCurrent({ enableTransition: slideToNegativeClone || slideToPositiveClone });
         }
     }
 
-    private next(howManySlides = 1, options = { automatic: false }): void {
-        // early return when there is nothing to slide
-        if (this.imageUrls.length <= this.slidesPerPage) {
-            return;
-        }
-
-        const beforeChange = this.currentSlide;
-        const isNewIndexClone = (this.currentSlide + howManySlides) - 1 > this.imageUrls.length - this.slidesPerPage;
-        if (isNewIndexClone) {
-            this.disableTransition();
-
-            const mirrorSlideIndex = this.currentSlide - this.imageUrls.length;
-            const mirrorSlideIndexOffset = this.slidesPerPage;
-            const moveTo = mirrorSlideIndex + mirrorSlideIndexOffset;
-            const offset = moveTo * (-1) * (this.slidesContainerWidth / this.slidesPerPage);
-            const dragDistance = this.drag.endX - this.drag.startX;
-
-            this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset + dragDistance}px, 0, 0)`;
-            this.currentSlide = mirrorSlideIndex + howManySlides;
-        } else {
-            this.currentSlide = this.currentSlide + howManySlides;
-        }
-
-        if (beforeChange !== this.currentSlide) {
-            this.slideToCurrent({ automatic: options.automatic });
-        }
+    private slideForward(slideAmount: number = 1, options = { automatic: false }): void {
+        this.moveSlider(slideAmount, options);
     }
 
-    private prev(howManySlides = 1): void {
+    private slideBackward(slideAmount: number = 1, options = { automatic: false }): void {
+        this.moveSlider(slideAmount * -1, options);
+    }
+
+    private moveSlider(slideAmount: number, options = { automatic: false }): void {
         // early return when there is nothing to slide
         if (this.imageUrls.length <= this.slidesPerPage) {
             return;
         }
 
-        const beforeChange = this.currentSlide;
+        const startingSlide = this.currentSlide;
+        let shouldLoop = false;
 
-        const isNewIndexClone = this.currentSlide - howManySlides < 0;
-        if (isNewIndexClone) {
+        if (slideAmount > 0) {
+            shouldLoop = (this.currentSlide + slideAmount) - 1 > this.imageUrls.length - this.slidesPerPage;
+        } else {
+            shouldLoop = this.currentSlide + slideAmount < 0;
+        }
+
+        if (shouldLoop) {
             this.disableTransition();
 
-            const mirrorSlideIndex = this.currentSlide + this.imageUrls.length;
-            const mirrorSlideIndexOffset = this.slidesPerPage;
-            const moveTo = mirrorSlideIndex + mirrorSlideIndexOffset;
+            const loopedSlideIndex = this.currentSlide + (Math.sign(slideAmount) * -1 * this.imageUrls.length);
+            const loopedSlideIndexOffset = this.slidesPerPage;
+            const moveTo = loopedSlideIndex + loopedSlideIndexOffset;
             const offset = moveTo * -1 * (this.slidesContainerWidth / this.slidesPerPage);
             const dragDistance = this.drag.endX - this.drag.startX;
 
             this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset + dragDistance}px, 0, 0)`;
-            this.currentSlide = mirrorSlideIndex - howManySlides;
+            this.currentSlide = loopedSlideIndex + slideAmount;
         } else {
-            this.currentSlide = this.currentSlide - howManySlides;
+            this.currentSlide = this.currentSlide + slideAmount;
         }
 
-        if (beforeChange !== this.currentSlide) {
-            this.slideToCurrent();
+        if (startingSlide !== this.currentSlide) {
+            this.slideToCurrent({ automatic: options.automatic });
         }
     }
 
-    private static prepareIndicator(slider: Slider, wrapClassName: String, className: String, howMany: number, activeIndex: number, activeClass: String) {
+    private static prepareIndicator(slider: Slider, wrapClassName: string, className: string, howMany: number, activeIndex: number, activeClass: String) {
         const item = document.createElement('span');
         const indicatorWrap = document.createElement('div');
         const indicatorContainer = document.createElement('div');
@@ -412,9 +398,9 @@ export class Slider {
         const indicators = [];
         let i;
 
-        indicatorWrap.className = 'slider-indicator';
+        indicatorWrap.className = wrapClassName;
 
-        item.className = 'slider-dot';
+        item.className = className;
         for (i = 1; i < howMany; i++) {
             indicators.push(indicatorWrap.appendChild(<HTMLElement>item.cloneNode(false)));
         }
@@ -435,7 +421,7 @@ export class Slider {
         for (const indicator of indicators) {
             indicator.classList.remove('active');
         }
-        if (currentIndex > (indicators.length - 1)) {
+        if (currentIndex > (indicators.length - 1) || currentIndex < 0) {
             currentIndex = 0;
         }
 
