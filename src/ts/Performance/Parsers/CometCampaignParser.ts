@@ -19,6 +19,22 @@ import {
 } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 
+// Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
+export enum ICometTrackingUrlEvents {
+    START = 'start',
+    CLICK = 'click',
+    ENDCARD_CLICK = 'videoEndCardClick', //
+    FIRST_QUARTILE = 'firstQuartile',
+    MIDPOINT = 'midpoint',
+    THIRD_QUARTILE = 'thirdQuartile',
+    ERROR = 'error',
+    STALLED = 'stalled', //
+    LOADED_IMPRESSION = 'loaded',
+    SHOW = 'show', //
+    COMPLETE = 'complete',
+    SKIP = 'skip'
+}
+
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
     public static ContentTypeVideo = 'comet/video';

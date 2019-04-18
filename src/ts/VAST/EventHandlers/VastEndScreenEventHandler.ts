@@ -10,7 +10,6 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { Url } from 'Core/Utilities/Url';
-import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
@@ -68,7 +67,8 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         return this.onOpenUrl(url).then(() => {
             this.setCallButtonEnabled(true);
             this._vastAdUnit.sendCompanionClickTrackingEvent(this._vastCampaign.getSession().getId());
-            this._vastAdUnit.sendTrackingEvent(TrackingEvent.VIDEO_ENDCARD_CLICK);
+            this._vastAdUnit.sendTrackingEvent('videoEndCardClick', this._vastCampaign.getSession().getId());
+
             ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'vast_endscreen', this._vastCampaign, this._abGroup.valueOf(), this._gameSessionId);
         }).catch(() => {
             this.setCallButtonEnabled(true);

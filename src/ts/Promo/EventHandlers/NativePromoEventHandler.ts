@@ -1,5 +1,5 @@
 import { IAdsApi } from 'Ads/IAds';
-import { ThirdPartyEventManager, ThirdPartyEventMacro, IThirdPartyEventManagerFactory, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, ThirdPartyEventMacro, IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
 import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
@@ -49,13 +49,13 @@ export class NativePromoEventHandler {
                 [ThirdPartyEventMacro.GAMER_SID]: playerMetadataServerId || ''
             });
         });
-        return this.sendTrackingEvent(TrackingEvent.IMPRESSION, campaign);
+        return this.sendTrackingEvent('impression', campaign);
     }
 
     public onPromoClosed(campaign: PromoCampaign) {
         this._core.Sdk.logInfo('Closing Unity Native Promo ad unit');
         this.onClose.trigger();
-        return this.sendTrackingEvent(TrackingEvent.COMPLETE, campaign);
+        return this.sendTrackingEvent('complete', campaign);
     }
 
     public onClick(productId: string, campaign: PromoCampaign, placementId: string): Promise<void> {
@@ -67,13 +67,13 @@ export class NativePromoEventHandler {
         this._thirdPartyEventManager.then((thirdPartyEventManager) => {
             PurchasingUtilities.onPurchase(thirdPartyEventManager, productId, campaign, placementId, true);
         });
-        return this.sendTrackingEvent(TrackingEvent.CLICK, campaign);
+        return this.sendTrackingEvent('click', campaign);
     }
 
-    private sendTrackingEvent(event: TrackingEvent, campaign: PromoCampaign): Promise<void> {
+    private sendTrackingEvent(eventName: string, campaign: PromoCampaign): Promise<void> {
         return this._purchasing.CustomPurchasing.available().then((isAvailable) => {
             const sessionId = campaign.getSession().getId();
-            let trackingEventUrls = campaign.getTrackingUrlsForEvent(event);
+            let trackingEventUrls = campaign.getTrackingUrlsForEvent(eventName);
 
             trackingEventUrls = trackingEventUrls.map((value: string): string => {
                 // add native flag true to designate native promo
@@ -84,7 +84,7 @@ export class NativePromoEventHandler {
             });
             for (const url of trackingEventUrls) {
                 this._thirdPartyEventManager.then((thirdPartyEventManager) => {
-                    thirdPartyEventManager.sendWithGet(event, sessionId, url);
+                    thirdPartyEventManager.sendWithGet(eventName, sessionId, url);
                 });
             }
         });

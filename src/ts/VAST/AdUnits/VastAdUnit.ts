@@ -1,5 +1,5 @@
 import { IVideoAdUnitParameters, VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
-import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { MOAT } from 'Ads/Views/MOAT';
 import { StreamType } from 'Core/Constants/Android/StreamType';
@@ -115,8 +115,13 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return this._endScreen;
     }
 
-    public sendTrackingEvent(eventName: TrackingEvent): void {
-        this._thirdPartyEventManager.sendTrackingEvents(this._vastCampaign, eventName, 'vast', this._vastCampaign.getUseWebViewUserAgentForTracking());
+    public sendTrackingEvent(eventName: string, sessionId: string): void {
+        const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
+        if (trackingEventUrls) {
+            for (const url of trackingEventUrls) {
+                this._thirdPartyEventManager.sendWithGet(`vast ${eventName}`, sessionId, url, this._vastCampaign.getUseWebViewUserAgentForTracking());
+            }
+        }
     }
 
     public getVideoClickThroughURL(): string | null {
@@ -152,9 +157,10 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public sendVideoClickTrackingEvent(sessionId: string): void {
-        this.sendTrackingEvent(TrackingEvent.CLICK);
+        this.sendTrackingEvent('click', sessionId);
 
         const clickTrackingEventUrls = this._vastCampaign.getVast().getVideoClickTrackingURLs();
+
         if (clickTrackingEventUrls) {
             for (const clickTrackingEventUrl of clickTrackingEventUrls) {
                 this._thirdPartyEventManager.sendWithGet('vast video click', sessionId, clickTrackingEventUrl, this._vastCampaign.getUseWebViewUserAgentForTracking());
