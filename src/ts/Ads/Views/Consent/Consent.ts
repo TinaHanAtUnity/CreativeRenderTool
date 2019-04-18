@@ -63,7 +63,8 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
         this._template = new Template(ConsentTemplate);
         this._templateData = {
-            useAltMyChoicesButtonText: parameters.useAltMyChoicesButtonText
+            useAltMyChoicesButtonText: parameters.useAltMyChoicesButtonText,
+            myChoicesButtonOrderTest: parameters.ctaABTest
         };
 
         this._bindings = [
@@ -175,8 +176,8 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         }
 
         if (this._isCtaAbTest) {
-            const homeScreenContainer = (<HTMLElement>this._container.querySelector('#consent-homescreen'));
-            homeScreenContainer.classList.add('no-borders-test');
+            const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
+            myChoicesElement.classList.add('my-choices-button-order-test');
         }
 
         this.showPage(this._landingPage);

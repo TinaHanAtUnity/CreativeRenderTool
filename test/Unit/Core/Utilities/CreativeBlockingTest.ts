@@ -43,15 +43,17 @@ describe('Creative Blocking', () => {
     describe('Sending with correct fields ', () => {
         const creativeId = 'fake-creative-id';
         const seatId = 900;
+        const campaignId = 'foo';
 
         tests.forEach((t) => {
             it(`should send matching payload when blockingReason is "${t.blockingReason}"`, () => {
-                CreativeBlocking.report(creativeId, seatId, t.blockingReason, t.extraFields);
+                CreativeBlocking.report(creativeId, seatId, campaignId, t.blockingReason, t.extraFields);
                 httpKafkaStub.calledWithExactly('ads.creative.blocking', KafkaCommonObjectType.EMPTY, {
                     ...t.extraFields,
                     type: t.blockingReason,
                     creativeId: creativeId,
-                    seatId: seatId
+                    seatId: seatId,
+                    campaignId: campaignId
                 });
             });
         });
