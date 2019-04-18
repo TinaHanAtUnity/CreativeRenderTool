@@ -17,6 +17,7 @@ export interface IDragOptions {
 }
 
 type OnSlideCallback = (options: { automatic: boolean }) => void;
+type OnDownloadCallback = (event: Event) => void;
 
 export class Slider {
     private config: ISliderOptions;
@@ -36,9 +37,11 @@ export class Slider {
     private _indicators: HTMLElement[];
     private _isVisible: boolean;
     private _onSlideCallback: OnSlideCallback;
+    private _onDownloadCallback: OnDownloadCallback;
 
-    constructor(urls: string[], imageOrientation: 'portrait' | 'landscape', onSlideCallback: OnSlideCallback) {
+    constructor(urls: string[], imageOrientation: 'portrait' | 'landscape', onSlideCallback: OnSlideCallback, onDownloadCallback: OnDownloadCallback) {
         this._onSlideCallback = onSlideCallback;
+        this._onDownloadCallback = onDownloadCallback;
 
         this.config = {
             duration: 200,
@@ -125,7 +128,6 @@ export class Slider {
         if (!options.triggeredByResize) {
             this._onSlideCallback({ automatic: options.automatic });
         }
-
         this.autoplay();
         const currentSlide = this.currentSlide + this.slidesPerPage;
 
@@ -141,7 +143,6 @@ export class Slider {
         } else {
             this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset}px, 0, 0)`;
         }
-
         Slider.updateIndicator(this._indicators, Math.floor(currentSlide));
     }
 
@@ -188,6 +189,7 @@ export class Slider {
                 resolve(this.generateSlideHTML('id', image));
             };
             image.src = url;
+            image.addEventListener('click', (this._onDownloadCallback));
         });
     }
 

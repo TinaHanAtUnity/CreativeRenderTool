@@ -54,7 +54,7 @@ export class SliderPerformanceEndScreen extends EndScreen {
 
         this._sliderEventSent = false;
 
-        this._slider = new Slider(screenshots, campaign.getScreenshotsOrientation(), this.onSlideCallback);
+        this._slider = new Slider(screenshots, campaign.getScreenshotsOrientation(), this.onSlideCallback, this.onDownloadCallback);
     }
 
     public show(): void {
@@ -66,6 +66,8 @@ export class SliderPerformanceEndScreen extends EndScreen {
             this._sliderEventParameters.sliderReadyWhenShown = sliderWasReady;
         }
     }
+
+    private onDownloadCallback = (event: Event) => this.onDownloadEvent(event);
 
     private onSlideCallback = ({ automatic }: { automatic: boolean }): void => {
         if (automatic) {
@@ -107,6 +109,7 @@ export class SliderPerformanceEndScreen extends EndScreen {
 
     protected onDownloadEvent(event: Event): void {
         event.preventDefault();
+        console.log(this);
         this._sliderEventParameters.downloadClicked = true;
         this.sendSlideEventToKafka();
         this._handlers.forEach(handler => handler.onEndScreenDownload({
