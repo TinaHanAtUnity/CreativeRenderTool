@@ -9,7 +9,7 @@
 
 # Wed Apr 17 13:05:52 UTC 2019
 
-* Stop all backup campaigns from production [#9126](https://github.com/Applifier/unity-ads-webview/pull/9126:)
+* Stop all backup campaigns from production [#9126](https://github.com/Applifier/unity-ads-webview/pull/9126)
 * Disable consent for limit ad tracking users [#9127](https://github.com/Applifier/unity-ads-webview/pull/9127)
 * Remove the Skip Under Timer Experiment on Groups 7 and 8 [#9125](https://github.com/Applifier/unity-ads-webview/pull/9125)
 * Always Show Consent UI if the Test Metadata is set [#9025](https://github.com/Applifier/unity-ads-webview/pull/9025)
