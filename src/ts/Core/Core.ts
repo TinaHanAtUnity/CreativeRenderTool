@@ -233,12 +233,11 @@ export class Core implements ICore {
 
             return this.Ads.initialize(jaegerInitSpan);
         }).then(() => {
-            if (this.DeviceIdManager && this.DeviceIdManager.isCompliant(this.Config.getCountry(), this.Ads.Config.isOptOutEnabled())) {
-                return this.DeviceIdManager.getDeviceIds().catch((error) => {
-                    Diagnostics.trigger('get_deviceid_failed', error);
-                });
-            }
-        }).then(() => {
+            // if (this.DeviceIdManager && this.DeviceIdManager.isCompliant(this.Config.getCountry(), this.Ads.Config.isOptOutEnabled())) {
+            //     this.DeviceIdManager.getDeviceIds().catch((error) => {
+            //         Diagnostics.trigger('get_deviceid_failed', error);
+            //     });
+            // }
             this.JaegerManager.stop(jaegerInitSpan);
         }).catch((error: { message: string; name: unknown }) => {
             jaegerInitSpan.addAnnotation(error.message);
