@@ -172,7 +172,7 @@ export class Slider {
                 this.slideToCurrent({ triggeredByResize: true });
             });
         }
-        if(this._resizeTimeId) {
+        if (this._resizeTimeId) {
             clearTimeout(this._resizeTimeId);
         }
 
@@ -273,7 +273,7 @@ export class Slider {
     private static webkitOrNot(): string {
         const style = document.documentElement.style;
         if (typeof style.transform === 'string') {
-          return 'transform';
+            return 'transform';
         }
         return 'WebkitTransform';
     }
@@ -291,7 +291,7 @@ export class Slider {
         this.pointerDown = false;
         this.enableTransition();
         if (this.drag.endX) {
-          this.updateAfterDrag();
+            this.updateAfterDrag();
         }
         this.clearDrag();
         this.autoplay();
@@ -413,7 +413,7 @@ export class Slider {
         indicatorWrap.className = 'slider-indicator';
 
         item.className = 'slider-dot';
-        for(i = 1; i < howMany; i++) {
+        for (i = 1; i < howMany; i++) {
             indicators.push(indicatorWrap.appendChild(<HTMLElement>item.cloneNode(false)));
         }
         indicators.push(indicatorWrap.appendChild(item));
