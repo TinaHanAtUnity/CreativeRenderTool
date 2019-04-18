@@ -2,7 +2,6 @@ import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
 import { Slider } from 'Performance/Views/Slider';
 import SliderEndScreenTemplate from 'html/SliderEndScreen.html';
-import { detectOrientation } from 'Device';
 import { Template } from 'Core/Utilities/Template';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
@@ -109,7 +108,6 @@ export class SliderPerformanceEndScreen extends EndScreen {
 
     protected onDownloadEvent(event: Event): void {
         event.preventDefault();
-        console.log(this);
         this._sliderEventParameters.downloadClicked = true;
         this.sendSlideEventToKafka();
         this._handlers.forEach(handler => handler.onEndScreenDownload({
