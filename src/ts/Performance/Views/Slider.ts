@@ -68,7 +68,7 @@ export class Slider {
         // Note: Bit stupid way to make sure the first image is the middle one etc. when the carousel is shown to the user
         this.imageUrls = [urls[1], urls[2], urls[0]];
         this.currentSlide = this.config.startIndex % this.imageUrls.length;
-        this.transformProperty = Slider.webkitOrNot();
+        this.transformProperty = typeof document.documentElement.style.transform === 'string' ? 'transform' : 'WebkitTransform';
 
         const cloneSlidesAmount = 3;
         const allSlidesCreatedPromise = [];
@@ -270,14 +270,6 @@ export class Slider {
         Object.keys(style).forEach((key) => {
             el.style.setProperty(key, String(style[key]));
         });
-    }
-
-    private static webkitOrNot(): string {
-        const style = document.documentElement.style;
-        if (typeof style.transform === 'string') {
-            return 'transform';
-        }
-        return 'WebkitTransform';
     }
 
     private touchstartHandler(e: TouchEvent): void {
