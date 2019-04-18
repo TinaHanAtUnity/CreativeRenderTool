@@ -20,7 +20,7 @@ type OnSlideCallback = (options: { automatic: boolean }) => void;
 
 export class Slider {
     private config: ISliderOptions;
-    private selectorWidth: number;
+    private slidesContainerWidth: number;
     private imageUrls: string[];
     private currentSlide: number;
     private transformProperty: string | number;
@@ -88,7 +88,7 @@ export class Slider {
                 this._slidesContainer.append(slide);
             });
             this._rootEl.appendChild(this._slidesContainer);
-            this.selectorWidth = this._slidesContainer.offsetWidth;
+            this.slidesContainerWidth = this._slidesContainer.offsetWidth;
             this.init();
             this.resizeContainer();
             this._ready = null;
@@ -129,7 +129,7 @@ export class Slider {
         this.autoplay();
         const currentSlide = this.currentSlide + this.slidesPerPage;
 
-        const offset = -Math.abs(currentSlide * (this.selectorWidth / this.slidesPerPage));
+        const offset = -Math.abs(currentSlide * (this.slidesContainerWidth / this.slidesPerPage));
         if (options.enableTransition) {
             // explanation for this one - https://youtu.be/cCOL7MC4Pl0
             requestAnimationFrame(() => {
@@ -156,8 +156,8 @@ export class Slider {
     }
 
     private resizeContainer(): void {
-        this.selectorWidth = this._rootEl.offsetWidth;
-        const widthItem = this.selectorWidth / this.slidesPerPage;
+        this.slidesContainerWidth = this._rootEl.offsetWidth;
+        const widthItem = this.slidesContainerWidth / this.slidesPerPage;
         const itemsToBuild = this.imageUrls.length + (this.slidesPerPage * 2);
         this._slidesContainer.style.width = `${(widthItem) * itemsToBuild}px`;
         this.disableTransition();
@@ -311,7 +311,7 @@ export class Slider {
             this._slidesContainer.style.transition = `all 0ms ${this.config.easing}`;
 
             const currentSlide = this.currentSlide + this.slidesPerPage;
-            const currentOffset = currentSlide * (this.selectorWidth / this.slidesPerPage);
+            const currentOffset = currentSlide * (this.slidesContainerWidth / this.slidesPerPage);
             const dragOffset = (this.drag.endX - this.drag.startX);
             const offset = currentOffset - dragOffset;
             this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset * (-1)}px, 0, 0)`;
@@ -331,7 +331,7 @@ export class Slider {
     private updateAfterDrag(): void {
         const movement = this.drag.endX - this.drag.startX;
         const movementDistance = Math.abs(movement);
-        const howManySliderToSlide = Math.ceil(movementDistance / (this.selectorWidth / this.slidesPerPage));
+        const howManySliderToSlide = Math.ceil(movementDistance / (this.slidesContainerWidth / this.slidesPerPage));
 
         const slideToNegativeClone = movement > 0 && this.currentSlide - howManySliderToSlide < 0;
         const slideToPositiveClone = movement < 0 && this.currentSlide + howManySliderToSlide > this.imageUrls.length - this.slidesPerPage;
@@ -359,7 +359,7 @@ export class Slider {
             const mirrorSlideIndex = this.currentSlide - this.imageUrls.length;
             const mirrorSlideIndexOffset = this.slidesPerPage;
             const moveTo = mirrorSlideIndex + mirrorSlideIndexOffset;
-            const offset = moveTo * (-1) * (this.selectorWidth / this.slidesPerPage);
+            const offset = moveTo * (-1) * (this.slidesContainerWidth / this.slidesPerPage);
             const dragDistance = this.drag.endX - this.drag.startX;
 
             this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset + dragDistance}px, 0, 0)`;
@@ -388,7 +388,7 @@ export class Slider {
             const mirrorSlideIndex = this.currentSlide + this.imageUrls.length;
             const mirrorSlideIndexOffset = this.slidesPerPage;
             const moveTo = mirrorSlideIndex + mirrorSlideIndexOffset;
-            const offset = moveTo * -1 * (this.selectorWidth / this.slidesPerPage);
+            const offset = moveTo * -1 * (this.slidesContainerWidth / this.slidesPerPage);
             const dragDistance = this.drag.endX - this.drag.startX;
 
             this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset + dragDistance}px, 0, 0)`;
