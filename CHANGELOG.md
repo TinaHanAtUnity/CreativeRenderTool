@@ -1,4 +1,8 @@
-# Thu Apr 18 17:21:48 UTC 2019
+# Pending
+
+* Revert "Minor Refactor to Tracking Events" [#9177](https://github.com/Applifier/unity-ads-webview/pull/9177)
+
+# Thu Apr 18 17:21:48 UTC 2019 (Reverted to LKG (Wed Apr 17 13:05:52 UTC 2019))
 
 * A/B test: Change order of the cta buttons on my choices page [#9101](https://github.com/Applifier/unity-ads-webview/pull/9101)
 * Track Homescreen Consent Link Clicks with PTS [9102](https://github.com/Applifier/unity-ads-webview/pull/9102)
