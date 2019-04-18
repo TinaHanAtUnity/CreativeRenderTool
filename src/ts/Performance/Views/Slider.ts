@@ -419,7 +419,7 @@ export class Slider {
         for (const indicator of indicators) {
             indicator.classList.remove('active');
         }
-        if (currentIndex > (indicators.length - 1)) {
+        if (currentIndex > (indicators.length - 1) || currentIndex < 0) {
             currentIndex = 0;
         }
 
