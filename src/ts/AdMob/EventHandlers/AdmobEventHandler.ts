@@ -139,9 +139,9 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     }
 
     public onTrackingEvent(event: string, data?: unknown) {
-        Object.keys(TrackingEvent).map((eventType) => {
-            if (TrackingEvent[<keyof typeof TrackingEvent>eventType] === event) {
-                this._adUnit.sendTrackingEvent(<TrackingEvent>eventType);
+        Object.values(TrackingEvent).forEach((eventType: TrackingEvent) => {
+            if (eventType === event) {
+                this._adUnit.sendTrackingEvent(eventType);
                 if (event === TrackingEvent.ERROR) {
                     SessionDiagnostics.trigger('admob_ad_error', data, this._campaign.getSession());
                 } else if (event === TrackingEvent.STALLED) {
