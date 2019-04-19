@@ -1,3 +1,7 @@
+# Pending
+
+* Disabled ABTest Third Party Open Measurement implementation for VAST [#9026](https://github.com/Applifier/unity-ads-webview/pull/9026)
+
 # Thu Apr 18 23:43:35 UTC 2019
 
 * A/B test: Change order of the cta buttons on my choices page [#9101](https://github.com/Applifier/unity-ads-webview/pull/9101)
