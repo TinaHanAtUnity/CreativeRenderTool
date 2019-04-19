@@ -1,4 +1,4 @@
-# Pending
+# Fri Apr 19 21:06:10 UTC 2019
 
 * Disabled ABTest Third Party Open Measurement implementation for VAST [#9026](https://github.com/Applifier/unity-ads-webview/pull/9026)
 
