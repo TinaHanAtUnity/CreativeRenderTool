@@ -16,6 +16,8 @@ interface IAdMobOptionalSignal {
     iuSizes: string;
     adtest: boolean;
     isJailbroken: boolean;
+    sdk_apis: string;
+    omid_p: string;
 }
 
 export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
@@ -35,7 +37,9 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
             hasIAPCapability: ['boolean'],
             iuSizes: ['string'],
             adtest: ['boolean'],
-            isJailbroken: ['boolean']
+            isJailbroken: ['boolean'],
+            sdk_apis: ['string'],
+            omid_p: ['string']
         });
     }
     public getSequenceNumber(): number {
@@ -83,6 +87,12 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
     public getIUSizes(): string {
         return this.get('iuSizes');
     }
+    public getSDKApis(): string {
+        return this.get('sdk_apis');
+    }
+    public getOMIDP(): string {
+        return this.get('omid_p');
+    }
     public setSequenceNumber(sequenceNumber: number) {
         this.set('sequenceNumber', sequenceNumber);
     }
@@ -127,6 +137,12 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
     }
     public setIUSizes(iuSizes: string) {
         this.set('iuSizes', iuSizes);
+    }
+    public setSDKApis(sdk_apis: string) {
+        this.set('sdk_apis', sdk_apis);
+    }
+    public setOMIDP(omid_p: string) {
+        this.set('omid_p', omid_p);
     }
 
     public getDTO() {
