@@ -100,6 +100,7 @@ import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import VastAdWithoutCompanionAdXml from 'xml/VastAdWithoutCompanionAd.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
+import VastAdVerificationAsExtension from 'xml/VastWithExtensionAdVerification.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { IARApi } from 'AR/AR';
 import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
@@ -605,6 +606,13 @@ export class TestFixtures {
         const vastXml = EventTestVast;
         const vast = vastParser.parseVast(vastXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345', session));
+    }
+
+    public static getAdVerificationsVastCampaign(): VastCampaign {
+        const vastParser = TestFixtures.getVastParserStrict();
+        const vastXml = VastAdVerificationAsExtension;
+        const vast = vastParser.parseVast(vastXml);
+        return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
     }
 
     public static getCompanionVastCampaignWithoutImages(): VastCampaign {
