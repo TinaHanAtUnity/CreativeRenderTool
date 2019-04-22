@@ -21,6 +21,7 @@ export interface IMRAIDHandler {
     onBridgeResizeWebview(): void;
     onBridgeSendStats(totalTime: number, playTime: number, frameCount: number): void;
     onBridgeAREvent(event: MessageEvent): void;
+    onBridgeArReadyToShow(event: MessageEvent): void;
 }
 
 export interface IMRAIDOrientationProperties {
@@ -37,7 +38,9 @@ export enum MRAIDEvents {
     STATE_CHANGE        = 'customMraidState',
     RESIZE_WEBVIEW      = 'resizeWebview',
     SEND_STATS          = 'sendStats',
-    AR                  = 'ar'
+    AR                  = 'ar',
+    AR_READY_SHOW       = 'arReadyShow',
+    CONSOLE_LOG         = 'consoleLog'
 }
 
 export abstract class MRAIDEventAdapter implements IMRAIDAdapter {

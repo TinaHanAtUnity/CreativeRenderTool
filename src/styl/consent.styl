@@ -192,6 +192,30 @@
     color: $white;
   }
 
+  &.my-choices-button-order-test {
+    .agree {
+      display: block;
+      flex-grow: 1;
+      margin-left: $default-size;
+      background: $consent-blue;
+      color: $white;
+    }
+
+    .disagree {
+      display: block;
+      margin-left: 0;
+      border: 1px solid $consent-border-gray;
+      color: $black;
+    }
+
+    .save-my-choices {
+      display: none;
+      flex-grow: 1;
+      background: $consent-blue;
+      color: $white;
+    }
+  }
+
   .consent-button-container:not(.show-save-my-choices-button) {
     .agree {
       display: block;

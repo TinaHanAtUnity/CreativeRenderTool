@@ -66,16 +66,6 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
         });
     }
 
-    protected sendTrackingEvents() {
-        const clickUrl = this._campaign.getClickUrl();
-        if (clickUrl) {
-            const sessionId = this._campaign.getSession().getId();
-            this._thirdPartyEventManager.sendWithGet(`mraid click`, sessionId, clickUrl, this._campaign.getUseWebViewUserAgentForTracking());
-        }
-
-        this._adUnit.sendClick();
-    }
-
     private getTopViewHeight(width: number, height: number): number {
         const webViewResizer = new WebViewTopCalculator(this._deviceInfo, this._platform);
         return webViewResizer.getTopPosition(width, height);

@@ -8,7 +8,7 @@ import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { INativeResponse, RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -18,7 +18,7 @@ import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { StorageType } from 'Core/Native/Storage';
 import { Url } from 'Core/Utilities/Url';
-import { AuctionV5Test } from 'Core/Models/ABGroup';
+import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 
 export interface IAuctionResponse {
     correlationId: string;
@@ -93,6 +93,7 @@ export class AuctionRequest {
 
     public static setBaseUrl(baseUrl: string): void {
         AuctionRequest.BaseUrl = baseUrl + '/v4/games';
+        AuctionRequest.AuctionV5BaseUrl = baseUrl + '/v5/games';
     }
 
     private static CampaignResponse: string;
@@ -107,13 +108,13 @@ export class AuctionRequest {
     protected _platform: Platform;
     protected _core: ICoreApi;
     protected _response: INativeResponse;
+    protected _deviceInfo: DeviceInfo;
     private _coreConfig: CoreConfiguration;
     private _adsConfig: AdsConfiguration;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _metaDataManager: MetaDataManager;
     private _request: RequestManager;
     private _clientInfo: ClientInfo;
-    private _deviceInfo: DeviceInfo;
     private _sessionManager: SessionManager;
     private _placements: { [id: string]: Placement } = {};
     private _previousPlacementID: string | undefined;
@@ -146,7 +147,7 @@ export class AuctionRequest {
         if(this._coreConfig.getTestMode()) {
             this._baseURL = AuctionRequest.TestModeUrl;
         } else {
-            this._baseURL = AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;
+            this._baseURL = RequestManager.getAuctionProtocol() === AuctionProtocol.V5 ? AuctionRequest.AuctionV5BaseUrl : AuctionRequest.BaseUrl;
         }
     }
 
@@ -245,16 +246,7 @@ export class AuctionRequest {
             return Promise.resolve(this._url);
         }
         let url = this.getBaseURL();
-        if (this._deviceInfo.getAdvertisingIdentifier()) {
-            url = Url.addParameters(url, {
-                advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
-                limitAdTracking: this._deviceInfo.getLimitAdTracking()
-            });
-        } else if (this._platform === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
-            url = Url.addParameters(url, {
-                androidId: this._deviceInfo.getAndroidId()
-            });
-        }
+        url = Url.addParameters(url, TrackingIdentifierFilter.getDeviceTrackingIdentifiers(this._platform, this._clientInfo.getSdkVersionName(), this._deviceInfo));
 
         url = Url.addParameters(url, {
             deviceModel: this._deviceInfo.getModel(),

@@ -1,4 +1,180 @@
-# Merged
+# Fri Apr 19 21:06:10 UTC 2019
+
+* Disabled ABTest Third Party Open Measurement implementation for VAST [#9026](https://github.com/Applifier/unity-ads-webview/pull/9026)
+
+# Thu Apr 18 23:43:35 UTC 2019
+
+* A/B test: Change order of the cta buttons on my choices page [#9101](https://github.com/Applifier/unity-ads-webview/pull/9101)
+* Track Homescreen Consent Link Clicks with PTS [#9102](https://github.com/Applifier/unity-ads-webview/pull/9102)
+* Add MetaJoy's Android GameIds to V4 list [#9151](https://github.com/Applifier/unity-ads-webview/pull/9151)
+* MRAID close button styles fix [#9150](https://github.com/Applifier/unity-ads-webview/pull/9150)
+* Add CampaignId to CreativeBlocking Payload [#9152](https://github.com/Applifier/unity-ads-webview/pull/9152)
+
+# Reverted to LKGs (Wed Apr 17 13:05:52 UTC 2019) - Thu Apr 18 19:21:48 UTC 2019
+* Revert A/B test: Change order of the cta buttons on my choices page [#9101](https://github.com/Applifier/unity-ads-webview/pull/9101)
+* Revert Track Homescreen Consent Link Clicks with PTS [#9102](https://github.com/Applifier/unity-ads-webview/pull/9102)
+* Revert Add MetaJoy's Android GameIds to V4 list [#9151](https://github.com/Applifier/unity-ads-webview/pull/9151)
+* Revert MRAID close button styles fix [#9150](https://github.com/Applifier/unity-ads-webview/pull/9150)
+* Revert Add CampaignId to CreativeBlocking Payload [#9152](https://github.com/Applifier/unity-ads-webview/pull/9152)
+* Revert Minor Refactor to Tracking Events [#9100](https://github.com/Applifier/unity-ads-webview/pull/9100)
+
+# Thu Apr 18 17:21:48 UTC 2019
+
+* A/B test: Change order of the cta buttons on my choices page [#9101](https://github.com/Applifier/unity-ads-webview/pull/9101)
+* Track Homescreen Consent Link Clicks with PTS [#9102](https://github.com/Applifier/unity-ads-webview/pull/9102)
+* Add MetaJoy's Android GameIds to V4 list [#9151](https://github.com/Applifier/unity-ads-webview/pull/9151)
+* MRAID close button styles fix [#9150](https://github.com/Applifier/unity-ads-webview/pull/9150)
+* Add CampaignId to CreativeBlocking Payload [#9152](https://github.com/Applifier/unity-ads-webview/pull/9152)
+* Minor Refactor to Tracking Events [#9100](https://github.com/Applifier/unity-ads-webview/pull/9100)
+
+# Wed Apr 17 13:05:52 UTC 2019
+
+* Stop all backup campaigns from production [#9126](https://github.com/Applifier/unity-ads-webview/pull/9126)
+* Disable consent for limit ad tracking users [#9127](https://github.com/Applifier/unity-ads-webview/pull/9127)
+* Remove the Skip Under Timer Experiment on Groups 7 and 8 [#9125](https://github.com/Applifier/unity-ads-webview/pull/9125)
+* Always Show Consent UI if the Test Metadata is set [#9025](https://github.com/Applifier/unity-ads-webview/pull/9025)
+* Correctly show number of campaigns received for Auction V5 [#9099](https://github.com/Applifier/unity-ads-webview/pull/9099)
+* Add Polyfill for Object.values [#9103](https://github.com/Applifier/unity-ads-webview/pull/9103)
+
+# Wed Apr 17 06:53:24 UTC 2019
+
+* Progress bar overlay experiment in groups 5 & 6 [#8832](https://github.com/Applifier/unity-ads-webview/pull/8832)
+
+# Fri Apr 12 07:05:28 UTC 2019
+
+* Log iOS storage write event and remove Zynga custom feature [#9050](https://github.com/Applifier/unity-ads-webview/pull/9050)
+* Force a specific auction protocol version [#8998](https://github.com/Applifier/unity-ads-webview/pull/8998)
+* Add stages for tests and deployment [#9076](https://github.com/Applifier/unity-ads-webview/pull/9076)
+* Test for disabling backup campaigns [#9077](https://github.com/Applifier/unity-ads-webview/pull/9077)
+
+# Wed Apr 10 21:59:07 UTC 2019
+
+* Remove custom kafka event from overlay install now button [#9051](https://github.com/Applifier/unity-ads-webview/pull/9051)
+* Remove borders from Show my choices CTA button (A/B test) [#9052](https://github.com/Applifier/unity-ads-webview/pull/9052)
+* Fix url cut off from multiple = character in query param [#9053](https://github.com/Applifier/unity-ads-webview/pull/9053)
+
+# Tue Apr  9 07:52:29 UTC 2019
+
+* Enable the 'Skip under timer experiment' as Zynga filtered AB test [#9024](https://github.com/Applifier/unity-ads-webview/pull/9024)
+* Add More Games to the Auction V4 Games List [#9039](https://github.com/Applifier/unity-ads-webview/pull/9049)
+
+# Fri Apr  5 18:04:16 UTC 2019
+
+* Whitelist creatives for imply tracking for mraid [#9000](https://github.com/Applifier/unity-ads-webview/pull/9000)
+* Remove VastParser in favor of VastParserStrict [#9002](https://github.com/Applifier/unity-ads-webview/pull/9002)
+* Filtered abtest [#8906](https://github.com/Applifier/unity-ads-webview/pull/8906)
+
+# Wed Apr  3 23:08:59 UTC 2019
+
+* Add more games to use V4 [#8999](https://github.com/Applifier/unity-ads-webview/pull/8999)
+* Replace consent title test with consent my choices button text test [#8997](https://github.com/Applifier/unity-ads-webview/pull/8997)
+* Enable rewarded video overlay install now button for entire network [#8951](https://github.com/Applifier/unity-ads-webview/pull/8951)
+* Removing duplicated code for setForcedGDPRBanner [#8833](https://github.com/Applifier/unity-ads-webview/pull/8833)
+* Set URL parameters for Banner Consistently with Ads [#8953](https://github.com/Applifier/unity-ads-webview/pull/8953)
+* Change Reporting Behavior to Reward from End Cards [#8975](https://github.com/Applifier/unity-ads-webview/pull/8975)
+
+# Tue Apr  2 21:57:26 UTC 2019
+
+* V4 for Fanatee games that has 87 placements [#8952](https://github.com/Applifier/unity-ads-webview/pull/8952)
+
+# Mon Apr  1 23:35:56 UTC 2019
+
+* Add Smart Banner Dimension Calculations [#8907](https://github.com/Applifier/unity-ads-webview/pull/8907)
+* Update Campaign Errors to Normal Format for Auction V5 [#8929](https://github.com/Applifier/unity-ads-webview/pull/8929)
+
+# Mon Apr  1 15:42:33 UTC 2019
+
+* Auction V5 rollout, mostly affecting Android [#8885](https://github.com/Applifier/unity-ads-webview/pull/8885)
+
+# Fri Mar 29 16:50:36 UTC 2019
+
+* AR Delayed Camera Consent [#8326](https://github.com/Applifier/unity-ads-webview/pull/8326)
+
+# Thu Mar 28 17:45:30 UTC 2019
+
+* Disable skip under timer test until we have Zynga filter in place [#8860](https://github.com/Applifier/unity-ads-webview/pull/8860)
+* Using ProgrammaictVastParserStrict in ProgrammaticVPAIDParser [#8883](https://github.com/Applifier/unity-ads-webview/pull/8883)
+* Only Refresh catalog if promo exists in placement config [#8882](https://github.com/Applifier/unity-ads-webview/pull/8882)
+* \<AdVerification\> as standalone tag and REASON code for VAST 4.1 [#8859](https://github.com/Applifier/unity-ads-webview/pull/8859)
+
+# Tue Mar 26 20:58:25 UTC 2019
+
+* Skip under timer experiment [#8835](https://github.com/Applifier/unity-ads-webview/pull/8835)
+* Release VastParserStrict to AdMob and VPAID [#8836](https://github.com/Applifier/unity-ads-webview/pull/8836)
+* Remove accessible close button tests [#8834](https://github.com/Applifier/unity-ads-webview/pull/8834)
+* Parse \<AdVerifications\> for Open Measurement support [#8830](https://github.com/Applifier/unity-ads-webview/pull/8830)
+
+# Fri Mar 22 01:15:43 UTC 2019
+
+* VastParserStrict test for AdMob video and update some diagnostics logs [#8783](https://github.com/Applifier/unity-ads-webview/pull/8783)
+* Fix Banner Ads Click Callback [#8784](https://github.com/Applifier/unity-ads-webview/pull/8784)
+* A/B test previous consent title [#8807](https://github.com/Applifier/unity-ads-webview/pull/8807)
+
+# Thu Mar 21 16:56:12 UTC 2019
+
+* Set metadata serverUrl also to auction v5 [#8758](https://github.com/Applifier/unity-ads-webview/pull/8758)
+* Promo supports missing orientation [#8736](https://github.com/Applifier/unity-ads-webview/pull/8736)
+* Whitelist carnival creative for analytics [#8782](https://github.com/Applifier/unity-ads-webview/pull/8782)
+* Promo background should cover entire background for iPhoneX [#8759](https://github.com/Applifier/unity-ads-webview/pull/8759)
+* Use auction v4 if creativeUrl is used [#8806](https://github.com/Applifier/unity-ads-webview/pull/8806)
+* Do not show Unity Consent in COPPA games [#8808](https://github.com/Applifier/unity-ads-webview/pull/8808)
+
+# Tue Mar 19 23:37:16 UTC 2019
+
+* Diagnostics for consent should be sampling at a 1% rate [#8760](https://github.com/Applifier/unity-ads-webview/pull/8760)
+
+# Tue Mar 19 17:27:24 UTC 2019
+
+* Introduce Observables utility class [#8475](https://github.com/Applifier/unity-ads-webview/pull/8475)
+* More loggings and locking v5 for ios test games [#8735](https://github.com/Applifier/unity-ads-webview/pull/8735)
+* Changing analytics to accept level index as a string rather than an int [#8733](https://github.com/Applifier/unity-ads-webview/pull/8733)
+* Override Unity consent from metadata if present [#8683](https://github.com/Applifier/unity-ads-webview/pull/8683)
+
+# Mon Mar 18 15:45:41 UTC 2019
+
+* Diagnostics of READ_PHONE_STATE permission for China Android 1% [#8687](https://github.com/Applifier/unity-ads-webview/pull/8687)
+* Making creativeType case agnostic [#8685](https://github.com/Applifier/unity-ads-webview/pull/8685)
+* V5 Rolling out iOS and diagnostics for failed send events [#8688](https://github.com/Applifier/unity-ads-webview/pull/8688) 
+
+# Fri Mar 15 14:46:01 UTC 2019
+
+* Change consent layout [#8711](https://github.com/Applifier/unity-ads-webview/pull/8711)
+
+# Fri Mar 15 12:36:40 UTC 2019
+
+* Promo fix where landscape font size was incorrect [#8686](https://github.com/Applifier/unity-ads-webview/pull/8686)
+* Fix the call to icon-size to use correct name [#8690](https://github.com/Applifier/unity-ads-webview/pull/8690)
+* Additional fields for consent layout A/B tests [#8372](https://github.com/Applifier/unity-ads-webview/pull/8372)
+
+# Thu Mar 14 08:37:20 UTC 2019
+
+* Experiment to test more accessible mraid close button in playables [#8614](https://github.com/Applifier/unity-ads-webview/pull/8614)
+* Show GDPR banner also in Performance VideoOverlay [#8637](https://github.com/Applifier/unity-ads-webview/pull/8637)
+* Add Reverse AB Test for "install now" button in rewarded ads [#8522](https://github.com/Applifier/unity-ads-webview/pull/8522)
+* Add Accessible close button test [#8471](https://github.com/Applifier/unity-ads-webview/pull/8471)
+* Release abGroup 17 to roll out VastStrictParser for Programmatic Vast [#8680](https://github.com/Applifier/unity-ads-webview/pull/8680)
+* Consolidate display adType to one [#8616](https://github.com/Applifier/unity-ads-webview/pull/8616)
+* Add miller creativeid for analytics events [#8682](https://github.com/Applifier/unity-ads-webview/pull/8682)
+
+# Tue Mar 12 21:19:07 UTC 2019
+
+* Revert "Don't send operative clicks for Programmatic MRAID" [#8639](https://github.com/Applifier/unity-ads-webview/pull/8639)
+* Restrict Auction V5 for request with over 10 placement [#8638](https://github.com/Applifier/unity-ads-webview/pull/8638)
+
+# Tue Mar 12 01:05:27 UTC 2019
+
+* VastParserStrict allow 'itms-apps://' protocol in urls [#8545](https://github.com/Applifier/unity-ads-webview/pull/8545)
+* Fix styles for GDPR banner in video overlay [#8615](https://github.com/Applifier/unity-ads-webview/pull/8615)
+* Improved server start stop [#8476](https://github.com/Applifier/unity-ads-webview/pull/8476)
+* VastParserStrict allow StaticResource with "type" attribute to parse [#8544](https://github.com/Applifier/unity-ads-webview/pull/8544)
+* Expose js console and errors + hook xmlhttprequest.open [#8298](https://github.com/Applifier/unity-ads-webview/pull/8298)
+
+# Sat Mar  9 00:15:01 UTC 2019
+
+* Adding session diagnostic for 10% of operative events that fail [#8591](https://github.com/Applifier/unity-ads-webview/pull/8591)
+* Re-enable setting monetization flag when Monetization module is initialized [#8590](https://github.com/Applifier/unity-ads-webview/pull/8590)
+
+# Fri Mar  8 04:20:03 UTC 2019
 
 * Don't send operative clicks for Programmatic MRAID [#8567](https://github.com/Applifier/unity-ads-webview/pull/8567)
 

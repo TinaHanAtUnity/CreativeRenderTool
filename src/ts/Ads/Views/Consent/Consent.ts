@@ -15,6 +15,7 @@ import {
     PrivacyRowItemContainer,
     PrivacyTextParagraph
 } from 'Ads/Views/Consent/PrivacyRowItemContainer';
+import { ProgrammaticTrackingService, ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export interface IConsentViewParameters {
     platform: Platform;
@@ -22,12 +23,15 @@ export interface IConsentViewParameters {
     landingPage: ConsentPage;
     apiLevel?: number;
     osVersion?: string;
+    useAltMyChoicesButtonText: boolean;
+    pts: ProgrammaticTrackingService;
+    ctaABTest: boolean;
 }
 
 export enum ConsentPage {
-    HOMESCREEN,
-    INTRO,
-    MY_CHOICES
+    HOMESCREEN = 'homescreen',
+    INTRO = 'intro',
+    MY_CHOICES = 'mychoices'
 }
 
 export class Consent extends View<IConsentViewHandler> implements IPrivacyRowItemContainerHandler, IPersonalizationSwitchGroupHandler {
@@ -39,9 +43,12 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private _switchGroup: PersonalizationSwitchGroup;
     private _privacyRowItemContainer: PrivacyRowItemContainer;
     private _consentButtonContainer: HTMLElement;
+    private _pts: ProgrammaticTrackingService;
 
     private _landingPage: ConsentPage;
     private _currentPage: ConsentPage;
+
+    private _isCtaAbTest: boolean;
 
     constructor(parameters: IConsentViewParameters) {
         super(parameters.platform, 'consent');
@@ -49,10 +56,16 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         this._landingPage = parameters.landingPage;
         this._apiLevel = parameters.apiLevel;
         this._osVersion = parameters.osVersion;
-
+        this._pts = parameters.pts;
         this._privacyManager = parameters.privacyManager;
 
+        this._isCtaAbTest = parameters.ctaABTest;
+
         this._template = new Template(ConsentTemplate);
+        this._templateData = {
+            useAltMyChoicesButtonText: parameters.useAltMyChoicesButtonText,
+            myChoicesButtonOrderTest: parameters.ctaABTest
+        };
 
         this._bindings = [
             {
@@ -161,6 +174,12 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
             myChoicesElement.classList.add('show-back-button');
         }
+
+        if (this._isCtaAbTest) {
+            const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
+            myChoicesElement.classList.add('my-choices-button-order-test');
+        }
+
         this.showPage(this._landingPage);
     }
 
@@ -205,26 +224,10 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     private showPage(page: ConsentPage) {
         this._currentPage = page;
 
-        let classToAdd: string;
-
-        switch (page) {
-            case ConsentPage.HOMESCREEN:
-                classToAdd = 'homescreen';
-                break;
-            case ConsentPage.INTRO:
-                classToAdd = 'intro';
-                break;
-            case ConsentPage.MY_CHOICES:
-                classToAdd = 'mychoices';
-                break;
-            default:
-                classToAdd = 'mychoices';
-        }
-
-        const states = ['homescreen', 'intro', 'mychoices'];
+        const states = [ConsentPage.HOMESCREEN, ConsentPage.INTRO, ConsentPage.MY_CHOICES];
         states.forEach(state => {
-            if (state === classToAdd) {
-                this.container().classList.add(classToAdd);
+            if (state === page) {
+                this.container().classList.add(page);
             } else {
                 this.container().classList.remove(state);
             }
@@ -332,8 +335,9 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
     }
 
     private showMyChoicesPageAndScrollToParagraph(paragraph: PrivacyTextParagraph): void {
+        // To get a rough estimate how often users click links on the homescreen
+        this._pts.reportMetric(ProgrammaticTrackingMetricName.ConsentParagraphLinkClicked);
         this.showPage(ConsentPage.MY_CHOICES);
         this._privacyRowItemContainer.showParagraphAndScrollToSection(paragraph);
-
     }
 }

@@ -1,20 +1,14 @@
 import { Platform } from 'Core/Constants/Platform';
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
-import ZyngaGamesJson from 'json/custom_features/ZyngaGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
-import { Campaign } from 'Ads/Models/Campaign';
-import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import AuctionV4GamesJson from 'json/custom_features/AuctionV4Games.json';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { toAbGroup, InstallInRewardedVideos } from 'Core/Models/ABGroup';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
-const ZyngaGameIds = setGameIds(ZyngaGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
+const AuctionV4GameIds = setGameIds(AuctionV4GamesJson);
 
 function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
@@ -41,7 +35,15 @@ export class CustomFeatures {
                 creativeId === '109091853' ||
                 creativeId === '109091754' ||
                 creativeId === '114617576' || // Hellfest
-                creativeId === '114617336';   // Hellfest
+                creativeId === '114617336' || // Hellfest
+                creativeId === '145941071' || // Miller Lite Fallback
+                creativeId === '145940860' || // Miller Lite Fallback
+                creativeId === '147367465' || // Carnival Creative
+                creativeId === '151099348' ||
+                creativeId === '151338976' ||
+                creativeId === '151337994' ||
+                creativeId === '152919353' ||
+                creativeId === '153119177';
     }
 
     public static isLoopMeSeat(seatId: number | undefined): boolean {
@@ -79,19 +81,33 @@ export class CustomFeatures {
         return gameId === '1453434';
     }
 
-    public static isZyngaGame(gameId: string): boolean {
-        return this.existsInList(ZyngaGameIds, gameId);
-    }
-
-    public static isRewardedVideoInstallButtonEnabled(campaign: Campaign, coreConfig: CoreConfiguration) {
-        if (!InstallInRewardedVideos.isValid(coreConfig.getAbGroup())) {
-            return false;
-        }
-
-        return (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign);
+    public static isAuctionV4Game(gameId: string): boolean {
+        return this.existsInList(AuctionV4GameIds, gameId);
     }
 
     private static existsInList(gameIdList: string[], gameId: string): boolean {
         return gameIdList.indexOf(gameId) !== -1;
+    }
+
+    public static shouldSampleAtOnePercent(): boolean {
+        // will only return true when Math.random returns 0
+        if (Math.floor(Math.random() * 100) % 100 === 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static shouldSampleAtTenPercent(): boolean {
+        // will only return true when Math.random returns 1
+        if (Math.floor(Math.random() * 10) % 10 === 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static isUnsupportedOMVendor(resourceUrl: string) {
+        return false;
     }
 }

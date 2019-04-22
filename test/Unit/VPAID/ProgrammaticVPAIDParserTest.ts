@@ -13,7 +13,6 @@ import ProgrammaticVPAIDCampaign from 'json/campaigns/vpaid/ProgrammaticVPAIDCam
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { VastParser } from 'VAST/Utilities/VastParser';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 
@@ -59,9 +58,6 @@ describe('ProgrammaticVPAIDParser', () => {
             it('should have valid data', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
                 assert.isTrue(campaign instanceof VPAIDCampaign, 'Campaign was not an VPAIDCampaign');
-
-                const json = JSON.parse(ProgrammaticVPAIDCampaign);
-                const vast = new VastParser().parseVast(decodeURIComponent(json.content));
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');

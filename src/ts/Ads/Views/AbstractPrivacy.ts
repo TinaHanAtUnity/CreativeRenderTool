@@ -6,12 +6,12 @@ import { ITemplateData, View } from 'Core/Views/View';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IPermissions } from 'Ads/Models/Privacy';
 import { Observable2 } from 'Core/Utilities/Observable';
-import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FinishState } from 'Core/Constants/FinishState';
 import { BlockingReason, CreativeBlocking } from 'Core/Utilities/CreativeBlocking';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { Observables } from 'Core/Utilities/Observables';
 
 export enum ReportReason {
     NOT_SHOWING = 'Ad is not showing',
@@ -88,43 +88,33 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandlerView> {
     }
 
     public setupReportListener(ad: AbstractAdUnit): void {
-        this._onReport.subscribe((campaign: Campaign, reasonKey: string) => {
+        Observables.once2(this._onReport, (campaign, reasonKey) => {
             this.onUserReport(campaign, reasonKey, ad);
             this.timeoutAd(ad);
-            this._onReport.unsubscribe();
         });
     }
 
-    private onUserReport(campaign: Campaign, reasonKey: string, ad: AbstractAdUnit | AbstractVideoOverlay): void {
-        let adType;
-        let isCached;
-        let finishState;
+    private onUserReport(campaign: Campaign, reasonKey: string, ad: AbstractAdUnit): void {
 
-        if (ad instanceof AbstractAdUnit) {
-            adType = ad.description();
-            finishState = FinishState[ad.getFinishState()];
-            isCached = ad.isCached();
-            ad.markAsSkipped(); // Don't grant user potential reward to prevent bad reports
-        } else {
-            adType = campaign.getAdType();
-            finishState = 'VIDEO_PROGRESS';
+        if (ad.getFinishState() !== FinishState.COMPLETED) {
+            ad.markAsSkipped(); // Don't grant user reward unless report is on Endcard
         }
 
         const creativeId = campaign.getCreativeId();
         const seatId = campaign.getSeatId();
-        CreativeBlocking.report(creativeId, seatId, BlockingReason.USER_REPORT, {
+        const campaignId = campaign.getId();
+        CreativeBlocking.report(creativeId, seatId, campaignId, BlockingReason.USER_REPORT, {
             message: reasonKey
         });
 
         const error = {
             creativeId: creativeId,
             reason: reasonKey,
-            adType: adType,
+            adType: ad.description(),
             seatId: seatId,
-            finishState: finishState,
-            isCached: isCached
+            campaignId: campaignId
         };
-        Diagnostics.trigger('reported_ad', error);
+        SessionDiagnostics.trigger('reported_ad', error, campaign.getSession());
     }
 
     // After the report, wait four seconds and close the ad

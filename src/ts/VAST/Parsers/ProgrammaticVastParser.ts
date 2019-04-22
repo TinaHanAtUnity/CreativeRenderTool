@@ -7,7 +7,6 @@ import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { Platform } from 'Core/Constants/Platform';
 import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
-import { VastParser } from 'VAST/Utilities/VastParser';
 import { Url } from 'Core/Utilities/Url';
 import { VastMediaSelector } from 'VAST/Utilities/VastMediaSelector';
 import { CampaignError } from 'Ads/Errors/CampaignError';
@@ -17,7 +16,6 @@ import { ICore, ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class ProgrammaticVastParser extends CampaignParser {
@@ -33,7 +31,7 @@ export class ProgrammaticVastParser extends CampaignParser {
     protected _requestManager: RequestManager;
     protected _deviceInfo: DeviceInfo;
 
-    protected _vastParser: VastParser = new VastParser();
+    protected _vastParser: VastParserStrict = new VastParserStrict();
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());

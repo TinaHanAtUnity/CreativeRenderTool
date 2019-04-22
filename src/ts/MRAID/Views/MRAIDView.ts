@@ -16,6 +16,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { MRAIDAdapterContainer } from 'MRAID/EventBridge/MRAIDAdapterContainer';
 import { IMRAIDHandler } from 'MRAID/EventBridge/MRAIDEventAdapter';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import JsConsoleDebugScript from 'html/DebugJsConsole.html';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -85,6 +86,12 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _mraidAdapterContainer: MRAIDAdapterContainer;
 
     protected _privacyPanelOpen: boolean;
+
+    private static DebugJsConsole: boolean | undefined;
+
+    public static setDebugJsConsole(debug: boolean) {
+        MRAIDView.DebugJsConsole = debug;
+    }
 
     constructor(platform: Platform, core: ICoreApi, deviceInfo: DeviceInfo, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(platform, id);
@@ -177,12 +184,17 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         const fetchingTimestamp = Date.now();
         let fetchingStopTimestamp = Date.now();
         let mraidParseTimestamp = Date.now();
+
         return this.fetchMRAID().then(mraid => {
             fetchingStopTimestamp = mraidParseTimestamp = Date.now();
             if(mraid) {
                 const markup = this._campaign.getDynamicMarkup();
                 if(markup) {
                     mraid = mraid.replace('{UNITY_DYNAMIC_MARKUP}', markup);
+                }
+
+                if(MRAIDView.DebugJsConsole) {
+                    container = container.replace('<script id=\"debug-js-console\"></script>', JsConsoleDebugScript);
                 }
 
                 mraid = mraid.replace(/\$/g, '$$$');
@@ -463,5 +475,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public onBridgeAREvent(msg: MessageEvent) {
         this.onAREvent(msg).catch((reason) => this._core.Sdk.logError('AR message error: ' + reason.toString()));
+    }
+
+    public onBridgeArReadyToShow(msg: MessageEvent) {
+        this.onArReadyToShowEvent(msg).catch((reason) => this._core.Sdk.logError('AR ready to show message error: ' + reason.toString()));
+    }
+
+    protected onArReadyToShowEvent(msg: MessageEvent): Promise<void> {
+        return Promise.resolve();
     }
 }

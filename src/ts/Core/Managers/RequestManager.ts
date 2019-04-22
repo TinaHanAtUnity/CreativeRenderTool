@@ -5,6 +5,12 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { iOSCrashTest } from 'Core/Models/ABGroup';
 
 const enum RequestStatus {
     COMPLETE,
@@ -15,6 +21,11 @@ const enum RequestMethod {
     GET,
     POST,
     HEAD
+}
+
+export enum AuctionProtocol {
+    V4 = 4,
+    V5 = 5
 }
 
 interface IRequestOptions {
@@ -74,6 +85,7 @@ export class RequestManager {
     private static _callbacks: { [key: number]: CallbackContainer<INativeResponse> } = {};
     private static _requests: { [key: number]: INativeRequest } = {};
     private static _authorizations: { host: RegExp; authorizationHeader: string }[] = [];
+    private static _auctionProtocol: AuctionProtocol | undefined;
 
     private static getDefaultRequestOptions(): IRequestOptions {
         return {
@@ -98,6 +110,47 @@ export class RequestManager {
         this._core.Request.onComplete.subscribe((rawId, url, response, responseCode, headers) => this.onRequestComplete(rawId, url, response, responseCode, headers));
         this._core.Request.onFailed.subscribe((rawId, url, error) => this.onRequestFailed(rawId, url, error));
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
+    }
+
+    public static setAuctionProtocol(coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, platform: Platform, clientInfo: ClientInfo) {
+        if (!RequestManager._auctionProtocol) {
+            const forceProtocol = TestEnvironment.get('forceAuctionProtocol');
+            if (forceProtocol === 'V5') {
+                RequestManager._auctionProtocol = AuctionProtocol.V5;
+                return;
+            } else if (forceProtocol === 'V4') {
+                RequestManager._auctionProtocol = AuctionProtocol.V4;
+                return;
+            }
+
+            if(TestEnvironment.get('creativeUrl')) {
+                RequestManager._auctionProtocol = AuctionProtocol.V4;
+                return;
+            }
+
+            if (coreConfig.getTestMode()) {
+                RequestManager._auctionProtocol = AuctionProtocol.V4;
+                return;
+            }
+
+            if (CustomFeatures.isAuctionV4Game(clientInfo.getGameId()) && !iOSCrashTest.isValid(coreConfig.getAbGroup())) {
+                RequestManager._auctionProtocol = AuctionProtocol.V4;
+                return;
+            }
+
+            RequestManager._auctionProtocol = AuctionProtocol.V5;
+        }
+    }
+
+    public static setTestAuctionProtocol(protocol: AuctionProtocol | undefined) {
+        RequestManager._auctionProtocol = protocol;
+    }
+
+    public static getAuctionProtocol(): AuctionProtocol {
+        if (RequestManager._auctionProtocol) {
+            return RequestManager._auctionProtocol;
+        }
+        return AuctionProtocol.V4; // default protocol for legacy tests
     }
 
     public static setAuthorizationHeaderForHost(hostRegex: string, authorizationHeader: string) {

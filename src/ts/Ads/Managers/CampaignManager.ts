@@ -21,7 +21,7 @@ import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheStatus } from 'Core/Managers/CacheManager';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { ABGroup, AuctionV5Test } from 'Core/Models/ABGroup';
+import { ABGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
@@ -40,7 +40,7 @@ import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCam
 import { CampaignErrorHandlerFactory } from 'Ads/Errors/CampaignErrorHandlerFactory';
 import { CampaignError } from 'Ads/Errors/CampaignError';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
-import { INativeResponse, RequestManager } from 'Core/Managers/RequestManager';
+import { INativeResponse, RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManager';
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
@@ -70,6 +70,7 @@ export class CampaignManager {
 
     public static setBaseUrl(baseUrl: string): void {
         CampaignManager.BaseUrl = baseUrl + '/v4/games';
+        CampaignManager.AuctionV5BaseUrl = baseUrl + '/v5/games';
     }
 
     protected static CampaignResponse: string | undefined;
@@ -112,6 +113,7 @@ export class CampaignManager {
     private _jaegerManager: JaegerManager;
     private _lastAuctionId: string | undefined;
     private _deviceFreeSpace: number;
+    private _auctionProtocol: AuctionProtocol;
 
     constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeepingManager, contentTypeHandlerManager: ContentTypeHandlerManager, jaegerManager: JaegerManager, backupCampaignManager: BackupCampaignManager) {
         this._platform = platform;
@@ -130,6 +132,7 @@ export class CampaignManager {
         this._requesting = false;
         this._jaegerManager = jaegerManager;
         this._backupCampaignManager = backupCampaignManager;
+        this._auctionProtocol = RequestManager.getAuctionProtocol();
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -182,7 +185,7 @@ export class CampaignManager {
                 if (response) {
                     this.setSDKSignalValues(requestTimestamp);
 
-                    if(!this._coreConfig.getTestMode() && AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
+                    if(this._auctionProtocol === AuctionProtocol.V5) {
                         return this.parseAuctionV5Campaigns(response, countersForOperativeEvents, requestPrivacy).catch((e) => {
                             this.handleGeneralError(e, 'parse_auction_v5_campaigns_error');
                         });
@@ -484,7 +487,7 @@ export class CampaignManager {
             }
         }
 
-        this._core.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
+        this._core.Sdk.logInfo('AdPlan received with ' + campaignCount + ' campaigns and refreshDelay ' + refreshDelay);
         this.onAdPlanReceived.trigger(refreshDelay, campaignCount, auctionStatusCode);
 
         for(const mediaId in campaigns) {
@@ -502,7 +505,7 @@ export class CampaignManager {
                             return this.handlePlacementError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), campaigns[mediaId], 'campaign_caching_get_file_path_failed', session);
                         }
 
-                        return this.handlePlacementError(error, campaigns[mediaId], 'handle_auction_v5_campaign_error', session);
+                        return this.handleParseCampaignError(auctionResponse.getContentType(), error, campaigns[mediaId], session);
                     }));
                 } catch(error) {
                     this.handlePlacementError(error, campaigns[mediaId], 'error_creating_auction_v5_handle_campaign_chain', session);
@@ -546,7 +549,7 @@ export class CampaignManager {
         if(this._sessionManager.getGameSessionId() % 1000 === 99) {
             SessionDiagnostics.trigger('ad_received', {
                 contentType: response.getContentType(),
-                auctionProtocol: AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? 5 : 4,
+                auctionProtocol: this._auctionProtocol,
                 abGroup: this._coreConfig.getAbGroup().valueOf()
             }, session);
         }
@@ -576,7 +579,7 @@ export class CampaignManager {
 
             return this.setupCampaignAssets(response.getPlacements(), campaign, response.getContentType(), session);
         }).catch((error) => {
-            CreativeBlocking.report(parser.creativeID, parser.seatID, BlockingReason.VIDEO_PARSE_FAILURE, {
+            CreativeBlocking.report(parser.creativeID, parser.seatID, parser.campaignID, BlockingReason.VIDEO_PARSE_FAILURE, {
                 errorCode: error.errorCode || undefined,
                 message: error.message || undefined
             });
@@ -590,7 +593,7 @@ export class CampaignManager {
             if(this._sessionManager.getGameSessionId() % 1000 === 99) {
                 SessionDiagnostics.trigger('ad_ready', {
                     contentType: contentType,
-                    auctionProtocol: AuctionV5Test.isValid(this._coreConfig.getAbGroup()) ? 5 : 4,
+                    auctionProtocol: this._auctionProtocol,
                     abGroup: this._coreConfig.getAbGroup().valueOf()
                 }, session);
             }
@@ -672,7 +675,7 @@ export class CampaignManager {
                 'requests'
             ].join('/');
         }
-        if(AuctionV5Test.isValid(this._coreConfig.getAbGroup())) {
+        if(this._auctionProtocol === AuctionProtocol.V5) {
             return [
                 CampaignManager.AuctionV5BaseUrl,
                 this._clientInfo.getGameId(),

@@ -155,6 +155,7 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     public render(): void {
         super.render();
         this.setupElementReferences();
+        this.choosePrivacyShown();
 
         if (this._country === 'CN' && this._chinaAdvertisementElement) {
             this._chinaAdvertisementElement.style.display = 'block';
@@ -209,6 +210,12 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
             this.showSkipButton();
             this._chinaAdvertisementElement.classList.add('with-skip-button');
         }
+
+        const isPerformanceCampaign = this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign;
+        if (isPerformanceCampaign && !this._skipEnabled && this._videoProgress > 5000) {
+            this.showCallButton();
+            return;
+        }
     }
 
     public setMuteEnabled(value: boolean) {
@@ -229,10 +236,6 @@ export class VideoOverlay extends AbstractVideoOverlay implements IPrivacyHandle
     }
 
     public setCallButtonVisible(value: boolean) {
-        if ((this._campaign instanceof XPromoCampaign || this._campaign instanceof PerformanceCampaign) && !this._skipEnabled) {
-            return;
-        }
-
         if (this._callButtonVisible !== value) {
             this._callButtonElement.style.display = value ? 'block' : 'none';
         }

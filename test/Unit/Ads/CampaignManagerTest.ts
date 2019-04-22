@@ -21,10 +21,8 @@ import { CacheBookkeepingManager } from 'Core/Managers/CacheBookkeepingManager';
 import { CacheManager } from 'Core/Managers/CacheManager';
 import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { RequestManager } from 'Core/Managers/RequestManager';
+import { RequestManager, AuctionProtocol } from 'Core/Managers/RequestManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { AuctionV5Test } from 'Core/Models/ABGroup';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -70,7 +68,6 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
-import { VastParser } from 'VAST/Utilities/VastParser';
 import IncorrectWrappedVast from 'xml/IncorrectWrappedVast.xml';
 import NonWrappedVast from 'xml/NonWrappedVast.xml';
 import NoVideoWrappedVast from 'xml/NoVideoWrappedVast.xml';
@@ -99,6 +96,7 @@ import { VPAIDAdUnitParametersFactory } from 'VPAID/AdUnits/VPAIDAdUnitParameter
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 import { VPAIDAdUnitFactory } from 'VPAID/AdUnits/VPAIDAdUnitFactory';
+import { VastParserStrict } from 'VAST/Utilities/VastParserStrict';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -110,7 +108,7 @@ describe('CampaignManager', () => {
     let storageBridge: StorageBridge;
     let wakeUpManager: WakeUpManager;
     let request: RequestManager;
-    let vastParser: VastParser;
+    let vastParser: VastParserStrict;
     let coreConfig: CoreConfiguration;
     let adsConfig: AdsConfiguration;
     let metaDataManager: MetaDataManager;
@@ -131,11 +129,13 @@ describe('CampaignManager', () => {
     };
 
     beforeEach(() => {
+        RequestManager.setTestAuctionProtocol(AuctionProtocol.V4);
+
         coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
         adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
 
         clientInfo = TestFixtures.getClientInfo();
-        vastParser = TestFixtures.getVastParser();
+        vastParser = TestFixtures.getVastParserStrict();
         platform = Platform.ANDROID;
         backend = TestFixtures.getBackend(platform);
         nativeBridge = TestFixtures.getNativeBridge(platform, backend);
@@ -156,7 +156,7 @@ describe('CampaignManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-        backupCampaignManager = new BackupCampaignManager(platform, core.Api, storageBridge, coreConfig, deviceInfo);
+        backupCampaignManager = new BackupCampaignManager(platform, core.Api, storageBridge, coreConfig, deviceInfo, TestFixtures.getClientInfo(platform));
         contentTypeHandlerManager = new ContentTypeHandlerManager();
         adUnitParametersFactory = sinon.createStubInstance(AbstractAdUnitParametersFactory);
     });
@@ -492,7 +492,7 @@ describe('CampaignManager', () => {
                 const response = {
                     response: OnProgrammaticVastPlcCampaignIncorrect
                 };
-                return verifyErrorForResponse(response, 'VAST xml data is missing');
+                return verifyErrorForResponse(response, 'VAST xml was not parseable:\n   This page contains the following errors:error on line 33 at column 12: Opening and ending tag mismatch: VASTy line 0 and VAST\nBelow is a rendering of the page up to the first error.');
             });
 
             it('should trigger onError after requesting a wrapped vast placement with incorrect document element node name', () => {
@@ -511,7 +511,7 @@ describe('CampaignManager', () => {
                 const response = {
                     response: OnProgrammaticVastPlcCampaignNoData
                 };
-                return verifyErrorForResponse(response, 'VAST xml data is missing');
+                return verifyErrorForResponse(response, 'VAST xml was not parseable:\n   This page contains the following errors:error on line 1 at column 1: Document is empty\nBelow is a rendering of the page up to the first error.');
             });
 
             it('should trigger onError after requesting a wrapped vast placement when a failure occurred requesting the wrapped VAST', () => {
@@ -819,7 +819,7 @@ describe('CampaignManager', () => {
             }));
 
             const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticStaticInterstitialParser.ContentTypeHtml, { parser: new ProgrammaticStaticInterstitialParser(platform, false), factory: new DisplayInterstitialAdUnitFactory(<DisplayInterstitialAdUnitParametersFactory>adUnitParametersFactory) });
+            contentTypeHandlerManager.addHandler(ProgrammaticStaticInterstitialParser.ContentTypeHtml, { parser: new ProgrammaticStaticInterstitialParser(platform), factory: new DisplayInterstitialAdUnitFactory(<DisplayInterstitialAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core.Api, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: DisplayInterstitialCampaign;
             let triggeredError: any;
@@ -849,7 +849,7 @@ describe('CampaignManager', () => {
             }));
 
             const assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
-            contentTypeHandlerManager.addHandler(ProgrammaticStaticInterstitialParser.ContentTypeJs, { parser: new ProgrammaticStaticInterstitialParser(platform, true), factory: new DisplayInterstitialAdUnitFactory(<DisplayInterstitialAdUnitParametersFactory>adUnitParametersFactory) });
+            contentTypeHandlerManager.addHandler(ProgrammaticStaticInterstitialParser.ContentTypeJs, { parser: new ProgrammaticStaticInterstitialParser(platform), factory: new DisplayInterstitialAdUnitFactory(<DisplayInterstitialAdUnitParametersFactory>adUnitParametersFactory) });
             const campaignManager = new CampaignManager(platform, core.Api, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
             let triggeredCampaign: DisplayInterstitialCampaign;
             let triggeredError: any;
@@ -861,12 +861,8 @@ describe('CampaignManager', () => {
             });
 
             return campaignManager.request().then(() => {
-                if (triggeredError) {
-                    throw triggeredError;
-                }
-
                 mockRequest.verify();
-                assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
+                assert.equal(triggeredError.message, ProgrammaticStaticInterstitialParser.ErrorMessage, 'Should trigger error when the content of display ad is not in HTML format');
             });
         });
     });
@@ -1184,9 +1180,12 @@ describe('CampaignManager', () => {
         const ConfigurationAuctionPlcJson = JSON.parse(ConfigurationAuctionPlc);
 
         beforeEach(() => {
+            sinon.stub(RequestManager, 'getAuctionProtocol').returns(AuctionProtocol.V5);
+
             contentTypeHandlerManager.addHandler(CometCampaignParser.ContentType, { parser: new CometCampaignParser(core), factory: new PerformanceAdUnitFactory(<PerformanceAdUnitParametersFactory>adUnitParametersFactory) });
             assetManager = new AssetManager(platform, core.Api, new CacheManager(core.Api, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, backupCampaignManager);
             campaignManager = new CampaignManager(platform, core.Api, CoreConfigurationParser.parse(ConfigurationAuctionPlcJson), AdsConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, contentTypeHandlerManager, jaegerManager, backupCampaignManager);
+
             mockRequest = sinon.mock(request);
         });
 
@@ -1207,8 +1206,6 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve({
                 response: AuctionV5Response
             }));
-
-            sinon.stub(AuctionV5Test, 'isValid').returns(true);
 
             campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign, trackingUrls: ICampaignTrackingUrls) => {
                 if(placement === 'premium') {

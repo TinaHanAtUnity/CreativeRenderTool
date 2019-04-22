@@ -28,22 +28,23 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
+import { ProgressBarVideoOverlay } from 'Ads/Views/ProgressBarVideoOverlay';
 import { PrivacySettings } from 'Ads/Views/Consent/PrivacySettings';
 import { PrivacyMethod } from 'Ads/Models/Privacy';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { VideoOverlayWithInstallInRewardedVideos } from 'Ads/Views/VideoOverlayWithInstallInRewardedVideo';
 import { IStoreApi } from 'Store/IStore';
+import { ABGroup, ProgressBarVideoTest } from 'Core/Models/ABGroup';
 
 export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> {
     create(campaign: T1, placement: Placement, orientation: Orientation, playerMetadataServerId: string, options: unknown): T2;
 }
 
 export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> implements IAbstractAdUnitParametersFactory<T1, T2> {
+    private static _forceGDPRBanner: boolean;
+    private static _forcedConsentUnit: boolean;
+
     protected _campaign: T1;
     protected _placement: Placement;
     protected _orientation: Orientation;
-
-    private static _forceGDPRBanner: boolean;
 
     private _platform: Platform;
     private _core: ICoreApi;
@@ -65,6 +66,14 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
 
     private _playerMetadataServerId: string;
     private _options: unknown;
+
+    public static setForcedGDPRBanner(value: boolean) {
+        AbstractAdUnitParametersFactory._forceGDPRBanner = value;
+    }
+
+    public static setForcedConsentUnit(value: boolean) {
+        AbstractAdUnitParametersFactory._forcedConsentUnit = value;
+    }
 
     constructor(core: ICore, ads: IAds) {
         this._platform = core.NativeBridge.getPlatform();
@@ -149,7 +158,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected createPrivacy(): AbstractPrivacy {
         let privacy: AbstractPrivacy;
 
-        if (this._adsConfig.getGamePrivacy().isEnabled()) {
+        if (this._adsConfig.getGamePrivacy().isEnabled() || AbstractAdUnitParametersFactory._forcedConsentUnit) {
             privacy = new PrivacySettings(this._platform, this._campaign, this._privacyManager, this._adsConfig.isGDPREnabled(), this._coreConfig.isCoppaCompliant());
         } else {
             privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._adsConfig.isGDPREnabled(), this._coreConfig.isCoppaCompliant());
@@ -207,9 +216,9 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected createOverlay(parameters: IAdUnitParameters<Campaign>, privacy: AbstractPrivacy, showPrivacyDuringVideo: boolean): AbstractVideoOverlay {
 
         let overlay: AbstractVideoOverlay;
-
-        if (CustomFeatures.isRewardedVideoInstallButtonEnabled(this._campaign, this._coreConfig)) {
-            overlay = new VideoOverlayWithInstallInRewardedVideos(parameters, parameters.privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
+        const abGroup = parameters.coreConfig.getAbGroup();
+        if (ProgressBarVideoTest.isValid(abGroup)) {
+            overlay = new ProgressBarVideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         } else {
             overlay = new VideoOverlay(parameters, privacy, this.showGDPRBanner(parameters), showPrivacyDuringVideo);
         }

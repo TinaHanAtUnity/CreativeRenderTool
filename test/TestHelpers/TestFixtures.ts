@@ -91,7 +91,6 @@ import { FakeIosDeviceInfo } from 'TestHelpers/FakeIosDeviceInfo';
 import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
-import { VastParser } from 'VAST/Utilities/VastParser';
 import { VPAID } from 'VPAID/Models/VPAID';
 import { IVPAIDCampaign, VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
@@ -101,6 +100,7 @@ import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import VastAdWithoutCompanionAdXml from 'xml/VastAdWithoutCompanionAd.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
+import VastAdVerificationAsExtension from 'xml/VastWithExtensionAdVerification.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { IARApi } from 'AR/AR';
 import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
@@ -591,7 +591,7 @@ export class TestFixtures {
     }
 
     public static getCompanionVastCampaign(): VastCampaign {
-        const vastParser = TestFixtures.getVastParser();
+        const vastParser = TestFixtures.getVastParserStrict();
         const vast = vastParser.parseVast(VastCompanionXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
     }
@@ -604,21 +604,28 @@ export class TestFixtures {
     }
 
     public static getEventVastCampaign(session?: Session): VastCampaign {
-        const vastParser = TestFixtures.getVastParser();
+        const vastParser = TestFixtures.getVastParserStrict();
         const vastXml = EventTestVast;
         const vast = vastParser.parseVast(vastXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345', session));
     }
 
+    public static getAdVerificationsVastCampaign(): VastCampaign {
+        const vastParser = TestFixtures.getVastParserStrict();
+        const vastXml = VastAdVerificationAsExtension;
+        const vast = vastParser.parseVast(vastXml);
+        return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
+    }
+
     public static getCompanionVastCampaignWithoutImages(): VastCampaign {
-        const vastParser = TestFixtures.getVastParser();
+        const vastParser = TestFixtures.getVastParserStrict();
         const vastXml = VastCompanionAdWithoutImagesXml;
         const vast = vastParser.parseVast(vastXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
     }
 
     public static getCompanionVastCampaignWithoutCompanionAd(): VastCampaign {
-        const vastParser = TestFixtures.getVastParser();
+        const vastParser = TestFixtures.getVastParserStrict();
         const vastXml = VastAdWithoutCompanionAdXml;
         const vast = vastParser.parseVast(vastXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
@@ -866,13 +873,6 @@ export class TestFixtures {
         };
     }
 
-    public static getVastParser(): VastParser {
-        let vastParser: VastParser;
-        const domParser = new DOMParser();
-        vastParser = new VastParser(domParser);
-        return vastParser;
-    }
-
     public static getVastParserStrict(): VastParserStrict {
         let vastParser: VastParserStrict;
         const domParser = new DOMParser();
@@ -903,7 +903,8 @@ export class TestFixtures {
             ResolveManager: new ResolveManager(api),
             MetaDataManager: new MetaDataManager(api),
             StorageBridge: new StorageBridge(api),
-            ClientInfo: this.getClientInfo(platform)
+            ClientInfo: this.getClientInfo(platform),
+            Config: this.getCoreConfiguration()
         };
         if (platform === Platform.ANDROID) {
             core.DeviceInfo = new AndroidDeviceInfo(api);
@@ -927,7 +928,7 @@ export class TestFixtures {
             InterstitialWebPlayerContainer: new InterstitialWebPlayerContainer(platform, api),
             SessionManager: new SessionManager(core.Api, core.RequestManager, core.StorageBridge),
             MissedImpressionManager: new MissedImpressionManager(core.Api),
-            BackupCampaignManager: new BackupCampaignManager(platform, core.Api, core.StorageBridge, core.Config, core.DeviceInfo),
+            BackupCampaignManager: new BackupCampaignManager(platform, core.Api, core.StorageBridge, core.Config, core.DeviceInfo, core.ClientInfo),
             ProgrammaticTrackingService: new ProgrammaticTrackingService(platform, core.RequestManager, core.ClientInfo, core.DeviceInfo),
             ContentTypeHandlerManager: new ContentTypeHandlerManager(),
             Config: TestFixtures.getAdsConfiguration(),
