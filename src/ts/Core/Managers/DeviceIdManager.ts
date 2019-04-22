@@ -87,14 +87,10 @@ export class DeviceIdManager {
      * @returns True if collecting device ID is okay, else false.
      */
     public isCompliant(country: string, isOptOutEnabled: boolean): boolean {
-        if (country === 'CN'
+        return country === 'CN'
             && !this._deviceInfo.getAdvertisingIdentifier()
             && !this._deviceInfo.getLimitAdTracking()
-            && !isOptOutEnabled) {
-            return true;
-        }
-
-        return false;
+            && !isOptOutEnabled;
     }
 
     private fetchDeviceIds(): Promise<void> {
