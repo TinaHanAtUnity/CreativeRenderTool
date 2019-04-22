@@ -108,7 +108,7 @@ export class DeviceIdManager {
             if (deviceId1 && deviceId2) {
                 (<AndroidDeviceInfo>this._deviceInfo).setDeviceIds(deviceId1, deviceId2);
             } else {
-                this._core.Sdk.logInfo('Device ids fetched were invalid');
+                this._core.Sdk.logInfo(`Device ids fetched were invalid deviceId1: ${deviceId1} deviceId2: ${deviceId2}`);
             }
         }).catch((error) => {
             this._core.Sdk.logWarning(JSON.stringify(error));
