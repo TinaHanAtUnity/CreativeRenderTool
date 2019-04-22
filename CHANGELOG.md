@@ -1,27 +1,31 @@
-# Pending
+# Fri Apr 19 21:06:10 UTC 2019
+
+* Disabled ABTest Third Party Open Measurement implementation for VAST [#9026](https://github.com/Applifier/unity-ads-webview/pull/9026)
+
+# Thu Apr 18 23:43:35 UTC 2019
 
 * A/B test: Change order of the cta buttons on my choices page [#9101](https://github.com/Applifier/unity-ads-webview/pull/9101)
-* Track Homescreen Consent Link Clicks with PTS [9102](https://github.com/Applifier/unity-ads-webview/pull/9102)
-* Add MetaJoy's Android GameIds to V4 list [9151](https://github.com/Applifier/unity-ads-webview/pull/9151)
-* MRAID close button styles fix [9150](https://github.com/Applifier/unity-ads-webview/pull/9150)
-* Add CampaignId to CreativeBlocking Payload [9152](https://github.com/Applifier/unity-ads-webview/pull/9152)
+* Track Homescreen Consent Link Clicks with PTS [#9102](https://github.com/Applifier/unity-ads-webview/pull/9102)
+* Add MetaJoy's Android GameIds to V4 list [#9151](https://github.com/Applifier/unity-ads-webview/pull/9151)
+* MRAID close button styles fix [#9150](https://github.com/Applifier/unity-ads-webview/pull/9150)
+* Add CampaignId to CreativeBlocking Payload [#9152](https://github.com/Applifier/unity-ads-webview/pull/9152)
 
 # Reverted to LKGs (Wed Apr 17 13:05:52 UTC 2019) - Thu Apr 18 19:21:48 UTC 2019
 * Revert A/B test: Change order of the cta buttons on my choices page [#9101](https://github.com/Applifier/unity-ads-webview/pull/9101)
-* Revert Track Homescreen Consent Link Clicks with PTS [9102](https://github.com/Applifier/unity-ads-webview/pull/9102)
-* Revert Add MetaJoy's Android GameIds to V4 list [9151](https://github.com/Applifier/unity-ads-webview/pull/9151)
-* Revert MRAID close button styles fix [9150](https://github.com/Applifier/unity-ads-webview/pull/9150)
-* Revert Add CampaignId to CreativeBlocking Payload [9152](https://github.com/Applifier/unity-ads-webview/pull/9152)
-* Revert Minor Refactor to Tracking Events [9100](https://github.com/Applifier/unity-ads-webview/pull/9100)
+* Revert Track Homescreen Consent Link Clicks with PTS [#9102](https://github.com/Applifier/unity-ads-webview/pull/9102)
+* Revert Add MetaJoy's Android GameIds to V4 list [#9151](https://github.com/Applifier/unity-ads-webview/pull/9151)
+* Revert MRAID close button styles fix [#9150](https://github.com/Applifier/unity-ads-webview/pull/9150)
+* Revert Add CampaignId to CreativeBlocking Payload [#9152](https://github.com/Applifier/unity-ads-webview/pull/9152)
+* Revert Minor Refactor to Tracking Events [#9100](https://github.com/Applifier/unity-ads-webview/pull/9100)
 
 # Thu Apr 18 17:21:48 UTC 2019
 
 * A/B test: Change order of the cta buttons on my choices page [#9101](https://github.com/Applifier/unity-ads-webview/pull/9101)
-* Track Homescreen Consent Link Clicks with PTS [9102](https://github.com/Applifier/unity-ads-webview/pull/9102)
-* Add MetaJoy's Android GameIds to V4 list [9151](https://github.com/Applifier/unity-ads-webview/pull/9151)
-* MRAID close button styles fix [9150](https://github.com/Applifier/unity-ads-webview/pull/9150)
-* Add CampaignId to CreativeBlocking Payload [9152](https://github.com/Applifier/unity-ads-webview/pull/9152)
-* Minor Refactor to Tracking Events [9100](https://github.com/Applifier/unity-ads-webview/pull/9100)
+* Track Homescreen Consent Link Clicks with PTS [#9102](https://github.com/Applifier/unity-ads-webview/pull/9102)
+* Add MetaJoy's Android GameIds to V4 list [#9151](https://github.com/Applifier/unity-ads-webview/pull/9151)
+* MRAID close button styles fix [#9150](https://github.com/Applifier/unity-ads-webview/pull/9150)
+* Add CampaignId to CreativeBlocking Payload [#9152](https://github.com/Applifier/unity-ads-webview/pull/9152)
+* Minor Refactor to Tracking Events [#9100](https://github.com/Applifier/unity-ads-webview/pull/9100)
 
 # Wed Apr 17 13:05:52 UTC 2019
 

@@ -349,7 +349,10 @@ export class VastParserStrict {
                     vastAdVerification.setVerificationTrackingEvent(url);
                 }
             });
-            vastAdVerifications.push(vastAdVerification);
+
+            if (vastAdVerification.getVerficationResources() && vastAdVerification.getVerificationVendor()) {
+                vastAdVerifications.push(vastAdVerification);
+            }
         });
 
         return vastAdVerifications;

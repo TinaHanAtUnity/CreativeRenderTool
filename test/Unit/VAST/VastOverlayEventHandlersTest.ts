@@ -34,6 +34,7 @@ import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHand
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
     describe('VastOverlayEventHandlersTest', () => {
@@ -61,6 +62,7 @@ import { IStoreApi } from 'Store/IStore';
         let sandbox: sinon.SinonSandbox;
         let privacy: Privacy;
         let programmaticTrackingService: ProgrammaticTrackingService;
+        let om: OpenMeasurement | undefined;
 
         before(() => {
             sandbox = sinon.createSandbox();
@@ -155,7 +157,8 @@ import { IStoreApi } from 'Store/IStore';
                 video: campaign.getVideo(),
                 privacyManager: privacyManager,
                 programmaticTrackingService: programmaticTrackingService,
-                privacy
+                privacy,
+                om: sinon.createStubInstance(OpenMeasurement)
             };
 
             vastAdUnit = new VastAdUnit(vastAdUnitParameters);
@@ -163,6 +166,8 @@ import { IStoreApi } from 'Store/IStore';
 
             moat = sinon.createStubInstance(MOAT);
             sandbox.stub(MoatViewabilityService, 'getMoat').returns(moat);
+            sandbox.stub(vastAdUnit, 'getOpenMeasurement').returns(vastAdUnitParameters.om);
+            om = vastAdUnitParameters.om;
         });
 
         afterEach(() => {
@@ -179,6 +184,17 @@ import { IStoreApi } from 'Store/IStore';
             it('should hide ad unit', () => {
                 vastOverlayEventHandler.onOverlaySkip(1);
                 sinon.assert.called(<sinon.SinonSpy>vastAdUnit.hide);
+            });
+
+            it('should fire viewability skip event along with session finish', () => {
+                vastAdUnit.setShowing(true);
+                return vastAdUnit.hide().then(() => {
+                    vastAdUnit = new VastAdUnit(vastAdUnitParameters);
+                    vastOverlayEventHandler = new VastOverlayEventHandler(vastAdUnit, vastAdUnitParameters);
+                    vastOverlayEventHandler.onOverlaySkip(1);
+                    sinon.assert.called(<sinon.SinonStub>om!.skipped);
+                    sinon.assert.called(<sinon.SinonStub>om!.sessionFinish);
+                });
             });
 
             describe('When ad unit has an endscreen', () => {
@@ -236,14 +252,16 @@ import { IStoreApi } from 'Store/IStore';
                 testMuteEvent(false);
             });
 
-            it('should call volumeChange when mute is true', () => {
+            it('should call viewability volumeChange when mute is true', () => {
                 vastOverlayEventHandler.onOverlayMute(true);
                 sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
+                sinon.assert.calledWith(<sinon.SinonStub>om!.volumeChange, 0);
             });
 
-            it('should call play when mute is false', () => {
+            it('should call viewability volumeChange when mute is false', () => {
                 vastOverlayEventHandler.onOverlayMute(false);
                 sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
+                sinon.assert.called(<sinon.SinonStub>om!.volumeChange);
             });
         });
 
@@ -252,6 +270,12 @@ import { IStoreApi } from 'Store/IStore';
                 sinon.spy(ads.VideoPlayer, 'pause');
                 sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
                 sinon.stub(vastAdUnit, 'sendVideoClickTrackingEvent').returns(sinon.spy());
+            });
+
+            it('should track clicks for viewability', () => {
+                vastOverlayEventHandler.onOverlayCallButton().then(() => {
+                    sinon.assert.called(<sinon.SinonStub>om!.adUserInteraction);
+                });
             });
 
             if(platform === Platform.IOS) {
