@@ -34,6 +34,7 @@ import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler'
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndscreenParameters, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { IStoreApi } from 'Store/IStore';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 
 describe('VastVideoEventHandler tests', () => {
     let platform: Platform;
@@ -65,6 +66,7 @@ describe('VastVideoEventHandler tests', () => {
     let privacyManager: UserPrivacyManager;
     let privacy: Privacy;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let openMeasurement: OpenMeasurement | undefined;
 
     before(() => {
         sandbox = sinon.createSandbox();
@@ -166,7 +168,8 @@ describe('VastVideoEventHandler tests', () => {
             video: campaign.getVideo(),
             privacyManager: privacyManager,
             programmaticTrackingService: programmaticTrackingService,
-            privacy
+            privacy,
+            om: sinon.createStubInstance(OpenMeasurement)
         };
 
         testAdUnit = new VastAdUnit(vastAdUnitParameters);
@@ -174,6 +177,9 @@ describe('VastVideoEventHandler tests', () => {
 
         moat = sinon.createStubInstance(MOAT);
         sandbox.stub(MoatViewabilityService, 'getMoat').returns(moat);
+
+        openMeasurement = vastAdUnitParameters.om;
+        sandbox.stub(testAdUnit, 'getOpenMeasurement').returns(openMeasurement);
 
         videoEventHandlerParams = {
             platform,
@@ -209,6 +215,16 @@ describe('VastVideoEventHandler tests', () => {
 
         it('initalizes moat', () => {
             sinon.assert.called(<sinon.SinonStub>moat.init);
+        });
+
+        it('should call session start', () => {
+            sinon.assert.called(<sinon.SinonStub>openMeasurement!.sessionStart);
+        });
+
+        it('should call session start once', () => {
+            vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
+            vastVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
+            sinon.assert.calledOnce(<sinon.SinonStub>openMeasurement!.sessionStart);
         });
     });
 
@@ -288,6 +304,13 @@ describe('VastVideoEventHandler tests', () => {
             vastVideoEventHandler.onPlay('https://test.com');
             sinon.assert.called(<sinon.SinonStub>moat.play);
         });
+
+        it('tiggers om resume, start events', () => {
+            vastVideoEventHandler.onPlay('https://test.com');
+            sinon.assert.called(<sinon.SinonStub>openMeasurement!.resume);
+            sinon.assert.called(<sinon.SinonStub>openMeasurement!.start);
+            sinon.assert.called(<sinon.SinonStub>openMeasurement!.playerStateChanged);
+        });
     });
 
     describe('onVideoProgress', () => {
@@ -318,9 +341,11 @@ describe('VastVideoEventHandler tests', () => {
             sinon.assert.called(<sinon.SinonSpy>testAdUnit.hide);
         });
 
-        it ('should trigger moat completed event', () => {
+        it ('should trigger viewability completed event', () => {
             vastVideoEventHandler.onCompleted('https://test.com');
             sinon.assert.called(<sinon.SinonStub>moat.completed);
+            sinon.assert.called(<sinon.SinonStub>openMeasurement!.completed);
+            sinon.assert.called(<sinon.SinonStub>openMeasurement!.sessionFinish);
         });
     });
 
@@ -340,8 +365,9 @@ describe('VastVideoEventHandler tests', () => {
             vastVideoEventHandler.onPause('https://test.com');
         });
 
-        it ('should send moat pause event', () => {
+        it ('should send viewability pause events', () => {
             sinon.assert.calledWith(<sinon.SinonStub>moat.pause, 4);
+            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.pause);
         });
     });
 
@@ -350,8 +376,9 @@ describe('VastVideoEventHandler tests', () => {
             vastVideoEventHandler.onVolumeChange(1, 10);
         });
 
-        it ('should call moat volumeChange event', () => {
+        it ('should call viewability volumeChange events', () => {
             sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 0.1);
+            sinon.assert.calledWith(<sinon.SinonStub>openMeasurement!.volumeChange, 0.1);
         });
     });
 

@@ -11,7 +11,8 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { Url } from 'Core/Utilities/Url';
-import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
+import { InteractionType } from 'Ads/Views/OMIDEventBridge';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -23,6 +24,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastOverlay?: AbstractVideoOverlay;
     private _gameSessionId?: number;
     private _abGroup: ABGroup;
+    private _om?: OpenMeasurement;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(adUnit, parameters);
@@ -37,6 +39,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._vastOverlay = this._vastAdUnit.getOverlay();
         this._gameSessionId = parameters.gameSessionId;
         this._abGroup = parameters.coreConfig.getAbGroup();
+        this._om = this._vastAdUnit.getOpenMeasurement();
     }
 
     public onOverlaySkip(position: number): void {
@@ -53,6 +56,16 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                 this._vastAdUnit.hide();
             }
         }
+
+        if (this._om) {
+            this._om.skipped();
+            this._om.sessionFinish({
+                adSessionId: this._campaign.getSession().getId(),
+                timestamp: new Date(),
+                type: 'sessionFinish',
+                data: {}
+            });
+        }
     }
 
     public onOverlayMute(isMuted: boolean): void {
@@ -61,12 +74,21 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             if (this._moat) {
                 this._moat.volumeChange(0);
             }
-            this._vastAdUnit.sendTrackingEvent(TrackingEvent.MUTE);
+
+            if (this._om) {
+                this._om.volumeChange(0);
+            }
+
+            this._vastAdUnit.sendTrackingEvent('mute', this._vastCampaign.getSession().getId());
         } else {
             if (this._moat) {
                 this._moat.volumeChange(this._vastAdUnit.getVolume());
             }
-            this._vastAdUnit.sendTrackingEvent(TrackingEvent.UNMUTE);
+
+            if (this._om) {
+                this._om.volumeChange(this._vastAdUnit.getVolume());
+            }
+            this._vastAdUnit.sendTrackingEvent('unmute', this._vastCampaign.getSession().getId());
         }
     }
 
@@ -75,6 +97,10 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
         this.setCallButtonEnabled(false);
         this._ads.Listener.sendClickEvent(this._placement.getId());
+
+        if (this._om) {
+            this._om.adUserInteraction(InteractionType.CLICK);
+        }
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {

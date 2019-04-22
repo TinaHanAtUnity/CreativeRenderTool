@@ -1,6 +1,6 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { WKAudiovisualMediaTypes } from 'Ads/Native/WebPlayer';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
@@ -113,7 +113,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
     }
 
-    public sendTrackingEvent(eventType: TrackingEvent) {
+    public sendTrackingEvent(eventType: string) {
         const urls = this._vpaidCampaign.getTrackingUrlsForEvent(eventType);
         const sessionId = this._vpaidCampaign.getSession().getId();
 

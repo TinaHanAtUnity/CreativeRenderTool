@@ -5,7 +5,6 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class XPromoVideoEventHandler extends VideoEventHandler {
 
@@ -47,7 +46,12 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
             this._adUnit.onStartProcessed.trigger();
         });
 
-        this.sendTrackingEvent(TrackingEvent.START);
+        const trackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('start');
+
+        for (const url of trackingUrls) {
+            this._thirdPartyEventManager.sendWithGet('xpromo start', this._xpromoCampaign.getSession().getId(), url);
+        }
+
         this._ads.Listener.sendStartEvent(this._placement.getId());
     }
 
@@ -61,7 +65,10 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
 
     protected handleCompleteEvent(): void {
         this._xpromoOperativeEventManager.sendView(this.getXPromoOperativeEventParams());
-        this.sendTrackingEvent(TrackingEvent.VIEW);
+        const clickTrackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('view');
+        for (const clickUrl of clickTrackingUrls) {
+            this._thirdPartyEventManager.sendWithGet('xpromo view', this._xpromoCampaign.getSession().getId(), clickUrl);
+        }
     }
 
     protected getVideoOrientation(): string | undefined {
@@ -73,9 +80,5 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
             placement: this._placement,
             videoOrientation: this.getVideoOrientation()
         };
-    }
-
-    private sendTrackingEvent(event: TrackingEvent) {
-        this._thirdPartyEventManager.sendTrackingEvents(this._campaign, event, 'xpromo');
     }
 }

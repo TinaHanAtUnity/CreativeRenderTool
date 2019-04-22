@@ -1,4 +1,4 @@
-import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ICoreApi } from 'Core/ICore';
 import { ClientInfo } from 'Core/Models/ClientInfo';
@@ -72,7 +72,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
     }
 
     public purchaseItem(thirdPartyEventManager: ThirdPartyEventManager, productId: string, campaign: PromoCampaign, placementId: string, isNative: boolean): Promise<ITransactionDetails> {
-        const purchaseUrls = campaign.getTrackingUrlsForEvent(TrackingEvent.PURCHASE);
+        const purchaseUrls = campaign.getTrackingUrlsForEvent('purchase');
         const modifiedPurchaseUrls = thirdPartyEventManager.replaceTemplateValuesAndEncodeUrls(purchaseUrls).map((value: string): string => {
             if (PromoEvents.purchaseHostnameRegex.test(value)) {
                 return Url.addParameters(value, {'native': isNative, 'iap_service': true});
@@ -92,7 +92,7 @@ export class UnityPurchasingPurchasingAdapter implements IPurchasingAdapter {
     }
 
     public onPromoClosed(thirdPartyEventManager: ThirdPartyEventManager, campaign: PromoCampaign, placementId: string): void {
-        const purchaseUrls = campaign.getTrackingUrlsForEvent(TrackingEvent.PURCHASE);
+        const purchaseUrls = campaign.getTrackingUrlsForEvent('purchase');
         const modifiedPurchaseUrls = thirdPartyEventManager.replaceTemplateValuesAndEncodeUrls(purchaseUrls);
         const iapPayload: IPromoPayload = {
             gamerToken: this._coreConfiguration.getToken(),
