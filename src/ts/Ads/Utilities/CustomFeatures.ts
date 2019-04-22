@@ -106,4 +106,8 @@ export class CustomFeatures {
             return false;
         }
     }
+
+    public static isUnsupportedOMVendor(resourceUrl: string) {
+        return false;
+    }
 }

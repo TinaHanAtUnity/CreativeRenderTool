@@ -9,7 +9,7 @@ import { RequestError } from 'Core/Errors/RequestError';
 import { Video } from 'Ads/Models/Assets/Video';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
-import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
@@ -94,7 +94,10 @@ export abstract class StoreHandler implements IStoreHandler {
         const operativeEventParameters = this.getOperativeEventParams(parameters);
         this._operativeEventManager.sendClick(operativeEventParameters);
         if (this._campaign instanceof XPromoCampaign) {
-            this._thirdPartyEventManager.sendTrackingEvents(this._campaign, TrackingEvent.CLICK, 'xpromo');
+            const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
+            for (const url of clickTrackingUrls) {
+                this._thirdPartyEventManager.sendWithGet('xpromo click', this._campaign.getSession().getId(), url);
+            }
         }
     }
 

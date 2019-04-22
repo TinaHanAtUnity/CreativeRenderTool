@@ -1,13 +1,16 @@
 import { IAdsApi } from 'Ads/IAds';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Closer } from 'Ads/Views/Closer';
+import { IARApi } from 'AR/AR';
 import { Backend } from 'Backend/Backend';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
+import { IPurchasingApi } from 'Purchasing/IPurchasing';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
@@ -57,7 +60,7 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
             };
         };
 
-        const verifyTrackingEvent = (eventType: TrackingEvent) => {
+        const verifyTrackingEvent = (eventType: string) => {
             return () => {
                 sinon.assert.calledWith(<sinon.SinonStub>adUnit.sendTrackingEvent, eventType);
             };
@@ -72,7 +75,7 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
 
         describe('on AdVideoFirstQuartile', () => {
             beforeEach(triggerVPAIDEvent('AdVideoFirstQuartile'));
-            it('should trigger firstQuartile tracking', verifyTrackingEvent(TrackingEvent.FIRST_QUARTILE));
+            it('should trigger firstQuartile tracking', verifyTrackingEvent('firstQuartile'));
             it('should send the first quartile operative event', () => {
                 sinon.assert.called(<sinon.SinonSpy>parameters.operativeEventManager.sendFirstQuartile);
             });
@@ -80,7 +83,7 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
 
         describe('on AdVideoMidpoint', () => {
             beforeEach(triggerVPAIDEvent('AdVideoMidpoint'));
-            it('should trigger midpoint tracking', verifyTrackingEvent(TrackingEvent.MIDPOINT));
+            it('should trigger midpoint tracking', verifyTrackingEvent('midpoint'));
             it('should send the midpoint operative event', () => {
                 sinon.assert.called(<sinon.SinonSpy>parameters.operativeEventManager.sendMidpoint);
             });
@@ -88,7 +91,7 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
 
         describe('on AdVideoThirdQuartile', () => {
             beforeEach(triggerVPAIDEvent('AdVideoThirdQuartile'));
-            it('should trigger thirdQuartile tracking', verifyTrackingEvent(TrackingEvent.THIRD_QUARTILE));
+            it('should trigger thirdQuartile tracking', verifyTrackingEvent('thirdQuartile'));
             it('should send the third quartile operative event', () => {
                 sinon.assert.called(<sinon.SinonSpy>parameters.operativeEventManager.sendThirdQuartile);
             });
@@ -96,7 +99,7 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
 
         describe('on AdVideoComplete', () => {
             beforeEach(triggerVPAIDEvent('AdVideoComplete'));
-            it('should trigger complete tracking', verifyTrackingEvent(TrackingEvent.COMPLETE));
+            it('should trigger complete tracking', verifyTrackingEvent('complete'));
             it('should send the view operative event', () => {
                 sinon.assert.called(<sinon.SinonSpy>parameters.operativeEventManager.sendView);
             });
@@ -108,7 +111,7 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
         describe('on AdSkipped', () => {
             beforeEach(triggerVPAIDEvent('AdSkipped'));
 
-            it('should trigger skip tracking', verifyTrackingEvent(TrackingEvent.SKIP));
+            it('should trigger skip tracking', verifyTrackingEvent('skip'));
             it('should send the skip operative event', () => {
                 sinon.assert.called(<sinon.SinonSpy>parameters.operativeEventManager.sendSkip);
             });
@@ -123,7 +126,7 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
         describe('on AdError', () => {
             beforeEach(triggerVPAIDEvent('AdError'));
 
-            it('should trigger error tracking', verifyTrackingEvent(TrackingEvent.ERROR));
+            it('should trigger error tracking', verifyTrackingEvent('error'));
             it('should set the finish state to ERROR', () => {
                 sinon.assert.calledWith(<sinon.SinonSpy>adUnit.setFinishState, FinishState.ERROR);
             });
@@ -134,7 +137,6 @@ describe('VPAIDEventHandlerTest @skipOnDevice', () => {
         });
 
         describe('on AdClickThru', () => {
-
             const checkClickThroughTracking = () => {
                 const urls = parameters.campaign.getVideoClickTrackingURLs();
                 for (const url of urls) {
