@@ -269,8 +269,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._handlers.forEach((h) => h.onClickSignalRequest(touchInfo));
     }
 
-    private onTrackingEvent(event: keyof typeof TrackingEvent, data?: unknown) {
-        this._handlers.forEach((h) => h.onTrackingEvent(TrackingEvent[event], data));
+    private onTrackingEvent(event: TrackingEvent, data?: unknown) {
+        this._handlers.forEach((h) => h.onTrackingEvent(event, data));
     }
 
     private onUserSeeked() {
