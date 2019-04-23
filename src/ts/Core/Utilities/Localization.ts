@@ -206,7 +206,7 @@ export class Localization {
     private _namespace: string;
 
     constructor(language: string, namespace: string) {
-        if ((namespace === 'consent' || namespace === 'privacy-settings') && !language.match('fr.*')) {
+        if (namespace === 'consent' && !language.match('fr.*')) {
             language = 'en.*';
         }
 

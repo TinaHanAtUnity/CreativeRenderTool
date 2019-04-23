@@ -8,6 +8,7 @@ import PrivacySettingsTemplate from 'html/consent/PrivacySettings.html';
 import { PrivacyRowItemContainer, IPrivacyRowItemContainerHandler } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { PersonalizationSwitchGroup } from 'Ads/Views/Consent/PersonalizationSwitchGroup';
 import { IPermissions } from 'Ads/Models/Privacy';
+import { Localization } from 'Core/Utilities/Localization';
 
 enum ViewState {
     INITIAL,
@@ -30,7 +31,8 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
 
     constructor(platform: Platform, campaign: Campaign, privacyManager: UserPrivacyManager,
                 gdprEnabled: boolean,
-                isCoppaCompliant: boolean) {
+                isCoppaCompliant: boolean,
+                language: string) {
         super(platform, privacyManager, isCoppaCompliant, gdprEnabled, 'privacy-settings', false);
 
         this._campaign = campaign;
@@ -39,7 +41,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         // https://github.com/Microsoft/TypeScript/issues/13775#issuecomment-276381229 explains "keyof typeof EnumType" cast
         this._templateData.reportReasons = Object.keys(ReportReason).map((reason) => ReportReason[<keyof typeof ReportReason>reason]);
 
-        this._template = new Template(PrivacySettingsTemplate);
+        this._template = new Template(PrivacySettingsTemplate, new Localization(language, 'consent'));
         this._bindings = [
             {
                 event: 'click',
@@ -104,10 +106,10 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             }
         ];
 
-        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager);
+        this._privacyRowItemContainer = new PrivacyRowItemContainer(platform, this._userPrivacyManager, language);
         this._privacyRowItemContainer.addEventHandler(this);
 
-        this._personalizationSwitchGroup = new PersonalizationSwitchGroup(platform, this._userPrivacyManager);
+        this._personalizationSwitchGroup = new PersonalizationSwitchGroup(platform, this._userPrivacyManager, language);
     }
 
     public render(): void {

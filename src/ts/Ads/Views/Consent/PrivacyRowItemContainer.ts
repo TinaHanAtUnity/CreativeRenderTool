@@ -4,6 +4,7 @@ import { Template } from 'Core/Utilities/Template';
 import { Platform } from 'Core/Constants/Platform';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
+import { Localization } from 'Core/Utilities/Localization';
 
 export interface IPrivacyRowItemContainerHandler {
     onPrivacy(url: string): void;
@@ -22,11 +23,11 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
 
     private _userPrivacyManager: UserPrivacyManager;
 
-    constructor(platform: Platform, userPrivacyManager: UserPrivacyManager, showChangingPrivacyChoiceItem: boolean = false) {
+    constructor(platform: Platform, userPrivacyManager: UserPrivacyManager, language: string, showChangingPrivacyChoiceItem: boolean = false) {
         super(platform, 'privacy-row-item-container', false);
 
         this._userPrivacyManager = userPrivacyManager;
-        this._template = new Template(PrivacyRowItemContainerTemplate);
+        this._template = new Template(PrivacyRowItemContainerTemplate, new Localization(language, 'consent'));
 
         this._templateData = {
             showChangingPrivacyChoiceItem: showChangingPrivacyChoiceItem
