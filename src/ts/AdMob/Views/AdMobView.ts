@@ -20,6 +20,7 @@ import AdMobContainer from 'html/admob/AdMobContainer.html';
 import AFMAContainer from 'html/admob/AFMAContainer.html';
 import MRAIDContainer from 'html/admob/MRAIDContainer.html';
 import { MRAIDBridge } from 'MRAID/EventBridge/MRAIDBridge';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
@@ -30,7 +31,7 @@ export interface IAdMobEventHandler extends IGDPREventHandler {
     onVideoStart(): void;
     onSetOrientationProperties(allowOrientation: boolean, forceOrientation: Orientation): void;
     onOpenableIntentsRequest(request: IOpenableIntentsRequest): void;
-    onTrackingEvent(event: string, data?: unknown): void;
+    onTrackingEvent(event: TrackingEvent, data?: unknown): void;
     onClickSignalRequest(touchInfo: ITouchInfo): void;
 }
 
@@ -268,8 +269,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._handlers.forEach((h) => h.onClickSignalRequest(touchInfo));
     }
 
-    private onTrackingEvent(event: string, data?: unknown) {
-        this._handlers.forEach((h) => h.onTrackingEvent(event, data));
+    private onTrackingEvent(event: keyof typeof TrackingEvent, data?: unknown) {
+        this._handlers.forEach((h) => h.onTrackingEvent(TrackingEvent[event], data));
     }
 
     private onUserSeeked() {
