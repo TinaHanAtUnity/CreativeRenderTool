@@ -2,12 +2,12 @@ import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandle
 import { VideoEventHandler } from 'Ads/EventHandlers/VideoEventHandler';
 import { EventType } from 'Ads/Models/Session';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 import { VideoPlayerState } from 'Ads/Views/OMIDEventBridge';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 
@@ -208,6 +208,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
                 this.sendThirdPartyEvent('vast impression', impressionUrl);
             }
         }
+        this._vastAdUnit.setImpressionOccurred();
     }
 
     private sendThirdPartyTrackingEvent(eventName: string): void {
