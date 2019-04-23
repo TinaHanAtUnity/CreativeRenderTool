@@ -28,13 +28,13 @@ export class BannerAuctionRequest extends AuctionRequest {
     private checkForLimitedAdTracking() {
         if (this._deviceInfo.getLimitAdTracking()) {
             // Report to PTS to easily get percent comparisons in Datadog
-            this._pts.reportMetric(ProgrammaticTrackingMetricName.BannerAdRequestWithLAT);
+            this._pts.reportMetric(ProgrammaticTrackingMetricName.BannerAdRequestWithLimitedAdTracking);
             let userId = this._deviceInfo.getAdvertisingIdentifier();
             if (!userId && this._platform === Platform.ANDROID) {
                 userId = (<AndroidDeviceInfo>this._deviceInfo).getAndroidId();
             }
             // Report to Kibana to break out by userId
-            Diagnostics.trigger('banner_request_with_lat', {
+            Diagnostics.trigger('banner_request_with_limited_ad_tracking', {
                 userId: userId
             });
         }
