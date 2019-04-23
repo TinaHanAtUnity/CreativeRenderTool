@@ -6,7 +6,8 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 export enum ProgrammaticTrackingErrorName {
     TooLargeFile = 'too_large_file', // a file 20mb and over are considered too large
     BannerRequestError = 'banner_request_error',
-    AdmobTestHttpError = 'admob_video_http_error'
+    AdmobTestHttpError = 'admob_video_http_error',
+    VastClickWithoutImpressionError = 'vast_click_without_impression'
 }
 
 export enum ProgrammaticTrackingMetricName {
@@ -16,6 +17,7 @@ export enum ProgrammaticTrackingMetricName {
 
     BannerAdRequest = 'banner_ad_request',
     BannerAdImpression = 'banner_ad_impression',
+    BannerAdRequestWithLimitedAdTracking = 'banner_ad_request_with_limited_ad_tracking',
 
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked'
 }

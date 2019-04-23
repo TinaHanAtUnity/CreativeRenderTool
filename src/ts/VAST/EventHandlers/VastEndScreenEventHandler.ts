@@ -6,11 +6,11 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { Url } from 'Core/Utilities/Url';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { ProgrammaticTrackingService, ProgrammaticTrackingErrorName } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _vastAdUnit: VastAdUnit;
@@ -21,6 +21,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _core: ICoreApi;
     private _gameSessionId?: number;
     private _abGroup: ABGroup;
+    private _pts: ProgrammaticTrackingService;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         this._platform = parameters.platform;
@@ -31,10 +32,15 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
         this._vastEndScreen = this._vastAdUnit.getEndScreen();
         this._gameSessionId = parameters.gameSessionId;
         this._abGroup = parameters.coreConfig.getAbGroup();
+        this._pts = parameters.programmaticTrackingService;
     }
 
     public onVastEndScreenClick(): Promise<void> {
         this.setCallButtonEnabled(false);
+
+        if (!this._vastAdUnit.hasImpressionOccurred()) {
+            this._pts.reportError(ProgrammaticTrackingErrorName.VastClickWithoutImpressionError, this._vastAdUnit.description());
+        }
 
         const clickThroughURL = this._vastAdUnit.getCompanionClickThroughUrl() || this._vastAdUnit.getVideoClickThroughURL();
         if (clickThroughURL) {

@@ -8,6 +8,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 import { VideoPlayerState } from 'Ads/Views/OMIDEventBridge';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 
@@ -206,6 +207,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
                 this.sendThirdPartyEvent('vast impression', impressionUrl);
             }
         }
+        this._vastAdUnit.setImpressionOccurred();
     }
 
     private sendTrackingEvent(eventName: TrackingEvent): void {
