@@ -1,16 +1,14 @@
 <div class="row-item">
     <div class="what-we-collect row-item-title">
-        <span>What information we collect and how we use it</span>
+        <span><%= data.t("privacy-what-we-collect-title") %></span>
         <div class="arrow-icon"><span class="consent-icon-chevron"></span></div>
     </div>
     <div class="description">
         <p>
-            Most of the information we use for this personalization is based on your device’s advertising
-            ID (Apple’s Advertising Identifier or Google Advertising Identifier) and your IP address.
+            <%= data.t("privacy-what-we-collect-desc-p1") %>
         </p>
         <p>
-            From your interaction with this app, here is an example of the information we use to predict
-            which other apps might interest you:
+            <%= data.t("privacy-what-we-collect-desc-p2") %>
         </p>
         <p>
             <span id="phone-type" class="intended-span"></span>
@@ -23,52 +21,36 @@
             <span id="sorry-message" class="intended-span">Sorry. We were unable to deliver our collected information at this time.</span>
         </p>
         <p>
-            We would use this information to show ads for other games we think you would enjoy
-            and to customize your gameplay wherever possible. This may include arranging the game’s store
-            according to tools and extras that you are more likely to use or to alter your game experience
-            in order to adjust to your skill level.
+            <%= data.t("privacy-what-we-collect-desc-p3") %>
         </p>
         <p>
-            We only retain personal data for 30 days; however, we may keep a transactional record using
-            your personal information for 180 days for billing and fraud prevention purposes.
+            <%= data.t("privacy-what-we-collect-desc-p4") %>
         </p>
         <p class="measurement-paragraph">
-            <span class="heading2">What do our partners collect (measurement and demographics)</span>
+            <span class="heading2"><%= data.t("privacy-what-we-collect-sub-title") %></span>
         </p>
         <p>
-            Our partners may use your advertising ID and IP address to build a profile about you
-            according to your preferences and household demographic information.  Demographic
-            information may include things like marital status or approximate income.  Please visit our
-            third parties’ privacy policies to see how you can access or delete the information they have
-            about you.
+            <%= data.t("privacy-what-we-collect-desc-p5") %>
         </p>
         <p>
-            Information may also be collected from your phone, including how hard you are pressing the
-            screen (pressure point measurement).  The purpose of our partners collecting such
-            information is to prevent fraud by assessing whether it is a real person engaging with the
-            application (uneven pressure points), or a bot put into the marketplace by a bad actor
-            attempting to mislead ad networks.
+            <%= data.t("privacy-what-we-collect-desc-p6") %>
         </p>
     </div>
 </div>
 <div class="row-item">
     <div class="data-transfer row-item-title">
-        <span>Data transfer outside of the EU</span>
+        <span><%= data.t("privacy-data-transfer-title") %></span>
         <div class="arrow-icon"><span class="consent-icon-chevron"></span></div>
     </div>
     <div class="description">
         <p>
-            Please note Unity may transfer and process your data on servers located in the United States.
-            We have committed through internal agreements and agreements with our third-party
-            processors to treat your data with the same protections as those afforded to you in the
-            European Economic Area if your data is collected in that region of the world.  For more
-            information on transfers, visit Unity’s <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a>.
+            <%= data.t("privacy-data-transfer-desc") %>
         </p>
     </div>
 </div>
 <div class="row-item">
     <div class="third-party row-item-title">
-        <span>View our third-party ad partners</span>
+        <span><%= data.t("privacy-third-party-title") %></span>
         <div class="arrow-icon"><span class="consent-icon-chevron"></span></div>
     </div>
     <div class="description">
@@ -105,29 +87,24 @@
 <% if(data.showChangingPrivacyChoiceItem) { %>
 <div class="row-item">
     <div class="changing-privacy-choice row-item-title">
-        <span>Changing your privacy choice</span>
+        <span><%= data.t("privacy-changing-privacy-choice-title") %></span>
         <div class="arrow-icon"><span class="consent-icon-chevron"></span></div>
     </div>
     <div class="description">
         <p>
-            You can access these options at any time by tapping the Unity Data Privacy icon when or
-            after an ad appears.
+            <%= data.t("privacy-changing-privacy-choice-text") %>
         </p>
     </div>
 </div>
 <% } %>
 <div class="row-item">
     <div class="privacy-policy row-item-title">
-        <span>Our Privacy Policy</span>
+        <span><%= data.t("privacy-our-privacy-policy-title") %></span>
         <div class="arrow-icon"><span class="consent-icon-chevron"></span></div>
     </div>
     <div class="description">
         <p>
-            Our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> explains how we manage your data, including how and where in the world
-            we transfer data for processing, and how we work with partners who serve ads. These
-            partners may collect information about your advertising ID from sources other than Unity to
-            further personalize the ads you see. Please visit the privacy policies of these third parties to
-            review the compiled data they may have.
+            <%= data.t("privacy-our-privacy-policy-desc") %>
         </p>
     </div>
 </div>

@@ -17,13 +17,11 @@
             <div class="stripe"></div>
             <div class="bottom-container">
                 <div class="button-container item">
-                    <div class="accept-all consent-button"><span>Accept</span></div>
+                    <div class="accept-all consent-button">
+                        <span><%= data.t("homepage-accept-all") %></span>
+                    </div>
                     <div class="show-choices consent-button">
-                        <% if(data.useAltMyChoicesButtonText) { %>
-                        <span>Learn more</span>
-                        <% } else { %>
-                        <span>Show my choices</span>
-                        <% } %>
+                        <span><%= data.t("homepage-show-my-choices") %></span>
                     </div>
                 </div>
                 <div class="logo-container">
@@ -55,7 +53,7 @@
 
     <div id="consent-my-choices" class="consent-container">
         <div class="back-button">
-            <span>Back</span>
+            <span><%= data.t("my-choices-back") %></span>
         </div>
 
         <div class="consent-settings">

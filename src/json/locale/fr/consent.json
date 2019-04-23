@@ -5,10 +5,11 @@
   "homepage-show-my-choices": "Configurer",
 
   "my-choices-title": "Autorisez-vous les cookies Unity à collecter et à utiliser vos données pour personnaliser vos publicités et votre expérience ?",
+  "my-choices-text": "Unity et nos partenaires externes collectent des données, notamment des informations à caractère démographique, et utilisent les identifiants des mobiles pour personnaliser et évaluer les publicités et l'expérience de jeu.  Vous pouvez accéder à ces options à tout moment en vous rendant sur l'icône de la politique de confidentialité Unity, pendant ou après l'affichage d'une publicité.",
   "my-choices-switch-game-experience": "J'accepte que mes données soient utilisées pour me fournir une expérience de jeu personnalisée",
   "my-choices-switch-personalized-ads": "J'accepte l'affichage de publicités et de contenu in-app Unity personnalisés",
   "my-choices-switch-personalized-third-party": "J'accepte également les publicités et les mesures, y compris la collecte de données démographiques et autres par des partenaires externes",
-  "my-choices-text": "Unity et nos partenaires externes collectent des données, notamment des informations à caractère démographique, et utilisent les identifiants des mobiles pour personnaliser et évaluer les publicités et l'expérience de jeu.  Vous pouvez accéder à ces options à tout moment en vous rendant sur l'icône de la politique de confidentialité Unity, pendant ou après l'affichage d'une publicité.",
+  "my-choices-back": "Retour",
 
   "save-my-choices": "Sauvegarder mes préférences",
   "agree-to-all": "Tout accepter",
@@ -32,15 +33,17 @@
   "privacy-changing-privacy-choice-text": "Vous pouvez accéder à ces options à tout moment en vous rendant sur l'icône de la politique de confidentialité Unity, pendant ou après l'affichage d'une publicité.",
 
   "privacy-our-privacy-policy-title": "Notre politique de confidentialité",
-  "privacy-our-privacy-policy-desc": "Notre <a href=\"https://unity3d.com/legal/privacy-policy\">politique de confidentialité</a> politique de confidentialité explique la façon dont nous gérons vos données, notamment comment et dans quelles régions du monde nous les transférons à des fins de traitement. Elle indique aussi les modalités de notre collaboration avec les partenaires qui proposent des publicités. Ces partenaires peuvent collecter des informations sur votre identifiant publicitaire de sources tierces, pour personnaliser encore davantage le service. Consultez les politiques de confidentialité de ces tierces parties pour savoir quelles données elles collectent.",
+  "privacy-our-privacy-policy-desc": "Notre <a href=\"https://unity3d.com/legal/privacy-policy\">politique de confidentialité</a> explique la façon dont nous gérons vos données, notamment comment et dans quelles régions du monde nous les transférons à des fins de traitement. Elle indique aussi les modalités de notre collaboration avec les partenaires qui proposent des publicités. Ces partenaires peuvent collecter des informations sur votre identifiant publicitaire de sources tierces, pour personnaliser encore davantage le service. Consultez les politiques de confidentialité de ces tierces parties pour savoir quelles données elles collectent.",
 
   "privacy-settings-title": "Paramètres de confidentialité",
-
-  "privacy-personalization-settings": "Modifier mon profil",
-  "privacy-manage-your-data": "Gérer vos données",
-  "privacy-manage-your-data-desc": "Vous pouvez supprimer toute donnée relative à votre appareil que possède Unity en cliquant ici.",
-  "privacy-manage-your-data-are-you-sure": "Vous êtes sûr(e) ?",
-  "privacy-manage-your-data-yes": "Oui",
-  "privacy-manage-your-data-no": "Non",
-  "privacy-manage-your-data-deletion-msg": "Nous allons traiter votre requête et supprimer vos données sous 30 jours. Vous êtes aussi désinscrit dès à présent du service de publicités personnalisées. Attention : il est possible que nous conservions un historique des transactions utilisant vos informations personnelles pendant 180 jours, à des fins de facturation et de répression des fraudes."
+  "privacy-settings-personalization-settings": "Modifier mon profil",
+  "privacy-settings-manage-your-data": "Gérer vos données",
+  "privacy-settings-manage-your-data-desc": "Vous pouvez supprimer toute donnée relative à votre appareil que possède Unity en cliquant ici.",
+  "privacy-settings-manage-your-data-are-you-sure": "Vous êtes sûr(e) ?",
+  "privacy-settings-manage-your-data-yes": "Oui",
+  "privacy-settings-manage-your-data-no": "Non",
+  "privacy-settings-manage-your-data-deletion-msg": "Nous allons traiter votre requête et supprimer vos données sous 30 jours. Vous êtes aussi désinscrit dès à présent du service de publicités personnalisées. Attention : il est possible que nous conservions un historique des transactions utilisant vos informations personnelles pendant 180 jours, à des fins de facturation et de répression des fraudes.",
+  "privacy-settings-report-ad": "Signaler une publicité",
+  "privacy-settings-build-info": "Informations de version",
+  "privacy-settings-close": "Retour"
 }
