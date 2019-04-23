@@ -239,6 +239,30 @@ export class CampaignManager {
         });
     }
 
+    public loadCampaign(placement: Placement, timeout: number): Promise<Campaign | undefined> {
+        const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
+        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy());
+
+        return Promise.all([this.createRequestUrl(false), this.createRequestBody(requestPrivacy, countersForOperativeEvents, false, undefined, placement)]).then(([requestUrl, requestBody]) => {
+            this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
+            const body = JSON.stringify(requestBody);
+            return this._request.post(requestUrl, body, [], {
+                retries: 0,
+                retryDelay: 0,
+                followRedirects: false,
+                retryWithConnectionEvents: false,
+                timeout: timeout
+            }).then(response => {
+                if(response) {
+                    return this.parseLoadedCampaign(response, placement);
+                }
+                return undefined;
+            }).catch(() => {
+                return undefined;
+            });
+        });
+    }
+
     public setPreviousPlacementId(id: string | undefined) {
         this._previousPlacementId = id;
     }
@@ -542,6 +566,11 @@ export class CampaignManager {
         }
     }
 
+    private parseLoadedCampaign(response: INativeResponse, placement: Placement): Promise<Campaign | undefined> {
+        // todo: implement method
+        return Promise.resolve(undefined);
+    }
+
     private handleCampaign(response: AuctionResponse, session: Session): Promise<void> {
         this._core.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
         let parser: CampaignParser;
@@ -779,7 +808,8 @@ export class CampaignManager {
         });
     }
 
-    private createRequestBody(requestPrivacy: IRequestPrivacy, gameSessionCounters: IGameSessionCounters, nofillRetry?: boolean, realtimePlacement?: Placement): Promise<unknown> {
+    // todo: refactor requestedPlacement to something more sensible
+    private createRequestBody(requestPrivacy: IRequestPrivacy, gameSessionCounters: IGameSessionCounters, nofillRetry?: boolean, realtimePlacement?: Placement, requestedPlacement?: Placement): Promise<unknown> {
         const placementRequest: { [key: string]: unknown } = {};
 
         if(realtimePlacement && this._realtimeBody) {
@@ -887,16 +917,25 @@ export class CampaignManager {
 
                 const placements = this._adsConfig.getPlacements();
 
-                Object.keys(placements).forEach((placementId) => {
-                    const placement = placements[placementId];
-                    if (!placement.isBannerPlacement()) {
-                        placementRequest[placementId] = {
-                            adTypes: placement.getAdTypes(),
-                            allowSkip: placement.allowSkip(),
-                            auctionType: placement.getAuctionType()
-                        };
-                    }
-                });
+                if(requestedPlacement) {
+                    placementRequest[requestedPlacement.getId()] = {
+                        adTypes: requestedPlacement.getAdTypes(),
+                        allowSkip: requestedPlacement.allowSkip(),
+                        auctionType: requestedPlacement.getAuctionType()
+                    };
+                } else {
+                    Object.keys(placements).forEach((placementId) => {
+                        const placement = placements[placementId];
+                        if (!placement.isBannerPlacement()) {
+                            placementRequest[placementId] = {
+                                adTypes: placement.getAdTypes(),
+                                allowSkip: placement.allowSkip(),
+                                auctionType: placement.getAuctionType()
+                            };
+                        }
+                    });
+                }
+
                 body.placements = placementRequest;
                 body.properties = this._coreConfig.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();

@@ -24,6 +24,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { IApiModule, IModuleApi } from 'Core/Modules/IApiModule';
 import { IThirdPartyEventManagerFactory } from 'Ads/Managers/ThirdPartyEventManager';
+import { RefreshManager } from 'Ads/Managers/RefreshManager';
 
 export interface IAdsApi extends IModuleApi {
     AdsProperties: AdsPropertiesApi;
@@ -56,6 +57,6 @@ export interface IAds extends IApiModule {
     PlacementManager: PlacementManager;
     AssetManager: AssetManager;
     CampaignManager: CampaignManager;
-    RefreshManager: CampaignRefreshManager;
+    RefreshManager: RefreshManager;
     ThirdPartyEventManagerFactory: IThirdPartyEventManagerFactory;
 }
