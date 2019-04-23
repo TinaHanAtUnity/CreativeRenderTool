@@ -5,7 +5,7 @@ import { IAdsApi } from 'Ads/IAds';
 import { UserPrivacyManager } from 'Ads/Managers/UserPrivacyManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { MOAT } from 'Ads/Views/MOAT';
@@ -230,9 +230,9 @@ import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
             });
 
             const testMuteEvent = (muted: boolean) => {
-                const eventName = muted ? 'mute' : 'unmute';
+                const eventName = muted ? TrackingEvent.MUTE : TrackingEvent.UNMUTE;
                 const mockEventManager = sinon.mock(thirdPartyEventManager);
-                mockEventManager.expects('sendWithGet').withArgs(`vast ${eventName}`, '12345', `http://localhost:3500/brands/14851/${eventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1`);
+                mockEventManager.expects('sendTrackingEvents').withArgs(campaign, eventName, 'vast');
 
                 vastOverlayEventHandler.onOverlayMute(muted);
                 mockEventManager.verify();
