@@ -22,6 +22,7 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { AuctionPlacement } from 'Ads/Models/AuctionPlacement';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class NoFillError extends Error {
     public response: INativeResponse;
@@ -46,7 +47,6 @@ export interface IRawBannerV5Response {
 export class BannerCampaignManager {
     private _platform: Platform;
     private _core: ICoreApi;
-    private _assetManager: AssetManager;
     private _coreConfig: CoreConfiguration;
     private _adsConfig: AdsConfiguration;
     private _clientInfo: ClientInfo;
@@ -57,15 +57,15 @@ export class BannerCampaignManager {
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
     private _jaegerManager: JaegerManager;
+    private _pts: ProgrammaticTrackingService;
 
     private _promise: Promise<Campaign> | null;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerManager: JaegerManager) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, pts: ProgrammaticTrackingService, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: RequestManager, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerManager: JaegerManager) {
         this._platform = platform;
         this._core = core;
         this._coreConfig = coreConfig;
         this._adsConfig = adsConfig;
-        this._assetManager = assetManager;
         this._sessionManager = sessionManager;
         this._request = request;
         this._clientInfo = clientInfo;
@@ -96,7 +96,8 @@ export class BannerCampaignManager {
             deviceInfo: this._deviceInfo,
             metaDataManager: this._metaDataManager,
             request: this._request,
-            sessionManager: this._sessionManager
+            sessionManager: this._sessionManager,
+            programmaticTrackingService: this._pts
         });
         request.addPlacement(placement);
         request.setTimeout(3000);
