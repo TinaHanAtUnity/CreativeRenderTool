@@ -14,6 +14,7 @@ import { ICoreApi } from 'Core/ICore';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { ABGroup, ConsentCTATest } from 'Core/Models/ABGroup';
 
 export interface IConsentUnitParameters {
@@ -24,6 +25,7 @@ export interface IConsentUnitParameters {
     adsConfig: AdsConfiguration;
     core: ICoreApi;
     deviceInfo: DeviceInfo;
+    pts: ProgrammaticTrackingService;
 }
 
 export class ConsentUnit implements IConsentViewHandler, IAdUnit {
@@ -49,6 +51,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             platform: parameters.platform,
             privacyManager: parameters.privacyManager,
             landingPage: this._landingPage,
+            pts: parameters.pts,
             useAltMyChoicesButtonText: false, // will be re-tested later
             ctaABTest: ConsentCTATest.isValid(parameters.abGroup)
         };

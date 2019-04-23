@@ -40,6 +40,7 @@ export interface IAbstractAdUnitParametersFactory<T1 extends Campaign, T2 extend
 
 export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 extends IAdUnitParameters<T1>> implements IAbstractAdUnitParametersFactory<T1, T2> {
     private static _forceGDPRBanner: boolean;
+    private static _forcedConsentUnit: boolean;
 
     protected _campaign: T1;
     protected _placement: Placement;
@@ -68,6 +69,10 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
 
     public static setForcedGDPRBanner(value: boolean) {
         AbstractAdUnitParametersFactory._forceGDPRBanner = value;
+    }
+
+    public static setForcedConsentUnit(value: boolean) {
+        AbstractAdUnitParametersFactory._forcedConsentUnit = value;
     }
 
     constructor(core: ICore, ads: IAds) {
@@ -153,7 +158,7 @@ export abstract class AbstractAdUnitParametersFactory<T1 extends Campaign, T2 ex
     protected createPrivacy(): AbstractPrivacy {
         let privacy: AbstractPrivacy;
 
-        if (this._adsConfig.getGamePrivacy().isEnabled()) {
+        if (this._adsConfig.getGamePrivacy().isEnabled() || AbstractAdUnitParametersFactory._forcedConsentUnit) {
             privacy = new PrivacySettings(this._platform, this._campaign, this._privacyManager, this._adsConfig.isGDPREnabled(), this._coreConfig.isCoppaCompliant());
         } else {
             privacy = new Privacy(this._platform, this._campaign, this._privacyManager, this._adsConfig.isGDPREnabled(), this._coreConfig.isCoppaCompliant());

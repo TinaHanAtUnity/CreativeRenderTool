@@ -4,8 +4,6 @@ import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import AuctionV4GamesJson from 'json/custom_features/AuctionV4Games.json';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { SkipUnderTimerExperiment } from 'Core/Models/ABGroup';
-import { Placement } from 'Ads/Models/Placement';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
@@ -87,10 +85,6 @@ export class CustomFeatures {
         return this.existsInList(AuctionV4GameIds, gameId);
     }
 
-    public static isSkipUnderTimerExperimentEnabled(coreConfig: CoreConfiguration, placement: Placement): boolean {
-        return SkipUnderTimerExperiment.isValid(coreConfig.getAbGroup()) && placement.allowSkip();
-    }
-
     private static existsInList(gameIdList: string[], gameId: string): boolean {
         return gameIdList.indexOf(gameId) !== -1;
     }
@@ -111,5 +105,9 @@ export class CustomFeatures {
         } else {
             return false;
         }
+    }
+
+    public static isUnsupportedOMVendor(resourceUrl: string) {
+        return false;
     }
 }
