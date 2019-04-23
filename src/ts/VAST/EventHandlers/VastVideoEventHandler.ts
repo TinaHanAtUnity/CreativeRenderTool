@@ -208,7 +208,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
                 this.sendThirdPartyEvent('vast impression', impressionUrl);
             }
         }
-        this._vastAdUnit.notifyImpressionOccurred();
+        this._vastAdUnit.setImpressionOccurred();
     }
 
     private sendThirdPartyTrackingEvent(eventName: string): void {

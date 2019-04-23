@@ -231,7 +231,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
-    public notifyImpressionOccurred(): void {
+    public setImpressionOccurred(): void {
         this._impressionSent = true;
     }
 
