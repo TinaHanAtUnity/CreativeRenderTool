@@ -15,6 +15,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { OMID_P, SDK_APIS } from 'Ads/Views/OpenMeasurement';
 
 export class AdMobSignalFactory {
     private _platform: Platform;
@@ -42,6 +43,8 @@ export class AdMobSignalFactory {
         signal.setIsJailbroken(this._deviceInfo.isRooted());
         signal.setDeviceIncapabilities(this.checkDeviceIncapabilities());
         signal.setDeviceSubModel(this._deviceInfo.getModel());
+        signal.setSDKApis(OMID_P);    // TODO: Add to Request DTO once auction handles parameter
+        signal.setOMIDP(SDK_APIS);    // TODO: Add to Request DTO once auction handles parameter
 
         const promises = [];
         promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {
@@ -511,5 +514,4 @@ export class AdMobSignalFactory {
         }
         return bucket;
     }
-
 }
