@@ -3,6 +3,7 @@ import { VastCreative } from 'VAST/Models/VastCreative';
 import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 interface IVastAd {
     id: string | null;
@@ -188,7 +189,7 @@ export class VastAd extends Model<IVastAd> {
     }
 
     public getCompanionCreativeViewTrackingUrls(): string[] {
-        return this.getCompanionEventTrackingUrls('creativeView');
+        return this.getCompanionEventTrackingUrls(TrackingEvent.CREATIVE_VIEW);
     }
 
     private getCompanionEventTrackingUrls(eventType: string): string[] {
