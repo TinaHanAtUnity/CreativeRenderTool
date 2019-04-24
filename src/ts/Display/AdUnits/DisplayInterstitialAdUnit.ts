@@ -1,7 +1,7 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from 'Ads/Native/WebPlayer';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
@@ -209,11 +209,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         }
 
         this._operativeEventManager.sendClick(this.getOperativeEventParams());
+        this.sendTrackingEvent(TrackingEvent.CLICK);
         this._clickEventHasBeenSent = true;
-
-        for (const trackingUrl of this._campaign.getTrackingUrlsForEvent('click')) {
-            this._thirdPartyEventManager.sendWithGet('display click', this._campaign.getSession().getId(), trackingUrl);
-        }
     }
 
     private shouldOverrideUrlLoading(url: string, method: string): void {
@@ -259,11 +256,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     }
 
     private sendStartEvents(): void {
-        const trackingUrls = this._campaign.getTrackingUrlsForEvent('impression');
-
-        for (const url of (this._campaign).getTrackingUrlsForEvent('impression')) {
-            this._thirdPartyEventManager.sendWithGet('display impression', this._campaign.getSession().getId(), url);
-        }
+        this.sendTrackingEvent(TrackingEvent.IMPRESSION);
 
         this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
@@ -350,5 +343,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
                 });
             });
         }
+    }
+
+    private sendTrackingEvent(event: TrackingEvent) {
+        this._thirdPartyEventManager.sendTrackingEvents(this._campaign, event, 'display', this._campaign.getUseWebViewUserAgentForTracking());
     }
 }

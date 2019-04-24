@@ -2,7 +2,7 @@ import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandle
 import { VideoEventHandler } from 'Ads/EventHandlers/VideoEventHandler';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
-import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export class PerformanceVideoEventHandler extends VideoEventHandler {
 
@@ -35,8 +35,7 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
                 overlay.setDebugMessage('Performance Ad');
             }
         }
-
-        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.LOADED_IMPRESSION);
+        this._performanceAdUnit.sendTrackingEvent(TrackingEvent.LOADED);
     }
 
     protected getVideoOrientation(): string | undefined {
@@ -45,26 +44,26 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
 
     protected handleStartEvent(progress: number): void {
         super.handleStartEvent(progress);
-        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.START);
+        this._performanceAdUnit.sendTrackingEvent(TrackingEvent.START);
     }
 
     protected handleFirstQuartileEvent(progress: number): void {
         super.handleFirstQuartileEvent(progress);
-        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.FIRST_QUARTILE);
+        this._performanceAdUnit.sendTrackingEvent(TrackingEvent.FIRST_QUARTILE);
     }
 
     protected handleMidPointEvent(progress: number): void {
         super.handleMidPointEvent(progress);
-        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.MIDPOINT);
+        this._performanceAdUnit.sendTrackingEvent(TrackingEvent.MIDPOINT);
     }
 
     protected handleThirdQuartileEvent(progress: number): void {
         super.handleThirdQuartileEvent(progress);
-        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.THIRD_QUARTILE);
+        this._performanceAdUnit.sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
     }
 
     protected handleCompleteEvent(url: string): void {
         super.handleCompleteEvent(url);
-        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.COMPLETE);
+        this._performanceAdUnit.sendTrackingEvent(TrackingEvent.COMPLETE);
     }
 }

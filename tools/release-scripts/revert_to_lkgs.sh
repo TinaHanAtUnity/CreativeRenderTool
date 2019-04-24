@@ -14,7 +14,8 @@ fi
 echo "Proceeding in five seconds."
 sleep 5
 
-releases="release-scripts/releases.txt"
+webviewdir=$(git rev-parse --show-toplevel)
+releases="$webviewdir/tools/release-scripts/releases.txt"
 
 git pull --tags
 while IFS= read -r release
