@@ -22,12 +22,14 @@ export enum PrivacyTextParagraph {
 export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandler> {
 
     private _userPrivacyManager: UserPrivacyManager;
+    private _localization: Localization;
 
     constructor(platform: Platform, userPrivacyManager: UserPrivacyManager, language: string, showChangingPrivacyChoiceItem: boolean = false) {
         super(platform, 'privacy-row-item-container', false);
 
         this._userPrivacyManager = userPrivacyManager;
-        this._template = new Template(PrivacyRowItemContainerTemplate, new Localization(language, 'consent'));
+        this._localization = new Localization(language, 'consent');
+        this._template = new Template(PrivacyRowItemContainerTemplate, this._localization);
 
         this._templateData = {
             showChangingPrivacyChoiceItem: showChangingPrivacyChoiceItem
@@ -108,12 +110,19 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
 
     private fillPersonalInfoFields(): void {
         this._userPrivacyManager.retrieveUserSummary().then((personalProperties) => {
+
+            const formatTranslation = (str: string, arr: string[]) => {
+                return str.replace(/{(\d+)}/g, (match, number) => {
+                    return typeof arr[number] !== 'undefined' ? arr[number] : match;
+                });
+            };
+
             document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
-            document.getElementById('phone-type')!.innerHTML = `Using ${personalProperties.deviceModel}`;
-            document.getElementById('country')!.innerHTML = `Located in ${personalProperties.country}`;
-            document.getElementById('game-plays-this-week')!.innerHTML = `Used this app ${personalProperties.gamePlaysThisWeek} times this week`;
-            document.getElementById('ads-seen-in-game')!.innerHTML = `Seen ${personalProperties.adsSeenInGameThisWeek} ads in this app`;
-            document.getElementById('games-installed-from-ads')!.innerHTML = `Installed ${personalProperties.installsFromAds} apps based on those ads`;
+            document.getElementById('phone-type')!.innerHTML = formatTranslation(this._localization.translate('privacy-using'), [personalProperties.deviceModel]);
+            document.getElementById('country')!.innerHTML = formatTranslation(this._localization.translate('privacy-located-in'), [personalProperties.country]);
+            document.getElementById('game-plays-this-week')!.innerHTML = formatTranslation(this._localization.translate('privacy-used-this-app'), [personalProperties.gamePlaysThisWeek.toString()]);
+            document.getElementById('ads-seen-in-game')!.innerHTML = formatTranslation(this._localization.translate('privacy-seen-ads'), [personalProperties.adsSeenInGameThisWeek.toString()]);
+            document.getElementById('games-installed-from-ads')!.innerHTML = formatTranslation(this._localization.translate('privacy-installed-based-on'), [personalProperties.installsFromAds.toString()]);
         }).catch(error => {
             Diagnostics.trigger('gdpr_personal_info_failed', error);
             document.getElementById('sorry-message')!.innerHTML = 'Sorry. We were unable to deliver our collected information at this time.';

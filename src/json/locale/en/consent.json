@@ -23,6 +23,11 @@
   "privacy-what-we-collect-sub-title": "What do our partners collect (measurement and demographics)",
   "privacy-what-we-collect-desc-p5": "Our partners may use your advertising ID and IP address to build a profile about you according to your preferences and household demographic information.  Demographic information may include things like marital status or approximate income.  Please visit our third parties’ privacy policies to see how you can access or delete the information they have about you.",
   "privacy-what-we-collect-desc-p6": "Information may also be collected from your phone, including how hard you are pressing the screen (pressure point measurement).  The purpose of our partners collecting such information is to prevent fraud by assessing whether it is a real person engaging with the application (uneven pressure points), or a bot put into the marketplace by a bad actor attempting to mislead ad networks.",
+  "privacy-using": "Using {0}",
+  "privacy-located-in": "Located in {0}",
+  "privacy-used-this-app": "Used this app {0} times this week",
+  "privacy-seen-ads": "Seen {0} ads in this app",
+  "privacy-installed-based-on": "Installed {0} apps based on those ads",
 
   "privacy-data-transfer-title": "Data transfer outside of the EU",
   "privacy-data-transfer-desc": "Please note Unity may transfer and process your data on servers located in the United States.  We have committed through internal agreements and agreements with our third-party processors to treat your data with the same protections as those afforded to you in the European Economic Area if your data is collected in that region of the world. For more information on transfers, visit Unity’s <a href=\"https://unity3d.com/legal/privacy-policy\">Privacy Policy</a>.",

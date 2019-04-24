@@ -23,6 +23,11 @@
   "privacy-what-we-collect-sub-title": "Données collectées par nos partenaires (informations démographiques et mesures)",
   "privacy-what-we-collect-desc-p5": "Nos partenaires peuvent utiliser votre identifiant publicitaire et votre adresse IP pour vous créer un profil en fonction de vos préférences et des informations démographiques de votre foyer.  Ces informations démographiques peuvent inclure des éléments tels que votre statut matrimonial ou votre niveau de revenus.  Consultez les politiques de confidentialité de nos partenaires pour voir comment accéder aux informations qu'ils possèdent à votre égard et comment les supprimer.",
   "privacy-what-we-collect-desc-p6": "Ces données collectées peuvent concerner votre téléphone, par exemple la façon dont vous appuyez sur l'écran (mesure de la pression).  L'objectif de nos partenaires est d'empêcher toute tentative de fraude en évaluant si l'application est utilisée par une vraie personne (pression irrégulière) ou par un robot introduit sur le marché par un acteur malveillant qui cherche à tromper les réseaux publicitaires.",
+  "privacy-using": "Vous utilisez un {0}",
+  "privacy-located-in": "Vous êtes en {0}",
+  "privacy-used-this-app": "Vous avez utilisé l'application à {0} reprises cette semaine",
+  "privacy-seen-ads": "Vous avez vu {0} publicités dans l'application",
+  "privacy-installed-based-on": "Vous avez installé {0} application à partir de ces publicités",
 
   "privacy-data-transfer-title": "Transfert des données hors de l'Union européenne",
   "privacy-data-transfer-desc": "Il est possible que Unity transfère et traite vos données sur des serveurs situés aux États-Unis.  Nous nous engageons à traiter vos données avec le même niveau de protection que celui offert dans l'Espace économique européen, si elles sont collectées dans cette région du monde. Nous avons pour cela signé et appliqué des contrats en interne et avec des gestionnaires externes.  Pour plus d'informations sur les transferts, consultez la <a href=\"https://unity3d.com/legal/privacy-policy\">politique de confidentialité de Unity</a>.",
