@@ -1,6 +1,6 @@
 {
   "homepage-title": "Autorisez-vous les cookies Unity à collecter et à utiliser vos données pour personnaliser vos publicités et votre expérience ?",
-  "homepage-main-text": "Unity et nos partenaires externes collectent des données, notamment des informations à caractère démographique, et utilisent les identifiants des mobiles pour personnaliser et évaluer les publicités et l'expérience de jeu.  Vous pouvez accéder à ces options à tout moment en vous rendant sur l'icône de la politique de confidentialité Unity, pendant ou après l'affichage d'une publicité.",
+  "homepage-main-text": "Unity et nos <span class=\"third-parties-link page-link\">partenaires externes</span> collectent <span class=\"data-link page-link\">des données</span>, notamment <span class=\"demographic-link page-link\">des informations à caractère démographique</span>, et utilisent <span class=\"mobile-identifiers-link page-link\">les identifiants des mobiles</span> pour <span class=\"personalization-link page-link\">personnaliser</span> et <span class=\"measurement-link page-link\">évaluer</span> les publicités et l'expérience de jeu.  Vous pouvez accéder à ces options à tout moment en vous rendant sur l'icône de la politique de confidentialité Unity, pendant ou après l'affichage d'une publicité.",
   "homepage-accept-all": "J'accepte",
   "homepage-show-my-choices": "Configurer",
 
