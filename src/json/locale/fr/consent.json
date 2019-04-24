@@ -38,7 +38,7 @@
   "privacy-settings-title": "Paramètres de confidentialité",
   "privacy-settings-personalization-settings": "Modifier mon profil",
   "privacy-settings-manage-your-data": "Gérer vos données",
-  "privacy-settings-manage-your-data-desc": "Vous pouvez supprimer toute donnée relative à votre appareil que possède Unity en cliquant ici.",
+  "privacy-settings-manage-your-data-desc": "Vous pouvez supprimer toute donnée relative à votre appareil que possède Unity en cliquant <span class=\"delete-your-data-link page-link\">ici</span>.",
   "privacy-settings-manage-your-data-are-you-sure": "Vous êtes sûr(e) ?",
   "privacy-settings-manage-your-data-yes": "Oui",
   "privacy-settings-manage-your-data-no": "Non",
