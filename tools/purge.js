@@ -8,7 +8,8 @@ const cdnConfig = {
             'cdn-akamai.unityads.unity3d.com',
             'cdn.unityads.unity3d.com',
             'config.unityads.unity3d.com',
-            'webview.unityads.unity3d.com'
+            'webview.unityads.unity3d.com',
+            'config-cn.unityads.unity3d.com'
         ],
         'check_url': 'cdn-akamai.unityads.unity3d.com',
         'username': process.env.AKAMAI_USERNAME,
