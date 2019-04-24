@@ -80,8 +80,8 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onDeleteYourDataButtonEvent(event),
-                selector: '#delete-your-data-button'
+                listener: (event: Event) => this.onDeleteYourDataLinkEvent(event),
+                selector: '.delete-your-data-link'
             },
             {
                 event: 'click',
@@ -270,7 +270,7 @@ export class PrivacySettings extends AbstractPrivacy implements IPrivacyRowItemC
         });
     }
 
-    private onDeleteYourDataButtonEvent(event: Event): void {
+    private onDeleteYourDataLinkEvent(event: Event): void {
         event.preventDefault();
         (<HTMLElement>this._container.querySelector('.delete-data-container')).classList.add('active');
     }
