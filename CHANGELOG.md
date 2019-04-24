@@ -1,3 +1,11 @@
+# Staged
+
+* Fix AR Delayed Camer Consent Layout [#9133](https://github.com/Applifier/unity-ads-webview/pull/9133)
+* Remove iterating through all values from AFMA Tracking Events [#9224](https://github.com/Applifier/unity-ads-webview/pull/9224)
+* Reintroduce Minor Tracking Refactor with Admob Fixes [#9200](https://github.com/Applifier/unity-ads-webview/pull/9200)
+* Add PTS and Kibana Metrics to Track Banner Requests with Limited Ad Tracking Enabled [#9154](https://github.com/Applifier/unity-ads-webview/pull/9154)
+* Add PTS Error Event when Vast Endscreen Click is fired without an Impression [#9153](https://github.com/Applifier/unity-ads-webview/pull/9153)
+
 # Fri Apr 19 21:06:10 UTC 2019
 
 * Disabled ABTest Third Party Open Measurement implementation for VAST [#9026](https://github.com/Applifier/unity-ads-webview/pull/9026)

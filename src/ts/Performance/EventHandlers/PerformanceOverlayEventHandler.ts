@@ -2,11 +2,10 @@ import {
     IVideoOverlayDownloadParameters,
     OverlayEventHandlerWithDownloadSupport
 } from 'Ads/EventHandlers/OverlayEventHandlerWithDownloadSupport';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { IStoreHandler } from 'Ads/EventHandlers/StoreHandlers/StoreHandler';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 
 export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownloadSupport<PerformanceCampaign> {
 
@@ -21,7 +20,7 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownl
 
     public onOverlayDownload(parameters: IVideoOverlayDownloadParameters): void {
         super.onOverlayDownload(parameters);
-        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.CLICK);
+        this._performanceAdUnit.sendTrackingEvent(TrackingEvent.CLICK);
     }
 
     public onOverlaySkip(position: number): void {
@@ -36,6 +35,6 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandlerWithDownl
             }
             this._performanceAdUnit.onFinish.trigger();
         }
-        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.SKIP);
+        this._performanceAdUnit.sendTrackingEvent(TrackingEvent.SKIP);
     }
 }

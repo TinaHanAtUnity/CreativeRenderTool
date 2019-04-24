@@ -2,18 +2,18 @@ import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandle
 import { VideoEventHandler } from 'Ads/EventHandlers/VideoEventHandler';
 import { EventType } from 'Ads/Models/Session';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
 import { VideoPlayerState } from 'Ads/Views/OMIDEventBridge';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 
 export class VastVideoEventHandler extends VideoEventHandler {
 
     private _vastAdUnit: VastAdUnit;
     private _vastCampaign: VastCampaign;
-    private _clientInfo: ClientInfo;
     private _om?: OpenMeasurement;
     private _omStartCalled = false;
 
@@ -21,7 +21,6 @@ export class VastVideoEventHandler extends VideoEventHandler {
         super(params);
         this._vastAdUnit = params.adUnit;
         this._vastCampaign = params.campaign;
-        this._clientInfo = params.clientInfo;
         this._om = this._vastAdUnit.getOpenMeasurement();
     }
 
@@ -133,9 +132,9 @@ export class VastVideoEventHandler extends VideoEventHandler {
         }
 
         this.sendThirdPartyVastImpressionEvent();
-        this.sendThirdPartyTrackingEvent('creativeView');
-        this.sendThirdPartyTrackingEvent('start');
-        this.sendThirdPartyTrackingEvent('impression');
+        this.sendTrackingEvent(TrackingEvent.CREATIVE_VIEW);
+        this.sendTrackingEvent(TrackingEvent.START);
+        this.sendTrackingEvent(TrackingEvent.IMPRESSION);
     }
 
     public onPause(url: string): void {
@@ -177,7 +176,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om) {
             this._om.sendFirstQuartile();
         }
-        this.sendThirdPartyTrackingEvent('firstQuartile');
+        this.sendTrackingEvent(TrackingEvent.FIRST_QUARTILE);
     }
 
     protected handleMidPointEvent(progress: number): void {
@@ -185,7 +184,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om) {
             this._om.sendMidpoint();
         }
-        this.sendThirdPartyTrackingEvent('midpoint');
+        this.sendTrackingEvent(TrackingEvent.MIDPOINT);
     }
 
     protected handleThirdQuartileEvent(progress: number): void {
@@ -193,12 +192,12 @@ export class VastVideoEventHandler extends VideoEventHandler {
         if (this._om) {
             this._om.sendThirdQuartile();
         }
-        this.sendThirdPartyTrackingEvent('thirdQuartile');
+        this.sendTrackingEvent(TrackingEvent.THIRD_QUARTILE);
     }
 
     protected handleCompleteEvent(url: string): void {
         super.handleCompleteEvent(url);
-        this.sendThirdPartyTrackingEvent('complete');
+        this.sendTrackingEvent(TrackingEvent.COMPLETE);
     }
 
     private sendThirdPartyVastImpressionEvent(): void {
@@ -208,9 +207,10 @@ export class VastVideoEventHandler extends VideoEventHandler {
                 this.sendThirdPartyEvent('vast impression', impressionUrl);
             }
         }
+        this._vastAdUnit.setImpressionOccurred();
     }
 
-    private sendThirdPartyTrackingEvent(eventName: string): void {
+    private sendTrackingEvent(eventName: TrackingEvent): void {
         const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {
