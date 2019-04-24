@@ -50,6 +50,11 @@ import { ProgrammaticVastParserStrict } from 'VAST/Parsers/ProgrammaticVastParse
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
+export interface ILoadedCampaign {
+    campaign: Campaign;
+    trackingUrls: ICampaignTrackingUrls;
+}
+
 export class CampaignManager {
 
     public static setCampaignId(campaignId: string) {
@@ -239,12 +244,14 @@ export class CampaignManager {
         });
     }
 
-    public loadCampaign(placement: Placement, timeout: number): Promise<Campaign | undefined> {
+    public loadCampaign(placement: Placement, timeout: number): Promise<ILoadedCampaign | undefined> {
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
         const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy());
+        let deviceFreeSpace: number;
 
         return Promise.all([this.createRequestUrl(false), this.createRequestBody(requestPrivacy, countersForOperativeEvents, false, undefined, placement)]).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
+            deviceFreeSpace = (<any>requestBody).deviceFreeSpace; // todo: figure out cleaner way to pass this data
             const body = JSON.stringify(requestBody);
             return this._request.post(requestUrl, body, [], {
                 retries: 0,
@@ -254,7 +261,7 @@ export class CampaignManager {
                 timeout: timeout
             }).then(response => {
                 if(response) {
-                    return this.parseLoadedCampaign(response, placement);
+                    return this.parseLoadedCampaign(response, placement, countersForOperativeEvents, requestPrivacy, deviceFreeSpace);
                 }
                 return undefined;
             }).catch(() => {
@@ -566,9 +573,71 @@ export class CampaignManager {
         }
     }
 
-    private parseLoadedCampaign(response: INativeResponse, placement: Placement): Promise<Campaign | undefined> {
-        // todo: implement method
-        return Promise.resolve(undefined);
+    private parseLoadedCampaign(response: INativeResponse, placement: Placement, gameSessionCounters: IGameSessionCounters, requestPrivacy: IRequestPrivacy, deviceFreeSpace: number): Promise<ILoadedCampaign | undefined> {
+        let json;
+        try {
+            json = JsonParser.parse<IRawAuctionV5Response>(response.response);
+        } catch(e) {
+            return Promise.resolve(undefined);
+        }
+
+        if(!json.auctionId) {
+            throw new Error('No auction ID found');
+        }
+
+        const session: Session = this._sessionManager.create(json.auctionId);
+        session.setAdPlan(response.response);
+        session.setGameSessionCounters(gameSessionCounters);
+        session.setPrivacy(requestPrivacy);
+        session.setDeviceFreeSpace(deviceFreeSpace);
+
+        const auctionStatusCode: number = json.statusCode || AuctionStatusCode.NORMAL;
+
+
+        if(!('placements' in json)) {
+            return Promise.resolve(undefined);
+        }
+
+        const placementId = placement.getId();
+        let mediaId: string | undefined;
+        let trackingUrls: ICampaignTrackingUrls | undefined;
+
+        if(json.placements.hasOwnProperty(placementId)) {
+            if(json.placements[placementId].hasOwnProperty('mediaId')) {
+                mediaId = json.placements[placementId].mediaId;
+            }
+
+            if(json.placements[placementId].hasOwnProperty('trackingId')) {
+                const trackingId: string = json.placements[placementId].trackingId;
+
+                if(json.tracking[trackingId]) {
+                    trackingUrls = json.tracking[trackingId];
+                }
+            }
+        }
+
+        if(mediaId && trackingUrls) {
+            const auctionPlacement: AuctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
+            const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId, auctionStatusCode);
+
+            const parser: CampaignParser = this.getCampaignParser(auctionResponse.getContentType());
+
+            return parser.parse(auctionResponse, session).then((campaign) => {
+                if(campaign && trackingUrls) {
+                    campaign.setMediaId(auctionResponse.getMediaId());
+                    return {
+                        campaign: campaign,
+                        trackingUrls: trackingUrls
+                    };
+                } else {
+                    return undefined;
+                }
+            }).catch(() => {
+                return undefined;
+            });
+        } else {
+            return Promise.resolve(undefined);
+        }
     }
 
     private handleCampaign(response: AuctionResponse, session: Session): Promise<void> {

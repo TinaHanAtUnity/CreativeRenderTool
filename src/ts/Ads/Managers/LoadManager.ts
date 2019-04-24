@@ -3,7 +3,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { INativeResponse } from 'Core/Managers/RequestManager';
-import { PlacementState } from 'Ads/Models/Placement';
+import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { NativePromoEventHandler } from 'Promo/EventHandlers/NativePromoEventHandler';
 import { Platform } from 'Core/Constants/Platform';
 import { ICoreApi } from 'Core/ICore';
@@ -43,10 +43,17 @@ export class LoadManager extends RefreshManager {
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
+        const placement = this._adsConfig.getPlacement(placementId);
+        if(placement) {
+            return placement.getCurrentCampaign();
+        }
+
         return undefined;
     }
 
-    public setCurrentAdUnit(adUnit: AbstractAdUnit): void {
+    public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
+        placement.setCurrentCampaign(undefined);
+        this.setPlacementState(placement.getId(), PlacementState.NO_FILL);
     }
 
     public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -63,9 +70,22 @@ export class LoadManager extends RefreshManager {
     }
 
     public setPlacementState(placementId: string, placementState: PlacementState): void {
+        const placement = this._adsConfig.getPlacement(placementId);
+        placement.setState(placementState);
+
+        this.sendPlacementStateChanges(placementId);
     }
 
     public sendPlacementStateChanges(placementId: string): void {
+        const placement = this._adsConfig.getPlacement(placementId);
+        if(placement.getPlacementStateChanged()) {
+            placement.setPlacementStateChanged(false);
+            this._ads.Placement.setPlacementState(placementId, placement.getState());
+            this._ads.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[placement.getPreviousState()], PlacementState[placement.getState()]);
+        }
+        if(placement.getState() === PlacementState.READY) {
+            this._ads.Listener.sendReadyEvent(placementId);
+        }
     }
 
     public setPlacementStates(placementState: PlacementState, placementIds: string[]): void {
@@ -99,11 +119,17 @@ export class LoadManager extends RefreshManager {
     }
 
     private loadPlacement(placementId: string) {
-        this._campaignManager.loadCampaign(this._adsConfig.getPlacement(placementId), 10000).then(campaign => {
-            if(campaign) {
-                // todo: set placement ready
+        this.setPlacementState(placementId, PlacementState.WAITING);
+        this._campaignManager.loadCampaign(this._adsConfig.getPlacement(placementId), 10000).then(loadedCampaign => {
+            if(loadedCampaign) {
+                const placement = this._adsConfig.getPlacement(placementId);
+                if(placement) {
+                    placement.setCurrentCampaign(loadedCampaign.campaign);
+                    placement.setCurrentTrackingUrls(loadedCampaign.trackingUrls);
+                }
+                this.setPlacementState(placementId, PlacementState.READY);
             } else {
-                // todo: set placement to no fill
+                this.setPlacementState(placementId, PlacementState.NO_FILL);
             }
         });
     }

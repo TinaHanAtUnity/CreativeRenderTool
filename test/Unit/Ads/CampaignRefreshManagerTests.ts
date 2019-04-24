@@ -425,7 +425,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.READY);
 
-                campaignRefreshManager.setCurrentAdUnit(currentAdUnit);
+                campaignRefreshManager.setCurrentAdUnit(currentAdUnit, placement);
                 currentAdUnit.onStart.trigger();
 
                 assert.equal(campaignRefreshManager.getCampaign('premium'), undefined);
@@ -462,7 +462,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.READY);
 
-                campaignRefreshManager.setCurrentAdUnit(currentAdUnit);
+                campaignRefreshManager.setCurrentAdUnit(currentAdUnit, placement);
                 currentAdUnit.onStart.trigger();
 
                 assert.equal(campaignRefreshManager.getCampaign('premium'), undefined);
