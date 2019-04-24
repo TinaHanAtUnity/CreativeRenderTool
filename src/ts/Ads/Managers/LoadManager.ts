@@ -95,26 +95,16 @@ export class LoadManager extends RefreshManager {
     }
 
     public refreshStoredLoads(): Promise<void> {
-        return this._core.Storage.getKeys(StorageType.PUBLIC, 'load', false).then(keys => {
-            if(keys && keys.length > 0) {
-                for(const key of keys) {
-                    this._core.Storage.get<ILoadEvent>(StorageType.PUBLIC, 'load.' + key).then(loadEvent => {
-                        if(loadEvent.ts && loadEvent.ts > this._clientInfo.getInitTimestamp()) { // ignore loads before SDK init
-                            this.loadPlacement(loadEvent.value);
-                        }
-                    }).catch(() => {
-                        // ignore error
-                    });
+        return this.getStoredLoads().then(storedLoads => {
+            this._adsConfig.getPlacementIds().forEach(placementId => {
+                if(!this._adsConfig.getPlacement(placementId).isBannerPlacement()) {
+                    if(storedLoads.indexOf(placementId) === -1) {
+                        this.setPlacementState(placementId, PlacementState.NO_FILL);
+                    } else {
+                        this.loadPlacement(placementId);
+                    }
                 }
-
-                this._core.Storage.delete(StorageType.PUBLIC, 'load');
-                this._core.Storage.write(StorageType.PUBLIC);
-            } else {
-                return undefined;
-            }
-        }).catch(() => {
-            // no keys found, no error
-            return undefined;
+            });
         });
     }
 
@@ -132,6 +122,53 @@ export class LoadManager extends RefreshManager {
                 this.setPlacementState(placementId, PlacementState.NO_FILL);
             }
         });
+    }
+
+    private getStoredLoads(): Promise<string[]> {
+        const placements: string[] = [];
+
+        return this._core.Storage.getKeys(StorageType.PUBLIC, 'load', false).then(keys => {
+            if(keys && keys.length > 0) {
+                const promises = [];
+
+                for(const key of keys) {
+                    promises.push(this.getStoredLoad(key));
+                }
+
+                return Promise.all(promises).then(storedLoads => {
+                    const validLoads: string[] = [];
+                    for(const load of storedLoads) {
+                        if(load) {
+                            validLoads.push(load);
+                        }
+                    }
+
+                    return validLoads;
+                });
+            } else {
+                return [];
+            }
+        }).catch(() => {
+            // no keys found, no error
+            return Promise.resolve([]);
+        });
+    }
+
+    private getStoredLoad(key: string): Promise<string | undefined> {
+        return this._core.Storage.get<ILoadEvent>(StorageType.PUBLIC, 'load.' + key).then(loadEvent => {
+            if(loadEvent.ts && loadEvent.ts > this._clientInfo.getInitTimestamp()) { // ignore loads before SDK init
+                return loadEvent.value;
+            } else {
+                return undefined;
+            }
+        }).catch(() => {
+            return Promise.resolve(undefined);
+        });
+    }
+
+    private deleteStoredLoads() {
+        this._core.Storage.delete(StorageType.PUBLIC, 'load');
+        this._core.Storage.write(StorageType.PUBLIC);
     }
 
     private onStorageSet(type: string, event: any) {
