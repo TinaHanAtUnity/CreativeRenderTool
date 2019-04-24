@@ -109,15 +109,13 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
     }
 
     private fillPersonalInfoFields(): void {
+        const formatTranslation = (str: string, arr: string[]) => {
+            return str.replace(/{(\d+)}/g, (match, number) => {
+                return typeof arr[number] !== 'undefined' ? arr[number] : match;
+            });
+        };
+
         this._userPrivacyManager.retrieveUserSummary().then((personalProperties) => {
-
-            const formatTranslation = (str: string, arr: string[]) => {
-                return str.replace(/{(\d+)}/g, (match, number) => {
-                    return typeof arr[number] !== 'undefined' ? arr[number] : match;
-                });
-            };
-
-            document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
             document.getElementById('phone-type')!.innerHTML = formatTranslation(this._localization.translate('privacy-using'), [personalProperties.deviceModel]);
             document.getElementById('country')!.innerHTML = formatTranslation(this._localization.translate('privacy-located-in'), [personalProperties.country]);
             document.getElementById('game-plays-this-week')!.innerHTML = formatTranslation(this._localization.translate('privacy-used-this-app'), [personalProperties.gamePlaysThisWeek.toString()]);
@@ -125,7 +123,12 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
             document.getElementById('games-installed-from-ads')!.innerHTML = formatTranslation(this._localization.translate('privacy-installed-based-on'), [personalProperties.installsFromAds.toString()]);
         }).catch(error => {
             Diagnostics.trigger('gdpr_personal_info_failed', error);
-            document.getElementById('sorry-message')!.innerHTML = 'Sorry. We were unable to deliver our collected information at this time.';
+            const hyphen = ['—'];
+            document.getElementById('phone-type')!.innerHTML = formatTranslation(this._localization.translate('privacy-using'), hyphen);
+            document.getElementById('country')!.innerHTML = formatTranslation(this._localization.translate('privacy-located-in'), hyphen);
+            document.getElementById('game-plays-this-week')!.innerHTML = formatTranslation(this._localization.translate('privacy-used-this-app'), hyphen);
+            document.getElementById('ads-seen-in-game')!.innerHTML = formatTranslation(this._localization.translate('privacy-seen-ads'), ['-']);
+            document.getElementById('games-installed-from-ads')!.innerHTML = formatTranslation(this._localization.translate('privacy-installed-based-on'), hyphen);
         });
     }
 
