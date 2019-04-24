@@ -32,7 +32,9 @@ const cdnConfig = {
             'cdn.unityads.unity3d.com',
             'geocdn.unityads.unity3d.com',
             'config.unityads.unity3d.com',
-            'webview.unityads.unity3d.com'
+            'webview.unityads.unity3d.com',
+            'config.unityads.unitychina.cn',
+            'webview.unityads.unitychina.cn'
         ],
         'check_url': 'china-cdn2.unityads.unity3d.com',
         'access_key_id': process.env.ALIBABACLOUD_ACCESS_KEY_ID,
