@@ -1,5 +1,5 @@
 import { Placement } from 'Ads/Models/Placement';
-import { AuctionRequest, IAuctionRequestParams } from 'Banners/Utilities/AuctionRequest';
+import { AuctionRequest, IAuctionRequestParams, IAuctionResponse } from 'Banners/Utilities/AuctionRequest';
 import { BannerSize } from 'Banners/Utilities/BannerSize';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Platform } from 'Core/Constants/Platform';
@@ -18,25 +18,23 @@ export class BannerAuctionRequest extends AuctionRequest {
         return placementRequest;
     }
 
-    protected getRequestURL(): Promise<string> {
-        return super.getRequestURL().then((url) => {
-            this.checkForLimitedAdTracking();
-            return url;
-        });
+    public request(): Promise<IAuctionResponse> {
+        if (this._deviceInfo.getLimitAdTracking()) {
+            this.reportLimitedAdTrackingRequest();
+        }
+        return super.request();
     }
 
-    private checkForLimitedAdTracking() {
-        if (this._deviceInfo.getLimitAdTracking()) {
-            // Report to PTS to easily get percent comparisons in Datadog
-            this._pts.reportMetric(ProgrammaticTrackingMetricName.BannerAdRequestWithLimitedAdTracking);
-            let userId = this._deviceInfo.getAdvertisingIdentifier();
-            if (!userId && this._platform === Platform.ANDROID) {
-                userId = (<AndroidDeviceInfo>this._deviceInfo).getAndroidId();
-            }
-            // Report to Kibana to break out by userId
-            Diagnostics.trigger('banner_request_with_limited_ad_tracking', {
-                userId: userId
-            });
+    private reportLimitedAdTrackingRequest() {
+        // Report to PTS to easily get percent comparisons in Datadog
+        this._pts.reportMetric(ProgrammaticTrackingMetricName.BannerAdRequestWithLimitedAdTracking);
+        let userId = this._deviceInfo.getAdvertisingIdentifier();
+        if (!userId && this._platform === Platform.ANDROID) {
+            userId = (<AndroidDeviceInfo>this._deviceInfo).getAndroidId();
         }
+        // Report to Kibana to break out by userId
+        Diagnostics.trigger('banner_request_with_limited_ad_tracking', {
+            userId: userId
+        });
     }
 }
