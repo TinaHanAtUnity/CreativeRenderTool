@@ -12,6 +12,7 @@ import { VastAdValidator } from 'VAST/Validators/VastAdValidator';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -231,7 +232,7 @@ export class VastParserStrict {
                 for (const clickTrackingUrl of ad.getVideoClickTrackingURLTemplates()) {
                     parsedAd.addVideoClickTrackingURLTemplate(clickTrackingUrl);
                 }
-                for (const eventName of ['creativeView', 'start', 'firstQuartile', 'midpoint', 'thirdQuartile', 'complete', 'mute', 'unmute']) {
+                for (const eventName of Object.keys(TrackingEvent).map((event) => TrackingEvent[<keyof typeof TrackingEvent>event])) {
                     for (const url of parent.getTrackingEventUrls(eventName)) {
                         parsedVast.addTrackingEventUrl(eventName, url);
                     }
@@ -348,7 +349,10 @@ export class VastParserStrict {
                     vastAdVerification.setVerificationTrackingEvent(url);
                 }
             });
-            vastAdVerifications.push(vastAdVerification);
+
+            if (vastAdVerification.getVerficationResources() && vastAdVerification.getVerificationVendor()) {
+                vastAdVerifications.push(vastAdVerification);
+            }
         });
 
         return vastAdVerifications;

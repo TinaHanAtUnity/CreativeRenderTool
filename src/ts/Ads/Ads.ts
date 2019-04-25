@@ -103,6 +103,8 @@ export class Ads implements IAds {
     public CampaignManager: CampaignManager;
     public RefreshManager: CampaignRefreshManager;
 
+    private static _forcedConsentUnit: boolean = false;
+
     private _currentAdUnit: AbstractAdUnit;
     private _showing: boolean = false;
     private _creativeUrl?: string;
@@ -155,7 +157,7 @@ export class Ads implements IAds {
         }
         this.SessionManager = new SessionManager(this._core.Api, this._core.RequestManager, this._core.StorageBridge);
         this.MissedImpressionManager = new MissedImpressionManager(this._core.Api);
-        this.BackupCampaignManager = new BackupCampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.StorageBridge, this._core.Config, this._core.DeviceInfo);
+        this.BackupCampaignManager = new BackupCampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.StorageBridge, this._core.Config, this._core.DeviceInfo, this._core.ClientInfo);
         this.ProgrammaticTrackingService = new ProgrammaticTrackingService(this._core.NativeBridge.getPlatform(), this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo);
         this.ContentTypeHandlerManager = new ContentTypeHandlerManager();
         this.ThirdPartyEventManagerFactory = new ThirdPartyEventManagerFactory(this._core.Api, this._core.RequestManager);
@@ -178,6 +180,9 @@ export class Ads implements IAds {
         }).then(() => {
             const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
+
+            // backup campaigns have been causing crashes so they have to be disabled for now, this issue should be reinvestigated at a later time.
+            this.BackupCampaignManager.setEnabled(false);
 
             this.AssetManager = new AssetManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.CacheManager, this.Config.getCacheMode(), this._core.DeviceInfo, this._core.CacheBookkeeping, this.ProgrammaticTrackingService, this.BackupCampaignManager);
             if(this.SessionManager.getGameSessionId() % 10000 === 0) {
@@ -275,6 +280,14 @@ export class Ads implements IAds {
     }
 
     private isConsentShowRequired(): boolean {
+        if (Ads._forcedConsentUnit) {
+            return true;
+        }
+
+        if (this._core.DeviceInfo.getLimitAdTracking()) {
+            return false;
+        }
+
         const gamePrivacy = this.Config.getGamePrivacy();
         const userPrivacy = this.Config.getUserPrivacy();
 
@@ -316,7 +329,8 @@ export class Ads implements IAds {
             adUnitContainer: this.Container,
             adsConfig: this.Config,
             core: this._core.Api,
-            deviceInfo: this._core.DeviceInfo
+            deviceInfo: this._core.DeviceInfo,
+            pts: this.ProgrammaticTrackingService
         });
         return consentView.show(options);
     }
@@ -589,6 +603,13 @@ export class Ads implements IAds {
         if (TestEnvironment.get('forcedARMRAID')) {
             forcedARMRAID = TestEnvironment.get('forcedARMRAID');
             MRAIDAdUnitParametersFactory.setForcedARMRAID(forcedARMRAID);
+        }
+
+        let forcedConsentUnit = false;
+        if(TestEnvironment.get('forcedConsent')) {
+            forcedConsentUnit = TestEnvironment.get('forcedConsent');
+            Ads._forcedConsentUnit = forcedConsentUnit;
+            AbstractAdUnitParametersFactory.setForcedConsentUnit(forcedConsentUnit);
         }
 
         if(TestEnvironment.get('creativeUrl')) {

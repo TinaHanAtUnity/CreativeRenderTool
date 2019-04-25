@@ -1,14 +1,13 @@
 import { IVideoAdUnitParameters, VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ThirdPartyEventManager, TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
-import { SliderPerformanceEndScreen } from 'Performance/Views/SliderPerformanceEndScreen';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { DownloadManager } from 'China/Managers/DownloadManager';
 import { DeviceIdManager } from 'China/Managers/DeviceIdManager';
+import { SliderPerformanceEndScreen } from 'Performance/Views/SliderPerformanceEndScreen';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen | SliderPerformanceEndScreen;
@@ -92,7 +91,11 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         if(endScreen) {
             endScreen.show();
         }
-        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._performanceCampaign, ICometTrackingUrlEvents.ERROR);
+        this.sendTrackingEvent(TrackingEvent.ERROR);
+    }
+
+    public sendTrackingEvent(event: TrackingEvent) {
+        this._thirdPartyEventManager.sendTrackingEvents(this._performanceCampaign, event, 'performance');
     }
 
     protected unsetReferences() {

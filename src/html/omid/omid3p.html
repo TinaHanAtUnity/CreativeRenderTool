@@ -1,0 +1,211 @@
+<script>
+    (function() {
+        var OmidVerification = function() {
+
+            /**
+             * Enum for ad event types.
+             * @enum {string}
+             */
+            var videoListeners = {
+                /* 
+                * Common Video Event Types
+                */
+                loaded: [],
+                start: [],
+                firstQuartile: [],
+                midpoint: [],
+                thirdQuartile: [],
+                complete: [],
+                pause: [],
+                resume: [],
+                bufferStart: [],
+                bufferFinish: [],
+                skipped: [],
+                volumeChange: [],
+                playerStateChange: [],
+                adUserInteraction: [],
+
+                /* 
+                * Common Ad Event Types
+                */
+                geometryChange: [],
+                impression: []
+            };
+
+            /**
+             * Calls the corresponding listener events function
+             * @param {string} event to send to the server
+             * @param {Object} parameters of the event
+             */
+            var trigger = function(event, parameters) {
+                if(!parameters) {
+                    parameters = [];
+                }
+                if(event in videoListeners) {
+                    videoListeners[event].forEach(function(listener) {
+                        listener(parameters);
+                    });
+                }
+            };
+
+            var sessionObserversMap = {};
+            var sessionStartData = {};
+
+            var triggerAllSessionObservers = function(eventData) {
+                const sessionObservers = Object.keys(sessionObserversMap).map(function(vendorKey) {
+                    return sessionObserversMap[vendorKey];
+                });
+
+                sessionObservers.forEach(function(sessionObserver) {
+                    sessionObserver(eventData);
+                });
+            }
+
+            /**
+             * Callback to communicate back to TS layer of changed state
+             * @param {string} event to send to the server
+             * @param {Object} data of the event
+             */
+            var postMessageCallback = function(event, data) {
+                window.parent.postMessage({
+                    type: 'omid',
+                    event: event,
+                    data: data
+                }, '*');
+            };
+
+            /**
+             * Strips 'omid' from string to be passed to vendor
+             * @param {string} event to send to the vendor
+             */
+            var stripEventString = function(eventType) {
+                return eventType.slice(4).charAt(0).toLowerCase() + eventType.slice(5);
+            }
+
+            var sessionStartCalled = false;
+
+            var eventHandlers = {};
+            eventHandlers['omidImpression'] = (e) => trigger('impression', e);
+            eventHandlers['omidGeometryChange'] = (e) => trigger('geometryChange', e);
+            eventHandlers['omidLoaded'] = (e) => trigger('loaded', e);
+            eventHandlers['omidStart'] = (e) => trigger('start', e);
+            eventHandlers['omidFirstQuartile'] = (e) => trigger('firstQuartile', e);
+            eventHandlers['omidMidpoint'] = (e) => trigger('midpoint', e);
+            eventHandlers['omidThirdQuartile'] = (e) => trigger('thirdQuartile', e);
+            eventHandlers['omidComplete'] = (e) => trigger('complete', e);
+            eventHandlers['omidPause'] = (e) => trigger('pause', e);
+            eventHandlers['omidResume'] = (e) => trigger('resume', e);
+            eventHandlers['omidBufferStart'] = (e) => trigger('bufferStart', e);
+            eventHandlers['omidBufferFinish'] = (e) => trigger('bufferFinish', e);
+            eventHandlers['omidSkipped'] = (e) => trigger('skipped', e);
+            eventHandlers['omidVolumeChange'] = (e) => trigger('volumeChange', e);
+            eventHandlers['omidPlayerStateChange'] = (e) => trigger('playerStateChange', e);
+            eventHandlers['omidAdUserInteraction'] = (e) => trigger('adUserInteraction', e);
+
+            /**
+             * LifeCycle Event Listener
+             */
+            window.addEventListener('message', function(event) {
+                /*
+                * AD AND VIDEO EVENTS:
+                */
+                payload = event.data.payload;
+                const eventData = {
+                        adSessionId: event.data.sessionId,
+                        timestamp: new Date(),
+                        type: stripEventString(event.data.type),
+                        data: payload
+                }
+                if (event.data.type in eventHandlers) {
+                    var handler = eventHandlers[event.data.type];
+                    handler(eventData);
+                }
+
+                /* 
+                * SESSION EVENTS:
+                */
+                switch(event.data.type) {
+                    case 'sessionStart':
+                        const data = event.data.data;
+                        if (sessionObserversMap[data.vendorkey] && !sessionStartCalled) {
+                            sessionObserversMap[data.vendorkey](event.data);
+                            postMessageCallback('onEventProcessed', {
+                                eventType: 'sessionStart'
+                            });
+                            sessionStartCalled = true;
+                        } else {
+                            sessionStartData[data.vendorkey] = event.data;
+                        }
+                        break;
+                    case 'sessionFinish':
+                        triggerAllSessionObservers(event.data);
+
+                        for (var listener in videoListeners) { 
+                            delete videoListeners[listener]; 
+                        }
+
+                        postMessageCallback('onEventProcessed', {
+                            eventType: 'sessionFinish'
+                        });
+                        break;
+                    case 'sessionError': 
+                        triggerAllSessionObservers(event.data);
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            /*
+            * Tells verification script omid3p is supported 
+            */
+            this.isSupported = function() {
+                return true;
+            }
+
+            this.postback = function(event, data) {
+                window.parent.postMessage({
+                    type: 'omid',
+                    event: event,
+                    data: data
+                }, '*');
+            };
+
+            /*
+            * This method registers events and signals that the verification script has loaded and is ready to receive events,
+            * and should be called upon initialization.
+            */
+            this.registerSessionObserver = function(functionToExecute, vendorKey) {
+                sessionObserversMap[vendorKey] = functionToExecute;
+
+                if (!sessionStartCalled && sessionStartData[vendorKey]) {
+                    sessionObserversMap[vendorKey](sessionStartData[vendorKey]);
+                    postMessageCallback('onEventProcessed', {
+                        eventType: 'sessionStart'
+                    });
+                    sessionStartCalled = true;
+                }
+            }
+
+            this.addEventListener = function(type, listener) {
+                if (type === 'video') {
+                    this._registerVideoEvents();
+                }
+
+                if(type in videoListeners && videoListeners[type] !== listener) {
+                    videoListeners[type].push(listener);
+                }
+            }
+
+            this.sendUrl = function(resourceUrl, successCallback, failureCallback) {}
+            this.setTimeout = function() {}
+            this.setClearTimeout = function() {}
+            this.setInterval = function() {}
+            this.clearInterval = function() {}
+            this._registerVideoEvents = function() {};
+        }
+
+        window.omid3p = new OmidVerification();
+        Object.freeze(window.omid3p);
+    })();
+</script>

@@ -1,17 +1,15 @@
 import { Platform } from 'Core/Constants/Platform';
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
-import ZyngaGamesJson from 'json/custom_features/ZyngaGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
 import AuctionV4GamesJson from 'json/custom_features/AuctionV4Games.json';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { SkipUnderTimerExperiment, SliderEndCardExperiment, ABGroup } from 'Core/Models/ABGroup';
-import { Placement } from 'Ads/Models/Placement';
+
+import { SliderEndCardExperiment, ABGroup } from 'Core/Models/ABGroup';
 import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
-const ZyngaGameIds = setGameIds(ZyngaGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
 const AuctionV4GameIds = setGameIds(AuctionV4GamesJson);
 
@@ -106,16 +104,8 @@ export class CustomFeatures {
         return gameId === '1453434';
     }
 
-    public static isZyngaGame(gameId: string): boolean {
-        return this.existsInList(ZyngaGameIds, gameId);
-    }
-
     public static isAuctionV4Game(gameId: string): boolean {
         return this.existsInList(AuctionV4GameIds, gameId);
-    }
-
-    public static isSkipUnderTimerExperimentEnabled(coreConfig: CoreConfiguration, placement: Placement): boolean {
-        return SkipUnderTimerExperiment.isValid(coreConfig.getAbGroup()) && placement.allowSkip();
     }
 
     private static existsInList(gameIdList: string[], gameId: string): boolean {
@@ -138,6 +128,10 @@ export class CustomFeatures {
         } else {
             return false;
         }
+    }
+
+    public static isUnsupportedOMVendor(resourceUrl: string) {
+        return false;
     }
 
     // Following 2 functions could be merged at some point later

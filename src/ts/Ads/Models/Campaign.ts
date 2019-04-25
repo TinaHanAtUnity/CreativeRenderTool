@@ -3,6 +3,7 @@ import { Session } from 'Ads/Models/Session';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ISchema, Model } from 'Core/Models/Model';
+import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 
 export type ICampaignTrackingUrls = { [key: string]: string[] };
 
@@ -114,7 +115,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return this.get('trackingUrls');
     }
 
-    public getTrackingUrlsForEvent(event: string): string[] {
+    public getTrackingUrlsForEvent(event: TrackingEvent): string[] {
         const urls = this.getTrackingUrls();
         if (urls) {
             return urls[event] || [];

@@ -487,7 +487,7 @@ export class CampaignManager {
             }
         }
 
-        this._core.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
+        this._core.Sdk.logInfo('AdPlan received with ' + campaignCount + ' campaigns and refreshDelay ' + refreshDelay);
         this.onAdPlanReceived.trigger(refreshDelay, campaignCount, auctionStatusCode);
 
         for(const mediaId in campaigns) {
@@ -579,7 +579,7 @@ export class CampaignManager {
 
             return this.setupCampaignAssets(response.getPlacements(), campaign, response.getContentType(), session);
         }).catch((error) => {
-            CreativeBlocking.report(parser.creativeID, parser.seatID, BlockingReason.VIDEO_PARSE_FAILURE, {
+            CreativeBlocking.report(parser.creativeID, parser.seatID, parser.campaignID, BlockingReason.VIDEO_PARSE_FAILURE, {
                 errorCode: error.errorCode || undefined,
                 message: error.message || undefined
             });
