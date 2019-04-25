@@ -123,11 +123,11 @@ export class PrivacyRowItemContainer extends View<IPrivacyRowItemContainerHandle
             document.getElementById('games-installed-from-ads')!.innerHTML = formatTranslation(this._localization.translate('privacy-installed-based-on'), [personalProperties.installsFromAds.toString()]);
         }).catch(error => {
             Diagnostics.trigger('gdpr_personal_info_failed', error);
-            const hyphen = ['—'];
+            const hyphen = ['-'];
             document.getElementById('phone-type')!.innerHTML = formatTranslation(this._localization.translate('privacy-using'), hyphen);
             document.getElementById('country')!.innerHTML = formatTranslation(this._localization.translate('privacy-located-in'), hyphen);
             document.getElementById('game-plays-this-week')!.innerHTML = formatTranslation(this._localization.translate('privacy-used-this-app'), hyphen);
-            document.getElementById('ads-seen-in-game')!.innerHTML = formatTranslation(this._localization.translate('privacy-seen-ads'), ['-']);
+            document.getElementById('ads-seen-in-game')!.innerHTML = formatTranslation(this._localization.translate('privacy-seen-ads'), hyphen);
             document.getElementById('games-installed-from-ads')!.innerHTML = formatTranslation(this._localization.translate('privacy-installed-based-on'), hyphen);
         });
     }
