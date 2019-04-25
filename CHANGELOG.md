@@ -1,3 +1,7 @@
+# Staged
+
+* Consent localization for France [#9247](https://github.com/Applifier/unity-ads-webview/pull/9247)
+
 # Wed Apr 24 18:52:48 UTC 2019
 
 * Fix AR Delayed Camer Consent Layout [#9133](https://github.com/Applifier/unity-ads-webview/pull/9133)
