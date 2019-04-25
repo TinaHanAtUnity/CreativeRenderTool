@@ -50,5 +50,7 @@
   "privacy-settings-manage-your-data-deletion-msg": "We will process your request and your data will be deleted in 30 days. We will also opt you out of personalized ads immediately. Please note we may keep a transactional record using your personal information for 180 days for billing and fraud prevention purposes.",
   "privacy-settings-report-ad": "Report ad",
   "privacy-settings-build-info": "Build info",
-  "privacy-settings-close": "Close"
+  "privacy-settings-close": "Close",
+
+  "disagree": "Disagree"
 }
