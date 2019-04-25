@@ -52,6 +52,7 @@ export class ConsentUnit implements IConsentViewHandler, IAdUnit {
             privacyManager: parameters.privacyManager,
             landingPage: this._landingPage,
             pts: parameters.pts,
+            language: parameters.deviceInfo.getLanguage(),
             useAltMyChoicesButtonText: false, // will be re-tested later
             ctaABTest: ConsentCTATest.isValid(parameters.abGroup)
         };
