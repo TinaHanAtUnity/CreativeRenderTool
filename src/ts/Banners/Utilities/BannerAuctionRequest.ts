@@ -19,22 +19,22 @@ export class BannerAuctionRequest extends AuctionRequest {
     }
 
     public request(): Promise<IAuctionResponse> {
-        this.checkForLimitedAdTracking();
+        if (this._deviceInfo.getLimitAdTracking()) {
+            this.reportLimitedAdTrackingRequest();
+        }
         return super.request();
     }
 
-    private checkForLimitedAdTracking() {
-        if (this._deviceInfo.getLimitAdTracking()) {
-            // Report to PTS to easily get percent comparisons in Datadog
-            this._pts.reportMetric(ProgrammaticTrackingMetricName.BannerAdRequestWithLimitedAdTracking);
-            let userId = this._deviceInfo.getAdvertisingIdentifier();
-            if (!userId && this._platform === Platform.ANDROID) {
-                userId = (<AndroidDeviceInfo>this._deviceInfo).getAndroidId();
-            }
-            // Report to Kibana to break out by userId
-            Diagnostics.trigger('banner_request_with_limited_ad_tracking', {
-                userId: userId
-            });
+    private reportLimitedAdTrackingRequest() {
+        // Report to PTS to easily get percent comparisons in Datadog
+        this._pts.reportMetric(ProgrammaticTrackingMetricName.BannerAdRequestWithLimitedAdTracking);
+        let userId = this._deviceInfo.getAdvertisingIdentifier();
+        if (!userId && this._platform === Platform.ANDROID) {
+            userId = (<AndroidDeviceInfo>this._deviceInfo).getAndroidId();
         }
+        // Report to Kibana to break out by userId
+        Diagnostics.trigger('banner_request_with_limited_ad_tracking', {
+            userId: userId
+        });
     }
 }
