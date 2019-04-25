@@ -1,3 +1,7 @@
+# Thu Apr 25 18:10:10 UTC 2019
+
+* Hotfix for Consent Permissions [#9273](https://github.com/Applifier/unity-ads-webview/pull/9273)
+
 # Thu Apr 25 12:13:52 UTC 2019
 
 * Consent localization for France [#9247](https://github.com/Applifier/unity-ads-webview/pull/9247)
