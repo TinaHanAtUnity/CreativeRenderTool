@@ -149,7 +149,7 @@ export class CustomFeatures {
 
     public static getSliderEndScreenImagesForGame(targetGameAppStoreId: string): ISliderEndScreenImagesForGame {
         // TODO: Remove line below for not forcing the slider
-        targetGameAppStoreId = SliderEndScreenTargetGameIds[Math.floor(Math.random() * 3)];
+        targetGameAppStoreId = SliderEndScreenTargetGameIds[Math.floor(Math.random() * 18)];
         return SliderEndScreenImages[targetGameAppStoreId];
     }
 }
