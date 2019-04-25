@@ -82,6 +82,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { LoadManager } from 'Ads/Managers/LoadManager';
+import { StorageType } from 'Core/Native/Storage';
 
 export class Ads implements IAds {
 
@@ -112,6 +113,7 @@ export class Ads implements IAds {
     private _creativeUrl?: string;
     private _requestDelay: number;
     private _wasRealtimePlacement: boolean = false;
+    private _loadApiEnabled: boolean = false;
 
     private _core: ICore;
     private _store: IStore;
@@ -175,10 +177,14 @@ export class Ads implements IAds {
 
             this.PlacementManager = new PlacementManager(this.Api, this.Config);
 
-            return this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
+            const promises = [];
+            promises.push(this.setupLoadApi());
+            promises.push(this.PrivacyManager.getConsentAndUpdateConfiguration().catch(() => {
                 // do nothing
                 // error happens when consent value is undefined
-            });
+            }));
+
+            return Promise.all(promises);
         }).then(() => {
             const defaultPlacement = this.Config.getDefaultPlacement();
             this.Api.Placement.setDefaultPlacement(defaultPlacement.getId());
@@ -253,9 +259,12 @@ export class Ads implements IAds {
             RequestManager.setAuctionProtocol(this._core.Config, this.Config, this._core.NativeBridge.getPlatform(), this._core.ClientInfo);
 
             this.CampaignManager = new CampaignManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Config, this.AssetManager, this.SessionManager, this.AdMobSignalFactory, this._core.RequestManager, this._core.ClientInfo, this._core.DeviceInfo, this._core.MetaDataManager, this._core.CacheBookkeeping, this.ContentTypeHandlerManager, this._core.JaegerManager, this.BackupCampaignManager);
-            // todo: make informed selection between refresh managers
-            // this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
-            this.RefreshManager = new LoadManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this.Config, this.CampaignManager, this._core.ClientInfo);
+
+            if(this._loadApiEnabled) {
+                this.RefreshManager = new LoadManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this.Config, this.CampaignManager, this._core.ClientInfo);
+            } else {
+                this.RefreshManager = new CampaignRefreshManager(this._core.NativeBridge.getPlatform(), this._core.Api, this._core.Config, this.Api, this._core.WakeUpManager, this.CampaignManager, this.Config, this._core.FocusManager, this.SessionManager, this._core.ClientInfo, this._core.RequestManager, this._core.CacheManager);
+            }
 
             SdkStats.initialize(this._core.Api, this._core.RequestManager, this._core.Config, this.Config, this.SessionManager, this.CampaignManager, this._core.MetaDataManager, this._core.ClientInfo, this._core.CacheManager);
 
@@ -557,6 +566,18 @@ export class Ads implements IAds {
 
     private onAdUnitClose(): void {
         this._showing = false;
+    }
+
+    private setupLoadApi(): Promise<void> {
+        return this._core.Api.Storage.get(StorageType.PUBLIC, 'load.enabled.value').then(enabled => {
+            if(enabled) {
+                this._loadApiEnabled = true;
+            } else {
+                this._loadApiEnabled = false;
+            }
+        }).catch(() => {
+            this._loadApiEnabled = false;
+        });
     }
 
     private setupTestEnvironment(): void {
