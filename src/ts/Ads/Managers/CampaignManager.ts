@@ -623,12 +623,21 @@ export class CampaignManager {
             const parser: CampaignParser = this.getCampaignParser(auctionResponse.getContentType());
 
             return parser.parse(auctionResponse, session).then((campaign) => {
-                if(campaign && trackingUrls) {
+                if(campaign) {
                     campaign.setMediaId(auctionResponse.getMediaId());
-                    return {
-                        campaign: campaign,
-                        trackingUrls: trackingUrls
-                    };
+
+                    return this._assetManager.setup(campaign).then(() => {
+                        if(trackingUrls) {
+                            return {
+                                campaign: campaign,
+                                trackingUrls: trackingUrls
+                            };
+                        } else {
+                            return undefined;
+                        }
+                    }).catch(() => {
+                        return undefined;
+                    });
                 } else {
                     return undefined;
                 }
