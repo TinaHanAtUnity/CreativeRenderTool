@@ -19,10 +19,8 @@ export class BannerAuctionRequest extends AuctionRequest {
     }
 
     protected getRequestURL(): Promise<string> {
-        return super.getRequestURL().then((url) => {
-            this.checkForLimitedAdTracking();
-            return url;
-        });
+        this.checkForLimitedAdTracking();
+        return super.getRequestURL();
     }
 
     private checkForLimitedAdTracking() {
