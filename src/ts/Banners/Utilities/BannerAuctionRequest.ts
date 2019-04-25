@@ -1,5 +1,5 @@
 import { Placement } from 'Ads/Models/Placement';
-import { AuctionRequest, IAuctionRequestParams } from 'Banners/Utilities/AuctionRequest';
+import { AuctionRequest, IAuctionRequestParams, IAuctionResponse } from 'Banners/Utilities/AuctionRequest';
 import { BannerSize } from 'Banners/Utilities/BannerSize';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Platform } from 'Core/Constants/Platform';
@@ -18,9 +18,9 @@ export class BannerAuctionRequest extends AuctionRequest {
         return placementRequest;
     }
 
-    protected getRequestURL(): Promise<string> {
+    public request(): Promise<IAuctionResponse> {
         this.checkForLimitedAdTracking();
-        return super.getRequestURL();
+        return super.request();
     }
 
     private checkForLimitedAdTracking() {
