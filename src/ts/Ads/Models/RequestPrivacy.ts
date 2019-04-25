@@ -4,7 +4,6 @@ import {
     IGranularPermissions,
     IPermissions,
     IProfilingPermissions,
-    isUnityConsentPermissions,
     PrivacyMethod,
     UserPrivacy
 } from 'Ads/Models/Privacy';
@@ -12,7 +11,7 @@ import {
 export interface IRequestPrivacy {
     method: PrivacyMethod;
     firstRequest: boolean;
-    permissions: IGranularPermissions | { [key: string]: never };
+    permissions: IPermissions | { [key: string]: never };
 }
 
 export interface ILegacyRequestPrivacy {
