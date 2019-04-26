@@ -1,5 +1,19 @@
 # Staged
 
+* Fix Banner Limited Ad Tracking Metric [#9274](https://github.com/Applifier/unity-ads-webview/pull/9274)
+* Remove Auction V4 Whitelist and iOS Crash Test [#9249](https://github.com/Applifier/unity-ads-webview/pull/9249)
+* Revert "Add stages for tests and deployment" [#9248](https://github.com/Applifier/unity-ads-webview/pull/9248)
+
+# Thu Apr 25 18:10:10 UTC 2019
+
+* Hotfix for Consent Permissions [#9273](https://github.com/Applifier/unity-ads-webview/pull/9273)
+
+# Thu Apr 25 12:13:52 UTC 2019
+
+* Consent localization for France [#9247](https://github.com/Applifier/unity-ads-webview/pull/9247)
+
+# Wed Apr 24 18:52:48 UTC 2019
+
 * Fix AR Delayed Camer Consent Layout [#9133](https://github.com/Applifier/unity-ads-webview/pull/9133)
 * Remove iterating through all values from AFMA Tracking Events [#9224](https://github.com/Applifier/unity-ads-webview/pull/9224)
 * Reintroduce Minor Tracking Refactor with Admob Fixes [#9200](https://github.com/Applifier/unity-ads-webview/pull/9200)
