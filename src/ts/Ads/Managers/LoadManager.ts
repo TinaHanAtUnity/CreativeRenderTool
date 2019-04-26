@@ -89,9 +89,11 @@ export class LoadManager extends RefreshManager {
     }
 
     public setPlacementStates(placementState: PlacementState, placementIds: string[]): void {
+        // todo: implement method or remove from parent class
     }
 
     public subscribeNativePromoEvents(eventHandler: NativePromoEventHandler): void {
+        // todo: implement method or remove from parent class
     }
 
     public refreshStoredLoads(): Promise<void> {
@@ -171,6 +173,8 @@ export class LoadManager extends RefreshManager {
         this._core.Storage.write(StorageType.PUBLIC);
     }
 
+    // todo: proper typing
+    // tslint:disable-next-line
     private onStorageSet(type: string, event: any) {
         if(event && event.hasOwnProperty('load')) {
             Object.keys(event.load).forEach(key => {

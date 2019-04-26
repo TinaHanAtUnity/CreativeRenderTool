@@ -251,6 +251,7 @@ export class CampaignManager {
 
         return Promise.all([this.createRequestUrl(false), this.createRequestBody(requestPrivacy, countersForOperativeEvents, false, undefined, placement)]).then(([requestUrl, requestBody]) => {
             this._core.Sdk.logInfo('Loading placement ' + placement.getId() + ' from ' + requestUrl);
+            // tslint:disable-next-line
             deviceFreeSpace = (<any>requestBody).deviceFreeSpace; // todo: figure out cleaner way to pass this data
             const body = JSON.stringify(requestBody);
             return this._request.post(requestUrl, body, [], {
@@ -592,7 +593,6 @@ export class CampaignManager {
         session.setDeviceFreeSpace(deviceFreeSpace);
 
         const auctionStatusCode: number = json.statusCode || AuctionStatusCode.NORMAL;
-
 
         if(!('placements' in json)) {
             return Promise.resolve(undefined);
