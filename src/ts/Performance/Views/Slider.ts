@@ -161,13 +161,6 @@ export class Slider {
     }
 
     private resizeHandler(): void {
-        if (this._ready === null) {
-            this.slideToCurrent({ triggeredByResize: true });
-        } else {
-            this._ready.then(() => {
-                this.slideToCurrent({ triggeredByResize: true });
-            });
-        }
         if (this._resizeTimeId) {
             clearTimeout(this._resizeTimeId);
         }
