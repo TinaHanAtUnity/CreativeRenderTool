@@ -1,3 +1,7 @@
+# Staged
+
+* Fix for the new consent protocol [#9297](https://github.com/Applifier/unity-ads-webview/pull/9297)
+
 # Fri Apr 26 16:24:40 UTC 2019
 
 * Fix Banner Limited Ad Tracking Metric [#9274](https://github.com/Applifier/unity-ads-webview/pull/9274)
