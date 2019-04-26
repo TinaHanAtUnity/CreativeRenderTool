@@ -1,9 +1,6 @@
 import { Placement } from 'Ads/Models/Placement';
 import { AuctionRequest, IAuctionRequestParams, IAuctionResponse } from 'Banners/Utilities/AuctionRequest';
 import { BannerSize } from 'Banners/Utilities/BannerSize';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Platform } from 'Core/Constants/Platform';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class BannerAuctionRequest extends AuctionRequest {
