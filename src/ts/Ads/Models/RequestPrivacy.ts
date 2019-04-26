@@ -1,11 +1,5 @@
-import {
-    GamePrivacy,
-    IAllPermissions,
-    IPermissions,
-    IProfilingPermissions,
-    PrivacyMethod,
-    UserPrivacy
-} from 'Ads/Models/Privacy';
+import { IAllPermissions, IPermissions, IProfilingPermissions, PrivacyMethod } from 'Ads/Models/Privacy';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 export interface IRequestPrivacy {
     method: PrivacyMethod;
@@ -24,7 +18,19 @@ function isProfilingPermissions(permissions: IPermissions | { [key: string]: nev
 }
 
 export class RequestPrivacyFactory {
-    public static create(userPrivacy: UserPrivacy, gamePrivacy: GamePrivacy): IRequestPrivacy {
+    public static create(adsConfig : AdsConfiguration): IRequestPrivacy {
+        const gamePrivacy = adsConfig.getGamePrivacy();
+        if (gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST) {
+            return {
+                method: PrivacyMethod.LEGITIMATE_INTEREST,
+                firstRequest: !adsConfig.isOptOutRecorded(),
+                permissions: {
+                    profiling: !adsConfig.isOptOutEnabled()
+                }
+            };
+        }
+
+        const userPrivacy = adsConfig.getUserPrivacy();
         if (!userPrivacy.isRecorded()) {
             return {
                 method: gamePrivacy.getMethod(),
