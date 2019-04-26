@@ -1,4 +1,4 @@
-# Staged
+# Fri Apr 26 16:24:40 UTC 2019
 
 * Fix Banner Limited Ad Tracking Metric [#9274](https://github.com/Applifier/unity-ads-webview/pull/9274)
 * Remove Auction V4 Whitelist and iOS Crash Test [#9249](https://github.com/Applifier/unity-ads-webview/pull/9249)
