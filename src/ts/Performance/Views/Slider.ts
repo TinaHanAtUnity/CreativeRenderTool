@@ -23,7 +23,8 @@ export class Slider {
     private slidesContainerWidth: number;
     private imageUrls: string[];
     private currentSlide: number;
-    private transformProperty: string | number;
+    private transformPropertyName: 'transform' | 'webkitTransform';
+    private transitionPropertyName: 'transition' | 'webkitTransition';
     private _slidesContainer: HTMLElement;
     private _rootEl: HTMLElement;
     private pointerDown: boolean;
@@ -67,7 +68,8 @@ export class Slider {
         // Note: Bit stupid way to make sure the first image is the middle one etc. when the carousel is shown to the user
         this.imageUrls = [urls[1], urls[2], urls[0]];
         this.currentSlide = this.config.startIndex % this.imageUrls.length;
-        this.transformProperty = typeof document.documentElement.style.transform === 'string' ? 'transform' : 'WebkitTransform';
+        this.transformPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transform' : 'webkitTransform';
+        this.transitionPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transition' : 'webkitTransition';
 
         const cloneSlidesAmount = 3;
         const allSlidesCreatedPromise = [];
@@ -135,24 +137,18 @@ export class Slider {
             // explanation for this one - https://youtu.be/cCOL7MC4Pl0
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    this.enableTransition();
-                    this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset}px, 0, 0)`;
+                    this.transformSlidesContainer(offset);
                 });
             });
         } else {
-            this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset}px, 0, 0)`;
+            this.transformSlidesContainer(offset, 0);
         }
         Slider.updateIndicator(this._indicators, Math.floor(currentSlide));
     }
 
-    private enableTransition(): void {
-        this._slidesContainer.style.webkitTransition = `all ${this.config.duration}ms ${this.config.easing}`;
-        this._slidesContainer.style.transition = `all ${this.config.duration}ms ${this.config.easing}`;
-    }
-
-    private disableTransition(): void {
-        this._slidesContainer.style.webkitTransition = `all 0ms ${this.config.easing}`;
-        this._slidesContainer.style.transition = `all 0ms ${this.config.easing}`;
+    private transformSlidesContainer(offset: number, duration: number = this.config.duration): void {
+        this._slidesContainer.style[this.transitionPropertyName] = `all ${duration}ms ${this.config.easing}`;
+        this._slidesContainer.style[this.transformPropertyName] = `translate3d(${offset}px, 0, 0)`;
     }
 
     private resizeContainer(): void {
@@ -160,24 +156,15 @@ export class Slider {
         const widthItem = this.slidesContainerWidth / this.slidesPerPage;
         const itemsToBuild = this.imageUrls.length + (this.slidesPerPage * 2);
         this._slidesContainer.style.width = `${(widthItem) * itemsToBuild}px`;
-        this.disableTransition();
-        this.slideToCurrent({ triggeredByResize: true });
+        this.slideToCurrent({ enableTransition: false, triggeredByResize: true });
     }
 
     private resizeHandler(): void {
-        if (this._ready === null) {
-            this.slideToCurrent({ triggeredByResize: true });
-        } else {
-            this._ready.then(() => {
-                this.slideToCurrent({ triggeredByResize: true });
-            });
-        }
         if (this._resizeTimeId) {
             clearTimeout(this._resizeTimeId);
         }
 
         // resize debounce
-        this.disableTransition();
         this._resizeTimeId = window.setTimeout(() => this.resizeContainer(), 100);
     }
 
@@ -282,7 +269,6 @@ export class Slider {
     private touchendHandler(e: TouchEvent): void {
         e.stopPropagation();
         this.pointerDown = false;
-        this.enableTransition();
         if (this.drag.endX) {
             this.updateAfterDrag();
         }
@@ -300,14 +286,11 @@ export class Slider {
         if (this.pointerDown && this.drag.letItGo) {
             e.preventDefault();
             this.drag.endX = e.touches[0].pageX;
-            this._slidesContainer.style.webkitTransition = `all 0ms ${this.config.easing}`;
-            this._slidesContainer.style.transition = `all 0ms ${this.config.easing}`;
-
             const currentSlide = this.currentSlide + this.slidesPerPage;
             const currentOffset = currentSlide * (this.slidesContainerWidth / this.slidesPerPage);
             const dragOffset = (this.drag.endX - this.drag.startX);
             const offset = currentOffset - dragOffset;
-            this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset * (-1)}px, 0, 0)`;
+            this.transformSlidesContainer(offset * -1, 0);
         }
 
     }
@@ -362,15 +345,12 @@ export class Slider {
         }
 
         if (shouldLoop) {
-            this.disableTransition();
-
             const loopedSlideIndex = this.currentSlide + (Math.sign(slideAmount) * -1 * this.imageUrls.length);
             const loopedSlideIndexOffset = this.slidesPerPage;
             const moveTo = loopedSlideIndex + loopedSlideIndexOffset;
             const offset = moveTo * -1 * (this.slidesContainerWidth / this.slidesPerPage);
             const dragDistance = this.drag.endX - this.drag.startX;
-
-            this._slidesContainer.style[<number>this.transformProperty] = `translate3d(${offset + dragDistance}px, 0, 0)`;
+            this.transformSlidesContainer(offset + dragDistance, 0);
             this.currentSlide = loopedSlideIndex + slideAmount;
         } else {
             this.currentSlide = this.currentSlide + slideAmount;
