@@ -143,7 +143,7 @@ export class CampaignManager {
 
         GameSessionCounters.addAdRequest();
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
-        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy());
+        const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig);
 
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
