@@ -179,7 +179,11 @@ export class LoadManager extends RefreshManager {
         if(event && event.hasOwnProperty('load')) {
             Object.keys(event.load).forEach(key => {
                 const loadEvent: ILoadEvent = event.load[key];
-                this.loadPlacement(loadEvent.value); // todo: validate that "value" is a valid placement
+                const placement: Placement = this._adsConfig.getPlacement(loadEvent.value);
+
+                if(placement && placement.getState() === PlacementState.NO_FILL) {
+                    this.loadPlacement(loadEvent.value);
+                }
             });
         }
     }

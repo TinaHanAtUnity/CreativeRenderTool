@@ -245,7 +245,13 @@ export class CampaignManager {
     }
 
     public loadCampaign(placement: Placement, timeout: number): Promise<ILoadedCampaign | undefined> {
+        // todo: when loading placements individually current logic for enabling and stopping caching might have race conditions
+        this._assetManager.enableCaching();
+
+        // todo: current logic for session counters assumes ad request cycle based on automatic loading
         const countersForOperativeEvents = GameSessionCounters.getCurrentCounters();
+
+        // todo: it appears there are some dependencies to automatic ad request cycle in privacy logic
         const requestPrivacy = RequestPrivacyFactory.create(this._adsConfig.getUserPrivacy(), this._adsConfig.getGamePrivacy());
         let deviceFreeSpace: number;
 
