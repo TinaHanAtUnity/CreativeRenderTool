@@ -3,7 +3,6 @@ import { promises } from 'fs';
 export interface ISliderOptions {
     duration: number;
     easing: string;
-    slidesPerPage: number;
     startIndex: number;
     threshold: number;
 }
@@ -38,6 +37,7 @@ export class Slider {
     private _isVisible: boolean;
     private _onSlideCallback: OnSlideCallback;
     private _onDownloadCallback: OnDownloadCallback;
+    private imageOrientation: string;
 
     constructor(urls: string[], imageOrientation: 'portrait' | 'landscape', onSlideCallback: OnSlideCallback, onDownloadCallback: OnDownloadCallback) {
         this._onSlideCallback = onSlideCallback;
@@ -46,7 +46,6 @@ export class Slider {
         this.config = {
             duration: 200,
             easing: 'ease',
-            slidesPerPage: 1.2,
             startIndex: 0,
             threshold: 70
         };
@@ -59,10 +58,10 @@ export class Slider {
         };
 
         this._isVisible = true;
-        imageOrientation === 'portrait' ? this.config.slidesPerPage = 1.666 : this.config.slidesPerPage = 1.2;
+        this.imageOrientation = imageOrientation;
+        imageOrientation === 'portrait' ? this.slidesPerPage = 1.666 : this.slidesPerPage = 1.3;
         this._rootEl = this.createElement('div', 'slider-root-container', ['slider-wrap', `${imageOrientation}-slider-images`]);
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
-        this.slidesPerPage = this.config.slidesPerPage;
 
         // TODO: Make sure we always have 3 images
         // Note: Bit stupid way to make sure the first image is the middle one etc. when the carousel is shown to the user
