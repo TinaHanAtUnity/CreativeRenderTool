@@ -287,9 +287,6 @@ export class Slider {
         if (this.pointerDown && this.drag.letItGo) {
             e.preventDefault();
             this.drag.endX = e.touches[0].pageX;
-            this._slidesContainer.style.webkitTransition = `all 0ms ${this.config.easing}`;
-            this._slidesContainer.style.transition = `all 0ms ${this.config.easing}`;
-
             const currentSlide = this.currentSlide + this.slidesPerPage;
             const currentOffset = currentSlide * (this.slidesContainerWidth / this.slidesPerPage);
             const dragOffset = (this.drag.endX - this.drag.startX);
