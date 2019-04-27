@@ -130,7 +130,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private onKeyDown(key: number) {
-        if (key === KeyCode.BACK) {
+        if (key === KeyCode.BACK && this._placement.allowSkip()) {
             this._promoView.onClose.trigger();
         }
     }
