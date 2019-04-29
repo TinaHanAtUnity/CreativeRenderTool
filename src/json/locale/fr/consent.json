@@ -50,5 +50,7 @@
   "privacy-settings-manage-your-data-deletion-msg": "Nous allons traiter votre requête et supprimer vos données sous 30 jours. Vous êtes aussi désinscrit dès à présent du service de publicités personnalisées. Attention : il est possible que nous conservions un historique des transactions utilisant vos informations personnelles pendant 180 jours, à des fins de facturation et de répression des fraudes.",
   "privacy-settings-report-ad": "Signaler une publicité",
   "privacy-settings-build-info": "Informations de version",
-  "privacy-settings-close": "Retour"
+  "privacy-settings-close": "Retour",
+
+  "disagree": "Non merci"
 }
