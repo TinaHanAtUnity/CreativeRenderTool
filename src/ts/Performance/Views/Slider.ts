@@ -74,7 +74,6 @@ export class Slider {
         const blurredBackground = this.createElement('div', 'slider-blurred-background', ['slider-blurred-background'], {
             'background-image': `url(${urls[0]})`
         });
-
         this._rootEl.appendChild(blurredBackground);
 
         for (let i = this.imageUrls.length - cloneSlidesAmount; i < this.imageUrls.length; i++) {
@@ -103,6 +102,10 @@ export class Slider {
 
     public show(): boolean {
         this._isVisible = true;
+        const bgContainer = document.body.getElementsByClassName('game-background-container')[0];
+        if (bgContainer) {
+            bgContainer.classList.add('slider-experiment');
+        }
 
         // If this._ready has already resolved and set to null, slider was ready
         if (this._ready === null) {
