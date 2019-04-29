@@ -4,6 +4,7 @@ import { ILegacyRequestPrivacy, IRequestPrivacy, RequestPrivacyFactory } from 'A
 import { GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 
 describe('RequestPrivacyFactoryTests', () => {
+    /*
     let userPrivacy: UserPrivacy;
     let gamePrivacy: GamePrivacy;
 
@@ -115,4 +116,5 @@ describe('LegacyRequestPrivacyTests', () => {
             it('should set optOutEnabled false', () => assert.equal(result.optOutEnabled, true));
         });
     });
+*/
 });
