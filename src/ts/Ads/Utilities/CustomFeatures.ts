@@ -2,13 +2,10 @@ import { Platform } from 'Core/Constants/Platform';
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
-import AuctionV4GamesJson from 'json/custom_features/AuctionV4Games.json';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
-const AuctionV4GameIds = setGameIds(AuctionV4GamesJson);
 
 function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
@@ -79,10 +76,6 @@ export class CustomFeatures {
 
     public static isTimerExpirationExperiment(gameId: string): boolean {
         return gameId === '1453434';
-    }
-
-    public static isAuctionV4Game(gameId: string): boolean {
-        return this.existsInList(AuctionV4GameIds, gameId);
     }
 
     private static existsInList(gameIdList: string[], gameId: string): boolean {

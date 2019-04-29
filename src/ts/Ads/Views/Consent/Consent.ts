@@ -16,14 +16,15 @@ import {
     PrivacyTextParagraph
 } from 'Ads/Views/Consent/PrivacyRowItemContainer';
 import { ProgrammaticTrackingService, ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Localization } from 'Core/Utilities/Localization';
 
 export interface IConsentViewParameters {
     platform: Platform;
     privacyManager: UserPrivacyManager;
     landingPage: ConsentPage;
+    language: string;
     apiLevel?: number;
     osVersion?: string;
-    useAltMyChoicesButtonText: boolean;
     pts: ProgrammaticTrackingService;
     ctaABTest: boolean;
 }
@@ -61,10 +62,9 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
         this._isCtaAbTest = parameters.ctaABTest;
 
-        this._template = new Template(ConsentTemplate);
+        this._template = new Template(ConsentTemplate, new Localization(parameters.language, 'consent'));
         this._templateData = {
-            useAltMyChoicesButtonText: parameters.useAltMyChoicesButtonText,
-            myChoicesButtonOrderTest: parameters.ctaABTest
+            myChoicesDisagreeCtaTest: parameters.ctaABTest
         };
 
         this._bindings = [
@@ -134,9 +134,9 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
             }
         ];
 
-        this._switchGroup = new PersonalizationSwitchGroup(parameters.platform, parameters.privacyManager);
+        this._switchGroup = new PersonalizationSwitchGroup(parameters.platform, parameters.privacyManager, parameters.language);
         this._switchGroup.addEventHandler(this);
-        this._privacyRowItemContainer = new PrivacyRowItemContainer(parameters.platform, parameters.privacyManager, true);
+        this._privacyRowItemContainer = new PrivacyRowItemContainer(parameters.platform, parameters.privacyManager, parameters.language, true);
         this._privacyRowItemContainer.addEventHandler(this);
     }
 
@@ -173,11 +173,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         if (this._landingPage === ConsentPage.HOMESCREEN) {
             const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
             myChoicesElement.classList.add('show-back-button');
-        }
-
-        if (this._isCtaAbTest) {
-            const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
-            myChoicesElement.classList.add('my-choices-button-order-test');
         }
 
         this.showPage(this._landingPage);

@@ -6,28 +6,22 @@
                     <span class="icon-gdpr"></span>
                 </div>
                 <div class="title item">
-                    <span class="centered-title">Can the Unity cookie collect and use your data to tailor your ads and experience?</span>
+                    <span class="centered-title"><%= data.t("homepage-title") %></span>
                 </div>
                 <div class="description item">
-                    <p>Unity and our <span class="third-parties-link page-link">third-parties</span>
-                        will collect <span class="data-link page-link">data</span>, including
-                        <span class="demographic-link page-link">demographic information</span>, and
-                        use <span class="mobile-identifiers-link page-link">mobile identifiers</span>
-                        for ads & gameplay <span class="personalization-link page-link">personalization</span>
-                        and <span class="measurement-link page-link">measurement</span>. You can access these options at any
-                        time by tapping the Unity Data Privacy icon when or after an ad appears.
-                    </p></div>
+                    <p>
+                        <%= data.t("homepage-main-text") %>
+                    </p>
+                </div>
             </div>
             <div class="stripe"></div>
             <div class="bottom-container">
                 <div class="button-container item">
-                    <div class="accept-all consent-button"><span>Accept</span></div>
+                    <div class="accept-all consent-button">
+                        <span><%= data.t("homepage-accept-all") %></span>
+                    </div>
                     <div class="show-choices consent-button">
-                        <% if(data.useAltMyChoicesButtonText) { %>
-                        <span>Learn more</span>
-                        <% } else { %>
-                        <span>Show my choices</span>
-                        <% } %>
+                        <span><%= data.t("homepage-show-my-choices") %></span>
                     </div>
                 </div>
                 <div class="logo-container">
@@ -59,20 +53,18 @@
 
     <div id="consent-my-choices" class="consent-container">
         <div class="back-button">
-            <span>Back</span>
+            <span><%= data.t("my-choices-back") %></span>
         </div>
 
         <div class="consent-settings">
             <span class="consent-title">
-                Can the Unity cookie collect and use your data to tailor your ads and experience?
+                <%= data.t("my-choices-title") %>
             </span>
             <div class="switch-group-container">
 
             </div>
             <p>
-                Unity and our third-parties will collect data, including demographic information, and use mobile identifiers
-                for ads & gameplay personalization and measurement. You can access these options at any time by tapping the
-                Unity Data Privacy icon when or after an ad appears.
+                <%= data.t("my-choices-text") %>
             </p>
             <div class="privacy-container">
 
@@ -81,15 +73,14 @@
             </div>
         </div>
         <div class="consent-button-container">
-            <% if(data.myChoicesButtonOrderTest) { %>
-            <div class="save-my-choices consent-button"><span>Save my choices</span></div>
-            <div class="disagree consent-button"><span>No thanks</span></div>
-            <div class="agree consent-button"><span>Agree to all</span></div>
+            <div class="save-my-choices consent-button"><span><%= data.t("save-my-choices") %></span></div>
+            <div class="agree consent-button"><span><%= data.t("agree-to-all") %></span></div>
+            <% if(data.myChoicesDisagreeCtaTest) { %>
+            <div class="disagree consent-button"><span><%= data.t("disagree") %></span></div>
             <% } else { %>
-            <div class="save-my-choices consent-button"><span>Save my choices</span></div>
-            <div class="agree consent-button"><span>Agree to all</span></div>
-            <div class="disagree consent-button"><span>No thanks</span></div>
+            <div class="disagree consent-button"><span><%= data.t("no-thanks") %></span></div>
             <% } %>
+
         </div>
     </div>
 </div>

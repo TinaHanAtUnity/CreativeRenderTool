@@ -192,30 +192,6 @@
     color: $white;
   }
 
-  &.my-choices-button-order-test {
-    .agree {
-      display: block;
-      flex-grow: 1;
-      margin-left: $default-size;
-      background: $consent-blue;
-      color: $white;
-    }
-
-    .disagree {
-      display: block;
-      margin-left: 0;
-      border: 1px solid $consent-border-gray;
-      color: $black;
-    }
-
-    .save-my-choices {
-      display: none;
-      flex-grow: 1;
-      background: $consent-blue;
-      color: $white;
-    }
-  }
-
   .consent-button-container:not(.show-save-my-choices-button) {
     .agree {
       display: block;
@@ -470,7 +446,7 @@ body {
       position: relative;
       align-self: center;
       margin: 0 $default-size;
-      padding: 1.5 * $default-size 1.5 * $default-size $default-size 1.5 * $default-size;
+      padding: $default-size $default-size $default-size $default-size;
       border-radius: .5 * $default-size;
       background: white;
     }

@@ -87,6 +87,8 @@
 
       .row-button {
         flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: 0;
         padding: $default-size;
         border-radius: .25 * $default-size;
         background: $white-smoke;
@@ -96,7 +98,11 @@
       }
 
       .report-ad-button {
-        margin-right: .5 * $default-size;
+        margin-right: .25 * $default-size;
+      }
+
+      .build-info-button {
+        margin-left: .25 * $default-size;
       }
     }
 
@@ -204,18 +210,6 @@
     min-height: 4 * $default-size;
   }
 
-  #delete-your-data-button {
-    padding: $default-size 0;
-    color: $privacy-red;
-    text-align: left;
-    font-weight: $privacy-title-font-weight;
-    font-size: $privacy-heading-font-size;
-
-    .consent-icon-alert {
-      padding: 0 .25 * $default-size 0 0;
-    }
-  }
-
   .delete-data-confirm {
     display: none;
   }
@@ -247,9 +241,6 @@
   }
 
   .delete-data-container.active {
-    #delete-your-data-button {
-      display: none;
-    }
 
     .delete-data-confirm {
       display: block;
@@ -264,9 +255,6 @@
   }
 
   .delete-data-container.data-deletion-confirmed {
-    #delete-your-data-button {
-      display: none;
-    }
 
     .delete-data-confirm {
       display: none;
