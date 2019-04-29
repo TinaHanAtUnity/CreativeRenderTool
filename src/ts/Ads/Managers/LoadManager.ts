@@ -158,7 +158,7 @@ export class LoadManager extends RefreshManager {
 
     private getStoredLoad(key: string): Promise<string | undefined> {
         return this._core.Storage.get<ILoadEvent>(StorageType.PUBLIC, 'load.' + key).then(loadEvent => {
-            if(loadEvent.ts && loadEvent.ts > this._clientInfo.getInitTimestamp()) { // ignore loads before SDK init
+            if(loadEvent.ts && loadEvent.ts > this._clientInfo.getInitTimestamp() - 60000) { // ignore loads 60 seconds older than SDK init timestamp
                 return loadEvent.value;
             } else {
                 return undefined;
