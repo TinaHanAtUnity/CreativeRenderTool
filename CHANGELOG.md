@@ -1,5 +1,9 @@
 # Staged
 
+* Consent A/B test: add a new consent CTA test and remove the old one [#9271](https://github.com/Applifier/unity-ads-webview/pull/9271)
+
+# Fri Apr 26 16:24:40 UTC 2019
+
 * Fix Banner Limited Ad Tracking Metric [#9274](https://github.com/Applifier/unity-ads-webview/pull/9274)
 * Remove Auction V4 Whitelist and iOS Crash Test [#9249](https://github.com/Applifier/unity-ads-webview/pull/9249)
 * Revert "Add stages for tests and deployment" [#9248](https://github.com/Applifier/unity-ads-webview/pull/9248)

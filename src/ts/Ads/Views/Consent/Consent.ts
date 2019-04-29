@@ -25,7 +25,6 @@ export interface IConsentViewParameters {
     language: string;
     apiLevel?: number;
     osVersion?: string;
-    useAltMyChoicesButtonText: boolean;
     pts: ProgrammaticTrackingService;
     ctaABTest: boolean;
 }
@@ -65,8 +64,7 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
 
         this._template = new Template(ConsentTemplate, new Localization(parameters.language, 'consent'));
         this._templateData = {
-            useAltMyChoicesButtonText: parameters.useAltMyChoicesButtonText,
-            myChoicesButtonOrderTest: parameters.ctaABTest
+            myChoicesDisagreeCtaTest: parameters.ctaABTest
         };
 
         this._bindings = [
@@ -175,11 +173,6 @@ export class Consent extends View<IConsentViewHandler> implements IPrivacyRowIte
         if (this._landingPage === ConsentPage.HOMESCREEN) {
             const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
             myChoicesElement.classList.add('show-back-button');
-        }
-
-        if (this._isCtaAbTest) {
-            const myChoicesElement = (<HTMLElement>this._container.querySelector('#consent-my-choices'));
-            myChoicesElement.classList.add('my-choices-button-order-test');
         }
 
         this.showPage(this._landingPage);
