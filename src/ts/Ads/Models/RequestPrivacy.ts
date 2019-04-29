@@ -1,5 +1,12 @@
-import { IAllPermissions, IPermissions, IProfilingPermissions, PrivacyMethod } from 'Ads/Models/Privacy';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import {
+    GamePrivacy,
+    IAllPermissions,
+    IGranularPermissions,
+    IPermissions,
+    IProfilingPermissions,
+    PrivacyMethod,
+    UserPrivacy
+} from 'Ads/Models/Privacy';
 
 export interface IRequestPrivacy {
     method: PrivacyMethod;
@@ -18,19 +25,7 @@ function isProfilingPermissions(permissions: IPermissions | { [key: string]: nev
 }
 
 export class RequestPrivacyFactory {
-    public static create(adsConfig : AdsConfiguration): IRequestPrivacy {
-        const gamePrivacy = adsConfig.getGamePrivacy();
-        if (gamePrivacy.getMethod() === PrivacyMethod.LEGITIMATE_INTEREST) {
-            return {
-                method: PrivacyMethod.LEGITIMATE_INTEREST,
-                firstRequest: !adsConfig.isOptOutRecorded(),
-                permissions: {
-                    profiling: !adsConfig.isOptOutEnabled()
-                }
-            };
-        }
-
-        const userPrivacy = adsConfig.getUserPrivacy();
+    public static create(userPrivacy: UserPrivacy, gamePrivacy: GamePrivacy): IRequestPrivacy {
         if (!userPrivacy.isRecorded()) {
             return {
                 method: gamePrivacy.getMethod(),
@@ -38,21 +33,29 @@ export class RequestPrivacyFactory {
                 permissions: {}
             };
         }
+        return {
+            method: userPrivacy.getMethod(),
+            firstRequest: false,
+            permissions: RequestPrivacyFactory.toGranularPermissions(userPrivacy)
+        };
+    }
 
-        let permissions = userPrivacy.getPermissions();
+    private static toGranularPermissions(userPrivacy: UserPrivacy): IGranularPermissions {
+        //TODO: Add other methods after hotfix is working
+        if (userPrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
+            return <IGranularPermissions>{};
+        }
+        const permissions = userPrivacy.getPermissions();
+
         if ((<IAllPermissions>permissions).all === true) {
-            permissions = {
+            return {
                 gameExp: true,
                 ads: true,
                 external: true
             };
         }
 
-        return {
-            method: userPrivacy.getMethod(),
-            firstRequest: false,
-            permissions: permissions
-        };
+        return <IGranularPermissions>permissions;
     }
 
     public static createLegacy(privacy: IRequestPrivacy): ILegacyRequestPrivacy {
