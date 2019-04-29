@@ -38,7 +38,6 @@ export class Slider {
     private _isVisible: boolean;
     private _onSlideCallback: OnSlideCallback;
     private _onDownloadCallback: OnDownloadCallback;
-    private imageOrientation: string;
 
     constructor(urls: string[], imageOrientation: 'portrait' | 'landscape', onSlideCallback: OnSlideCallback, onDownloadCallback: OnDownloadCallback) {
         this._onSlideCallback = onSlideCallback;
@@ -59,7 +58,6 @@ export class Slider {
         };
 
         this._isVisible = true;
-        this.imageOrientation = imageOrientation;
         imageOrientation === 'portrait' ? this.slidesPerPage = 1.666 : this.slidesPerPage = 1.3;
         this._rootEl = this.createElement('div', 'slider-root-container', ['slider-wrap', `${imageOrientation}-slider-images`]);
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
