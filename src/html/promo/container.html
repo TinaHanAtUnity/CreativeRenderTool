@@ -439,6 +439,7 @@
             clearInterval(animationInterval)
             document.getElementsByClassName("btn-close")[orientationIndex].style.visibility = "visible";
             document.getElementsByClassName("progress")[orientationIndex].style.visibility = "hidden";
+            setCloseButtonVisible();
         }
     }
 
@@ -462,6 +463,11 @@
     function purchase() {
         window.parent.postMessage({
             type: "promo"
+        }, '*');
+    }
+    function setCloseButtonVisible() {
+        window.parent.postMessage({
+            type: "closeButtonVisible"
         }, '*');
     }
 </script>

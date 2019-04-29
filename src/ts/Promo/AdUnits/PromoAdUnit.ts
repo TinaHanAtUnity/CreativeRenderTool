@@ -130,7 +130,9 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private onKeyDown(key: number) {
-        if (key === KeyCode.BACK && this._placement.allowSkip()) {
+        const isRewardedBackPress = this._promoView.isRewardedCloseVisible();
+        const isNonRewardedBackPress = this._placement.allowSkip();
+        if (KeyCode.BACK && (isRewardedBackPress || isNonRewardedBackPress)) {
             this._promoView.onClose.trigger();
         }
     }
