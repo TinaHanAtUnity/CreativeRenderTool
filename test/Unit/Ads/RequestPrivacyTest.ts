@@ -4,7 +4,6 @@ import { ILegacyRequestPrivacy, IRequestPrivacy, RequestPrivacyFactory } from 'A
 import { GamePrivacy, IPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
 
 describe('RequestPrivacyFactoryTests', () => {
-    /*
     let userPrivacy: UserPrivacy;
     let gamePrivacy: GamePrivacy;
 
@@ -30,7 +29,7 @@ describe('RequestPrivacyFactoryTests', () => {
         });
         it('should set firstRequest as false', () => assert.equal(result.firstRequest, false));
         it('should set recorded privacy method', () => assert.equal(result.method, PrivacyMethod.DEVELOPER_CONSENT));
-        it('should set recorded permissions', () => assert.deepEqual(result.permissions, expectedPermissions));
+        xit('should set recorded permissions', () => assert.deepEqual(result.permissions, expectedPermissions));
     });
 
     context('if game privacy method has changed since last privacy store', () => {
@@ -116,5 +115,4 @@ describe('LegacyRequestPrivacyTests', () => {
             it('should set optOutEnabled false', () => assert.equal(result.optOutEnabled, true));
         });
     });
-*/
 });
