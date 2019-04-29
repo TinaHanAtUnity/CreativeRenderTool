@@ -12,34 +12,43 @@ export interface ITrackingIdentifier {
 
 export class TrackingIdentifierFilter {
     public static getDeviceTrackingIdentifiers(platform: Platform, sdkVersionName: string, deviceInfo: DeviceInfo): ITrackingIdentifier {
-        const adIds: ITrackingIdentifier = {
-            advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
-            limitAdTracking: deviceInfo.getLimitAdTracking()
-        };
-        let personalIds: ITrackingIdentifier = {};
+        let trackingIdentifiers: ITrackingIdentifier = {};
 
-        if (platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
-            if (deviceInfo.getAndroidId()) {
-                personalIds = {
+        if (CustomFeatures.isChinaSDK(platform, sdkVersionName) && deviceInfo instanceof AndroidDeviceInfo) {
+            if (deviceInfo.getAndroidId() || deviceInfo.getDeviceId1()) {
+                trackingIdentifiers = {
                     androidId: deviceInfo.getAndroidId()
                 };
-            }
-            if (deviceInfo.getDeviceId1()) {
-                personalIds = {
-                    ...personalIds,
-                    imei: deviceInfo.getDeviceId1()
+                if (deviceInfo.getDeviceId1()) {
+                    trackingIdentifiers = {
+                        ...trackingIdentifiers,
+                        imei: deviceInfo.getDeviceId1()
+                    };
+                }
+            } else {
+                trackingIdentifiers = {
+                    advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
+                    limitAdTracking: deviceInfo.getLimitAdTracking()
                 };
             }
+        } else {
+            if (deviceInfo.getAdvertisingIdentifier()) {
+                trackingIdentifiers = {
+                    advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
+                    limitAdTracking: deviceInfo.getLimitAdTracking()
+                };
+            } else if(platform === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
+                trackingIdentifiers = {
+                    androidId: deviceInfo.getAndroidId()
+                };
+                if (deviceInfo.getDeviceId1()) {
+                    trackingIdentifiers = {
+                        ...trackingIdentifiers,
+                        imei: deviceInfo.getDeviceId1()
+                    };
+                }
+            }
         }
-
-        if (CustomFeatures.isChinaSDK(platform, sdkVersionName) && Object.keys(personalIds).length > 0) {
-            return personalIds;
-        }
-
-        if (adIds.advertisingTrackingId && adIds.limitAdTracking) {
-            return adIds;
-        }
-
-        return personalIds;
+        return trackingIdentifiers;
     }
 }
