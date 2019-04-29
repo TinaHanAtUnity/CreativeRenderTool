@@ -360,6 +360,8 @@
         var animationTime = '<%=data.rewardedPromoTimerDuration%>';
         if (animationTime > 0) {
             startTimerAnimation(animationTime)
+        } else {
+            setCloseButtonVisible();
         }
         document.querySelector('#promo .promo-container').classList.add('start-animation');
     }
