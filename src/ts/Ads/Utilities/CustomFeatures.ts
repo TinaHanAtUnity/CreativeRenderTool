@@ -127,16 +127,11 @@ export class CustomFeatures {
         return false;
     }
 
-    // Following 2 functions could be merged at some point later
     public static isSliderEndScreenEnabled(abGroup: ABGroup, targetGameAppStoreId: string): boolean {
-        // TODO: Also check for the gameid in real use case;
-        //return SliderEndCardExperiment.isValid() && this.existsInList(SliderEndScreenTargetGameIds, '' + targetGameAppStoreId);
-        return SliderEndCardExperiment.isValid(abGroup);
+        return SliderEndCardExperiment.isValid(abGroup) && this.existsInList(SliderEndScreenTargetGameIds, '' + targetGameAppStoreId);
     }
 
     public static getSliderEndScreenImagesForGame(targetGameAppStoreId: string): ISliderEndScreenImagesForGame {
-        // TODO: Remove line below for not forcing the slider
-        targetGameAppStoreId = SliderEndScreenTargetGameIds[Math.floor(Math.random() * 18)];
         return SliderEndScreenImages[targetGameAppStoreId];
     }
 }

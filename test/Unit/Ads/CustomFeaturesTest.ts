@@ -1,6 +1,7 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { assert } from 'chai';
 import 'mocha';
+import { toAbGroup } from 'Core/Models/ABGroup';
 
 describe('CustomFeatures', () => {
 
@@ -57,6 +58,28 @@ describe('CustomFeatures', () => {
         it('should return false if gameId is 99999', () => {
             const value = CustomFeatures.isCloseIconSkipEnabled('99999');
             assert.isFalse(value);
+        });
+    });
+
+    describe('isSliderEndScreenEnabled', () => {
+        it('should return true if ab group is 7 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '547145938');
+            assert.isTrue(isEnabled);
+        });
+
+        it('should return false if ab group is 7 and targetGameAppStoreId is not in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(7), '-1');
+            assert.isFalse(isEnabled);
+        });
+
+        it('should return false if ab group is 1 and targetGameAppStoreId is in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(1), '547145938');
+            assert.isFalse(isEnabled);
+        });
+
+        it('should return false if ab group is 1 and targetGameAppStoreId is not in the SliderEndScreenTargetGameIds.', () => {
+            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(1), '-1');
+            assert.isFalse(isEnabled);
         });
     });
 });
