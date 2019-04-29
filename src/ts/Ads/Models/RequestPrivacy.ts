@@ -1,4 +1,12 @@
-import { GamePrivacy, IPermissions, IProfilingPermissions, PrivacyMethod, UserPrivacy } from 'Ads/Models/Privacy';
+import {
+    GamePrivacy,
+    IAllPermissions,
+    IGranularPermissions,
+    IPermissions,
+    IProfilingPermissions,
+    PrivacyMethod,
+    UserPrivacy
+} from 'Ads/Models/Privacy';
 
 export interface IRequestPrivacy {
     method: PrivacyMethod;
@@ -28,8 +36,26 @@ export class RequestPrivacyFactory {
         return {
             method: userPrivacy.getMethod(),
             firstRequest: false,
-            permissions: userPrivacy.getPermissions()
+            permissions: RequestPrivacyFactory.toGranularPermissions(userPrivacy)
         };
+    }
+
+    private static toGranularPermissions(userPrivacy: UserPrivacy): IGranularPermissions {
+        //TODO: Add other methods after hotfix is working
+        if (userPrivacy.getMethod() !== PrivacyMethod.UNITY_CONSENT) {
+            return <IGranularPermissions>{};
+        }
+        const permissions = userPrivacy.getPermissions();
+
+        if ((<IAllPermissions>permissions).all === true) {
+            return {
+                gameExp: true,
+                ads: true,
+                external: true
+            };
+        }
+
+        return <IGranularPermissions>permissions;
     }
 
     public static createLegacy(privacy: IRequestPrivacy): ILegacyRequestPrivacy {
