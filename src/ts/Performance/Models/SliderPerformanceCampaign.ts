@@ -2,9 +2,6 @@ import { IPerformanceCampaign, PerformanceCampaign } from 'Performance/Models/Pe
 import { Asset } from 'Ads/Models/Assets/Asset';
 
 export class SliderPerformanceCampaign extends PerformanceCampaign {
-    constructor(campaign: IPerformanceCampaign) {
-        super(campaign);
-    }
 
     public getOptionalAssets() {
         const assets: Asset[] = [];
