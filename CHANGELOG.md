@@ -1,7 +1,13 @@
-# Staged
+# Pending
+
+* Add Metrics to Track User Behavior in China [#9345](https://github.com/Applifier/unity-ads-webview/pull/9345)
+
+# Tue Apr 30 10:27:46 UTC 2019
 
 * Consent A/B test: add a new consent CTA test and remove the old one [#9271](https://github.com/Applifier/unity-ads-webview/pull/9271)
-* Deprecating ProgrammaticVastParserStrict in favor of ProgrammaticVastParser [#9298](https://github.com/Applifier/unity-ads-webview/pull/9298)
+* Deprecate ProgrammaticVastParserStrict in favor of ProgrammaticVastParser [#9298](https://github.com/Applifier/unity-ads-webview/pull/9298)
+* Fix back button exit for rewarded promo [#9321](https://github.com/Applifier/unity-ads-webview/pull/9321)
+* Remove Banner Limited Ad Tracking Diagnostic [#9299](https://github.com/Applifier/unity-ads-webview/pull/9299)
 
 # Fri Apr 26 16:24:40 UTC 2019
 

@@ -33,7 +33,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -228,6 +228,8 @@ export class Ads implements IAds {
                     Diagnostics.trigger('read_device_permission_error', error);
                 });
             }
+
+            this.logChinaInitMetric();
 
             const parserModules: AbstractParserModule[] = [
                 new AdMob(this._core, this),
@@ -643,6 +645,33 @@ export class Ads implements IAds {
 
         if(TestEnvironment.get('debugJsConsole')) {
             MRAIDView.setDebugJsConsole(TestEnvironment.get('debugJsConsole'));
+        }
+    }
+
+    private logChinaInitMetric(): void {
+        // Only report metrics for users in China
+        if (this._core.Config.getCountry() === 'CN') {
+            this._core.DeviceInfo.getNetworkOperator().then(networkOperator => {
+                if (networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460') {
+                    this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaNetworkOperatorIsValid);
+                } else {
+                    this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaNetworkOperatorIsNotValid);
+                }
+            });
+        }
+
+        // Only report metrics for localization of Chinese
+        const deviceLanguage = this._core.DeviceInfo.getLanguage().toLowerCase();
+        if (deviceLanguage.match(/zh[-_]cn/) || deviceLanguage.match(/zh[-_]hans/) || deviceLanguage.match(/zh(((_#?hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?hans)?))$/)) {
+            this._core.DeviceInfo.getConnectionType().then(connectionType => {
+                if (connectionType === 'wifi') {
+                    if (this._core.Config.getCountry() === 'CN') {
+                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaWifiInitializeInChina);
+                    } else {
+                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaWifiInitializeOutisdeChina);
+                    }
+                }
+            });
         }
     }
 }

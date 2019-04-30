@@ -19,7 +19,12 @@ export enum ProgrammaticTrackingMetricName {
     BannerAdImpression = 'banner_ad_impression',
     BannerAdRequestWithLimitedAdTracking = 'banner_ad_request_with_limited_ad_tracking',
 
-    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked'
+    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
+
+    ChinaNetworkOperatorIsValid = 'valid_china_network_operator',
+    ChinaNetworkOperatorIsNotValid = 'invalid_china_network_operator',
+    ChinaWifiInitializeInChina = 'china_initialize_on_wifi_in_china',
+    ChinaWifiInitializeOutisdeChina = 'china_initialize_on_wifi_outside_of_china'
 }
 
 export interface IProgrammaticTrackingData {
