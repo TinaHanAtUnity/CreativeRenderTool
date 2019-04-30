@@ -24,20 +24,14 @@ if (typeof navigator !== 'undefined') {
 const animationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 let runningResizeEvent = false;
 
-export const detectOrientation = () => {
+const changeOrientation = () => {
+
     // Calculate orientation based on width and height by default
     let orientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
 
     if (typeof window.orientation !== 'undefined' && platform === 'ios' && !isIOS7) {
         orientation = (Math.abs(<number>window.orientation) === 90) ? 'landscape' : 'portrait';
     }
-
-    return orientation;
-};
-
-const changeOrientation = () => {
-
-    const orientation = detectOrientation();
 
     document.body.classList.remove('landscape');
     document.body.classList.remove('portrait');
@@ -95,8 +89,7 @@ const onChangeOrientation = () => {
 document.addEventListener('DOMContentLoaded', onChangeOrientation, false);
 window.addEventListener('orientationchange', onChangeOrientation, false);
 
-// TODO: Avoid run this *if* in browser
-if(typeof location !== 'undefined' && location.href.indexOf('build/browser') === -1) {
+if(typeof location !== 'undefined') {
     let nativeBridge: NativeBridge;
     switch(platform) {
         case 'android':
@@ -110,6 +103,7 @@ if(typeof location !== 'undefined' && location.href.indexOf('build/browser') ===
                 nativeBridge = new NativeBridge(new UIWebViewBridge(), Platform.IOS);
             }
             break;
+
         default:
             throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
     }
