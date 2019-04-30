@@ -46,7 +46,7 @@ import { ContentTypeHandlerManager } from 'Ads/Managers/ContentTypeHandlerManage
 import { CreativeBlocking, BlockingReason } from 'Core/Utilities/CreativeBlocking';
 import { IRequestPrivacy, RequestPrivacyFactory } from 'Ads/Models/RequestPrivacy';
 import { CampaignContentTypes } from 'Ads/Utilities/CampaignContentTypes';
-import { ProgrammaticVastParserStrict } from 'VAST/Parsers/ProgrammaticVastParser';
+import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { TrackingIdentifierFilter } from 'Ads/Utilities/TrackingIdentifierFilter';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
@@ -563,7 +563,7 @@ export class CampaignManager {
 
         const parseTimestamp = Date.now();
         return parser.parse(response, session).catch((error) => {
-            if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === ProgrammaticVastParserStrict.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
+            if (error instanceof CampaignError && error.contentType === CampaignContentTypes.ProgrammaticVast && error.errorCode === ProgrammaticVastParser.MEDIA_FILE_GIVEN_VPAID_IN_VAST_AD) {
                 parser = this.getCampaignParser(CampaignContentTypes.ProgrammaticVpaid);
                 return parser.parse(response, session);
             } else {
