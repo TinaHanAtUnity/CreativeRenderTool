@@ -242,7 +242,7 @@ export class Ads implements IAds {
 
             // Only report metrics for localization of Chinese
             const deviceLanguage = this._core.DeviceInfo.getLanguage().toLowerCase();
-            if (deviceLanguage.startsWith('zh_cn') || deviceLanguage.startsWith('zh-hans')) {
+            if (deviceLanguage.match(/zh_cn|zh-cn/) || deviceLanguage.match(/zh-hans|zh_hans/)) {
                 this._core.DeviceInfo.getConnectionType().then(connectionType => {
                     if (connectionType === 'wifi') {
                         if (this._core.Config.getCountry() === 'CN') {
