@@ -33,7 +33,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -226,6 +226,17 @@ export class Ads implements IAds {
                     Diagnostics.trigger('read_device_permission', {readDeviceSupported, permissionInManifest});
                 }).catch(error => {
                     Diagnostics.trigger('read_device_permission_error', error);
+                });
+            }
+
+            if (this._core.Config.getCountry() === 'CN') {
+                this._core.DeviceInfo.getNetworkOperator().then(networkOperator => {
+                    if (networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460') {
+                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaInitializeWithSimCard);
+                    } else {
+                        // Assume they are on wifi if they initialize without a network operator
+                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaInitializeWithoutSimCard);
+                    }
                 });
             }
 

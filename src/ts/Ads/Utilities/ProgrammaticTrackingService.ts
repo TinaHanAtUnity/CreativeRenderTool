@@ -19,7 +19,10 @@ export enum ProgrammaticTrackingMetricName {
     BannerAdImpression = 'banner_ad_impression',
     BannerAdRequestWithLimitedAdTracking = 'banner_ad_request_with_limited_ad_tracking',
 
-    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked'
+    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
+
+    ChinaInitializeWithSimCard = 'china_initialize_with_sim_card',
+    ChinaInitializeWithoutSimCard = 'china_initialize_without_sim_card'
 }
 
 export interface IProgrammaticTrackingData {
