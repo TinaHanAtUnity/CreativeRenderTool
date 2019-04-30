@@ -77,17 +77,20 @@ export class Slider {
         this._rootEl.appendChild(blurredBackground);
 
         for (let i = this.imageUrls.length - cloneSlidesAmount; i < this.imageUrls.length; i++) {
-            allSlidesCreatedPromise.push(this.createSlide(this.imageUrls[i]));
+            allSlidesCreatedPromise.push(this.createSlide(this.imageUrls[i]).catch(() => null));
         }
         this.imageUrls.forEach((url, i) => {
-            allSlidesCreatedPromise.push(this.createSlide(url));
+            allSlidesCreatedPromise.push(this.createSlide(url).catch(() => null));
         });
 
         this._ready = Promise.all(allSlidesCreatedPromise).then((slides) => {
             this._slidesContainer.innerHTML = '';
             slides.forEach((slide) => {
-                this._slidesContainer.append(slide);
+                if (slide) {
+                    this._slidesContainer.appendChild(slide);
+                }
             });
+
             this._rootEl.appendChild(this._slidesContainer);
             this.slidesContainerWidth = this._slidesContainer.offsetWidth;
             this.init();
