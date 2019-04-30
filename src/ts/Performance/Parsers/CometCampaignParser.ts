@@ -28,11 +28,13 @@ export class CometCampaignParser extends CampaignParser {
 
     private _requestManager: RequestManager;
     private _abGroup: ABGroup;
+    private _core: ICore;
 
     constructor(core: ICore) {
         super(core.NativeBridge.getPlatform());
         this._requestManager = core.RequestManager;
         this._abGroup = core.Config.getAbGroup();
+        this._core = core;
     }
 
     public parse(response: AuctionResponse, session: Session): Promise<Campaign> {
@@ -150,8 +152,9 @@ export class CometCampaignParser extends CampaignParser {
             }
 
             let promise;
-
-            if (CustomFeatures.isSliderEndScreenEnabled(this._abGroup, parameters.appStoreId)) {
+            const osVersion = this._core.DeviceInfo.getOsVersion();
+            const platform = this._core.NativeBridge.getPlatform();
+            if (CustomFeatures.isSliderEndScreenEnabled(this._abGroup, parameters.appStoreId, osVersion, platform)) {
                 const sliderImages = CustomFeatures.getSliderEndScreenImagesForGame(parameters.appStoreId);
                 const orientation = sliderImages && sliderImages.portrait && sliderImages.portrait.length === 0 ? 'landscape' : 'portrait';
                 parameters.screenshotsOrientation = orientation;

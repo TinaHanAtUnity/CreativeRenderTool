@@ -40,6 +40,11 @@ function setGameIds(gameIdJson: string): string[] {
     return gameIds;
 }
 
+export function matchesMajorOSVersion(majorVersion: number, osVersion: string): boolean {
+    const regex = new RegExp(`^${majorVersion}\\.|^${majorVersion}$`);
+    return regex.test(osVersion);
+}
+
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
         return gameId === '14850' || gameId === '14851';
@@ -127,7 +132,16 @@ export class CustomFeatures {
         return false;
     }
 
-    public static isSliderEndScreenEnabled(abGroup: ABGroup, targetGameAppStoreId: string): boolean {
+    public static isSliderEndScreenEnabled(abGroup: ABGroup, targetGameAppStoreId: string, osVersion: string, platform: Platform): boolean {
+        const isAndroid4 = platform === Platform.ANDROID && matchesMajorOSVersion(4, osVersion);
+        const isIOS7 = platform === Platform.IOS && matchesMajorOSVersion(7, osVersion);
+        const isIOS8 = platform === Platform.IOS && matchesMajorOSVersion(8, osVersion);
+
+        // Exclude Android 4 and iOS 7 & 8 devices from the test because of layout issues
+        if (isAndroid4 || isIOS7 || isIOS8) {
+            return false;
+        }
+
         return SliderEndCardExperiment.isValid(abGroup) && this.existsInList(SliderEndScreenTargetGameIds, '' + targetGameAppStoreId);
     }
 
