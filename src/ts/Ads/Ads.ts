@@ -246,8 +246,9 @@ export class Ads implements IAds {
                     if (connectionType === 'wifi') {
                         if (this._core.Config.getCountry() === 'CN') {
                             this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaWifiInitializeInChina);
+                        } else {
+                            this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaWifiInitializeOutisdeChina);
                         }
-                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaWifiInitializeInChina);
                     }
                 });
             }
