@@ -1,7 +1,9 @@
 # Staged
 
 * Consent A/B test: add a new consent CTA test and remove the old one [#9271](https://github.com/Applifier/unity-ads-webview/pull/9271)
-* Deprecating ProgrammaticVastParserStrict in favor of ProgrammaticVastParser [#9298](https://github.com/Applifier/unity-ads-webview/pull/9298)
+* Deprecate ProgrammaticVastParserStrict in favor of ProgrammaticVastParser [#9298](https://github.com/Applifier/unity-ads-webview/pull/9298)
+* Fix back button exit for rewarded promo [#9299](https://github.com/Applifier/unity-ads-webview/pull/9299)
+* Remove Banner Limited Ad Tracking Diagnostic [#9298](https://github.com/Applifier/unity-ads-webview/pull/9298)
 
 # Fri Apr 26 16:24:40 UTC 2019
 
