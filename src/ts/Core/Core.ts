@@ -135,7 +135,7 @@ export class Core implements ICore {
             if(this.NativeBridge.getPlatform() === Platform.ANDROID) {
                 this.DeviceInfo = new AndroidDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager, <AndroidDeviceInfo>this.DeviceInfo);
-                this.DeviceIdManager = new DeviceIdManager(this.Api, this.DeviceInfo);
+                this.DeviceIdManager = new DeviceIdManager(this.Api, <AndroidDeviceInfo>this.DeviceInfo);
             } else if(this.NativeBridge.getPlatform() === Platform.IOS) {
                 this.DeviceInfo = new IosDeviceInfo(this.Api);
                 this.RequestManager = new RequestManager(this.NativeBridge.getPlatform(), this.Api, this.WakeUpManager);

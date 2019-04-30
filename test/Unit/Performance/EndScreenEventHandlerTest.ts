@@ -293,7 +293,7 @@ describe('EndScreenEventHandlerTest', () => {
                     china = TestFixtures.getChinaApi(nativeBridge);
 
                     downloadManager = new DownloadManager(core, china, (<AndroidDeviceInfo>deviceInfo).getApiLevel());
-                    deviceIdManager = new DeviceIdManager(core, deviceInfo);
+                    deviceIdManager = new DeviceIdManager(core, <AndroidDeviceInfo>deviceInfo);
 
                     const storeHandlerParameters: IStoreHandlerParameters = {
                         platform,

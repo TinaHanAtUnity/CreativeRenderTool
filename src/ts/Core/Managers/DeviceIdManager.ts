@@ -1,6 +1,5 @@
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { StorageType } from 'Core/Native/Storage';
 import { CurrentPermission, PermissionsUtil, PermissionTypes } from 'Core/Utilities/Permissions';
 import { ICoreApi } from 'Core/ICore';
@@ -19,9 +18,9 @@ export enum DeviceIdStorageKeys {
 
 export class DeviceIdManager {
     private _core : ICoreApi;
-    private _deviceInfo: DeviceInfo;
+    private _deviceInfo: AndroidDeviceInfo;
 
-    constructor(core: ICoreApi, deviceInfo: DeviceInfo) {
+    constructor(core: ICoreApi, deviceInfo: AndroidDeviceInfo) {
         this._core = core;
         this._deviceInfo = deviceInfo;
     }
@@ -47,7 +46,7 @@ export class DeviceIdManager {
     public getDeviceIdsWithPermissionRequest(): Promise<void> {
         const deviceIdPromise = new Promise<void>((resolve, reject) => {
             this.getDeviceIds().then(resolve).catch((error) => {
-                if (error.message === DeviceIdMessage.PERMISSION_ERROR && (<AndroidDeviceInfo>this._deviceInfo).getApiLevel() >= BuildVerionCode.M) {
+                if (error.message === DeviceIdMessage.PERMISSION_ERROR && this._deviceInfo.getApiLevel() >= BuildVerionCode.M) {
                     Diagnostics.trigger('device_id_permission', 'Permission requested');
                     this.handlePermissionRequest(PermissionTypes.READ_PHONE_STATE).then(() => {
                         Diagnostics.trigger('device_id_permission', 'Permission granted upon request');
@@ -72,7 +71,7 @@ export class DeviceIdManager {
     public loadStoredDeviceIds(): Promise<void> {
         return this.fetchStoredDeviceIds().then(([deviceId1, deviceId2]) => {
             if (deviceId1 && deviceId2) {
-                (<AndroidDeviceInfo>this._deviceInfo).setDeviceIds(deviceId1, deviceId2);
+                this._deviceInfo.setDeviceIds(deviceId1, deviceId2);
                 return Promise.resolve();
             } else {
                 return Promise.reject(new Error('Device ids not found in cache'));
@@ -95,7 +94,7 @@ export class DeviceIdManager {
 
     private fetchDeviceIds(): Promise<void> {
         return new Promise<[string, string]>((resolve, reject) => {
-            if ((<AndroidDeviceInfo>this._deviceInfo).getApiLevel() <= BuildVerionCode.M) {
+            if (this._deviceInfo.getApiLevel() <= BuildVerionCode.M) {
                 return this._core.DeviceInfo.Android!.getDeviceId().then((deviceId) => {
                     resolve([deviceId, deviceId]);
                 }).catch(reject);
@@ -106,7 +105,7 @@ export class DeviceIdManager {
             }
         }).then(([deviceId1, deviceId2]) => {
             if (deviceId1 && deviceId2) {
-                (<AndroidDeviceInfo>this._deviceInfo).setDeviceIds(deviceId1, deviceId2);
+                this._deviceInfo.setDeviceIds(deviceId1, deviceId2);
             } else {
                 this._core.Sdk.logInfo(`Device ids fetched were invalid deviceId1: ${deviceId1} deviceId2: ${deviceId2}`);
             }
@@ -143,8 +142,8 @@ export class DeviceIdManager {
     }
 
     private storeDeviceIds(): Promise<(void[])[]> {
-        const deviceId1 = (<AndroidDeviceInfo>this._deviceInfo).getDeviceId1();
-        const deviceId2 = (<AndroidDeviceInfo>this._deviceInfo).getDeviceId2();
+        const deviceId1 = this._deviceInfo.getDeviceId1();
+        const deviceId2 = this._deviceInfo.getDeviceId2();
         if (deviceId1 && deviceId2) {
             return Promise.all([
                 this.storeValue(DeviceIdStorageKeys.DEVICE_ID1, deviceId1),
