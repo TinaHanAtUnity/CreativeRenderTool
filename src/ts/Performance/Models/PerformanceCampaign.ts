@@ -181,7 +181,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return 0;
     }
 
-    public getRequiredAssets(): Asset[] {
+    public getRequiredAssets() {
         return [];
     }
 
