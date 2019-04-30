@@ -229,13 +229,25 @@ export class Ads implements IAds {
                 });
             }
 
+            // Only report metrics for users in China
             if (this._core.Config.getCountry() === 'CN') {
                 this._core.DeviceInfo.getNetworkOperator().then(networkOperator => {
                     if (networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460') {
-                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaInitializeWithSimCard);
+                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaNetworkOperatorIsValid);
                     } else {
-                        // Assume they are on wifi if they initialize without a network operator
-                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaInitializeWithoutSimCard);
+                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaNetworkOperatorIsNotValid);
+                    }
+                });
+            }
+
+            // Only report metrics for localization of Chinese
+            if (this._core.DeviceInfo.getLanguage() === 'cn') {
+                this._core.DeviceInfo.getConnectionType().then(connectionType => {
+                    if (connectionType === 'wifi') {
+                        if (this._core.Config.getCountry() === 'CN') {
+                            this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaWifiInitializeInChina);
+                        }
+                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaWifiInitializeInChina);
                     }
                 });
             }

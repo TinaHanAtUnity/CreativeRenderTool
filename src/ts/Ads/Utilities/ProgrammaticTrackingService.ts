@@ -21,8 +21,10 @@ export enum ProgrammaticTrackingMetricName {
 
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
 
-    ChinaInitializeWithSimCard = 'china_initialize_with_sim_card',
-    ChinaInitializeWithoutSimCard = 'china_initialize_without_sim_card'
+    ChinaNetworkOperatorIsValid = 'valid_china_network_operator',
+    ChinaNetworkOperatorIsNotValid = 'invalid_china_network_operator',
+    ChinaWifiInitializeInChina = 'china_initialize_on_wifi_in_china',
+    ChinaWifiInitializeOutisdeChina = 'china_initialize_on_wifi_outside_of_china'
 }
 
 export interface IProgrammaticTrackingData {
