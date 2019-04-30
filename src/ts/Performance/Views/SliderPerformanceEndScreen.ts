@@ -17,7 +17,7 @@ export class SliderPerformanceEndScreen extends EndScreen {
     private _slider: Slider;
     private _sliderEventParameters: ISliderEventParameters;
     private _showTimestamp: number;
-    private _sliderEventSent: boolean;
+    private _sliderUsageDataEventSent: boolean;
 
     constructor(parameters: IEndScreenParameters, campaign: SliderPerformanceCampaign) {
         super(parameters);
@@ -45,7 +45,7 @@ export class SliderPerformanceEndScreen extends EndScreen {
             sliderReadyWhenShown: undefined
         };
 
-        this._sliderEventSent = false;
+        this._sliderUsageDataEventSent = false;
 
         this._slider = new Slider(screenshots, campaign.getScreenshotsOrientation(), this.onSlideCallback, this.onDownloadCallback);
     }
@@ -71,11 +71,11 @@ export class SliderPerformanceEndScreen extends EndScreen {
         this._sliderEventParameters.manualSlideCount += 1;
     }
 
-    private sendSlideEventToKafka() {
-        if (this._sliderEventSent) {
+    private sendSliderUsageDataEventToKafka() {
+        if (this._sliderUsageDataEventSent) {
             return;
         }
-        this._sliderEventSent = true;
+        this._sliderUsageDataEventSent = true;
 
         const kafkaObject: { [key: string]: unknown } = this._sliderEventParameters;
         kafkaObject.type = 'slider_data';
@@ -91,7 +91,7 @@ export class SliderPerformanceEndScreen extends EndScreen {
         // Hide seems to be called first time when the ad is shown before 'show' call so guard
         // against not sending event when that happens.
         if (this._showTimestamp) {
-            this.sendSlideEventToKafka();
+            this.sendSliderUsageDataEventToKafka();
         }
     }
 
@@ -103,7 +103,7 @@ export class SliderPerformanceEndScreen extends EndScreen {
     protected onDownloadEvent(event: Event): void {
         event.preventDefault();
         this._sliderEventParameters.downloadClicked = true;
-        this.sendSlideEventToKafka();
+        this.sendSliderUsageDataEventToKafka();
         this._handlers.forEach(handler => handler.onEndScreenDownload({
             clickAttributionUrl: this._campaign.getClickAttributionUrl(),
             clickAttributionUrlFollowsRedirects: this._campaign.getClickAttributionUrlFollowsRedirects(),
