@@ -218,17 +218,6 @@ export class Ads implements IAds {
                 });
             }
 
-            if (this._core.Config.getCountry() === 'CN' && this._core.NativeBridge.getPlatform() === Platform.ANDROID && this.SessionManager.getGameSessionId() % 100 === 0) {
-                Promise.all([
-                    PermissionsUtil.checkPermissionInManifest(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.READ_PHONE_STATE),
-                    PermissionsUtil.checkPermissions(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.READ_PHONE_STATE)
-                ]).then(([readDeviceSupported, permissionInManifest]) => {
-                    Diagnostics.trigger('read_device_permission', {readDeviceSupported, permissionInManifest});
-                }).catch(error => {
-                    Diagnostics.trigger('read_device_permission_error', error);
-                });
-            }
-
             this.logChinaMetrics();
 
             const parserModules: AbstractParserModule[] = [
@@ -660,8 +649,11 @@ export class Ads implements IAds {
             this._core.DeviceInfo.getConnectionType().then(connectionType => {
                 if (connectionType === 'wifi') {
                     this._core.Ads.ProgrammaticTrackingService.reportMetric(metric);
+                    const timeZone = this._core.DeviceInfo.getTimeZone();
+                    if (timeZone === 'GMT+08:00') { // Need to verify that this is the correct time zone representation
+                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChineseTimeZoneUser);
+                    }
                 }
-                // Potentially add a timezone check as well to check for that traffic?
             });
         }
     }

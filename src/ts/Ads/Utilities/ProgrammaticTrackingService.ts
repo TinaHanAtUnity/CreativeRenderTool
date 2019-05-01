@@ -21,10 +21,11 @@ export enum ProgrammaticTrackingMetricName {
 
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
 
-    ChinaNetworkOperatorIsValid = 'valid_china_network_operator',
-    ChinaNetworkOperatorIsNotValid = 'invalid_china_network_operator',
-    ChinaWifiInitializeInChina = 'china_initialize_on_wifi_in_china',
-    ChinaWifiInitializeOutisdeChina = 'china_initialize_on_wifi_outside_of_china'
+    ChineseNetworkOperatorExists = 'valid_china_network_operator',
+    ChineseNetworkOperatorDoesNotExist = 'invalid_china_network_operator',
+    ChineseLocalizedInitializationOutsideOfChina = 'chinese_localized_initialization_outside_of_china',
+    ChineseLocalizedInitializationInChina = 'chinese_localized_initialization_in_china',
+    ChineseTimeZoneUser = 'chinese_time_zone_user'
 }
 
 export interface IProgrammaticTrackingData {
