@@ -321,7 +321,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             if(this.getVideo().isCached() && this.getVideo().getFileId()) {
                 return this._core.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
                     if(result.found) {
-                        const remoteVideoSize: number | undefined = this.getVideo().getFileSize();
+                        const remoteVideoSize: number | undefined = this.getVideo().getSize();
                         if(remoteVideoSize && remoteVideoSize !== result.size) {
                             SessionDiagnostics.trigger('video_size_mismatch', {
                                 remoteVideoSize: remoteVideoSize,

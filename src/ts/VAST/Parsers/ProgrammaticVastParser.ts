@@ -124,7 +124,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         const mediaVideo = VastMediaSelector.getOptimizedVastMedia(vast.getVideoMediaFiles(), connectionType);
         if (!mediaVideo) {
-            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED);
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND);
         }
 
         let mediaVideoUrl = mediaVideo.getFileURL();

@@ -2,7 +2,7 @@ import { Asset, IAsset } from 'Ads/Models/Assets/Asset';
 import { Session } from 'Ads/Models/Session';
 
 export interface IVideo extends IAsset {
-    fileSize: number | undefined;
+    size: number | undefined;
     width: number;
     height: number;
     duration: number;
@@ -16,7 +16,7 @@ export class Video extends Asset<IVideo> {
     constructor(url: string, session: Session, size?: number, creativeId?: string, width?: number, height?: number) {
         super('Video', session, {
             ... Asset.Schema,
-            fileSize: ['number', 'undefined'],
+            size: ['number', 'undefined'],
             width: ['number'],
             height: ['number'],
             duration: ['number'],
@@ -28,7 +28,7 @@ export class Video extends Asset<IVideo> {
         });
 
         this.set('url', url);
-        this.set('fileSize', size);
+        this.set('size', size);
         this.set('width', 0);
         this.set('height', 0);
         this.set('duration', 0);
@@ -43,8 +43,8 @@ export class Video extends Asset<IVideo> {
         return 'VIDEO';
     }
 
-    public getFileSize(): number | undefined {
-        return this.get('fileSize');
+    public getSize(): number | undefined {
+        return this.get('size');
     }
 
     public getWidth(): number {
@@ -102,7 +102,7 @@ export class Video extends Asset<IVideo> {
     public getDTO(): { [key: string]: unknown } {
         return {
             'asset': super.getDTO(),
-            'fileSize': this.getFileSize(),
+            'size': this.getSize(),
             'width': this.getWidth(),
             'height': this.getHeight(),
             'duration': this.getDuration(),
