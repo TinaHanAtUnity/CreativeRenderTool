@@ -1,6 +1,7 @@
 # Merged
 
 * Remove china permission diagnostics [#9367](https://github.com/Applifier/unity-ads-webview/pull/9367)
+* Add width and height properties into Video object for OM [#9369](https://github.com/Applifier/unity-ads-webview/pull/9369)
 
 # Wed May  1 16:06:14 UTC 2019
 
