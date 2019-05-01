@@ -29,8 +29,8 @@ export class Video extends Asset<IVideo> {
 
         this.set('url', url);
         this.set('size', size);
-        this.set('width', 0);
-        this.set('height', 0);
+        this.set('width', width || 0);
+        this.set('height', height || 0);
         this.set('duration', 0);
         this.set('position', 0);
         this.set('positionRepeats', 0);
