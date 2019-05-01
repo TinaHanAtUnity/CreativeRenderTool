@@ -10,7 +10,7 @@ export enum VASTMediaFileSize {
 
 export class VastMediaSelector {
 
-    public static getOptimizedVastMedia(mediaFiles: VastMediaFile[], connectionType?: string): VastMediaFile | null {
+    public static getOptimizedVastMediaFile(mediaFiles: VastMediaFile[], connectionType?: string): VastMediaFile | null {
         if (connectionType && connectionType === 'wifi') {
             return VastMediaSelector.getVastMediaInRange(mediaFiles, VASTMediaFileSize.WIFI_MIN, VASTMediaFileSize.WIFI_MAX);
         } else {

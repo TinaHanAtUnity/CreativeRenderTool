@@ -122,7 +122,7 @@ export class ProgrammaticVastParser extends CampaignParser {
             landscapeAsset = new Image(Url.encode(landscapeUrl), session);
         }
 
-        const mediaVideo = VastMediaSelector.getOptimizedVastMedia(vast.getVideoMediaFiles(), connectionType);
+        const mediaVideo = VastMediaSelector.getOptimizedVastMediaFile(vast.getVideoMediaFiles(), connectionType);
         if (!mediaVideo) {
             throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND);
         }
