@@ -229,7 +229,7 @@ export class Ads implements IAds {
                 });
             }
 
-            this.logChinaInitMetric();
+            this.logChinaMetrics();
 
             const parserModules: AbstractParserModule[] = [
                 new AdMob(this._core, this),
@@ -638,29 +638,30 @@ export class Ads implements IAds {
         }
     }
 
-    private logChinaInitMetric(): void {
-        // Only report metrics for users in China
+    private logChinaMetrics() {
         if (this._core.Config.getCountry() === 'CN') {
+            this.checkForChineseLocalizationAndWifiConnection(ProgrammaticTrackingMetricName.ChineseLocalizedInitializationInChina);
             this._core.DeviceInfo.getNetworkOperator().then(networkOperator => {
+                // Mobile Country Code of China is 460
                 if (networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460') {
-                    this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaNetworkOperatorIsValid);
+                    this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChineseNetworkOperatorExists);
                 } else {
-                    this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaNetworkOperatorIsNotValid);
+                    this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChineseNetworkOperatorDoesNotExist);
                 }
             });
+        } else {
+            this.checkForChineseLocalizationAndWifiConnection(ProgrammaticTrackingMetricName.ChineseLocalizedInitializationOutsideOfChina);
         }
+    }
 
-        // Only report metrics for localization of Chinese
+    private checkForChineseLocalizationAndWifiConnection(metric: ProgrammaticTrackingMetricName) {
         const deviceLanguage = this._core.DeviceInfo.getLanguage().toLowerCase();
         if (deviceLanguage.match(/zh[-_]cn/) || deviceLanguage.match(/zh[-_]hans/) || deviceLanguage.match(/zh(((_#?hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?hans)?))$/)) {
             this._core.DeviceInfo.getConnectionType().then(connectionType => {
                 if (connectionType === 'wifi') {
-                    if (this._core.Config.getCountry() === 'CN') {
-                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaWifiInitializeInChina);
-                    } else {
-                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaWifiInitializeOutisdeChina);
-                    }
+                    this._core.Ads.ProgrammaticTrackingService.reportMetric(metric);
                 }
+                // Potentially add a timezone check as well to check for that traffic?
             });
         }
     }
