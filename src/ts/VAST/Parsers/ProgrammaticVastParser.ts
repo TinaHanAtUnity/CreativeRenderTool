@@ -122,7 +122,12 @@ export class ProgrammaticVastParser extends CampaignParser {
             landscapeAsset = new Image(Url.encode(landscapeUrl), session);
         }
 
-        let mediaVideoUrl = VastMediaSelector.getOptimizedVideoUrl(vast.getVideoMediaFiles(), connectionType);
+        const mediaVideo = VastMediaSelector.getOptimizedVastMedia(vast.getVideoMediaFiles(), connectionType);
+        if (!mediaVideo) {
+            throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_UNSUPPORTED], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_UNSUPPORTED);
+        }
+
+        let mediaVideoUrl = mediaVideo.getFileURL();
         if (!mediaVideoUrl) {
             throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, errorTrackingUrl, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND);
         }
@@ -140,7 +145,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         const vastCampaignParms: IVastCampaign = {
             ... baseCampaignParams,
             vast: vast,
-            video: new Video(mediaVideoUrl, session),
+            video: new Video(mediaVideoUrl, session, mediaVideo.getFileSize(), response.getCreativeId(), mediaVideo.getWidth(), mediaVideo.getHeight()),
             hasEndscreen: !!portraitAsset || !!landscapeAsset,
             portrait: portraitAsset,
             landscape: landscapeAsset,

@@ -77,24 +77,6 @@ export class Vast extends Model<IVast> {
         throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast);
     }
 
-    public getMediaVideoUrl(): string | null {
-        const ad = this.getAd();
-        if (ad) {
-            for (const creative of ad.getCreatives()) {
-                for (const mediaFile of creative.getMediaFiles()) {
-                    const mimeType = mediaFile.getMIMEType();
-                    const playable = mimeType && this.isSupportedMIMEType(mimeType);
-                    const fileUrl = mediaFile.getFileURL();
-                    if (fileUrl && playable) {
-                        return fileUrl;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
     public getImpressionUrls(): string[] {
         const ad = this.getAd();
         if (ad) {

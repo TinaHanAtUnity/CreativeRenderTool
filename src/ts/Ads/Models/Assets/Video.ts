@@ -2,7 +2,9 @@ import { Asset, IAsset } from 'Ads/Models/Assets/Asset';
 import { Session } from 'Ads/Models/Session';
 
 export interface IVideo extends IAsset {
-    size: number | undefined;
+    fileSize: number | undefined;
+    width: number;
+    height: number;
     duration: number;
     position: number;
     positionRepeats: number;
@@ -11,10 +13,12 @@ export interface IVideo extends IAsset {
 }
 
 export class Video extends Asset<IVideo> {
-    constructor(url: string, session: Session, size?: number, creativeId?: string) {
+    constructor(url: string, session: Session, size?: number, creativeId?: string, width?: number, height?: number) {
         super('Video', session, {
             ... Asset.Schema,
-            size: ['number', 'undefined'],
+            fileSize: ['number', 'undefined'],
+            width: ['number'],
+            height: ['number'],
             duration: ['number'],
             position: ['number'],
             positionRepeats: ['number'],
@@ -24,7 +28,9 @@ export class Video extends Asset<IVideo> {
         });
 
         this.set('url', url);
-        this.set('size', size);
+        this.set('fileSize', size);
+        this.set('width', 0);
+        this.set('height', 0);
         this.set('duration', 0);
         this.set('position', 0);
         this.set('positionRepeats', 0);
@@ -37,8 +43,16 @@ export class Video extends Asset<IVideo> {
         return 'VIDEO';
     }
 
-    public getSize() {
-        return this.get('size');
+    public getFileSize(): number | undefined {
+        return this.get('fileSize');
+    }
+
+    public getWidth(): number {
+        return this.get('width');
+    }
+
+    public getHeight(): number {
+        return this.get('height');
     }
 
     public hasStarted() {
@@ -88,7 +102,9 @@ export class Video extends Asset<IVideo> {
     public getDTO(): { [key: string]: unknown } {
         return {
             'asset': super.getDTO(),
-            'size': this.getSize(),
+            'fileSize': this.getFileSize(),
+            'width': this.getWidth(),
+            'height': this.getHeight(),
             'duration': this.getDuration(),
             'position': this.getPosition(),
             'positionRepeats': this.getPositionRepeats(),
