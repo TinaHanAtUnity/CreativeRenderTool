@@ -1,8 +1,10 @@
-# Merged
+# Staged
 
 * Consent localization for German [#9392](https://github.com/Applifier/unity-ads-webview/pull/9392)
 * Remove china permission diagnostics [#9367](https://github.com/Applifier/unity-ads-webview/pull/9367)
 * Add width and height properties into Video object for OM [#9369](https://github.com/Applifier/unity-ads-webview/pull/9369)
+* Allow analytics events for Programmatic MRAID [#9368](https://github.com/Applifier/unity-ads-webview/pull/9368)
+* Edit China Metrics to Collect More Relevant Information [#9391](https://github.com/Applifier/unity-ads-webview/pull/9391)
 
 # Wed May  1 16:06:14 UTC 2019
 
