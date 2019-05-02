@@ -13,6 +13,7 @@ import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { StorageType } from 'Core/Native/Storage';
 import { ClientInfo } from 'Core/Models/ClientInfo';
+import { FocusManager } from 'Core/Managers/FocusManager';
 
 interface ILoadEvent {
     value: string;
@@ -27,8 +28,9 @@ export class LoadManager extends RefreshManager {
     private _adsConfig: AdsConfiguration;
     private _campaignManager: CampaignManager;
     private _clientInfo: ClientInfo;
+    private _focusManager: FocusManager;
 
-    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, ads: IAdsApi, adsConfig: AdsConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo) {
+    constructor(platform: Platform, core: ICoreApi, coreConfig: CoreConfiguration, ads: IAdsApi, adsConfig: AdsConfiguration, campaignManager: CampaignManager, clientInfo: ClientInfo, focusManager: FocusManager) {
         super();
 
         this._platform = platform;
@@ -38,8 +40,11 @@ export class LoadManager extends RefreshManager {
         this._adsConfig = adsConfig;
         this._campaignManager = campaignManager;
         this._clientInfo = clientInfo;
+        this._focusManager = focusManager;
 
         this._core.Storage.onSet.subscribe((type, value) => this.onStorageSet(type, value));
+        this._focusManager.onAppForeground.subscribe(() => this.refresh());
+        this._focusManager.onActivityResumed.subscribe((activity) => this.refresh());
     }
 
     public getCampaign(placementId: string): Campaign | undefined {
@@ -57,7 +62,8 @@ export class LoadManager extends RefreshManager {
     }
 
     public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
-        // todo: implement method
+        this.invalidateExpiredCampaigns();
+
         return Promise.resolve(undefined);
     }
 
@@ -185,6 +191,21 @@ export class LoadManager extends RefreshManager {
                     this.loadPlacement(loadEvent.value);
                 }
             });
+        }
+    }
+
+    private invalidateExpiredCampaigns() {
+        for(const placementId of this._adsConfig.getPlacementIds()) {
+            const placement = this._adsConfig.getPlacement(placementId);
+
+            if(placement && placement.getState() === PlacementState.READY) {
+                const campaign = placement.getCurrentCampaign();
+
+                if(campaign && campaign.isExpired()) {
+                    placement.setCurrentCampaign(undefined);
+                    this.setPlacementState(placement.getId(), PlacementState.NO_FILL);
+                }
+            }
         }
     }
 }
