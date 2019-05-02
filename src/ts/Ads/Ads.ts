@@ -628,21 +628,20 @@ export class Ads implements IAds {
     }
 
     private logChinaMetrics() {
-        if (this._core.Config.getCountry() === 'CN') {
+        const isChineseUser = this._core.Config.getCountry() === 'CN';
+        if (isChineseUser) {
             this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChineseUserInitialized);
-            this.identifyUser(true);
-        } else {
-            this.identifyUser(false);
         }
+        this.identifyUser(isChineseUser);
     }
 
-    private identifyUser(identificationIsCorrect: boolean) {
+    private identifyUser(isChineseUser: boolean) {
         this.isUsingChineseNetworkOperator().then(isAChineseNetwork => {
             if (isAChineseNetwork) {
-                const networkMetric = identificationIsCorrect ? ProgrammaticTrackingMetricName.ChineseUserIdentifiedCorrectlyByNetworkOperator : ProgrammaticTrackingMetricName.ChineseUserIdentifiedIncorrectlyByNetworkOperator;
+                const networkMetric = isChineseUser ? ProgrammaticTrackingMetricName.ChineseUserIdentifiedCorrectlyByNetworkOperator : ProgrammaticTrackingMetricName.ChineseUserIdentifiedIncorrectlyByNetworkOperator;
                 this._core.Ads.ProgrammaticTrackingService.reportMetric(networkMetric);
             } else {
-                const localeMetric = identificationIsCorrect ? ProgrammaticTrackingMetricName.ChineseUserIdentifiedCorrectlyByLocale : ProgrammaticTrackingMetricName.ChineseUserIdentifiedIncorrectlyByLocale;
+                const localeMetric = isChineseUser ? ProgrammaticTrackingMetricName.ChineseUserIdentifiedCorrectlyByLocale : ProgrammaticTrackingMetricName.ChineseUserIdentifiedIncorrectlyByLocale;
                 this.logChinaLocalizationOptimizations(localeMetric);
             }
         });
