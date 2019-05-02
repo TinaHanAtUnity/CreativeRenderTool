@@ -636,21 +636,6 @@ export class Ads implements IAds {
         }
     }
 
-    private logChinaLocalizationOptimizations(metric: ProgrammaticTrackingMetricName) {
-        const deviceLanguage = this._core.DeviceInfo.getLanguage().toLowerCase();
-        const chineseLanguage = !!(deviceLanguage.match(/zh[-_]cn/) || deviceLanguage.match(/zh[-_]hans/) || deviceLanguage.match(/zh(((_#?hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?hans)?))$/));
-        const chineseTimeZone = this._core.DeviceInfo.getTimeZone() === 'GMT+08:00';
-        if (chineseLanguage && chineseTimeZone) {
-            this._core.Ads.ProgrammaticTrackingService.reportMetric(metric);
-        }
-    }
-
-    private isUsingChineseNetworkOperator(): Promise<boolean> {
-        return this._core.DeviceInfo.getNetworkOperator().then(networkOperator => {
-            return !!(networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460');
-        });
-    }
-
     private identifyUser(identificationIsCorrect: boolean) {
         this.isUsingChineseNetworkOperator().then(isAChineseNetwork => {
             if (isAChineseNetwork) {
@@ -661,5 +646,20 @@ export class Ads implements IAds {
                 this.logChinaLocalizationOptimizations(localeMetric);
             }
         });
+    }
+
+    private isUsingChineseNetworkOperator(): Promise<boolean> {
+        return this._core.DeviceInfo.getNetworkOperator().then(networkOperator => {
+            return !!(networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460');
+        });
+    }
+
+    private logChinaLocalizationOptimizations(metric: ProgrammaticTrackingMetricName) {
+        const deviceLanguage = this._core.DeviceInfo.getLanguage().toLowerCase();
+        const chineseLanguage = !!(deviceLanguage.match(/zh[-_]cn/) || deviceLanguage.match(/zh[-_]hans/) || deviceLanguage.match(/zh(((_#?hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?hans)?))$/));
+        const chineseTimeZone = this._core.DeviceInfo.getTimeZone() === 'GMT+08:00';
+        if (chineseLanguage && chineseTimeZone) {
+            this._core.Ads.ProgrammaticTrackingService.reportMetric(metric);
+        }
     }
 }
