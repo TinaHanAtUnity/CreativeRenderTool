@@ -97,8 +97,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this.unsetReferences();
 
         const gameId = this._clientInfo.getGameId();
-
-        if (!CustomFeatures.spawnsNewViewControllerOnFinish(gameId)) {
+        if (!CustomFeatures.gameSpawnsNewViewControllerOnFinish(gameId)) {
             this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         }
 
@@ -106,7 +105,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
         return this._container.close().then(() => {
             this.onClose.trigger();
-            if (CustomFeatures.spawnsNewViewControllerOnFinish(gameId)) {
+            if (CustomFeatures.gameSpawnsNewViewControllerOnFinish(gameId)) {
                 this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
             }
         });

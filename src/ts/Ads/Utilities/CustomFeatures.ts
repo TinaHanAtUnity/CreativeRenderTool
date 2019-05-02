@@ -104,8 +104,7 @@ export class CustomFeatures {
         return false;
     }
 
-    public static spawnsNewViewControllerOnFinish(gameId: string): boolean {
-        return true;
-        // return gameId === '';
+    public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
+        return gameId === '2955123';
     }
 }
