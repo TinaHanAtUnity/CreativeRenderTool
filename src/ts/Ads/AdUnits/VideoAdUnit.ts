@@ -96,11 +96,19 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this.hideChildren();
         this.unsetReferences();
 
-        this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        const gameId = this._clientInfo.getGameId();
+
+        if (!CustomFeatures.spawnsNewViewControllerOnFinish(gameId)) {
+            this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        }
+
         this._container.removeEventHandler(this);
 
         return this._container.close().then(() => {
             this.onClose.trigger();
+            if (CustomFeatures.spawnsNewViewControllerOnFinish(gameId)) {
+                this._ads.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+            }
         });
     }
 
