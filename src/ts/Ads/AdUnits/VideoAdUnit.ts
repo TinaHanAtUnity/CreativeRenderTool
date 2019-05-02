@@ -321,11 +321,16 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             if(this.getVideo().isCached() && this.getVideo().getFileId()) {
                 return this._core.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
                     if(result.found) {
-                        const remoteVideoSize: number | undefined = this.getVideo().getSize();
-                        if(remoteVideoSize && remoteVideoSize !== result.size) {
+                        const video: Video = this.getVideo();
+                        const isPerformanceVideo = this._campaign instanceof PerformanceCampaign;
+                        const remoteVideoSize = this.getVideo().getSize();
+
+                        // TODO: Remove the check for only performance videos after syncing with APIN
+                        if(isPerformanceVideo && remoteVideoSize !== result.size) {
                             SessionDiagnostics.trigger('video_size_mismatch', {
                                 remoteVideoSize: remoteVideoSize,
-                                localVideoSize: result.size
+                                localVideoSize: result.size,
+                                creativeId: video.getCreativeId()
                             }, this._campaign.getSession());
 
                             // this condition is most commonly triggered on Android that probably has some unknown issue with resuming downloads
