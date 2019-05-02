@@ -30,6 +30,7 @@ export class Promo extends View<{}> implements IPrivacyHandlerView {
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked: boolean = false;
     private _promoIndexTemplate: string;
+    private _closeButtonVisible = false;
 
     constructor(platform: Platform, core: ICoreApi, campaign: PromoCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, placement: Placement) {
         super(platform, 'promo');
@@ -107,6 +108,10 @@ export class Promo extends View<{}> implements IPrivacyHandlerView {
         }
     }
 
+    public isCloseButtonVisible(): boolean {
+        return this._closeButtonVisible;
+    }
+
     private choosePrivacyShown() {
         if (!this._gdprPopupClicked && this._showGDPRBanner) {
             this._GDPRPopupElement.style.visibility = 'visible';
@@ -127,6 +132,9 @@ export class Promo extends View<{}> implements IPrivacyHandlerView {
                 break;
             case 'promo':
                 this.onPromoEvent(e);
+                break;
+            case 'closeButtonVisible':
+                this._closeButtonVisible = true;
                 break;
             default:
         }
