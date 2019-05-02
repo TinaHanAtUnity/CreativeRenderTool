@@ -1,5 +1,6 @@
 # Merged
 
+* Consent localization for German [#9392](https://github.com/Applifier/unity-ads-webview/pull/9392)
 * Remove china permission diagnostics [#9367](https://github.com/Applifier/unity-ads-webview/pull/9367)
 * Add width and height properties into Video object for OM [#9369](https://github.com/Applifier/unity-ads-webview/pull/9369)
 

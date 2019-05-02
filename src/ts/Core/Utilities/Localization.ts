@@ -3,6 +3,7 @@ import DanishOverlay from 'json/locale/da_DK/overlay.json';
 import GermanEndscreen from 'json/locale/de/endscreen.json';
 import GermanLoadingScreen from 'json/locale/de/loadingscreen.json';
 import GermanOverlay from 'json/locale/de/overlay.json';
+import GermanConsent from 'json/locale/de/consent.json';
 import EnglishEndscreen from 'json/locale/en/endscreen.json';
 import EnglishLoadingScreen from 'json/locale/en/loadingscreen.json';
 import EnglishOverlay from 'json/locale/en/overlay.json';
@@ -132,7 +133,8 @@ export class Localization {
         'de.*': {
             'endscreen': JSON.parse(GermanEndscreen),
             'overlay': JSON.parse(GermanOverlay),
-            'loadingscreen': JSON.parse(GermanLoadingScreen)
+            'loadingscreen': JSON.parse(GermanLoadingScreen),
+            'consent': JSON.parse(GermanConsent)
         },
         'zh(_TW|_HK|_MO|_#?Hant)?(_TW|_HK|_MO|_#?Hant)+$': {
             'endscreen': JSON.parse(ChineseTraditionalEndscreen),
@@ -206,7 +208,7 @@ export class Localization {
     private _namespace: string;
 
     constructor(language: string, namespace: string) {
-        if (namespace === 'consent' && !language.match('fr.*')) {
+        if (namespace === 'consent' && !language.match('fr.*') && !language.match('de.*')) {
             language = 'en.*';
         }
 

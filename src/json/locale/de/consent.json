@@ -1,0 +1,56 @@
+{
+  "homepage-title": "Darf der Unity-Cookie Ihre Daten sammeln und nutzen, um Ihre Spielerfahrung und die Ads zu personalisieren?",
+  "homepage-main-text": "Unity und unsere <span class=\"third-parties-link page-link\">Partner</span> sammeln <span class=\"data-link page-link\">Daten</span>, einschließlich <span class=\"demographic-link page-link\">demographischer Informationen</span>, und nutzen <span class=\"mobile-identifiers-link page-link\">Handy-Indentifikatoren</span> für die <span class=\"personalization-link page-link\">Personalisierung</span> und <span class=\"measurement-link page-link\">Erfassung</span> von Gameplay und Ads. Sie können diese Einstellungen jederzeit einsehen, indem Sie auf das Unity-Datenschutzsymbol tippen, wenn oder nachdem eine Anzeige erscheint.",
+  "homepage-accept-all": "Akzeptieren",
+  "homepage-show-my-choices": "Wahlmöglichkeiten anzeigen",
+
+  "my-choices-title": "Darf der Unity-Cookie Ihre Daten sammeln und nutzen, um Ihre Spielerfahrung und die Ads zu personalisieren?",
+  "my-choices-text": "Unity und unsere Partner sammeln Daten, einschließlich demographischer Informationen, und nutzen Handy-Indentifikatoren für die Personalisierung und Erfassung von Gameplay und Ads.  Sie können diese Einstellungen jederzeit einsehen, indem Sie auf das Unity-Datenschutzsymbol tippen, wenn oder nachdem eine Anzeige erscheint.",
+  "my-choices-switch-game-experience": "Ich stimme einer personalisierten Spielerfahrung zu",
+  "my-choices-switch-personalized-ads": "Ich stimme personalisierten Ads und In-App-Inhalten von Unity zu",
+  "my-choices-switch-personalized-third-party": "Ich stimme personalisierten Ads zu, sowie der Erfassung von Daten, einschließlich demographischer und anderer Daten von Drittanbietern.",
+  "my-choices-back": "Zurück",
+
+  "save-my-choices": "Auswahl speichern",
+  "agree-to-all": "Allem zustimmen",
+  "no-thanks": "Nein danke",
+
+  "privacy-what-we-collect-title": "Welche Informationen wir sammeln und wie wir sie nutzen",
+  "privacy-what-we-collect-desc-p1": "Die meisten Informationen, die für die Personalisierung verwendet werden, basieren auf der Werbe-ID Ihres Gerätes (Werbeidentifikatoren von Apple oder Google) und Ihrer IP-Adresse.",
+  "privacy-what-we-collect-desc-p2": "Aus Ihrer Interaktion mit der App, schließen wir, welche anderen Apps für Sie von Interesse sein könnten. Hier ein Beispiel:",
+  "privacy-what-we-collect-desc-p3": "Wir würden diese Informationen nutzen, um Ihnen Ads zu Spielen zu zeigen, von denen wir glauben, dass sie Ihnen gefallen würden. Außerdem können wir so Ihre Spielerfahrung gegebenenfalls anpassen. Dies schließt die Anpassung des Spiel-Stores ein, um Ihnen Werkzeuge und Extras anzubieten, die Sie interessieren könnten, sowie um das Spiel ihrem gegenwärtigen Fortschrittslevel anzupassen.",
+  "privacy-what-we-collect-desc-p4": "Wir speichern die Daten nur für 30 Tage. Transaktionsaufzeichnungen mit Ihren Daten werden zur Rechnungserstellung und Betrugsprävention bis zu 180 Tage gespeichert.",
+  "privacy-what-we-collect-sub-title": "Welche Daten unsere Werbepartner sammeln (Erfassung und Demographie)",
+  "privacy-what-we-collect-desc-p5": "Unsere Partner nutzen Ihre Werbe-ID und IP-Adresse, um ein Profil über Sie zu erstellen und Ihre Präferenzen und Ihre demographischen Daten zu Ihrem Haushalt zu erfassen.  Zu den demographischen Daten gehören Informationen zum Familienstand und zum ungefähren Einkommen.  Lesen Sie die Datenschutzrichtlinien unserer Partner, um zu erfahren wie sie Ihre gesammelten Daten einsehen und löschen können.",
+  "privacy-what-we-collect-desc-p6": "Erfasst werden ebenfalls Informationen von Ihrem Handy, einschließlich des Drucks, den sie auf den Bildschirm ausüben (Druckpunktmessung).  Der Hintergrund dieser Datenerfassung liegt in der Betrugsprävention. So können unsere Partner feststellen, ob es sich bei einer Interaktion um eine echte Person handelt (ungleichmäßige Druckpunkte) oder um einen Bot, der zu Täuschungszwecken dem Markt hinzugefügt wurde, mit dem Ziel Werbenetzwerke zu stören.",
+  "privacy-using": "Nutzt {0}",
+  "privacy-located-in": "Hält sich in {0} auf",
+  "privacy-used-this-app": "Hat diese App {0} mal in dieser Woche genutzt",
+  "privacy-seen-ads": "Hat {0} Ads in dieser App gesehen",
+  "privacy-installed-based-on": "Hat {0} Apps basierend auf diesen Ads installiert",
+
+  "privacy-data-transfer-title": "Datentransfer außerhalb der EU",
+  "privacy-data-transfer-desc": "Beachten Sie, dass Unity Daten auf Servern in den USA transferieren und verarbeiten kann.  Wir gewähren Ihren Daten jedoch mittels internationaler Abkommen und Abkommen mit unseren Drittanbietern den Schutz, der Ihnen im europäischen Wirtschaftsraum gewährt wird, auch wenn Ihre Daten in diesem Teil der Welt gesammelt wurden. Besuchen sie Unitys <a href=\"https://unity3d.com/legal/privacy-policy\">Datenschutzrichtlinie</a>, um mehr über Datentransfers zu erfahren.",
+
+  "privacy-third-party-title": "Drittanbieter-Werbepartner anzeigen",
+
+  "privacy-changing-privacy-choice-title": "Datenschutzeinstellungen ändern",
+  "privacy-changing-privacy-choice-text": "Sie können diese Einstellungen jederzeit einsehen, indem Sie auf das Unity-Datenschutzsymbol tippen, wenn oder nachdem eine Anzeige erscheint.",
+
+  "privacy-our-privacy-policy-title": "Unsere Datenschutzrichtlinie",
+  "privacy-our-privacy-policy-desc": "Unsere <a href=\"https://unity3d.com/legal/privacy-policy\">Datenschutzrichtlinie</a> erklärt, wie wir mit Ihren Daten umgehen, einschließlich wie und wo in der Welt Ihre Daten transferiert und verarbeitet werden und wie wir mit unseren Partnern zusammenarbeiten, die die Ads bereitstellen. Diese Partner können über Ihre Werbe-ID Daten aus weiteren Quellen außerhalb von Unity sammeln, um die Ads genauer auf Sie anzupassen. Besuchen Sie die Datenschutzrichtlinien dieser Werbepartner, um die gesammelten Daten über Sie einzusehen.",
+
+  "privacy-settings-title": "Datenschutzeinstellungen",
+  "privacy-settings-personalization-settings": "Personalisierungseinstellungen",
+  "privacy-settings-manage-your-data": "Verwalten Sie Ihre Informationen",
+  "privacy-settings-manage-your-data-desc": "Sie können jegliche Information, die Unity über Sie gesammelt hat, löschen, indem sie <span class=\"delete-your-data-link page-link\">hier</span> klicken.",
+  "privacy-settings-manage-your-data-are-you-sure": "Sind Sie sicher?",
+  "privacy-settings-manage-your-data-yes": "Ja",
+  "privacy-settings-manage-your-data-no": "Nein",
+  "privacy-settings-manage-your-data-deletion-msg": "Wir verarbeiten Ihre Anfrage. Ihre Daten werden nach 30 Tagen gelöscht sein. Wir melden Sie ebenfalls von personalisierten Ads sofort ab. Bitte beachten Sie: Transaktionsaufzeichnungen mit Ihren Daten werden zur Rechnungserstellung und Betrugsprävention bis zu 180 Tage gespeichert.",
+  "privacy-settings-report-ad": "Ad melden",
+  "privacy-settings-build-info": "Build-Info",
+  "privacy-settings-close": "Schließen",
+
+  "disagree": "Nein danke"
+}
