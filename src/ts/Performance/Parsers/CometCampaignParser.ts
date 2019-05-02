@@ -21,6 +21,8 @@ import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCam
 import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
 import { ABGroup } from 'Core/Models/ABGroup';
 
+const SLIDER_SCREENSHOT_BASE_URL = 'https://cdn-aui-experiments-data.unityads.unity3d.com/ec/';
+
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
     public static ContentTypeVideo = 'comet/video';
@@ -158,7 +160,10 @@ export class CometCampaignParser extends CampaignParser {
                 const sliderImages = CustomFeatures.getSliderEndScreenImagesForGame(parameters.appStoreId);
                 const orientation = sliderImages && sliderImages.portrait && sliderImages.portrait.length === 0 ? 'landscape' : 'portrait';
                 parameters.screenshotsOrientation = orientation;
-                parameters.screenshots = sliderImages[orientation].map(url => new Image(this.validateAndEncodeUrl(url, session), session));
+                parameters.screenshots = sliderImages[orientation].map(image => {
+                    const url = this.validateAndEncodeUrl(`${SLIDER_SCREENSHOT_BASE_URL}${parameters.appStoreId}/${image}`, session);
+                    return new Image(url, session);
+                });
                 promise = Promise.resolve(new SliderPerformanceCampaign(parameters));
             } else {
                 promise = Promise.resolve(new PerformanceCampaign(parameters));
