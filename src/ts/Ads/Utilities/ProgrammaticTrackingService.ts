@@ -21,10 +21,11 @@ export enum ProgrammaticTrackingMetricName {
 
     ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
 
-    ChineseUserIdentifiedByNetworkOperator = 'chinese_user_identified_by_network_operator',
     ChineseUserInitialized = 'chinese_user_intialized',
-    ChineseUserCorrectlyIdentified = 'chinese_user_correctly_identified',
-    ChineseUserIncorrectlyIdentified = 'chinese_user_incorrectly_identified'
+    ChineseUserIdentifiedCorrectlyByNetworkOperator = 'chinese_user_identified_correctly_by_network_operator',
+    ChineseUserIdentifiedIncorrectlyByNetworkOperator = 'chinese_user_identified_incorrectly_by_network_operator',
+    ChineseUserIdentifiedCorrectlyByLocale = 'chinese_user_identified_correctly_by_locale',
+    ChineseUserIdentifiedIncorrectlyByLocale = 'chinese_user_identified_incorrectly_by_locale'
 }
 
 export interface IProgrammaticTrackingData {
