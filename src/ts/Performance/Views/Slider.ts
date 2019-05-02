@@ -1,10 +1,13 @@
 import { promises } from 'fs';
 
 export interface ISliderOptions {
-    duration: number;
-    easing: string;
     startIndex: number;
     threshold: number;
+}
+
+export interface ITransformationConfig {
+    duration: number;
+    easing: string;
 }
 
 export interface IDragOptions {
@@ -19,6 +22,21 @@ type OnSlideCallback = (options: { automatic: boolean }) => void;
 type OnDownloadCallback = (event: Event) => void;
 
 const animationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+
+const TRANSFORMATION_CONFIG: ITransformationConfig = {
+    duration: 300,
+    easing: 'ease'
+};
+
+const AUTOMATIC_TRANSFORMATION_CONFIG: ITransformationConfig = {
+    duration: 600,
+    easing: 'ease-in-out'
+};
+
+const INSTANT_TRANSFORMATION_CONFIG: ITransformationConfig = {
+    duration: 0,
+    easing: 'ease'
+};
 
 export class Slider {
     private config: ISliderOptions;
@@ -46,8 +64,6 @@ export class Slider {
         this._onDownloadCallback = onDownloadCallback;
 
         this.config = {
-            duration: 200,
-            easing: 'ease',
             startIndex: 0,
             threshold: 70
         };
@@ -135,21 +151,22 @@ export class Slider {
         const currentSlide = this.currentSlide + this.slidesPerPage;
 
         const offset = -Math.abs(currentSlide * (this.slidesContainerVisibleWidth / this.slidesPerPage));
+        const config = options.automatic ? AUTOMATIC_TRANSFORMATION_CONFIG : TRANSFORMATION_CONFIG;
         if (options.enableTransition) {
             // explanation for this one - https://youtu.be/cCOL7MC4Pl0
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    this.transformSlidesContainer(offset);
+                    this.transformSlidesContainer(offset, config);
                 });
             });
         } else {
-            this.transformSlidesContainer(offset, 0);
+            this.transformSlidesContainer(offset, INSTANT_TRANSFORMATION_CONFIG);
         }
         Slider.updateIndicator(this._indicators, Math.floor(currentSlide));
     }
 
-    private transformSlidesContainer(offset: number, duration: number = this.config.duration): void {
-        this._slidesContainer.style[this.transitionPropertyName] = `all ${duration}ms ${this.config.easing}`;
+    private transformSlidesContainer(offset: number, config: ITransformationConfig = AUTOMATIC_TRANSFORMATION_CONFIG): void {
+        this._slidesContainer.style[this.transitionPropertyName] = `all ${config.duration}ms ${config.easing}`;
         this._slidesContainer.style[this.transformPropertyName] = `translate3d(${offset}px, 0, 0)`;
     }
 
@@ -210,7 +227,7 @@ export class Slider {
             window.clearTimeout(this._autoplayTimeoutId);
         }
 
-        const interval = 3000;
+        const interval = 2500;
         this._autoplayTimeoutId = window.setTimeout(() => {
             this.slideForward(1, { automatic: true });
             this.autoplay();
@@ -296,7 +313,7 @@ export class Slider {
             const currentOffset = currentSlide * (this.slidesContainerVisibleWidth / this.slidesPerPage);
             const dragOffset = (this.drag.endX - this.drag.startX);
             const offset = currentOffset - dragOffset;
-            this.transformSlidesContainer(offset * -1, 0);
+            this.transformSlidesContainer(offset * -1, INSTANT_TRANSFORMATION_CONFIG);
         }
 
     }
@@ -356,7 +373,7 @@ export class Slider {
             const moveTo = loopedSlideIndex + loopedSlideIndexOffset;
             const offset = moveTo * -1 * (this.slidesContainerVisibleWidth / this.slidesPerPage);
             const dragDistance = this.drag.endX - this.drag.startX;
-            this.transformSlidesContainer(offset + dragDistance, 0);
+            this.transformSlidesContainer(offset + dragDistance, INSTANT_TRANSFORMATION_CONFIG);
             this.currentSlide = loopedSlideIndex + slideAmount;
         } else {
             this.currentSlide = this.currentSlide + slideAmount;
