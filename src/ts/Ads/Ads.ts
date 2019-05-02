@@ -218,7 +218,7 @@ export class Ads implements IAds {
                 });
             }
 
-            this.logChinaInitMetric();
+            this.logChinaMetrics();
 
             const parserModules: AbstractParserModule[] = [
                 new AdMob(this._core, this),
@@ -627,30 +627,38 @@ export class Ads implements IAds {
         }
     }
 
-    private logChinaInitMetric(): void {
-        // Only report metrics for users in China
-        if (this._core.Config.getCountry() === 'CN') {
-            this._core.DeviceInfo.getNetworkOperator().then(networkOperator => {
-                if (networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460') {
-                    this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaNetworkOperatorIsValid);
-                } else {
-                    this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaNetworkOperatorIsNotValid);
-                }
-            });
+    private logChinaMetrics() {
+        const isChineseUser = this._core.Config.getCountry() === 'CN';
+        if (isChineseUser) {
+            this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChineseUserInitialized);
         }
+        this.identifyUser(isChineseUser);
+    }
 
-        // Only report metrics for localization of Chinese
+    private identifyUser(isChineseUser: boolean) {
+        this.isUsingChineseNetworkOperator().then(isAChineseNetwork => {
+            if (isAChineseNetwork) {
+                const networkMetric = isChineseUser ? ProgrammaticTrackingMetricName.ChineseUserIdentifiedCorrectlyByNetworkOperator : ProgrammaticTrackingMetricName.ChineseUserIdentifiedIncorrectlyByNetworkOperator;
+                this._core.Ads.ProgrammaticTrackingService.reportMetric(networkMetric);
+            } else {
+                const localeMetric = isChineseUser ? ProgrammaticTrackingMetricName.ChineseUserIdentifiedCorrectlyByLocale : ProgrammaticTrackingMetricName.ChineseUserIdentifiedIncorrectlyByLocale;
+                this.logChinaLocalizationOptimizations(localeMetric);
+            }
+        });
+    }
+
+    private isUsingChineseNetworkOperator(): Promise<boolean> {
+        return this._core.DeviceInfo.getNetworkOperator().then(networkOperator => {
+            return !!(networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460');
+        });
+    }
+
+    private logChinaLocalizationOptimizations(metric: ProgrammaticTrackingMetricName) {
         const deviceLanguage = this._core.DeviceInfo.getLanguage().toLowerCase();
-        if (deviceLanguage.match(/zh[-_]cn/) || deviceLanguage.match(/zh[-_]hans/) || deviceLanguage.match(/zh(((_#?hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?hans)?))$/)) {
-            this._core.DeviceInfo.getConnectionType().then(connectionType => {
-                if (connectionType === 'wifi') {
-                    if (this._core.Config.getCountry() === 'CN') {
-                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaWifiInitializeInChina);
-                    } else {
-                        this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChinaWifiInitializeOutisdeChina);
-                    }
-                }
-            });
+        const chineseLanguage = !!(deviceLanguage.match(/zh[-_]cn/) || deviceLanguage.match(/zh[-_]hans/) || deviceLanguage.match(/zh(((_#?hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?hans)?))$/));
+        const chineseTimeZone = this._core.DeviceInfo.getTimeZone() === 'GMT+08:00';
+        if (chineseLanguage && chineseTimeZone) {
+            this._core.Ads.ProgrammaticTrackingService.reportMetric(metric);
         }
     }
 }
