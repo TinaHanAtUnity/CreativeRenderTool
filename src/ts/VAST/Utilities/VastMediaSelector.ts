@@ -10,43 +10,43 @@ export enum VASTMediaFileSize {
 
 export class VastMediaSelector {
 
-    public static getOptimizedVideoUrl(mediaFiles: VastMediaFile[], connectionType?: string): string | null {
+    public static getOptimizedVastMediaFile(mediaFiles: VastMediaFile[], connectionType?: string): VastMediaFile | null {
         if (connectionType && connectionType === 'wifi') {
-            return VastMediaSelector.getVideoUrlInRange(mediaFiles, VASTMediaFileSize.WIFI_MIN, VASTMediaFileSize.WIFI_MAX);
+            return VastMediaSelector.getVastMediaInRange(mediaFiles, VASTMediaFileSize.WIFI_MIN, VASTMediaFileSize.WIFI_MAX);
         } else {
-            return VastMediaSelector.getVideoUrlInRange(mediaFiles, VASTMediaFileSize.CELL_MIN, VASTMediaFileSize.CELL_MAX);
+            return VastMediaSelector.getVastMediaInRange(mediaFiles, VASTMediaFileSize.CELL_MIN, VASTMediaFileSize.CELL_MAX);
         }
     }
 
-    private static getVideoUrlInRange(mediaFiles: VastMediaFile[], minSize: number, maxSize: number): string | null {
-        let mediaUrl: string | null = null;
+    private static getVastMediaInRange(mediaFiles: VastMediaFile[], minSize: number, maxSize: number): VastMediaFile | null {
+        let selectedMediaFile: VastMediaFile | null = null;
+        let defaultMediaFile: VastMediaFile | null = null;
         let mediaMinSize = Number.MAX_SAFE_INTEGER;
         let mediaMinBitrate = Number.MAX_SAFE_INTEGER;
-        let defaultMediaUrl: string | null = null;
         let defaultMinDiff = Number.MAX_SAFE_INTEGER;
         for (const mediaFile of mediaFiles) {
             const fileSize = mediaFile.getFileSize();
             const bitRate = mediaFile.getBitrate();
             if (fileSize >= minSize && fileSize <= maxSize) {
                 if (fileSize < mediaMinSize) {
-                    mediaUrl = mediaFile.getFileURL();
                     mediaMinSize = fileSize;
+                    selectedMediaFile = mediaFile;
                 }
             } else if (fileSize <= VASTMediaFileSize.SDK_MAX) {
                 // if there is no media in the range or file size is 0
                 // then pick the closest to minSize or the lowest bitrate file
                 if (Math.abs(fileSize - minSize) < defaultMinDiff || bitRate < mediaMinBitrate) {
-                    defaultMediaUrl = mediaFile.getFileURL();
                     defaultMinDiff = Math.abs(fileSize - minSize);
                     mediaMinBitrate = bitRate;
+                    defaultMediaFile = mediaFile;
                 }
             }
         }
 
-        if (mediaUrl) {
-            return mediaUrl;
+        if (selectedMediaFile) {
+            return selectedMediaFile;
         }
 
-        return defaultMediaUrl;
+        return defaultMediaFile;
     }
 }
