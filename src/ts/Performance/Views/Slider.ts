@@ -18,6 +18,8 @@ export interface IDragOptions {
 type OnSlideCallback = (options: { automatic: boolean }) => void;
 type OnDownloadCallback = (event: Event) => void;
 
+const animationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+
 export class Slider {
     private config: ISliderOptions;
     private slidesContainerWidth: number;
@@ -164,8 +166,12 @@ export class Slider {
             clearTimeout(this._resizeTimeId);
         }
 
-        // resize debounce
-        this._resizeTimeId = window.setTimeout(() => this.resizeContainer(), 100);
+        if (typeof animationFrame === 'function') {
+            animationFrame(() => this.resizeContainer());
+        } else {
+            // resize debounce
+            this._resizeTimeId = window.setTimeout(() => this.resizeContainer(), 100);
+        }
     }
 
     private createSlide(url: string): Promise<HTMLElement> {
