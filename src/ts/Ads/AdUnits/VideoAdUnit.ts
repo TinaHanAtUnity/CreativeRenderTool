@@ -332,7 +332,8 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                         if(remoteVideoSize && remoteVideoSize !== result.size) {
                             SessionDiagnostics.trigger('video_size_mismatch', {
                                 remoteVideoSize: remoteVideoSize,
-                                localVideoSize: result.size
+                                localVideoSize: result.size,
+                                creativeId: this.getVideo().getCreativeId()
                             }, this._campaign.getSession());
 
                             // this condition is most commonly triggered on Android that probably has some unknown issue with resuming downloads

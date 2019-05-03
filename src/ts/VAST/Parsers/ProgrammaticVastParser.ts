@@ -145,7 +145,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         const vastCampaignParms: IVastCampaign = {
             ... baseCampaignParams,
             vast: vast,
-            video: new Video(mediaVideoUrl, session, mediaVideo.getFileSize(), response.getCreativeId(), mediaVideo.getWidth(), mediaVideo.getHeight()),
+            video: new Video(mediaVideoUrl, session, undefined, response.getCreativeId(), mediaVideo.getWidth(), mediaVideo.getHeight()),
             hasEndscreen: !!portraitAsset || !!landscapeAsset,
             portrait: portraitAsset,
             landscape: landscapeAsset,
