@@ -82,7 +82,7 @@ import { RequestManager } from 'Core/Managers/RequestManager';
 import { AbstractAdUnitParametersFactory } from 'Ads/AdUnits/AdUnitParametersFactory';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { LoadManager } from 'Ads/Managers/LoadManager';
-import { StorageType } from 'Core/Native/Storage';
+import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 
 export class Ads implements IAds {
 
@@ -560,14 +560,16 @@ export class Ads implements IAds {
     }
 
     private setupLoadApi(): Promise<void> {
-        return this._core.Api.Storage.get(StorageType.PUBLIC, 'load.enabled.value').then(enabled => {
-            if(enabled) {
-                this._loadApiEnabled = true;
-            } else {
-                this._loadApiEnabled = false;
+        this._loadApiEnabled = false;
+
+        return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
+            if(mediation) {
+                const loadEnabled = mediation.isMetaDataLoadEnabled();
+
+                if(loadEnabled && loadEnabled === 'true') {
+                    this._loadApiEnabled = true;
+                }
             }
-        }).catch(() => {
-            this._loadApiEnabled = false;
         });
     }
 
