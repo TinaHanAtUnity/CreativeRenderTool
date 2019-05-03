@@ -35,6 +35,7 @@ import { StorageApi } from 'Core/Native/Storage';
 import { StorageBridge } from 'Core/Utilities/StorageBridge';
 import { IPurchasing } from 'Purchasing/IPurchasing';
 import { IStore } from 'Store/IStore';
+import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 
 export interface ICoreApi extends IModuleApi {
     Cache: CacheApi;
@@ -47,6 +48,7 @@ export interface ICoreApi extends IModuleApi {
     Sdk: SdkApi;
     SensorInfo: SensorInfoApi;
     Storage: StorageApi;
+    Error: NativeErrorApi;
     Android?: {
         Broadcast: BroadcastApi;
         Intent: IntentApi;
