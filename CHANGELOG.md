@@ -1,6 +1,7 @@
 # Staged 
 
-Russian localization for consent views [#9419](https://github.com/Applifier/unity-ads-webview/pull/9419)
+* Russian localization for consent views [#9419](https://github.com/Applifier/unity-ads-webview/pull/9419)
+* Temporarily disable video_size_mismatch for VAST Videos [#9394](https://github.com/Applifier/unity-ads-webview/pull/9394)
 
 # Fri May  3 12:04:59 UTC 2019
 
