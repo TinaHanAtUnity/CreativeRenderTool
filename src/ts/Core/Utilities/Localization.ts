@@ -40,6 +40,7 @@ import RomanianOverlay from 'json/locale/ro/overlay.json';
 import RussianEndscreen from 'json/locale/ru/endscreen.json';
 import RussianLoadingScreen from 'json/locale/ru/loadingscreen.json';
 import RussianOverlay from 'json/locale/ru/overlay.json';
+import RussianConsent from 'json/locale/ru/consent.json';
 import TurkishEndscreen from 'json/locale/tr/endscreen.json';
 import TurkishOverlay from 'json/locale/tr/overlay.json';
 import ChineseSimplifiedEndscreen from 'json/locale/zh_Hans/endscreen.json';
@@ -116,7 +117,8 @@ export class Localization {
         'ru.*': {
             'endscreen': JSON.parse(RussianEndscreen),
             'overlay': JSON.parse(RussianOverlay),
-            'loadingscreen': JSON.parse(RussianLoadingScreen)
+            'loadingscreen': JSON.parse(RussianLoadingScreen),
+            'consent': JSON.parse(RussianConsent)
         },
         'ja.*': {
             'endscreen': JSON.parse(JapaneseEndscreen),
@@ -244,7 +246,8 @@ export class Localization {
     private isConsentTranslationAvailable(language: string) {
         if (language.match('fr.*')
             || language.match('de.*')
-            || language.match('es.*')) {
+            || language.match('es.*')
+            || language.match('ru.*')) {
             return true;
         }
 
