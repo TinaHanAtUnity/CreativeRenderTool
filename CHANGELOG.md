@@ -1,3 +1,7 @@
+# Staged
+
+* Consent localization for Spanish [#9397](https://github.com/Applifier/unity-ads-webview/pull/9397)
+
 # Thu May  2 18:00:07 UTC 2019
 
 * Consent localization for German [#9392](https://github.com/Applifier/unity-ads-webview/pull/9392)
