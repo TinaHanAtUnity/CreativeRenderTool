@@ -48,7 +48,7 @@ export interface ICoreApi extends IModuleApi {
     Sdk: SdkApi;
     SensorInfo: SensorInfoApi;
     Storage: StorageApi;
-    Error: NativeErrorApi;
+    NativeError: NativeErrorApi;
     Android?: {
         Broadcast: BroadcastApi;
         Intent: IntentApi;

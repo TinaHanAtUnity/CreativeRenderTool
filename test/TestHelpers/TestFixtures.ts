@@ -986,7 +986,7 @@ export class TestFixtures {
             Resolve: new ResolveApi(nativeBridge),
             Sdk: new SdkApi(nativeBridge),
             SensorInfo: new SensorInfoApi(nativeBridge),
-            Error: new NativeErrorApi(nativeBridge),
+            NativeError: new NativeErrorApi(nativeBridge),
             Storage: new StorageApi(nativeBridge),
             Android: platform === Platform.ANDROID ? {
                 Broadcast: new BroadcastApi(nativeBridge),

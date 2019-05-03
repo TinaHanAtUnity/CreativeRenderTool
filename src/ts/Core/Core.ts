@@ -97,7 +97,7 @@ export class Core implements ICore {
             Sdk: new SdkApi(nativeBridge),
             SensorInfo: new SensorInfoApi(nativeBridge),
             Storage: new StorageApi(nativeBridge),
-            Error: new NativeErrorApi(nativeBridge),
+            NativeError: new NativeErrorApi(nativeBridge),
             Android: platform === Platform.ANDROID ? {
                 Broadcast: new BroadcastApi(nativeBridge),
                 Intent: new IntentApi(nativeBridge),
