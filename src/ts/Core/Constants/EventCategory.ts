@@ -22,5 +22,6 @@ export enum EventCategory {
     PERMISSIONS,
     DOWNLOAD,
     INSTALL,
-    STORE
+    STORE,
+    WEB_AUTH_SESSION
 }
