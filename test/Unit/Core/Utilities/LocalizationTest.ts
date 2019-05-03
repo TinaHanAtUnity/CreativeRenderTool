@@ -119,6 +119,12 @@ describe('LocalizationTest', () => {
             const phrase = 'What information we collect and how we use it';
             assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
         });
+
+        it('RU. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+            const localization = new Localization('ru', 'consent');
+            const phrase = 'Какую информацию мы собираем и как ее используем';
+            assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+        });
     });
 
 });
