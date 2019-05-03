@@ -135,10 +135,9 @@ export class CustomFeatures {
     public static isSliderEndScreenEnabled(abGroup: ABGroup, targetGameAppStoreId: string, osVersion: string, platform: Platform): boolean {
         const isAndroid4 = platform === Platform.ANDROID && matchesMajorOSVersion(4, osVersion);
         const isIOS7 = platform === Platform.IOS && matchesMajorOSVersion(7, osVersion);
-        const isIOS8 = platform === Platform.IOS && matchesMajorOSVersion(8, osVersion);
 
-        // Exclude Android 4 and iOS 7 & 8 devices from the test because of layout issues
-        if (isAndroid4 || isIOS7 || isIOS8) {
+        // Exclude Android 4 and iOS 7 devices from the test because of layout issues
+        if (isAndroid4 || isIOS7) {
             return false;
         }
 
