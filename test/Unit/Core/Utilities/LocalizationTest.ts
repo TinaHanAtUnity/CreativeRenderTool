@@ -87,4 +87,38 @@ describe('LocalizationTest', () => {
         assert.equal(new Localization('zh_TW_#Hant', 'endscreen').translate(phrase), '免費下載', 'Localization zh_TW_#Hant did not map to correct language');
     });
 
+    describe('Consent', () => {
+        const id = 'privacy-what-we-collect-title';
+
+        it('EN. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+            const localization = new Localization('en_GB', 'consent');
+            const phrase = 'What information we collect and how we use it';
+            assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+        });
+
+        it('FR. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+            const localization = new Localization('fr_GB', 'consent');
+            const phrase = 'Informations collectées et utilisation';
+            assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+        });
+
+        it('DE. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+            const localization = new Localization('de_AU', 'consent');
+            const phrase = 'Welche Informationen wir sammeln und wie wir sie nutzen';
+            assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+        });
+
+        it('ES. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+            const localization = new Localization('es', 'consent');
+            const phrase = 'Qué información recopilamos y cómo la utilizamos';
+            assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+        });
+
+        it('FI. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+            const localization = new Localization('fi_FI', 'consent');
+            const phrase = 'What information we collect and how we use it';
+            assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+        });
+    });
+
 });
