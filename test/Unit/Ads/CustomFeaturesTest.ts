@@ -98,11 +98,6 @@ describe('CustomFeatures', () => {
             assert.isFalse(isEnabled);
         });
 
-        it('should return false if on iOS and os version is 8.x', () => {
-            const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(8), '547145938', '8.11', Platform.IOS);
-            assert.isFalse(isEnabled);
-        });
-
         it('should return false if all conditions do not match', () => {
             const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(1), '-1', '7.9', Platform.IOS);
             assert.isFalse(isEnabled);
