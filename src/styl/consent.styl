@@ -156,7 +156,7 @@
   .consent-button {
     position: relative;
     align-self: center;
-    padding: .75 * $default-size $default-size;
+    padding: .75 * $default-size .75 * $default-size;
     border-radius: 2 * $default-size;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05);
     text-align: center;
@@ -190,30 +190,6 @@
     flex-grow: 1;
     background: $consent-blue;
     color: $white;
-  }
-
-  &.my-choices-button-order-test {
-    .agree {
-      display: block;
-      flex-grow: 1;
-      margin-left: $default-size;
-      background: $consent-blue;
-      color: $white;
-    }
-
-    .disagree {
-      display: block;
-      margin-left: 0;
-      border: 1px solid $consent-border-gray;
-      color: $black;
-    }
-
-    .save-my-choices {
-      display: none;
-      flex-grow: 1;
-      background: $consent-blue;
-      color: $white;
-    }
   }
 
   .consent-button-container:not(.show-save-my-choices-button) {

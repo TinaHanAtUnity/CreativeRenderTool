@@ -54,7 +54,7 @@ export class CustomFeatures {
         return gameId === '1300023' || gameId === '1300024';
     }
 
-    public static isSonicPlayable(creativeId: string | undefined) {
+    public static isNestedIframePlayable(creativeId: string | undefined) {
         return  creativeId === '109455881' ||
                 creativeId === '109455877' ||
                 creativeId === '109091853' ||

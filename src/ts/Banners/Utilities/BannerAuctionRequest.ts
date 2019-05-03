@@ -1,9 +1,6 @@
 import { Placement } from 'Ads/Models/Placement';
 import { AuctionRequest, IAuctionRequestParams, IAuctionResponse } from 'Banners/Utilities/AuctionRequest';
 import { BannerSize } from 'Banners/Utilities/BannerSize';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Platform } from 'Core/Constants/Platform';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class BannerAuctionRequest extends AuctionRequest {
@@ -20,21 +17,8 @@ export class BannerAuctionRequest extends AuctionRequest {
 
     public request(): Promise<IAuctionResponse> {
         if (this._deviceInfo.getLimitAdTracking()) {
-            this.reportLimitedAdTrackingRequest();
+            this._pts.reportMetric(ProgrammaticTrackingMetricName.BannerAdRequestWithLimitedAdTracking);
         }
         return super.request();
-    }
-
-    private reportLimitedAdTrackingRequest() {
-        // Report to PTS to easily get percent comparisons in Datadog
-        this._pts.reportMetric(ProgrammaticTrackingMetricName.BannerAdRequestWithLimitedAdTracking);
-        let userId = this._deviceInfo.getAdvertisingIdentifier();
-        if (!userId && this._platform === Platform.ANDROID) {
-            userId = (<AndroidDeviceInfo>this._deviceInfo).getAndroidId();
-        }
-        // Report to Kibana to break out by userId
-        Diagnostics.trigger('banner_request_with_limited_ad_tracking', {
-            userId: userId
-        });
     }
 }

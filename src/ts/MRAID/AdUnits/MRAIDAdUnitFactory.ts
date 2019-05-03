@@ -1,5 +1,4 @@
 import { AbstractAdUnitFactory } from 'Ads/AdUnits/AbstractAdUnitFactory';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { ARMRAID } from 'AR/Views/ARMRAID';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
@@ -27,7 +26,7 @@ export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMR
     }
 
     private getMRAIDEventHandler(mraidAdUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters): IMRAIDViewHandler {
-        if (CustomFeatures.isSonicPlayable(parameters.campaign.getCreativeId()) || parameters.campaign instanceof PerformanceMRAIDCampaign) {
+        if (parameters.campaign instanceof PerformanceMRAIDCampaign) {
             return new PerformanceMRAIDEventHandler(mraidAdUnit, parameters);
         } else if (parameters.mraid instanceof ARMRAID) {
             return new ARMRAIDEventHandler(mraidAdUnit, parameters);

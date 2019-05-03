@@ -37,6 +37,7 @@ import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { IStoreApi } from 'Store/IStore';
+import { HttpKafka } from 'Core/Utilities/HttpKafka';
 
 [Platform.ANDROID, Platform.IOS].forEach(platform => {
 
@@ -344,6 +345,17 @@ import { IStoreApi } from 'Store/IStore';
                         });
                     });
                 }
+            });
+
+            describe('onPlayableAnalytics Event', () => {
+                beforeEach(() => {
+                    sinon.stub(HttpKafka, 'sendEvent');
+                });
+
+                it('should send an analytics event', () => {
+                    programmaticMraidEventHandler.onPlayableAnalyticsEvent(15, 12, 0, 'win_screen', { 'level': 2 });
+                    sinon.assert.called(<sinon.SinonStub>HttpKafka.sendEvent);
+                });
             });
         });
     });
