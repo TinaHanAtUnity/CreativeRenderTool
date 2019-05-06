@@ -19,7 +19,13 @@ export enum ProgrammaticTrackingMetricName {
     BannerAdImpression = 'banner_ad_impression',
     BannerAdRequestWithLimitedAdTracking = 'banner_ad_request_with_limited_ad_tracking',
 
-    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked'
+    ConsentParagraphLinkClicked = 'consent_paragraph_link_clicked',
+
+    ChineseUserInitialized = 'chinese_user_intialized',
+    ChineseUserIdentifiedCorrectlyByNetworkOperator = 'chinese_user_identified_correctly_by_network_operator',
+    ChineseUserIdentifiedIncorrectlyByNetworkOperator = 'chinese_user_identified_incorrectly_by_network_operator',
+    ChineseUserIdentifiedCorrectlyByLocale = 'chinese_user_identified_correctly_by_locale',
+    ChineseUserIdentifiedIncorrectlyByLocale = 'chinese_user_identified_incorrectly_by_locale'
 }
 
 export interface IProgrammaticTrackingData {
