@@ -147,4 +147,8 @@ export class CustomFeatures {
     public static getSliderEndScreenImagesForGame(targetGameAppStoreId: string): ISliderEndScreenImagesForGame {
         return SliderEndScreenImages[targetGameAppStoreId];
     }
+
+    public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
+        return gameId === '2955123';
+    }
 }
