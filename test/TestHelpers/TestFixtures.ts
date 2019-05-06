@@ -162,7 +162,6 @@ import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
 import { IStoreApi } from 'Store/IStore';
 import { AndroidStoreApi } from 'Store/Native/Android/Store';
 import { ProductsApi } from 'Store/Native/iOS/Products';
-import { WebAuthApi } from 'Core/Native/iOS/WebAuthApi';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
@@ -999,8 +998,7 @@ export class TestFixtures {
                 MainBundle: new MainBundleApi(nativeBridge),
                 Notification: new NotificationApi(nativeBridge),
                 Preferences: new IosPreferencesApi(nativeBridge),
-                UrlScheme: new UrlSchemeApi(nativeBridge),
-                WebAuth: new WebAuthApi(nativeBridge)
+                UrlScheme: new UrlSchemeApi(nativeBridge)
             } : undefined
         };
     }

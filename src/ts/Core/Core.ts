@@ -50,7 +50,6 @@ import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { Store } from 'Store/Store';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
-import { WebAuthApi } from 'Core/Native/iOS/WebAuthApi';
 import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 
 export class Core implements ICore {
@@ -109,8 +108,7 @@ export class Core implements ICore {
                 MainBundle: new MainBundleApi(nativeBridge),
                 Notification: new NotificationApi(nativeBridge),
                 Preferences: new IosPreferencesApi(nativeBridge),
-                UrlScheme: new UrlSchemeApi(nativeBridge),
-                WebAuth: new WebAuthApi(nativeBridge)
+                UrlScheme: new UrlSchemeApi(nativeBridge)
             } : undefined
         };
 
