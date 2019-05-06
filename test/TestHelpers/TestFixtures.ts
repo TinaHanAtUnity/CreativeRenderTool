@@ -163,6 +163,7 @@ import { IStoreApi } from 'Store/IStore';
 import { AndroidStoreApi } from 'Store/Native/Android/Store';
 import { ProductsApi } from 'Store/Native/iOS/Products';
 import { WebAuthApi } from 'Core/Native/iOS/WebAuthApi';
+import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -986,6 +987,7 @@ export class TestFixtures {
             Resolve: new ResolveApi(nativeBridge),
             Sdk: new SdkApi(nativeBridge),
             SensorInfo: new SensorInfoApi(nativeBridge),
+            NativeError: new NativeErrorApi(nativeBridge),
             Storage: new StorageApi(nativeBridge),
             Android: platform === Platform.ANDROID ? {
                 Broadcast: new BroadcastApi(nativeBridge),

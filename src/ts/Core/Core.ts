@@ -51,6 +51,7 @@ import { Store } from 'Store/Store';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import { Purchasing } from 'Purchasing/Purchasing';
 import { WebAuthApi } from 'Core/Native/iOS/WebAuthApi';
+import { NativeErrorApi } from 'Core/Api/NativeErrorApi';
 
 export class Core implements ICore {
 
@@ -97,6 +98,7 @@ export class Core implements ICore {
             Sdk: new SdkApi(nativeBridge),
             SensorInfo: new SensorInfoApi(nativeBridge),
             Storage: new StorageApi(nativeBridge),
+            NativeError: new NativeErrorApi(nativeBridge),
             Android: platform === Platform.ANDROID ? {
                 Broadcast: new BroadcastApi(nativeBridge),
                 Intent: new IntentApi(nativeBridge),
