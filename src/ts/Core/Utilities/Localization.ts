@@ -24,6 +24,7 @@ import IcelandicOverlay from 'json/locale/is/overlay.json';
 import ItalianEndscreen from 'json/locale/it/endscreen.json';
 import ItalianLoadingScreen from 'json/locale/it/loadingscreen.json';
 import ItalianOverlay from 'json/locale/it/overlay.json';
+import ItalianConsent from 'json/locale/it/consent.json';
 import JapaneseEndscreen from 'json/locale/ja/endscreen.json';
 import JapaneseOverlay from 'json/locale/ja/overlay.json';
 import KoreanEndscreen from 'json/locale/ko/endscreen.json';
@@ -132,7 +133,8 @@ export class Localization {
         'it.*': {
             'endscreen': JSON.parse(ItalianEndscreen),
             'overlay': JSON.parse(ItalianOverlay),
-            'loadingscreen': JSON.parse(ItalianLoadingScreen)
+            'loadingscreen': JSON.parse(ItalianLoadingScreen),
+            'consent': JSON.parse(ItalianConsent)
         },
         'de.*': {
             'endscreen': JSON.parse(GermanEndscreen),
@@ -250,7 +252,8 @@ export class Localization {
             || language.match('de.*')
             || language.match('es.*')
             || language.match('ru.*')
-            || language.match('pt.*')) {
+            || language.match('pt.*')
+            || language.match('it.*')) {
             return true;
         }
 
