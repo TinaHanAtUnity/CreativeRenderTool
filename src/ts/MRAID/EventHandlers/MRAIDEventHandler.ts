@@ -13,6 +13,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ABGroup } from 'Core/Models/ABGroup';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -83,7 +84,22 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     public onPlayableAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, backgroundTime: number, event: string, eventData: unknown): void {
-        // no-op
+        const kafkaObject: { [key: string]: unknown } = {};
+        kafkaObject.type = event;
+        kafkaObject.eventData = eventData;
+        kafkaObject.timeFromShow = timeFromShow;
+        kafkaObject.timeFromPlayableStart = timeFromPlayableStart;
+        kafkaObject.backgroundTime = backgroundTime;
+
+        const resourceUrl = this._campaign.getResourceUrl();
+        if (resourceUrl) {
+            kafkaObject.url = resourceUrl.getOriginalUrl();
+        }
+
+        kafkaObject.auctionId = this._campaign.getSession().getId();
+        kafkaObject.abGroup = this._coreConfig.getAbGroup();
+
+        HttpKafka.sendEvent('ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
 
     public onMraidShowEndScreen(): void {

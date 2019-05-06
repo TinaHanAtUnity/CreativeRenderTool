@@ -26,7 +26,7 @@ export class CustomFeatures {
         return gameId === '1300023' || gameId === '1300024';
     }
 
-    public static isSonicPlayable(creativeId: string | undefined) {
+    public static isNestedIframePlayable(creativeId: string | undefined) {
         return  creativeId === '109455881' ||
                 creativeId === '109455877' ||
                 creativeId === '109091853' ||
@@ -102,5 +102,9 @@ export class CustomFeatures {
 
     public static isUnsupportedOMVendor(resourceUrl: string) {
         return false;
+    }
+
+    public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
+        return gameId === '2955123';
     }
 }

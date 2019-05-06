@@ -1,7 +1,24 @@
-# Merged
+# Mon May  6 11:54:47 UTC 2019
 
+* Italian and Portuguese localization for consent views [#9443](https://github.com/Applifier/unity-ads-webview/pull/9443) 
+
+# Fri May  3 19:52:17 UTC 2019 
+
+* Russian localization for consent views [#9419](https://github.com/Applifier/unity-ads-webview/pull/9419)
+* Temporarily disable video_size_mismatch for VAST Videos [#9394](https://github.com/Applifier/unity-ads-webview/pull/9394)
+* Send Finish event after Ad Unit container destroy [#9396](https://github.com/Applifier/unity-ads-webview/pull/9396)
+
+# Fri May  3 12:04:59 UTC 2019
+
+* Consent localization for Spanish [#9397](https://github.com/Applifier/unity-ads-webview/pull/9397)
+
+# Thu May  2 18:00:07 UTC 2019
+
+* Consent localization for German [#9392](https://github.com/Applifier/unity-ads-webview/pull/9392)
 * Remove china permission diagnostics [#9367](https://github.com/Applifier/unity-ads-webview/pull/9367)
 * Add width and height properties into Video object for OM [#9369](https://github.com/Applifier/unity-ads-webview/pull/9369)
+* Allow analytics events for Programmatic MRAID [#9368](https://github.com/Applifier/unity-ads-webview/pull/9368)
+* Edit China Metrics to Collect More Relevant Information [#9391](https://github.com/Applifier/unity-ads-webview/pull/9391)
 
 # Wed May  1 16:06:14 UTC 2019
 
