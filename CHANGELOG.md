@@ -1,3 +1,7 @@
+# Staged
+
+* Italian and Portuguese localization for consent views [#9443](https://github.com/Applifier/unity-ads-webview/pull/9443) 
+
 # Fri May  3 19:52:17 UTC 2019 
 
 * Russian localization for consent views [#9419](https://github.com/Applifier/unity-ads-webview/pull/9419)
