@@ -1,3 +1,7 @@
+# Staged 
+
+* Remove top overlay progress bar experiment [#9393](https://github.com/Applifier/unity-ads-webview/pull/9393)
+
 # Mon May  6 11:54:47 UTC 2019
 
 * Italian and Portuguese localization for consent views [#9443](https://github.com/Applifier/unity-ads-webview/pull/9443) 
