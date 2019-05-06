@@ -6,7 +6,6 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { AnimatedPerfomanceEndScreen } from 'Performance/Views/AnimatedPerfomanceEndScreen';
-import { AnimationEndCardTest } from 'Core/Models/ABGroup';
 
 import { ICore } from 'Core/ICore';
 import { IAds } from 'Ads/IAds';
@@ -17,7 +16,9 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { VideoOverlay } from 'Ads/Views/VideoOverlay';
+import { AnimationEndCardTest, RedesignedEndScreenDesignExperiment } from 'Core/Models/ABGroup';
 import { AnimatedVideoOverlay } from 'Ads/Views/AnimatedVideoOverlay';
+import { RedesignedPerformanceEndscreen } from 'Performance/Views/RedesignedPerformanceEndScreen';
 
 export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParametersFactory<PerformanceCampaign, IPerformanceAdUnitParameters> {
 
@@ -49,6 +50,9 @@ export class PerformanceAdUnitParametersFactory extends AbstractAdUnitParameters
 
         if (AnimationEndCardTest.isValid(abGroup)) {
             endScreen = new AnimatedPerfomanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
+        } else if (RedesignedEndScreenDesignExperiment.isValid(baseParams.coreConfig.getAbGroup())) {
+            endScreenParameters.id = 'redesigned-end-screen';
+            endScreen = new RedesignedPerformanceEndscreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         } else {
             endScreen = new PerformanceEndScreen(endScreenParameters, baseParams.campaign, baseParams.coreConfig.getCountry());
         }

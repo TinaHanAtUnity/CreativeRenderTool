@@ -1,0 +1,218 @@
+@import "vars.styl";
+
+$square-campaign-container-background-color = #dedede;
+
+#redesigned-end-screen.square-end-screen {
+  .campaign-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: $square-campaign-container-background-color;
+  }
+
+  .privacy-button {
+    bottom: 0;
+    left: 0;
+  }
+
+  .game-image {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  .game-background-blurred {
+    position: absolute;
+    display: block;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    filter: blur(6px) brightness(.8) opacity(.88);
+    transform: scale(1.4);
+    background-color: transparent;
+    background-size: cover;
+  }
+
+  &.old-androids {
+    .game-background-blurred {
+      display: none;
+    }
+
+    .game-image {
+      background-color: $light-gray;
+    }
+  }
+
+  .end-screen-info-background {
+    position: relative;
+    z-index: 6;
+    flex-grow: 1;
+    width: auto;
+    background-color: $end-screen-background-color;
+  }
+}
+
+&.landscape #redesigned-end-screen.square-end-screen {
+  .campaign-container {
+    flex-direction: row;
+  }
+
+  .privacy-button {
+    left: 0;
+  }
+}
+
+/* Font size fixes to the end-screen.styl media queries */
+
+html #redesigned-end-screen.square-end-screen .end-screen-info-background {
+  @media (orientation: portrait) {
+    @media (min-height: 0) {
+      font-size: $default-px-size * .3;
+    }
+
+    @media (min-height: 250px) {
+      font-size: $default-px-size * .4;
+    }
+
+    @media (min-height: 320px) {
+      font-size: $default-px-size * .6;
+    }
+
+    @media (min-height: 380px) {
+      font-size: $default-px-size * .7;
+    }
+
+    @media (min-height: 460px) {
+      font-size: $default-px-size * .9;
+    }
+
+    @media (min-height: 560px) {
+      font-size: $default-px-size * 1.1;
+    }
+
+    @media (min-height: 600px) {
+      font-size: $default-px-size * 1.2;
+    }
+
+    @media (min-height: 680px) {
+      font-size: $default-px-size * 1.3;
+    }
+
+    @media (min-height: 780px) {
+      font-size: $default-px-size * 1.4;
+    }
+
+    @media (min-height: 980px) {
+      font-size: $default-px-size * 1.6;
+    }
+
+    @media (min-height: 1050px) {
+      font-size: $default-px-size * 1.8;
+    }
+
+    @media (min-height: 1175px) {
+      font-size: $default-px-size * 2.2;
+    }
+
+    @media (min-height: 1375px) {
+        font-size: $default-px-size * 2.6;
+    }
+
+    @media (min-height: 1675px) {
+      font-size: $default-px-size * 3;
+    }
+
+    @media (min-height: 1975px) {
+      font-size: $default-px-size * 4;
+    }
+
+    @media (min-height: 2275px) {
+      font-size: $default-px-size * 4.6;
+    }
+
+    @media (min-height: 2575px) {
+      font-size: $default-px-size * 5.5;
+    }
+
+    @media (min-height: 2875px) {
+      font-size: $default-px-size * 6.2;
+    }
+
+    @media (min-height: 3475px) {
+      font-size: $default-px-size * 7;
+    }
+  }
+
+  @media (orientation: landscape) {
+      @media (min-width: 200px) {
+        font-size: $default-px-size * .5;
+      }
+
+      @media (min-width: 320px) {
+        font-size: $default-px-size * .6;
+      }
+
+      @media (min-width: 460px) {
+        font-size: $default-px-size * .9;
+      }
+
+      @media (min-width: 580px) {
+        font-size: $default-px-size * 1.2;
+      }
+
+      @media (min-width: 760px) {
+        font-size: $default-px-size * 1.4;
+      }
+
+      @media (min-width: 960px) {
+        font-size: $default-px-size * 1.6;
+      }
+
+      @media (min-width: 1160px) {
+        font-size: $default-px-size * 2.2;
+      }
+
+      @media (min-width: 1460px) {
+        font-size: $default-px-size * 2.8;
+      }
+
+      @media (min-width: 1760px) {
+        font-size: $default-px-size * 3.4;
+      }
+
+      @media (min-width: 2260px) {
+        font-size: $default-px-size * 4.4;
+      }
+  }
+}
+
+/* iPhone X, XR and XS Max fixes */
+@media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3),
+only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2),
+only screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) {
+  &.landscape #redesigned-end-screen.square-end-screen {
+    .game-image {
+      background-position: left;
+    }
+
+    .download-container {
+      font-size: 1.05rem;
+    }
+
+    .game-rating, .name-container {
+      font-size: 1.2rem;
+    }
+
+    /* This is to fix issue that was visible at least in some iPhone X series. The square image doesn't
+      take the full space it has so the campaign-container's background color that was meant for devices that
+      don't support blurring of the background image was visible.
+    */
+    .campaign-container {
+      background-color: $end-screen-background-color;
+    }
+  }
+}
