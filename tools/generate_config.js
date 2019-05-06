@@ -52,3 +52,17 @@ fs.writeFileSync(output, JSON.stringify({
     hash: hash,
     version: commitId
 }), options);
+
+const chinaUrl = [
+    'https://webview.unityads.unitychina.cn/webview',
+    branch,
+    commitId,
+    target,
+    'index.html'
+].join('/');
+
+fs.writeFileSync(output + '.cn', JSON.stringify({
+    url: chinaUrl,
+    hash: hash,
+    version: commitId
+}), options);
