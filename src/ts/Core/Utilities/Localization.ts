@@ -35,6 +35,7 @@ import NorwegianOverlay from 'json/locale/nb/overlay.json';
 import PortugueseEndscreen from 'json/locale/pt/endscreen.json';
 import PortugueseLoadingScreen from 'json/locale/pt/loadingscreen.json';
 import PortugueseOverlay from 'json/locale/pt/overlay.json';
+import PortugueseConsent from 'json/locale/pt/consent.json';
 import RomanianEndscreen from 'json/locale/ro/endscreen.json';
 import RomanianOverlay from 'json/locale/ro/overlay.json';
 import RussianEndscreen from 'json/locale/ru/endscreen.json';
@@ -194,7 +195,8 @@ export class Localization {
         'pt.*': {
             'endscreen': JSON.parse(PortugueseEndscreen),
             'overlay': JSON.parse(PortugueseOverlay),
-            'loadingscreen': JSON.parse(PortugueseLoadingScreen)
+            'loadingscreen': JSON.parse(PortugueseLoadingScreen),
+            'consent': JSON.parse(PortugueseConsent)
         }
     };
 
@@ -247,7 +249,8 @@ export class Localization {
         if (language.match('fr.*')
             || language.match('de.*')
             || language.match('es.*')
-            || language.match('ru.*')) {
+            || language.match('ru.*')
+            || language.match('pt.*')) {
             return true;
         }
 
