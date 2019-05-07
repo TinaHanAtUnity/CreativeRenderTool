@@ -13,7 +13,8 @@ import { ClickDiagnostics } from 'Ads/Utilities/ClickDiagnostics';
 import { Url } from 'Core/Utilities/Url';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 import { OpenMeasurement } from 'Ads/Views/OpenMeasurement';
-import { InteractionType } from 'Ads/Views/OMIDEventBridge';
+import { InteractionType, ObstructionReasons, IViewPort, IAdView } from 'Ads/Views/OMIDEventBridge';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _platform: Platform;
@@ -26,6 +27,11 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _gameSessionId?: number;
     private _abGroup: ABGroup;
     private _om?: OpenMeasurement;
+    private _deviceInfo: DeviceInfo;
+
+    private _viewPort: IViewPort;
+    private _obstructedAdView: IAdView;
+    private _unObstructedAdView: IAdView;
 
     constructor(adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(adUnit, parameters);
@@ -41,6 +47,58 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._gameSessionId = parameters.gameSessionId;
         this._abGroup = parameters.coreConfig.getAbGroup();
         this._om = this._vastAdUnit.getOpenMeasurement();
+        this._deviceInfo = parameters.deviceInfo;
+    }
+
+    public onShowPrivacyPopUp(x: number, y: number, width: number, height: number): Promise<void> {
+
+        if (this._om) {
+            // if obstruction already calculated
+            if (this._viewPort && this._obstructedAdView) {
+                this._om.geometryChange(this._viewPort, this._obstructedAdView);
+                return Promise.resolve();
+            }
+
+            return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([screenWidth, screenHeight]) => {
+                if (this._om) {
+                    this._viewPort = this._om.calculateViewPort(screenWidth, screenHeight);
+                    const obstructionRectangle = {
+                        x: x,
+                        y: y,
+                        width: width,
+                        height: height
+                    };
+                    const percentCoverage = (width / screenWidth) + (height / screenHeight);
+                    const percentInView = (1 - percentCoverage) * 100;
+
+                    this._obstructedAdView = this._om.calculateVastAdView(percentInView, [ObstructionReasons.OBSTRUCTED], screenWidth, screenHeight, true, [obstructionRectangle]);
+                    this._om.geometryChange(this._viewPort, this._obstructedAdView);
+                }
+            });
+        }
+
+        return super.onShowPrivacyPopUp(x, y, width, height);
+    }
+
+    public onClosePrivacyPopUp(): Promise<void> {
+
+        if (this._om) {
+            // if obstruction already calculated
+            if (this._viewPort && this._unObstructedAdView) {
+                this._om.geometryChange(this._viewPort, this._unObstructedAdView);
+                return Promise.resolve();
+            }
+
+            return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+                if (this._om) {
+                    this._viewPort = this._om.calculateViewPort(width, height);
+                    this._unObstructedAdView = this._om.calculateVastAdView(100, [], width, height, true, []);
+                    this._om.geometryChange(this._viewPort, this._unObstructedAdView);
+                }
+            });
+        }
+
+        return super.onClosePrivacyPopUp();
     }
 
     public onOverlaySkip(position: number): void {
