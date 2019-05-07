@@ -28,6 +28,13 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       opacity: .6;
     }
 
+    .pop-up-container {
+        width: calc(100% - 1.5em);
+        height: calc(100% - 1.5em);
+        margin: .75em auto;
+        border-radius: 1em;
+      }
+
     .download-container {
       margin: .75 * $default-scale-size * $scale-size auto 0 auto;
       padding: $endscreen-default-size * .6 0;
@@ -144,12 +151,20 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     .game-background-container {
       position: relative;
       width: 100%;
-      height: 65%;
+      height: 69%;
     }
 
     .game-background {
       width: 100%;
       height: 100%;
+    }
+
+    .game-background-portrait {
+      border-radius: 1em 1em 0 0;
+    }
+
+    .game-background-landscape {
+      border-radius: 1em 0 0 1em;
     }
 
     .column-container {
@@ -173,10 +188,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       }
 
       .pop-up-container {
-        width: 94%;
-        height: 94%;
-        margin: 3% auto 0 auto;
-        border-radius: 1em;
+        margin: .75em auto 0 auto;
       }
 
       .game-background-blurred {
@@ -202,7 +214,6 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       }
 
       .end-screen-info-background {
-        background-color: #2b2b2b;
         border-radius: 0 0 1rem 1rem;  
       }
 
@@ -280,7 +291,7 @@ body {
 
     .end-screen-info-background {
       width: 100%;
-      height: 35%;
+      height: 31%;
     }
 
     .game-icon {
@@ -319,6 +330,7 @@ body {
 
     .campaign-container {
       display: flex;
+      border-radius: 1em;
     }
 
     .end-screen-info-background {
@@ -375,7 +387,9 @@ body {
     align-content: center;
     height: 100%;
     justify-content: center;
-    background-color: $end-screen-background-color;
+    background-color: #2b2b2b;
+    border-radius: 0 1rem 1rem 0;
+
   }
 
   .bottom-container,
