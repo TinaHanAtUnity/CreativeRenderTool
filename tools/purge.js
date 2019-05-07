@@ -8,7 +8,8 @@ const cdnConfig = {
             'cdn-akamai.unityads.unity3d.com',
             'cdn.unityads.unity3d.com',
             'config.unityads.unity3d.com',
-            'webview.unityads.unity3d.com'
+            'webview.unityads.unity3d.com',
+            'config-cn.unityads.unity3d.com'
         ],
         'check_url': 'cdn-akamai.unityads.unity3d.com',
         'username': process.env.AKAMAI_USERNAME,
@@ -32,7 +33,9 @@ const cdnConfig = {
             'cdn.unityads.unity3d.com',
             'geocdn.unityads.unity3d.com',
             'config.unityads.unity3d.com',
-            'webview.unityads.unity3d.com'
+            'webview.unityads.unity3d.com',
+            'config.unityads.unitychina.cn',
+            'webview.unityads.unitychina.cn'
         ],
         'check_url': 'china-cdn2.unityads.unity3d.com',
         'access_key_id': process.env.ALIBABACLOUD_ACCESS_KEY_ID,

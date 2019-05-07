@@ -1,3 +1,7 @@
+# Tue May  7 18:10:12 UTC 2019
+
+* China config json deploy [#9272](https://github.com/Applifier/unity-ads-webview/pull/9272)
+
 # Mon May  6 22:35:49 UTC 2019 
 
 * Remove top overlay progress bar experiment [#9393](https://github.com/Applifier/unity-ads-webview/pull/9393)
