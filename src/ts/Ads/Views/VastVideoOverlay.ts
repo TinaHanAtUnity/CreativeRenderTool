@@ -22,4 +22,22 @@ export class VastVideoOverlay extends VideoOverlay implements IPrivacyHandlerVie
             delete this._privacy;
         }
     }
+
+    protected onPrivacyEvent(event: Event) {
+        super.onPrivacyEvent(event);
+
+        const popup = <HTMLElement>document.querySelector('.pop-up');
+        const rect = popup.getBoundingClientRect();
+        const x = rect.left;
+        const y = rect.top;
+        const width = rect.width;
+        const height = rect.height;
+
+        this._handlers.forEach(handler => handler.onShowPrivacyPopUp(x, y, width, height));
+    }
+
+    public onPrivacyClose(): void {
+        super.onPrivacyClose();
+        this._handlers.forEach(handler => handler.onClosePrivacyPopUp());
+    }
 }
