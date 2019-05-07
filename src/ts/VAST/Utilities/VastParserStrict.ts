@@ -13,6 +13,7 @@ import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities
 import { VastVerificationResource } from 'VAST/Models/VastVerificationResource';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
+import { VastCreativeStaticResourceCompanionAdValidator } from 'VAST/Validators/VastCreativeStaticResourceCompanionAdValidator';
 
 enum VastNodeName {
     ERROR = 'Error',
@@ -295,10 +296,15 @@ export class VastParserStrict {
             const staticResourceElement = this.getFirstNodeWithName(element, VastNodeName.STATIC_RESOURCE);
             if (staticResourceElement) {
                 const companionAd = this.parseCreativeStaticResourceCompanionAdElement(element, urlProtocol);
-                vastAd.addCompanionAd(companionAd);
+                const companionAdErrors = new VastCreativeStaticResourceCompanionAdValidator(companionAd).getErrors();
+                if (companionAdErrors.length === 0) {
+                    vastAd.addCompanionAd(companionAd);
+                } else {
+                    vastAd.addUnsupportedItem(element.outerHTML + ' reason: ' + companionAdErrors.join(' '));
+                }
             } else {
                 // ignore element as it is not of a type we support
-                vastAd.addUnparseableCompanionAd(element.outerHTML);
+                vastAd.addUnsupportedItem(element.outerHTML);
             }
         });
 

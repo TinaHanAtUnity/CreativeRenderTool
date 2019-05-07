@@ -8,7 +8,7 @@ describe('VastCreativeCompanionAdValidatorTest', () => {
     describe('getErrors', () => {
 
         it('Should not give any errors when valid VastCreativeCompanionAd is given', () => {
-            const companionAd = new VastCreativeStaticResourceCompanionAd('testId', 200, 200, 'image/jpg', 'http://google.com?someQuery=test&other=no', 'http://google.com?someQuery=test&other=no', ['https://google.com?companionAd=yes&clickTracking=true'], {
+            const companionAd = new VastCreativeStaticResourceCompanionAd('testId', 480, 320, 'image/jpg', 'http://google.com?someQuery=test&other=no', 'http://google.com?someQuery=test&other=no', ['https://google.com?companionAd=yes&clickTracking=true'], {
                 'click': ['http://google.com', 'https://reddit.com'],
                 'impression': ['http://google.com/impression?someQuery=test&other=no']
             });
@@ -18,7 +18,7 @@ describe('VastCreativeCompanionAdValidatorTest', () => {
 
         it('Should not give any errors when creativeType is supported', () => {
             const test = (type: string) => {
-                const companionAd = new VastCreativeStaticResourceCompanionAd('testId', 200, 200, type, 'http://google.com?someQuery=test&other=no', 'http://google.com?someQuery=test&other=no', [], {
+                const companionAd = new VastCreativeStaticResourceCompanionAd('testId', 320, 480, type, 'http://google.com?someQuery=test&other=no', 'http://google.com?someQuery=test&other=no', [], {
                     'click': ['http://google.com', 'https://reddit.com'],
                     'impression': ['http://google.com/impression?someQuery=test&other=no']
                 });
@@ -35,7 +35,7 @@ describe('VastCreativeCompanionAdValidatorTest', () => {
         });
 
         it('Should give errors when invalid VastCreativeCompanionAd is given', () => {
-            const companionAd = new VastCreativeStaticResourceCompanionAd('testId', 200, 200, 'invalid', 'http://google.com?someQuery=test&other=no', 'invalidClick', ['invalidClickTracking'], {
+            const companionAd = new VastCreativeStaticResourceCompanionAd('testId', 320, 480, 'invalid', 'http://google.com?someQuery=test&other=no', 'invalidClick', ['invalidClickTracking'], {
                 'click': ['', 'abc'],
                 'impression': ['abc?no=hello']
             });
@@ -47,8 +47,8 @@ describe('VastCreativeCompanionAdValidatorTest', () => {
         it('Should give errors when invalid VastCreativeCompanionAd is given', () => {
             const companionAd = new VastCreativeStaticResourceCompanionAd(null, null, null);
             const errors = new VastCreativeStaticResourceCompanionAdValidator(companionAd).getErrors();
-            assert.lengthOf(errors, 3, JSON.stringify(errors));
-            assert.equal(VastValidationUtilities.formatErrors(errors), 'VAST Companion ad(null) is missing required StaticResource Element\n    VAST Companion ad(null) "StaticResource" is missing required "creativeType" attribute\n    VAST Companion ad(null) is missing required CompanionClickThrough Element');
+            assert.lengthOf(errors, 4, JSON.stringify(errors));
+            assert.equal(VastValidationUtilities.formatErrors(errors), 'VAST Companion ad(null) is missing required StaticResource Element\n    VAST Companion ad(null) "StaticResource" is missing required "creativeType" attribute\n    VAST Companion ad(null) "StaticResource" is not meeting minimum size 480 x 320\n    VAST Companion ad(null) is missing required CompanionClickThrough Element');
         });
     });
 });

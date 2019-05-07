@@ -18,7 +18,7 @@ describe('VastAdValidatorTest', () => {
                 ['http://reddit.com/click', 'https://reddit.com/thridparty/click'],
                 ['http://google.com/custom/click'],
                 'test');
-            const companionAd = new VastCreativeStaticResourceCompanionAd('testId', 200, 200, 'image/jpg', 'http://google.com?someQuery=test&other=no', 'http://google.com?someQuery=test&other=no', [], {
+            const companionAd = new VastCreativeStaticResourceCompanionAd('testId', 480, 320, 'image/jpg', 'http://google.com?someQuery=test&other=no', 'http://google.com?someQuery=test&other=no', [], {
                 'click': ['http://google.com', 'https://reddit.com'],
                 'impression': ['http://google.com/impression?someQuery=test&other=no']
             });
@@ -45,7 +45,7 @@ describe('VastAdValidatorTest', () => {
                 ['htt', 'https://reddit.com/thridparty/click?someQuery=test&other=no'],
                 [''],
                 'test');
-            const companionAd = new VastCreativeStaticResourceCompanionAd('testId', 200, 200, 'invalid', 'http://google.com?someQuery=test&other=no', 'invalidClick', [], {
+            const companionAd = new VastCreativeStaticResourceCompanionAd('testId', 480, 320, 'invalid', 'http://google.com?someQuery=test&other=no', 'invalidClick', [], {
                 'click': ['', 'abc'],
                 'impression': ['abc?no=hello']            });
             const vastAd = new VastAd(

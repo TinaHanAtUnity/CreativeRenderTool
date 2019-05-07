@@ -8,7 +8,7 @@ import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
 interface IVastAd {
     id: string | null;
     creatives: VastCreative[];
-    unparseableCompanionAds: string[];
+    unsupportedItems: string[];
     companionAds: VastCreativeStaticResourceCompanionAd[];
     errorURLTemplates: string[];
     impressionURLTemplates: string[];
@@ -19,8 +19,8 @@ interface IVastAd {
 export class VastAd extends Model<IVastAd> {
 
     constructor();
-    constructor(id: string, creatives: VastCreative[], errorURLTemplates: string[], impressionURLTemplates: string[], wrapperURLs: string[], companionAds: VastCreativeStaticResourceCompanionAd[], unparseableCompanionAds: string[], adVerifications: VastAdVerification[]);
-    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeStaticResourceCompanionAd[], unparseableCompanionAds?: string[], adVerifications?: VastAdVerification[]) {
+    constructor(id: string, creatives: VastCreative[], errorURLTemplates: string[], impressionURLTemplates: string[], wrapperURLs: string[], companionAds: VastCreativeStaticResourceCompanionAd[], unsupportedItems: string[], adVerifications: VastAdVerification[]);
+    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeStaticResourceCompanionAd[], unsupportedItems?: string[], adVerifications?: VastAdVerification[]) {
         super('VastAd', {
             id: ['string', 'null'],
             creatives: ['array'],
@@ -28,7 +28,7 @@ export class VastAd extends Model<IVastAd> {
             errorURLTemplates: ['array'],
             impressionURLTemplates: ['array'],
             wrapperURLs: ['array'],
-            unparseableCompanionAds: ['array'],
+            unsupportedItems: ['array'],
             adVerifications: ['array']
         });
 
@@ -38,7 +38,7 @@ export class VastAd extends Model<IVastAd> {
         this.set('errorURLTemplates', errorURLTemplates || []);
         this.set('impressionURLTemplates', impressionURLTemplates || []);
         this.set('wrapperURLs', wrapperURLs || []);
-        this.set('unparseableCompanionAds', unparseableCompanionAds || []);
+        this.set('unsupportedItems', unsupportedItems || []);
         this.set('adVerifications', adVerifications || []);
     }
 
@@ -85,12 +85,12 @@ export class VastAd extends Model<IVastAd> {
         this.get('companionAds').push(companionAd);
     }
 
-    public getUnparseableCompanionAds(): string[] {
-        return this.get('unparseableCompanionAds');
+    public getUnsupportedItems(): string[] {
+        return this.get('unsupportedItems');
     }
 
-    public addUnparseableCompanionAd(companionAd: string) {
-        this.get('unparseableCompanionAds').push(companionAd);
+    public addUnsupportedItem(unsupportedItem: string) {
+        this.get('unsupportedItems').push(unsupportedItem);
     }
 
     public addAdVerifications(verfications: VastAdVerification[]) {
@@ -184,7 +184,8 @@ export class VastAd extends Model<IVastAd> {
             'impressionURLTemplates': this.getImpressionURLTemplates(),
             'wrapperURLs': this.getWrapperURLs(),
             'vastCreatives': vastCreatives,
-            'companionAds': companionAds
+            'companionAds': companionAds,
+            'unsupportedItems': this.getUnsupportedItems()
         };
     }
 

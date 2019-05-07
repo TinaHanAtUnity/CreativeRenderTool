@@ -6,6 +6,10 @@ import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities
 export class VastCreativeStaticResourceCompanionAdValidator implements IValidator {
 
     private static readonly _supportedCreativeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    private static readonly _minPortraitHeight = 480;
+    private static readonly _minPotratitWidth = 320;
+    private static readonly _minLandscapeHeight = 320;
+    private static readonly _minLandscapeWidth = 480;
 
     private _errors: Error[] = [];
 
@@ -20,6 +24,7 @@ export class VastCreativeStaticResourceCompanionAdValidator implements IValidato
     private validate(companionAd: VastCreativeStaticResourceCompanionAd) {
         this.validateStaticResourceUrl(companionAd);
         this.validateCreativeType(companionAd);
+        this.validateCreativeSize(companionAd);
         this.validateCompanionClickThroughURLTemplate(companionAd);
         this.validateCompanionClickTrackingURLTemplates(companionAd);
         this.validateTrackingEvents(companionAd);
@@ -42,6 +47,21 @@ export class VastCreativeStaticResourceCompanionAdValidator implements IValidato
             this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" is missing required "creativeType" attribute`));
         } else if (VastCreativeStaticResourceCompanionAdValidator._supportedCreativeTypes.indexOf(creativeType.toLowerCase()) === -1) {
             this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" attribute "creativeType=${creativeType}" is not supported`));
+        }
+    }
+
+    private validateCreativeSize(companionAd: VastCreativeStaticResourceCompanionAd) {
+        const adId = companionAd.getId();
+        const height = companionAd.getHeight();
+        const width = companionAd.getWidth();
+        if (height > width) {   // Portrait
+            if (height < VastCreativeStaticResourceCompanionAdValidator._minPortraitHeight || width < VastCreativeStaticResourceCompanionAdValidator._minPotratitWidth) {
+                this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 320 x 480`));
+            }
+        } else {
+            if (height < VastCreativeStaticResourceCompanionAdValidator._minLandscapeHeight || width < VastCreativeStaticResourceCompanionAdValidator._minLandscapeWidth) {
+                this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 480 x 320`));
+            }
         }
     }
 
@@ -76,5 +96,4 @@ export class VastCreativeStaticResourceCompanionAdValidator implements IValidato
             });
         });
     }
-
 }

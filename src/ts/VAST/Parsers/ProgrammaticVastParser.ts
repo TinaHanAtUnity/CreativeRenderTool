@@ -168,7 +168,7 @@ export class ProgrammaticVastParser extends CampaignParser {
     private getWarnings(vast: Vast): string[] {
         let warnings: string[] = [];
         for (const vastAd of vast.getAds()) {
-            warnings = warnings.concat(vastAd.getUnparseableCompanionAds());
+            warnings = warnings.concat(vastAd.getUnsupportedItems());
         }
         return warnings.map((warning) => {
             return `Unsupported companionAd : ${warning}`;
