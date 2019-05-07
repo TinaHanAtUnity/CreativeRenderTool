@@ -1,9 +1,9 @@
 import { IValidator } from 'VAST/Validators/IValidator';
-import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
+import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { Url } from 'Core/Utilities/Url';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
 
-export class VastCreativeStaticResourceCompanionAdValidator implements IValidator {
+export class VastCompanionAdStaticResourceValidator implements IValidator {
 
     private static readonly _supportedCreativeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
     private static readonly _minPortraitHeight = 480;
@@ -13,7 +13,7 @@ export class VastCreativeStaticResourceCompanionAdValidator implements IValidato
 
     private _errors: Error[] = [];
 
-    constructor(companionAd: VastCreativeStaticResourceCompanionAd) {
+    constructor(companionAd: VastCompanionAdStaticResource) {
         this.validate(companionAd);
     }
 
@@ -21,7 +21,7 @@ export class VastCreativeStaticResourceCompanionAdValidator implements IValidato
         return this._errors;
     }
 
-    private validate(companionAd: VastCreativeStaticResourceCompanionAd) {
+    private validate(companionAd: VastCompanionAdStaticResource) {
         this.validateStaticResourceUrl(companionAd);
         this.validateCreativeType(companionAd);
         this.validateCreativeSize(companionAd);
@@ -30,7 +30,7 @@ export class VastCreativeStaticResourceCompanionAdValidator implements IValidato
         this.validateTrackingEvents(companionAd);
     }
 
-    private validateStaticResourceUrl(companionAd: VastCreativeStaticResourceCompanionAd) {
+    private validateStaticResourceUrl(companionAd: VastCompanionAdStaticResource) {
         const adId = companionAd.getId();
         const staticResourceURL = companionAd.getStaticResourceURL();
         if (staticResourceURL === null) {
@@ -40,32 +40,32 @@ export class VastCreativeStaticResourceCompanionAdValidator implements IValidato
         }
     }
 
-    private validateCreativeType(companionAd: VastCreativeStaticResourceCompanionAd) {
+    private validateCreativeType(companionAd: VastCompanionAdStaticResource) {
         const adId = companionAd.getId();
         const creativeType = companionAd.getCreativeType();
         if (creativeType === null) {
             this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" is missing required "creativeType" attribute`));
-        } else if (VastCreativeStaticResourceCompanionAdValidator._supportedCreativeTypes.indexOf(creativeType.toLowerCase()) === -1) {
+        } else if (VastCompanionAdStaticResourceValidator._supportedCreativeTypes.indexOf(creativeType.toLowerCase()) === -1) {
             this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" attribute "creativeType=${creativeType}" is not supported`));
         }
     }
 
-    private validateCreativeSize(companionAd: VastCreativeStaticResourceCompanionAd) {
+    private validateCreativeSize(companionAd: VastCompanionAdStaticResource) {
         const adId = companionAd.getId();
         const height = companionAd.getHeight();
         const width = companionAd.getWidth();
         if (height > width) {   // Portrait
-            if (height < VastCreativeStaticResourceCompanionAdValidator._minPortraitHeight || width < VastCreativeStaticResourceCompanionAdValidator._minPotratitWidth) {
+            if (height < VastCompanionAdStaticResourceValidator._minPortraitHeight || width < VastCompanionAdStaticResourceValidator._minPotratitWidth) {
                 this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 320 x 480`));
             }
         } else {
-            if (height < VastCreativeStaticResourceCompanionAdValidator._minLandscapeHeight || width < VastCreativeStaticResourceCompanionAdValidator._minLandscapeWidth) {
+            if (height < VastCompanionAdStaticResourceValidator._minLandscapeHeight || width < VastCompanionAdStaticResourceValidator._minLandscapeWidth) {
                 this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 480 x 320`));
             }
         }
     }
 
-    private validateCompanionClickThroughURLTemplate(companionAd: VastCreativeStaticResourceCompanionAd) {
+    private validateCompanionClickThroughURLTemplate(companionAd: VastCompanionAdStaticResource) {
         const adId = companionAd.getId();
         const companionClickThroughURLTemplate = companionAd.getCompanionClickThroughURLTemplate();
         if (companionClickThroughURLTemplate === null) {
@@ -75,7 +75,7 @@ export class VastCreativeStaticResourceCompanionAdValidator implements IValidato
         }
     }
 
-    private validateCompanionClickTrackingURLTemplates(companionAd: VastCreativeStaticResourceCompanionAd) {
+    private validateCompanionClickTrackingURLTemplates(companionAd: VastCompanionAdStaticResource) {
         const adId = companionAd.getId();
         const companionClickTrackingURLTemplates = companionAd.getCompanionClickTrackingURLTemplates();
         for (const companionClickTrackingURLTemplate of companionClickTrackingURLTemplates) {
@@ -85,7 +85,7 @@ export class VastCreativeStaticResourceCompanionAdValidator implements IValidato
         }
     }
 
-    private validateTrackingEvents(companionAd: VastCreativeStaticResourceCompanionAd) {
+    private validateTrackingEvents(companionAd: VastCompanionAdStaticResource) {
         const trackingEvents = companionAd.getTrackingEvents();
         Object.keys(trackingEvents).map((key) => {
             const urls = trackingEvents[key];

@@ -1,6 +1,6 @@
 import { Model } from 'Core/Models/Model';
 import { VastCreative } from 'VAST/Models/VastCreative';
-import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
+import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
@@ -9,7 +9,7 @@ interface IVastAd {
     id: string | null;
     creatives: VastCreative[];
     unsupportedItems: string[];
-    companionAds: VastCreativeStaticResourceCompanionAd[];
+    companionAds: VastCompanionAdStaticResource[];
     errorURLTemplates: string[];
     impressionURLTemplates: string[];
     wrapperURLs: string[];
@@ -19,8 +19,8 @@ interface IVastAd {
 export class VastAd extends Model<IVastAd> {
 
     constructor();
-    constructor(id: string, creatives: VastCreative[], errorURLTemplates: string[], impressionURLTemplates: string[], wrapperURLs: string[], companionAds: VastCreativeStaticResourceCompanionAd[], unsupportedItems: string[], adVerifications: VastAdVerification[]);
-    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeStaticResourceCompanionAd[], unsupportedItems?: string[], adVerifications?: VastAdVerification[]) {
+    constructor(id: string, creatives: VastCreative[], errorURLTemplates: string[], impressionURLTemplates: string[], wrapperURLs: string[], companionAds: VastCompanionAdStaticResource[], unsupportedItems: string[], adVerifications: VastAdVerification[]);
+    constructor(id?: string, creatives?: VastCreative[], errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCompanionAdStaticResource[], unsupportedItems?: string[], adVerifications?: VastAdVerification[]) {
         super('VastAd', {
             id: ['string', 'null'],
             creatives: ['array'],
@@ -77,11 +77,11 @@ export class VastAd extends Model<IVastAd> {
         this.get('creatives').push(creative);
     }
 
-    public getCompanionAds(): VastCreativeStaticResourceCompanionAd[] {
+    public getCompanionAds(): VastCompanionAdStaticResource[] {
         return this.get('companionAds');
     }
 
-    public addCompanionAd(companionAd: VastCreativeStaticResourceCompanionAd) {
+    public addCompanionAd(companionAd: VastCompanionAdStaticResource) {
         this.get('companionAds').push(companionAd);
     }
 
