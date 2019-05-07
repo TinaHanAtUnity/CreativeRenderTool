@@ -1,6 +1,7 @@
 # Pending
 
 * Calculate additional Open Measurement Obstructions [#9223](https://github.com/Applifier/unity-ads-webview/pull/9223)
+* Add Lion Studios games to fire ad dismiss delegate callback after animation is finished [#9510](https://github.com/Applifier/unity-ads-webview/pull/9510)
 
 # Tue May  7 18:10:12 UTC 2019
 
