@@ -3,7 +3,7 @@ import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign, ICampaign, IRawCampaign } from 'Ads/Models/Campaign';
 import { Asset } from 'Ads/Models/Assets/Asset';
-import { SliderEndScreenImageOrientation } from './SliderPerformanceCampaign';
+import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 
 export enum StoreName {
     APPLE,
