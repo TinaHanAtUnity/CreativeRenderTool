@@ -23,5 +23,6 @@ export enum EventCategory {
     DOWNLOAD,
     INSTALL,
     STORE,
+    WEB_AUTH_SESSION,
     NATIVE_ERROR
 }
