@@ -103,4 +103,8 @@ export class CustomFeatures {
     public static isUnsupportedOMVendor(resourceUrl: string) {
         return false;
     }
+
+    public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
+        return gameId === '2955123';
+    }
 }

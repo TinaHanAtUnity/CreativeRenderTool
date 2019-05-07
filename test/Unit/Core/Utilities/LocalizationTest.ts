@@ -88,6 +88,7 @@ describe('LocalizationTest', () => {
     });
 
     describe('Consent', () => {
+        // What information we collect and how we use it
         const id = 'privacy-what-we-collect-title';
 
         it('EN. Should return correct translation for id "privacy-what-we-collect-title"', () => {
@@ -117,6 +118,24 @@ describe('LocalizationTest', () => {
         it('FI. Should return correct translation for id "privacy-what-we-collect-title"', () => {
             const localization = new Localization('fi_FI', 'consent');
             const phrase = 'What information we collect and how we use it';
+            assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+        });
+
+        it('RU. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+            const localization = new Localization('ru', 'consent');
+            const phrase = 'Какую информацию мы собираем и как ее используем';
+            assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+        });
+
+        it('PT. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+            const localization = new Localization('pt', 'consent');
+            const phrase = 'Que informações recolhemos e como as utilizamos';
+            assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
+        });
+
+        it('IT. Should return correct translation for id "privacy-what-we-collect-title"', () => {
+            const localization = new Localization('it', 'consent');
+            const phrase = 'Quali informazioni raccogliamo e come le utilizziamo';
             assert.equal(localization.translate(id), phrase, 'Localization did not translate exact match');
         });
     });
