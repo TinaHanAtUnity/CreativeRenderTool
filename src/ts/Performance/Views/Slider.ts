@@ -1,4 +1,5 @@
 import { promises } from 'fs';
+import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 
 export interface ISliderOptions {
     startIndex: number;
@@ -59,7 +60,7 @@ export class Slider {
     private _onSlideCallback: OnSlideCallback;
     private _onDownloadCallback: OnDownloadCallback;
 
-    constructor(urls: string[], imageOrientation: 'portrait' | 'landscape', onSlideCallback: OnSlideCallback, onDownloadCallback: OnDownloadCallback) {
+    constructor(urls: string[], imageOrientation: SliderEndScreenImageOrientation, onSlideCallback: OnSlideCallback, onDownloadCallback: OnDownloadCallback) {
         this._onSlideCallback = onSlideCallback;
         this._onDownloadCallback = onDownloadCallback;
 
@@ -76,8 +77,9 @@ export class Slider {
         };
 
         this._isVisible = true;
-        imageOrientation === 'portrait' ? this.slidesPerPage = 1.666 : this.slidesPerPage = 1.3;
-        this._rootEl = this.createElement('div', 'slider-root-container', ['slider-wrap', `${imageOrientation}-slider-images`]);
+        this.slidesPerPage = imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE ? 1.3 : 1.666;
+        const imageOrientationClassNamePrefix = imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE ? 'landscape' : 'portrait';
+        this._rootEl = this.createElement('div', 'slider-root-container', ['slider-wrap', `${imageOrientationClassNamePrefix}-slider-images`]);
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
 
         // TODO: Make sure we always have 3 images

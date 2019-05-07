@@ -3,6 +3,7 @@ import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign, ICampaign, IRawCampaign } from 'Ads/Models/Campaign';
 import { Asset } from 'Ads/Models/Assets/Asset';
+import { SliderEndScreenImageOrientation } from './SliderPerformanceCampaign';
 
 export enum StoreName {
     APPLE,
@@ -64,7 +65,7 @@ export interface IPerformanceCampaign extends ICampaign {
     adUnitStyle: AdUnitStyle | undefined;
     appDownloadUrl?: string;
     screenshots?: Image[];
-    screenshotsOrientation?: 'portrait' | 'landscape';
+    screenshotsOrientation?: SliderEndScreenImageOrientation;
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
@@ -93,7 +94,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             adUnitStyle: ['object', 'undefined'],
             screenshots: ['array', 'undefined'],
             appDownloadUrl: ['string', 'undefined'],
-            screenshotsOrientation: ['string', 'undefined']
+            screenshotsOrientation: ['number', 'undefined']
         }, campaign);
     }
 

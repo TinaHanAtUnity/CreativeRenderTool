@@ -1,5 +1,10 @@
-import { IPerformanceCampaign, PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Asset } from 'Ads/Models/Assets/Asset';
+
+export enum SliderEndScreenImageOrientation {
+    LANDSCAPE,
+    PORTRAIT
+}
 
 export class SliderPerformanceCampaign extends PerformanceCampaign {
 
@@ -15,9 +20,14 @@ export class SliderPerformanceCampaign extends PerformanceCampaign {
         return this.get('screenshots') || [];
     }
 
-    public getScreenshotsOrientation(): 'portrait' | 'landscape' {
+    public getScreenshotsOrientation(): SliderEndScreenImageOrientation {
+        const orientation = this.get('screenshotsOrientation');
         // Note: In practice we don't need the default value but because the screenshotsOrientation is in
         // IPerformanceCampaign interface it needs to be optional
-        return this.get('screenshotsOrientation') || 'portrait';
+        if (orientation === undefined) {
+            return SliderEndScreenImageOrientation.PORTRAIT;
+        }
+
+        return orientation;
     }
 }

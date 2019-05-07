@@ -18,7 +18,7 @@ import {
     StoreName
 } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
-import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
+import { SliderPerformanceCampaign, SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 import { ABGroup } from 'Core/Models/ABGroup';
 
 const SLIDER_SCREENSHOT_BASE_URL = 'https://cdn-aui-experiments-data.unityads.unity3d.com/ec/';
@@ -157,11 +157,10 @@ export class CometCampaignParser extends CampaignParser {
             const osVersion = this._core.DeviceInfo.getOsVersion();
             const platform = this._core.NativeBridge.getPlatform();
             if (CustomFeatures.isSliderEndScreenEnabled(this._abGroup, parameters.appStoreId, osVersion, platform)) {
-                const sliderImages = CustomFeatures.getSliderEndScreenImagesForGame(parameters.appStoreId);
-                const orientation = sliderImages && sliderImages.portrait && sliderImages.portrait.length === 0 ? 'landscape' : 'portrait';
+                const orientation = CustomFeatures.getSliderEndScreenImageOrientation(parameters.appStoreId);
                 parameters.screenshotsOrientation = orientation;
-                parameters.screenshots = sliderImages[orientation].map(image => {
-                    const url = this.validateAndEncodeUrl(`${SLIDER_SCREENSHOT_BASE_URL}${parameters.appStoreId}/${image}`, session);
+                parameters.screenshots = Array.from([1, 2, 3], i => {
+                    const url = this.validateAndEncodeUrl(`${SLIDER_SCREENSHOT_BASE_URL}${parameters.appStoreId}/${i}.png`, session);
                     return new Image(url, session);
                 });
                 promise = Promise.resolve(new SliderPerformanceCampaign(parameters));

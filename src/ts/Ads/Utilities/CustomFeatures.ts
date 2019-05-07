@@ -5,6 +5,7 @@ import Game7GamesJson from 'json/custom_features/Game7Games.json';
 
 import { SliderEndCardExperiment, ABGroup } from 'Core/Models/ABGroup';
 import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
+import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
@@ -12,12 +13,6 @@ const Game7GameIds = setGameIds(Game7GamesJson);
 
 const SliderEndScreenImages = parseSliderEndScreenImages();
 const SliderEndScreenTargetGameIds = Object.keys(SliderEndScreenImages);
-
-interface ISliderEndScreenImagesForGame {
-    [key: string]: string[];
-    'portrait': string[];
-    'landscape': string[];
-}
 
 function parseSliderEndScreenImages() {
     let images;
@@ -144,7 +139,7 @@ export class CustomFeatures {
         return SliderEndCardExperiment.isValid(abGroup) && this.existsInList(SliderEndScreenTargetGameIds, '' + targetGameAppStoreId);
     }
 
-    public static getSliderEndScreenImagesForGame(targetGameAppStoreId: string): ISliderEndScreenImagesForGame {
+    public static getSliderEndScreenImageOrientation(targetGameAppStoreId: string): SliderEndScreenImageOrientation {
         return SliderEndScreenImages[targetGameAppStoreId];
     }
 
