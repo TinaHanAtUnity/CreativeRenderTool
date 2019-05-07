@@ -52,17 +52,19 @@ export class ProgrammaticMRAIDEventHandler extends MRAIDEventHandler implements 
         return this.openUrl(url).then(() => {
             this._mraidView.setCallButtonEnabled(true);
             this.sendTrackingEvents();
+            let clickLocation = 'programmatic_mraid';
             if (this._jaegerSpan) {
                 this._jaegerSpan.addAnnotation(`openUrlOnCallButton from ProgrammaticMRAIDEventHandler after openURL success ${url}`);
+                clickLocation = 'programmatic_mraid_webplayer';
             }
 
-            ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, 'programmatic_mraid', this._campaign, this._abGroup.valueOf(), this._gameSessionId);
+            ClickDiagnostics.sendClickDiagnosticsEvent(clickDuration, clickUrl, clickLocation, this._campaign, this._abGroup.valueOf(), this._gameSessionId);
         }).catch((e) => {
+            this._mraidView.setCallButtonEnabled(true);
+            this.sendTrackingEvents();
             if (this._jaegerSpan) {
                 this._jaegerSpan.addAnnotation(`openUrlOnCallButton from ProgrammaticMRAIDEventHandler after openURL fail ${e.message}`);
             }
-            this._mraidView.setCallButtonEnabled(true);
-            this.sendTrackingEvents();
         });
     }
 
