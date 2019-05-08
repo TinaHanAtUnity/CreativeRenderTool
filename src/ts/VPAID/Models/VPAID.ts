@@ -1,5 +1,5 @@
 import { Vast } from 'VAST/Models/Vast';
-import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
+import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 import { TrackingEvent } from 'Ads/Managers/ThirdPartyEventManager';
@@ -34,7 +34,7 @@ export class VPAID {
         return false;
     }
 
-    public getCompanion(): VastCreativeStaticResourceCompanionAd | null {
+    public getCompanion(): VastCompanionAdStaticResource | null {
         const ad = this.vast.getAd();
         if (ad) {
             const companions = ad.getCompanionAds();
