@@ -7,6 +7,7 @@ import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 import { SliderEndCardExperiment, ABGroup } from 'Core/Models/ABGroup';
 import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
 import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
+import { VersionMatchers } from 'Ads/Utilities/VersionMatchers';
 
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
@@ -35,11 +36,6 @@ function setGameIds(gameIdJson: string): string[] {
         gameIds = [];
     }
     return gameIds;
-}
-
-export function matchesMajorOSVersion(majorVersion: number, osVersion: string): boolean {
-    const regex = new RegExp(`^${majorVersion}\\.|^${majorVersion}$`);
-    return regex.test(osVersion);
 }
 
 export class CustomFeatures {
@@ -130,8 +126,8 @@ export class CustomFeatures {
     }
 
     public static isSliderEndScreenEnabled(abGroup: ABGroup, targetGameAppStoreId: string, osVersion: string, platform: Platform): boolean {
-        const isAndroid4 = platform === Platform.ANDROID && matchesMajorOSVersion(4, osVersion);
-        const isIOS7 = platform === Platform.IOS && matchesMajorOSVersion(7, osVersion);
+        const isAndroid4 = platform === Platform.ANDROID && VersionMatchers.matchesMajorOSVersion(4, osVersion);
+        const isIOS7 = platform === Platform.IOS && VersionMatchers.matchesMajorOSVersion(7, osVersion);
 
         // Exclude Android 4 and iOS 7 devices from the test because of layout issues
         if (isAndroid4 || isIOS7) {

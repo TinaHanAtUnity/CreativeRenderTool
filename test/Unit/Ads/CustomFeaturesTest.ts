@@ -1,4 +1,4 @@
-import { CustomFeatures, matchesMajorOSVersion } from 'Ads/Utilities/CustomFeatures';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { assert } from 'chai';
 import 'mocha';
 import { toAbGroup } from 'Core/Models/ABGroup';
@@ -101,24 +101,6 @@ describe('CustomFeatures', () => {
         it('should return false if all conditions do not match', () => {
             const isEnabled = CustomFeatures.isSliderEndScreenEnabled(toAbGroup(1), '-1', '7.9', Platform.IOS);
             assert.isFalse(isEnabled);
-        });
-    });
-
-    describe('matchesMajorOSVersion', () => {
-        it('Should match correctly a version with no minor version', () => {
-            assert.isTrue(matchesMajorOSVersion(7, '7'));
-        });
-
-        it('Should match correctly a version with minor version', () => {
-            assert.isTrue(matchesMajorOSVersion(7, '7.1'));
-        });
-
-        it('Should not match with when major version just starts with the same number', () => {
-            assert.isFalse(matchesMajorOSVersion(7, '70'));
-        });
-
-        it('Should not match to a different version', () => {
-            assert.isFalse(matchesMajorOSVersion(8, '7'));
         });
     });
 });
