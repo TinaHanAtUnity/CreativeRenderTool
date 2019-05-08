@@ -1,4 +1,3 @@
-import { promises } from 'fs';
 import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerformanceCampaign';
 
 export interface ISliderOptions {
