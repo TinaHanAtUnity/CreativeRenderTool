@@ -108,4 +108,12 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
             videoProgress: this._adUnit.getVideo().getPosition()
         };
     }
+
+    public onShowPrivacyPopUp(x: number, y: number, width: number, height: number): Promise<void> {
+        return Promise.resolve();
+    }
+
+    public onClosePrivacyPopUp(): Promise<void> {
+        return Promise.resolve();
+    }
 }

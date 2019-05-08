@@ -2,6 +2,7 @@ import { Platform } from 'Core/Constants/Platform';
 import CheetahGamesJson from 'json/custom_features/CheetahGames.json';
 import BitmangoGamesJson from 'json/custom_features/BitmangoGames.json';
 import Game7GamesJson from 'json/custom_features/Game7Games.json';
+import LionStudiosGamesJson from 'json/custom_features/LionStudiosGames.json';
 
 import { SliderEndCardExperiment, ABGroup } from 'Core/Models/ABGroup';
 import SliderEndScreenImagesJson from 'json/experiments/SliderEndScreenImages.json';
@@ -10,6 +11,7 @@ import { SliderEndScreenImageOrientation } from 'Performance/Models/SliderPerfor
 const CheetahGameIds = setGameIds(CheetahGamesJson);
 const BitmangoGameIds = setGameIds(BitmangoGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
+const LionStudiosGameIds = setGameIds(LionStudiosGamesJson);
 
 const SliderEndScreenImages = parseSliderEndScreenImages();
 const SliderEndScreenTargetGameIds = Object.keys(SliderEndScreenImages);
@@ -144,6 +146,6 @@ export class CustomFeatures {
     }
 
     public static gameSpawnsNewViewControllerOnFinish(gameId: string): boolean {
-        return gameId === '2955123';
+        return this.existsInList(LionStudiosGameIds, gameId);
     }
 }

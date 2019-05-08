@@ -8,13 +8,13 @@ import { ICoreApi } from 'Core/ICore';
 import { OMIDEventBridge, IImpressionValues, IVastProperties, VideoPlayerState, InteractionType, ISessionEvent, IVerificationScriptResource, IViewPort, IAdView, VideoPosition, ObstructionReasons, MediaType, AccessMode, VideoEventAdaptorType, IRectangle, OMID3pEvents, SESSIONEvents } from 'Ads/Views/OMIDEventBridge';
 import { Template } from 'Core/Utilities/Template';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { VerificationReasonCode, VastAdVerification } from 'VAST/Models/VastAdVerification';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 interface IVerifationVendorMap {
     [vendorKey: string]: string;
@@ -77,7 +77,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _omIframe: HTMLIFrameElement;
     private _core: ICoreApi;
     private _clientInfo: ClientInfo;
-    private _campaign: Campaign;
+    private _campaign: VastCampaign;
     private _omBridge: OMIDEventBridge;
     private _request: RequestManager;
 
@@ -94,7 +94,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
     private _sessionStartCalled = false;
     private _adVerifications: VastAdVerification[];
 
-    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: Campaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vastAdVerifications: VastAdVerification[]) {
+    constructor(platform: Platform, core: ICoreApi, clientInfo: ClientInfo, campaign: VastCampaign, placement: Placement, deviceInfo: DeviceInfo, request: RequestManager, vastAdVerifications: VastAdVerification[]) {
         super(platform, 'openMeasurement');
         this._template = new Template(OMIDTemplate);
         this._bindings = [];
@@ -366,24 +366,37 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         };
     }
 
+    public calculateObstruction(x: number, y: number, width: number, height: number): IRectangle {
+        return {
+            x: x,
+            y: y,
+            width: width,
+            height: height
+        };
+    }
+
     /*
     * All AdViews will assume fullscreen interstitial video
     * so onscreen geometry, onscreencontainer geometry, and container geometry will be the same as geometry and have [0,0] origin
     */
     public calculateVastAdView(percentInView: number, obstructionReasons: ObstructionReasons[], screenWidth: number, screenHeight: number, measuringElementAvailable: boolean, obstructionRectangles: IRectangle[]): IAdView {
+        const videoHeight = this.calculateAdViewVideoHeight(screenWidth, screenHeight);      // If in portrait, video adview height will be smaller
+        const videoWidth = this.calculateAdViewVideoWidth(screenWidth, screenHeight);        // If in portrait, video adview width will be smaller
+        const topLeftY = this.calculateAdViewTopLeftYPosition(videoHeight, screenWidth, screenHeight); // If in portrait, video adview height will be different
+
         const adView: IAdView = {
             percentageInView: percentInView,
             geometry: {
                 x: 0,
-                y: 0,
-                width: screenWidth,
-                height: screenHeight
+                y: topLeftY,
+                width: videoWidth,
+                height: videoHeight
             },
             onScreenGeometry: {
                 x: 0,
-                y: 0,
-                width: screenWidth,
-                height: screenHeight,
+                y: topLeftY,
+                width: videoWidth,
+                height: videoHeight,
                 obstructions: obstructionRectangles
             },
             measuringElement: measuringElementAvailable,
@@ -406,7 +419,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
                 y: 0,
                 width: screenWidth,
                 height: screenHeight,
-                obstructions: []
+                obstructions: obstructionRectangles
             };
         }
 
@@ -443,7 +456,7 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
     }
 
-    public buildVastImpressionValues(mediaTypeValue: MediaType, accessMode: AccessMode, screenWidth: number, screenHeight: number, measuringElementAvailable: boolean): IImpressionValues {
+    private buildVastImpressionValues(mediaTypeValue: MediaType, accessMode: AccessMode, screenWidth: number, screenHeight: number, measuringElementAvailable: boolean): IImpressionValues {
         const impressionObject: IImpressionValues = {
             mediaType: mediaTypeValue
         };
@@ -459,6 +472,42 @@ export class OpenMeasurement extends View<AdMobCampaign> {
         }
 
         return impressionObject;
+    }
+
+    private calculateAdViewVideoWidth(screenWidth: number, screenHeight: number) {
+        let videoWidth = screenWidth;
+
+        const isLandscape = screenWidth > screenHeight;
+        const campaignVideoWidth = this._campaign.getVideo().getWidth();
+        if (!isLandscape && campaignVideoWidth > 0) {
+            videoWidth = campaignVideoWidth;
+        }
+
+        return videoWidth;
+    }
+
+    private calculateAdViewVideoHeight(screenWidth: number, screenHeight: number) {
+        let videoHeight = screenHeight;
+
+        const isLandscape = screenWidth > screenHeight;
+        const campaignVideoHeight = this._campaign.getVideo().getHeight();
+        if (!isLandscape && campaignVideoHeight > 0) {
+            videoHeight = campaignVideoHeight;
+        }
+
+        return videoHeight;
+    }
+
+    private calculateAdViewTopLeftYPosition(videoHeight: number, screenWidth: number, screenHeight: number) {
+        let topLeftY = 0;
+
+        const isLandscape = screenWidth > screenHeight;
+        if (!isLandscape && videoHeight > 0) {
+            const centerpoint = screenHeight / 2;
+            topLeftY = centerpoint - (videoHeight / 2);
+        }
+
+        return topLeftY;
     }
 
     private getState(): OMState {
