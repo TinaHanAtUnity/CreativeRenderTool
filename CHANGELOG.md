@@ -1,3 +1,7 @@
+# Staged Changes
+
+* Add `ads.` prefix to Ads SDK analytics topics [#9487](https://github.com/Applifier/unity-ads-webview/pull/9487)
+
 # Wed May  8 17:45:57 UTC 2019
 
 * Calculate additional Open Measurement Obstructions [#9223](https://github.com/Applifier/unity-ads-webview/pull/9223)
