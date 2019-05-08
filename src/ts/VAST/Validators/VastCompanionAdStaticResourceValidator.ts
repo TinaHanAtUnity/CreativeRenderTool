@@ -24,7 +24,7 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
     private validate(companionAd: VastCompanionAdStaticResource) {
         this.validateStaticResourceUrl(companionAd);
         this.validateCreativeType(companionAd);
-        this.validateCreativeSize(companionAd);
+        this.validateCreativeDimensions(companionAd);
         this.validateCompanionClickThroughURLTemplate(companionAd);
         this.validateCompanionClickTrackingURLTemplates(companionAd);
         this.validateTrackingEvents(companionAd);
@@ -50,7 +50,7 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
         }
     }
 
-    private validateCreativeSize(companionAd: VastCompanionAdStaticResource) {
+    private validateCreativeDimensions(companionAd: VastCompanionAdStaticResource) {
         const adId = companionAd.getId();
         const height = companionAd.getHeight();
         const width = companionAd.getWidth();

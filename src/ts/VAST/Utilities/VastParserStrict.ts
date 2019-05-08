@@ -300,11 +300,11 @@ export class VastParserStrict {
                 if (companionAdErrors.length === 0) {
                     vastAd.addCompanionAd(companionAd);
                 } else {
-                    vastAd.addUnsupportedItem(element.outerHTML + ' reason: ' + companionAdErrors.join(' '));
+                    vastAd.addUnsupportedCompanionAd(element.outerHTML + ' reason: ' + companionAdErrors.join(' '));
                 }
             } else {
                 // ignore element as it is not of a type we support
-                vastAd.addUnsupportedItem(element.outerHTML);
+                vastAd.addUnsupportedCompanionAd(element.outerHTML);
             }
         });
 
