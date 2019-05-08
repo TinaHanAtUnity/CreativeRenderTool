@@ -39,17 +39,17 @@ const INSTANT_TRANSFORMATION_CONFIG: ITransformationConfig = {
 };
 
 export class Slider {
-    private config: ISliderOptions;
-    private slidesContainerVisibleWidth: number;
-    private imageUrls: string[];
-    private currentSlide: number;
-    private transformPropertyName: 'transform' | 'webkitTransform';
-    private transitionPropertyName: 'transition' | 'webkitTransition';
+    private _config: ISliderOptions;
+    private _slidesContainerVisibleWidth: number;
+    private _imageUrls: string[];
+    private _currentSlide: number;
+    private _transformPropertyName: 'transform' | 'webkitTransform';
+    private _transitionPropertyName: 'transition' | 'webkitTransition';
     private _slidesContainer: HTMLElement;
     private _rootEl: HTMLElement;
-    private pointerDown: boolean;
-    private drag: IDragOptions;
-    private slidesPerPage: number;
+    private _pointerDown: boolean;
+    private _drag: IDragOptions;
+    private _slidesPerPage: number;
     private _ready: Promise<void> | null;
     private _resizeTimeId: number | null;
     private _autoplayTimeoutId: number | null;
@@ -63,11 +63,11 @@ export class Slider {
         this._onSlideCallback = onSlideCallback;
         this._onDownloadCallback = onDownloadCallback;
 
-        this.config = {
+        this._config = {
             startIndex: 0,
             threshold: 70
         };
-        this.drag = {
+        this._drag = {
             startX: 0,
             endX: 0,
             startY: 0,
@@ -76,17 +76,17 @@ export class Slider {
         };
 
         this._isVisible = true;
-        this.slidesPerPage = imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE ? 1.3 : 1.666;
+        this._slidesPerPage = imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE ? 1.3 : 1.666;
         const imageOrientationClassNamePrefix = imageOrientation === SliderEndScreenImageOrientation.LANDSCAPE ? 'landscape' : 'portrait';
         this._rootEl = this.createElement('div', 'slider-root-container', ['slider-wrap', `${imageOrientationClassNamePrefix}-slider-images`]);
         this._slidesContainer = this.createElement('div', 'slider-slides-container', ['slider-content']);
 
         // TODO: Make sure we always have 3 images
         // Note: Bit stupid way to make sure the first image is the middle one etc. when the carousel is shown to the user
-        this.imageUrls = [urls[1], urls[2], urls[0]];
-        this.currentSlide = this.config.startIndex % this.imageUrls.length;
-        this.transformPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transform' : 'webkitTransform';
-        this.transitionPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transition' : 'webkitTransition';
+        this._imageUrls = [urls[1], urls[2], urls[0]];
+        this._currentSlide = this._config.startIndex % this._imageUrls.length;
+        this._transformPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transform' : 'webkitTransform';
+        this._transitionPropertyName = typeof document.documentElement.style.transform === 'string' ? 'transition' : 'webkitTransition';
 
         const cloneSlidesAmount = 3;
         const allSlidesCreatedPromise = [];
@@ -95,10 +95,10 @@ export class Slider {
         });
         this._rootEl.appendChild(blurredBackground);
 
-        for (let i = this.imageUrls.length - cloneSlidesAmount; i < this.imageUrls.length; i++) {
-            allSlidesCreatedPromise.push(this.createSlide(this.imageUrls[i]).catch(() => null));
+        for (let i = this._imageUrls.length - cloneSlidesAmount; i < this._imageUrls.length; i++) {
+            allSlidesCreatedPromise.push(this.createSlide(this._imageUrls[i]).catch(() => null));
         }
-        this.imageUrls.forEach((url, i) => {
+        this._imageUrls.forEach((url, i) => {
             allSlidesCreatedPromise.push(this.createSlide(url).catch(() => null));
         });
 
@@ -111,7 +111,7 @@ export class Slider {
             });
 
             this._rootEl.appendChild(this._slidesContainer);
-            this.slidesContainerVisibleWidth = this._slidesContainer.offsetWidth;
+            this._slidesContainerVisibleWidth = this._slidesContainer.offsetWidth;
             this.init();
             this.resizeContainer();
             this._ready = null;
@@ -149,15 +149,15 @@ export class Slider {
             this._onSlideCallback({ automatic: options.automatic });
         }
         this.autoplay();
-        const currentSlide = this.currentSlide + this.slidesPerPage;
+        const currentSlide = this._currentSlide + this._slidesPerPage;
 
-        const offset = -Math.abs(currentSlide * (this.slidesContainerVisibleWidth / this.slidesPerPage));
-        const config = options.automatic ? AUTOMATIC_TRANSFORMATION_CONFIG : TRANSFORMATION_CONFIG;
+        const offset = -Math.abs(currentSlide * (this._slidesContainerVisibleWidth / this._slidesPerPage));
+        const _config = options.automatic ? AUTOMATIC_TRANSFORMATION_CONFIG : TRANSFORMATION_CONFIG;
         if (options.enableTransition) {
             // explanation for this one - https://youtu.be/cCOL7MC4Pl0
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    this.transformSlidesContainer(offset, config);
+                    this.transformSlidesContainer(offset, _config);
                 });
             });
         } else {
@@ -166,15 +166,15 @@ export class Slider {
         Slider.updateIndicator(this._indicators, Math.floor(currentSlide));
     }
 
-    private transformSlidesContainer(offset: number, config: ITransformationConfig = AUTOMATIC_TRANSFORMATION_CONFIG): void {
-        this._slidesContainer.style[this.transitionPropertyName] = `all ${config.duration}ms ${config.easing}`;
-        this._slidesContainer.style[this.transformPropertyName] = `translate3d(${offset}px, 0, 0)`;
+    private transformSlidesContainer(offset: number, _config: ITransformationConfig = AUTOMATIC_TRANSFORMATION_CONFIG): void {
+        this._slidesContainer.style[this._transitionPropertyName] = `all ${_config.duration}ms ${_config.easing}`;
+        this._slidesContainer.style[this._transformPropertyName] = `translate3d(${offset}px, 0, 0)`;
     }
 
     private resizeContainer(): void {
-        this.slidesContainerVisibleWidth = this._rootEl.offsetWidth;
-        const widthItem = this.slidesContainerVisibleWidth / this.slidesPerPage;
-        const itemsToBuild = this.imageUrls.length + (this.slidesPerPage * 2);
+        this._slidesContainerVisibleWidth = this._rootEl.offsetWidth;
+        const widthItem = this._slidesContainerVisibleWidth / this._slidesPerPage;
+        const itemsToBuild = this._imageUrls.length + (this._slidesPerPage * 2);
         this._slidesContainer.style.width = `${(widthItem) * itemsToBuild}px`;
         this.slideToCurrent({ enableTransition: false, triggeredByResize: true });
     }
@@ -205,7 +205,7 @@ export class Slider {
 
     private generateSlideHTML(id: string, image?: HTMLImageElement): HTMLElement {
         const item = this.createElement('div', null, ['slider-item', 'slider-item']);
-        item.style.width = `${100 / (this.imageUrls.length + (this.slidesPerPage * 2))}%`;
+        item.style.width = `${100 / (this._imageUrls.length + (this._slidesPerPage * 2))}%`;
         if (image !== undefined) {
             item.appendChild(image);
             this._slidesContainer.appendChild(item);
@@ -215,7 +215,7 @@ export class Slider {
 
     private init(): void {
         this.addEventHandlers();
-        Slider.prepareIndicator(this, 'slider-indicator', 'slider-dot', this.imageUrls.length, 0, 'active');
+        Slider.prepareIndicator(this, 'slider-indicator', 'slider-dot', this._imageUrls.length, 0, 'active');
         this._rootEl.style.overflow = 'hidden';
     }
 
@@ -243,8 +243,8 @@ export class Slider {
 
     private addEventHandlers(): void {
         // Keep track pointer hold and dragging distance
-        this.pointerDown = false;
-        this.drag = {
+        this._pointerDown = false;
+        this._drag = {
             startX: 0,
             endX: 0,
             startY: 0,
@@ -285,15 +285,15 @@ export class Slider {
     private touchstartHandler(e: TouchEvent): void {
         this.stopAutoplay();
         e.stopPropagation();
-        this.pointerDown = true;
-        this.drag.startX = e.touches[0].pageX;
-        this.drag.startY = e.touches[0].pageY;
+        this._pointerDown = true;
+        this._drag.startX = e.touches[0].pageX;
+        this._drag.startY = e.touches[0].pageY;
     }
 
     private touchendHandler(e: TouchEvent): void {
         e.stopPropagation();
-        this.pointerDown = false;
-        if (this.drag.endX) {
+        this._pointerDown = false;
+        if (this._drag.endX) {
             this.updateAfterDrag();
         }
         this.clearDrag();
@@ -303,42 +303,42 @@ export class Slider {
     private touchmoveHandler(e: TouchEvent): void {
         e.stopPropagation();
 
-        if (this.drag.letItGo === null) {
-            this.drag.letItGo = Math.abs(this.drag.startY - e.touches[0].pageY) < Math.abs(this.drag.startX - e.touches[0].pageX);
+        if (this._drag.letItGo === null) {
+            this._drag.letItGo = Math.abs(this._drag.startY - e.touches[0].pageY) < Math.abs(this._drag.startX - e.touches[0].pageX);
         }
 
-        if (this.pointerDown && this.drag.letItGo) {
+        if (this._pointerDown && this._drag.letItGo) {
             e.preventDefault();
-            this.drag.endX = e.touches[0].pageX;
-            const currentSlide = this.currentSlide + this.slidesPerPage;
-            const currentOffset = currentSlide * (this.slidesContainerVisibleWidth / this.slidesPerPage);
-            const dragOffset = (this.drag.endX - this.drag.startX);
+            this._drag.endX = e.touches[0].pageX;
+            const currentSlide = this._currentSlide + this._slidesPerPage;
+            const currentOffset = currentSlide * (this._slidesContainerVisibleWidth / this._slidesPerPage);
+            const dragOffset = (this._drag.endX - this._drag.startX);
             const offset = currentOffset - dragOffset;
             this.transformSlidesContainer(offset * -1, INSTANT_TRANSFORMATION_CONFIG);
         }
 
     }
     private clearDrag(): void {
-        this.drag = {
+        this._drag = {
             startX: 0,
             endX: 0,
             startY: 0,
             letItGo: null,
-            preventClick: this.drag.preventClick
+            preventClick: this._drag.preventClick
         };
     }
 
     private updateAfterDrag(): void {
-        const movement = this.drag.endX - this.drag.startX;
+        const movement = this._drag.endX - this._drag.startX;
         const movementDistance = Math.abs(movement);
-        const howManySliderToSlide = Math.ceil(movementDistance / (this.slidesContainerVisibleWidth / this.slidesPerPage));
+        const howManySliderToSlide = Math.ceil(movementDistance / (this._slidesContainerVisibleWidth / this._slidesPerPage));
 
-        const slideToNegativeClone = movement > 0 && this.currentSlide - howManySliderToSlide < 0;
-        const slideToPositiveClone = movement < 0 && this.currentSlide + howManySliderToSlide > this.imageUrls.length - this.slidesPerPage;
+        const slideToNegativeClone = movement > 0 && this._currentSlide - howManySliderToSlide < 0;
+        const slideToPositiveClone = movement < 0 && this._currentSlide + howManySliderToSlide > this._imageUrls.length - this._slidesPerPage;
 
-        if (movement > 0 && movementDistance > this.config.threshold && this.imageUrls.length > this.slidesPerPage) {
+        if (movement > 0 && movementDistance > this._config.threshold && this._imageUrls.length > this._slidesPerPage) {
             this.slideBackward(howManySliderToSlide);
-        } else if (movement < 0 && movementDistance > this.config.threshold && this.imageUrls.length > this.slidesPerPage) {
+        } else if (movement < 0 && movementDistance > this._config.threshold && this._imageUrls.length > this._slidesPerPage) {
             this.slideForward(howManySliderToSlide);
         } else {
             this.slideToCurrent({ enableTransition: slideToNegativeClone || slideToPositiveClone });
@@ -355,32 +355,32 @@ export class Slider {
 
     private moveSlider(slideAmount: number, options = { automatic: false }): void {
         // early return when there is nothing to slide
-        if (this.imageUrls.length <= this.slidesPerPage) {
+        if (this._imageUrls.length <= this._slidesPerPage) {
             return;
         }
 
-        const startingSlide = this.currentSlide;
+        const startingSlide = this._currentSlide;
         let shouldLoop = false;
 
         if (slideAmount > 0) {
-            shouldLoop = (this.currentSlide + slideAmount) - 1 > this.imageUrls.length - this.slidesPerPage;
+            shouldLoop = (this._currentSlide + slideAmount) - 1 > this._imageUrls.length - this._slidesPerPage;
         } else {
-            shouldLoop = this.currentSlide + slideAmount < 0;
+            shouldLoop = this._currentSlide + slideAmount < 0;
         }
 
         if (shouldLoop) {
-            const loopedSlideIndex = this.currentSlide + (Math.sign(slideAmount) * -1 * this.imageUrls.length);
-            const loopedSlideIndexOffset = this.slidesPerPage;
+            const loopedSlideIndex = this._currentSlide + (Math.sign(slideAmount) * -1 * this._imageUrls.length);
+            const loopedSlideIndexOffset = this._slidesPerPage;
             const moveTo = loopedSlideIndex + loopedSlideIndexOffset;
-            const offset = moveTo * -1 * (this.slidesContainerVisibleWidth / this.slidesPerPage);
-            const dragDistance = this.drag.endX - this.drag.startX;
+            const offset = moveTo * -1 * (this._slidesContainerVisibleWidth / this._slidesPerPage);
+            const dragDistance = this._drag.endX - this._drag.startX;
             this.transformSlidesContainer(offset + dragDistance, INSTANT_TRANSFORMATION_CONFIG);
-            this.currentSlide = loopedSlideIndex + slideAmount;
+            this._currentSlide = loopedSlideIndex + slideAmount;
         } else {
-            this.currentSlide = this.currentSlide + slideAmount;
+            this._currentSlide = this._currentSlide + slideAmount;
         }
 
-        if (startingSlide !== this.currentSlide) {
+        if (startingSlide !== this._currentSlide) {
             this.slideToCurrent({ automatic: options.automatic });
         }
     }
