@@ -7,7 +7,7 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
 
     private static readonly _supportedCreativeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
     private static readonly _minPortraitHeight = 480;
-    private static readonly _minPotratitWidth = 320;
+    private static readonly _minPortraitWidth = 320;
     private static readonly _minLandscapeHeight = 320;
     private static readonly _minLandscapeWidth = 480;
 
@@ -55,7 +55,7 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
         const height = companionAd.getHeight();
         const width = companionAd.getWidth();
         if (height > width) {   // Portrait
-            if (height < VastCompanionAdStaticResourceValidator._minPortraitHeight || width < VastCompanionAdStaticResourceValidator._minPotratitWidth) {
+            if (height < VastCompanionAdStaticResourceValidator._minPortraitHeight || width < VastCompanionAdStaticResourceValidator._minPortraitWidth) {
                 this._errors.push(new Error(`VAST Companion ad(${adId}) "StaticResource" is not meeting minimum size 320 x 480`));
             }
         } else {
