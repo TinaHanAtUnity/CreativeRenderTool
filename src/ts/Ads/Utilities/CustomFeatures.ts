@@ -14,19 +14,7 @@ const BitmangoGameIds = setGameIds(BitmangoGamesJson);
 const Game7GameIds = setGameIds(Game7GamesJson);
 const LionStudiosGameIds = setGameIds(LionStudiosGamesJson);
 
-const SliderEndScreenImages = parseSliderEndScreenImages();
-const SliderEndScreenTargetGameIds = Object.keys(SliderEndScreenImages);
-
-function parseSliderEndScreenImages() {
-    let images;
-    try {
-        images = JSON.parse(SliderEndScreenImagesJson);
-    } catch {
-        images = {};
-    }
-
-    return images;
-}
+const SliderEndScreenImages = JSON.parse(SliderEndScreenImagesJson);
 
 function setGameIds(gameIdJson: string): string[] {
     let gameIds: string[];
@@ -134,7 +122,7 @@ export class CustomFeatures {
             return false;
         }
 
-        return SliderEndCardExperiment.isValid(abGroup) && this.existsInList(SliderEndScreenTargetGameIds, targetGameAppStoreId);
+        return SliderEndCardExperiment.isValid(abGroup) && SliderEndScreenImages[targetGameAppStoreId] !== undefined;
     }
 
     public static getSliderEndScreenImageOrientation(targetGameAppStoreId: string): SliderEndScreenImageOrientation {
