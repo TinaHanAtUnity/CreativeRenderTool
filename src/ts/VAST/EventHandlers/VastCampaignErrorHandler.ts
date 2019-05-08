@@ -3,6 +3,7 @@ import { CampaignError } from 'Ads/Errors/CampaignError';
 import { ICoreApi } from 'Core/ICore';
 import { RequestManager } from 'Core/Managers/RequestManager';
 import { Url } from 'Core/Utilities/Url';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 // VAST Error code defined in 3.0
 // https://wiki.iabtechlab.com/index.php?title=VAST_Error_Code_Troubleshooting_Matrix
@@ -76,13 +77,23 @@ export class VastCampaignErrorHandler implements ICampaignErrorHandler {
         if (campaignError.errorTrackingUrl) {
             const errorCode = campaignError.errorCode ? campaignError.errorCode : VastErrorCode.UNDEFINED_ERROR;
             const errorUrl = this.formatVASTErrorURL(campaignError.errorTrackingUrl, errorCode, campaignError.assetUrl);
-            this._core.Sdk.logInfo(`VAST Campaign Error tracking url: ${errorUrl} with errorCode: ${errorCode} errorMessage: ${campaignError.errorMessage}`);
-
-            this._request.get(errorUrl, []).then(() => {
-                return Promise.resolve();
+            this._request.get(errorUrl, []).then((response) => {
+                Diagnostics.trigger('vast_error_tracking_success', {
+                    errorUrl: errorUrl,
+                    errorCode: errorCode,
+                    errorMessage: VastErrorInfo.errorMap[errorCode],
+                    seatId: campaignError.seatId
+            });
+            }).catch(e => {
+                Diagnostics.trigger('vast_error_tracking_fail', {
+                    errorUrl: errorUrl,
+                    errorCode: errorCode,
+                    errorMessage: VastErrorInfo.errorMap[errorCode],
+                    seatId: campaignError.seatId
+                });
             });
         }
-        return Promise.reject(new Error('VastCampaignErrorHandler errorTrackingUrl was undefined'));
+        return Promise.resolve();
     }
 
     private formatVASTErrorURL(errorUrl: string, errorCode: VastErrorCode, assetUrl?: string): string {
