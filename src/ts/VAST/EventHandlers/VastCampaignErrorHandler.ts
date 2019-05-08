@@ -83,13 +83,14 @@ export class VastCampaignErrorHandler implements ICampaignErrorHandler {
                     errorCode: errorCode,
                     errorMessage: VastErrorInfo.errorMap[errorCode],
                     seatId: campaignError.seatId
-            });
+                });
             }).catch(e => {
                 Diagnostics.trigger('vast_error_tracking_fail', {
                     errorUrl: errorUrl,
                     errorCode: errorCode,
                     errorMessage: VastErrorInfo.errorMap[errorCode],
-                    seatId: campaignError.seatId
+                    seatId: campaignError.seatId,
+                    failError: e
                 });
             });
         }
