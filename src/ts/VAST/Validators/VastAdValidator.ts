@@ -6,6 +6,7 @@ import { VastCreativeValidator } from 'VAST/Validators/VastCreativeValidator';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
 import { Url } from 'Core/Utilities/Url';
 import { VastCompanionAdStaticResourceValidator } from 'VAST/Validators/VastCompanionAdStaticResourceValidator';
+import { Warning } from 'Ads/Errors/Warning';
 
 export class VastAdValidator implements IValidator {
 
@@ -17,6 +18,10 @@ export class VastAdValidator implements IValidator {
 
     public getErrors(): Error[] {
         return this._errors;
+    }
+
+    public getWarnings(): Warning[] {
+        return [];
     }
 
     private validate(vastAd: VastAd) {

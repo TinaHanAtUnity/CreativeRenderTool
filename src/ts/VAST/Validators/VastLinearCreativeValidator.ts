@@ -4,6 +4,7 @@ import { VastCreativeValidator } from 'VAST/Validators/VastCreativeValidator';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
 import { Url } from 'Core/Utilities/Url';
 import { IValidator } from 'VAST/Validators/IValidator';
+import { Warning } from 'Ads/Errors/Warning';
 
 export class VastLinearCreativeValidator implements IValidator {
 
@@ -15,6 +16,10 @@ export class VastLinearCreativeValidator implements IValidator {
 
     public getErrors(): Error[] {
         return this._errors;
+    }
+
+    public getWarnings(): Warning[] {
+        return [];
     }
 
     private validate(linearCreative: VastCreativeLinear) {

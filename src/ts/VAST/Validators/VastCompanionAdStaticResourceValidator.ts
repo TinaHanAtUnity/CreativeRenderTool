@@ -2,6 +2,7 @@ import { IValidator } from 'VAST/Validators/IValidator';
 import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 import { Url } from 'Core/Utilities/Url';
 import { VastValidationUtilities } from 'VAST/Validators/VastValidationUtilities';
+import { Warning } from 'Ads/Errors/Warning';
 
 export class VastCompanionAdStaticResourceValidator implements IValidator {
 
@@ -19,6 +20,10 @@ export class VastCompanionAdStaticResourceValidator implements IValidator {
 
     public getErrors(): Error[] {
         return this._errors;
+    }
+
+    public getWarnings(): Warning[] {
+        return [];
     }
 
     private validate(companionAd: VastCompanionAdStaticResource) {
