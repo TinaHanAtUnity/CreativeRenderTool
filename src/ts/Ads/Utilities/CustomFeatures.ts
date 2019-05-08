@@ -138,7 +138,7 @@ export class CustomFeatures {
             return false;
         }
 
-        return SliderEndCardExperiment.isValid(abGroup) && this.existsInList(SliderEndScreenTargetGameIds, '' + targetGameAppStoreId);
+        return SliderEndCardExperiment.isValid(abGroup) && this.existsInList(SliderEndScreenTargetGameIds, targetGameAppStoreId);
     }
 
     public static getSliderEndScreenImageOrientation(targetGameAppStoreId: string): SliderEndScreenImageOrientation {
