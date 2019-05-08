@@ -152,12 +152,12 @@ export class Slider {
         const currentSlide = this._currentSlide + this._slidesPerPage;
 
         const offset = -Math.abs(currentSlide * (this._slidesContainerVisibleWidth / this._slidesPerPage));
-        const _config = options.automatic ? AUTOMATIC_TRANSFORMATION_CONFIG : TRANSFORMATION_CONFIG;
+        const config = options.automatic ? AUTOMATIC_TRANSFORMATION_CONFIG : TRANSFORMATION_CONFIG;
         if (options.enableTransition) {
             // explanation for this one - https://youtu.be/cCOL7MC4Pl0
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    this.transformSlidesContainer(offset, _config);
+                    this.transformSlidesContainer(offset, config);
                 });
             });
         } else {
@@ -166,8 +166,8 @@ export class Slider {
         Slider.updateIndicator(this._indicators, Math.floor(currentSlide));
     }
 
-    private transformSlidesContainer(offset: number, _config: ITransformationConfig = AUTOMATIC_TRANSFORMATION_CONFIG): void {
-        this._slidesContainer.style[this._transitionPropertyName] = `all ${_config.duration}ms ${_config.easing}`;
+    private transformSlidesContainer(offset: number, config: ITransformationConfig = AUTOMATIC_TRANSFORMATION_CONFIG): void {
+        this._slidesContainer.style[this._transitionPropertyName] = `all ${config.duration}ms ${config.easing}`;
         this._slidesContainer.style[this._transformPropertyName] = `translate3d(${offset}px, 0, 0)`;
     }
 
