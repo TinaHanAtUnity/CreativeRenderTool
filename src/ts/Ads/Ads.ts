@@ -440,6 +440,7 @@ export class Ads implements IAds {
 
         const context = this.Banners.BannerAdContext;
         context.load(placementId).catch((e) => {
+            this.Banners.PlacementManager.sendBannersReady();
             this._core.Api.Sdk.logWarning(`Could not show banner due to ${e.message}`);
         });
     }
