@@ -152,10 +152,10 @@ export class BannerCampaignManager {
         const json = JsonParser.parse<IRawBannerResponse>(response.response);
         const session = new Session(json.auctionId);
 
-        if('placements' in json) {
+        if ('placements' in json) {
             const mediaId: string = json.placements[placement.getId()];
 
-            if(mediaId) {
+            if (mediaId) {
                 const auctionPlacement = new AuctionPlacement(placement.getId(), mediaId);
                 const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId);
                 return this.handleBannerCampaign(auctionResponse, session);
@@ -178,7 +178,6 @@ export class BannerCampaignManager {
         if ('placements' in json) {
             const placementId = placement.getId();
             if (placement.isBannerPlacement()) {
-
                 let mediaId: string | undefined;
                 if (json.placements.hasOwnProperty(placementId)) {
                     if (json.placements[placementId].hasOwnProperty('mediaId')) {
@@ -217,13 +216,21 @@ export class BannerCampaignManager {
                     const auctionPlacement = new AuctionPlacement(placementId, mediaId, trackingUrls);
                     const auctionResponse = new AuctionResponse([auctionPlacement], json.media[mediaId], mediaId, json.correlationId);
                     return this.handleV5BannerCampaign(auctionResponse, session, trackingUrls);
+                } else {
+                    const e = new NoFillError(`No fill for placement ${placementId}`);
+                    this._core.Sdk.logError(e.message);
+                    return Promise.reject(e);
                 }
+            } else {
+                const e = new Error(`Placement ${placementId} is not a banner placement`);
+                this._core.Sdk.logError(e.message);
+                return Promise.reject(e);
             }
+        } else {
+            const e = new Error('No placements found in realtime V5 campaign json.');
+            this._core.Sdk.logError(e.message);
+            return Promise.reject(e);
         }
-
-        const e = new Error('No placements found in realtime V5 campaign json.');
-        this._core.Sdk.logError(e.message);
-        return Promise.reject(e);
     }
 
     private handleV5BannerCampaign(response: AuctionResponse, session: Session, trackingUrls: ICampaignTrackingUrls): Promise<Campaign> {
