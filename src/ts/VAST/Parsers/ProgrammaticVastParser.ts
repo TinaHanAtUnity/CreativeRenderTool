@@ -92,11 +92,6 @@ export class ProgrammaticVastParser extends CampaignParser {
             backupCampaign: false
         };
 
-        let errorTrackingUrl;
-        if (vast.getErrorURLTemplate()) {
-            errorTrackingUrl = vast.getErrorURLTemplate()!;
-        }
-
         const vastImpressionUrls: string[] = [];
         for (const impUrl of vast.getImpressionUrls()) {
             if (Url.isValid(impUrl)) {
