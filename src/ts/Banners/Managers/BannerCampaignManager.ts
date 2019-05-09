@@ -1,5 +1,4 @@
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
-import { AssetManager } from 'Ads/Managers/AssetManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AuctionResponse, IAuctionResponse } from 'Ads/Models/AuctionResponse';
@@ -73,6 +72,7 @@ export class BannerCampaignManager {
         this._metaDataManager = metaDataManager;
         this._adMobSignalFactory = adMobSignalFactory;
         this._jaegerManager = jaegerManager;
+        this._pts = pts;
     }
 
     public request(placement: Placement, nofillRetry?: boolean): Promise<Campaign> {

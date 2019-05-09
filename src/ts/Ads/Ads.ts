@@ -33,7 +33,7 @@ import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, ProgrammaticTrackingMetricName } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { InterstitialWebPlayerContainer } from 'Ads/Utilities/WebPlayer/InterstitialWebPlayerContainer';
@@ -218,16 +218,7 @@ export class Ads implements IAds {
                 });
             }
 
-            if (this._core.Config.getCountry() === 'CN' && this._core.NativeBridge.getPlatform() === Platform.ANDROID && this.SessionManager.getGameSessionId() % 100 === 0) {
-                Promise.all([
-                    PermissionsUtil.checkPermissionInManifest(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.READ_PHONE_STATE),
-                    PermissionsUtil.checkPermissions(this._core.NativeBridge.getPlatform(), this._core.Api, PermissionTypes.READ_PHONE_STATE)
-                ]).then(([readDeviceSupported, permissionInManifest]) => {
-                    Diagnostics.trigger('read_device_permission', {readDeviceSupported, permissionInManifest});
-                }).catch(error => {
-                    Diagnostics.trigger('read_device_permission_error', error);
-                });
-            }
+            this.logChinaMetrics();
 
             const parserModules: AbstractParserModule[] = [
                 new AdMob(this._core, this),
@@ -634,6 +625,41 @@ export class Ads implements IAds {
 
         if(TestEnvironment.get('debugJsConsole')) {
             MRAIDView.setDebugJsConsole(TestEnvironment.get('debugJsConsole'));
+        }
+    }
+
+    private logChinaMetrics() {
+        const isChineseUser = this._core.Config.getCountry() === 'CN';
+        if (isChineseUser) {
+            this._core.Ads.ProgrammaticTrackingService.reportMetric(ProgrammaticTrackingMetricName.ChineseUserInitialized);
+        }
+        this.identifyUser(isChineseUser);
+    }
+
+    private identifyUser(isChineseUser: boolean) {
+        this.isUsingChineseNetworkOperator().then(isAChineseNetwork => {
+            if (isAChineseNetwork) {
+                const networkMetric = isChineseUser ? ProgrammaticTrackingMetricName.ChineseUserIdentifiedCorrectlyByNetworkOperator : ProgrammaticTrackingMetricName.ChineseUserIdentifiedIncorrectlyByNetworkOperator;
+                this._core.Ads.ProgrammaticTrackingService.reportMetric(networkMetric);
+            } else {
+                const localeMetric = isChineseUser ? ProgrammaticTrackingMetricName.ChineseUserIdentifiedCorrectlyByLocale : ProgrammaticTrackingMetricName.ChineseUserIdentifiedIncorrectlyByLocale;
+                this.logChinaLocalizationOptimizations(localeMetric);
+            }
+        });
+    }
+
+    private isUsingChineseNetworkOperator(): Promise<boolean> {
+        return this._core.DeviceInfo.getNetworkOperator().then(networkOperator => {
+            return !!(networkOperator && networkOperator.length >= 3 && networkOperator.substring(0, 3) === '460');
+        });
+    }
+
+    private logChinaLocalizationOptimizations(metric: ProgrammaticTrackingMetricName) {
+        const deviceLanguage = this._core.DeviceInfo.getLanguage().toLowerCase();
+        const chineseLanguage = !!(deviceLanguage.match(/zh[-_]cn/) || deviceLanguage.match(/zh[-_]hans/) || deviceLanguage.match(/zh(((_#?hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?hans)?))$/));
+        const chineseTimeZone = this._core.DeviceInfo.getTimeZone() === 'GMT+08:00';
+        if (chineseLanguage && chineseTimeZone) {
+            this._core.Ads.ProgrammaticTrackingService.reportMetric(metric);
         }
     }
 }

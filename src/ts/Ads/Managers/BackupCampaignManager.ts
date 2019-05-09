@@ -20,8 +20,6 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { FileId } from 'Core/Utilities/FileId';
 import { RequestManager } from 'Core/Managers/RequestManager';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { iOSCrashTest } from 'Core/Models/ABGroup';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 
 export class BackupCampaignManager {
@@ -75,14 +73,6 @@ export class BackupCampaignManager {
             operation.set(rootKey + '.trackingurls', JSON.stringify(trackingUrls));
         }
 
-        if (this._platform === Platform.IOS && iOSCrashTest.isValid(this._coreConfiguration.getAbGroup()) && CustomFeatures.isAuctionV4Game(this._clientInfo.getGameId())) {
-            Diagnostics.trigger('store_placement', {
-                mediaId: mediaId,
-                adTypes: JSON.stringify(placement.getAdTypes()),
-                trackingUrls: trackingUrls ? JSON.stringify(trackingUrls) : ''
-            });
-        }
-
         this._storageBridge.queue(operation);
     }
 
@@ -124,14 +114,6 @@ export class BackupCampaignManager {
             operation.set(rootKey + '.data', campaign.toJSON());
             operation.set(rootKey + '.willexpireat', willExpireAt);
             this._storageBridge.queue(operation);
-
-            if (this._platform === Platform.IOS && iOSCrashTest.isValid(this._coreConfiguration.getAbGroup()) && CustomFeatures.isAuctionV4Game(this._clientInfo.getGameId())) {
-                Diagnostics.trigger('store_campaign', {
-                    campaignType: campaignType,
-                    data: campaign.toJSON(),
-                    willExpireAt: willExpireAt
-                });
-            }
         }
     }
 

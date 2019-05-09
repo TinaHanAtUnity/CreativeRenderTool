@@ -183,7 +183,7 @@ export class AnalyticsProtocol {
             };
 
             return {
-                type: 'analytics.deviceInfo.v1',
+                type: 'ads.analytics.deviceInfo.v1',
                 msg: event
             };
         });
@@ -194,7 +194,7 @@ export class AnalyticsProtocol {
             ts: Date.now()
         };
         return {
-            type: 'analytics.appStart.v1',
+            type: 'ads.analytics.appStart.v1',
             msg: startEvent
         };
     }
@@ -205,7 +205,7 @@ export class AnalyticsProtocol {
             app_ver: clientInfo.getApplicationVersion()
         };
         return {
-            type: 'analytics.appInstall.v1',
+            type: 'ads.analytics.appInstall.v1',
             msg: installEvent
         };
     }
@@ -216,7 +216,7 @@ export class AnalyticsProtocol {
             app_ver: clientInfo.getApplicationVersion()
         };
         return {
-            type: 'analytics.appUpdate.v1',
+            type: 'ads.analytics.appUpdate.v1',
             msg: updateEvent
         };
     }
@@ -228,7 +228,7 @@ export class AnalyticsProtocol {
             local_time_offset: new Date().getTimezoneOffset() * -1 * 60 * 1000
         };
         return {
-            type: 'analytics.appRunning.v1',
+            type: 'ads.analytics.appRunning.v1',
             msg: appRunningEvent
         };
     }

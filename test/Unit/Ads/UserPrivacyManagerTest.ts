@@ -423,7 +423,14 @@ describe('UserPrivacyManagerTest', () => {
 
         it('should call request.get', () => {
             return privacyManager.retrieveUserSummary().then(() => {
-                sinon.assert.calledWith(getRequestStub, `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=${gameId}&adid=${adId}&projectId=${projectId}&storeId=${stores}`);
+                sinon.assert.calledWith(getRequestStub, `https://ads-privacy-api.prd.mz.internal.unity3d.com/api/v1/summary?gameId=${gameId}&adid=${adId}&projectId=${projectId}&storeId=${stores}`);
+            });
+        });
+
+        it('should call request.get with testurl in testmode', () => {
+            (<sinon.SinonStub>coreConfig.getTestMode).returns(true);
+            return privacyManager.retrieveUserSummary().then(() => {
+                sinon.assert.calledWith(getRequestStub, `https://ads-privacy-api.stg.mz.internal.unity3d.com/api/v1/summary?adid=f2c5a456-229f-49c8-abed-c4047c86f8e7&projectId=24295855-8602-4efc-a30d-a9d84b275eda&storeId=google&gameId=1490325`);
             });
         });
 
@@ -441,7 +448,7 @@ describe('UserPrivacyManagerTest', () => {
                 assert.fail('Should throw error');
             }).catch((error) => {
                 assert.equal(error, 'Test Error');
-                sinon.assert.calledWith(diagnosticTriggerStub, 'gdpr_request_failed', {url: `https://tracking.prd.mz.internal.unity3d.com/user-summary?gameId=${gameId}&adid=${adId}&projectId=${projectId}&storeId=${stores}`});
+                sinon.assert.calledWith(diagnosticTriggerStub, 'gdpr_request_failed', {url: `https://ads-privacy-api.prd.mz.internal.unity3d.com/api/v1/summary?gameId=${gameId}&adid=${adId}&projectId=${projectId}&storeId=${stores}`});
             });
         });
 

@@ -245,7 +245,7 @@ export class AuctionRequest {
         this._baseURL = url;
     }
 
-    protected getRequestURL(): Promise<string> {
+    private getRequestURL(): Promise<string> {
         if (this._url) {
             return Promise.resolve(this._url);
         }
