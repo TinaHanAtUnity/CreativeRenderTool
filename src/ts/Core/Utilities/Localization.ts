@@ -24,6 +24,7 @@ import IcelandicOverlay from 'json/locale/is/overlay.json';
 import ItalianEndscreen from 'json/locale/it/endscreen.json';
 import ItalianLoadingScreen from 'json/locale/it/loadingscreen.json';
 import ItalianOverlay from 'json/locale/it/overlay.json';
+import ItalianConsent from 'json/locale/it/consent.json';
 import JapaneseEndscreen from 'json/locale/ja/endscreen.json';
 import JapaneseOverlay from 'json/locale/ja/overlay.json';
 import KoreanEndscreen from 'json/locale/ko/endscreen.json';
@@ -35,6 +36,7 @@ import NorwegianOverlay from 'json/locale/nb/overlay.json';
 import PortugueseEndscreen from 'json/locale/pt/endscreen.json';
 import PortugueseLoadingScreen from 'json/locale/pt/loadingscreen.json';
 import PortugueseOverlay from 'json/locale/pt/overlay.json';
+import PortugueseConsent from 'json/locale/pt/consent.json';
 import RomanianEndscreen from 'json/locale/ro/endscreen.json';
 import RomanianOverlay from 'json/locale/ro/overlay.json';
 import RussianEndscreen from 'json/locale/ru/endscreen.json';
@@ -131,7 +133,8 @@ export class Localization {
         'it.*': {
             'endscreen': JSON.parse(ItalianEndscreen),
             'overlay': JSON.parse(ItalianOverlay),
-            'loadingscreen': JSON.parse(ItalianLoadingScreen)
+            'loadingscreen': JSON.parse(ItalianLoadingScreen),
+            'consent': JSON.parse(ItalianConsent)
         },
         'de.*': {
             'endscreen': JSON.parse(GermanEndscreen),
@@ -194,7 +197,8 @@ export class Localization {
         'pt.*': {
             'endscreen': JSON.parse(PortugueseEndscreen),
             'overlay': JSON.parse(PortugueseOverlay),
-            'loadingscreen': JSON.parse(PortugueseLoadingScreen)
+            'loadingscreen': JSON.parse(PortugueseLoadingScreen),
+            'consent': JSON.parse(PortugueseConsent)
         }
     };
 
@@ -247,7 +251,9 @@ export class Localization {
         if (language.match('fr.*')
             || language.match('de.*')
             || language.match('es.*')
-            || language.match('ru.*')) {
+            || language.match('ru.*')
+            || language.match('pt.*')
+            || language.match('it.*')) {
             return true;
         }
 

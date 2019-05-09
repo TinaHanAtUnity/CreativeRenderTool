@@ -1,10 +1,10 @@
 import { assert } from 'chai';
 import 'mocha';
-import { VastCreativeStaticResourceCompanionAd } from 'VAST/Models/VastCreativeStaticResourceCompanionAd';
+import { VastCompanionAdStaticResource } from 'VAST/Models/VastCompanionAdStaticResource';
 
-describe('VastCreativeCompanionAd', () => {
+describe('VastCompanionAdStaticResource', () => {
     it('should have the correct data', () => {
-        const vastCreativeCompanionAd = new VastCreativeStaticResourceCompanionAd('id', 700, 800, 'image/png', 'http://image.com', 'https://url.com/companionClickThroughURLTemplate', ['https://url.com/companionClickTrackingURLTemplate1', 'https://url.com/companionClickTrackingURLTemplate2'], { 'creativeView': ['https://url.com/companionCreativeViewURLTemplate'] });
+        const vastCreativeCompanionAd = new VastCompanionAdStaticResource('id', 700, 800, 'image/png', 'http://image.com', 'https://url.com/companionClickThroughURLTemplate', ['https://url.com/companionClickTrackingURLTemplate1', 'https://url.com/companionClickTrackingURLTemplate2'], { 'creativeView': ['https://url.com/companionCreativeViewURLTemplate'] });
         assert.equal(vastCreativeCompanionAd.getId(), 'id');
         assert.equal(vastCreativeCompanionAd.getCreativeType(), 'image/png');
         assert.equal(vastCreativeCompanionAd.getHeight(), 700);

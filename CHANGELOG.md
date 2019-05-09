@@ -1,3 +1,28 @@
+# Staged Changes
+
+* Add `ads.` prefix to Ads SDK analytics topics [#9487](https://github.com/Applifier/unity-ads-webview/pull/9487)
+* VastCompanionAdStaticResource validator update [#9532](https://github.com/Applifier/unity-ads-webview/pull/9532)
+* Update user summary privacy endpoint [#9509](https://github.com/Applifier/unity-ads-webview/pull/9509)
+* Reduce to one abgroup for MRAID WebPlayer test [#9556](https://github.com/Applifier/unity-ads-webview/pull/9556)
+
+# Wed May  8 17:45:57 UTC 2019
+
+* Calculate additional Open Measurement Obstructions [#9223](https://github.com/Applifier/unity-ads-webview/pull/9223)
+* Add Lion Studios games to fire ad dismiss delegate callback after animation is finished [#9510](https://github.com/Applifier/unity-ads-webview/pull/9510)
+
+# Tue May  7 18:10:12 UTC 2019
+
+* China config json deploy [#9272](https://github.com/Applifier/unity-ads-webview/pull/9272)
+
+# Mon May  6 22:35:49 UTC 2019 
+
+* Remove top overlay progress bar experiment [#9393](https://github.com/Applifier/unity-ads-webview/pull/9393)
+* ABTest round 2 for MRAID webplayer [#9486](https://github.com/Applifier/unity-ads-webview/pull/9486)
+
+# Mon May  6 11:54:47 UTC 2019
+
+* Italian and Portuguese localization for consent views [#9443](https://github.com/Applifier/unity-ads-webview/pull/9443) 
+
 # Fri May  3 19:52:17 UTC 2019 
 
 * Russian localization for consent views [#9419](https://github.com/Applifier/unity-ads-webview/pull/9419)
