@@ -578,24 +578,6 @@ describe('VastParserStrict', () => {
         });
 
         describe('fail', () => {
-            const tests: {
-                message: string;
-                inputVast: string;
-            }[] = [
-                    {
-                        message: 'Should fail to parse VastCompanionAdWithoutClickThrough.xml',
-                        inputVast: VastCompanionAdWithoutClickThrough
-                    }
-                ];
-            tests.forEach((test) => {
-                it(test.message, () => {
-                    const vastParser = TestFixtures.getVastParserStrict();
-                    assert.throws(() => {
-                        vastParser.parseVast(test.inputVast);
-                    });
-                });
-            });
-
             it('should throw when given null', () => {
                 assert.throws(() => {
                     TestFixtures.getVastParserStrict().parseVast(null);
