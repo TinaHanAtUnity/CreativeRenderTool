@@ -12,4 +12,9 @@ export class RedesignedPerformanceEndscreen extends PerformanceEndScreen {
 
         return EndScreenTemplate;
     }
+
+    public render(): void {
+        super.render();
+        document.documentElement.classList.add('accessible-close-button');
+    }
 }

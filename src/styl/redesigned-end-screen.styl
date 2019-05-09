@@ -209,8 +209,8 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       }
 
       .btn-close-region {
-        top: -.3em;
-        right: -.3em;
+        top: -1.55em;
+        right: -1.55em;
       }
 
       .end-screen-info-background {
@@ -229,6 +229,8 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     &.landscape #redesigned-end-screen {
       .btn-close-region {
         color: $gray;
+        top: -2em;
+        right: -2em;
       }
 
       .end-screen-info {
@@ -360,6 +362,7 @@ body {
   background-color: transparent;
 
   .campaign-container {
+    position: relative;
     width: 100%;
     height: 100%;
     background: $white;
