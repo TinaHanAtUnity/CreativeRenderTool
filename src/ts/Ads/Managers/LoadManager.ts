@@ -58,7 +58,7 @@ export class LoadManager extends RefreshManager {
 
     public setCurrentAdUnit(adUnit: AbstractAdUnit, placement: Placement): void {
         placement.setCurrentCampaign(undefined);
-        this.setPlacementState(placement.getId(), PlacementState.NO_FILL);
+        this.setPlacementState(placement.getId(), PlacementState.NOT_AVAILABLE);
     }
 
     public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -106,9 +106,7 @@ export class LoadManager extends RefreshManager {
         return this.getStoredLoads().then(storedLoads => {
             this._adsConfig.getPlacementIds().forEach(placementId => {
                 if(!this._adsConfig.getPlacement(placementId).isBannerPlacement()) {
-                    if(storedLoads.indexOf(placementId) === -1) {
-                        this.setPlacementState(placementId, PlacementState.NO_FILL);
-                    } else {
+                    if(storedLoads.indexOf(placementId) !== -1) {
                         this.loadPlacement(placementId);
                     }
                 }
@@ -187,7 +185,7 @@ export class LoadManager extends RefreshManager {
                 const loadEvent: ILoadEvent = event.load[key];
                 const placement: Placement = this._adsConfig.getPlacement(loadEvent.value);
 
-                if(placement && placement.getState() === PlacementState.NO_FILL) {
+                if(placement && (placement.getState() === PlacementState.NO_FILL || placement.getState() === PlacementState.NOT_AVAILABLE)) {
                     this.loadPlacement(loadEvent.value);
                 }
             });
@@ -203,7 +201,7 @@ export class LoadManager extends RefreshManager {
 
                 if(campaign && campaign.isExpired()) {
                     placement.setCurrentCampaign(undefined);
-                    this.setPlacementState(placement.getId(), PlacementState.NO_FILL);
+                    this.setPlacementState(placement.getId(), PlacementState.NOT_AVAILABLE);
                 }
             }
         }
