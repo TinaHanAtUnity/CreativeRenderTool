@@ -1,5 +1,6 @@
 # Staged Changes
 
+* Slideshow endcard experiment [#8858](https://github.com/Applifier/unity-ads-webview/pull/8858)
 * Add `ads.` prefix to Ads SDK analytics topics [#9487](https://github.com/Applifier/unity-ads-webview/pull/9487)
 * VastCompanionAdStaticResource validator update [#9532](https://github.com/Applifier/unity-ads-webview/pull/9532)
 * Update user summary privacy endpoint [#9509](https://github.com/Applifier/unity-ads-webview/pull/9509)
