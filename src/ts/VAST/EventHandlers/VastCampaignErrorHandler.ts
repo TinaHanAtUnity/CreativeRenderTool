@@ -74,24 +74,17 @@ export class VastCampaignErrorHandler implements ICampaignErrorHandler {
     }
 
     public handleCampaignError(campaignError: CampaignError): Promise<void> {
-        if (campaignError.errorTrackingUrl) {
+        const errorTrackingUrls = campaignError.errorTrackingUrls;
+        for (const errorTrackingUrl of errorTrackingUrls) {
             const errorCode = campaignError.errorCode ? campaignError.errorCode : VastErrorCode.UNDEFINED_ERROR;
-            const errorUrl = this.formatVASTErrorURL(campaignError.errorTrackingUrl, errorCode, campaignError.assetUrl);
-            this._request.get(errorUrl, []).then((response) => {
-                Diagnostics.trigger('vast_error_tracking_success', {
-                    errorUrl: errorUrl,
-                    errorCode: errorCode,
-                    errorMessage: VastErrorInfo.errorMap[errorCode],
-                    seatId: campaignError.seatId
-                });
-            }).catch(e => {
-                Diagnostics.trigger('vast_error_tracking_fail', {
-                    errorUrl: errorUrl,
-                    errorCode: errorCode,
-                    errorMessage: VastErrorInfo.errorMap[errorCode],
-                    seatId: campaignError.seatId,
-                    failError: e
-                });
+            const errorUrl = this.formatVASTErrorURL(errorTrackingUrl, errorCode, campaignError.assetUrl);
+            this._request.get(errorUrl, []);
+            Diagnostics.trigger('vast_error_tracking_sent', {
+                errorUrl: errorUrl,
+                errorCode: errorCode,
+                errorMessage: VastErrorInfo.errorMap[errorCode] || 'not found',
+                seatId: campaignError.seatId || -1,
+                creativeId: campaignError.creativeId || 'not found'
             });
         }
         return Promise.resolve();

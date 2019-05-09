@@ -446,6 +446,7 @@ describe('CampaignManager', () => {
             const verify = () => {
                 // then the onError observable is triggered with an appropriate error
                 mockRequest.verify();
+                console.log('----triggeredError ' + triggeredError.message + ' expectedErrorMessage ' + expectedErrorMessage);
                 if(triggeredError instanceof Error) {
                     assert.equal(triggeredError.message, expectedErrorMessage);
                 } else if (triggeredError instanceof WebViewError) {
@@ -453,6 +454,7 @@ describe('CampaignManager', () => {
                 } else {
                     assert.equal(triggeredError, expectedErrorMessage);
                 }
+                console.log('----triggeredError ' + triggeredError.message + ' expectedErrorMessage ' + expectedErrorMessage);
             };
 
             campaignManager.onError.subscribe((error) => {

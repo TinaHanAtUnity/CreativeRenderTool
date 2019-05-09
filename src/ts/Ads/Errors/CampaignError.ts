@@ -1,19 +1,21 @@
 
 export class CampaignError extends Error {
     public contentType: string;
-    public errorTrackingUrl: string | undefined;
+    public errorTrackingUrls: string[];
     public errorCode: number;
     public errorMessage: string;
     public assetUrl: string | undefined;
     public seatId: number | undefined;
+    public creativeId: string | undefined;
 
-    constructor(message: string, contentType: string, errorTrackingUrl?: string, errorCode?: number, assetUrl?: string, seatId?: number) {
+    constructor(message: string, contentType: string, errorCode?: number, errorTrackingUrls?: string[], assetUrl?: string, seatId?: number, creativeId?: string) {
         super(message);
         this.contentType = contentType;
-        this.errorTrackingUrl = errorTrackingUrl;
-        this.errorCode = errorCode ? errorCode : 999;   // 999 Undefined general error
+        this.errorTrackingUrls = errorTrackingUrls || [];
+        this.errorCode = errorCode || 999;   // 999 Undefined general error
         this.errorMessage = message;
         this.assetUrl = assetUrl;
         this.seatId = seatId;
+        this.creativeId = creativeId;
     }
 }
