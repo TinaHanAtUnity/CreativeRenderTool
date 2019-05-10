@@ -1,3 +1,8 @@
+# Staged Changes
+
+* Fix Banner not ready after first banner is shown [#9561](https://github.com/Applifier/unity-ads-webview/pull/9561)
+* Fix Banners not trying to get fill after no fill [#9560](https://github.com/Applifier/unity-ads-webview/pull/9560)
+
 # Fri May 10 16:38:03 UTC 2019
 
 * Fix MRAID Webplayer AB group [#9559](https://github.com/Applifier/unity-ads-webview/pull/9559)
