@@ -1,10 +1,11 @@
 import { BaseMetaData, IMetaData } from 'Core/Models/MetaData/BaseMetaData';
 
+
 interface IMediationMetaData extends IMetaData {
     name: string | undefined;
     version: string | undefined;
     ordinal: number | undefined;
-    enable_metadata_load: string | undefined;
+    enable_metadata_load: boolean | undefined;
 }
 
 export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
@@ -15,7 +16,7 @@ export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
             name: ['string', 'undefined'],
             version: ['string', 'undefined'],
             ordinal: ['number', 'undefined'],
-            enable_metadata_load: ['string', 'undefined']
+            enable_metadata_load: ['boolean', 'undefined']
         });
 
         this.set('category', 'mediation');
@@ -38,8 +39,9 @@ export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
         return this.get('ordinal');
     }
 
-    public isMetaDataLoadEnabled(): string | undefined {
-        return this.get('enable_metadata_load');
+    public isMetaDataLoadEnabled(): boolean {
+        const enableMetadataLoad:boolean | undefined = this.get('enable_metadata_load');
+        return enableMetadataLoad ? enableMetadataLoad : false;
     }
 
     public getDTO(): { [key: string]: unknown } {
