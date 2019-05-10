@@ -1,6 +1,5 @@
 import { BaseMetaData, IMetaData } from 'Core/Models/MetaData/BaseMetaData';
 
-
 interface IMediationMetaData extends IMetaData {
     name: string | undefined;
     version: string | undefined;
@@ -40,7 +39,7 @@ export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
     }
 
     public isMetaDataLoadEnabled(): boolean {
-        const enableMetadataLoad:boolean | undefined = this.get('enable_metadata_load');
+        const enableMetadataLoad: boolean | undefined = this.get('enable_metadata_load');
         return enableMetadataLoad ? enableMetadataLoad : false;
     }
 
