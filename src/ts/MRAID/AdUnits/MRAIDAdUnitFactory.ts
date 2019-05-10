@@ -12,26 +12,46 @@ import { WebPlayerMRAIDAdUnit } from 'MRAID/AdUnits/WebPlayerMRAIDAdUnit';
 
 export class MRAIDAdUnitFactory extends AbstractAdUnitFactory<MRAIDCampaign, IMRAIDAdUnitParameters> {
     public createAdUnit(parameters: IMRAIDAdUnitParameters): MRAIDAdUnit {
+
+        const mraidAdUnit = this.getMRAIDAdUnit(parameters);
+        const mraidEventHandler: IMRAIDViewHandler = this.getMRAIDEventHandler(mraidAdUnit, parameters);
+        parameters.mraid.addEventHandler(mraidEventHandler);
+
+        return mraidAdUnit;
+    }
+
+    private getMRAIDEventHandler(mraidAdUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters): IMRAIDViewHandler {
+
+        const isPerformanceMRAID = parameters.campaign instanceof PerformanceMRAIDCampaign;
+        const isARMRAID = parameters.mraid instanceof ARMRAID;
+        const isProgrammaticWebPlayerTest = WebPlayerMRAIDTest.isValid(parameters.coreConfig.getAbGroup()) && !isPerformanceMRAID && !isARMRAID;
+
+        if (isProgrammaticWebPlayerTest) {
+            return new ProgrammaticMRAIDEventHandler(mraidAdUnit, parameters);
+        } else {
+            if (isPerformanceMRAID) {
+                return new PerformanceMRAIDEventHandler(mraidAdUnit, parameters);
+            } else if (isARMRAID) {
+                return new ARMRAIDEventHandler(mraidAdUnit, parameters);
+            } else {
+                return new ProgrammaticMRAIDEventHandler(mraidAdUnit, parameters);
+            }
+        }
+    }
+
+    private getMRAIDAdUnit(parameters: IMRAIDAdUnitParameters): MRAIDAdUnit {
         let mraidAdUnit: MRAIDAdUnit;
 
-        if (WebPlayerMRAIDTest.isValid(parameters.coreConfig.getAbGroup())) {
+        const isPerformanceMRAID = parameters.campaign instanceof PerformanceMRAIDCampaign;
+        const isARMRAID = parameters.mraid instanceof ARMRAID;
+        const isProgrammaticWebPlayerTest = WebPlayerMRAIDTest.isValid(parameters.coreConfig.getAbGroup()) && !isPerformanceMRAID && !isARMRAID;
+
+        if (isProgrammaticWebPlayerTest) {
             mraidAdUnit = new WebPlayerMRAIDAdUnit(parameters);
         } else {
             mraidAdUnit = new MRAIDAdUnit(parameters);
         }
 
-        const mraidEventHandler: IMRAIDViewHandler = this.getMRAIDEventHandler(mraidAdUnit, parameters);
-        parameters.mraid.addEventHandler(mraidEventHandler);
         return mraidAdUnit;
-    }
-
-    private getMRAIDEventHandler(mraidAdUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters): IMRAIDViewHandler {
-        if (parameters.campaign instanceof PerformanceMRAIDCampaign) {
-            return new PerformanceMRAIDEventHandler(mraidAdUnit, parameters);
-        } else if (parameters.mraid instanceof ARMRAID) {
-            return new ARMRAIDEventHandler(mraidAdUnit, parameters);
-        } else {
-            return new ProgrammaticMRAIDEventHandler(mraidAdUnit, parameters);
-        }
     }
 }
