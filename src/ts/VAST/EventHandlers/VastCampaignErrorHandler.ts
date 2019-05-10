@@ -32,7 +32,7 @@ export enum VastErrorCode {
     COMPANION_RESOURCE_NOT_FOUND = 604,
     UNDEFINED_ERROR = 900,
     GENERAL_VPAID_ERROR = 901,
-    UNKNOWN_ERROR = 9999
+    UNKNOWN_ERROR = 999
 }
 export class VastErrorInfo {
     public static errorMap: { [key: number]: string } = {
