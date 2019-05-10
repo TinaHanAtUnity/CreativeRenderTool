@@ -91,9 +91,9 @@ export class VastCampaignErrorHandler implements ICampaignErrorHandler {
     }
 
     private formatVASTErrorURL(errorUrl: string, errorCode: VastErrorCode, assetUrl?: string): string {
-        let formattedUrl = errorUrl.replace('[ERRORCODE]', errorCode.toString());
+        let formattedUrl = errorUrl.replace(/\[ERRORCODE\]|%5BERRORCODE%5D/ig, errorCode.toString());
         if (assetUrl) {
-            formattedUrl = formattedUrl.replace('[ASSETURI]', Url.encodeParam(assetUrl));
+            formattedUrl = formattedUrl.replace(/\[ASSETURI\]|%5BASSETURI%5D/ig, Url.encodeParam(assetUrl));
         }
         return formattedUrl;
     }
