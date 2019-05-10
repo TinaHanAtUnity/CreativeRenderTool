@@ -1,4 +1,4 @@
-# Pending
+# Fri May 10 16:38:03 UTC 2019
 
 * Fix MRAID Webplayer AB group [#9559](https://github.com/Applifier/unity-ads-webview/pull/9559)
 
