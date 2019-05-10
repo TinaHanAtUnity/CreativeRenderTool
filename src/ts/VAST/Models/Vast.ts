@@ -74,7 +74,7 @@ export class Vast extends Model<IVast> {
             }
         }
 
-        throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND);
+        throw new CampaignError(VastErrorInfo.errorMap[VastErrorCode.MEDIA_FILE_URL_NOT_FOUND], CampaignContentTypes.ProgrammaticVast, VastErrorCode.MEDIA_FILE_URL_NOT_FOUND, this.getErrorURLTemplates());
     }
 
     public getImpressionUrls(): string[] {
