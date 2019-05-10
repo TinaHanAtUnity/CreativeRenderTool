@@ -563,15 +563,10 @@ export class Ads implements IAds {
         this._loadApiEnabled = false;
 
         return this._core.MetaDataManager.fetch(MediationMetaData).then((mediation) => {
-            this._core.Api.Sdk.logInfo('LOAD API WEBVIEW CHECKING FOR LOAD METADATA');
             if(mediation) {
                 const loadEnabled = mediation.isMetaDataLoadEnabled();
-                this._core.Api.Sdk.logInfo(`load enabled = ${loadEnabled}`);
                 if(loadEnabled) {
-                    this._core.Api.Sdk.logInfo('LOAD API DETECTED');
                     this._loadApiEnabled = true;
-                }else{
-                    this._core.Api.Sdk.logInfo('LOAD API NOT DETECTED');
                 }
             }
         });
